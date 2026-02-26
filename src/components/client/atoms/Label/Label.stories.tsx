@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { Label } from "./Label";
 
 const meta: Meta<typeof Label> = {
-    title: "Components/Server/Atoms/Label",
+    title: "Components/Client/Atoms/Label",
     component: Label,
     parameters: { layout: "centered" },
     tags: ["autodocs"],

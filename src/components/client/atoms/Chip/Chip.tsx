@@ -11,7 +11,6 @@ export const Chip = ({
 }: ChipProps) => {
     return (
     <div className={classNames(styles.chip, styles[variant], styles[state], className)}>
-      {/* Agregamos el círculo solo si NO es la variante 'outlined' */}
         {variant !== 'outlined' && <span className={styles.dot}></span>}
         <span className={styles.label}>{label}</span>
     </div>

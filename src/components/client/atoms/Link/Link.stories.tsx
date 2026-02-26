@@ -2,10 +2,10 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { Link } from "./Link";
 
 const meta: Meta<typeof Link> = {
-  title: "Components/Client/Atoms/Link", // Nota que este es Client
-  component: Link,
-  parameters: { layout: "centered" },
-  tags: ["autodocs"],
+    title: "Components/Client/Atoms/Link", 
+    component: Link,
+    parameters: { layout: "centered" },
+    tags: ["autodocs"],
 };
 
 export default meta;

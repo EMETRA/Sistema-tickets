@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { Title } from "./index";
 
 const meta: Meta<typeof Title> = {
-    title: "Components/Server/Atoms/Title", // Jerarquía del proyecto
+    title: "Components/Client/Atoms/Title",
     component: Title,
     parameters: { layout: "centered" },
     tags: ["autodocs"],

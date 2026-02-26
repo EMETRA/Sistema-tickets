@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { Avatar } from "./index";
 
 const meta: Meta<typeof Avatar> = {
-    title: "Components/Server/Atoms/Avatar", // Jerarquía de tu proyecto
+    title: "Components/Client/Atoms/Avatar", // Jerarquía de tu proyecto
     component: Avatar,
     parameters: {
         layout: "centered",
@@ -23,7 +23,6 @@ const meta: Meta<typeof Avatar> = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// 1. Avatar con Iniciales (Como se ve en el Dashboard de EMETRA)
 export const Initials: Story = {
     args: {
         initials: "G",
@@ -32,16 +31,14 @@ export const Initials: Story = {
     },
 };
 
-// 2. Avatar con Imagen Local
 export const WithImage: Story = {
     args: {
-        src: "/images/image.png", // Usando la ruta de tu captura de pantalla
+        src: "/images/image.png",
         size: "lg",
         ringed: false,
     },
 };
 
-// 3. Avatar con Punto de Notificación (Online)
 export const WithStatus: Story = {
     args: {
         initials: "F",
@@ -51,7 +48,6 @@ export const WithStatus: Story = {
     },
 };
 
-// 4. Variante Pequeña (Para barras laterales o tablas)
 export const Small: Story = {
     args: {
         initials: "M",
@@ -60,10 +56,9 @@ export const Small: Story = {
     },
 };
 
-// 5. Ejemplo completo: Gildder Caceres
 export const GildderFull: Story = {
     args: {
-        src: "/images/image.png", //
+        src: "/images/image.png",
         size: "lg",
         ringed: true,
         status: "online",

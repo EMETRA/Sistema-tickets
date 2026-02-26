@@ -9,7 +9,7 @@ export const Icon = ({
     variant = "action", 
     size = 24, 
     className,
-    active = false // Añadimos esta prop para navegación
+    active = false
     }: IconProps) => {
     return (
         <Image
@@ -17,7 +17,6 @@ export const Icon = ({
         alt={`${name} icon`}
         width={size}
         height={size}
-        // Agregamos la clase condicional de 'active'
         className={classNames(
             styles.icon, 
             styles[variant], 

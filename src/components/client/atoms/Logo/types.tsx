@@ -1,4 +1,3 @@
-// Inclusión de archivos de logos
 /**
  * Definición de los nombres para los tipos de Logos.
  */
@@ -9,7 +8,7 @@ type LogoType = "EmetraMain";
  */
 interface LogoProps extends React.SVGProps<SVGSVGElement> {
     className?: string;
-  name?: LogoType; // Lo hacemos opcional y que por defecto sea EmetraMain
+  name?: LogoType;
 }
 
 /**

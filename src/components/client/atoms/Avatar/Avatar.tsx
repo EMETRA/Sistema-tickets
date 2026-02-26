@@ -9,11 +9,10 @@ export const Avatar = ({
     initials, 
     size = "md", 
     ringed, 
-    status, // Desestructuramos la nueva prop
+    status,
     className 
 }: AvatarProps) => {
     return (
-        // Agregamos 'position: relative' al contenedor padre en el CSS
         <div className={classNames(styles.avatar, styles[size], { [styles.ringed]: ringed }, className)}>
         {src ? (
             <Image src={src} alt="User" width={80} height={80} rounded />

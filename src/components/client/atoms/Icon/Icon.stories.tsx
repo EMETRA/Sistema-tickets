@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { Icon } from "./index";
 
 const meta: Meta<typeof Icon> = {
-  title: "Components/Server/Atoms/Icon",
+  title: "Components/Client/Atoms/Icon",
   component: Icon,
   tags: ["autodocs"],
 };
@@ -10,13 +10,12 @@ const meta: Meta<typeof Icon> = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// Ejemplo de icono en el Sidebar
 export const NavigationItem: Story = {
   parameters: { 
-    backgrounds: { default: 'dark' } // Esto pondrá el fondo gris oscuro en Storybook
+    backgrounds: { default: 'dark' } 
   },
   args: {
-    name: "home", // Asegúrate de que home.svg esté en tu carpeta public
+    name: "home",
     variant: "navigation",
     active: false,
     size: 24,

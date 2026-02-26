@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { Divider } from "./index";
 
 const meta: Meta<typeof Divider> = {
-    title: "Components/Server/Atoms/Divider", // Sigue la jerarquía de tu proyecto
+    title: "Components/Client/Atoms/Divider",
     component: Divider,
     tags: ["autodocs"],
     argTypes: {
@@ -16,7 +16,6 @@ const meta: Meta<typeof Divider> = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// Historia para el separador horizontal (común en tablas)
 export const Horizontal: Story = {
     args: {
         orientation: "horizontal",
@@ -30,7 +29,6 @@ export const Horizontal: Story = {
     ),
 };
 
-// Historia para el separador vertical (como el del Login)
 export const Vertical: Story = {
     args: {
         orientation: "vertical",

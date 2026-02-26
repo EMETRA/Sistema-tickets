@@ -1,0 +1,35 @@
+.icon {
+  display: inline-block;
+  flex-shrink: 0;
+  transition: all 0.2s ease-in-out;
+}
+
+/** * VARIANT: NAVIGATION
+ * Se usa para la barra lateral azul. 
+ * Los iconos suelen ser blancos para resaltar.
+ */
+.navigation {
+  filter: brightness(0) invert(1); // Convierte cualquier SVG a blanco puro
+  opacity: 0.8;
+  
+  &.active {
+    opacity: 1;
+    transform: scale(1.1); // Un pequeño realce si la ruta está activa
+  }
+}
+
+/** * VARIANT: STATUS
+ * Se usa para iconos informativos en tablas o tarjetas.
+ * Mantienen su color original o se ajustan sutilmente.
+ */
+.status {
+  opacity: 1;
+  // Estos no suelen llevar filtros porque ya vienen con colores del diseño
+}
+
+/** * VARIANT: ACTION (Tu default)
+ */
+.action {
+  cursor: pointer;
+  &:hover { opacity: 0.7; }
+}

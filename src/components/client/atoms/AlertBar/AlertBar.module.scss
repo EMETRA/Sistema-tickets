@@ -1,0 +1,26 @@
+.container {
+    width: 100%;
+    height: 6px;
+    background-color: #E0E0E0;
+    border-radius: 4px; // Bordes redondeados suaves
+    overflow: hidden; // Asegura que la barra interna no se salga de las esquinas
+}
+
+.bar {
+    height: 100%;
+    width: 0%;
+    background-color: #CE4545;
+    border-radius: 4px;
+    animation-name: fillProgress;
+    animation-timing-function: linear; // Velocidad constante
+    animation-fill-mode: forwards; // Se queda en 100% al terminar, no se reinicia
+}
+
+@keyframes fillProgress {
+    from {
+        width: 0%;
+    }
+    to {
+        width: 100%;
+    }
+}

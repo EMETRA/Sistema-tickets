@@ -1,0 +1,36 @@
+.avatar {
+  font-family: 'Montserrat', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #BADA55; // Color de fondo para iniciales
+  color: white;
+  border-radius: 50%;
+  font-weight: 700;
+  position: relative; // 👈 ¡Muy importante para que el badge se ubique bien!
+  flex-shrink: 0; // Evita que se aplaste en flexbox
+}
+.ringed { border: 3px solid #99cc33; } // Verde Emetra
+.sm { width: 32px; height: 32px; font-size: 0.8rem; }
+.md { width: 48px; height: 48px; font-size: 1.2rem; }
+.lg { width: 80px; height: 80px; font-size: 2rem; }
+
+// Estilos para el nuevo badge de notificación
+.statusBadge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 12px; // Tamaño del puntito
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid white; // Un borde blanco para que se separe visualmente del avatar
+    
+    // Ajuste de posición según el tamaño del avatar para que quede justo en el borde
+    .lg & { bottom: 2px; right: 2px; width: 16px; height: 16px; }
+    .sm & { width: 8px; height: 8px; border-width: 1px; }
+}
+
+// Colores de estado
+.online { background-color: #4CAF50; } // Verde como en el diseño
+.offline { background-color: #9E9E9E; } // Gris
+.busy { background-color: #F44336; }    // Rojo

@@ -1,0 +1,81 @@
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 999;
+}
+
+.popoverContent {
+    position: fixed;
+    background: white;
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0px 8px 32px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    min-width: 320px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-family: var(--font-montserrat), sans-serif;
+}
+
+.center {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.top { 
+    top: 20px; 
+    left: 50%; 
+    transform: translateX(-50%); 
+}
+.bottom { 
+    bottom: 20px; 
+    left: 50%; 
+    transform: translateX(-50%); 
+}
+
+// Reseteamos el eje opuesto para que Left y Right no se queden pegados al 50%
+.left { 
+    left: 20px; 
+    top: 50%; 
+    transform: translateY(-50%); 
+    right: auto; 
+}
+.right { 
+    right: 20px; 
+    top: 50%; 
+    transform: 
+    translateY(-50%); 
+    left: auto; 
+}
+// Posiciones combinadas para esquinas
+.top-left { 
+    top: 20px; 
+    left: 20px; 
+    transform: none; 
+    right: auto; 
+    bottom: auto; 
+}
+.top-right { 
+    top: 20px; 
+    right: 20px; 
+    transform: none; 
+    left: auto; 
+    bottom: auto; 
+}
+.bottom-left { 
+    bottom: 20px; 
+    left: 20px; 
+    transform: none;
+    right: auto;
+    top: auto;
+}
+.bottom-right { 
+    bottom: 20px; 
+    right: 20px; 
+    transform: none; 
+    left: auto; 
+    top: auto;
+}

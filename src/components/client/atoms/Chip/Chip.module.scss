@@ -1,0 +1,60 @@
+.chip {
+  font-family: 'Montserrat', sans-serif;
+  display: inline-flex;
+  align-items: center; // Centra el círculo y el texto verticalmente
+  justify-content: center;
+  padding: 6px 12px; // Un poco más de padding vertical
+  border-radius: 16px;
+  font-size: 0.75rem;
+  font-weight: 700; // Un poco más grueso para que se lea bien
+  white-space: nowrap;
+  gap: 8px; // Espacio entre el círculo y el texto
+}
+
+// Estilos del círculo indicador
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  // ¡El truco! Toma el color del texto del padre
+  background-color: currentColor; 
+  flex-shrink: 0;
+}
+  
+// Estado "Asignado" (Naranja)
+.active { 
+  background-color: #FFF4E5; // Fondo naranja muy suave
+  color: #FF9800;           // Texto naranja vibrante
+}
+
+// Estado "En Proceso" (Amarillo)
+.warning { 
+  background-color: #FFFDE7; 
+  color: #FBC02D;           
+}
+
+// Estado "Resuelto" (El Verde que faltaba)
+.success { 
+  background-color: #E8F5E9; // Fondo verde menta suave
+  color: #2E7D32;           // Texto verde oscuro institucional
+}
+
+// Estado "Inactivo" o "Cancelado"
+.inactive { 
+  background-color: #F5F5F5; 
+  color: #757575; 
+}
+
+// --- VARIANTE OUTLINED (Filtros) ---
+.outlined {
+  background-color: transparent;
+  color: #666;
+  padding: 5px 11px; // Ajuste por el borde
+  
+  // Cuando un filtro está seleccionado
+  &.active {
+    background-color: #4361EE; // Fondo azul muy claro
+    color: #E3F2FD;           // Azul EMETRA
+    border-color: #4361EE;
+  }
+}

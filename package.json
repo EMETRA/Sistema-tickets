@@ -12,6 +12,7 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
+    "classnames": "^2.5.1",
     "axios": "^1.13.5",
     "next": "16.1.6",
     "react": "19.2.3",
@@ -25,6 +26,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "eslint-plugin-storybook": "^10.2.8",
+    "sass-embedded": "^1.97.3",
     "storybook": "^10.2.8",
     "typescript": "^5",
     "vite": "^7.3.1"

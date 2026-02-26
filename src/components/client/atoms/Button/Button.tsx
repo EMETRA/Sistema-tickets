@@ -1,39 +1,61 @@
-import './button.css';
+"use client";
 
-export interface ButtonProps {
-  /** Is this the principal call to action on the page? */
-  primary?: boolean;
-  /** What background color to use */
-  backgroundColor?: string;
-  /** How large should the button be? */
-  size?: 'small' | 'medium' | 'large';
-  /** Button contents */
-  label: string;
-  /** Optional click handler */
-  onClick?: () => void;
-}
+import React, { forwardRef } from "react";
+import classNames from "classnames";
+import styles from "./Button.module.scss";
+import { ButtonProps } from "./types";
 
-/** Primary UI component for user interaction */
-export const Button = ({
-  primary = false,
-  size = 'medium',
-  backgroundColor,
-  label,
-  ...props
-}: ButtonProps) => {
-  const mode = primary ? 'storybook-button--primary' : 'storybook-button--secondary';
-  return (
-    <button
-      type="button"
-      className={['storybook-button', `storybook-button--${size}`, mode].join(' ')}
-      {...props}
-    >
-      {label}
-      <style jsx>{`
-        button {
-          background-color: ${backgroundColor};
-        }
-      `}</style>
-    </button>
-  );
-};
+/**
+ * Componente de botón reutilizable con diferentes variantes, colores y estados.
+ *
+ * @param {ButtonProps} props - Las propiedades del componente de botón.
+ * @returns {JSX.Element} El componente de botón renderizado.
+ */
+const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+  (
+    {
+      variant = "contained",
+      color = "default",
+      rounded = false,
+      fullWidth = false,
+      state = "default",
+      className,
+      children,
+      loadingText = "Cargando...",
+      ...props
+    },
+    ref
+  ) => {
+    // Determinar si el botón está deshabilitado
+    const isDisabled = state === "disabled" || state === "loading";
+
+    // Construir las clases CSS dinámicamente usando classnames
+    const buttonClasses = classNames(
+      styles.Button,
+      styles[`Button--${variant}`],
+      styles[`Button--${color}`],
+      {
+        [styles["Button--rounded"]]: rounded && (variant === "contained" || variant === "outlined"),
+        [styles["Button--fullWidth"]]: fullWidth,
+        [styles["Button--disabled"]]: state === "disabled",
+        [styles["Button--loading"]]: state === "loading",
+      },
+      className
+    );
+
+    return (
+      <button
+        ref={ref}
+        className={buttonClasses}
+        disabled={isDisabled}
+        {...props}
+      >
+        {state === "loading" ? loadingText : children}
+      </button>
+    );
+  }
+);
+
+Button.displayName = "Button";
+
+export default Button;

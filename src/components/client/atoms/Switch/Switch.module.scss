@@ -1,0 +1,108 @@
+.Wrapper {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.Container {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+}
+
+.ContainerDisabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.ContainerError {
+  .StyledSwitch {
+    border-color: #ff4444;
+  }
+}
+
+/* Input nativo oculto */
+.HiddenSwitch {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+/* Switch estilizado */
+.StyledSwitch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 26px;
+  background-color: #56648b;
+  border-radius: 13px;
+  transition: background-color 0.3s ease;
+  flex-shrink: 0;
+}
+
+/* Slider (círculo que se mueve) */
+.Slider {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  background-color: white;
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Estado checked (marcado) */
+.HiddenSwitch:checked + .StyledSwitch {
+  background-color: #80b918;
+}
+
+.HiddenSwitch:checked + .StyledSwitch .Slider {
+  transform: translateX(24px);
+}
+
+/* Estado focus */
+.HiddenSwitch:focus-visible + .StyledSwitch {
+  outline: 2px solid #80b918;
+  outline-offset: 2px;
+}
+
+/* Estado disabled */
+.ContainerDisabled .StyledSwitch {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.ContainerDisabled .HiddenSwitch:checked + .StyledSwitch {
+  background-color: #cccccc;
+}
+
+/* Hover (solo si no está disabled) */
+.Container:not(.ContainerDisabled):hover .StyledSwitch {
+  filter: brightness(1.1);
+}
+
+/* Label */
+.Label {
+  font-size: 14px;
+  color: #262626;
+  line-height: 1.4;
+}
+
+.ContainerDisabled .Label {
+  color: #a9a9a9;
+}
+
+/* Mensaje de error */
+.ErrorMessage {
+  font-size: 12px;
+  color: #ff4444;
+  margin-left: 62px;
+  display: block;
+}

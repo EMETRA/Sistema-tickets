@@ -1,0 +1,227 @@
+@use  "../../../../../src/theme/colors.scss" as *;
+@use "sass:color";
+
+// Estilos base del botón
+.Button {
+  font-family: inherit;
+  box-sizing: border-box;
+  outline: none;
+  border: none;
+  padding: 10px 24px;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  white-space: nowrap;
+  user-select: none;
+
+  &:focus-visible {
+    outline: 2px solid $azul-5;
+    outline-offset: 2px;
+  }
+
+  // ============================================
+  // VARIANTES
+  // ============================================
+
+  // Contained (con relleno)
+  &--contained {
+    border-radius: 5px;
+    color: #ffffff;
+
+    // Colores para contained
+    &.Button--default {
+      background-color: $azul-5;
+
+      &:hover:not(.Button--disabled):not(.Button--loading) {
+        background-color: $azul-4;
+      }
+
+      &:active:not(.Button--disabled):not(.Button--loading) {
+        background-color: $azul-3;
+      }
+    }
+
+    &.Button--success {
+      background-color: $verde-claro-1;
+
+      &:hover:not(.Button--disabled):not(.Button--loading) {
+        background-color: color.adjust($verde-claro-1, $lightness: -10%);
+      }
+
+      &:active:not(.Button--disabled):not(.Button--loading) {
+        background-color: color.adjust($verde-claro-1, $lightness: -20%);
+      }
+    }
+
+    &.Button--danger {
+      background-color: $rojo-1;
+
+      &:hover:not(.Button--disabled):not(.Button--loading) {
+        background-color: color.adjust($rojo-1, $lightness: -20%);
+      }
+
+      &:active:not(.Button--disabled):not(.Button--loading) {
+        background-color: color.adjust($rojo-1, $lightness: -10%);
+      }
+    }
+
+    &.Button--cancel {
+      background-color: $negro-1;
+
+      &:hover:not(.Button--disabled):not(.Button--loading) {
+        background-color: color.adjust($negro-1, $lightness: -20%);
+      }
+
+      &:active:not(.Button--disabled):not(.Button--loading) {
+        background-color: color.adjust($negro-1, $lightness: -30%);
+      }
+    }
+  }
+
+  // Outlined (con borde)
+  &--outlined {
+    border-radius: 5px;
+    background-color: transparent;
+    border: 1px solid $gris-2;
+    color: $negro-1;
+
+    &:hover:not(.Button--disabled):not(.Button--loading) {
+      background-color: rgba($gris-2, 0.3);
+      border-color: color.adjust($gris-2, $lightness: -10%);
+    }
+
+    &:active:not(.Button--disabled):not(.Button--loading) {
+      background-color: rgba($gris-2, 0.5);
+    }
+
+    // Colores para outlined
+    &.Button--default {
+      border-color: $azul-5;
+      color: $azul-5;
+
+      &:hover:not(.Button--disabled):not(.Button--loading) {
+        background-color: rgba($azul-5, 0.1);
+        border-color: color.adjust($azul-5, $lightness: -10%);
+        color: color.adjust($azul-5, $lightness: -10%);
+      }
+    }
+
+    &.Button--success {
+      border-color: $verde-claro-1;
+      color: $verde-claro-1;
+
+      &:hover:not(.Button--disabled):not(.Button--loading) {
+        background-color: rgba($verde-claro-1, 0.2);
+      }
+    }
+
+    &.Button--danger {
+      border-color: $rojo-1;
+      color: $rojo-1;
+
+      &:hover:not(.Button--disabled):not(.Button--loading) {
+        background-color: rgba($rojo-1, 0.1);
+        border-color: color.adjust($rojo-1, $lightness: -5%);
+        color: color.adjust($rojo-1, $lightness: -5%);
+      }
+    }
+
+    &.Button--cancel {
+      border-color: $negro-1;
+      color: $negro-1;
+
+      &:hover:not(.Button--disabled):not(.Button--loading) {
+        background-color: rgba($negro-1, 0.1);
+        border-color: color.adjust($negro-1, $lightness: -10%);
+        color: color.adjust($negro-1, $lightness: -10%);
+      }
+    }
+  }
+
+  // Text (solo texto)
+  &--text {
+    background-color: transparent;
+    border: none;
+    padding: 8px 12px;
+    color: $negro-2;
+    border-radius: 5px;
+
+    &:hover:not(.Button--disabled):not(.Button--loading) {
+      background-color: rgba($negro-2, 0.08);
+    }
+
+    &:active:not(.Button--disabled):not(.Button--loading) {
+      background-color: rgba($negro-2, 0.15);
+    }
+
+    // Colores para text
+    &.Button--default {
+      color: $azul-5;
+
+      &:hover:not(.Button--disabled):not(.Button--loading) {
+        background-color: rgba($azul-5, 0.1);
+        color: color.adjust($azul-5, $lightness: -10%);
+      }
+    }
+
+    &.Button--success {
+      color: $verde-claro-1;
+
+      &:hover:not(.Button--disabled):not(.Button--loading) {
+        background-color: rgba($verde-claro-1, 0.2);
+      }
+    }
+
+    &.Button--danger {
+      color: $rojo-1;
+
+      &:hover:not(.Button--disabled):not(.Button--loading) {
+        background-color: rgba($rojo-1, 0.2);
+        color: color.adjust($rojo-1, $lightness: -5%);
+      }
+    }
+
+    &.Button--cancel {
+      color: $negro-1;
+
+      &:hover:not(.Button--disabled):not(.Button--loading) {
+        background-color: rgba($negro-1, 0.1);
+        color: color.adjust($negro-1, $lightness: -10%);
+      }
+    }
+  }
+
+  // ============================================
+  // MODIFICADORES
+  // ============================================
+
+  // Bordes redondeados completos
+  &--rounded {
+    border-radius: 50px;
+  }
+
+  // Full width
+  &--fullWidth {
+    width: 100%;
+    display: block;
+  }
+
+  // Estado disabled
+  &--disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  // Estado loading
+  &--loading {
+    opacity: 0.7;
+    cursor: wait;
+    pointer-events: none;
+  }
+}

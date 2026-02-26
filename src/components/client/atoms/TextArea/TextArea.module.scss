@@ -1,0 +1,47 @@
+// Estilos base del TextArea
+.TextArea {
+  font-family: inherit;
+  box-sizing: border-box;
+  outline: none;
+  background: #ffffff;
+  border: 1px solid #262626;
+  border-radius: 8px;
+  padding: 10px;
+  font-weight: 400;
+  width: 100%;
+  color: #262626;
+  font-size: 14px;
+  transition: border-color 0.2s ease;
+  resize: none;
+  min-height: 100px;
+
+  &::placeholder {
+    color: #a9a9a9;
+  }
+
+  &:focus {
+    border-color: #a9a9a9;
+    outline: none;
+  }
+
+  &[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: #f5f5f5;
+    resize: none;
+  }
+}
+
+// TextArea con error
+.TextAreaError {
+  border-color: #ff4444 !important;
+}
+
+// Mensaje de error
+.ErrorMessage {
+  display: block;
+  color: #ff4444;
+  font-size: 12px;
+  margin-top: 4px;
+  padding-left: 2px;
+}

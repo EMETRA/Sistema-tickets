@@ -1,0 +1,179 @@
+// Estilos base del Input
+.Input {
+  font-family: inherit;
+  box-sizing: border-box;
+  outline: none;
+  background: #ffffff;
+  border: 1px solid #262626;
+  border-radius: 8px;
+  padding: 10px;
+  font-weight: 400;
+  width: 100%;
+  color: #262626;
+  font-size: 14px;
+  transition: border-color 0.2s ease;
+
+  &::placeholder {
+    color: #a9a9a9;
+  }
+
+  &:focus {
+    border-color: #A9A9A9;
+    outline: none;
+  }
+
+  &[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: #f5f5f5;
+  }
+}
+
+// Input tipo text con icono
+.InputText {
+  padding-right: 40px;
+}
+
+// Input con error
+.InputError {
+  border-color: #ff4444 !important;
+}
+
+// Contenedor base
+.Container {
+  display: flex;
+  position: relative;
+  align-items: center;
+  width: 100%;
+}
+
+// Contenedor para password
+.ContainerPassword {
+  .Input {
+    padding-right: 40px;
+  }
+}
+
+// Contenedor para text con icono
+.ContainerText {
+  .Input {
+    padding-right: 40px;
+  }
+
+  &.IconLeft .Input {
+    padding-left: 40px;
+    padding-right: 10px;
+  }
+}
+
+// Contenedor para file
+.ContainerFile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 32px;
+  border: 3px dashed #4361ee;
+  border-radius: 14px;
+  background: #4361EE0F;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 200px;
+
+  &:hover {
+    background: #f8f9ff;
+    border-color: #0e3cc1;
+  }
+
+  &:focus {
+    outline: 2px solid #4361ee;
+    outline-offset: 2px;
+  }
+}
+
+.ContainerFileDisabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+// Input file oculto
+.HiddenFileInput {
+  display: none;
+}
+
+// Contenido del input file
+.FileContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+}
+
+.FileMainText {
+  margin: 0;
+  font-size: 16px;
+  color: #262626;
+  font-weight: 400;
+}
+
+.FileLinkText {
+  margin: 0;
+  font-size: 16px;
+  color: #4361ee;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.FileSizeText {
+  margin: 0;
+  font-size: 12px;
+  color: #a9a9a9;
+  font-weight: 400;
+  margin-top: 4px;
+}
+
+// IconButton para password
+.IconButton {
+  position: absolute;
+  right: 10px;
+}
+
+// Contenedores para iconos personalizados (text con icono)
+.IconButtonLeft {
+  position: absolute;
+  left: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.IconButtonRight {
+  position: absolute;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// Estado disabled para contenedores de iconos personalizados
+.IconContainerDisabled {
+  opacity: 0.5;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+// Mensaje de error
+.ErrorMessage {
+  display: block;
+  color: #ff4444;
+  font-size: 12px;
+  margin-top: 4px;
+  padding-left: 2px;
+}

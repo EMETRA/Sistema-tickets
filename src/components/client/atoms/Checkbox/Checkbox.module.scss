@@ -1,0 +1,121 @@
+// Wrapper principal
+.Wrapper {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+// Contenedor del checkbox y label
+.Container {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+
+  &:hover .StyledCheckbox {
+    border-color: #a9a9a9;
+  }
+}
+
+// Contenedor deshabilitado
+.ContainerDisabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+
+  &:hover .StyledCheckbox {
+    border-color: #262626;
+  }
+}
+
+// Contenedor con error
+.ContainerError {
+  .StyledCheckbox {
+    border-color: #ff4444;
+  }
+}
+
+// Checkbox nativo oculto
+.HiddenCheckbox {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+// Checkbox visual personalizado
+.StyledCheckbox {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  min-height: 20px;
+  border: 1px solid #262626;
+  border-radius: 4px;
+  background-color: #ffffff;
+  transition: all 0.2s ease;
+
+  &:focus-within {
+    outline: 2px solid #a9a9a9;
+    outline-offset: 2px;
+  }
+}
+
+// Ícono de check
+.CheckIcon {
+  width: 14px;
+  height: 14px;
+  opacity: 0;
+  transform: scale(0);
+  transition: all 0.2s ease;
+}
+
+// Cuando el checkbox está marcado
+.HiddenCheckbox:checked + .StyledCheckbox {
+  background-color: #4361EE;
+  border-color: #CECECE;
+
+  .CheckIcon {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+// Focus del checkbox
+.HiddenCheckbox:focus + .StyledCheckbox {
+  outline: 2px solid #a9a9a9;
+  outline-offset: 2px;
+}
+
+// Checkbox disabled y checked
+.HiddenCheckbox:disabled:checked + .StyledCheckbox {
+  background-color: #262626;
+  border-color: #262626;
+}
+
+// Label del checkbox
+.Label {
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  color: #262626;
+  line-height: 1.5;
+}
+
+// Label disabled
+.ContainerDisabled .Label {
+  color: #a9a9a9;
+}
+
+// Mensaje de error
+.ErrorMessage {
+  display: block;
+  color: #ff4444;
+  font-size: 12px;
+  margin-left: 28px;
+  padding-left: 2px;
+}

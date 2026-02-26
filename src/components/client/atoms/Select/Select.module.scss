@@ -1,0 +1,88 @@
+.Wrapper {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+
+.SelectContainer {
+  position: relative;
+  width: 100%;
+}
+
+.Select {
+  width: 100%;
+  padding: 10px 36px 10px 10px;
+  font-size: 14px;
+  color: #262626;
+  background-color: white;
+  border: 1px solid #262626;
+  border-radius: 8px;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+  
+  /* Remover la flecha nativa del select */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  &:focus {
+    border-color: #000000;
+  }
+
+  /* Estilo para placeholder (opción deshabilitada) */
+  option[disabled] {
+    color: #a9a9a9;
+  }
+
+  /* Evitar que las opciones tengan el estilo del placeholder */
+  option:not([disabled]) {
+    color: #262626;
+  }
+}
+
+.SelectError {
+  border-color: #ff4444;
+
+  &:focus {
+    border-color: #ff4444;
+  }
+}
+
+.SelectDisabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  background-color: #f5f5f5;
+
+  &:focus {
+    border-color: #262626;
+  }
+}
+
+.DropdownIcon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #262626;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.Select:focus + .DropdownIcon {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+.SelectDisabled + .DropdownIcon {
+  opacity: 0.5;
+}
+
+.ErrorMessage {
+  font-size: 12px;
+  color: #ff4444;
+  margin-left: 4px;
+}

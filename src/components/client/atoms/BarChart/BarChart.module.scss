@@ -1,0 +1,24 @@
+@use "../../../../theme/colors.scss" as *;
+
+.BarChartContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+  width: 100%;
+}
+
+.Bar {
+  transition: opacity 0.2s ease;
+
+  &:hover {
+    opacity: 0.85;
+  }
+}
+
+.EmptyState {
+  padding: 32px;
+  text-align: center;
+  color: $gris-1;
+  font-size: 14px;
+}

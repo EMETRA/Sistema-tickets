@@ -1,34 +1,36 @@
-.icon {
-  display: inline-block;
-  flex-shrink: 0;
+.container {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   transition: all 0.2s ease-in-out;
-}
+  flex-shrink: 0;
 
-/** * VARIANT: NAVIGATION
- * Se usa para la barra lateral azul. 
- * Los iconos suelen ser blancos para resaltar.
- */
-.navigation {
-  filter: brightness(0) invert(1); // Convierte cualquier SVG a blanco puro
-  opacity: 0.8;
-  
-  &.active {
-    opacity: 1;
-    transform: scale(1.1); // Un pequeño realce si la ruta está activa
+  &.hasBg {
+    border-radius: 50%; // Para el estilo circular de tu captura
   }
 }
 
-/** * VARIANT: STATUS
- * Se usa para iconos informativos en tablas o tarjetas.
- * Mantienen su color original o se ajustan sutilmente.
- */
-.status {
-  opacity: 1;
-  // Estos no suelen llevar filtros porque ya vienen con colores del diseño
+.iconMask {
+  width: var(--icon-size);
+  height: var(--icon-size);
+  background-color: var(--icon-color, currentColor);
+  mask-repeat: no-repeat;
+  mask-size: contain;
+  mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  -webkit-mask-position: center;
 }
 
-/** * VARIANT: ACTION (Tu default)
- */
+// Mantener compatibilidad con tus variantes anteriores
+.navigation {
+  --icon-color: rgba(255, 255, 255, 0.8);
+  &.active {
+    --icon-color: #ffffff;
+    transform: scale(1.1);
+  }
+}
+
 .action {
   cursor: pointer;
   &:hover { opacity: 0.7; }

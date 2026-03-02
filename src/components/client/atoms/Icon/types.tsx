@@ -1,13 +1,6 @@
 export type IconName = 
-    | "file" 
-    | "globe" 
-    | "logo-emetra" 
-    | "home" 
-    | "users" 
-    | "ticket" 
-    | "settings" 
-    | "bell" 
-    | "logout";
+    | "file" | "globe" | "logo-emetra" | "home" 
+    | "users" | "ticket" | "settings" | "bell" | "logout";
 
 export type IconVariant = "navigation" | "status" | "action";
 
@@ -17,4 +10,6 @@ export interface IconProps {
     size?: number;
     className?: string;
     active?: boolean;
+    color?: string; 
+    backgroundColor?: string;
 }

@@ -39,3 +39,12 @@ export const StatusInfo: Story = {
     size: 20,
   },
 };
+
+export const TicketBadge: Story = {
+  args: {
+    name: "ticket",
+    size: 25,
+    color: "#FFFFFF",
+    backgroundColor: "#80B918",
+  },
+};

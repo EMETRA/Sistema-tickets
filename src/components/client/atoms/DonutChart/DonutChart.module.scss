@@ -1,0 +1,72 @@
+@use "../../../../theme/colors.scss" as *;
+
+.DonutChartContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 32px;
+}
+
+.Segment {
+  transition: opacity 0.2s ease;
+  cursor: pointer;
+  
+  &:hover {
+    opacity: 0.85;
+  }
+}
+
+.Tooltip {
+  background-color: $negro-1;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 12px;
+  opacity: 0.9;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.TooltipLabel {
+  color: white;
+  font-size: 11px;
+  font-weight: 400;
+  margin: 0 0 4px 0;
+}
+
+.TooltipValue {
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.Legend {
+  display: grid;
+  grid-template-rows: repeat(4, auto);
+  grid-auto-flow: column;
+  gap: 24px;
+  column-gap: 32px;
+}
+
+.LegendItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.Label {
+  color: $negro-1;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.Value {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.EmptyState {
+  padding: 32px;
+  text-align: center;
+  color: $gris-1;
+  font-size: 14px;
+}

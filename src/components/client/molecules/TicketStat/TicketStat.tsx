@@ -29,6 +29,10 @@ export const TicketStat: React.FC<TicketStatProps> = (props) => {
           name={iconName} 
           size={32}
           variant="status"
+<<<<<<< Updated upstream
+=======
+          className={styles.Icon}
+>>>>>>> Stashed changes
         />
       </div>
       

@@ -31,6 +31,10 @@ export const TicketCard: React.FC<TicketCardProps> = (props) => {
             name={iconName} 
             size={30}
             variant="status"
+<<<<<<< Updated upstream
+=======
+            className={styles.Icon}
+>>>>>>> Stashed changes
           />
         </div>
       </div>

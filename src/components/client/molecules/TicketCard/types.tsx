@@ -14,6 +14,7 @@ export const TICKET_CARD_CONFIG: Record<
 > = {
   entered: {
     color: "#AACC00",
+<<<<<<< Updated upstream
     iconName: "ticket_v2",
   },
   solved: {
@@ -23,6 +24,17 @@ export const TICKET_CARD_CONFIG: Record<
   "in-progress": {
     color: "#FFB703",
     iconName: "ticket_v2",
+=======
+    iconName: "ticket-solid",
+  },
+  solved: {
+    color: "#E63946",
+    iconName: "ticket-solid",
+  },
+  "in-progress": {
+    color: "#FFB703",
+    iconName: "ticket-solid",
+>>>>>>> Stashed changes
   },
 };
 

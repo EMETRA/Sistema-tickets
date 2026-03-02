@@ -14,6 +14,7 @@ export const TICKET_STAT_CONFIG: Record<
 > = {
   solved: {
     color: "#E63946",
+<<<<<<< Updated upstream
     iconName: "ticket_v2",
   },
   working: {
@@ -27,6 +28,21 @@ export const TICKET_STAT_CONFIG: Record<
   assigned: {
     color: "#FB8500",
     iconName: "ticket_v2",
+=======
+    iconName: "ticket-solid",
+  },
+  working: {
+    color: "#FFB703",
+    iconName: "ticket-solid",
+  },
+  entered: {
+    color: "#80B918",
+    iconName: "ticket-solid",
+  },
+  assigned: {
+    color: "#FB8500",
+    iconName: "ticket-solid",
+>>>>>>> Stashed changes
   },
 };
 

@@ -1,6 +1,6 @@
-import React from "react";
 import { NavItemProps } from "./types";
 import { Icon } from "../../atoms/Icon";
+import { Text } from "../../atoms/Text";
 import styles from "./NavItem.module.scss";
 import classNames from "classnames";
 
@@ -27,7 +27,9 @@ export const NavItem = ({
                 active={active}
                 size={32}
             />
-            <span className={styles.label}>{label}</span>
+            <Text variant="navLabel">
+                {label}
+            </Text>
         </button>
     );
 };

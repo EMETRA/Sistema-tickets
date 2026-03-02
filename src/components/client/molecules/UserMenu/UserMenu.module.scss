@@ -1,0 +1,34 @@
+.userMenu {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  width: fit-content;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  flex: 1; 
+  justify-content: space-between;
+  overflow: hidden;
+  gap: 0;
+  align-items: flex-start;  
+}
+
+.name {
+    color: #333333;
+    font-weight: 600;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0;
+}
+
+.role {
+    color: #999999; 
+    font-weight: 400;
+    line-height: 1.2;
+    margin: 0;
+}

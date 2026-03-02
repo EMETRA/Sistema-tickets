@@ -1,6 +1,6 @@
 export type IconName = 
     | "file" | "globe" | "logo-emetra" | "home" 
-    | "users" | "ticket" | "settings" | "bell" | "logout";
+    | "users" | "ticket" | "settings" | "bell" | "logout" | string;
 
 export type IconVariant = "navigation" | "status" | "action";
 

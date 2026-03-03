@@ -1,0 +1,111 @@
+"use client";
+
+import React, { useState, useRef, useEffect } from "react";
+import classNames from "classnames";
+import { Avatar } from "../../atoms/Avatar";
+import { Text } from "../../atoms/Text";
+import { MemberSelectProps } from "./types";
+import styles from "./MemberSelect.module.scss";
+
+/**
+ * Componente MemberSelect - Select personalizado para seleccionar miembros de un equipo
+ *
+ * @param {MemberSelectProps} props - Las propiedades del componente
+ * @returns {JSX.Element} El componente MemberSelect renderizado
+ */
+export const MemberSelect: React.FC<MemberSelectProps> = ({
+  members,
+  selectedId,
+  onSelect,
+  placeholder = "Seleccionar miembro",
+  className,
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Encontrar el miembro seleccionado
+  const selectedMember = members.find((member) => member.id === selectedId);
+
+  // Cerrar el dropdown cuando se hace clic fuera
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen]);
+
+  const handleToggle = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const handleSelect = (member: typeof members[0]) => {
+    onSelect?.(member);
+    setIsOpen(false);
+  };
+
+  return (
+    <div className={classNames(styles.MemberSelect, className)} ref={containerRef}>
+      {/* Botón/Trigger del select */}
+      <button
+        type="button"
+        className={classNames(styles.trigger, { [styles.open]: isOpen })}
+        onClick={handleToggle}
+      >
+        {selectedMember ? (
+          <>
+            <Avatar
+              src={selectedMember.avatarSrc}
+              initials={selectedMember.initials}
+              size="sm"
+              className={styles.avatar}
+            />
+            <Text variant="body" className={styles.memberName}>
+              {selectedMember.name}
+            </Text>
+          </>
+        ) : (
+          <Text variant="muted" className={styles.placeholder}>
+            {placeholder}
+          </Text>
+        )}
+      </button>
+
+      {/* Dropdown con la lista de miembros */}
+      {isOpen && (
+        <div className={styles.dropdown}>
+          {members.map((member) => (
+            <button
+              key={member.id}
+              type="button"
+              className={classNames(styles.memberItem, {
+                [styles.selected]: member.id === selectedId,
+              })}
+              onClick={() => handleSelect(member)}
+            >
+              <Avatar
+                src={member.avatarSrc}
+                initials={member.initials}
+                size="sm"
+                className={styles.avatar}
+              />
+              <Text variant="body" className={styles.memberName}>
+                {member.name}
+              </Text>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default MemberSelect;

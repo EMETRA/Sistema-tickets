@@ -1,0 +1,39 @@
+.AssignedChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px 4px 4px;
+  border-radius: 24px;
+  transition: all 0.2s ease;
+  font-family: "Montserrat", sans-serif;
+
+  .avatar {
+    flex-shrink: 0;
+  }
+
+  .userName {
+    margin: 0;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 1.4;
+    white-space: nowrap;
+  }
+
+  // Estado no asignado
+  &.unassigned {
+    background-color: #F5F5F5;
+
+    .userName {
+      color: #737373;
+    }
+  }
+
+  // Estado asignado
+  &.assigned {
+    background-color: transparent;
+
+    .userName {
+      color: #262626;
+    }
+  }
+}

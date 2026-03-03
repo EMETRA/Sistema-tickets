@@ -102,7 +102,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
               disabled={state === "disabled"}
               {...props}
             />
-            <Icon name="file" variant="status" size={40} />
+            <Icon name="file-arrow-up-solid-full" variant="status" size={40} className={styles.Icon} />
             <div className={styles.FileContent}>
               <p className={styles.FileMainText}>Arrastra tu archivo aquí o</p>
               <p className={styles.FileLinkText}>da click aquí</p>

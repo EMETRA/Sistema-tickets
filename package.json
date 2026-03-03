@@ -16,7 +16,9 @@
     "axios": "^1.13.5",
     "next": "16.1.6",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "recharts": "^3.7.0",
+    "sass": "^1.97.3"
   },
   "devDependencies": {
     "@storybook/nextjs-vite": "^10.2.8",

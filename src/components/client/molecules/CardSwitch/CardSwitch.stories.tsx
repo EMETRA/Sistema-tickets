@@ -6,7 +6,6 @@ const meta: Meta<typeof CardSwitch> = {
     title: "Components/Client/Molecules/CardSwitch",
     component: CardSwitch,
     tags: ["autodocs"],
-    // Este decorador ayuda a que el componente no use todo el ancho de la pantalla si no quieres
     decorators: [
         (Story) => (
             <div style={{ padding: '2rem', display: 'flex', justifyContent: 'center' }}>

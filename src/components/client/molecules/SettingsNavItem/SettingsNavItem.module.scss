@@ -1,0 +1,33 @@
+.settingsNavItem {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 16px;
+    width: 100%;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    border-radius: 8px;
+
+    &:hover {
+        background-color: rgba(0, 0, 0, 0.03);
+    }
+
+    &.active {
+        background-color: #C5C5C530;
+        
+        .label {
+        font-weight: 700;
+        color: #333333;
+        }
+    }
+}
+
+.label {
+    color: #000000;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: left;
+    margin: 0;
+}

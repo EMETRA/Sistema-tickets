@@ -16,36 +16,35 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  // ¡El truco! Toma el color del texto del padre
   background-color: currentColor; 
   flex-shrink: 0;
 }
   
-// Estado "Asignado" (Naranja)
-.active { 
-  background-color: #FFF4E5; // Fondo naranja muy suave
-  color: #FF9800;           // Texto naranja vibrante
+.ingressed { 
+  background-color: #80B91866; 
+  color: #80B918           
 }
 
-// Estado "En Proceso" (Amarillo)
-.warning { 
-  background-color: #FFFDE7; 
-  color: #FBC02D;           
+.assigned { 
+  background-color: #FB850066; 
+  color: #FB8500;           
 }
 
-// Estado "Resuelto" (El Verde que faltaba)
-.success { 
-  background-color: #E8F5E9; // Fondo verde menta suave
-  color: #2E7D32;           // Texto verde oscuro institucional
+.inwork { 
+  background-color: #FFB70366; 
+  color: #FFB703;           
 }
 
-// Estado "Inactivo" o "Cancelado"
-.inactive { 
-  background-color: #F5F5F5; 
-  color: #757575; 
+.resolved { 
+  background-color: #0318ff66; 
+  color: #0320ff; 
 }
 
-// --- VARIANTE OUTLINED (Filtros) ---
+.canceled { 
+  background-color: #E6394666; 
+  color: #E63946;
+}
+
 .outlined {
   background-color: transparent;
   color: #666;

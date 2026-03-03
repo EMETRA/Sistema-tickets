@@ -10,26 +10,30 @@ const meta: Meta<typeof Chip> = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+export const Ingressed: Story = {
+    args: { label: "Ingresado", state: "ingressed" },
+};
+
 export const Assigned: Story = {
-    args: { label: "Asignado", state: "active" },
+    args: { label: "Asignado", state: "assigned" },
 };
 
-export const InProcess: Story = {
-    args: { label: "En Proceso", state: "warning" },
+export const Inwork: Story = {
+    args: { label: "En trabajo", state: "inwork" },
 };
 
-export const FilterSelected: Story = {
-    args: { label: "Todos", variant: "outlined", state: "active" },
+export const Resolved: Story = {
+    args: { label: "Resuelto", state: "resolved" },
 };
 
-export const AssignedWithDot: Story = {
-    args: { label: "Asignado", state: "active" },
-};
-
-export const ResolvedWithDot: Story = {
-    args: { label: "Resuelto", state: "success" },
+export const Canceled: Story = {
+    args: { label: "Cancelado", state: "canceled" },
 };
 
 export const FilterOption: Story = {
-    args: { label: "Técnicos", variant: "outlined", state: "inactive" },
+    args: { label: "Cancelado", variant: "outlined", state: "canceled" },
+};
+
+export const FilterSelected: Story = {
+    args: { label: "En trabajo", variant: "outlined", state: "inwork" },
 };

@@ -35,6 +35,13 @@ export interface IconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonEl
    * @default false
    */
   borderless?: boolean;
+
+  /**
+   * Squared para un cuadrado con esquinas redondeadas
+   * @default false
+   */
+  squared_borded?: boolean;
+  
   
   /**
    * Clase CSS adicional

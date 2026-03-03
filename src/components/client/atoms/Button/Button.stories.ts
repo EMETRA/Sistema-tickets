@@ -32,6 +32,14 @@ const meta = {
       control: "text",
       description: "Texto mostrado durante el estado loading",
     },
+    icon: {
+      control: "text",
+      description: "Nombre del icono a mostrar (opcional)",
+    },
+    left: {
+      control: "boolean",
+      description: "Si el icono se muestra a la izquierda del texto",
+    },
   },
 } satisfies Meta<typeof Button>;
 
@@ -218,5 +226,67 @@ export const TextLoading: Story = {
     state: "loading",
     children: "Submit",
     loadingText: "Cargando...",
+  },
+};
+
+// ============================================
+// BUTTONS WITH ICONS
+// ============================================
+
+export const ContainedWithIconRight: Story = {
+  args: {
+    variant: "contained",
+    color: "success",
+    children: "Guardar",
+    icon: "arrow-right-solid",
+  },
+};
+
+export const ContainedWithIconLeft: Story = {
+  args: {
+    variant: "contained",
+    color: "default",
+    children: "Agregar",
+    icon: "hashtag-solid",
+    left: true,
+  },
+};
+
+export const OutlinedWithIconRight: Story = {
+  args: {
+    variant: "outlined",
+    color: "danger",
+    children: "Eliminar",
+    icon: "trash-solid-full",
+    left: true,
+  },
+};
+
+export const OutlinedWithIconLeft: Story = {
+  args: {
+    variant: "outlined",
+    color: "default",
+    children: "Descargar",
+    icon: "clipboard-solid",
+    left: true,
+  },
+};
+
+export const TextWithIconRight: Story = {
+  args: {
+    variant: "text",
+    color: "default",
+    children: "Ver más",
+    icon: "arrow-right-solid",
+  },
+};
+
+export const TextWithIconLeft: Story = {
+  args: {
+    variant: "text",
+    color: "default",
+    children: "Regresar",
+    icon: "arrows-rotate-solid-full",
+    left: true,
   },
 };

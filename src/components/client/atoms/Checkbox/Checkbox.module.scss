@@ -13,7 +13,7 @@
   cursor: pointer;
   user-select: none;
 
-  &:hover .StyledCheckbox {
+  &:hover .CheckboxButton {
     border-color: #a9a9a9;
   }
 }
@@ -23,14 +23,14 @@
   cursor: not-allowed;
   opacity: 0.5;
 
-  &:hover .StyledCheckbox {
+  &:hover .CheckboxButton {
     border-color: #262626;
   }
 }
 
 // Contenedor con error
 .ContainerError {
-  .StyledCheckbox {
+  .CheckboxButton {
     border-color: #ff4444;
   }
 }
@@ -44,55 +44,44 @@
   pointer-events: none;
 }
 
-// Checkbox visual personalizado
-.StyledCheckbox {
-  position: relative;
+// Contenedor del Icon
+.CheckboxButton {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
-  min-width: 20px;
-  min-height: 20px;
   border: 1px solid #262626;
   border-radius: 4px;
   background-color: #ffffff;
   transition: all 0.2s ease;
-
-  &:focus-within {
-    outline: 2px solid #a9a9a9;
-    outline-offset: 2px;
+  flex-shrink: 0;
+  
+  .CheckIcon {
+    opacity: 0;
+    transform: scale(0);
+    transition: all 0.2s ease;
   }
 }
 
-// Ícono de check
-.CheckIcon {
-  width: 14px;
-  height: 14px;
-  opacity: 0;
-  transform: scale(0);
-  transition: all 0.2s ease;
-}
-
 // Cuando el checkbox está marcado
-.HiddenCheckbox:checked + .StyledCheckbox {
+.HiddenCheckbox:checked ~ .CheckboxButton {
   background-color: #4361EE;
   border-color: #CECECE;
-
+  
   .CheckIcon {
     opacity: 1;
     transform: scale(1);
+    --icon-color: #ffffff;
   }
 }
 
 // Focus del checkbox
-.HiddenCheckbox:focus + .StyledCheckbox {
+.HiddenCheckbox:focus ~ .CheckboxButton {
   outline: 2px solid #a9a9a9;
   outline-offset: 2px;
 }
 
 // Checkbox disabled y checked
-.HiddenCheckbox:disabled:checked + .StyledCheckbox {
+.HiddenCheckbox:disabled:checked ~ .CheckboxButton {
   background-color: #262626;
   border-color: #262626;
 }

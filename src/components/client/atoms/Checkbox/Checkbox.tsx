@@ -4,6 +4,7 @@ import React, { forwardRef, useImperativeHandle, useRef } from "react";
 import classNames from "classnames";
 import styles from "./Checkbox.module.scss";
 import { CheckboxProps } from "./types";
+import { Icon } from "../Icon";
 
 /**
  * Componente de checkbox reutilizable con diferentes estados.
@@ -12,7 +13,7 @@ import { CheckboxProps } from "./types";
  * @returns {JSX.Element} El componente de checkbox renderizado.
  */
 const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
-  ({ className, state = "default", errorMessage, label, id, ...props }, ref) => {
+  ({ className, state = "default", errorMessage, label, id, size = 16, ...props }, ref) => {
     // Referencia interna al checkbox
     const checkboxRef = useRef<HTMLInputElement>(null);
 
@@ -39,22 +40,21 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
             disabled={state === "disabled"}
             {...props}
           />
-          <span className={styles.StyledCheckbox}>
-            <svg
+          <div 
+            className={styles.CheckboxButton}
+            style={{
+              width: size,
+              height: size,
+              minWidth: size,
+              minHeight: size,
+            }}
+          >
+            <Icon
+              name="check-solid"
+              size={size * 0.7}
               className={styles.CheckIcon}
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M20 6L9 17L4 12"
-                stroke="white"
-                strokeWidth="3"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </span>
+            />
+          </div>
           {label && <span className={styles.Label}>{label}</span>}
         </label>
         {state === "error" && errorMessage && (

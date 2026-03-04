@@ -26,6 +26,10 @@ const meta = {
       control: "text",
       description: "Mensaje de error (solo visible cuando state='error')",
     },
+    size: {
+      control: { type: "number", min: 16, max: 48 },
+      description: "Tamaño del checkbox en píxeles",
+    },
   },
 } satisfies Meta<typeof Checkbox>;
 
@@ -105,5 +109,31 @@ export const LongLabel: Story = {
   args: {
     label: "Acepto los términos y condiciones de uso, la política de privacidad y el tratamiento de datos personales",
     state: "default",
+  },
+};
+
+// Checkbox pequeño
+export const Small: Story = {
+  args: {
+    label: "Checkbox pequeño (default)",
+    state: "default",
+  },
+};
+
+// Checkbox mediano (default)
+export const Medium: Story = {
+  args: {
+    label: "Checkbox mediano",
+    state: "default",
+    size: 24
+  },
+};
+
+// Checkbox grande
+export const Large: Story = {
+  args: {
+    label: "Checkbox grande",
+    state: "default",
+    size: 32,
   },
 };

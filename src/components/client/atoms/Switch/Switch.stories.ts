@@ -26,6 +26,11 @@ const meta = {
       control: "text",
       description: "Mensaje de error (solo visible cuando state='error')",
     },
+    switchSize: {
+      control: "select",
+      options: ["small", "medium", "large"],
+      description: "Tamaño del switch",
+    },
   },
 } satisfies Meta<typeof Switch>;
 
@@ -105,5 +110,62 @@ export const LongLabel: Story = {
   args: {
     label: "Activar todas las notificaciones por correo electrónico, SMS y notificaciones push",
     state: "default",
+  },
+};
+
+// Switch pequeño
+export const Small: Story = {
+  args: {
+    label: "Switch pequeño",
+    state: "default",
+    switchSize: "small",
+  },
+};
+
+// Switch pequeño activado
+export const SmallChecked: Story = {
+  args: {
+    label: "Switch pequeño",
+    state: "default",
+    switchSize: "small",
+    defaultChecked: true,
+  },
+};
+
+// Switch mediano (default)
+export const Medium: Story = {
+  args: {
+    label: "Switch mediano (default)",
+    state: "default",
+    switchSize: "medium",
+  },
+};
+
+// Switch mediano activado
+export const MediumChecked: Story = {
+  args: {
+    label: "Switch mediano (default)",
+    state: "default",
+    switchSize: "medium",
+    defaultChecked: true,
+  },
+};
+
+// Switch grande
+export const Large: Story = {
+  args: {
+    label: "Switch grande",
+    state: "default",
+    switchSize: "large",
+  },
+};
+
+// Switch grande activado
+export const LargeChecked: Story = {
+  args: {
+    label: "Switch grande",
+    state: "default",
+    switchSize: "large",
+    defaultChecked: true,
   },
 };

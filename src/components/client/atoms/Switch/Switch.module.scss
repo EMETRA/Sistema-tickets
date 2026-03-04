@@ -37,10 +37,7 @@
 .StyledSwitch {
   position: relative;
   display: inline-block;
-  width: 50px;
-  height: 26px;
   background-color: #56648b;
-  border-radius: 13px;
   transition: background-color 0.3s ease;
   flex-shrink: 0;
 }
@@ -48,10 +45,6 @@
 /* Slider (círculo que se mueve) */
 .Slider {
   position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 20px;
-  height: 20px;
   background-color: white;
   border-radius: 50%;
   transition: transform 0.3s ease;
@@ -64,7 +57,7 @@
 }
 
 .HiddenSwitch:checked + .StyledSwitch .Slider {
-  transform: translateX(24px);
+  transform: translateX(var(--translate-x));
 }
 
 /* Estado focus */

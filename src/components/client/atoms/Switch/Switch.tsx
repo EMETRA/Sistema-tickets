@@ -12,7 +12,7 @@ import { SwitchProps } from "./types";
  * @returns {JSX.Element} El componente de switch renderizado.
  */
 const Switch = forwardRef<HTMLInputElement, SwitchProps>(
-  ({ className, state = "default", errorMessage, label, id, ...props }, ref) => {
+  ({ className, state = "default", errorMessage, label, id, switchSize = "medium", ...props }, ref) => {
     // Referencia interna al switch
     const switchRef = useRef<HTMLInputElement>(null);
 
@@ -28,6 +28,16 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
       [styles.ContainerDisabled]: state === "disabled",
     }, className);
 
+    // Dimensiones predefinidas para cada tamaño
+    const sizeConfig = {
+      small: { width: 40, height: 20, sliderSize: 17, padding: 2 },
+      medium: { width: 50, height: 26, sliderSize: 20, padding: 3 },
+      large: { width: 62, height: 32, sliderSize: 26, padding: 3 },
+    };
+
+    const config = sizeConfig[switchSize];
+    const translateX = config.width - config.sliderSize - (config.padding * 2);
+
     return (
       <div className={styles.Wrapper}>
         <label htmlFor={switchId} className={containerClasses}>
@@ -39,8 +49,24 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
             disabled={state === "disabled"}
             {...props}
           />
-          <span className={styles.StyledSwitch}>
-            <span className={styles.Slider}></span>
+          <span 
+            className={styles.StyledSwitch}
+            style={{
+              width: config.width,
+              height: config.height,
+              borderRadius: config.height / 2,
+            }}
+          >
+            <span 
+              className={styles.Slider}
+              style={{
+                width: config.sliderSize,
+                height: config.sliderSize,
+                top: config.padding,
+                left: config.padding,
+                '--translate-x': `${translateX}px`,
+              } as React.CSSProperties}
+            ></span>
           </span>
           {label && <span className={styles.Label}>{label}</span>}
         </label>

@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { PopOver } from "./index";
 
 const meta: Meta<typeof PopOver> = {
-    title: "Components/Client/Atoms/PopOver",
+    title: "Atoms/PopOver",
     component: PopOver,
     argTypes: {
         position: {

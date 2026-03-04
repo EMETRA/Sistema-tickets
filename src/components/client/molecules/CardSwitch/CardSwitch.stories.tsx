@@ -3,7 +3,7 @@ import { CardSwitch } from "./index";
 import { useState } from "react";
 
 const meta: Meta<typeof CardSwitch> = {
-    title: "Components/Client/Molecules/CardSwitch",
+    title: "Molecules/CardSwitch",
     component: CardSwitch,
     tags: ["autodocs"],
     decorators: [

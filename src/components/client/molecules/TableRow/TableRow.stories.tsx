@@ -9,7 +9,7 @@ import classNames from "classnames";
 import styles from "./TableRow.module.scss";
 
 const meta: Meta<typeof TableRow> = {
-    title: "Components/Client/Molecules/TableRow",
+    title: "Molecules/TableRow",
     component: TableRow,
 };
 

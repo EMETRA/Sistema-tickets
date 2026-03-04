@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { Link } from "./Link";
 
 const meta: Meta<typeof Link> = {
-    title: "Components/Client/Atoms/Link", 
+    title: "Atoms/Link", 
     component: Link,
     parameters: { layout: "centered" },
     tags: ["autodocs"],

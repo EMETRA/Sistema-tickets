@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { AlertBar } from "./index";
 
 const meta: Meta<typeof AlertBar> = {
-    title: "Components/Client/Atoms/AlertBar",
+    title: "Atoms/AlertBar",
     component: AlertBar,
     tags: ["autodocs"],
     // Decorador para darle un ancho fijo en Storybook se vea como en la página

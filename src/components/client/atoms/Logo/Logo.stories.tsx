@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { Logo } from "./index";
 
 const meta: Meta<typeof Logo> = {
-    title: "Components/Client/Atoms/Logo",
+    title: "Atoms/Logo",
     component: Logo,
     parameters: {
         layout: "centered",

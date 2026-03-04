@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { Divider } from "./index";
 
 const meta: Meta<typeof Divider> = {
-    title: "Components/Client/Atoms/Divider",
+    title: "Atoms/Divider",
     component: Divider,
     tags: ["autodocs"],
     argTypes: {

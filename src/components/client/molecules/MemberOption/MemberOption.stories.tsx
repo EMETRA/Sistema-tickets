@@ -3,7 +3,7 @@ import { MemberOption } from "./index";
 import { useState } from "react";
 
 const meta: Meta<typeof MemberOption> = {
-    title: "Components/Client/Molecules/MemberOption",
+    title: "Molecules/MemberOption",
     component: MemberOption,
     tags: ["autodocs"],
     decorators: [

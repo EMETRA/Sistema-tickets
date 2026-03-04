@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { Avatar } from "./index";
 
 const meta: Meta<typeof Avatar> = {
-    title: "Components/Client/Atoms/Avatar", // Jerarquía de tu proyecto
+    title: "Atoms/Avatar", // Jerarquía de tu proyecto
     component: Avatar,
     parameters: {
         layout: "centered",

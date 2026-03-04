@@ -1,0 +1,33 @@
+@use  "../../../../../src/theme/colors.scss" as *;
+@use "sass:color";
+
+// Estilos base del formactions
+.FormActions {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+// ============================================
+// VARIANTES
+// ============================================
+
+// Alineación izquierda
+.FormActions--left {
+    justify-content: flex-start;
+}
+
+// Alineación derecha
+.FormActions--right {
+    justify-content: flex-end;
+}
+
+// Alineación centro
+.FormActions--center {
+    justify-content: center;
+}
+
+// Alineación distribuida
+.FormActions--space-between {
+    justify-content: space-between;
+}

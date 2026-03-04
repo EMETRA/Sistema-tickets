@@ -1,0 +1,24 @@
+@use  "../../../../../src/theme/colors.scss" as *;
+@use "sass:color";
+
+// Estilos base del formfield
+.FormField {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.control {
+    display: flex;
+    flex-direction: column;
+}
+
+// ============================================
+// MODIFICADORES
+// ============================================
+
+// Campo requerido
+.required {
+    margin-left: 4px;
+    color: $rojo-1;
+}

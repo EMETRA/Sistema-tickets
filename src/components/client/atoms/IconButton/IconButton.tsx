@@ -13,7 +13,7 @@ import { Icon } from "../Icon";
  * @returns {JSX.Element} El componente IconButton renderizado.
  */
 export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
-  ({ icon, size = 24, disabled = false, loading = false, onClick, borderless = false, className, iconColor, ...props }, ref) => {
+  ({ icon, size = 24, disabled = false, loading = false, onClick, borderless = false, squared_borded, className, iconColor, ...props }, ref) => {
     // El botón está deshabilitado si disabled=true O loading=true
     const isDisabled = disabled || loading;
 
@@ -33,6 +33,7 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
         [styles.Loading]: loading,
         [styles.Disabled]: isDisabled,
         [styles.Borderless]: borderless,
+        [styles.SquaredBordered]: squared_borded,
       },
       className
     );

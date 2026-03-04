@@ -1,4 +1,5 @@
 import { ButtonHTMLAttributes, ReactNode } from "react";
+import { IconName } from "../Icon/types";
 
 /**
  * Variante del botón.
@@ -70,4 +71,16 @@ export interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement
    * @default "Cargando..."
    */
   loadingText?: string;
+
+  /**
+   * Nombre del icono a mostrar en el botón.
+   * @optional
+   */
+  icon?: IconName;
+
+  /**
+   * Posición del icono en el botón.
+   * @default false
+   */
+  left?: boolean;
 }

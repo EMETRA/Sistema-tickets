@@ -3,7 +3,6 @@
 
 // Estilos base del botón
 .Button {
-  font-family: inherit;
   box-sizing: border-box;
   outline: none;
   border: none;
@@ -209,7 +208,7 @@
   // Full width
   &--fullWidth {
     width: 100%;
-    display: block;
+    display: flex;
   }
 
   // Estado disabled

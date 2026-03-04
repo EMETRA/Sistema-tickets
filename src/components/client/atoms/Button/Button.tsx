@@ -4,6 +4,7 @@ import React, { forwardRef } from "react";
 import classNames from "classnames";
 import styles from "./Button.module.scss";
 import { ButtonProps } from "./types";
+import { Icon } from "../Icon";
 
 /**
  * Componente de botón reutilizable con diferentes variantes, colores y estados.
@@ -22,6 +23,8 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       className,
       children,
       loadingText = "Cargando...",
+      icon,
+      left = false,
       ...props
     },
     ref
@@ -50,7 +53,15 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         disabled={isDisabled}
         {...props}
       >
-        {state === "loading" ? loadingText : children}
+        {state === "loading" ? (
+          loadingText
+        ) : (
+          <>
+            {icon && left && <Icon name={icon} variant="action" size={20} />}
+            {children}
+            {icon && !left && <Icon name={icon} variant="action" size={20} />}
+          </>
+        )}
       </button>
     );
   }

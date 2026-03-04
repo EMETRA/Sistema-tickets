@@ -34,6 +34,14 @@ const meta = {
       control: "number",
       description: "Cantidad de tickets resueltos",
     },
+    onStatusChange: {
+      description: "Callback cuando se selecciona una opción del menú",
+      action: "statusChanged",
+    },
+    onMenuClick: {
+      description: "Callback cuando se hace clic en el botón de menú",
+      action: "menuClicked",
+    },
   },
 } satisfies Meta<typeof UserCard>;
 
@@ -201,6 +209,5 @@ export const WithMenuAction: Story = {
     status: "online",
     assignedCount: 12,
     resolvedCount: 8,
-    onMenuClick: () => alert("pruebas"),
   },
 };

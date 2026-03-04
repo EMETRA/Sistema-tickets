@@ -1,5 +1,24 @@
 import { AvatarStatus } from "../../atoms/Avatar/types";
-import { IconName } from "../../atoms/Icon/types";
+
+/**
+ * Opción del menú de estado del usuario
+ */
+export interface UserStatusOption {
+  /**
+   * Etiqueta a mostrar
+   */
+  label: string;
+
+  /**
+   * Color del indicador (bolita)
+   */
+  color: string;
+
+  /**
+   * Valor único de la opción
+   */
+  value: string;
+}
 
 /**
  * Props del componente UserCard
@@ -46,15 +65,14 @@ export interface UserCardProps {
   resolvedCount: number;
 
   /**
-   * Ícono del botón de opciones
-   * @default "ellipsis-vertical-solid"
-   */
-  menuIcon?: IconName;
-
-  /**
    * Callback cuando se hace clic en el botón de opciones
    */
   onMenuClick?: () => void;
+
+  /**
+   * Callback cuando se selecciona una opción del menú
+   */
+  onStatusChange?: (value: string) => void;
 
   /**
    * Clase CSS adicional para el contenedor

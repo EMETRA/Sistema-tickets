@@ -1,13 +1,19 @@
 "use client";
 
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import classNames from "classnames";
 import { Avatar } from "../../atoms/Avatar";
 import { IconButton } from "../../atoms/IconButton";
 import { Text } from "../../atoms/Text";
 import { StatInLine } from "../StatInLine";
-import { UserCardProps } from "./types";
+import { UserCardProps, UserStatusOption } from "./types";
 import styles from "./UserCard.module.scss";
+
+// Opciones de estado del usuario
+const statusOptions: UserStatusOption[] = [
+  { label: "De vacaciones", color: "#EF4444", value: "vacation" },
+  { label: "Disponible", color: "#AACC00", value: "available" },
+];
 
 /**
  * Componente UserCard - Muestra información de un usuario con estadísticas
@@ -24,10 +30,39 @@ export const UserCard: React.FC<UserCardProps> = ({
   status,
   assignedCount,
   resolvedCount,
-  menuIcon = "ellipsis-vertical-solid",
   onMenuClick,
+  onStatusChange,
   className,
 }) => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Cerrar el menú cuando se hace clic fuera de él
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    if (isMenuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isMenuOpen]);
+
+  const handleMenuClick = () => {
+    setIsMenuOpen(!isMenuOpen);
+    onMenuClick?.();
+  };
+
+  const handleOptionClick = (value: string) => {
+    onStatusChange?.(value);
+    setIsMenuOpen(false);
+  };
   return (
     <div className={classNames(styles.UserCard, className)}>
       {/* Header con Avatar y botón de menú */}
@@ -39,13 +74,32 @@ export const UserCard: React.FC<UserCardProps> = ({
           status={status}
           className={styles.avatar}
         />
-        <IconButton
-          icon={menuIcon}
-          size={20}
-          borderless
-          onClick={onMenuClick}
-          className={styles.menuButton}
-        />
+        <div className={styles.menuContainer} ref={menuRef}>
+          <IconButton
+            icon="ellipsis-vertical-solid"
+            size={20}
+            borderless
+            onClick={handleMenuClick}
+            className={styles.menuButton}
+          />
+          {isMenuOpen && (
+            <div className={styles.dropdown}>
+              {statusOptions.map((option) => (
+                <button
+                  key={option.value}
+                  className={styles.dropdownItem}
+                  onClick={() => handleOptionClick(option.value)}
+                >
+                  <span 
+                    className={styles.statusDot}
+                    style={{ backgroundColor: option.color }}
+                  />
+                  <span className={styles.optionLabel}>{option.label}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Información del usuario */}

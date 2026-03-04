@@ -26,7 +26,6 @@ export const EquipmentGrid: Story = {
             gridTemplateColumns: 'repeat(2, 1fr)', 
             gap: '15px', 
             maxWidth: '400px',
-            // padding: '10px'
         }}>
             <EquipmentItem iconName="desktop-solid" title="Monitor" description="Dell 27 pulgadas" iconColor="#6F87FB" />
             <EquipmentItem iconName="keyboard-solid" title="Teclado" description="Microsoft e56a5" iconColor="#99cc33" />

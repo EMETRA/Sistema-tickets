@@ -16,7 +16,6 @@ export const TableRow = ({ cells, isHeader = false, gridTemplate, scale = 1, cla
                     key={index} 
                     className={classNames(
                         styles.cell, 
-                        // Aplicamos la clase de alineación (por defecto left)
                         styles[cell.align || "left"] 
                     )}
                 >

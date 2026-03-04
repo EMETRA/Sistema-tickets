@@ -1,0 +1,69 @@
+.alertContainer {
+    background-color: #FFFFFF;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+    max-width: 500px;
+    min-width: 400px;
+}
+
+.popOver {
+    border-radius: 0px;
+}
+
+.sideBorder {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 6px;
+    background-color: #D32F2F;
+}
+
+.mainContent {
+    padding: 16px 16px 20px 24px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0px;
+}
+
+.titleGroup {
+    display: flex;
+    align-items: center;
+    column-gap: 12px;
+    row-gap: 0;
+    color: #D32F2F;
+
+    .title {
+        font-weight: 700;
+        margin: 0;
+        color: #D32F2F;
+
+    }
+}
+
+.description {
+    color: #666666;
+    margin: 0;
+    margin-bottom: 16px;
+    margin-left: 35px;
+    display: block;
+    max-width: 250px;
+}
+
+.actionBtn {
+    align-self: flex-start;
+    margin-left: 35px;
+}
+
+.progressBar {
+    margin-left: 25px;
+    width: 87%;
+    margin-bottom: 20px;
+}
+

@@ -1,0 +1,16 @@
+.permissionToggle {
+    display: flex;
+    flex-direction: column;
+    align-items: center; // Alineación centrada según el diseño
+    gap: 4px;            // Espacio pequeño entre texto y switch
+    width: fit-content;
+    padding: 8px;
+}
+
+.label {
+    margin: 0;
+    font-weight: 400;    // Un poco más de peso para legibilidad
+    font-size: 14px;
+    text-align: center;
+    user-select: none;   // Evita que el usuario seleccione el texto por error
+}

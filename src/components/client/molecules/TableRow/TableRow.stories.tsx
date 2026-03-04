@@ -8,6 +8,7 @@ import { AssignedChip } from "../AssignedChip";
 import classNames from "classnames";
 import styles from "./TableRow.module.scss";
 import React from "react";
+import { PermissionToggle } from "../PermissionToggle";
 
 const meta: Meta<typeof TableRow> = {
     title: "Molecules/TableRow",
@@ -204,6 +205,108 @@ export const SelectableTableExample: Story = {
                         gridTemplate={COMMON_GRID}
                         scale={0.8}
                         cells={exampleCells}
+                    />
+                ))}
+            </div>
+        );
+    }
+};
+
+export const PermissionsTableExample: Story = {
+    render: () => {
+        const permissionIds = [1, 2];
+        
+        // 1. Estado para los switches de permisos
+        const [permissions, setPermissions] = React.useState<Record<string, { grabar: boolean; editar: boolean; eliminar: boolean; ver: boolean }>>({
+            "1": { grabar: true, editar: false, eliminar: true, ver: true },
+            "2": { grabar: false, editar: true, eliminar: false, ver: true },
+        });
+
+        // 2. Estado para los checkboxes de selección de fila
+        const [selectedRows, setSelectedRows] = React.useState<number[]>([]);
+        const isModuleSelected = selectedRows.length === permissionIds.length;
+
+        const handleTogglePermission = (rowId: number, field: string, value: boolean) => {
+            setPermissions(prev => ({
+                ...prev,
+                [rowId.toString()]: { ...prev[rowId.toString()], [field]: value }
+            }));
+        };
+
+        const handleSelectAll = (checked: boolean) => {
+            setSelectedRows(checked ? permissionIds : []);
+        };
+
+        const handleSelectRow = (id: number, checked: boolean) => {
+            setSelectedRows(prev => 
+                checked ? [...prev, id] : prev.filter(pId => pId !== id)
+            );
+        };
+
+        return (
+            <div style={{ display: 'flex', flexDirection: 'column', width: '100%', border: '1px solid #E0E0E0', borderRadius: '8px', overflow: 'hidden' }}>
+                <TableRow 
+                    variant="permission"
+                    isHeader
+                    selectable
+                    isSelected={isModuleSelected}
+                    onSelect={handleSelectAll}
+                    gridTemplate=""
+                    cells={[{ label: "Nombre del modulo (Modulo Usuarios)" }]}
+                />
+                
+                {permissionIds.map((id) => (
+                    <TableRow 
+                        key={id}
+                        id={id}
+                        variant="permission"
+                        selectable
+                        isSelected={selectedRows.includes(id)}
+                        onSelect={(checked) => handleSelectRow(id, checked)}
+                        scale={1}
+                        gridTemplate=""
+                        cells={[
+                            { 
+                                content: (
+                                    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', justifyContent: "center" }}>
+                                        <Text variant="body" className={styles.storieP}>Nombre del permiso</Text>
+                                        <Text variant="muted" className={styles.storieP}>Descripcion del permiso si es demasiado largo debera ser cortada</Text>
+                                    </div>
+                                ) 
+                            },
+                            { 
+                                content: <PermissionToggle 
+                                    id={`row-${id}-grabar`} 
+                                    label="Grabar" 
+                                    checked={permissions[id].grabar} 
+                                    onChange={(val) => handleTogglePermission(id, 'grabar', val)} 
+                                /> 
+                            },
+                            { 
+                                content: <PermissionToggle 
+                                    id={`row-${id}-editar`} 
+                                    label="Editar" 
+                                    checked={permissions[id].editar} 
+                                    onChange={(val) => handleTogglePermission(id, 'editar', val)} 
+                                /> 
+                            },
+                            { 
+                                content: <PermissionToggle 
+                                    id={`row-${id}-eliminar`} 
+                                    label="Eliminar" 
+                                    checked={permissions[id].eliminar} 
+                                    onChange={(val) => handleTogglePermission(id, 'eliminar', val)} 
+                                /> 
+                            },
+                            { 
+                                content: <PermissionToggle 
+                                    id={`row-${id}-ver`} 
+                                    label="Visualizacion" 
+                                    checked={permissions[id].ver} 
+                                    onChange={(val) => handleTogglePermission(id, 'ver', val)} 
+                                /> 
+                            },
+                        ]}
                     />
                 ))}
             </div>

@@ -7,6 +7,7 @@ import { IconButton } from "../../atoms/IconButton";
 import { AssignedChip } from "../AssignedChip";
 import classNames from "classnames";
 import styles from "./TableRow.module.scss";
+import React from "react";
 
 const meta: Meta<typeof TableRow> = {
     title: "Molecules/TableRow",
@@ -126,4 +127,85 @@ export const TableExample: Story = {
             />
         </div>
     )
+};
+
+/**
+ * Ejemplo de Tabla Seleccionable:
+ * Esta historia demuestra la funcionalidad de selección múltiple.
+ * El checkbox del Header permite seleccionar/deseleccionar todas las filas.
+ */
+export const SelectableTableExample: Story = {
+    render: () => {
+        // IDs de las 3 filas de ejemplo
+        const rowIds = [1, 2, 3];
+        const [selectedRows, setSelectedRows] = React.useState<number[]>([]);
+
+        const isAllSelected = selectedRows.length === rowIds.length;
+
+        // Función para seleccionar/deseleccionar todo
+        const handleSelectAll = (checked: boolean) => {
+            setSelectedRows(checked ? rowIds : []);
+        };
+
+        // Función para seleccionar una fila individual
+        const handleSelectRow = (id: number, checked: boolean) => {
+            setSelectedRows(prev => 
+                checked ? [...prev, id] : prev.filter(rowId => rowId !== id)
+            );
+        };
+
+        const exampleCells = [
+            { 
+                content:
+                    <div className={classNames(styles.userMenu)}>
+                        <Avatar initials="G" size="sm" />
+                        <div className={styles.info}>
+                            <Text variant="body" className={styles.name}>Gildder Caceres</Text>
+                            <Text variant="caption" className={styles.role}>Recursos Humanos</Text>
+                        </div>
+                    </div> 
+            },
+            { content: <Text variant="muted">Cancelación Remisión</Text> },
+            { content: <Text variant="muted">Remisión errónea a vehículo</Text> },
+            { content: <Text variant="muted">Hoy, 17:24</Text> },
+            { content: <Chip label="Ingresado" state="assigned" />, align: "center" as const },
+            { content: <AssignedChip assigned={false} />, align: "center" as const },
+            { content: <IconButton icon="trash-solid" size={24} iconColor="#BDBDBD" />, align: "center" as const },
+        ];
+
+        return (
+            <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+                {/* Header con lógica de Seleccionar Todo */}
+                <TableRow 
+                    isHeader
+                    selectable
+                    isSelected={isAllSelected}
+                    onSelect={handleSelectAll}
+                    gridTemplate={COMMON_GRID}
+                    cells={[
+                        { icon: "user-regular", label: "Usuario" },
+                        { icon: "clipboard-regular", label: "Titulo" },
+                        { icon: "file-lines-regular", label: "Descripción" },
+                        { icon: "calendar-regular", label: "Fecha" },
+                        { icon: "magnifying-glass-solid", label: "Status Actual" },
+                        { icon: "circle-user-regular", label: "Asignación" },
+                        { icon: "hand-regular", label: "Acciones" },
+                    ]}
+                />
+                
+                {/* Renderizado de las 3 filas con estado independiente */}
+                {rowIds.map((id) => (
+                    <TableRow 
+                        key={id}
+                        selectable
+                        isSelected={selectedRows.includes(id)}
+                        onSelect={(checked: boolean) => handleSelectRow(id, checked)}
+                        gridTemplate={COMMON_GRID}
+                        scale={0.8}
+                        cells={exampleCells}
+                    />
+                ))}
+            </div>
+        );
+    }
 };

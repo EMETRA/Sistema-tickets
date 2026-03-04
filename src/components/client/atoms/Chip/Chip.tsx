@@ -6,7 +6,7 @@ import classNames from "classnames";
 export const Chip = ({ 
     label, 
     variant = "default", 
-    state = "active", 
+    state = "assigned", 
     className 
 }: ChipProps) => {
     return (

@@ -1,0 +1,46 @@
+.modalCard {
+    max-width: 350px;
+    width: 90vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    // background-color: red;
+}
+
+.iconWrapper {
+    margin-bottom: 0px;
+    
+    .mainIcon {
+        color: #D32F2F;
+    }
+}
+
+.textWrapper {
+    margin-bottom: 32px;
+    // background-color: red;
+
+    .title {
+        margin: 15px;
+        font-size: 20px;
+        font-weight: 600;
+        color: #333333;
+        margin-bottom: 10px;
+    }
+
+    .description {
+        margin: 0;
+        color: #666666;
+        line-height: 1.5;
+        font-size: 15px;
+    }
+}
+
+.actions {
+    display: flex;
+    gap: 16px;
+    width: 100%;
+    justify-content: center;
+
+}
+

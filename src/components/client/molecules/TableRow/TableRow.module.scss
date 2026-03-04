@@ -1,0 +1,87 @@
+.tableRow {
+  --row-scale: 1;
+  display: grid;
+  align-items: center;
+  background-color: #FFFFFF;
+  width: 100%;
+  border-bottom: 1px solid #E0E0E0;
+
+  &.header {
+    background-color: #F9F9F9;
+    border: 2px solid #BDBDBD;
+    border-radius: 8px 8px 0 0;
+    
+    .cell {
+      border-right: 1px solid #D0D7DE;
+      padding: calc(8px * var(--row-scale)) calc(12px * var(--row-scale)); 
+      min-height: calc(25px * var(--row-scale)); 
+    }
+  }
+}
+
+.cell {
+  padding: calc(6px * var(--row-scale)) calc(10px * var(--row-scale));
+  display: flex;
+  align-items: center; 
+  min-height: calc(48px * var(--row-scale));
+  overflow: hidden; 
+
+  &.left { 
+    justify-content: flex-start; 
+    text-align: left; 
+  }
+  &.center { 
+    justify-content: center; 
+    text-align: center;
+    .headerContent { justify-content: center; }
+  }
+  &.right { 
+    justify-content: flex-end; 
+    text-align: right; 
+    .headerContent { justify-content: flex-end; }
+  }
+}
+
+.headerLabel {
+  font-weight: 600;
+  font-size: calc(12px * var(--row-scale));
+  margin: 0;
+}
+
+.rowContent {
+  width: 100%;
+  font-size: calc(13px * var(--row-scale)); 
+  
+  :global(.text) { 
+    font-size: calc(13px * var(--row-scale)) !important;
+  }
+  
+}
+
+.headerContent {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: calc(8px * var(--row-scale)); 
+  white-space: nowrap;
+  width: 100%;
+}
+
+.userMenu {
+    display: flex;
+    align-items: center;
+    gap: calc(12px * var(--row-scale));
+    // padding: calc(8px * var(--row-scale)) calc(12px * var(--row-scale));
+}
+
+.name {
+    font-size: calc(14px * var(--row-scale));
+    line-height: 1.2;
+    margin: 0;
+}
+
+.role {
+    font-size: calc(11px * var(--row-scale)); 
+    line-height: 1.2;
+    margin: 0;
+}

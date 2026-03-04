@@ -5,6 +5,7 @@ import styles from "./SearchField.module.scss";
 import { SearchFieldProps } from "./types";
 import { Input } from "../../atoms/Input";
 import { Button } from "../../atoms/Button";
+import { IconButton } from "../../atoms/IconButton";
 
 const SearchField: React.FC<SearchFieldProps> = ({
     value,
@@ -21,15 +22,16 @@ const SearchField: React.FC<SearchFieldProps> = ({
                 onSearch();
             }}
         >
-            <Input 
-                value={value}
-                placeholder={placeholder}
-                onChange={e => onChange(e.target.value)}
-            />
+            <div className={styles.inputWrapper}>
+                <Input 
+                    value={value}
+                    placeholder={placeholder}
+                    onChange={e => onChange(e.target.value)}
+                    className={styles.input}
+                />
 
-            <Button type="submit">
-                Search
-            </Button>
+                <IconButton icon="magnifying-glass-solid" type="submit" className={styles.searchButton}/>
+            </div>
         </form>
     );
 };

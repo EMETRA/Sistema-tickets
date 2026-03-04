@@ -3,7 +3,7 @@ import { SettingsNavItem } from "./index";
 import { useState } from "react";
 
 const meta: Meta<typeof SettingsNavItem> = {
-    title: "Components/Client/Molecules/SettingsNavItem",
+    title: "Molecules/SettingsNavItem",
     component: SettingsNavItem,
     tags: ["autodocs"],
     decorators: [

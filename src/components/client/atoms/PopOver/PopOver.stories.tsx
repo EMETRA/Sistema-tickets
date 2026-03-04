@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { PopOver } from "./index";
 
 const meta: Meta<typeof PopOver> = {
-    title: "Components/Client/Atoms/PopOver",
+    title: "Atoms/PopOver",
     component: PopOver,
     argTypes: {
         position: {
@@ -22,7 +22,7 @@ export const DynamicPosition: StoryObj<typeof PopOver> = {
         isOpen: true,
         position: "center",
         children: (
-        <div style={{ fontFamily: 'Gadugi' }}>
+        <div style={{ fontFamily: 'Gadugi', padding: '20px' }}>
             <h3 style={{ marginTop: '15px', marginBottom: '-6px', fontWeight: 700 }}>Asignar Usuario</h3>
             <p style={{ fontSize: '14px' }}>Contenido flexible dentro del esqueleto.</p>
         </div>

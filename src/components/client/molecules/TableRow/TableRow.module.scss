@@ -17,6 +17,32 @@
       min-height: calc(25px * var(--row-scale)); 
     }
   }
+
+  transition: background-color 0.2s ease;
+
+  &.selected {
+    background-color: #F0F4FF; 
+  }
+}
+
+
+.checkboxCell {
+  padding: 0 !important;
+  display: flex;
+  justify-content: center;
+  align-items: center; 
+}
+
+// Nueva regla específica para el Header
+.header {
+  .checkboxCell {
+    border-right: none !important; // Eliminamos el borde solo en el header
+  }
+}
+
+// Opcional: si quieres que el checkbox del header tenga el mismo estilo gris
+.header .checkboxCell {
+  background-color: #F9F9F9;
 }
 
 .cell {
@@ -71,7 +97,6 @@
     display: flex;
     align-items: center;
     gap: calc(12px * var(--row-scale));
-    // padding: calc(8px * var(--row-scale)) calc(12px * var(--row-scale));
 }
 
 .name {
@@ -84,4 +109,9 @@
     font-size: calc(11px * var(--row-scale)); 
     line-height: 1.2;
     margin: 0;
+}
+
+.checkbox {
+  width: 15px;
+  height: 15px;
 }

@@ -13,4 +13,8 @@ export interface TableRowProps {
     gridTemplate: string;
     scale?: number;
     className?: string;
+    // Props de selección
+    selectable?: boolean;
+    isSelected?: boolean;
+    onSelect?: (checked: boolean) => void;
 }

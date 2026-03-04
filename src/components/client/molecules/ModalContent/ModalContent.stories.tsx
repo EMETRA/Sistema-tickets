@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "../../atoms/Button";
 
 const meta: Meta<typeof ModalContent> = {
-    title: "Components/Client/Molecules/ModalContent",
+    title: "Molecules/ModalContent",
     component: ModalContent,
 };
 

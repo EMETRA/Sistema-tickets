@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { NavItem } from "./index";
 
 const meta: Meta<typeof NavItem> = {
-    title: "Components/Client/Molecules/NavItem",
+    title: "Molecules/NavItem",
     component: NavItem,
     // El Decorator envuelve a todas las historias de este archivo
     decorators: [

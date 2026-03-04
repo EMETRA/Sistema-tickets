@@ -197,6 +197,7 @@ export const SelectableTableExample: Story = {
                 {rowIds.map((id) => (
                     <TableRow 
                         key={id}
+                        id={id} // 👈 Pasamos el ID único de la fila
                         selectable
                         isSelected={selectedRows.includes(id)}
                         onSelect={(checked: boolean) => handleSelectRow(id, checked)}

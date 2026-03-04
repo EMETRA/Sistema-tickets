@@ -11,13 +11,13 @@ export const TableRow = ({
     isHeader = false, 
     gridTemplate, 
     scale = 1, 
-    selectable = false, // Nuevo
-    isSelected = false, // Nuevo
-    onSelect,           // Nuevo
+    selectable = false, 
+    isSelected = false, 
+    onSelect,
+    id, // 👈 Añadimos el id aquí
     className 
-}: TableRowProps) => {
+}: TableRowProps & { id?: string | number }) => { // Extendemos el tipo temporalmente
     
-    // Si es seleccionable, inyectamos una columna de 45px al inicio del grid
     const finalGridTemplate = selectable 
         ? `minmax(0, 45px) ${gridTemplate}` 
         : gridTemplate;
@@ -26,10 +26,7 @@ export const TableRow = ({
         <div 
             className={classNames(
                 styles.tableRow, 
-                { 
-                    [styles.header]: isHeader,
-                    [styles.selected]: isSelected // Resaltado visual si está marcado
-                }, 
+                { [styles.header]: isHeader, [styles.selected]: isSelected }, 
                 className
             )}
             style={{ 
@@ -37,37 +34,26 @@ export const TableRow = ({
                 '--row-scale': scale 
             } as React.CSSProperties}
         >
-            {/* Renderizamos el Checkbox solo si la fila es seleccionable */}
             {selectable && (
                 <div className={classNames(styles.cell, styles.center, styles.checkboxCell)}>
-                    <Checkbox
+                    <Checkbox 
+                        id={`check-${isHeader ? 'header' : id}`} // 👈 ID único por fila
                         checked={isSelected}
                         onChange={(e) => onSelect?.(e.target.checked)}
-                        // Escalamos el checkbox proporcionalmente a la fila
                         style={{ transform: `scale(${scale})` }}
-                        className={styles.checkbox}
                     />
                 </div>
             )}
+
             {cells.map((cell, index) => (
-                <div 
-                    key={index} 
-                    className={classNames(
-                        styles.cell, 
-                        styles[cell.align || "left"] 
-                    )}
-                >
+                <div key={index} className={classNames(styles.cell, styles[cell.align || "left"])}>
                     {isHeader ? (
                         <div className={styles.headerContent}>
                             {cell.icon && <Icon name={cell.icon} size={Math.round(18 * scale)} />}
-                            <Text variant="body" className={styles.headerLabel}>
-                                {cell.label}
-                            </Text>
+                            <Text variant="body" className={styles.headerLabel}>{cell.label}</Text>
                         </div>
                     ) : (
-                        <div className={styles.rowContent}>
-                            {cell.content}
-                        </div>
+                        <div className={styles.rowContent}>{cell.content}</div>
                     )}
                 </div>
             ))}

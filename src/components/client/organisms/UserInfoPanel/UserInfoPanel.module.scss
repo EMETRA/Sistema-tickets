@@ -1,0 +1,64 @@
+.panelCard {
+    background-color: #FFFFFF;
+    border: 1px solid #E0E0E0;
+    border-radius: 16px;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 450px;
+    gap: 20px;
+}
+
+.section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    // background-color: #8C94A8;
+}
+
+.label {
+    color: #8C94A8; // Gris azulado para subtítulos
+    font-weight: 600;
+    margin: 0;
+}
+
+.chipContainer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+}
+
+.locationChip {
+    border: 1px solid #333333; // Borde oscuro tipo capsule
+    border-radius: 100px;
+    padding: 4px 5px;
+    min-width: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    :global(.text) {
+        margin: 0;
+        font-size: 14px;
+        font-weight: 500;
+    }
+}
+
+.daysHighlight {
+    font-size: 50px; // Tamaño grande para el dato principal
+    font-weight: 400;
+    color: #333333;
+    margin: 0;
+    line-height: 0.75;
+}
+
+.locationText {
+    color: #333333;
+    font-weight: 500;
+    margin: 0;
+}

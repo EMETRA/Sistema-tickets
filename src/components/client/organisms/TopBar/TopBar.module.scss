@@ -1,0 +1,30 @@
+.topBar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;           // Ocupa todo el ancho disponible
+    height: 60px;
+    background-color: #FFFFFF;
+    padding: 0 24px;
+    margin: 0;             // Aseguramos que no tenga margen externo
+    box-sizing: border-box; 
+}
+
+.pageContext {
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.globalActions {
+    display: flex;
+    align-items: center;
+    gap: 20px;;
+}
+
+.buttonGroup {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+}

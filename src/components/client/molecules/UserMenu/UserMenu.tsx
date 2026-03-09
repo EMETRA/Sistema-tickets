@@ -21,7 +21,7 @@ export const UserMenu = ({
                 initials={name.charAt(0)}
                 status={status}
                 ringed={status ? true : false}
-                size="md"
+                size="sm"
             />
             
             <div className={styles.info}>

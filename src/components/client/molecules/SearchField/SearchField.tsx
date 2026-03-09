@@ -4,7 +4,6 @@ import classNames from "classnames";
 import styles from "./SearchField.module.scss";
 import { SearchFieldProps } from "./types";
 import { Input } from "../../atoms/Input";
-import { Button } from "../../atoms/Button";
 import { IconButton } from "../../atoms/IconButton";
 
 const SearchField: React.FC<SearchFieldProps> = ({

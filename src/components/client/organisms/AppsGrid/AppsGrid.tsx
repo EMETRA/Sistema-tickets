@@ -1,6 +1,5 @@
 import React from "react";
 import { AppsGridProps } from "./types";
-import { TableHeader } from "../../molecules/TableHeader";
 import { AppCard } from "../../molecules/AppCard";
 import styles from "./AppsGrid.module.scss";
 import classNames from "classnames";

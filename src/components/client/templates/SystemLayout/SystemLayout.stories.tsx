@@ -8,6 +8,12 @@ const meta: Meta<typeof SystemLayout> = {
     component: SystemLayout,
     parameters: {
         layout: "fullscreen",
+        nextjs: {
+        appDirectory: true,
+        navigation: {
+            pathname: '/dashboard', 
+        },
+    },
     },
 };
 
@@ -15,18 +21,18 @@ export default meta;
 
 export const LayoutPage: StoryObj<typeof SystemLayout> = {
     args: {
-        sidebarProps: {
-            role: "admin",
-            activePath: "/perfil",
-            onNavigate: (path) => console.log(path),
-        },
-        topBarProps: {
-            title: "Perfil",
-            iconName: "user-solid",
-            userName: "Gildder Caceres",
-            userRole: "Administrador",
-            userStatus: "online",
-        },
+        // sidebarProps: {
+        //     role: "admin",
+        //     activePath: "/perfil",
+        //     onNavigate: (path) => console.log(path),
+        // },
+        // topBarProps: {
+        //     title: "Perfil",
+        //     iconName: "user-solid",
+        //     userName: "Gildder Caceres",
+        //     userRole: "Administrador",
+        //     userStatus: "online",
+        // },
         children: (
             <>
                 <div style={{
@@ -45,18 +51,18 @@ export const LayoutPage: StoryObj<typeof SystemLayout> = {
 
 export const ExamplePage: StoryObj<typeof SystemLayout> = {
     args: {
-        sidebarProps: {
-            role: "admin",
-            activePath: "/perfil",
-            onNavigate: (path) => console.log(path),
-        },
-        topBarProps: {
-            title: "Perfil",
-            iconName: "user-solid",
-            userName: "Gildder Caceres",
-            userRole: "Administrador",
-            userStatus: "online",
-        },
+        // sidebarProps: {
+        //     role: "admin",
+        //     activePath: "/perfil",
+        //     onNavigate: (path) => console.log(path),
+        // },
+        // topBarProps: {
+        //     title: "Perfil",
+        //     iconName: "user-solid",
+        //     userName: "Gildder Caceres",
+        //     userRole: "Administrador",
+        //     userStatus: "online",
+        // },
         children: (
             <>
                 <ProfileHeader 

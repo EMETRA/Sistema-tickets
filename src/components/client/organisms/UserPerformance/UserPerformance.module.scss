@@ -1,0 +1,53 @@
+.UserPerformance {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.DescriptionHeader {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+
+    .Title {
+        font-size: 24px;
+        font-weight: 700;
+        color: #333333;
+        margin: 0;
+    }
+}
+
+.Content {
+    padding-left: 32px; // Alineación con el texto bajo el icono
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.Subtitle {
+    color: #666666;
+    font-size: 18px;
+    margin: 0;
+}
+
+.CardsContainer {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap; // Asegura que las tarjetas bajen en pantallas pequeñas
+}
+
+// Estilo para pantallas móviles
+@media (max-width: 600px) {
+    .CardsContainer {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .Content {
+        padding-left: 0;
+        align-items: center;
+        text-align: center;
+    }
+}

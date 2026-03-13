@@ -19,7 +19,7 @@ export const WelcomeMessage = ({ userName }: WelcomeMessageProps) => {
       <Text variant="caption">
         Bienvenido, al sistema de tickets 
       </Text>
-      <Text variant="body">
+      <Text variant="body" className={styles.description}>
         Esta plataforma fue especialmente diseñada para poder llevar un control de todas tus solicitudes realizadas al departamento de informatica EMETRA.
       </Text>
     </div>

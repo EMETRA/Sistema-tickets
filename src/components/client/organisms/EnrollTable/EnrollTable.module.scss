@@ -1,0 +1,21 @@
+.EnrollTable {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.table {
+    display: flex;
+    flex-direction: column;
+}
+
+.user {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.actions {
+    display: flex;
+    justify-content: flex-end;
+}

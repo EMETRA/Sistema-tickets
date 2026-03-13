@@ -1,0 +1,38 @@
+@use  "../../../../../src/theme/colors.scss" as *;
+@use "sass:color";
+
+.RoleForm {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.form {
+    display: grid;
+    gap: 16px;
+}
+
+.table {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    border: 1px solid $cuaternary-text;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.permissionRow {
+    height: 100%;
+}
+
+.permission {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: center;
+}
+
+.permissionText {
+    font-size: 13px;
+    margin: 0;
+}

@@ -1,0 +1,35 @@
+.container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.svg {
+    transform: rotate(-90deg); // Para que el progreso empiece desde arriba
+}
+
+.backgroundRing {
+    stroke: #e0e0e0;
+}
+
+.progressRing {
+    stroke: #AACC00; 
+    transition: stroke-dashoffset 0.5s ease-in-out;
+}
+
+.content {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.percentageText {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 2rem;
+    font-weight: 500;
+    color: #262626;
+}

@@ -1,0 +1,59 @@
+.card {
+    background-color: #FFFFFF;
+    border: 1px solid #F0F0F0;
+    border-radius: 16px;
+    padding: 32px;
+    max-width: 500px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #333333;
+}
+
+.records {
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+}
+
+.row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    line-height: 0;
+}
+
+.label {
+    font-weight: 500;
+    color: #333333;
+    margin: 0;
+    padding: 0;
+    line-height: 0;
+}
+
+.dateInfo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 140px;
+    line-height: 0;
+    margin: 0;
+}
+
+.observationsSection {
+    .obsLabel {
+        font-weight: 600;
+        color: #333333;
+        margin-bottom: 8px;
+    }
+
+    .obsContent {
+        line-height: 1.5;
+        font-size: 14px;
+    }
+}

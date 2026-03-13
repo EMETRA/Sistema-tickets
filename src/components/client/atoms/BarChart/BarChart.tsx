@@ -115,7 +115,7 @@ export const BarChart: React.FC<BarChartProps> = ({
           margin={{ 
             top: 20, 
             right: 20, 
-            bottom: verticalLabels ? 100 : 50, 
+            bottom: verticalLabels ? 0 : 50, 
             left: 20 
           }}
         >
@@ -128,11 +128,11 @@ export const BarChart: React.FC<BarChartProps> = ({
           <XAxis
             dataKey="label"
             tick={{ fill: "#262626", fontSize: 12 }}
-            angle={verticalLabels ? -45 : 0}
+            angle={verticalLabels ? -90 : 0}
             textAnchor={verticalLabels ? "end" : "middle"}
             height={verticalLabels ? 100 : 50}
             interval={0}
-            dy={verticalLabels ? 10 : 0}
+            dy={verticalLabels ? 30 : 0}
             stroke="#A9A9A9"
           />
           <YAxis

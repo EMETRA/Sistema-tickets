@@ -1,0 +1,12 @@
+// Estilos base del richtextfield
+.RichTextField {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.textarea {
+    min-height: 120px;
+    resize: vertical;
+    padding: 8px;
+}

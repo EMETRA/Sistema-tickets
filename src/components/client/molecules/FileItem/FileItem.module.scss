@@ -1,0 +1,68 @@
+@use  "../../../../../src/theme/colors.scss" as *;
+@use "sass:color";
+
+// Estilos base del fileitem
+.FileItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border: 2px solid $cuaternary-text;
+    border-radius: 10px;
+    background-color: rgba($tertiary-text, 0.2);
+}
+
+.left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.name {
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.state {
+    font-size: 12px;
+    color: $secondary-text;
+}
+
+.upload {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.progressBar {
+    width: 150px;
+    height: 6px;
+    background: $cuaternary-text;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.progress {
+    height: 100%;
+    background: $brand-green;
+    transition: width 0.2s ease;
+}
+
+.percent {
+    font-size: 12px;
+    color: $tertiary-text;
+    min-width: 32px;
+    text-align: right;
+}

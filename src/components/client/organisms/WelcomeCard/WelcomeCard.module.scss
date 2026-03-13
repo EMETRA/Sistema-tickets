@@ -1,0 +1,31 @@
+.welcomeCard {
+    background-color: #FFFFFF;
+    border: 1px solid #F0F0F0;
+    border-radius: 16px;
+    width: 400px;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 24px; 
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    min-height: 300px; 
+}
+
+.textContainer {
+    width: 100%;
+    margin: 0;
+}
+
+.illustrationWrapper {
+    display: flex;
+    justify-content: right;
+    align-items: right;
+    width: 100%;
+}
+
+.illustration {
+    object-fit: contain;
+    display: block;
+}

@@ -1,0 +1,39 @@
+.barContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 16px;
+    width: 100%;
+}
+
+.search {
+//   max-width: 600px; // Evita que el buscador se estire demasiado
+    flex: 1;
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-left: 24px;
+}
+
+.catButton {
+    min-width: 100px;
+    padding: 8px 20px !important;
+}
+
+@media (max-width: 768px) {
+    .barContainer {
+        flex-direction: column;
+        gap: 16px;
+        align-items: stretch;
+    }
+    
+    .actions {
+        margin-left: 0;
+        justify-content: center;
+        overflow-x: auto;
+        padding-bottom: 4px;
+    }
+}

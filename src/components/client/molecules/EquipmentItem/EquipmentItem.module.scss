@@ -1,0 +1,46 @@
+.equipmentItem {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 16px 24px;
+    background-color: #D9D9D936;
+    border-radius: 12px;
+    width: auto;
+    padding-right: 100px;
+    transition: transform 0.2s ease;
+
+    &:hover {
+        transform: translateY(-2px); 
+    }
+}
+
+.iconContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.infoContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.title {
+    font-weight: 400;
+    color: #333333;
+    margin-top: 1px;
+    font-size: 15px;
+}
+
+.description {
+    font-weight: 550;
+    color: #333333;
+    font-size: 15px;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

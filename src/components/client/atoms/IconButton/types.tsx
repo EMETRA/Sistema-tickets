@@ -47,4 +47,5 @@ export interface IconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonEl
    * Clase CSS adicional
    */
   className?: string;
+  iconColor?: string; 
 }

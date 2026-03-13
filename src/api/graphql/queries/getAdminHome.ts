@@ -15,7 +15,7 @@ export interface TicketResolvedPoint {
   color: string;
 }
 
-export async function getDashboardStatsDummy(): Promise<TicketStatData[]> {
+export async function   getDashboardStatsDummy(): Promise<TicketStatData[]> {
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve([

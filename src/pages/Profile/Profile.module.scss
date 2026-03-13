@@ -1,0 +1,31 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.viewLayout {
+    display: grid;
+    grid-template-columns: 1fr 1.9fr; 
+    gap: 40px; // Espacio entre el panel izquierdo y el derecho
+    align-items: center;
+    justify-items: center;
+    padding: 40px 20px; 
+    // background-color: #b40c0c;
+    width: 100%;
+    margin: 0 auto;
+
+    @media (max-width: 1200px) {
+        grid-template-columns: 1fr; // En pantallas medianas, uno abajo del otro
+        padding: 20px;
+    }
+}
+
+// Estilos específicos para que tus organismos ocupen bien el espacio
+.infoPanel, .maintenancePanel {
+    height: 100%;
+}
+
+.performancePanel, .equipmentPanel {
+    height: 100%;
+}

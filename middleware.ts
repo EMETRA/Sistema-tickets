@@ -25,7 +25,7 @@ export function middleware( request: NextRequest ) {
     const isProtectedRoute = matchRoute(pathname, protectedRoutes);
     const isPublicRoute = matchRoute(pathname, publicRoutes);
     const isNologRoute = matchRoute(pathname, nologRoutes);
-    const isDeclaredRoute = isProtectedRoute || isPublicRoute || nologRoutes;
+    const isDeclaredRoute = isProtectedRoute || isPublicRoute || isNologRoute;
 
     if (!isDeclaredRoute) {
         return NextResponse.rewrite(

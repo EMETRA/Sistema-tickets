@@ -1,12 +1,14 @@
-import { PermissionsTableProps } from "./types";
+import { PermissionsTableProps, PermissionsView } from "./types";
 import styles from "./PermissionsTable.module.scss";
 import classNames from "classnames";
 import { TableHeader } from "../../molecules/TableHeader";
 import { TableRow } from "../../molecules/TableRow";
 import { Text } from "../../atoms/Text";
 import { Chip } from "../../atoms/Chip";
-import { center } from "../../molecules/FormActions/FormActions.stories";
 import { IconButton } from "../../atoms/IconButton";
+import { useState } from "react";
+import { PermissionsForm } from "../PermissionsForm";
+import { Button } from "../../atoms/Button";
 
 const GRID = "minmax(0,1fr) minmax(0,1.8fr) minmax(0,1fr) minmax(0,1fr)";
 
@@ -14,13 +16,32 @@ const PermissionsTable: React.FC<PermissionsTableProps> = ({
     permissions,
     className
 }) => {
+
+    const [view, setView] = useState<PermissionsView>("table");
+
+    if (view === "create") {
+        return (
+            <PermissionsForm 
+                modules={[]}
+                onCancel={() => setView("table")}
+                onSubmit={() => alert("Grabar")}
+            />
+        )
+    }
+
     return (
         <div className={classNames(styles.PermissionTable, className)}>
 
-            <TableHeader 
-                iconName="user-lock-solid"
-                label="Permisos del sistema"
-            />
+            <div className={styles.header}>
+                <TableHeader 
+                    iconName="user-lock-solid"
+                    label="Permisos del sistema"
+                />
+
+                <Button onClick={() => setView("create")}>
+                    Nuevo
+                </Button>
+            </div>
 
             <div className={styles.table}>
                 <TableRow 

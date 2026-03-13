@@ -3,6 +3,7 @@
 import React from "react";
 import classNames from "classnames";
 import { TicketStat } from "../../molecules/TicketStat";
+import { Divider } from "@/components/client/atoms/Divider";
 import { DashboardStatsBarProps } from "./types";
 import styles from "./DashboardStatsBar.module.scss";
 
@@ -27,7 +28,7 @@ export const DashboardStatsBar: React.FC<DashboardStatsBarProps> = ({
             className={styles.StatItem}
           />
           {index < stats.length - 1 && (
-            <div className={styles.Divider} />
+            <Divider orientation="vertical" />
           )}
         </React.Fragment>
       ))}

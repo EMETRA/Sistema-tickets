@@ -10,3 +10,5 @@ export interface RolesTableProps {
     roles: Roles[];
     className?: string;
 };
+
+export type RolesView = "table" | "create";

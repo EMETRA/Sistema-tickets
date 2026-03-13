@@ -8,3 +8,5 @@ export interface PermissionsTableProps {
     permissions: Permissions[];
     className?: string;
 };
+
+export type PermissionsView = "table" | "create";

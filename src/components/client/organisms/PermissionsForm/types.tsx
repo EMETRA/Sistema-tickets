@@ -1,12 +1,11 @@
 export interface Modules {
     id: number;
     name: string;
-    status: string;
 };
 
-export interface ModulesTableProps {
+export interface PermissionsFormProps {
     modules: Modules[];
+    onSubmit?: () => void;
+    onCancel?: () => void;
     className?: string;
-};
-
-export type ModulesView = "table" | "create";
+}

@@ -9,7 +9,10 @@
   background-color: #FFFFFF;
   position: relative;
 
+  width: 280px;
   min-width: 280px;
+  max-width: 280px;
+  height: fit-content;
 
   &:hover {
     transition: box-shadow 0.3s ease;

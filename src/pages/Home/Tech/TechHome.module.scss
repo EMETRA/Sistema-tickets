@@ -1,0 +1,38 @@
+
+.mainContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 50px 0 0 20px;
+}
+
+.dashboardContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 0 50px 20px 0;
+  gap: 10px;
+}
+
+.myPerformanceContainer {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(500px, 1.5fr) minmax(auto, 0.5fr);
+  gap: 10px;
+
+}
+
+.performanceChart {
+  width: 100%;
+}
+
+.eventsAndTicketsContainer {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(400px, 0.5fr) minmax(500px, 1.5fr);
+  gap: 10px;
+}
+
+.infoPanel {
+  width: 100%;
+}

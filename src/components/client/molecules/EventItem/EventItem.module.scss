@@ -2,13 +2,16 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 16px;
+  padding: 5px 10px;
   border-radius: 8px;
   transition: background-color 0.2s ease;
   font-family: "Montserrat", sans-serif;
+  height: 50px;
+  min-height: 50px;
+  max-height: 50px;
 
   &:hover {
-    background-color: rgba(0, 0, 0, 0.02);
+    background-color: rgba(0, 0, 0, 0.05);
   }
 
   .content {
@@ -17,6 +20,7 @@
     flex-direction: column;
     gap: 4px;
     min-width: 0; // Para permitir truncado de texto
+    font-size: 14px;
   }
 
   // Tipo Movement
@@ -34,6 +38,9 @@
     .label {
       margin: 0;
       color: #737373;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .date {

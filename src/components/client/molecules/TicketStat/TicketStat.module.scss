@@ -9,35 +9,18 @@
   padding: 0;
 }
 
-.IconContainer {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  
-  :global(.icon) {
-    filter: brightness(0) invert(1);
-  }
-}
-
-<<<<<<< Updated upstream
-=======
 .Icon {
   color: white;
 }
 
->>>>>>> Stashed changes
 .Content {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 10px;
 }
 
 .Label {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 400;
   color: $primary-text;
   margin: 0;
@@ -45,7 +28,7 @@
 }
 
 .Value {
-  font-size: 24px;
+  font-size: 16px;
   font-weight: 700;
   margin: 0;
   line-height: 1;

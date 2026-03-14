@@ -26,4 +26,9 @@ export interface AssignedChipProps {
    * Clase CSS adicional para el contenedor
    */
   className?: string;
+
+  /**
+   * Función callback que se llama al hacer clic en el chip (opcional)
+   */
+  onClick?: () => void;
 }

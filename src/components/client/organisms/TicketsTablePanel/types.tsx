@@ -65,9 +65,14 @@ export interface TicketsTablePanelProps {
   tickets: Ticket[];
 
   /**
-   * Callback cuando se elimina un ticket
-   */
-  onDelete?: (ticketId: string | number) => void;
+  * Callback cuando se confirma la cancelación definitiva de un ticket
+  */
+  onDelete?: (ticketId: string | number) => void | Promise<void>;
+
+  /**
+  * Callback para asignar/reasignar un ticket a un usuario
+  */
+  onAssign?: (ticketId: string | number, userId: string) => void | Promise<void>;
 
   /**
    * Callback cuando se exporta la tabla

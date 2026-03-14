@@ -5,11 +5,13 @@ import classNames from "classnames";
 import { TableRow } from "../../molecules/TableRow";
 import { TicketsFilterBar } from "../TicketsFilterBar";
 import { ModalContent } from "../../molecules/ModalContent";
+import { InlineAlert } from "../../molecules/InlineAlert";
 import { Avatar } from "../../atoms/Avatar";
 import { Text } from "../../atoms/Text";
 import { Chip } from "../../atoms/Chip";
 import { AssignedChip } from "../../molecules/AssignedChip";
 import { IconButton } from "../../atoms/IconButton";
+import ModalUserSelect from "@/components/client/molecules/ModalUserSelect";
 import type { TicketsTablePanelProps, Ticket } from "./types";
 import styles from "./TicketsTablePanel.module.scss";
 
@@ -30,6 +32,7 @@ const FILTER_OPTIONS = [
 export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
   tickets,
   onDelete,
+  onAssign,
   onExport,
   loading = false,
   className,
@@ -38,12 +41,21 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
   const [selectedMemberId, setSelectedMemberId] = useState<string | number | undefined>();
   const [ticketToDelete, setTicketToDelete] = useState<string | number | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [hiddenTicketIds, setHiddenTicketIds] = useState<Array<string | number>>([]);
+  const [pendingCancellation, setPendingCancellation] = useState<{ id: string | number; title: string } | null>(null);
+  const [openAssignedChipModal, setOpenAssignedChipModal] = useState(false);
+  const [ticketToAssign, setTicketToAssign] = useState<string | number | null>(null);
+  const [isAssigning, setIsAssigning] = useState(false);
+
+  const visibleTickets = useMemo(() => (
+    tickets.filter((ticket) => !hiddenTicketIds.includes(ticket.id))
+  ), [tickets, hiddenTicketIds]);
 
   // Extraer miembros únicos de los tickets para el filtro
   const members = useMemo(() => {
     const uniqueUsers = new Map();
     
-    tickets.forEach(ticket => {
+    visibleTickets.forEach(ticket => {
       if (!uniqueUsers.has(ticket.user.id)) {
         uniqueUsers.set(ticket.user.id, {
           id: ticket.user.id,
@@ -64,11 +76,11 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
     });
     
     return Array.from(uniqueUsers.values());
-  }, [tickets]);
+  }, [visibleTickets]);
 
   // Filtrar tickets según el filtro seleccionado y el miembro seleccionado
   const filteredTickets = useMemo(() => {
-    let filtered = tickets;
+    let filtered = visibleTickets;
 
     // Filtrar por tipo (Asignados/Cancelados)
     if (selectedFilter === "assigned") {
@@ -86,18 +98,27 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
     }
 
     return filtered;
-  }, [tickets, selectedFilter, selectedMemberId]);
+  }, [visibleTickets, selectedFilter, selectedMemberId]);
 
   // Manejar apertura del modal de eliminación
   const handleDeleteClick = (ticketId: string | number) => {
+    if (pendingCancellation) {
+      return;
+    }
+
     setTicketToDelete(ticketId);
     setIsDeleteModalOpen(true);
   };
 
-  // Confirmar eliminación
+  // Confirmar cancelación y mostrar ventana para revertir
   const handleConfirmDelete = () => {
     if (ticketToDelete !== null) {
-      onDelete?.(ticketToDelete);
+      const selectedTicket = tickets.find((ticket) => ticket.id === ticketToDelete);
+      setHiddenTicketIds((prev) => (prev.includes(ticketToDelete) ? prev : [...prev, ticketToDelete]));
+      setPendingCancellation({
+        id: ticketToDelete,
+        title: selectedTicket?.title || "Ticket",
+      });
       setIsDeleteModalOpen(false);
       setTicketToDelete(null);
     }
@@ -107,6 +128,68 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
   const handleCancelDelete = () => {
     setIsDeleteModalOpen(false);
     setTicketToDelete(null);
+  };
+
+  const handleUndoCancellation = () => {
+    if (!pendingCancellation) {
+      return;
+    }
+
+    setHiddenTicketIds((prev) => prev.filter((id) => id !== pendingCancellation.id));
+    setPendingCancellation(null);
+  };
+
+  const handleFinalizeCancellation = async () => {
+    if (!pendingCancellation) {
+      return;
+    }
+
+    const ticketId = pendingCancellation.id;
+    setPendingCancellation(null);
+
+    if (!onDelete) {
+      return;
+    }
+
+    try {
+      await onDelete(ticketId);
+    } catch (error) {
+      console.error("Error cancelando ticket:", error);
+      // En caso de error, devolver el ticket a la lista.
+      setHiddenTicketIds((prev) => prev.filter((id) => id !== ticketId));
+      return;
+    }
+
+    setHiddenTicketIds((prev) => prev.filter((id) => id !== ticketId));
+  };
+
+  const handleAssignClick = (ticketId: string | number) => {
+    setTicketToAssign(ticketId);
+    setOpenAssignedChipModal(true);
+  };
+
+  const handleAssignConfirm = async (selectedUserId: string) => {
+    if (ticketToAssign === null) {
+      setOpenAssignedChipModal(false);
+      return;
+    }
+
+    if (!onAssign) {
+      setOpenAssignedChipModal(false);
+      setTicketToAssign(null);
+      return;
+    }
+
+    try {
+      setIsAssigning(true);
+      await onAssign(ticketToAssign, selectedUserId);
+    } catch (error) {
+      console.error("Error asignando ticket:", error);
+    } finally {
+      setIsAssigning(false);
+      setOpenAssignedChipModal(false);
+      setTicketToAssign(null);
+    }
   };
 
   // Renderizar una fila de ticket
@@ -150,6 +233,11 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
                 userName={ticket.assignedTo?.name}
                 avatarSrc={ticket.assignedTo?.avatarSrc}
                 avatarInitials={ticket.assignedTo?.initials}
+                onClick={() => {
+                  if (!isAssigning) {
+                    handleAssignClick(ticket.id);
+                  }
+                }}
               />
             ),
             align: "center",
@@ -160,6 +248,7 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
                 icon="trash-solid"
                 size={24}
                 iconColor="#BDBDBD"
+                disabled={!!pendingCancellation || isAssigning}
                 onClick={() => handleDeleteClick(ticket.id)}
               />
             ),
@@ -224,6 +313,26 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
         description="Estas seguro de cancelar este ticket, este ticket lo encontraras en el apartado de cancelados"
         confirmLabel="Confirmar"
         cancelLabel="Cancelar"
+      />
+
+      <InlineAlert
+        isOpen={!!pendingCancellation}
+        onClose={handleFinalizeCancellation}
+        onAction={handleUndoCancellation}
+        title="Revertir cancelacion"
+        description={`Cierra la alerta si no quieres revertirlo o espera a que se cierre.`}
+        actionLabel="Revertir"
+        duration={6}
+      />
+
+      {/* Modal para asignación de usuario a un ticket sin asignación */}
+      <ModalUserSelect
+        isOpen={openAssignedChipModal}
+        onClose={() => {
+          setOpenAssignedChipModal(false);
+          setTicketToAssign(null);
+        }}
+        onConfirm={handleAssignConfirm}
       />
     </div>
   );

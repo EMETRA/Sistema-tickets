@@ -6,25 +6,23 @@
   border-radius: 24px;
   transition: all 0.2s ease;
   font-family: "Montserrat", sans-serif;
-  background-color: #F5F5F5;  
-  cursor: pointer;
+  background-color: transparent;
   max-width: 100%;
   overflow: hidden;
-
-  &:hover {
-    background-color: #E0E0E0;
-  }
-}
-
+}  
+   
 .avatar {
   flex-shrink: 0;
 }
 
 .userName {
+  color: #262626;
+  margin: 0;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 1.4;
   max-width: 100%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: #737373;
-  font-size: 14px;
 }

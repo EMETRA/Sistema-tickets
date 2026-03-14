@@ -4,6 +4,7 @@ import React from "react";
 import classNames from "classnames";
 import { Avatar } from "../../atoms/Avatar";
 import { Text } from "../../atoms/Text";
+import UserChip from "@/components/client/atoms/UserChip/UserChip";
 import { AssignedChipProps } from "./types";
 import styles from "./AssignedChip.module.scss";
 
@@ -19,11 +20,12 @@ export const AssignedChip: React.FC<AssignedChipProps> = ({
   avatarSrc,
   avatarInitials,
   className,
+  onClick,
 }) => {
   // Si no está asignado, mostrar estado por defecto
   if (!assigned) {
     return (
-      <div className={classNames(styles.AssignedChip, styles.unassigned, className)}>
+      <div className={classNames(styles.AssignedChip, className)} onClick={onClick}>
         <Avatar 
           src="/images/no-user.png"
           size="sm"
@@ -38,16 +40,14 @@ export const AssignedChip: React.FC<AssignedChipProps> = ({
 
   // Si está asignado, mostrar usuario
   return (
-    <div className={classNames(styles.AssignedChip, styles.assigned, className)}>
-      <Avatar 
-        src={avatarSrc}
-        initials={avatarInitials}
-        size="sm"
-        className={styles.avatar}
+    <div className={classNames(styles.AssignedChip, className)} onClick={onClick}>
+      <UserChip 
+        userName={userName!}
+        avatarProps={{
+          src: avatarSrc,
+          initials: avatarInitials,
+        }}
       />
-      <Text variant="body" className={styles.userName}>
-        {userName || "Usuario"}
-      </Text>
     </div>
   );
 };

@@ -36,7 +36,7 @@ export const MENU_CONFIG: Record<UserRole, NavConfigItem[]> = {
     ],
     user: [
         { iconName: "house-solid", label: "INICIO", path: "/" },
-        { iconName: "file-circle-plus-solid", label: "CREAR TICKET", path: "/crear" },
+        { iconName: "file-circle-plus-solid", label: "CREAR TICKET", path: "/tickets-creation" },
         { iconName: "clock-rotate-left-solid", label: "HISTORIAL", path: "/historial" },
         { iconName: "user-solid", label: "USUARIOS", path: "/usuarios" },
         { iconName: "chart-pie-solid", label: "REPORTES", path: "/reportes" },

@@ -1,0 +1,14 @@
+.pageContainer {
+    display: flex;
+    justify-content: center;
+    padding: 24px;
+    width: 100%;
+}
+
+.formWrapper {
+    width: 100%;
+    max-width: 80%;
+    background-color: var(--white);
+    border-radius: 12px;
+    border: 1px solid #E0E0E0;
+}

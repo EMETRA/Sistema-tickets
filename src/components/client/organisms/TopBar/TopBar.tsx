@@ -35,12 +35,14 @@ export const TopBar = ({
                         borderless 
                         onClick={onSettingsClick}
                         size={20}
+                        iconColor="#000000"
                     />
                     <IconButton 
                         icon="bell-regular" 
                         borderless 
                         onClick={onNotificationsClick}
                         size={20}
+                        iconColor="#000000"
                     />
                 </div>
                 

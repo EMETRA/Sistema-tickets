@@ -38,6 +38,7 @@ export const UserMenu = ({
                 borderless 
                 onClick={onMenuClick}
                 size={20}
+                iconColor="#000000"
             />
         </div>
     );

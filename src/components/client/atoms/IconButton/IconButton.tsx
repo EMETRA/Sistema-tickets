@@ -37,7 +37,6 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
       },
       className
     );
-
     return (
       <button
         ref={ref}

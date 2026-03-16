@@ -138,7 +138,7 @@ export const TicketCreationPanel: React.FC<TicketCreationPanelProps> = ({
         </div>
 
         {/* Botones de acción */}
-        <FormActions align="right">
+        <FormActions align="center">
           <Button
             type="button"
             variant="contained"

@@ -11,90 +11,12 @@ import { ModulesTable } from "../ModulesTable";
 import { PermissionsTable } from "../PermissionsTable";
 import { EnrollTable } from "../EnrollTable";
 
-const testRequest = [
-    {
-        id: 1,
-        name: 'Feyser Cáceres',
-        email: 'fcaceres@muniguate.com',
-        employeeNumber: '2000145',
-        budget: '011',
-        position: 'Administrador de sistemas',
-        status: 'Solicitado'
-    },
-    {
-        id: 2,
-        name: 'Gerbert Martinez',
-        email: 'gmartinez@muniguate.com',
-        employeeNumber: '2024043',
-        budget: '011',
-        position: 'Admin',
-        status: 'Aprobado'
-    }
-];
-
-const testRoles = [
-    {
-        id: 1,
-        name: 'Administrador del sistema',
-        code: '0001',
-        roleCode: 'GRPADMIN',
-        status: 'Activo'
-    },
-    {
-        id: 2,
-        name: 'Usuario regular',
-        code: '0002',
-        roleCode: 'GRPREGULAR',
-        status: 'Baja'
-    }
-];
-
-const testModules = [
-    {
-        id: 1,
-        name: 'Evial',
-        status: 'Activo'
-    },
-    {
-        id: 2,
-        name: 'Tickets',
-        status: 'Baja'
-    }
-];
-
-const testPermissions = [
-    {
-        id: 1,
-        name: 'Permiso 1',
-        status: 'Activo'
-    },
-    {
-        id: 2,
-        name: 'Permiso 2',
-        status: 'Baja'
-    }
-];
-
-const testEnroll = [
-    {
-        id: 1,
-        name: 'Feyser Cáceres',
-        department: 'Dirección de informática',
-        employeeNumber: '2000145',
-        permission: 'Administrador de tickets',
-        status: 'Solicitado'
-    },
-    {
-        id: 2,
-        name: 'Gerbert Martinez',
-        department: 'Dirección de Jurídico',
-        employeeNumber: '2024043',
-        permission: 'Permisos regulares tickets',
-        status: 'Aprobado'
-    }
-];
-
 const ConfigurationManagement: React.FC<ConfigurationManagementProps> = ({
+    requests,
+    modules,
+    permissions,
+    roles,
+    enrolls,
     className
 }) => {
 
@@ -103,15 +25,15 @@ const ConfigurationManagement: React.FC<ConfigurationManagementProps> = ({
     const renderView = () => {
         switch (view) {
             case "requests":
-                return <RequestTable requests={testRequest} />;
+                return <RequestTable requests={requests} onApprove={(select) => alert(select)} />;
             case "modules":
-                return <ModulesTable modules={testModules} />;
+                return <ModulesTable modules={modules} />;
             case "permissions":
-                return <PermissionsTable permissions={testPermissions}/>;
+                return <PermissionsTable permissions={permissions}/>;
             case "roles":
-                return <RolesTable roles={testRoles} />;
+                return <RolesTable roles={roles} />;
             case "enroll":
-                return <EnrollTable enroll={testEnroll} />;
+                return <EnrollTable enroll={enrolls} />;
             
         }
     };

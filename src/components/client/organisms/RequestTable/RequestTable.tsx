@@ -8,6 +8,7 @@ import { Avatar } from "../../atoms/Avatar";
 import { Text } from "../../atoms/Text";
 import { Chip } from "../../atoms/Chip";
 import { IconButton } from "../../atoms/IconButton";
+import { Button } from "../../atoms/Button";
 
 const GRID = "minmax(0, 1.8fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 0.8fr) minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr)";
 
@@ -38,10 +39,18 @@ const RequestTable: React.FC<RequestTableProps> = ({
     return (
         <div className={classNames(styles.RequestTable, className)}>
 
-            <TableHeader 
-                iconName="user-clock-solid"
-                label="Solicitudes pendientes"
-            />
+            <div className={styles.header}>
+
+                <TableHeader 
+                    iconName="user-clock-solid"
+                    label="Solicitudes pendientes"
+                />
+
+                <Button onClick={handleApprove}>
+                    Aprobar y notificar
+                </Button>
+
+            </div>
 
             <div className={styles.table}>
 
@@ -97,13 +106,6 @@ const RequestTable: React.FC<RequestTableProps> = ({
                     />
                 ))}
 
-            </div>
-
-            <div className={styles.actions}>
-                <IconButton 
-                    icon="check"
-                    onClick={handleApprove}
-                />
             </div>
 
         </div>

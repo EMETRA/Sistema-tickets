@@ -16,8 +16,8 @@ export interface SideBarNavigationProps {
 export const MENU_CONFIG: Record<UserRole, NavConfigItem[]> = {
     admin: [
         { iconName: "house-solid", label: "INICIO", path: "/home" },
-        { iconName: "people-group-solid", label: "EQUIPO", path: "/equip" },
-        { iconName: "user-solid", label: "USUARIOS", path: "/profile" },
+        { iconName: "people-group-solid", label: "EQUIPO", path: "/equipo" },
+        { iconName: "user-solid", label: "USUARIOS", path: "/usuarios" },
         { iconName: "clipboard-list-solid", label: "TICKETS", path: "/tickets" },
         { iconName: "network-wired-solid", label: "CONFIG", path: "/config" },
         { iconName: "ticket-solid", label: "MIS TICKETS", path: "/mis-tickets" },

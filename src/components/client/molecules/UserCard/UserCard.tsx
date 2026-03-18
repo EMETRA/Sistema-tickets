@@ -8,6 +8,7 @@ import { Text } from "../../atoms/Text";
 import { StatInLine } from "../StatInLine";
 import { UserCardProps, UserStatusOption } from "./types";
 import styles from "./UserCard.module.scss";
+import { Link } from "../../atoms/Link";
 
 // Opciones de estado del usuario
 const statusOptions: UserStatusOption[] = [
@@ -21,7 +22,8 @@ const statusOptions: UserStatusOption[] = [
  * @param {UserCardProps} props - Las propiedades del componente
  * @returns {JSX.Element} El componente UserCard renderizado
  */
-export const UserCard: React.FC<UserCardProps> = ({
+export const UserCard: React.FC<UserCardProps & { id: string }> = ({
+  id,
   name,
   email,
   role,
@@ -33,6 +35,7 @@ export const UserCard: React.FC<UserCardProps> = ({
   onMenuClick,
   onStatusChange,
   className,
+  pathActive = "profile",
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -67,13 +70,15 @@ export const UserCard: React.FC<UserCardProps> = ({
     <div className={classNames(styles.UserCard, className)}>
       {/* Header con Avatar y botón de menú */}
       <div className={styles.header}>
-        <Avatar
-          src={avatarSrc}
-          initials={avatarInitials}
-          size="lg"
-          status={status}
-          className={styles.avatar}
-        />
+        <Link href={`/${pathActive}/${id}`} className={styles.avatarLink}>
+          <Avatar
+            src={avatarSrc}
+            initials={avatarInitials}
+            size="lg"
+            status={status}
+            className={styles.avatar}
+          />
+        </Link>
         <div className={styles.menuContainer} ref={menuRef}>
           <IconButton
             icon="ellipsis-vertical-solid"

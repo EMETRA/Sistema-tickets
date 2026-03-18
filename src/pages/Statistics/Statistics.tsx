@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import classNames from "classnames";
 import { Text } from "@/components/client/atoms/Text";
 import { Button } from "@/components/client/atoms/Button";

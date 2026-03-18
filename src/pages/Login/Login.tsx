@@ -12,8 +12,10 @@ import { Link } from "@/components/client/atoms/Link";
 import { Image } from "@/components/client/atoms/Image";
 import { login } from "@/api/graphql/mutations/login";
 import styles from "./Login.module.scss";
+import { useRouter } from "next/dist/client/components/navigation";
 
 const Login: React.FC = () => {
+   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -27,10 +29,11 @@ const Login: React.FC = () => {
     try {
       const response = await login({ email, password });
       console.log("Login exitoso:", response);
-      
+      router.push("/home");
     } catch (err) {
       console.error("Error en login:", err);
       setError("Error al iniciar sesión. Verifica tus credenciales.");
+
     } finally {
       setIsLoading(false);
     }

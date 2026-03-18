@@ -12,9 +12,9 @@ export const WelcomeMessage = ({ userName }: WelcomeMessageProps) => {
     <div className={styles.container}>
       <Title variant="mid" className={styles.header}>
         Bienvenido,{'   '}
-        <Title variant="mid" className={styles.name}>
+        <Text className={styles.name}>
           {userName}
-        </Title>
+        </Text>
       </Title>
       <Text variant="caption">
         Bienvenido, al sistema de tickets 

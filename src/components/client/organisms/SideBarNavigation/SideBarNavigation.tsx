@@ -1,9 +1,9 @@
-import React from "react";
-import { SideBarNavigationProps, MENU_CONFIG } from "./types";
+import { SideBarNavigationProps } from "./types";
 import { NavItem } from "../../molecules/NavItem";
-import { Icon } from "../../atoms/Icon";
+import { getMenuByRole } from "@/config/navigation";
 import styles from "./SideBarNavigation.module.scss";
 import classNames from "classnames";
+import { IconButton } from "../../atoms/IconButton";
 
 export const SideBarNavigation = ({ 
     role, 
@@ -11,29 +11,30 @@ export const SideBarNavigation = ({
     onNavigate, 
     className 
 }: SideBarNavigationProps) => {
-    const items = MENU_CONFIG[role];
+    const items = getMenuByRole(role);
 
     return (
         <aside className={classNames(styles.sidebar, className)}>
             <div className={styles.logoSection}>
-                <Icon name="ticket-solid" size={40} variant="navigation" active />
+                <IconButton icon="ticket-solid" size={40} onClick={() => onNavigate("/home")} borderless />
             </div>
 
             <nav className={styles.navContainer}>
                 <div className={styles.navItemsGroup}>
-                    {items.map((item) => (
-                        <NavItem 
-                            key={item.path}
-                            iconName={item.iconName}
-                            label={item.label}
-                            active={activePath === item.path}
-                            onClick={() => onNavigate(item.path)}
-                        />
-                    ))}
+                    {items.map((item) => {
+                        const isActive = activePath === item.path || activePath.startsWith(`${item.path}/`);
+                        return (
+                            <NavItem 
+                                key={item.path}
+                                iconName={item.iconName}
+                                label={item.label}
+                                active={isActive} // 👈 Pasamos el nuevo cálculo
+                                onClick={() => onNavigate(item.path)}
+                            />
+                        );
+                    })}
                 </div>
             </nav>
         </aside>
     );
 };
-
-export default SideBarNavigation;

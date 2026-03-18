@@ -28,12 +28,13 @@
 
 .profileInfo {
     display: flex;
-    align-items: flex-end; // Alinea el texto con la base del avatar
-    
+    align-items: flex-end;
+    gap: 1%;
+    flex-grow: 1;
+    min-width: 0;
 }
 
 .avatarOverlap {
-    // El truco para que sobresalga hacia arriba del área blanca
     margin-top: -60px; 
     border-width: 2px !important;
     border-color: #FFFFFF !important;
@@ -41,7 +42,10 @@
 }
 
 .textGroup {
+    // background-color: #ff0000;
     padding-bottom: 8px;
+    flex-grow: 1;
+    min-width: 0;
 
     .userName {
         font-size: 24px;

@@ -12,15 +12,15 @@ export type StatInLineSize = "small" | "medium";
  * Configuración de colores para cada tipo predefinido
  */
 export const STAT_INLINE_CONFIG: Record<StatInLineType, { color: string }> = {
-  resolved: {
-    color: "#AACC00",
-  },
-  assigned: {
-    color: "#FB8500",
-  },
-  "in-progress": {
-    color: "#FFB703",
-  },
+    resolved: {
+        color: "#AACC00",
+    },
+    assigned: {
+        color: "#FB8500",
+    },
+    "in-progress": {
+        color: "#FFB703",
+    },
 };
 
 /**

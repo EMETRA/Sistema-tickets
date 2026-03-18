@@ -34,7 +34,7 @@ export const Left: Story = {
     }
 };
 
-export const center: Story = {
+export const Center: Story = {
     args: {
         align: 'center',
         children: (

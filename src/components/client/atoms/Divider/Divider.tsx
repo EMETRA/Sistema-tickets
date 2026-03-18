@@ -10,8 +10,8 @@ interface DividerProps {
 export const Divider = ({ orientation = "horizontal", className }: DividerProps) => {
     return (
         <div 
-        className={classNames(styles.divider, styles[orientation], className)} 
-        role="separator" 
+            className={classNames(styles.divider, styles[orientation], className)} 
+            role="separator" 
         />
     );
 };

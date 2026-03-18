@@ -14,28 +14,28 @@ import styles from "./TicketsResolvePanel.module.scss";
  * @returns {JSX.Element} El componente TicketsResolvePanel renderizado
  */
 export const TicketsResolvePanel: React.FC<TicketsResolvePanelProps> = ({
-  data,
-  size = 250,
-  strokeWidth = 30,
-  className,
+    data,
+    size = 250,
+    strokeWidth = 30,
+    className,
 }) => {
-  return (
-    <div className={classNames(styles.TicketsResolvePanel, className)}>
-      <TableHeader 
-        iconName="ranking-star-solid" 
-        label="Tickets Resueltos" 
-        className={styles.header}
-      />
+    return (
+        <div className={classNames(styles.TicketsResolvePanel, className)}>
+            <TableHeader 
+                iconName="ranking-star-solid" 
+                label="Tickets Resueltos" 
+                className={styles.header}
+            />
       
-      <div className={styles.chartContainer}>
-        <DonutChart 
-          data={data} 
-          size={size} 
-          strokeWidth={strokeWidth}
-        />
-      </div>
-    </div>
-  );
+            <div className={styles.chartContainer}>
+                <DonutChart 
+                    data={data} 
+                    size={size} 
+                    strokeWidth={strokeWidth}
+                />
+            </div>
+        </div>
+    );
 };
 
 export default TicketsResolvePanel;

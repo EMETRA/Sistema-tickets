@@ -41,7 +41,7 @@ const Configuration: React.FC = () => {
                 setEnrolls(enrolls);
 
             } catch (err) {
-                setError("No fue posible cargar los datos");
+                setError("No fue posible cargar los datos" + (err instanceof Error ? `: ${err.message}` : ""));
             } finally {
                 setIsLoading(false);
             }

@@ -31,7 +31,7 @@ export async function getTeamUsersDummy(): Promise<UserCardProps[]> {
                     assignedCount: 50, 
                     resolvedCount: 48 
                 },
-                        { 
+                { 
                     name: "Usuario 1", 
                     email: "joseherndez@muniguate.com", 
                     role: "Tecnico", 
@@ -40,7 +40,7 @@ export async function getTeamUsersDummy(): Promise<UserCardProps[]> {
                     assignedCount: 50, 
                     resolvedCount: 48 
                 },
-                        { 
+                { 
                     name: "Usuario 2", 
                     email: "jehernandez@muniguate.com", 
                     role: "Tecnico", 
@@ -49,7 +49,7 @@ export async function getTeamUsersDummy(): Promise<UserCardProps[]> {
                     assignedCount: 50, 
                     resolvedCount: 48 
                 },
-                        { 
+                { 
                     name: "Usuario 3", 
                     email: "josehernand@muniguate.com", 
                     role: "Desarrollador", 

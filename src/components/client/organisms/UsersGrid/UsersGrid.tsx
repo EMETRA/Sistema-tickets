@@ -13,13 +13,13 @@ export const UsersGrid: React.FC<UsersGridProps> = ({
         <section className={classNames(styles.UsersGrid, className)}>
             <div className={styles.grid}>
                 {users.map((user, index) => (
-                <UserCard
-                    id={user.id || index.toString()}
-                    key={user.email || index}
-                    {...user}
-                    className={styles.card}
-                    pathActive={pathActive}
-                />
+                    <UserCard
+                        id={user.id || index.toString()}
+                        key={user.email || index}
+                        {...user}
+                        className={styles.card}
+                        pathActive={pathActive}
+                    />
                 ))}
             </div>
         </section>

@@ -8,18 +8,18 @@ import { UserChipProps } from "./types";
 import styles from "./UserChip.module.scss";
 
 export const UserChip: React.FC<UserChipProps> = ({ userName, avatarProps, className }) => {
-  return (
-    <div className={classNames(styles.AssignedChip, className)}>
-      <Avatar 
-        {...avatarProps}
-        size="sm"
-        className={styles.avatar}
-      />
-      <Text variant="body" className={styles.userName}>
-        {userName || "Usuario"}
-      </Text>
-    </div>
-  )
+    return (
+        <div className={classNames(styles.AssignedChip, className)}>
+            <Avatar 
+                {...avatarProps}
+                size="sm"
+                className={styles.avatar}
+            />
+            <Text variant="body" className={styles.userName}>
+                {userName || "Usuario"}
+            </Text>
+        </div>
+    )
 }
 
 export default UserChip;

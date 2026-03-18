@@ -13,27 +13,27 @@ import styles from "./ProgressRingStat.module.scss";
  * @returns {JSX.Element} El componente ProgressRingStat renderizado
  */
 export const ProgressRingStat: React.FC<ProgressRingStatProps> = ({
-  label,
-  percentage,
-  size = 180,
-  strokeWidth = 20,
-  className,
+    label,
+    percentage,
+    size = 180,
+    strokeWidth = 20,
+    className,
 }) => {
-  // Limitar percentage entre 0 y 100
-  const normalizedPercentage = Math.min(100, Math.max(0, percentage));
+    // Limitar percentage entre 0 y 100
+    const normalizedPercentage = Math.min(100, Math.max(0, percentage));
 
-  return (
-    <div className={classNames(styles.ProgressRingStat, className)}>
-      <ProgressRing
-        percentage={normalizedPercentage}
-        size={size}
-        strokeWidth={strokeWidth}
-        className={styles.RingContainer}
-      />
+    return (
+        <div className={classNames(styles.ProgressRingStat, className)}>
+            <ProgressRing
+                percentage={normalizedPercentage}
+                size={size}
+                strokeWidth={strokeWidth}
+                className={styles.RingContainer}
+            />
       
-      <p className={styles.Label}>{label}</p>
-    </div>
-  );
+            <p className={styles.Label}>{label}</p>
+        </div>
+    );
 };
 
 export default ProgressRingStat;

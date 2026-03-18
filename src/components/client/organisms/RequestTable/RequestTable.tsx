@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { Request, RequestTableProps } from "./types";
+import { RequestTableProps } from "./types";
 import styles from "./RequestTable.module.scss";
 import { TableHeader } from "../../molecules/TableHeader";
 import { TableRow } from "../../molecules/TableRow";

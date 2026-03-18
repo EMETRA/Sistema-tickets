@@ -15,10 +15,10 @@ export const PopOver = ({
 
     return (
         <>
-        {withOverlay && <div className={styles.overlay} onClick={onClose} />}
-        <div className={classNames(styles.popoverContent, styles[position], className)}>
-            {children}
-        </div>
+            {withOverlay && <div className={styles.overlay} onClick={onClose} />}
+            <div className={classNames(styles.popoverContent, styles[position], className)}>
+                {children}
+            </div>
         </>
     );
 };

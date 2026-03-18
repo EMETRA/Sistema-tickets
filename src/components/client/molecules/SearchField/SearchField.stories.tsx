@@ -22,12 +22,12 @@ export const Default: Story = {
         const [value, setValue] = useState("");
 
         return (
-        <SearchField
-            value={value}
-            onChange={setValue}
-            onSearch={() => alert(value)}
-            placeholder="Buscar..."
-        />
+            <SearchField
+                value={value}
+                onChange={setValue}
+                onSearch={() => alert(value)}
+                placeholder="Buscar..."
+            />
         );
     }
 };

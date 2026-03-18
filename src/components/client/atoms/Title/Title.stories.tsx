@@ -7,9 +7,9 @@ const meta: Meta<typeof Title> = {
     parameters: { layout: "centered" },
     tags: ["autodocs"],
     argTypes: {
-    variant: {
-        control: { type: "select" },
-        options: ["xlarge", "large", "mid"],
+        variant: {
+            control: { type: "select" },
+            options: ["xlarge", "large", "mid"],
         },
     },
 };

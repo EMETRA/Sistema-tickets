@@ -2,35 +2,35 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { Checkbox } from "./";
 
 const meta = {
-  title: "Atoms/Checkbox",
-  component: Checkbox,
-  parameters: {
-    layout: "centered",
-  },
-  tags: ["autodocs"],
-  argTypes: {
-    state: {
-      control: "select",
-      options: ["default", "error", "disabled"],
-      description: "Estado visual del checkbox",
+    title: "Atoms/Checkbox",
+    component: Checkbox,
+    parameters: {
+        layout: "centered",
     },
-    label: {
-      control: "text",
-      description: "Texto del label",
+    tags: ["autodocs"],
+    argTypes: {
+        state: {
+            control: "select",
+            options: ["default", "error", "disabled"],
+            description: "Estado visual del checkbox",
+        },
+        label: {
+            control: "text",
+            description: "Texto del label",
+        },
+        checked: {
+            control: "boolean",
+            description: "Si el checkbox está marcado",
+        },
+        errorMessage: {
+            control: "text",
+            description: "Mensaje de error (solo visible cuando state='error')",
+        },
+        size: {
+            control: { type: "number", min: 16, max: 48 },
+            description: "Tamaño del checkbox en píxeles",
+        },
     },
-    checked: {
-      control: "boolean",
-      description: "Si el checkbox está marcado",
-    },
-    errorMessage: {
-      control: "text",
-      description: "Mensaje de error (solo visible cuando state='error')",
-    },
-    size: {
-      control: { type: "number", min: 16, max: 48 },
-      description: "Tamaño del checkbox en píxeles",
-    },
-  },
 } satisfies Meta<typeof Checkbox>;
 
 export default meta;
@@ -38,102 +38,102 @@ type Story = StoryObj<typeof meta>;
 
 // Checkbox default sin marcar
 export const Default: Story = {
-  args: {
-    label: "Acepto los términos y condiciones",
-    state: "default",
-  },
+    args: {
+        label: "Acepto los términos y condiciones",
+        state: "default",
+    },
 };
 
 // Checkbox marcado
 export const Checked: Story = {
-  args: {
-    label: "Acepto los términos y condiciones",
-    state: "default",
-    defaultChecked: true,
-  },
+    args: {
+        label: "Acepto los términos y condiciones",
+        state: "default",
+        defaultChecked: true,
+    },
 };
 
 // Checkbox sin label
 export const WithoutLabel: Story = {
-  args: {
-    state: "default",
-  },
+    args: {
+        state: "default",
+    },
 };
 
 // Checkbox sin label marcado
 export const WithoutLabelChecked: Story = {
-  args: {
-    state: "default",
-    defaultChecked: true,
-  },
+    args: {
+        state: "default",
+        defaultChecked: true,
+    },
 };
 
 // Checkbox con error
 export const WithError: Story = {
-  args: {
-    label: "Debes aceptar los términos",
-    state: "error",
-    errorMessage: "Este campo es requerido",
-  },
+    args: {
+        label: "Debes aceptar los términos",
+        state: "error",
+        errorMessage: "Este campo es requerido",
+    },
 };
 
 // Checkbox con error marcado
 export const WithErrorChecked: Story = {
-  args: {
-    label: "Debes aceptar los términos",
-    state: "error",
-    errorMessage: "Este campo es requerido",
-    defaultChecked: true,
-  },
+    args: {
+        label: "Debes aceptar los términos",
+        state: "error",
+        errorMessage: "Este campo es requerido",
+        defaultChecked: true,
+    },
 };
 
 // Checkbox deshabilitado
 export const Disabled: Story = {
-  args: {
-    label: "Opción deshabilitada",
-    state: "disabled",
-  },
+    args: {
+        label: "Opción deshabilitada",
+        state: "disabled",
+    },
 };
 
 // Checkbox deshabilitado y marcado
 export const DisabledChecked: Story = {
-  args: {
-    label: "Opción deshabilitada",
-    state: "disabled",
-    defaultChecked: true,
-  },
+    args: {
+        label: "Opción deshabilitada",
+        state: "disabled",
+        defaultChecked: true,
+    },
 };
 
 // Checkbox con label largo
 export const LongLabel: Story = {
-  args: {
-    label: "Acepto los términos y condiciones de uso, la política de privacidad y el tratamiento de datos personales",
-    state: "default",
-  },
+    args: {
+        label: "Acepto los términos y condiciones de uso, la política de privacidad y el tratamiento de datos personales",
+        state: "default",
+    },
 };
 
 // Checkbox pequeño
 export const Small: Story = {
-  args: {
-    label: "Checkbox pequeño (default)",
-    state: "default",
-  },
+    args: {
+        label: "Checkbox pequeño (default)",
+        state: "default",
+    },
 };
 
 // Checkbox mediano (default)
 export const Medium: Story = {
-  args: {
-    label: "Checkbox mediano",
-    state: "default",
-    size: 24
-  },
+    args: {
+        label: "Checkbox mediano",
+        state: "default",
+        size: 24
+    },
 };
 
 // Checkbox grande
 export const Large: Story = {
-  args: {
-    label: "Checkbox grande",
-    state: "default",
-    size: 32,
-  },
+    args: {
+        label: "Checkbox grande",
+        state: "default",
+        size: 32,
+    },
 };

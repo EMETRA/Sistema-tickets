@@ -14,26 +14,26 @@ export const ReportTable: React.FC<ReportTableProps> = ({
     width = 700,
     height = 400,
     className,
-    }) => {
+}) => {
     return (
         <article className={classNames(styles.ReportTable, className)}>
-        <div className={styles.header}>
-            <TableHeader
-                iconName={iconName}
-                label={title}
-                className={styles.headerTitle}
-            />
-        </div>
+            <div className={styles.header}>
+                <TableHeader
+                    iconName={iconName}
+                    label={title}
+                    className={styles.headerTitle}
+                />
+            </div>
 
-        <div className={styles.chartContainer}>
-            <BarChart
-                data={data}
-                width={width}
-                height={height}
-                colorScheme="green-gradient"
-                verticalLabels
-            />
-        </div>
+            <div className={styles.chartContainer}>
+                <BarChart
+                    data={data}
+                    width={width}
+                    height={height}
+                    colorScheme="green-gradient"
+                    verticalLabels
+                />
+            </div>
         </article>
     );
 };

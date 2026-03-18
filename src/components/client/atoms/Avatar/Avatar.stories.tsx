@@ -10,12 +10,12 @@ const meta: Meta<typeof Avatar> = {
     tags: ["autodocs"],
     argTypes: {
         size: {
-        control: { type: "select" },
-        options: ["sm", "md", "lg"],
+            control: { type: "select" },
+            options: ["sm", "md", "lg"],
         },
         status: {
-        control: { type: "select" },
-        options: ["online", "offline", "busy"],
+            control: { type: "select" },
+            options: ["online", "offline", "busy"],
         },
     },
 };

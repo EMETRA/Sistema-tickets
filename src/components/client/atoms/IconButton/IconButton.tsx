@@ -13,43 +13,43 @@ import { Icon } from "../Icon";
  * @returns {JSX.Element} El componente IconButton renderizado.
  */
 export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
-  ({ icon, size = 24, disabled = false, loading = false, onClick, borderless = false, squared_borded, className, iconColor, ...props }, ref) => {
+    ({ icon, size = 24, disabled = false, loading = false, onClick, borderless = false, squared_borded, className, iconColor, ...props }, ref) => {
     // El botón está deshabilitado si disabled=true O loading=true
-    const isDisabled = disabled || loading;
+        const isDisabled = disabled || loading;
 
-    /**
+        /**
      * Manejar el clic del botón
      */
-    const handleClick = () => {
-      if (!isDisabled && onClick) {
-        onClick();
-      }
-    };
+        const handleClick = () => {
+            if (!isDisabled && onClick) {
+                onClick();
+            }
+        };
 
-    // Construir las clases CSS dinámicamente
-    const buttonClasses = classNames(
-      styles.IconButton,
-      {
-        [styles.Loading]: loading,
-        [styles.Disabled]: isDisabled,
-        [styles.Borderless]: borderless,
-        [styles.SquaredBordered]: squared_borded,
-      },
-      className
-    );
-    return (
-      <button
-        ref={ref}
-        type="button"
-        onClick={handleClick}
-        disabled={isDisabled}
-        className={buttonClasses}
-        {...props}
-      >
-        <Icon name={icon} variant="action" size={size} color={iconColor} />
-      </button>
-    );
-  }
+        // Construir las clases CSS dinámicamente
+        const buttonClasses = classNames(
+            styles.IconButton,
+            {
+                [styles.Loading]: loading,
+                [styles.Disabled]: isDisabled,
+                [styles.Borderless]: borderless,
+                [styles.SquaredBordered]: squared_borded,
+            },
+            className
+        );
+        return (
+            <button
+                ref={ref}
+                type="button"
+                onClick={handleClick}
+                disabled={isDisabled}
+                className={buttonClasses}
+                {...props}
+            >
+                <Icon name={icon} variant="action" size={size} color={iconColor} />
+            </button>
+        );
+    }
 );
 
 IconButton.displayName = "IconButton";

@@ -12,18 +12,18 @@ export const TICKET_CARD_CONFIG: Record<
   TicketCardType,
   { color: string; iconName: IconName }
 > = {
-  entered: {
-    color: "#AACC00",
-    iconName: "ticket-solid",
-  },
-  solved: {
-    color: "#E63946",
-    iconName: "ticket-solid",
-  },
-  "in-progress": {
-    color: "#FFB703",
-    iconName: "ticket-solid",
-  },
+    entered: {
+        color: "#AACC00",
+        iconName: "ticket-solid",
+    },
+    solved: {
+        color: "#E63946",
+        iconName: "ticket-solid",
+    },
+    "in-progress": {
+        color: "#FFB703",
+        iconName: "ticket-solid",
+    },
 };
 
 /**

@@ -1,12 +1,58 @@
-// Estilos base del richtextfield
 .RichTextField {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    border: 1px solid #000000;
+    background: #fff;
+    transition: all 0.2s ease-in-out;
+    border-radius: 10px;
 }
 
-.textarea {
-    min-height: 120px;
-    resize: vertical;
+.toolbar {
+    display: flex;
     padding: 8px;
+    gap: 4px;
+    background: #f9fafb;
+    border-bottom: 1px solid #000000;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.toolBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    color: #6b7280;
+
+    &:hover {
+        background: #f3f4f6;
+    }
+
+    &.active {
+        background: #000000; // Rojo clarito para el estado activo
+        color: #ffffff;
+    }
+}
+
+.editorContainer {
+    padding: 12px;
+    min-height: 150px;
+}
+
+.editorContent {
+    outline: none;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    
+    p { margin: 0; }
+    strong { font-weight: bold; }
+    em { font-style: italic; }
+    u { text-decoration: underline; }
+    s { text-decoration: line-through; }
+    ul { padding-left: 20px; list-style-type: disc; }
 }

@@ -15,7 +15,7 @@ export const SystemLayout = ({ children, className }: { children: React.ReactNod
     const router = useRouter();
     // const { user } = useAuth(); // Aquí obtendrás el rol real pronto
 
-    const [currentRole, setCurrentRole] = useState<"admin" | "tech" | "user">("user");
+    const [currentRole, setCurrentRole] = useState<"admin" | "tech" | "user">("admin");
     // Lógica automática de títulos e iconos -- LOGICA TITULOS TOPBAR
     const authorizedRoutes = Object.entries(APP_ROUTES).filter(([, config]) => {
         if (config.roles === 'all') return true;

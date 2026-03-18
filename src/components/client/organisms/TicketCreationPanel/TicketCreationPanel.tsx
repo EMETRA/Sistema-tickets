@@ -6,13 +6,13 @@ import { Title } from "../../atoms/Title";
 import { FormField } from "../../molecules/FormField";
 import { Input } from "../../atoms/Input";
 import { Select } from "../../atoms/Select";
-import { TextArea } from "../../atoms/TextArea";
 import { FileDropzone } from "../../molecules/FileDropzone";
 import { FileItem } from "../../molecules/FileItem";
 import { FormActions } from "../../molecules/FormActions";
 import { Button } from "../../atoms/Button";
 import type { TicketCreationPanelProps, TicketFormData, UploadedFile } from "./types";
 import styles from "./TicketCreationPanel.module.scss";
+import { RichTextField } from "../../molecules/RichTextField";
 
 /**
  * Componente TicketCreationPanel - Formulario completo para crear un ticket
@@ -52,18 +52,19 @@ export const TicketCreationPanel: React.FC<TicketCreationPanelProps> = ({
   };
 
   // Manejar envío del formulario
-  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
 
-    const formData: TicketFormData = {
-      subject,
-      departmentId,
-      description,
-      files: uploadedFiles,
+      const formData: TicketFormData = {
+        subject,
+        departmentId,
+        description, // 👈 Este ya lleva el Markdown con **, __, etc.
+        files: uploadedFiles,
+      };
+
+      console.log("RAW:", formData.description);
+      onSubmit?.(formData);
     };
-
-    onSubmit?.(formData);
-  };
 
   // Manejar cancelación
   const handleCancel = () => {
@@ -107,14 +108,10 @@ export const TicketCreationPanel: React.FC<TicketCreationPanelProps> = ({
 
         {/* Descripción del problema */}
         <FormField label="Descripción del problema" htmlFor="description" required>
-          <TextArea
-            id="description"
+          <RichTextField
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Describe el problema..."
-            rows={4}
-            state={loading ? "disabled" : "default"}
-            required
+            onChange={(val) => setDescription(val)} // 👈 Recibe el string directamente
+            placeholder="Describe el problema detalladamente..."
           />
         </FormField>
 

@@ -1,66 +1,75 @@
-import { useRef } from "react";
-import { RichTextFieldProps } from "./types";
-import styles from "./RichTextField.module.scss";
-import { RichTextActions, RichTextToolbar } from "../RichTextToolbar";
+"use client";
+
+import React, { useEffect } from "react";
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Underline from "@tiptap/extension-underline";
+import { Markdown } from "tiptap-markdown";
 import classNames from "classnames";
-import { TextArea } from "../../atoms/TextArea";
+import styles from "./RichTextField.module.scss";
+import { RichTextFieldProps } from "./types";
+import { RichTextToolbar } from "./RichTextToolbar";
 
-const RichTextField: React.FC<RichTextFieldProps> = ({
-    value,
-    onChange,
-    className
-}) => {
-
-    const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-    const apply = (action: RichTextActions) => {
-        
-        const el = textareaRef.current;
-        if (!el) return;
-
-        const start = el.selectionStart;
-        const end = el.selectionEnd;
-        const selected = value.slice(start, end);
-
-        let wrapped = selected;
-
-        switch (action) {
-            case "bold":
-                wrapped = `**${selected}**`;
-                break;
-            case "italic":
-                wrapped = `*${selected}*`;
-                break;
-            case "underline":
-                wrapped = `__${selected}__`;
-                break;
-            case "strike":
-                wrapped = `~~${selected}~~`;
-                break;
-            case "bullet":
-                wrapped = `- ${selected}`;
-                break;
-        }
-
-        onChange( value.slice(0, start) + wrapped + value.slice(end) );
-
+interface MarkdownStorage {
+    markdown: {
+        getMarkdown: () => string;
     };
+}
+
+export const RichTextField: React.FC<RichTextFieldProps> = ({ 
+    value, 
+    onChange, 
+    className,
+    placeholder 
+}) => {
+    const editor = useEditor({
+        extensions: [
+            StarterKit.configure({
+                heading: false,
+                codeBlock: false,
+                blockquote: false,
+            }),
+            Underline,
+            Markdown.configure({
+                bulletListMarker: "-", // Sincronizado con tu preferencia de guiones
+            }),
+        ],
+        content: value,
+        immediatelyRender: false,
+        editorProps: {
+            attributes: {
+                class: styles.editorContent,
+            },
+        },
+        onUpdate: ({ editor }) => {
+            const storage = editor.storage as unknown as MarkdownStorage;
+            const markdown = storage.markdown.getMarkdown();
+            onChange(markdown);
+        },
+    });
+
+    // Sincronización robusta con el estado externo
+    useEffect(() => {
+        if (!editor) return;
+        const storage = editor.storage as unknown as MarkdownStorage;
+        const markdown = storage.markdown.getMarkdown();
+        
+        // Solo actualizamos si el cambio viene de afuera y es distinto
+        if (value !== markdown) {
+            editor.commands.setContent(value);
+        }
+    }, [value, editor]);
+
+    if (!editor) return null;
 
     return (
         <div className={classNames(styles.RichTextField, className)}>
-
-            <RichTextToolbar onAction={apply} />
-
-            <TextArea 
-                ref={textareaRef}
-                className={styles.textarea}
-                value={value}
-                onChange={e => onChange(e.target.value)}
-            />
-
+            <RichTextToolbar editor={editor} />
+            <div className={styles.editorContainer}>
+                <EditorContent editor={editor} placeholder={placeholder} />
+            </div>
         </div>
     );
-
 };
 
 export default RichTextField;

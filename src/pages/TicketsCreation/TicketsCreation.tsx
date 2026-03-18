@@ -21,7 +21,6 @@ export default function CreateTicketPage() {
         // await createTicket({ variables: data });
         
         // Al terminar, regresamos al historial
-        router.push("/tickets");
     };
 
     const handleCancel = () => {

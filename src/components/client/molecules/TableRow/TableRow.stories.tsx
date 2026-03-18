@@ -40,24 +40,24 @@ export const DataRow: Story = {
     args: {
         gridTemplate: COMMON_GRID,
         cells: [
-                { 
+            { 
                 content:
-                    <div className={classNames(styles.userMenu)}>
-                        <Avatar 
-                            initials={"G"}
-                            ringed={false}
-                            size="md"
-                        />
+    <div className={classNames(styles.userMenu)}>
+        <Avatar 
+            initials={"G"}
+            ringed={false}
+            size="md"
+        />
                 
-                        <div className={styles.info}>
-                            <Text variant="body" className={styles.name}>
-                                Gildder Caceres
-                            </Text>
-                            <Text variant="caption" className={styles.role}>
-                                Recursos Humanos  
-                            </Text>
-                        </div>
-                    </div> 
+        <div className={styles.info}>
+            <Text variant="body" className={styles.name}>
+                Gildder Caceres
+            </Text>
+            <Text variant="caption" className={styles.role}>
+                Recursos Humanos  
+            </Text>
+        </div>
+    </div> 
             },
             { content: <Text variant="body" className="{
                 
@@ -106,17 +106,17 @@ export const TableExample: Story = {
                 cells={[
                     { 
                         content:
-                            <div className={classNames(styles.userMenu)}>
-                                <Avatar initials="F" size="sm"   />
-                                <div className={styles.info}>
-                                    <Text variant="body" className={styles.name}>
-                                        Feyser Emilio Caceres
-                                    </Text>
-                                    <Text variant="caption" className={styles.role}>
-                                        Informática
-                                    </Text>
-                                </div>
-                            </div> 
+    <div className={classNames(styles.userMenu)}>
+        <Avatar initials="F" size="sm"   />
+        <div className={styles.info}>
+            <Text variant="body" className={styles.name}>
+                Feyser Emilio Caceres
+            </Text>
+            <Text variant="caption" className={styles.role}>
+                Informática
+            </Text>
+        </div>
+    </div> 
                     },
                     { content: <Text variant="muted">Solicitud de Mantenimiento</Text> },
                     { content: <Text variant="muted">Mantenimiento a computadora</Text> },
@@ -158,13 +158,13 @@ export const SelectableTableExample: Story = {
         const exampleCells = [
             { 
                 content:
-                    <div className={classNames(styles.userMenu)}>
-                        <Avatar initials="G" size="sm" />
-                        <div className={styles.info}>
-                            <Text variant="body" className={styles.name}>Gildder Caceres</Text>
-                            <Text variant="caption" className={styles.role}>Recursos Humanos</Text>
-                        </div>
-                    </div> 
+    <div className={classNames(styles.userMenu)}>
+        <Avatar initials="G" size="sm" />
+        <div className={styles.info}>
+            <Text variant="body" className={styles.name}>Gildder Caceres</Text>
+            <Text variant="caption" className={styles.role}>Recursos Humanos</Text>
+        </div>
+    </div> 
             },
             { content: <Text variant="muted">Cancelación Remisión</Text> },
             { content: <Text variant="muted">Remisión errónea a vehículo</Text> },

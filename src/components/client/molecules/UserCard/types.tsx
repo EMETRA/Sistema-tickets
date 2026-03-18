@@ -25,6 +25,10 @@ export interface UserStatusOption {
  */
 export interface UserCardProps {
   /**
+   * ID del usuario (TEMPORAL - Se utilizará el identificador real cuando se integre con backend)
+   */
+  id?: string; 
+  /**
    * Nombre completo del usuario
    */
   name: string;
@@ -78,4 +82,9 @@ export interface UserCardProps {
    * Clase CSS adicional para el contenedor
    */
   className?: string;
+
+  /**
+   * Ruta base para los enlaces (por ejemplo, "profile" o "equipo")
+   */
+  pathActive?: string;
 }

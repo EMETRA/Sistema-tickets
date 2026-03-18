@@ -9,11 +9,11 @@ const meta: Meta<typeof SystemLayout> = {
     parameters: {
         layout: "fullscreen",
         nextjs: {
-        appDirectory: true,
-        navigation: {
-            pathname: '/dashboard', 
+            appDirectory: true,
+            navigation: {
+                pathname: '/dashboard', 
+            },
         },
-    },
     },
 };
 

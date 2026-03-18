@@ -10,10 +10,10 @@ export const Chip = ({
     className 
 }: ChipProps) => {
     return (
-    <div className={classNames(styles.chip, styles[variant], styles[state], className)}>
-        {variant !== 'outlined' && <span className={styles.dot}></span>}
-        <span className={styles.label}>{label}</span>
-    </div>
+        <div className={classNames(styles.chip, styles[variant], styles[state], className)}>
+            {variant !== 'outlined' && <span className={styles.dot}></span>}
+            <span className={styles.label}>{label}</span>
+        </div>
     );
 };
 

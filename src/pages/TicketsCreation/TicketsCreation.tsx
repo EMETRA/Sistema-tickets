@@ -20,11 +20,10 @@ export default function CreateTicketPage() {
         // Lógica de carga...
         // await createTicket({ variables: data });
         
-        // Al terminar, regresamos al historial
     };
 
     const handleCancel = () => {
-        router.back(); // Regresa a la página anterior
+        router.back();
     };
 
     return (

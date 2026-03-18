@@ -12,8 +12,8 @@
 
   .header {
     display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
+    align-items: center;
+    justify-content: center;
     position: relative;
 
     .avatar {
@@ -133,4 +133,29 @@
       align-items: center;
     }
   }
+}
+
+.avatarLink {
+    text-decoration: none;
+    align-self: center;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    outline: none;
+
+    &:hover, 
+    &:active, 
+    &:focus, 
+    &:visited {
+      text-decoration: none !important;
+    }
+    &:hover {
+        transform: scale(1.05);
+        // opacity: 0.9;  
+    }
+
+    &:active {
+        transform: scale(0.95);
+    }
 }

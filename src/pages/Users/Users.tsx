@@ -23,8 +23,8 @@ const Users: React.FC = () => {
 
                 const data = await getTeamUsersDummy();
                 setUsers(data);
-            } catch (err) {
-                setError("No fue posible cargar los usuarios");
+            } catch (error) {
+                setError("No fue posible cargar los usuarios" + (error instanceof Error ? `: ${error.message}` : ""));
             } finally {
                 setIsLoading(false);
             }
@@ -76,6 +76,7 @@ const Users: React.FC = () => {
                         title=""
                         iconName=""
                         users={filteredUsers}
+                        pathActive="usuarios"
                     />
                 </div>
             </div>

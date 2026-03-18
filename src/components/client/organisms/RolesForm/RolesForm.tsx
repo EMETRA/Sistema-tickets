@@ -57,7 +57,7 @@ const RolesForm: React.FC<RolesFormProps> = ({
             setPermissionState(mergedPermissions);
             
         }
-    }, [initialData])
+    }, [initialData, permissions])
 
     const isAllSelected = selected.length === permissions.length;
 

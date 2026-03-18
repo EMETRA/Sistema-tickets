@@ -14,23 +14,23 @@ import styles from "./TableHeader.module.scss";
  * @returns {JSX.Element} El componente TableHeader renderizado
  */
 export const TableHeader: React.FC<TableHeaderProps> = ({
-  iconName,
-  label,
-  className,
+    iconName,
+    label,
+    className,
 }) => {
-  return (
-    <div className={classNames(styles.TableHeader, className)}>
-      <Icon 
-        name={iconName} 
-        variant="status"
-        size={32}
-        className={styles.icon}
-      />
-      <Title variant="mid" tag="h2" className={styles.title}>
-        {label}
-      </Title>
-    </div>
-  );
+    return (
+        <div className={classNames(styles.TableHeader, className)}>
+            <Icon 
+                name={iconName} 
+                variant="status"
+                size={32}
+                className={styles.icon}
+            />
+            <Title variant="mid" tag="h2" className={styles.title}>
+                {label}
+            </Title>
+        </div>
+    );
 };
 
 export default TableHeader;

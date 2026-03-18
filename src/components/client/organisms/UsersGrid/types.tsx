@@ -5,4 +5,5 @@ export interface UsersGridProps {
     iconName: string;
     users: UserCardProps[];
     className?: string;
+    pathActive?: string;
 }

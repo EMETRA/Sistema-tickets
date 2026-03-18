@@ -25,7 +25,7 @@ const PermissionsForm: React.FC<PermissionsFormProps> = ({
     const [description, setDescription] = useState("");
 
     const options = modules.map(item => 
-        { return { label: item.name, value: item.id }}
+    { return { label: item.name, value: item.id }}
     );
 
     useEffect(() => {

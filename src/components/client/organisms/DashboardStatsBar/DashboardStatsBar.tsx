@@ -14,26 +14,26 @@ import styles from "./DashboardStatsBar.module.scss";
  * @returns {JSX.Element} El componente DashboardStatsBar renderizado
  */
 export const DashboardStatsBar: React.FC<DashboardStatsBarProps> = ({
-  stats,
-  className,
+    stats,
+    className,
 }) => {
-  return (
-    <div className={classNames(styles.DashboardStatsBar, className)}>
-      {stats.map((stat, index) => (
-        <React.Fragment key={`${stat.type}-${index}`}>
-          <TicketStat
-            type={stat.type}
-            label={stat.label}
-            value={stat.value}
-            className={styles.StatItem}
-          />
-          {index < stats.length - 1 && (
-            <Divider orientation="vertical" />
-          )}
-        </React.Fragment>
-      ))}
-    </div>
-  );
+    return (
+        <div className={classNames(styles.DashboardStatsBar, className)}>
+            {stats.map((stat, index) => (
+                <React.Fragment key={`${stat.type}-${index}`}>
+                    <TicketStat
+                        type={stat.type}
+                        label={stat.label}
+                        value={stat.value}
+                        className={styles.StatItem}
+                    />
+                    {index < stats.length - 1 && (
+                        <Divider orientation="vertical" />
+                    )}
+                </React.Fragment>
+            ))}
+        </div>
+    );
 };
 
 export default DashboardStatsBar;

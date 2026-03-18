@@ -11,7 +11,7 @@ export const Icon = ({
     active = false,
     color,
     backgroundColor
-    }: IconProps) => {
+}: IconProps) => {
 
     const isCustom = !!(color || backgroundColor);
 

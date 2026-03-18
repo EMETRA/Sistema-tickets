@@ -10,17 +10,17 @@ const meta: Meta<typeof Logo> = {
     tags: ["autodocs"],
     argTypes: {
         name: {
-        control: { type: "select" },
-        options: ["Emetra"],
-        description: "Nombre del logo a renderizar",
+            control: { type: "select" },
+            options: ["Emetra"],
+            description: "Nombre del logo a renderizar",
         },
         width: {
-        control: { type: "number" },
-        description: "Ancho del logo en píxeles",
+            control: { type: "number" },
+            description: "Ancho del logo en píxeles",
         },
         height: {
-        control: { type: "number" },
-        description: "Alto del logo en píxeles",
+            control: { type: "number" },
+            description: "Alto del logo en píxeles",
         },
     },
 };
@@ -48,18 +48,18 @@ export const Small: Story = {
 export const SizeComparison: Story = {
     render: () => (
         <div style={{ display: "flex", flexDirection: "column", gap: "24px", alignItems: "center" }}>
-        <div>
-            <p style={{ fontSize: "12px", fontFamily: "Arial, sans-serif", color: "gray", marginBottom: "8px" }}>Large (Default)</p>
-            <Logo name="EmetraMain" width={250} />
-        </div>
-        <div>
-            <p style={{ fontSize: "12px", fontFamily: "Arial, sans-serif", color: "gray", marginBottom: "8px" }}>Medium</p>
-            <Logo name="EmetraMain" width={150} />
-        </div>
-        <div>
-            <p style={{ fontSize: "12px", fontFamily: "Arial, sans-serif", color: "gray", marginBottom: "8px" }}>Small</p>
-            <Logo name="EmetraMain" width={80} />
-        </div>
+            <div>
+                <p style={{ fontSize: "12px", fontFamily: "Arial, sans-serif", color: "gray", marginBottom: "8px" }}>Large (Default)</p>
+                <Logo name="EmetraMain" width={250} />
+            </div>
+            <div>
+                <p style={{ fontSize: "12px", fontFamily: "Arial, sans-serif", color: "gray", marginBottom: "8px" }}>Medium</p>
+                <Logo name="EmetraMain" width={150} />
+            </div>
+            <div>
+                <p style={{ fontSize: "12px", fontFamily: "Arial, sans-serif", color: "gray", marginBottom: "8px" }}>Small</p>
+                <Logo name="EmetraMain" width={80} />
+            </div>
         </div>
     ),
 };

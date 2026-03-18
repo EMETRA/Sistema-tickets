@@ -13,7 +13,7 @@ interface LinkProps {
 export const Link = ({ children, href, className }: LinkProps) => {
     return (
         <NextLink href={href} className={classNames(styles.link, className)}>
-        {children}
+            {children}
         </NextLink>
     );
 };

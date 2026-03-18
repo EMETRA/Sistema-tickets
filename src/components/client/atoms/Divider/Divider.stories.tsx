@@ -7,8 +7,8 @@ const meta: Meta<typeof Divider> = {
     tags: ["autodocs"],
     argTypes: {
         orientation: {
-        control: { type: "radio" },
-        options: ["horizontal", "vertical"],
+            control: { type: "radio" },
+            options: ["horizontal", "vertical"],
         },
     },
 };
@@ -22,9 +22,9 @@ export const Horizontal: Story = {
     },
     render: (args) => (
         <div style={{ width: "400px" }}>
-        <p style={{ fontFamily: 'Montserrat' }}>Texto Superior</p>
-        <Divider {...args} />
-        <p style={{ fontFamily: 'Montserrat' }}>Texto Inferior</p>
+            <p style={{ fontFamily: 'Montserrat' }}>Texto Superior</p>
+            <Divider {...args} />
+            <p style={{ fontFamily: 'Montserrat' }}>Texto Inferior</p>
         </div>
     ),
 };
@@ -35,14 +35,14 @@ export const Vertical: Story = {
     },
     render: (args) => (
         <div style={{ 
-        display: "flex", 
-        alignItems: "center", 
-        height: "50px", 
-        fontFamily: 'Montserrat' 
+            display: "flex", 
+            alignItems: "center", 
+            height: "50px", 
+            fontFamily: 'Montserrat' 
         }}>
-        <span style={{ fontFamily: 'Montserrat' }} >Sección A</span>
-        <Divider {...args} />
-        <span style={{ fontFamily: 'Montserrat' }} >Sección B</span>
+            <span style={{ fontFamily: 'Montserrat' }} >Sección A</span>
+            <Divider {...args} />
+            <span style={{ fontFamily: 'Montserrat' }} >Sección B</span>
         </div>
     ),
 };

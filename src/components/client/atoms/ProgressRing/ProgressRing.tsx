@@ -28,15 +28,15 @@ export const ProgressRing = ({
                     cy={size / 2}
                 />
                 <circle
-                className={styles.progressRing}
-                strokeWidth={strokeWidth}
-                strokeDasharray={`${circumference} ${circumference}`}
-                style={{ strokeDashoffset: offset }}
-                strokeLinecap="round"
-                fill="transparent"
-                r={radius}
-                cx={size / 2}
-                cy={size / 2}
+                    className={styles.progressRing}
+                    strokeWidth={strokeWidth}
+                    strokeDasharray={`${circumference} ${circumference}`}
+                    style={{ strokeDashoffset: offset }}
+                    strokeLinecap="round"
+                    fill="transparent"
+                    r={radius}
+                    cx={size / 2}
+                    cy={size / 2}
                 />
             </svg>
             {/* Texto central con el porcentaje */}
@@ -45,7 +45,7 @@ export const ProgressRing = ({
                     className={styles.percentageText}
                     style={{ fontSize: fontSize || `${size * 0.2}px` }}
                 >
-                        {percentage} %           
+                    {percentage} %           
                 </span>
             </div>
         </div>

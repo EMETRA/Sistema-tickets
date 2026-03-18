@@ -7,7 +7,7 @@ const meta: Meta<typeof UserPerformance> = {
     parameters: {
         layout: "padded",
     },
-    };
+};
 
 export default meta;
 type Story = StoryObj<typeof meta>;

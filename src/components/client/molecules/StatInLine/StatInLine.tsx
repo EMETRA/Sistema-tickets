@@ -12,19 +12,19 @@ import styles from "./StatInLine.module.scss";
  * @returns {JSX.Element} El componente StatInLine renderizado
  */
 export const StatInLine: React.FC<StatInLineProps> = (props) => {
-  const { label, value, size = "small", className } = props;
+    const { label, value, size = "small", className } = props;
 
-  // Determinar color según si usa type predefinido o valor custom
-  const color = props.type ? STAT_INLINE_CONFIG[props.type].color : props.color;
+    // Determinar color según si usa type predefinido o valor custom
+    const color = props.type ? STAT_INLINE_CONFIG[props.type].color : props.color;
 
-  return (
-    <div className={classNames(styles.StatInLine, styles[size], className)}>
-      <p className={styles.Label}>{label}</p>
-      <p className={styles.Value} style={{ color }}>
-        {value.toLocaleString()}
-      </p>
-    </div>
-  );
+    return (
+        <div className={classNames(styles.StatInLine, styles[size], className)}>
+            <p className={styles.Label}>{label}</p>
+            <p className={styles.Value} style={{ color }}>
+                {value.toLocaleString()}
+            </p>
+        </div>
+    );
 };
 
 export default StatInLine;

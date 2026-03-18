@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ProfileHeader } from "@/components/client/organisms/ProfileHeader";
 import { UserPerformance } from "@/components/client/organisms/UserPerformance";
 import { UserInfoPanel } from "@/components/client/organisms/UserInfoPanel";
@@ -9,16 +9,30 @@ import { EquipmentReportPanel } from "@/components/client/organisms/EquipmentRep
 
 import styles from "./Profile.module.scss";
 
-export default function Profile() {
+interface ProfileProps {
+    userId?: string; // 👈 ID opcional para ver otros perfiles
+}
+
+export default function Profile({ userId }: ProfileProps) {
     // Estado para controlar la conmutación de vistas
     const [view, setView] = useState<"perfil" | "mantenimiento">("perfil");
 
-    // Datos mockeados para visualizar los organismos (Luego vendrán de GraphQL)
+    // Lógica de carga (Placeholder para GraphQL)
+    useEffect(() => {
+        if (userId) {
+            console.log(`Cargando datos para el colaborador con ID: ${userId}`);
+            // Aquí llamarías a: const data = await getMemberById(userId);
+        } else {
+            console.log("Cargando perfil del usuario actual (Mi Perfil)");
+        }
+    }, [userId]);
+
+    // Datos mockeados (Fuente Única por ahora)
     const mockData = {
         user: {
-            name: "Gildder Alberto Caceres Urizar",
-            initials: "G",
-            role: "Administrador",
+            name: userId ? `Colaborador ${userId}` : "Gildder Alberto Caceres Urizar",
+            initials: userId ? "C" : "G",
+            role: userId ? "Técnico" : "Administrador",
             locations: ["Zona 5", "Zona 7", "Zona 6", "Zona 1"],
             vacationDays: 15,
             stats: { entered: 150, solved: 120, inProgress: 1 }
@@ -28,50 +42,19 @@ export default function Profile() {
             nextMaintenance: "24/11/2024",
             observations: "Ejemplo de una descripción de lo realizado al equipo.",
             percentage: 85,
-                    items: [
-                { 
-                    iconName: "desktop-solid", 
-                    title: "Monitor", 
-                    description: "Dell 27 pulgadas", 
-                    iconColor: "#6F87FB" 
-                },
-                { 
-                    iconName: "keyboard-solid", 
-                    title: "Teclado", 
-                    description: "Microsoft e56a5", 
-                    iconColor: "#99cc33" 
-                },
-                { 
-                    iconName: "computer-solid", 
-                    title: "CPU", 
-                    description: "Dell icore 5", 
-                    iconColor: "#FFB347" 
-                },
-                { 
-                    iconName: "print-solid", 
-                    title: "Impresora", 
-                    description: "No asignada", 
-                    iconColor: "#9C27B0" 
-                },
-                { 
-                    iconName: "computer-mouse-solid", 
-                    title: "Mouse", 
-                    description: "Logitech 205", 
-                    iconColor: "#D32F2F" 
-                },
-                { 
-                    iconName: "fax-solid", 
-                    title: "Fax", 
-                    description: "No asignada", 
-                    iconColor: "#2C3E50" 
-                },
+            items: [
+                { iconName: "desktop-solid", title: "Monitor", description: "Dell 27 pulgadas", iconColor: "#6F87FB" },
+                { iconName: "keyboard-solid", title: "Teclado", description: "Microsoft e56a5", iconColor: "#99cc33" },
+                { iconName: "computer-solid", title: "CPU", description: "Dell icore 5", iconColor: "#FFB347" },
+                { iconName: "print-solid", title: "Impresora", description: "No asignada", iconColor: "#9C27B0" },
+                { iconName: "computer-mouse-solid", title: "Mouse", description: "Logitech 205", iconColor: "#D32F2F" },
+                { iconName: "fax-solid", title: "Fax", description: "No asignada", iconColor: "#2C3E50" },
             ]
         }
     };
 
     return (
         <div className={styles.container}>
-            {/* Header con Switch funcional */}
             <ProfileHeader 
                 bannerSrc="/images/city.png"
                 initials={mockData.user.initials}

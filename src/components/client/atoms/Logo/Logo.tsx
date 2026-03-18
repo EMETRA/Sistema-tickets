@@ -11,18 +11,18 @@ const Logo: React.FC<LogoProps> = ({
     name = "EmetraMain", 
     width = 180, 
     height = 60 
-            }: LogoProps) => {
+}: LogoProps) => {
     const imagePath = LogoMap[name];
 
     return (
         <div className={classNames(styles.logoContainer, className)}>
-        <Image
-            src={imagePath}
-            alt="Logo Emetra"
-            width={typeof width === 'string' ? parseInt(width) : width}
-            height={typeof height === 'string' ? parseInt(height) : height}
-            priority
-        />
+            <Image
+                src={imagePath}
+                alt="Logo Emetra"
+                width={typeof width === 'string' ? parseInt(width) : width}
+                height={typeof height === 'string' ? parseInt(height) : height}
+                priority
+            />
         </div>
     );
 };

@@ -1,10 +1,3 @@
-/**
- * Error Handler para GraphQL
- * ==========================
- * Gestión centralizada de errores del cliente GraphQL
- * Convierte errores GraphQL/Red en mensajes legibles
- */
-
 import { ERROR_MESSAGES } from '@/config/constants';
 
 /**

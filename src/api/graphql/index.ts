@@ -3,12 +3,14 @@
 export {
     getGraphQLClient,
     graphqlRequest,
-    resetGraphQLClient,
     type GraphQLRequestOptions,
 } from './client';
 
 // Authentication
 export { LOGIN_MUTATION } from './auth/login';
+
+// Tickets
+export * from './tickets';
 
 // Error Handling
 export {

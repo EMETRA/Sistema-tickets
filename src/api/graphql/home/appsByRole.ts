@@ -6,7 +6,7 @@ import type { AppLink } from "./types";
 
 export const GET_APPS_BY_ROLE_QUERY = `
   query GetAppsByRole {
-    appsByRole {
+    AppsByRole {
       nombre
       icono
       ruta

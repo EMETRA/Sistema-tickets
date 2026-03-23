@@ -9,7 +9,6 @@ export const GET_MY_STATS_QUERY = `
     myStats {
       tickets {
         ingresados
-        asignados
         resueltos
         cerrados
       }

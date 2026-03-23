@@ -12,7 +12,7 @@ import {
  * Incluye: tickets, vacaciones, zonas a cargo, gráfico mensual
  * Requiere: Authorization header con JWT token
  */
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
     try {
         const result = await graphqlRequest<Record<string, unknown>>(
             GET_MY_STATS_QUERY

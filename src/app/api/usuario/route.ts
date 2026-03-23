@@ -8,7 +8,7 @@ import { GET_USER_QUERY, type GetUserResponse } from "@/api/graphql/home";
  * Obtiene el perfil del usuario autenticado
  * Requiere: Authorization header con JWT token
  */
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
     try {
         const result = await graphqlRequest<Record<string, unknown>>(
             GET_USER_QUERY

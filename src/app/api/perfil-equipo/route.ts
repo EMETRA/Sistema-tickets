@@ -11,7 +11,7 @@ import {
  * Obtiene el perfil del departamento/equipo del usuario autenticado
  * Requiere: Authorization header con JWT token
  */
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
     try {
         const result = await graphqlRequest<Record<string, unknown>>(
             GET_PERFIL_EQUIPO_QUERY

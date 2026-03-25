@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react"; // 👈 Añadimos useState
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { TicketCreationPanel } from "@/components/client/organisms/TicketCreationPanel";
 import { useCreateTicket } from "@/api/hooks/useCreateTicket";

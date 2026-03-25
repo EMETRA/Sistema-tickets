@@ -64,7 +64,6 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
                     avatarSrc: ticket.user.avatarSrc,
                 });
             }
-      
             if (ticket.assignedTo && !uniqueUsers.has(ticket.assignedTo.id)) {
                 uniqueUsers.set(ticket.assignedTo.id, {
                     id: ticket.assignedTo.id,

@@ -6,7 +6,7 @@ export interface AssignableUser {
   workstation: string;
 }
 
-const ASSIGNABLE_USERS: AssignableUser[] = [
+export const ASSIGNABLE_USERS: AssignableUser[] = [
     {
         id: "1",
         userInfo: {

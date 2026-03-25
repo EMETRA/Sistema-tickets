@@ -14,9 +14,9 @@ export default function CreateTicketPage() {
 
     const departments = [
         { label: "Informática / IT", value: "1" },
-        { label: "Mantenimiento", value: "1" },
-        { label: "Recursos Humanos", value: "1" },
-        { label: "Administración", value: "1" },
+        { label: "Mantenimiento", value: "2" },
+        { label: "Recursos Humanos", value: "3" },
+        { label: "Administración", value: "4" },
     ];
 
     const handleTicketSubmit = async (data: TicketFormData) => {

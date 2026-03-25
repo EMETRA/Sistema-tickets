@@ -10,7 +10,7 @@ import { ModulesTable } from "../ModulesTable";
 import { PermissionsTable } from "../PermissionsTable";
 import { EnrollTable } from "../EnrollTable";
 
-const ConfigurationManagement: React.FC<ConfigurationManagementProps> = ({
+const   ConfigurationManagement: React.FC<ConfigurationManagementProps> = ({
     requests,
     onRequestApproveAll,
     onRequestApprove,

@@ -10,7 +10,8 @@ import { Roles } from "@/components/client/organisms/RolesTable/types";
 import { Enroll } from "@/components/client/organisms/EnrollTable/types";
 import { getEnrollsDummy, getModulesDummy, getPermissionsDummy, getRequestsDummy, getRolesDummy } from "@/api/graphql/queries/getConfig";
 import { useCreateModule } from "@/api/hooks/useCreateModule"; // Importamos el hook
-import { useAssignPermission, useCreateRol } from "@/api/hooks";
+import { useAproveRequest, useAssignPermission, useCreateRol, useUpdateRol } from "@/api/hooks";
+import { UpdateRolInput } from "@/api/graphql/rbac";
 const Configuration: React.FC = () => {
     const [activeView, setActiveView] = useState<ConfigManageView>("requests");
     const [requests, setRequests] = useState<Request[]>([]);
@@ -23,7 +24,9 @@ const Configuration: React.FC = () => {
 
     const { createModule } = useCreateModule();
     const { createRol } = useCreateRol();
+    const { updateRol } = useUpdateRol();
     const { assignPermission } = useAssignPermission();
+    const { aproveRequest } = useAproveRequest();
 
     const fetchData = useCallback(async () => {
         try {
@@ -55,16 +58,22 @@ const Configuration: React.FC = () => {
         fetchData();
     }, [fetchData]);
 
-    // Manejador para crear módulos
+    if (isLoading) {
+        return <div className={styles.mainContainer}>Cargando datos...</div>
+    }
+
+    if (error) {
+        return <div className={styles.mainContainer}>{error}</div>
+    }
+
+    /////////////////////////////////////////// Handlers para HOOKS ///////////////////////////////////////////////////
     const handleModulesSubmit = async (data: { name: string; description: string }) => {
         try {
-        // 2. Mapeamos manualmente al formato CreateModuleInput
             const response = await createModule({
                 nombre: data.name,
                 descripcion: data.description,
                 ruta: `/config`,
             });
-
             if (response.success) {
                 alert("Módulo creado con éxito");
                 const updatedModules = await getModulesDummy();
@@ -75,16 +84,11 @@ const Configuration: React.FC = () => {
         }
     };
 
-    // Manejador para crear roles
     const handleRolesSubmit = async (data: { name: string; description: string }) => {
         try {
-            // Mapeo al formato que espera la Mutation: nombre_rol y descripcion
             const response = await createRol(data.name, data.description);
-
             if (response.success) {
                 alert("Rol creado con éxito");
-                
-                // Actualizamos la lista de roles (usando tu función dummy por ahora)
                 const updatedRoles = await getRolesDummy();
                 setRoles(updatedRoles);
             } else {
@@ -95,18 +99,31 @@ const Configuration: React.FC = () => {
         }
     };
 
-    if (isLoading) {
-        return <div className={styles.mainContainer}>Cargando datos...</div>
-    }
+    const handleRolesEdit = async (data: Roles) => {
+        try {
+            setIsLoading(true);
+            const input: UpdateRolInput = {
+                nombre_rol: data.name,
+                descripcion: data.description
+            };
+            const response = await updateRol(data.id, input);
 
-    if (error) {
-        return <div className={styles.mainContainer}>{error}</div>
-    }
+            if (response.success) {
+                alert("Rol actualizado correctamente con: " + response.message);
+                await fetchData(); 
+            } else {
+                alert(`Error: ${response.message}`);
+            }
+        } catch (err) {
+            console.error("Error al actualizar rol:", err);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     const handleEnrollApprove = async (userId: number) => {
         try {
             console.log("Aprobar enroll para usuario ID:", userId);
-            // Buscamos el permiso que el usuario tiene solicitado en los datos locales
             const userEnroll = enrolls.find(e => e.id === userId);
             const permissionToAssign = userEnroll?.permission ? [userEnroll.permission] : [];
 
@@ -119,7 +136,7 @@ const Configuration: React.FC = () => {
 
             if (response.success) {
                 alert(`Permisos asignados con éxito a ${userEnroll?.name}`);
-                fetchData(); // Refrescamos la tabla
+                fetchData();
             } else {
                 alert(`Error: ${response.message}`);
             }
@@ -129,16 +146,9 @@ const Configuration: React.FC = () => {
     };
 
     const handleEnrollApproveAll = async (userIds: number[]) => {
-        if (userIds.length === 0) {
-            alert("No hay usuarios seleccionados.");
-            return;
-        }
-
+        
         try {
             setIsLoading(true);
-
-            // Dado que la mutation assignPermission es individual por id_usuario,
-            // ejecutamos todas las promesas en paralelo para los IDs seleccionados.
             const promises = userIds.map(userId => {
                 const userEnroll = enrolls.find(e => e.id === userId);
                 const permission = userEnroll?.permission ? [userEnroll.permission] : [];
@@ -156,6 +166,32 @@ const Configuration: React.FC = () => {
         }
     };
 
+    const handleApproveRequests = async (ids: number | number[]) => {
+        if (Array.isArray(ids) && ids.length === 0) {
+            alert("No hay usuarios seleccionados.");
+            return;
+        }
+        try {
+            setIsLoading(true);
+        
+            // Normalizamos a array porque la mutation SIEMPRE espera [Int!]!
+            const idsArray = Array.isArray(ids) ? ids : [ids];
+        
+            if (idsArray.length === 0) return;
+
+            const response = await aproveRequest(idsArray);
+
+            if (response.success) {
+                alert(response.message || "Solicitudes procesadas con éxito");
+                fetchData(); // Refrescamos la lista de pendientes
+            }
+        } catch (err) {
+            console.error("Error al aprobar solicitudes:", err);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     return (
         <div className={styles.mainContainer}>
             <div className={styles.configContainer}>
@@ -164,10 +200,9 @@ const Configuration: React.FC = () => {
                     onViewChange={setActiveView}
 
                     requests={requests}
-                    onRequestApproveAll={(data) => alert(data)}
-                    onRequestApprove={(data) => alert(data)}
+                    onRequestApprove={(id) => handleApproveRequests(id)}
+                    onRequestApproveAll={(selectedIds) => handleApproveRequests(selectedIds)}
                     
-                    // Configuración de Módulos
                     modules={modules}
                     onModulesSubmit={handleModulesSubmit} 
                     onModulesEdit={(data) => console.log(data)}
@@ -180,7 +215,7 @@ const Configuration: React.FC = () => {
                     
                     roles={roles}
                     onRolesSubmit={handleRolesSubmit}
-                    onRolesEdit={(data) => console.log(data)}
+                    onRolesEdit={handleRolesEdit}
                     onRolesDelete={(data) => alert(data)}
                     
                     enrolls={enrolls}

@@ -34,6 +34,7 @@ const RequestTable: React.FC<RequestTableProps> = ({
     };
 
     const handleApproveAll = () => {
+        if (selected.length === 0) return;
         onApproveAll?.(selected);
     };
 
@@ -51,7 +52,7 @@ const RequestTable: React.FC<RequestTableProps> = ({
                     label="Solicitudes pendientes"
                 />
 
-                <Button onClick={handleApproveAll}>
+                <Button onClick={handleApproveAll} state={selected.length === 0 ? "disabled" : "default"}>
                     Aprobar y notificar
                 </Button>
 

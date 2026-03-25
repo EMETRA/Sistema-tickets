@@ -60,6 +60,7 @@ export const TicketsFilterBar: React.FC<TicketsFilterBarProps> = ({
                     onSelect={onMemberSelect}
                     isOpen={isFilterOpen}
                     onOpenChange={setIsFilterOpen}
+                    disabled={disabled}
                 >
                     <Button
                         variant="outlined"

@@ -4,6 +4,7 @@ import React from "react";
 import classNames from "classnames";
 import { TableHeader } from "../../molecules/TableHeader";
 import { EventItem } from "../../molecules/EventItem";
+import { Text } from "@/components/client/atoms/Text";
 import { InfoPanelProps, InfoPanelType } from "./types";
 import { IconName } from "../../atoms/Icon/types";
 import styles from "./InfoPanel.module.scss";
@@ -52,14 +53,18 @@ export const InfoPanel: React.FC<InfoPanelProps> = ({
             />
       
             <div className={styles.itemsContainer}>
-                {limitedItems.map((item, index) => (
+                {limitedItems.length === 0 ? (
+                    <Text variant="caption" className={styles.noDataText}>
+                        No hay información disponible.
+                    </Text>
+                ) : (limitedItems.map((item, index) => (
                     <React.Fragment key={index}>
                         <EventItem {...item} className={styles.item} />
                         {showDividers && index < limitedItems.length - 1 && (
                             <div className={styles.divider} />
                         )}
                     </React.Fragment>
-                ))}
+                )))}
             </div>
         </div>
     );

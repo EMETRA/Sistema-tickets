@@ -270,7 +270,7 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
                 members={members}
                 selectedMemberId={selectedMemberId}
                 onMemberSelect={(member) => setSelectedMemberId(member?.id)}
-                disabled={loading}
+                disabled={loading || !!pendingCancellation || isAssigning || tickets.length === 0}
             />
 
             {/* Tabla de tickets */}

@@ -4,33 +4,31 @@ import { FilterUsersBar } from "@/components/client/organisms/FilterUsersBar";
 import style from "./Team.module.scss";
 import { UsersGrid } from "@/components/client/organisms/UsersGrid";
 import { UserCardProps } from "@/components/client/molecules/UserCard";
-import { useEffect, useState } from "react";
-import { getTeamUsersDummy } from "@/api/graphql/queries/getTeamUsers";
+import { useState } from "react";
+import { useGetTeamMembers } from "@/api/hooks";
 
 const Team: React.FC = () => {
 
     const [cat, setCat] = useState("todos");
     const [search, setSearch] = useState("");
-    const [users, setUsers] = useState<UserCardProps[]>([]);
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState("");
 
-    useEffect(() => {
-        const fetchUsers = async () => {
-            try {
-                setIsLoading(true);
-                setError("");
+    // Hook para obtener miembros del equipo
+    const { data: teamMembers, loading: loadingMembers, error: errorMembers } = useGetTeamMembers();
 
-                const data = await getTeamUsersDummy();
-                setUsers(data);
-            } catch (err) {
-                setError("No fue posible cargar los usuarios" + (err instanceof Error ? `: ${err.message}` : ""));
-            } finally {
-                setIsLoading(false);
-            }
-        };
-        fetchUsers();
-    }, [])
+    // Derivar estados de carga y error
+    const isLoading = loadingMembers;
+    const error = errorMembers ? "No fue posible cargar los usuarios" : "";
+
+    // Transformar TeamMemberRow[] a UserCardProps[]
+    const users: UserCardProps[] = teamMembers?.map(member => ({
+        id: member.id_usuario.toString(),
+        name: member.nombre || "Sin nombre",
+        email: "Sin email", // no viene del backend
+        role: member.rol || "Sin rol",
+        department: member.departamento || "Sin departamento",
+        assignedCount: member.tickets_asignados,
+        resolvedCount: member.tickets_resueltos,
+    })) || [];
 
     const filteredUsers = users.filter((user) => {
         
@@ -70,6 +68,7 @@ const Team: React.FC = () => {
                         { label: "Técnicos", value: "tecnicos" },
                         { label: "Desarrolladores", value: "desarrolladores" }
                     ]}
+                    disabled={isLoading || !!error || users.length === 0}
                 />
                 <div className={style.users}>
                     <UsersGrid 

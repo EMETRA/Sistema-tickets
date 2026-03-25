@@ -4,6 +4,7 @@ import React from "react";
 import classNames from "classnames";
 import { TicketStat } from "../../molecules/TicketStat";
 import { Divider } from "@/components/client/atoms/Divider";
+import { Text } from "@/components/client/atoms/Text";
 import { DashboardStatsBarProps } from "./types";
 import styles from "./DashboardStatsBar.module.scss";
 
@@ -19,7 +20,11 @@ export const DashboardStatsBar: React.FC<DashboardStatsBarProps> = ({
 }) => {
     return (
         <div className={classNames(styles.DashboardStatsBar, className)}>
-            {stats.map((stat, index) => (
+            {stats.length === 0 ? (
+                <Text variant="caption" className={styles.NoStatsText}>
+                    No hay estadísticas disponibles.
+                </Text>
+            ) : (stats.map((stat, index) => (
                 <React.Fragment key={`${stat.type}-${index}`}>
                     <TicketStat
                         type={stat.type}
@@ -31,7 +36,7 @@ export const DashboardStatsBar: React.FC<DashboardStatsBarProps> = ({
                         <Divider orientation="vertical" />
                     )}
                 </React.Fragment>
-            ))}
+            )))}
         </div>
     );
 };

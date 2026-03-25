@@ -1,62 +1,102 @@
 "use client"
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { MyPerformanceChart } from "@/components/client/organisms/MyPerformanceChart";
 import { MyStatisticsPanel } from "@/components/client/organisms/MyStatisticsPanel";
 import { InfoPanel } from "@/components/client/organisms/InfoPanel";
 import TicketsPanel from "@/components/client/organisms/TicketsPanel/TicketsPanel";
 import { EventItemProps } from "@/components/client/molecules/EventItem";
 import { TicketData } from "@/components/client/organisms/TicketsPanel";
+import { ChipState } from "@/components/client/atoms/Chip/types";
 import {
-    getPerformanceDataDummy,
-    getRecentTicketsDummy,
-    getTeamEventsDummy,
-    getTechStatisticsDummy,
-    TechStatistics,
-} from "@/api/graphql/queries/getTechHome";
+    useGetUser,
+    useGetTechnicianStats,
+    useGetTechnicianEvents,
+    useGetTechnicianLastTickets,
+} from "@/api/hooks";
 
 import styles from "./TechHome.module.scss";
 
 const TechHome: React.FC = () => {
-    const [performanceData, setPerformanceData] = useState<Array<{ label: string; value: number }>>([]);
-    const [statisticInfo, setStatisticInfo] = useState<TechStatistics>({
-        percentage: 0,
-        resolvedTickets: 0,
-        assignedTickets: 0,
-        inProgressTickets: 0,
-    });
-    const [eventItems, setEventItems] = useState<EventItemProps[]>([]);
-    const [sampleTickets, setSampleTickets] = useState<TicketData[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState("");
+    // Hooks para obtener datos del API
+    const { data: userData, loading: loadingUser, error: errorUser } = useGetUser();
+    const { data: technicianStatsData, loading: loadingStats, error: errorStats } = useGetTechnicianStats();
+    const { data: technicianEventsData, loading: loadingEvents, error: errorEvents } = useGetTechnicianEvents();
+    const { data: technicianTicketsData, loading: loadingTickets, error: errorTickets } = useGetTechnicianLastTickets({ limit: 10 });
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                setIsLoading(true);
-                setError("");
+    // Derivar estados de carga y error
+    const isLoading = loadingUser || loadingStats || loadingEvents || loadingTickets;
+    const error = (errorUser || errorStats || errorEvents || errorTickets)
+        ? "No fue posible cargar la información. Intenta nuevamente."
+        : "";
 
-                const [performance, statistics, events, tickets] = await Promise.all([
-                    getPerformanceDataDummy(),
-                    getTechStatisticsDummy(),
-                    getTeamEventsDummy(),
-                    getRecentTicketsDummy(),
-                ]);
+    // Transformar datos del gráfico de rendimiento
+    const performanceData = technicianStatsData?.grafico_rendimiento?.map(point => ({
+        label: point.mes,
+        value: point.resueltos,
+    })) || [];
 
-                setPerformanceData(performance);
-                setStatisticInfo(statistics);
-                setEventItems(events);
-                setSampleTickets(tickets);
-            } catch (err) {
-                console.error("Error cargando Home técnico:", err);
-                setError("No fue posible cargar la información. Intenta nuevamente.");
-            } finally {
-                setIsLoading(false);
-            }
+    // Transformar datos de estadísticas
+    const statisticInfo = technicianStatsData
+        ? {
+            percentage: Math.round((technicianStatsData.resueltos / technicianStatsData.tickets) * 100),
+            resolvedTickets: technicianStatsData.resueltos,
+            assignedTickets: technicianStatsData.asignados,
+            inProgressTickets: technicianStatsData.pendientes,
+        }
+        : {
+            percentage: 0,
+            resolvedTickets: 0,
+            assignedTickets: 0,
+            inProgressTickets: 0,
         };
 
-        fetchData();
-    }, []);
+    // Transformar eventos a EventItemProps
+    const eventItems: EventItemProps[] = technicianEventsData
+        ?.map(event => ({
+            type: "event" as const,
+            eventName: event.titulo,
+            date: new Date(event.fecha_inicio),
+            iconColor: "#262626",
+            iconBackgroundColor: "#F5F5F5",
+        })) || [];
+
+    // Transformar tickets del técnico a TicketData
+    const sampleTickets: TicketData[] = technicianTicketsData
+        ?.map((ticket, index) => {
+            // Mapear estado a ChipState y statusLabel
+            const estadoMap: Record<number, { status: ChipState; label: string }> = {
+                1: { status: "ingressed", label: "Ingresado" },
+                2: { status: "assigned", label: "Asignado" },
+                3: { status: "inwork", label: "En Trabajo" },
+                4: { status: "resolved", label: "Resuelto" },
+                5: { status: "canceled", label: "Cancelado" },
+            };
+            
+            const estadoInfo = estadoMap[ticket.estado] || { status: "ingressed", label: "Ingresado" };
+
+            // Mapear prioridad a tipo
+            const prioridadMap: Record<number, string> = {
+                1: "Baja",
+                2: "Normal",
+                3: "Alta",
+                4: "Urgente",
+            };
+            
+            const tipo = prioridadMap[ticket.prioridad] || "Normal";
+
+            return {
+                id: index,
+                description: ticket.titulo,
+                userName: userData?.nombre || "Usuario",
+                avatarInitials: userData?.nombre ? userData.nombre.charAt(0) : "U",
+                assigned: true,
+                type: tipo,
+                status: estadoInfo.status,
+                statusLabel: estadoInfo.label,
+                dateIngress: new Date(ticket.fecha_creacion),
+            };
+        }) || [];
 
     if (isLoading) {
         return <div className={styles.mainContainer}>Cargando información...</div>;

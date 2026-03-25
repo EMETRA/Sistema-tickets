@@ -3,6 +3,7 @@ export type FilterBarVariant = "categories" | "filter-button";
 export interface FilterUsersBarProps {
     variant: FilterBarVariant;
     searchValue: string;
+    disabled?: boolean;
     onSearchChange: (value: string) => void;
     onSearchSubmit: () => void;
     // Props para variante 'categories'

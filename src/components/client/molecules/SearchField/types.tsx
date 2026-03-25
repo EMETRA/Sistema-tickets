@@ -15,6 +15,11 @@ export interface SearchFieldProps {
     placeholder?: string;
 
     /**
+     * Indica si el campo de búsqueda está deshabilitado.
+     */
+    disabled?: boolean;
+
+    /**
      * Función al cambiar.
      */
     onChange: (value: string) => void;

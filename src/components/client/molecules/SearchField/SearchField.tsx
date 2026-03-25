@@ -8,6 +8,7 @@ import { IconButton } from "../../atoms/IconButton";
 const SearchField: React.FC<SearchFieldProps> = ({
     value,
     placeholder,
+    disabled = false,
     onChange,
     onSearch,
     className
@@ -26,9 +27,10 @@ const SearchField: React.FC<SearchFieldProps> = ({
                     placeholder={placeholder}
                     onChange={e => onChange(e.target.value)}
                     className={styles.input}
+                    disabled={disabled}
                 />
 
-                <IconButton icon="magnifying-glass-solid" borderless type="submit" className={styles.searchButton}/>
+                <IconButton icon="magnifying-glass-solid" borderless type="submit" disabled={disabled} className={styles.searchButton}/>
             </div>
         </form>
     );

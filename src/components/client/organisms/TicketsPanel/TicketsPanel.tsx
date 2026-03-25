@@ -36,6 +36,23 @@ export const TicketsPanel: React.FC<TicketsPanelProps> = ({
     // Limitar a máximo 10 tickets
     const limitedTickets = tickets.slice(0, 10);
 
+    if (tickets.length === 0) {
+        return (
+            <div className={classNames(styles.TicketTable, className)}>
+                {variant === "my-tickets" ? (
+                    <Title variant="mid" tag="h2" className={styles.title}>
+                        Mis últimos tickets
+                    </Title>
+                ) : (
+                    <TableHeader iconName="ticket-solid" label="Últimos tickets" />
+                )}
+                <Text variant="caption" className={styles.noTicketsText}>
+                    No hay tickets para mostrar.
+                </Text>
+            </div>
+        );
+    }
+
     // Renderizar variante "my-tickets"
     if (variant === "my-tickets") {
         return (

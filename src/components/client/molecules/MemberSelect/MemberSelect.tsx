@@ -17,6 +17,7 @@ export const MemberSelect: React.FC<MemberSelectProps> = ({
     members,
     selectedId,
     onSelect,
+    disabled = false,
     placeholder = "Seleccionar miembro",
     children,
     isOpen: isOpenProp,
@@ -62,6 +63,7 @@ export const MemberSelect: React.FC<MemberSelectProps> = ({
     }, [isOpen, setIsOpen]);
 
     const handleToggle = () => {
+        if (disabled) return;
         setIsOpen(!isOpen);
     };
 
@@ -85,6 +87,7 @@ export const MemberSelect: React.FC<MemberSelectProps> = ({
                     type="button"
                     className={classNames(styles.trigger, { [styles.open]: isOpen })}
                     onClick={handleToggle}
+                    disabled={disabled}
                 >
                     {selectedMember ? (
                         <>

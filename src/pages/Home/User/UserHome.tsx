@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { AppsGrid } from "@/components/client/organisms/AppsGrid";
 import { WelcomeCard } from "@/components/client/organisms/WelcomeCard";
 import { InfoPanel } from "@/components/client/organisms/InfoPanel";
@@ -8,57 +8,54 @@ import { ReportTable } from "@/components/client/organisms/ReportTable";
 
 import { EventItemProps } from "@/components/client/molecules/EventItem";
 import { AppCardProps } from "@/components/client/molecules/AppCard/types";
-import {
-    getMyActivityDummy,
-    getMyAppsDummy,
-    getReportTableDataDummy,
-    getUserSummaryDummy,
-} from "@/api/graphql/queries/getUserHome";
+import { IconName } from "@/components/client/atoms/Icon/types";
+import { useGetUser, useGetMyStats, useGetAppsByRole, useGetMyActivity } from "@/api/hooks";
 
 import styles from "./UserHome.module.scss";
 
 const UserHome: React.FC = () => {
-    const [user, setUser] = useState({
-        name: "",
-        role: "",
-    });
-    const [apps, setApps] = useState<AppCardProps[]>([]);
-    const [eventItems, setEventItems] = useState<EventItemProps[]>([]);
-    const [reportData, setReportData] = useState<Array<{ label: string; value: number }>>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState("");
+    const { data: userData, loading: loadingUser, error: errorUser } = useGetUser();
+    const { data: statsData, loading: loadingStats, error: errorStats } = useGetMyStats();
+    const { data: appsData, loading: loadingApps, error: errorApps } = useGetAppsByRole();
+    const { data: myActivityData, loading: loadingMyActivity, error: errorMyActivity } = useGetMyActivity();
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                setIsLoading(true);
-                setError("");
-                const [userSummary, appsData, myActivityData, reportTableData] = await Promise.all([
-                    getUserSummaryDummy(),
-                    getMyAppsDummy(),
-                    getMyActivityDummy(),
-                    getReportTableDataDummy(),
-                ]);
+    // Derivar valores de carga y error directamente
+    const isLoading = loadingUser || loadingStats || loadingApps || loadingMyActivity;
+    const error = (errorUser || errorStats || errorApps || errorMyActivity)
+        ? "No fue posible cargar la información. Intenta nuevamente."
+        : "";
 
-                setUser(userSummary);
-                setApps(appsData);
-                setEventItems(myActivityData);
-                setReportData(reportTableData);
-            } catch (err) {
-                console.error("Error cargando Home:", err);
-                setError("No fue posible cargar la información. Intenta nuevamente.");
-            } finally {
-                setIsLoading(false);
-            }
-        };
+    const user = userData
+        ? {
+            name: userData.nombre,
+            role: userData.rol || "user",
+        }
+        : { name: "", role: "" };
 
-        fetchData();
-    }, []);
+    const reportData = statsData?.grafico_mensual?.map(point => ({
+        label: point.mes,
+        value: point.tickets,
+    })) || [];
 
-    const handleBookmarkToggle = (index: number) => {
-        setApps(prev => prev.map((app, i) =>
-            i === index ? { ...app, bookmarked: !app.bookmarked } : app
-        ));
+    const transformedApps: AppCardProps[] = appsData
+        ?.map(app => ({
+            icon: app.icono as IconName,
+            iconLabel: app.nombre,
+            title: app.nombre,
+        })) || [];
+
+    const eventItems: EventItemProps[] = myActivityData
+        ? myActivityData.map(activity => ({
+            type: "movement",
+            userName: user.name || "Usuario",
+            avatarInitials: user.name ? user.name.charAt(0) : "U",
+            label: activity.descripcion,
+            date: activity.fecha ? new Date(activity.fecha) : new Date(),
+        }))
+        : [];
+
+    const handleBookmarkToggle = () => {
+        // Implementar cuando el hook de apps retorne si la app está marcada o no
     };
 
     const handleAppClick = (title: string) => {
@@ -80,15 +77,15 @@ const UserHome: React.FC = () => {
                 <div className={styles.appsContainer}>
                     <AppsGrid
                         title="Mis Apps"
-                        apps={apps.map((app, index) => ({
+                        apps={transformedApps.map((app) => ({
                             ...app,
-                            onBookmarkClick: () => handleBookmarkToggle(index),
+                            onBookmarkClick: () => handleBookmarkToggle(),
                             onButtonClick: () => handleAppClick(app.title),
                         }))}
                     />
                     <WelcomeCard
-                        userName={user.name.split(" ")[0]}
-                        imageSrc= "/images/image.png"
+                        userName={user.name.split(" ")[0] || "Usuario"}
+                        imageSrc="/images/image.png"
                     />
                 </div>
                 <div className={styles.eventsAndPerformanceContainer}>

@@ -8,6 +8,7 @@ import { Button } from "../../atoms/Button";
 export const FilterUsersBar = ({
     variant,
     searchValue,
+    disabled = false,
     onSearchChange,
     onSearchSubmit,
     categories = [],
@@ -24,6 +25,7 @@ export const FilterUsersBar = ({
                 onSearch={onSearchSubmit}
                 placeholder="Buscar por nombre"
                 className={styles.search}
+                disabled={disabled}
             />
 
             <div className={styles.actions}>
@@ -35,6 +37,7 @@ export const FilterUsersBar = ({
                         color={selectedCategory === cat.value ? "default" : "cancel"}
                         onClick={() => onCategoryChange?.(cat.value)}
                         className={styles.catButton}
+                        state={disabled ? "disabled" : 'default'}
                     >
                         {cat.label}
                     </Button>
@@ -47,6 +50,7 @@ export const FilterUsersBar = ({
                         icon="filter-solid"
                         left
                         onClick={onFilterClick}
+                        state={disabled ? "disabled" : 'default'}
                     >
                         Filtrar
                     </Button>

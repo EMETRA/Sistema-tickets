@@ -46,6 +46,11 @@ export interface MemberSelectProps {
   onSelect?: (member: Member | undefined) => void;
 
   /**
+   * Indica si el selector está deshabilitado
+   */
+  disabled?: boolean;
+
+  /**
    * Placeholder cuando no hay selección
    */
   placeholder?: string;

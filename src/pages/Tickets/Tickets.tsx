@@ -1,50 +1,67 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { TicketsTablePanel } from "@/components/client/organisms/TicketsTablePanel";
 import { Ticket } from "@/components/client/organisms/TicketsTablePanel/types";
-import {
-    assignTicketDummy,
-    cancelTicketDummy,
-    getTicketsDummy,
-} from "@/api/graphql/queries/getTickets";
+import { useGetTickets } from "@/api/hooks";
 import styles from "./Tickets.module.scss";
 
 const Tickets: React.FC = () => {
-    const [tickets, setTickets] = useState<Ticket[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState("");
+    // Hook para obtener tickets
+    const { data: ticketsData, loading: isLoading, error: loadError } = useGetTickets();
 
-    const loadTickets = async () => {
-        try {
-            setError("");
-            const data = await getTicketsDummy();
-            setTickets(data);
-        } catch (loadError) {
-            console.error("Error cargando tickets:", loadError);
-            setError("No fue posible cargar los tickets. Intenta nuevamente.");
+    // Derivar estados
+    const error = loadError ? "No fue posible cargar los tickets. Intenta nuevamente." : "";
+
+    // Función para formatear fecha
+    // Si es hoy, retorna solo la hora; si no, retorna fecha y hora
+    const formatTicketDate = (dateString: string): string => {
+        const ticketDate = new Date(dateString);
+        const today = new Date();
+        
+        const isToday = 
+            ticketDate.getDate() === today.getDate() &&
+            ticketDate.getMonth() === today.getMonth() &&
+            ticketDate.getFullYear() === today.getFullYear();
+
+        if (isToday) {
+            // Mostrar solo la hora
+            return ticketDate.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
+        } else {
+            // Mostrar fecha y hora
+            return ticketDate.toLocaleString('es-CO', { 
+                day: '2-digit', 
+                month: '2-digit', 
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
         }
     };
 
-    useEffect(() => {
-        const run = async () => {
-            setIsLoading(true);
-            await loadTickets();
-            setIsLoading(false);
-        };
-
-        run();
-    }, []);
-
-    const handleAssignTicket = async (ticketId: string | number, userId: string) => {
-        await assignTicketDummy(ticketId, userId);
-        await loadTickets();
+    // Usuario quemado para todos los tickets (mismo para todos)
+    const defaultUser = {
+        id: "1",
+        name: "Usuario",
+        email: "usuario@example.com",
+        department: "General"
     };
 
-    const handleCancelTicket = async (ticketId: string | number) => {
-        await cancelTicketDummy(ticketId);
-        await loadTickets();
-    };
+    // Mapear tickets del API al tipo esperado por TicketsTablePanel
+    const transformedTickets: Ticket[] = ticketsData?.map(ticket => ({
+        id: ticket.id,
+        user: defaultUser,
+        title: ticket.titulo,
+        description: ticket.descripcion,
+        date: formatTicketDate(ticket.fechaCreacion),
+        status: {
+            // TODO: Falta implementar hook useGetTicketStatuses para obtener las etiquetas de estados
+            // Por ahora mapear estadoId a un número que representa el estado
+            label: `Estado ${ticket.estadoId}`,
+            state: "ingressed" as const, // Placeholder: necesita mapeo real de estados
+        },
+        assignedTo: null, // TODO: Si hay usuarioAsignadoId, mapear a un usuario
+    })) || [];
 
     if (isLoading) {
         return <div className={styles.mainContainer}>Cargando tickets...</div>;
@@ -57,10 +74,16 @@ const Tickets: React.FC = () => {
     return (
         <div className={styles.mainContainer}>
             <TicketsTablePanel
-                tickets={tickets}
+                tickets={transformedTickets}
                 loading={isLoading}
-                onAssign={handleAssignTicket}
-                onDelete={handleCancelTicket}
+                onAssign={(ticketId, userId) => {
+                    // TODO: Implementar mutation assignTicket cuando esté lista
+                    console.log(`Asignar ticket ${ticketId} a usuario ${userId}`);
+                }}
+                onDelete={(ticketId) => {
+                    // TODO: Implementar mutation cancelTicket cuando esté lista
+                    console.log(`Cancelar ticket ${ticketId}`);
+                }}
                 onExport={() => console.log("Exportar tickets")}
             />
         </div>

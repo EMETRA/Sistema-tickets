@@ -42,6 +42,7 @@ export const PerformanceChartPanel: React.FC<PerformanceChartPanelProps> = (prop
                         variant="primary"
                         options={PRIMARY_FILTER_OPTIONS}
                         value={selectedFilter}
+                        disabled={data.length === 0}
                         onChange={(value) => onFilterChange(value as PrimaryFilter)}
                     />
                 </div>

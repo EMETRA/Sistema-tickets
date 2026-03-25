@@ -29,9 +29,15 @@ export { useGetLastMovements } from './useGetLastMovements';
 
 // Configuration hooks
 export { useGetPendingRequests } from './useGetPendingRequests';
+export { useAproveRequest } from './useAproveRequest';
+export { useRequestPermission } from './useRequestPermission';
 
 // RBAC hooks
 export { useGetRoles } from './useGetRoles';
+export { useCreateRol } from './useCreateRol';
+export { useUpdateRol } from './useUpdateRol';
+export { useAssignPermission } from './useAssignPermission';
+export { useCreateModule } from './useCreateModule';
 
 // Tickets hooks - Details, Comments, History, Attachments, Tags
 export { useGetTicketById } from './useGetTicketById';
@@ -40,8 +46,25 @@ export { useGetTicketHistory } from './useGetTicketHistory';
 export { useGetTicketAttachments } from './useGetTicketAttachments';
 export { useGetTicketTags } from './useGetTicketTags';
 
+// Tickets hooks - Mutations
+export { useCreateTicket } from './useCreateTicket';
+export { useUpdateTicket } from './useUpdateTicket';
+export { useDeleteTicket } from './useDeleteTicket';
+export { useAddTicketComment } from './useAddTicketComment';
+
+// Tickets hooks - Mutations - Tags
+export { useAddTagToTicket } from './useAddTagToTicket';
+export { useCreateTicketTag } from './useCreateTicketTag';
+export { useRemoveTagFromTicket } from './useRemoveTagFromTicket';
+
 // Tickets hooks - Catalogs
 export { useGetTicketCategories } from './useGetTicketCategories';
 export { useGetTicketPriorities } from './useGetTicketPriorities';
 export { useGetTicketStatuses } from './useGetTicketStatuses';
 export { useGetTicketTagCatalog } from './useGetTicketTagCatalog';
+export { useCreateCategory } from './useCreateCategory';
+export { useCreatePriority } from './useCreatePriority';
+export { useCreateStatus } from './useCreateStatus';
+
+
+

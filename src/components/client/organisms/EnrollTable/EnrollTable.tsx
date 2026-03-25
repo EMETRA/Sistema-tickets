@@ -34,6 +34,7 @@ const EnrollTable: React.FC<EnrollTableProps> = ({
     };
 
     const handleApproveAll = () => {
+        if (selected.length === 0) return;
         onApproveAll?.(selected);
     };
 
@@ -51,7 +52,7 @@ const EnrollTable: React.FC<EnrollTableProps> = ({
                     iconName="id-badge-solid"
                 />
 
-                <Button onClick={handleApproveAll}>
+                <Button onClick={handleApproveAll} state={selected.length === 0 ? "disabled" : "default"}>
                     Asignar seleccionados
                 </Button>
 

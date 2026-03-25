@@ -148,3 +148,95 @@ export interface GetTicketTagCatalogResponse {
 export interface GetTicketByIdResponse {
   ticket: Ticket | null;
 }
+
+
+// ========================================
+// INTERFACES PARA MUTACIONES DE TICKET
+// ========================================
+export interface CreateTicketInput {
+  titulo: string;
+  descripcion: string;
+  usuarioCreadorId: number;
+  usuarioAsignadoId?: number;
+  categoriaId: number;
+  prioridadId: number;
+  estadoId: number;
+  tiempoEstimado?: number;
+  codigo?: string;
+}
+export interface UpdateTicketInput {
+  titulo?: string;
+  descripcion?: string;
+  usuarioAsignadoId?: number;
+  categoriaId?: number;
+  prioridadId?: number;
+  estadoId?: number;
+  tiempoEstimado?: number;
+  codigo?: string;
+}
+export interface AddTicketCommentInput {
+  ticketId: string;
+  usuarioId: number;
+  comentario: string;
+  esInterno?: boolean;
+}
+
+// ========================================
+// RESPUESTAS DE MUTACIONES DE TICKET
+// ========================================
+
+export interface CreateTicketResponse { createTicket: Ticket; [key: string]: unknown; }
+export interface UpdateTicketResponse { updateTicket: Ticket; [key: string]: unknown; }
+export interface DeleteTicketResponse { deleteTicket: boolean; [key: string]: unknown; }
+export interface AddTicketCommentResponse { addTicketComment: TicketComentario; [key: string]: unknown; }
+
+// ========================================
+// TAGS DE TICKET
+// ========================================
+
+export interface CreateTicketTagResponse {
+  createTicketTag: TicketTag;
+}
+
+export interface AddTagToTicketResponse {
+  addTagToTicket: {
+    ticketId: string;
+    tagId: number;
+  };
+}
+
+export interface RemoveTagFromTicketResponse {
+  removeTagFromTicket: boolean;
+}
+
+// ========================================
+// RESPONSES PARA MUTATIONS DE TAGS
+// ========================================
+
+/**
+ * Respuesta al crear un nuevo Tag en el catálogo
+ */
+export interface CreateTicketTagResponse {
+  createTicketTag: TicketTag;
+}
+
+/**
+ * Respuesta al asignar un Tag a un Ticket específico
+ * El backend devuelve un objeto con los IDs vinculados
+ */
+export interface AddTagToTicketResponse {
+  addTagToTicket: {
+    ticketId: string;
+    tagId: number;
+  };
+}
+
+/**
+ * Respuesta al remover un Tag de un Ticket
+ */
+export interface RemoveTagFromTicketResponse {
+  removeTagFromTicket: boolean;
+}
+
+
+

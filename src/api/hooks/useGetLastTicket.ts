@@ -1,7 +1,11 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { TicketSummaryRow } from '@/api/graphql/admin-dashboard';
 
-export function useGetLastTicket() {
+export interface LastTicketFilters {
+    limit?: number;
+}
+
+export function useGetLastTicket(filters?: LastTicketFilters) {
     const [data, setData] = useState<TicketSummaryRow[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
@@ -10,7 +14,12 @@ export function useGetLastTicket() {
         setLoading(true);
         setError(null);
         try {
-            const response = await fetch('/api/admin-dashboard/last-ticket');
+            // Construir query params
+            const params = new URLSearchParams();
+            if (filters?.limit) params.append('limit', String(filters.limit));
+
+            const url = `/api/admin-dashboard/last-ticket${params.toString() ? `?${params.toString()}` : ''}`;
+            const response = await fetch(url);
             if (!response.ok) throw new Error(`Error: ${response.status}`);
             const result = await response.json();
             setData(result);
@@ -20,7 +29,12 @@ export function useGetLastTicket() {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [filters?.limit]);
+
+    // Auto-fetch cuando los filtros cambien
+    useEffect(() => {
+        refetch();
+    }, [refetch]);
 
     return { data, loading, error, refetch };
 }

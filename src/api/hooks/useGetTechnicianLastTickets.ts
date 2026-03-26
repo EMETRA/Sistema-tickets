@@ -9,7 +9,7 @@
  * 3. Hook retorna { data, loading, error, refetch }
  */
 
-import { useState } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { type TechnicianTicketRow } from "@/api/graphql/technician";
 
 interface TechnicianLastTicketsFilters {
@@ -26,7 +26,7 @@ export function useGetTechnicianLastTickets(filters?: TechnicianLastTicketsFilte
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
 
-    async function refetch() {
+    const refetch = useCallback(async () => {
         setLoading(true);
         setError(null);
 
@@ -49,7 +49,12 @@ export function useGetTechnicianLastTickets(filters?: TechnicianLastTicketsFilte
         } finally {
             setLoading(false);
         }
-    }
+    }, [filters?.limit]);
+
+    // Auto-fetch cuando los filtros cambien
+    useEffect(() => {
+        refetch();
+    }, [refetch]);
 
     return {
         data,

@@ -1,9 +1,13 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import type { PendingRequestRow } from '@/api/graphql/configuration';
 
-export function useGetPendingRequests() {
+export interface PendingRequestsFilters {
+    limit?: number;
+}
+
+export function useGetPendingRequests(filters?: PendingRequestsFilters) {
     const [data, setData] = useState<PendingRequestRow[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
@@ -12,7 +16,12 @@ export function useGetPendingRequests() {
         setLoading(true);
         setError(null);
         try {
-            const response = await fetch('/api/configuration/pending-requests');
+            // Construir query params
+            const params = new URLSearchParams();
+            if (filters?.limit) params.append('limit', String(filters.limit));
+
+            const url = `/api/configuration/pending-requests${params.toString() ? `?${params.toString()}` : ''}`;
+            const response = await fetch(url);
             if (!response.ok) {
                 throw new Error(`Error: ${response.status}`);
             }
@@ -24,7 +33,12 @@ export function useGetPendingRequests() {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [filters?.limit]);
+
+    // Auto-fetch cuando los filtros cambien
+    useEffect(() => {
+        refetch();
+    }, [refetch]);
 
     return { data, loading, error, refetch };
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { TicketsTablePanel } from "@/components/client/organisms/TicketsTablePanel";
 import { Ticket } from "@/components/client/organisms/TicketsTablePanel/types";
 import { useGetTickets } from "@/api/hooks";
@@ -8,7 +8,17 @@ import styles from "./Tickets.module.scss";
 
 const Tickets: React.FC = () => {
     // Hook para obtener tickets
-    const { data: ticketsData, loading: isLoading, error: loadError } = useGetTickets();
+    const { data: ticketsData, loading: isLoading, error: loadError, refetch: refetchTickets } = useGetTickets();
+
+    const hasRunOnce = useRef(false);
+
+    useEffect(() => {
+        if (!hasRunOnce.current) {
+            hasRunOnce.current = true;
+            refetchTickets();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     // Derivar estados
     const error = loadError ? "No fue posible cargar los tickets. Intenta nuevamente." : "";

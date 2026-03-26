@@ -21,14 +21,17 @@ export { useGetPriorities } from './useGetPriorities';
 export { useGetStatuses } from './useGetStatuses';
 
 // Admin Dashboard hooks
-export { useGetAdminDashboardStats } from './useGetAdminDashboardStats';
-export { useGetUserPerformance } from './useGetUserPerformance';
+export { useGetAdminDashboardStats, type AdminDashboardStatsOptions } from './useGetAdminDashboardStats';
+export { useGetUserPerformance, type UserPerformanceOptions } from './useGetUserPerformance';
 export { useGetTeamMembers } from './useGetTeamMembers';
 export { useGetLastTicket } from './useGetLastTicket';
 export { useGetLastMovements } from './useGetLastMovements';
 
 // Configuration hooks
 export { useGetPendingRequests } from './useGetPendingRequests';
+export { useGetModules } from './useGetModules';
+export { useGetPermissions } from './useGetPermissions';
+export { useGetEnrolls } from './useGetEnrolls';
 
 // RBAC hooks
 export { useGetRoles } from './useGetRoles';

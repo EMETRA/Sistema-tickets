@@ -20,13 +20,19 @@ import {
  */
 export async function GET(_request: NextRequest) {
     try {
-        // Por ahora, ejecutamos la query sin filtros en el lado GraphQL
-        // Los filtros (fecha_inicio, fecha_fin) están disponibles en query params
-        // pero al no soportar variables en nuestra query simple, se pueden manejar
-        // en el backend o agregarse como parámetros GraphQL si se requiere
+        // Params fecha_inicio y fecha_fin opcionales
+        const { searchParams } = new URL(_request.url);
+        const fecha_inicio = searchParams.get("fecha_inicio") || undefined;
+        const fecha_fin = searchParams.get("fecha_fin") || undefined;
 
         const result = await graphqlRequest<Record<string, unknown>>(
-            GET_TECHNICIAN_EVENTS_QUERY
+            GET_TECHNICIAN_EVENTS_QUERY,
+            {
+                variables: {
+                    fecha_inicio,
+                    fecha_fin,
+                }
+            }
         );
 
         const typedResult = result as unknown as GetTechnicianEventsResponse;

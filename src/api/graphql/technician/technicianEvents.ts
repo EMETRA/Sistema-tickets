@@ -5,8 +5,8 @@
 import type { TechnicianEventRow } from "./types";
 
 export const GET_TECHNICIAN_EVENTS_QUERY = `
-  query GetTechnicianEvents {
-    TechnicianEvents {
+  query GetTechnicianEvents($fecha_inicio: String, $fecha_fin: String) {
+    TechnicianEvents(fecha_inicio: $fecha_inicio, fecha_fin: $fecha_fin) {
       id_evento
       titulo
       fecha_inicio

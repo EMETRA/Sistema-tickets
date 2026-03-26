@@ -12,7 +12,7 @@
  * 4. Hook retorna { data, loading, error, refetch }
  */
 
-import { useState } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { type Ticket, type TicketFilterInput } from '@/api/graphql/tickets';
 
 /**
@@ -35,7 +35,7 @@ export function useGetTickets(filters?: TicketFilterInput) {
     /**
      * Ejecuta fetch a /api/tickets con filtros
      */
-    async function refetch() {
+    const refetch = useCallback(async () => {
         setLoading(true);
         setError(null);
 
@@ -72,7 +72,12 @@ export function useGetTickets(filters?: TicketFilterInput) {
         } finally {
             setLoading(false);
         }
-    }
+    }, [filters]);
+
+    // Auto-fetch cuando los filtros cambien
+    useEffect(() => {
+        refetch();
+    }, [refetch]);
 
     return {
         data,

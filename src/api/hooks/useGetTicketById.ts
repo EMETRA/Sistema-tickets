@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import type { GetTicketByIdResponse, Ticket } from '@/api/graphql/tickets';
 
 export function useGetTicketById(initialId?: string) {
@@ -34,6 +34,13 @@ export function useGetTicketById(initialId?: string) {
         },
         [initialId]
     );
+
+    // Auto-fetch cuando el ID cambie
+    useEffect(() => {
+        if (initialId) {
+            refetch();
+        }
+    }, [initialId, refetch]);
 
     return { data, loading, error, refetch };
 }

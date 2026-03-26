@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { AppsGrid } from "@/components/client/organisms/AppsGrid";
 import { WelcomeCard } from "@/components/client/organisms/WelcomeCard";
 import { InfoPanel } from "@/components/client/organisms/InfoPanel";
@@ -14,10 +14,22 @@ import { useGetUser, useGetMyStats, useGetAppsByRole, useGetMyActivity } from "@
 import styles from "./UserHome.module.scss";
 
 const UserHome: React.FC = () => {
-    const { data: userData, loading: loadingUser, error: errorUser } = useGetUser();
-    const { data: statsData, loading: loadingStats, error: errorStats } = useGetMyStats();
-    const { data: appsData, loading: loadingApps, error: errorApps } = useGetAppsByRole();
-    const { data: myActivityData, loading: loadingMyActivity, error: errorMyActivity } = useGetMyActivity();
+    const { data: userData, loading: loadingUser, error: errorUser, refetch: refetchUser } = useGetUser();
+    const { data: statsData, loading: loadingStats, error: errorStats, refetch: refetchMyStats } = useGetMyStats();
+    const { data: appsData, loading: loadingApps, error: errorApps, refetch: refetchAppsByRole } = useGetAppsByRole();
+    const { data: myActivityData, loading: loadingMyActivity, error: errorMyActivity, refetch: refetchMyActivity } = useGetMyActivity();
+
+    const hasRunOnce = useRef(false);
+        
+    useEffect(() => {
+        if (!hasRunOnce.current) {
+            hasRunOnce.current = true;
+            refetchUser();
+            refetchMyStats();
+            refetchAppsByRole();
+            refetchMyActivity();
+        }
+    }, [refetchAppsByRole, refetchMyActivity, refetchMyStats, refetchUser]);
 
     // Derivar valores de carga y error directamente
     const isLoading = loadingUser || loadingStats || loadingApps || loadingMyActivity;

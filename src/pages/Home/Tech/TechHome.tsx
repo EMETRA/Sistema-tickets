@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { MyPerformanceChart } from "@/components/client/organisms/MyPerformanceChart";
 import { MyStatisticsPanel } from "@/components/client/organisms/MyStatisticsPanel";
 import { InfoPanel } from "@/components/client/organisms/InfoPanel";
@@ -19,10 +19,22 @@ import styles from "./TechHome.module.scss";
 
 const TechHome: React.FC = () => {
     // Hooks para obtener datos del API
-    const { data: userData, loading: loadingUser, error: errorUser } = useGetUser();
-    const { data: technicianStatsData, loading: loadingStats, error: errorStats } = useGetTechnicianStats();
-    const { data: technicianEventsData, loading: loadingEvents, error: errorEvents } = useGetTechnicianEvents();
-    const { data: technicianTicketsData, loading: loadingTickets, error: errorTickets } = useGetTechnicianLastTickets({ limit: 10 });
+    const { data: userData, loading: loadingUser, error: errorUser, refetch: refetchUser } = useGetUser();
+    const { data: technicianStatsData, loading: loadingStats, error: errorStats, refetch: refetchTechnicianStats } = useGetTechnicianStats();
+    const { data: technicianEventsData, loading: loadingEvents, error: errorEvents, refetch: refetchTechnicianEvents } = useGetTechnicianEvents({ fecha_inicio: new Date().toISOString().split('T')[0] });
+    const { data: technicianTicketsData, loading: loadingTickets, error: errorTickets, refetch: refetchTechnicianLastTickets } = useGetTechnicianLastTickets({ limit: 10 });
+
+    const hasRunOnce = useRef(false);
+    
+    useEffect(() => {
+        if (!hasRunOnce.current) {
+            hasRunOnce.current = true;
+            refetchUser();
+            refetchTechnicianStats();
+            refetchTechnicianEvents();
+            refetchTechnicianLastTickets();
+        }
+    }, [refetchTechnicianEvents, refetchTechnicianLastTickets, refetchTechnicianStats, refetchUser]);
 
     // Derivar estados de carga y error
     const isLoading = loadingUser || loadingStats || loadingEvents || loadingTickets;
@@ -57,14 +69,12 @@ const TechHome: React.FC = () => {
             type: "event" as const,
             eventName: event.titulo,
             date: new Date(event.fecha_inicio),
-            iconColor: "#262626",
-            iconBackgroundColor: "#F5F5F5",
         })) || [];
 
     // Transformar tickets del técnico a TicketData
     const sampleTickets: TicketData[] = technicianTicketsData
         ?.map((ticket, index) => {
-            // Mapear estado a ChipState y statusLabel
+            // DUMMY - ELIMINAR: para interpretar el estado retornaod del query
             const estadoMap: Record<number, { status: ChipState; label: string }> = {
                 1: { status: "ingressed", label: "Ingresado" },
                 2: { status: "assigned", label: "Asignado" },
@@ -75,7 +85,7 @@ const TechHome: React.FC = () => {
             
             const estadoInfo = estadoMap[ticket.estado] || { status: "ingressed", label: "Ingresado" };
 
-            // Mapear prioridad a tipo
+            // DUMMY - ELIMINAR: para interpretar el id retornaod del query
             const prioridadMap: Record<number, string> = {
                 1: "Baja",
                 2: "Normal",

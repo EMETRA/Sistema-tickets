@@ -9,7 +9,7 @@
  * 3. Hook retorna { data, loading, error, refetch }
  */
 
-import { useState } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { type AnnualReport } from "@/api/graphql/technician";
 
 interface AnnualReportFilters {
@@ -26,7 +26,7 @@ export function useGetAnnualReport(filters: AnnualReportFilters) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
 
-    async function refetch() {
+    const refetch = useCallback(async () => {
         setLoading(true);
         setError(null);
 
@@ -50,7 +50,12 @@ export function useGetAnnualReport(filters: AnnualReportFilters) {
         } finally {
             setLoading(false);
         }
-    }
+    }, [filters.anio]);
+
+    // Auto-fetch cuando el año cambia
+    useEffect(() => {
+        refetch();
+    }, [refetch]);
 
     return {
         data,

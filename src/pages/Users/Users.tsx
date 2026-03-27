@@ -4,33 +4,38 @@ import { FilterUsersBar } from "@/components/client/organisms/FilterUsersBar";
 import style from "./Users.module.scss";
 import { UsersGrid } from "@/components/client/organisms/UsersGrid";
 import { UserCardProps } from "@/components/client/molecules/UserCard";
-import { useEffect, useState } from "react";
-import { getTeamUsersDummy } from "@/api/graphql/queries/getTeamUsers";
+import { useEffect, useState, useRef } from "react";
+import { useGetTeamMembers } from "@/api/hooks";
 
 const Users: React.FC = () => {
 
     const [cat, setCat] = useState("todos");
     const [search, setSearch] = useState("");
-    const [users, setUsers] = useState<UserCardProps[]>([]);
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState("");
+
+    // Hook para obtener miembros del equipo
+    const { data: teamMembers, loading: isLoading, error, refetch } = useGetTeamMembers();
+
+    const hasRunOnce = useRef(false);
 
     useEffect(() => {
-        const fetchUsers = async () => {
-            try {
-                setIsLoading(true);
-                setError("");
+        if (!hasRunOnce.current) {
+            hasRunOnce.current = true;
+            refetch();
+        }
+    }, [refetch]);
 
-                const data = await getTeamUsersDummy();
-                setUsers(data);
-            } catch (error) {
-                setError("No fue posible cargar los usuarios" + (error instanceof Error ? `: ${error.message}` : ""));
-            } finally {
-                setIsLoading(false);
-            }
-        };
-        fetchUsers();
-    }, [])
+    // Transformar datos del API a UserCardProps[]
+    const users: UserCardProps[] = teamMembers
+        ? teamMembers.map(member => ({
+            id: member.id_usuario.toString(),
+            name: member.nombre || "Sin nombre",
+            email: member.departamento || "Sin departamento",
+            role: member.rol || "Sin rol",
+            avatar: undefined,
+            assignedCount: member.tickets_asignados,
+            resolvedCount: member.tickets_resueltos,
+        }))
+        : [];
 
     const filteredUsers = users.filter((user) => {
         
@@ -52,7 +57,7 @@ const Users: React.FC = () => {
     }
 
     if (error) {
-        return <div className={style.mainContainer}>{error}</div>
+        return <div className={style.mainContainer}>No fue posible cargar los usuarios</div>
     }
 
     return (

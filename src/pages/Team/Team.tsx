@@ -1,5 +1,6 @@
 "use client"
 
+import React, { useEffect, useRef } from "react";
 import { FilterUsersBar } from "@/components/client/organisms/FilterUsersBar";
 import style from "./Team.module.scss";
 import { UsersGrid } from "@/components/client/organisms/UsersGrid";
@@ -13,7 +14,16 @@ const Team: React.FC = () => {
     const [search, setSearch] = useState("");
 
     // Hook para obtener miembros del equipo
-    const { data: teamMembers, loading: loadingMembers, error: errorMembers } = useGetTeamMembers();
+    const { data: teamMembers, loading: loadingMembers, error: errorMembers, refetch: refetchTeamMembers } = useGetTeamMembers();
+
+    const hasRunOnce = useRef(false);
+
+    useEffect(() => {
+        if (!hasRunOnce.current) {
+            hasRunOnce.current = true;
+            refetchTeamMembers();
+        }
+    }, [refetchTeamMembers]);
 
     // Derivar estados de carga y error
     const isLoading = loadingMembers;

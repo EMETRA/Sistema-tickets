@@ -9,7 +9,7 @@
  * 3. Hook retorna { data, loading, error, refetch }
  */
 
-import { useState } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { type TechnicianEventRow } from "@/api/graphql/technician";
 
 interface TechnicianEventsFilters {
@@ -27,7 +27,7 @@ export function useGetTechnicianEvents(filters?: TechnicianEventsFilters) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
 
-    async function refetch() {
+    const refetch = useCallback(async () => {
         setLoading(true);
         setError(null);
 
@@ -51,7 +51,12 @@ export function useGetTechnicianEvents(filters?: TechnicianEventsFilters) {
         } finally {
             setLoading(false);
         }
-    }
+    }, [filters?.fecha_inicio, filters?.fecha_fin]);
+
+    // Auto-fetch cuando los filtros cambien
+    useEffect(() => {
+        refetch();
+    }, [refetch]);
 
     return {
         data,

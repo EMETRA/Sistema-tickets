@@ -12,9 +12,11 @@ const Tickets: React.FC = () => {
     const { data: ticketsData, loading: isLoading, error: loadError, refetch: refetchTickets } = useGetTickets();
     const { deleteTicket, loading: isDeleting } = useDeleteTicket();
     const { updateTicket, loading: isAssigning } = useUpdateTicket();
-    const hasRunOnce = useRef(false);
 
     // Auto-ejecutar refetch al montar el componente (solo una vez)
+
+    const hasRunOnce = useRef(false);
+
     useEffect(() => {
         if (!hasRunOnce.current) {
             hasRunOnce.current = true;
@@ -22,7 +24,7 @@ const Tickets: React.FC = () => {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
- 
+    
 
     const handleDeleteTicket = async (ticketId: string | number) => {
 

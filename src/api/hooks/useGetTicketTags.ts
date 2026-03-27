@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import type { GetTicketTagsResponse, TicketTag } from '@/api/graphql/tickets';
 
 export function useGetTicketTags(initialTicketId?: string) {
@@ -34,6 +34,13 @@ export function useGetTicketTags(initialTicketId?: string) {
         },
         [initialTicketId]
     );
+
+    // Auto-fetch cuando el ID del ticket cambie
+    useEffect(() => {
+        if (initialTicketId) {
+            refetch();
+        }
+    }, [initialTicketId, refetch]);
 
     return { data, loading, error, refetch };
 }

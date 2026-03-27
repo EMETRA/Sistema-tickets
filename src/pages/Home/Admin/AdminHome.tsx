@@ -1,10 +1,11 @@
 "use client"
 
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { DashboardStatsBar } from "@/components/client/organisms/DashboardStatsBar";
 import { PerformanceChartPanel } from "@/components/client/organisms/PerformanceChartPanel";
 import { InfoPanel } from "@/components/client/organisms/InfoPanel";
 import { TicketsResolvePanel } from "@/components/client/organisms/TicketsResolvePanel";
+import type { DonutChartDataItem } from "@/components/client/atoms/DonutChart";
 import TicketsPanel from "@/components/client/organisms/TicketsPanel/TicketsPanel";
 import styles from "./AdminHome.module.scss";
 
@@ -12,7 +13,7 @@ import { TicketStatData } from "@/components/client/organisms/DashboardStatsBar"
 import { EventItemProps } from "@/components/client/molecules/EventItem";
 import { TicketData } from "@/components/client/organisms/TicketsPanel";
 import { ChipState } from "@/components/client/atoms/Chip/types";
-import type { PerformanceFilter, PerformancePoint, TicketResolvedPoint } from "@/api/graphql/queries/getAdminHome";
+import type { PerformanceFilter, PerformancePoint } from "@/api/graphql/queries/getAdminHome";
 import {
     useGetAdminDashboardStats,
     useGetUserPerformance,
@@ -23,11 +24,72 @@ import {
 const AdminHome: React.FC = () => {
     const [filter, setFilter] = useState<PerformanceFilter>("today");
 
-    // Hooks para obtener datos del API
-    const { data: dashboardStats, loading: loadingStats, error: errorStats } = useGetAdminDashboardStats();
-    const { data: performanceData, loading: loadingPerformance, error: errorPerformance } = useGetUserPerformance();
-    const { data: lastMovements, loading: loadingMovements, error: errorMovements } = useGetLastMovements();
-    const { data: lastTickets, loading: loadingTickets, error: errorTickets } = useGetLastTicket();
+    const getDateRangeByFilter = (filterType: PerformanceFilter): { fecha_inicio: string; fecha_fin: string } => {
+        const today = new Date();
+        const currentYear = today.getFullYear();
+        const currentMonth = today.getMonth();
+
+        const formatDate = (date: Date): string => date.toISOString().split('T')[0];
+
+        switch (filterType) {
+        case "today":
+            // Hoy a hoy
+            const todayStr = formatDate(today);
+            return { fecha_inicio: todayStr, fecha_fin: todayStr };
+
+        case "weekly":
+            // Últimos 7 días (desde hace 6 días a hoy)
+            const sevenDaysAgo = new Date(today);
+            sevenDaysAgo.setDate(today.getDate() - 6);
+            return {
+                fecha_inicio: formatDate(sevenDaysAgo),
+                fecha_fin: formatDate(today),
+            };
+
+        case "monthly":
+            // Desde el primer día del mes actual a hoy
+            const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
+            return {
+                fecha_inicio: formatDate(firstDayOfMonth),
+                fecha_fin: formatDate(today),
+            };
+
+        case "annual":
+            // Desde el primer día del año actual a hoy
+            const firstDayOfYear = new Date(currentYear, 0, 1);
+            return {
+                fecha_inicio: formatDate(firstDayOfYear),
+                fecha_fin: formatDate(today),
+            };
+
+        default:
+            const defaultDate = formatDate(today);
+            return { fecha_inicio: defaultDate, fecha_fin: defaultDate };
+        }
+    };
+
+    // Calcular las fechas según el filtro actual
+    const dateRange = getDateRangeByFilter(filter);
+
+    const { data: dashboardStats, loading: loadingStats, error: errorStats, refetch: refetchDashboardStats } = useGetAdminDashboardStats();
+    const { data: performanceData, loading: loadingPerformance, error: errorPerformance, refetch: refetchUserPerformance } = useGetUserPerformance({
+        fecha_inicio: dateRange.fecha_inicio,
+        fecha_fin: dateRange.fecha_fin,
+    });
+    const { data: lastMovements, loading: loadingMovements, error: errorMovements, refetch: refetchLastMovements } = useGetLastMovements();
+    const { data: lastTickets, loading: loadingTickets, error: errorTickets, refetch: refetchLastTickets } = useGetLastTicket();
+
+    const hasRunOnce = useRef(false);
+
+    useEffect(() => {
+        if (!hasRunOnce.current) {
+            hasRunOnce.current = true;
+            refetchDashboardStats();
+            refetchUserPerformance();
+            refetchLastMovements();
+            refetchLastTickets();
+        }
+    }, [refetchDashboardStats, refetchLastMovements, refetchLastTickets, refetchUserPerformance]);
 
     // Derivar estados de carga y error
     const isLoading = loadingStats || loadingPerformance || loadingMovements || loadingTickets;
@@ -45,29 +107,13 @@ const AdminHome: React.FC = () => {
         ]
         : [];
 
-    // Transformar UserPerformance a datos por filtro
-    // Nota: En un escenario real, los hooks deberían filtrar según los parámetros
-    // Por ahora, mantenemos los mismos datos para todos los filtros (simulando que vienen del backend)
-    const dataByFilter: Record<PerformanceFilter, PerformancePoint[]> = performanceData?.rows
-        ? {
-            annual: performanceData.rows.map(user => ({
-                label: user.nombre || "Sin nombre",
-                value: user.tickets_resueltos * 1000, // Simulación de valor anual
-            })),
-            monthly: performanceData.rows.map(user => ({
-                label: user.nombre || "Sin nombre",
-                value: user.tickets_resueltos * 100, // Simulación de valor mensual
-            })),
-            weekly: performanceData.rows.slice(0, 3).map(user => ({
-                label: user.nombre || "Sin nombre",
-                value: user.tickets_resueltos * 20, // Simulación de valor semanal
-            })),
-            today: performanceData.rows.slice(0, 2).map(user => ({
-                label: user.nombre || "Sin nombre",
-                value: user.tickets_resueltos * 3, // Simulación de valor diario
-            })),
-        }
-        : { annual: [], monthly: [], weekly: [], today: [] };
+    // Transformar UserPerformance a datos para el gráfico
+    const dataByFilter: PerformancePoint[] = performanceData?.rows
+        ? performanceData.rows.map(user => ({
+            label: user.nombre || "Sin nombre",
+            value: user.tickets_resueltos,
+        }))
+        : [];
 
     // Transformar LastMovements a EventItemProps[]
     const eventItems: EventItemProps[] = lastMovements
@@ -79,29 +125,30 @@ const AdminHome: React.FC = () => {
             date: new Date(movement.fecha),
         })) || [];
 
+    // DUMMY - ELIMINAR: para interpretar el id retornaod del query
+    const estadoMap: Record<number, { status: ChipState; label: string }> = {
+        1: { status: "ingressed", label: "Ingresado" },
+        2: { status: "assigned", label: "Asignado" },
+        3: { status: "inwork", label: "En Trabajo" },
+        4: { status: "resolved", label: "Resuelto" },
+        5: { status: "canceled", label: "Cancelado" },
+    };
+
     // Transformar LastTicket a TicketData[]
     const sampleTickets: TicketData[] = lastTickets
         ?.map((ticket, index) => {
             // Mapear estado a ChipState
-            const estadoMap: Record<number, { status: ChipState; label: string }> = {
-                1: { status: "ingressed", label: "Ingresado" },
-                2: { status: "assigned", label: "Asignado" },
-                3: { status: "inwork", label: "En Trabajo" },
-                4: { status: "resolved", label: "Resuelto" },
-                5: { status: "canceled", label: "Cancelado" },
-            };
-
             const estadoInfo = estadoMap[ticket.estado] || { status: "ingressed", label: "Ingresado" };
 
-            // Mapear prioridad a tipo
-            const prioridadMap: Record<number, string> = {
-                1: "Baja",
-                2: "Normal",
-                3: "Alta",
-                4: "Urgente",
+            // DUMMY - ELIMINAR: para interpretar el id retornaod del query
+            const categoriaMap: Record<number, string> = {
+                1: "Soporte",
+                2: "Desarrollo",
+                3: "Mantenimiento",
+                4: "Consultoría",
             };
 
-            const tipo = prioridadMap[ticket.prioridad] || "Normal";
+            const tipo = categoriaMap[ticket.categoria] || "Normal";
 
             return {
                 id: index,
@@ -116,21 +163,10 @@ const AdminHome: React.FC = () => {
             };
         }) || [];
 
-    // Transformar por_estado a TicketResolvedPoint[]
-    // Combinamos los datos del dashboard con colores predefinidos
-    const colorMap: Record<string, string> = {
-        "Hardware": "#FF9100",
-        "Software": "#00BC70",
-        "Red": "#FFCE00",
-        "Acceso": "#E63946",
-        "Otros": "#6B7280",
-    };
-
-    const ticketsResolvedData: TicketResolvedPoint[] = dashboardStats?.por_estado
+    const ticketsResolvedData: DonutChartDataItem[] = dashboardStats?.por_estado
         ?.map(estado => ({
-            label: estado.estado,
+            label: estadoMap[Number(estado.estado)].label, // DUMMY: interpretar el id de estado
             value: estado.cantidad,
-            color: colorMap[estado.estado] || "#6B7280",
         })) || [];
 
     if (isLoading) {
@@ -150,7 +186,7 @@ const AdminHome: React.FC = () => {
                 <div className={styles.teamPerformanceContainer}>
                     <PerformanceChartPanel
                         variant="primary"
-                        data={dataByFilter[filter]}
+                        data={dataByFilter}
                         selectedFilter={filter}
                         onFilterChange={setFilter}
                     />

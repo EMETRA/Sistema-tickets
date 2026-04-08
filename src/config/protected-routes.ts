@@ -1,11 +1,14 @@
 export const protectedRoutes = [
-    '/home',
+    "/home",
+    "/tickets",
+    "/tickets-creation",
+    "/mis-tickets",
+    "/statistics",
+    "/equipo",
+    "/config",
+    "/usuarios"
 ];
 
-export const publicRoutes = [
-    '/landing'
-];
+export const publicRoutes = ["/"];
 
-export const nologRoutes = [
-    '/login'
-];
+export const nologRoutes = ["/login", "/forgot-password"];

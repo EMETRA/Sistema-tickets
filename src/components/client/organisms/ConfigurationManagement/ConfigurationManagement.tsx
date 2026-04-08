@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { ConfigurationManagementProps, ConfigManageView } from "./types";
+import { ConfigurationManagementProps } from "./types";
 import styles from "./ConfigurationManagement.module.scss";
 import classNames from "classnames";
 import { SettingsNavItem } from "../../molecules/SettingsNavItem";
@@ -11,7 +10,7 @@ import { ModulesTable } from "../ModulesTable";
 import { PermissionsTable } from "../PermissionsTable";
 import { EnrollTable } from "../EnrollTable";
 
-const ConfigurationManagement: React.FC<ConfigurationManagementProps> = ({
+const   ConfigurationManagement: React.FC<ConfigurationManagementProps> = ({
     requests,
     onRequestApproveAll,
     onRequestApprove,
@@ -30,11 +29,13 @@ const ConfigurationManagement: React.FC<ConfigurationManagementProps> = ({
     enrolls,
     onEnrollApproveAll,
     onEnrollApprove,
-    className
+    className,
+    activeView,
+    onViewChange
 }) => {
 
-    const [view, setView] = useState<ConfigManageView>("requests");
-
+    const view = activeView; 
+    const setView = onViewChange;
     const renderView = () => {
         switch (view) {
         case "requests":

@@ -31,3 +31,50 @@ export interface TicketEstado {
 export interface GetStatusesResponse {
   ticketStatuses: TicketEstado[];
 }
+
+// ========================================
+// INPUTS DE CATÁLOGOS
+// ========================================
+
+export interface CreateCategoryInput {
+  nombre: string;
+  descripcion?: string;
+  activo?: number; // 1 (activo) o 0 (inactivo)
+}
+
+export interface CreatePriorityInput {
+  nombre: string;
+  nivel: number;
+  color?: string;
+}
+
+export interface CreateStatusInput {
+  nombre: string;
+  es_final?: number; // 1 o 0
+}
+
+// ========================================
+// RESPONSES DE CATÁLOGOS
+// ========================================
+
+/**
+ * Respuesta estándar para operaciones de creación en catálogos
+ */
+export interface OperationResponse {
+  success: boolean;
+  message: string;
+  errorCode?: string;
+  timestamp: string;
+}
+
+export interface CreateCategoryResponse {
+  createCategory: OperationResponse;
+}
+
+export interface CreatePriorityResponse {
+  createPriority: OperationResponse;
+}
+
+export interface CreateStatusResponse {
+  createStatus: OperationResponse;
+}

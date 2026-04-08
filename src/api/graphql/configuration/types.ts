@@ -22,7 +22,24 @@ export interface GetPendingRequestsResponse {
   pendingRequests: PendingRequestRow[];
 }
 
-// ===== MODULES =====
+/**
+ * Respuesta estándar para operaciones de configuración
+ */
+export interface OperationResponse {
+  success: boolean;
+  message: string;
+  errorCode?: string;
+  timestamp: string;
+}
+
+export interface AproveRequestResponse {
+  aproveRequest: OperationResponse;
+}
+
+export interface RequestPermissionResponse {
+  requestPermission: OperationResponse;
+}
+
 export interface ModuleRow {
   id_modulo: number;
   nombre: string;

@@ -37,5 +37,7 @@ export interface ConfigurationManagementProps {
      * Clase CSS adicional.
      */
     className?: string;
+    activeView: ConfigManageView;
+    onViewChange: (view: ConfigManageView) => void;
     
 }

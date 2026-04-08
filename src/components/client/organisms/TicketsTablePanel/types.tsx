@@ -9,7 +9,7 @@ export interface User extends Member {
   /**
    * Departamento o área del usuario
    */
-  department: string;
+  department?: string;
 }
 
 /**

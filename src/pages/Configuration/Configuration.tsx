@@ -1,14 +1,17 @@
 "use client";
 
-import { ConfigurationManagement } from "@/components/client/organisms/ConfigurationManagement";
+import { ConfigManageView, ConfigurationManagement } from "@/components/client/organisms/ConfigurationManagement";
 import styles from "./Configuration.module.scss";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Request } from "@/components/client/organisms/RequestTable/types";
 import { Modules } from "@/components/client/organisms/ModulesTable/types";
 import { Permissions } from "@/components/client/organisms/PermissionsTable/types";
 import { Roles } from "@/components/client/organisms/RolesTable/types";
 import { Enroll } from "@/components/client/organisms/EnrollTable/types";
 import { getEnrollsDummy, getModulesDummy, getPermissionsDummy, getRequestsDummy, getRolesDummy } from "@/api/graphql/queries/getConfig";
+import { useCreateModule } from "@/api/hooks/useCreateModule"; // Importamos el hook
+import { useAproveRequest, useAssignPermission, useCreateRol, useUpdateRol } from "@/api/hooks";
+import { UpdateRolInput } from "@/api/graphql/rbac";
 /**
  import {
     useGetPendingRequests,
@@ -20,7 +23,7 @@ import { getEnrollsDummy, getModulesDummy, getPermissionsDummy, getRequestsDummy
  */
 
 const Configuration: React.FC = () => {
-
+    const [activeView, setActiveView] = useState<ConfigManageView>("requests");
     const [requests, setRequests] = useState<Request[]>([]);
     const [modules, setModules] = useState<Modules[]>([]);
     const [permissions, setPermissions] = useState<Permissions[]>([]);
@@ -29,34 +32,41 @@ const Configuration: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                setIsLoading(true);
-                setError("");
+    const { createModule } = useCreateModule();
+    const { createRol } = useCreateRol();
+    const { updateRol } = useUpdateRol();
+    const { assignPermission } = useAssignPermission();
+    const { aproveRequest } = useAproveRequest();
 
-                const [requests, modules, permissions, roles, enrolls] = await Promise.all([
-                    getRequestsDummy(),
-                    getModulesDummy(),
-                    getPermissionsDummy(),
-                    getRolesDummy(),
-                    getEnrollsDummy()
-                ]);
+    const fetchData = useCallback(async () => {
+        try {
+            setIsLoading(true);
+            setError("");
 
-                setRequests(requests);
-                setModules(modules);
-                setPermissions(permissions);
-                setRoles(roles);
-                setEnrolls(enrolls);
+            const [requestsData, modulesData, permissionsData, rolesData, enrollsData] = await Promise.all([
+                getRequestsDummy(),
+                getModulesDummy(),
+                getPermissionsDummy(),
+                getRolesDummy(),
+                getEnrollsDummy()
+            ]);
 
-            } catch (err) {
-                setError("No fue posible cargar los datos" + (err instanceof Error ? `: ${err.message}` : ""));
-            } finally {
-                setIsLoading(false);
-            }
+            setRequests(requestsData);
+            setModules(modulesData);
+            setPermissions(permissionsData);
+            setRoles(rolesData);
+            setEnrolls(enrollsData);
+
+        } catch (err) {
+            setError("No fue posible cargar los datos" + (err instanceof Error ? `: ${err.message}` : ""));
+        } finally {
+            setIsLoading(false);
         }
+    }, []);
+
+    useEffect(() => {
         fetchData();
-    },[])
+    }, [fetchData]);
 
     if (isLoading) {
         return <div className={styles.mainContainer}>Cargando datos...</div>
@@ -66,6 +76,131 @@ const Configuration: React.FC = () => {
         return <div className={styles.mainContainer}>{error}</div>
     }
 
+    /////////////////////////////////////////// Handlers para HOOKS ///////////////////////////////////////////////////
+    const handleModulesSubmit = async (data: { name: string; description: string }) => {
+        try {
+            const response = await createModule({
+                nombre: data.name,
+                descripcion: data.description,
+                ruta: `/config`,
+            });
+            if (response.success) {
+                alert("Módulo creado con éxito");
+                const updatedModules = await getModulesDummy();
+                setModules(updatedModules);
+            }
+        } catch (err) {
+            console.error("Error:", err);
+        }
+    };
+
+    const handleRolesSubmit = async (data: { name: string; description: string }) => {
+        try {
+            const response = await createRol(data.name, data.description);
+            if (response.success) {
+                alert("Rol creado con éxito");
+                const updatedRoles = await getRolesDummy();
+                setRoles(updatedRoles);
+            } else {
+                alert(`Error: ${response.message}`);
+            }
+        } catch (err) {
+            console.error("Error creando rol:", err);
+        }
+    };
+
+    const handleRolesEdit = async (data: Roles) => {
+        try {
+            setIsLoading(true);
+            const input: UpdateRolInput = {
+                nombre_rol: data.name,
+                descripcion: data.description
+            };
+            const response = await updateRol(data.id, input);
+
+            if (response.success) {
+                alert("Rol actualizado correctamente con: " + response.message);
+                await fetchData(); 
+            } else {
+                alert(`Error: ${response.message}`);
+            }
+        } catch (err) {
+            console.error("Error al actualizar rol:", err);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleEnrollApprove = async (userId: number) => {
+        try {
+            console.log("Aprobar enroll para usuario ID:", userId);
+            const userEnroll = enrolls.find(e => e.id === userId);
+            const permissionToAssign = userEnroll?.permission ? [userEnroll.permission] : [];
+
+            if (permissionToAssign.length === 0) {
+                alert("El usuario no tiene un permiso definido para asignar.");
+                return;
+            }
+
+            const response = await assignPermission(userId, permissionToAssign);
+
+            if (response.success) {
+                alert(`Permisos asignados con éxito a ${userEnroll?.name}`);
+                fetchData();
+            } else {
+                alert(`Error: ${response.message}`);
+            }
+        } catch (err) {
+            console.error("Error en assignPermission individual:", err);
+        }
+    };
+
+    const handleEnrollApproveAll = async (userIds: number[]) => {
+        
+        try {
+            setIsLoading(true);
+            const promises = userIds.map(userId => {
+                const userEnroll = enrolls.find(e => e.id === userId);
+                const permission = userEnroll?.permission ? [userEnroll.permission] : [];
+                return assignPermission(userId, permission);
+            });
+
+            await Promise.all(promises);
+            
+            alert("Proceso de asignación de usuarios seleccionados completado.");
+            fetchData();
+        } catch (err) {
+            console.error("Error en asignación masiva:", err);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleApproveRequests = async (ids: number | number[]) => {
+        if (Array.isArray(ids) && ids.length === 0) {
+            alert("No hay usuarios seleccionados.");
+            return;
+        }
+        try {
+            setIsLoading(true);
+        
+            // Normalizamos a array porque la mutation SIEMPRE espera [Int!]!
+            const idsArray = Array.isArray(ids) ? ids : [ids];
+        
+            if (idsArray.length === 0) return;
+
+            const response = await aproveRequest(idsArray);
+
+            if (response.success) {
+                alert(response.message || "Solicitudes procesadas con éxito");
+                fetchData(); // Refrescamos la lista de pendientes
+            }
+        } catch (err) {
+            console.error("Error al aprobar solicitudes:", err);
+        } finally {
+            setIsLoading(false);
+        }
+    };
     /**
     // Hooks para obtener datos de la API
     const { data: pendingRequestsData, loading: loadingRequests, error: errorRequests, refetch: refetchRequests } = useGetPendingRequests();
@@ -157,25 +292,32 @@ const Configuration: React.FC = () => {
     return (
         <div className={styles.mainContainer}>
             <div className={styles.configContainer}>
-                <ConfigurationManagement 
+                <ConfigurationManagement
+                    activeView={activeView}
+                    onViewChange={setActiveView}
+
                     requests={requests}
-                    onRequestApproveAll={(data) => alert(data)}
-                    onRequestApprove={(data) => alert(data)}
+                    onRequestApprove={(id) => handleApproveRequests(id)}
+                    onRequestApproveAll={(selectedIds) => handleApproveRequests(selectedIds)}
+                    
                     modules={modules}
-                    onModulesSubmit={(data) => console.log(data)}
+                    onModulesSubmit={handleModulesSubmit} 
                     onModulesEdit={(data) => console.log(data)}
                     onModulesDelete={(data) => alert(data)}
+                    
                     permissions={permissions}
                     onPermissionsSubmit={(data) => console.log(data)}
                     onPermissionsEdit={(data) => console.log(data)}
                     onPermissionsDelete={(data) => alert(data)}
+                    
                     roles={roles}
-                    onRolesSubmit={(data) => console.log(data)}
-                    onRolesEdit={(data) => console.log(data)}
+                    onRolesSubmit={handleRolesSubmit}
+                    onRolesEdit={handleRolesEdit}
                     onRolesDelete={(data) => alert(data)}
+                    
                     enrolls={enrolls}
-                    onEnrollApproveAll={(data) => alert(data)}
-                    onEnrollApprove={(data) => alert(data)}
+                    onEnrollApprove={handleEnrollApprove}
+                    onEnrollApproveAll={handleEnrollApproveAll}
                 />
             </div>
         </div>

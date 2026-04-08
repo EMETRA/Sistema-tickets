@@ -20,6 +20,7 @@ export { GET_TICKET_PRIORITIES_QUERY } from './ticketPriorities';
 export { GET_TICKET_STATUSES_QUERY } from './ticketStatuses';
 export { GET_TICKET_TAG_CATALOG_QUERY } from './ticketTagCatalog';
 
+
 // ========================================
 // TYPES - All types centralized (DRY)
 // ========================================
@@ -29,6 +30,9 @@ export type {
     TicketFilterInput,
     GetTicketsResponse,
     GetTicketByIdResponse,
+    CreateTicketInput,
+    UpdateTicketInput,
+    DeleteTicketResponse,
     // Comments
     TicketComentario,
     GetTicketCommentsResponse,
@@ -41,6 +45,10 @@ export type {
     // Tags
     TicketTag,
     GetTicketTagsResponse,
+    AddTicketCommentInput,
+    AddTagToTicketResponse,
+    CreateTicketTagResponse,
+    RemoveTagFromTicketResponse,
     // Catalogs
     TicketCategoria,
     GetTicketCategoriesResponse,
@@ -51,7 +59,13 @@ export type {
     GetTicketTagCatalogResponse,
 } from './types';
 
-// TODO: Mutations (próximas fases)
-// export { CREATE_TICKET_MUTATION } from './createTicket';
-// export { UPDATE_TICKET_MUTATION } from './updateTicket';
-// export { DELETE_TICKET_MUTATION } from './deleteTicket';
+// ========================================
+// MUTATIONS - Create, Update, Delete
+// ========================================
+export { CREATE_TICKET_MUTATION } from './createTicket';
+export { UPDATE_TICKET_MUTATION } from './updateTicket';
+export { DELETE_TICKET_MUTATION } from './deleteTicket';
+export { ADD_TICKET_COMMENT_MUTATION } from './addTicketComment';
+export { ADD_TAG_TO_TICKET_MUTATION } from './addTagToTicket';
+export { CREATE_TICKET_TAG_MUTATION } from './createTicketTag';
+export { REMOVE_TAG_FROM_TICKET_MUTATION } from './removeTagFromTicket';

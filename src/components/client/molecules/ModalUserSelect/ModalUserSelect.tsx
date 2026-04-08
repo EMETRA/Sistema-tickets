@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import classNames from "classnames";
 import { PopOver } from "@/components/client/atoms/PopOver";
 import { Title } from "@/components/client/atoms/Title";
@@ -26,10 +26,16 @@ export const ModalUserSelect = ({
     const [isLoadingUsers, setIsLoadingUsers] = useState(false);
     const [usersError, setUsersError] = useState("");
 
-    const currentUserId = useMemo(() => {
-    // Dummy para obtener el ID del usuario actual desde el contexto o estado global
-        return localStorage.getItem("currentUserId") || "1";
+    const [currentUserId, setCurrentUserId] = useState<string>("1"); // Valor inicial por defecto
+
+    useEffect(() => {
+        // Este código solo corre en el cliente
+        const storedId = localStorage.getItem("currentUserId");
+        if (storedId) {
+            setCurrentUserId(storedId);
+        }
     }, []);
+
 
     useEffect(() => {
         if (!isOpen) {

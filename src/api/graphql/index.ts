@@ -16,7 +16,6 @@ export * from './tickets';
 export {
     ErrorHandler,
     ErrorType,
-    GraphQLClientError,
-    type GraphQLErrorData,
-    type NetworkErrorData,
+    AppError,
+    type ErrorInfo,
 } from './errors';

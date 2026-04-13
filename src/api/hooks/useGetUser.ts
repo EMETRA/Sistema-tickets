@@ -4,12 +4,15 @@
  * Hook useGetUser
  *
  * Flujo:
- * 1. Hook llama a fetch('/api/usuario')
- * 2. Route handler ejecuta GET_USER_QUERY en servidor
- * 3. Hook retorna { data, loading, error, refetch }
+ * 1. Hook llama a apiFetch('/api/usuario') con token automático
+ * 2. Route handler recibe Authorization header
+ * 3. Route handler ejecuta graphqlRequest(GET_USER_QUERY)
+ * 4. graphqlRequest() lee token del header y lo envía al backend
+ * 5. Hook retorna { data, loading, error, refetch }
  */
 
 import { useState } from "react";
+import { apiFetch } from "@/api/graphql/client";
 import { type UsuarioPerfil } from "@/api/graphql/home";
 
 /**
@@ -26,14 +29,11 @@ export function useGetUser() {
         setError(null);
 
         try {
-            const response = await fetch("/api/usuario");
+            const response = await apiFetch<{ usuario: UsuarioPerfil }>(
+                "/api/usuario"
+            );
 
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-
-            const result = await response.json();
-            setData(result.usuario || null);
+            setData(response.usuario || null);
         } catch (err) {
             const error = err instanceof Error ? err : new Error(String(err));
             setError(error);

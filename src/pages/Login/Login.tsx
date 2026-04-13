@@ -9,32 +9,75 @@ import { Input } from "@/components/client/atoms/Input";
 import { Button } from "@/components/client/atoms/Button";
 import { Link } from "@/components/client/atoms/Link";
 import { Image } from "@/components/client/atoms/Image";
-import { login } from "@/api/graphql/mutations/login";
+import { useLogin } from "@/api/hooks/useLogin";
+import { useAuthStore } from "@/store/useAuthStore";
+import { apiFetch } from "@/api/graphql/client";
 import styles from "./Login.module.scss";
 import { useRouter } from "next/dist/client/components/navigation";
+import type { UsuarioPerfil } from "@/api/graphql/home/types";
 
 const Login: React.FC = () => {
     const router = useRouter();
+    const { loading, error: loginError, login } = useLogin();
+    const setAuth = useAuthStore((state) => state.setAuth);
     const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState("");
+    const [clave, setClave] = useState("");
+    const [error, setError] = useState<string | null>(null);
+
+    /**
+     * Obtener información del usuario desde el backend
+     * El token se envía automáticamente via apiFetch
+     */
+    const fetchUserInfo = async (): Promise<UsuarioPerfil | null> => {
+        try {
+            const response = await apiFetch<{ usuario: UsuarioPerfil }>(
+                "/api/usuario"
+            );
+            return response.usuario || null;
+        } catch {
+            return null;
+        }
+    };
 
     const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setError("");
-        setIsLoading(true);
+        setError(null);
 
         try {
-            const response = await login({ email, password });
-            console.log("Login exitoso:", response);
+            const response = await login(email, clave);
+
+            let userInfo = await fetchUserInfo();
+
+            // DUMMY: En desarrollo, si el backend retorna null, usar datos de prueba
+            if (process.env.NODE_ENV === "development") {
+                // Descomentar para usar este dummy cuando el backend retorne null:
+                userInfo = {
+                    id_usuario: userInfo?.id_usuario || "999",
+                    nombre: userInfo?.nombre || "Juan Perez",
+                    email: email,
+                    rol: "tech",
+                    departamento: userInfo?.departamento || "Desarrollo",
+                    avatar: userInfo?.avatar || undefined,
+                };
+            }
+
+            if (!userInfo) {
+                setError("Ocurrió un error. Intenta nuevamente.");
+                return;
+            }
+
+            const userRole = userInfo.rol || "USER";
+            const normalizedUser: UsuarioPerfil = {
+                ...userInfo,
+                rol: userRole,
+            };
+
+            setAuth(response.token, normalizedUser);
+            
             router.push("/home");
         } catch (err) {
             console.error("Error en login:", err);
             setError("Error al iniciar sesión. Verifica tus credenciales.");
-
-        } finally {
-            setIsLoading(false);
         }
     };
 
@@ -55,27 +98,27 @@ const Login: React.FC = () => {
                                     placeholder="email@ejemplo.com"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    disabled={isLoading}
+                                    disabled={loading}
                                     required
                                 />
                             </FormField>
-                            <FormField htmlFor="password" label="Contraseña" required>
+                            <FormField htmlFor="clave" label="Contraseña" required>
                                 <Input 
-                                    id="password" 
+                                    id="clave" 
                                     type="password" 
                                     placeholder="Contraseña"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    disabled={isLoading}
+                                    value={clave}
+                                    onChange={(e) => setClave(e.target.value)}
+                                    disabled={loading}
                                     required
                                 />
                             </FormField>
                             <Link href="/forgot-password" className={styles.forgotPasswordLink}>
                                 ¿Olvidaste tu contraseña?
                             </Link>
-                            {error && (
+                            {(loginError || error) && (
                                 <Text variant="caption" className={styles.errorText}>
-                                    {error}
+                                    {error || loginError}
                                 </Text>
                             )}
                         </div>
@@ -84,9 +127,9 @@ const Login: React.FC = () => {
                                 color="cancel" 
                                 fullWidth 
                                 type="submit"
-                                state={isLoading ? "loading" : "default"}
+                                state={loading ? "loading" : "default"}
                             >
-                                {isLoading ? "Iniciando..." : "Iniciar Sesión"}
+                                {loading ? "Iniciando..." : "Iniciar Sesión"}
                             </Button>
                         </FormActions>
                     </form>

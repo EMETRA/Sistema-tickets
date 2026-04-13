@@ -6,7 +6,7 @@ import { GET_USER_QUERY, type GetUserResponse } from "@/api/graphql/home";
  * GET /api/usuario
  *
  * Obtiene el perfil del usuario autenticado
- * Requiere: Authorization header con JWT token
+ * El token se obtiene automáticamente del header Authorization
  */
 export async function GET(_request: NextRequest) {
     try {
@@ -20,7 +20,7 @@ export async function GET(_request: NextRequest) {
     } catch (error) {
         const message = error instanceof Error ? error.message : "Error desconocido";
         const statusCode =
-      error instanceof Error && error.message.includes("401") ? 401 : 500;
+            error instanceof Error && error.message.includes("401") ? 401 : 500;
 
         return NextResponse.json(
             {

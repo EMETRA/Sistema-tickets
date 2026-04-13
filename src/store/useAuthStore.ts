@@ -1,8 +1,9 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import Cookies from 'js-cookie';
-import { UserRole } from '@/types/roles';
-import { UsuarioPerfil } from '@/types/users';
+import { UsuarioPerfil } from '@/api/graphql/home/types';
+
+type UserRole = 'ADMIN' | 'TECH' | 'USER';
 
 interface AuthState {
     token: string | null;
@@ -16,7 +17,7 @@ interface AuthState {
 
     // RBAC: Helpers de Roles
     hasRole: (roles: UserRole | UserRole[]) => boolean;
-    getRole: () => UserRole | null;
+    getRole: () => UserRole;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -48,11 +49,27 @@ export const useAuthStore = create<AuthState>()(
 
             setHydrated: () => set({ isHydrated: true }),
 
-            getRole: () => (get().user?.rol as UserRole) || null,
+            /**
+             * Obtener el rol del usuario normalizado a mayúsculas
+             * Si no existe rol o es inválido, retorna 'USER' como default
+             */
+            getRole: () => {
+                const user = get().user;
+                if (!user?.rol) return 'USER';
+                
+                const roleUpper = user.rol.toUpperCase();
+                
+                // Validar que sea un rol válido
+                if (['ADMIN', 'TECH', 'USER'].includes(roleUpper)) {
+                    return roleUpper as UserRole;
+                }
+                
+                // Default a USER si no es válido
+                return 'USER';
+            },
 
             hasRole: (roles) => {
-                const currentRole = get().user?.rol as UserRole;
-                if (!currentRole) return false;
+                const currentRole = get().getRole();
                 return Array.isArray(roles) ? roles.includes(currentRole) : currentRole === roles;
             },
         }),

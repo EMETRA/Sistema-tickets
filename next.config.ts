@@ -11,6 +11,8 @@ const nextConfig: NextConfig = {
                 port: '',
                 pathname: '/**', // Permite cualquier ruta dentro del dominio
             },
+            { protocol: "http", hostname: "localhost", port: "3000", pathname: "/**" },
+            { protocol: "http", hostname: "localhost", pathname: "/**" },
         ],
     },
 };

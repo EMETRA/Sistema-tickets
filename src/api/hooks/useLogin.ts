@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import { useCallback, useState } from 'react';
-import { graphqlRequest } from '@/api/graphql/client';
+import { graphqlRequestClient } from '@/api/graphql/client';
 import { ErrorHandler } from '@/api/graphql/errors';
 import { LOGIN_MUTATION } from '@/api/graphql/auth/login';
 import { type LoginInput, type LoginResponse } from '@/api/graphql/auth/types';
@@ -68,7 +68,7 @@ export function useLogin() {
                 throw new Error('Contraseña no puede estar vacía');
             }
 
-            const response = await graphqlRequest<{ login: LoginResponse }>(
+            const response = await graphqlRequestClient<{ login: LoginResponse }>(
                 LOGIN_MUTATION,
                 {
                     variables: {

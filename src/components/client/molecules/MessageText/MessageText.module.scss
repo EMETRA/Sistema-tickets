@@ -1,0 +1,35 @@
+.MessageText {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    padding: 8px;
+}
+
+.avatarContainer {
+    display: flex;
+    align-items: flex-start;
+    padding-top: 8px;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.header {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    align-items: center;
+}
+
+.text {
+    margin: 0;
+}
+
+.filesContainer {
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+}

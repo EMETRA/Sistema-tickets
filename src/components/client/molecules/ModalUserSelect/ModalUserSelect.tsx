@@ -12,6 +12,8 @@ import { Button } from "@/components/client/atoms/Button";
 import { Divider } from "@/components/client/atoms/Divider";
 import { AssignableUser, getAssignableUsersDummy } from "@/api/graphql/queries/getAssignableUsers";
 
+import { useAuthStore } from "@/store/useAuthStore";
+
 import { ModalUserSelectProps } from "./types";
 import styles from "./ModalUserSelect.module.scss";
 
@@ -28,13 +30,14 @@ export const ModalUserSelect = ({
 
     const [currentUserId, setCurrentUserId] = useState<string>("1"); // Valor inicial por defecto
 
+    const { getUserId } = useAuthStore();
+
     useEffect(() => {
-        // Este código solo corre en el cliente
-        const storedId = localStorage.getItem("currentUserId");
+        const storedId = getUserId();
         if (storedId) {
             setCurrentUserId(storedId);
         }
-    }, []);
+    }, [getUserId]);
 
 
     useEffect(() => {

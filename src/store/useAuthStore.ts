@@ -8,6 +8,7 @@ type UserRole = 'ADMIN' | 'TECH' | 'USER';
 interface AuthState {
     token: string | null;
     user: UsuarioPerfil | null;
+    userId: UsuarioPerfil['id_usuario'] | null;
     isHydrated: boolean;
 
     // Acciones (El "Set" y "Get")
@@ -18,6 +19,7 @@ interface AuthState {
     // RBAC: Helpers de Roles
     hasRole: (roles: UserRole | UserRole[]) => boolean;
     getRole: () => UserRole;
+    getUserId: () => UsuarioPerfil['id_usuario'] | null;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -25,10 +27,11 @@ export const useAuthStore = create<AuthState>()(
         (set, get) => ({
             token: null,
             user: null,
+            userId: null,
             isHydrated: false,
 
             setAuth: (token, user) => {
-                set({ token, user });
+                set({ token, user, userId: user.id_usuario });
                 // 1. Sincronización con Cookies para el Middleware
                 // Usamos una cookie estándar (accesible por JS) para que tu compa no peleé
                 Cookies.set('auth_token', token, { 
@@ -39,7 +42,7 @@ export const useAuthStore = create<AuthState>()(
             },
 
             logout: () => {
-                set({ token: null, user: null });
+                set({ token: null, user: null, userId: null });
                 // Limpiamos tanto la Cookie como el Storage
                 Cookies.remove('auth_token');
                 localStorage.removeItem('auth-storage');
@@ -72,6 +75,8 @@ export const useAuthStore = create<AuthState>()(
                 const currentRole = get().getRole();
                 return Array.isArray(roles) ? roles.includes(currentRole) : currentRole === roles;
             },
+
+            getUserId: () => get().userId,
         }),
         {
             name: 'auth-storage', // Nombre en LocalStorage

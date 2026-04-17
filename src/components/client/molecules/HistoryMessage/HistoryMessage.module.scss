@@ -1,0 +1,53 @@
+.HistoryMessage {
+    display: flex;
+    flex-direction: column;
+    gap: 50px;
+    padding: 20px 40px;
+    border: 1px solid #EDF0F2;
+    border-radius: 10px;
+    width: fit-content;
+}
+
+.historyItemContainer {
+    position: relative;
+}
+
+.historyItem {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+}
+
+.content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.textContainer {
+    display: flex;
+    flex-direction: row;
+    white-space-collapse: preserve;
+}
+
+.user, .ticket, .assignedToName, .tagName, .statusName {
+    font-weight: bold;
+    margin: 0;
+}
+
+.action, .tag, .status, .assignedTo {
+    margin: 0;
+    display: flex;
+    flex-direction: row;
+    width: max-content;
+}
+
+.conector {
+    position: absolute;
+    width: 2px;
+    height: 50px;
+    background-color: #C5C5C5;
+    left: 20px;
+    top: 60px;
+}

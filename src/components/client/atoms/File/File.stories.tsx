@@ -16,3 +16,11 @@ export const Default: Story = {
         onClick: () => alert("File clicked!"),
     },
 };
+
+export const Outlined: Story = {
+    args: {
+        name: "document.pdf",
+        onClick: () => alert("File clicked!"),
+        variant: "outlined",
+    },
+};

@@ -34,6 +34,7 @@
 .user, .ticket, .assignedToName, .tagName, .statusName {
     font-weight: bold;
     margin: 0;
+    width: max-content;
 }
 
 .action, .tag, .status, .assignedTo {

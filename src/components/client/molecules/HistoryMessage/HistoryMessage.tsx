@@ -5,9 +5,9 @@ import { Title } from "@/components/client/atoms/Title";
 import { Text } from "@/components/client/atoms/Text";
 
 import styles from "./HistoryMessage.module.scss";
-import { HistoryMessageProps } from "./types";
+import { HistoryItem, HistoryMessageProps } from "./types";
 
-const HistoryMessage: React.FC<HistoryMessageProps> = ({ historyItems, className }) => {
+const HistoryMessage: React.FC<HistoryMessageProps> = ({ ticketId, className }) => {
     const iconMap: Record<string, string> = {
         CREATED: "ticket-solid",
         ASSIGNED: "user-add",
@@ -31,6 +31,43 @@ const HistoryMessage: React.FC<HistoryMessageProps> = ({ historyItems, className
         IN_PROGRESS: "#FFCD52",
         FINALIZED: "#93EDB6"
     };
+
+    const historyItems: HistoryItem[] = [
+        {
+            user: "John Doe",
+            ticketId: "123",
+            timestamp: "2024-06-01T10:00:00Z",
+            action: "CREATED",
+            ticketStatus: "espera",
+        },
+        {
+            user: "Jane Smith",
+            ticketId: "123",
+            timestamp: "2024-05-31T10:00:00Z",
+            action: "ASSIGNED",
+            assignedTo: "John Doe",
+        },
+        {
+            user: "John Doe",
+            ticketId: "123",
+            timestamp: "2024-05-30T10:00:00Z",
+            action: "TAGGED",
+            tag: "Urgente",
+        },
+        {
+            user: "Jane Smith",
+            ticketId: "123",
+            timestamp: "2024-05-29T10:00:00Z",
+            action: "IN_PROGRESS",
+        },
+        {
+            user: "John Doe",
+            ticketId: "123",
+            timestamp: "2024-05-28T10:00:00Z",
+            action: "FINALIZED",
+            ticketStatus: "Finalizado",
+        },
+    ]
 
     const actionText = (action: string) => {
         switch (action) {
@@ -64,7 +101,7 @@ const HistoryMessage: React.FC<HistoryMessageProps> = ({ historyItems, className
         }
     }
 
-    const renderHistoryItemText = (item: HistoryMessageProps["historyItems"][0]) => {
+    const renderHistoryItemText = (item: HistoryItem) => {
         return (
             <div className={styles.textContainer}>
                 <Text className={styles.user}>{item.user} </Text>

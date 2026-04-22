@@ -3,9 +3,10 @@
     flex-direction: column;
     gap: 50px;
     padding: 20px 40px;
-    border: 1px solid #EDF0F2;
+    border: 2px solid #EDF0F2;
     border-radius: 10px;
-    width: fit-content;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .historyItemContainer {

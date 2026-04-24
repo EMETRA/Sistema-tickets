@@ -12,6 +12,7 @@ import { Chip } from "../../atoms/Chip";
 import { AssignedChip } from "../../molecules/AssignedChip";
 import { IconButton } from "../../atoms/IconButton";
 import ModalUserSelect from "@/components/client/molecules/ModalUserSelect";
+import { TicketDetail } from "@/components/client/organisms/TicketDetail";
 import type { TicketsTablePanelProps, Ticket } from "./types";
 import styles from "./TicketsTablePanel.module.scss";
 
@@ -39,13 +40,15 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
 }) => {
     const [selectedFilter, setSelectedFilter] = useState<string>("all");
     const [selectedMemberId, setSelectedMemberId] = useState<string | number | undefined>();
-    const [ticketToDelete, setTicketToDelete] = useState<string | number | null>(null);
+    const [ticketToDelete, setTicketToDelete] = useState<string | null>(null);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [hiddenTicketIds, setHiddenTicketIds] = useState<Array<string | number>>([]);
-    const [pendingCancellation, setPendingCancellation] = useState<{ id: string | number; title: string } | null>(null);
+    const [pendingCancellation, setPendingCancellation] = useState<{ id: string; title: string } | null>(null);
     const [openAssignedChipModal, setOpenAssignedChipModal] = useState(false);
-    const [ticketToAssign, setTicketToAssign] = useState<string | number | null>(null);
+    const [ticketToAssign, setTicketToAssign] = useState<string | null>(null);
     const [isAssigning, setIsAssigning] = useState(false);
+
+    const [selectedTickedId, setSelectedTicketId] = useState<string | null>(null);
 
     const visibleTickets = useMemo(() => (
         tickets.filter((ticket) => !hiddenTicketIds.includes(ticket.id))
@@ -100,7 +103,7 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
     }, [visibleTickets, selectedFilter, selectedMemberId]);
 
     // Manejar apertura del modal de eliminación
-    const handleDeleteClick = (ticketId: string | number) => {
+    const handleDeleteClick = (ticketId: string) => {
         if (pendingCancellation) {
             return;
         }
@@ -162,7 +165,7 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
         setHiddenTicketIds((prev) => prev.filter((id) => id !== ticketId));
     };
 
-    const handleAssignClick = (ticketId: string | number) => {
+    const handleAssignClick = (ticketId: string) => {
         setTicketToAssign(ticketId);
         setOpenAssignedChipModal(true);
     };
@@ -243,13 +246,22 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
                     },
                     {
                         content: (
-                            <IconButton
-                                icon="trash-solid"
-                                size={24}
-                                iconColor="#BDBDBD"
-                                disabled={!!pendingCancellation || isAssigning}
-                                onClick={() => handleDeleteClick(ticket.id)}
-                            />
+                            <div className={styles.actions}>
+                                <IconButton
+                                    icon="trash-solid"
+                                    size={24}
+                                    iconColor="#BDBDBD"
+                                    disabled={!!pendingCancellation || isAssigning}
+                                    onClick={() => handleDeleteClick(ticket.id)}
+                                />
+                                <IconButton
+                                    icon="eye"
+                                    size={24}
+                                    iconColor="#BDBDBD"
+                                    disabled={!!pendingCancellation || isAssigning}
+                                    onClick={() => setSelectedTicketId(ticket.id)}
+                                />
+                            </div>
                         ),
                         align: "center",
                     },
@@ -332,6 +344,13 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
                     setTicketToAssign(null);
                 }}
                 onConfirm={handleAssignConfirm}
+            />
+
+            {/* Modal para ver detalles de un ticket */}
+            <TicketDetail
+                isOpen={!!selectedTickedId}
+                onClose={() => setSelectedTicketId(null)}
+                ticketId={selectedTickedId || ""}
             />
         </div>
     );

@@ -3,7 +3,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import Cookies from 'js-cookie';
 import { UsuarioPerfil } from '@/api/graphql/home/types';
 
-type UserRole = 'ADMIN' | 'TECH' | 'USER';
+import { UserRole } from '@/types/roles';
 
 interface AuthState {
     token: string | null;

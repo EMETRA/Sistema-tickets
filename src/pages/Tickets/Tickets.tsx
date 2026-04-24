@@ -26,11 +26,9 @@ const Tickets: React.FC = () => {
     }, []);
     
 
-    const handleDeleteTicket = async (ticketId: string | number) => {
-
-        const tickedIdToDelete = typeof ticketId === "string" ? ticketId : ticketId.toString();
+    const handleDeleteTicket = async (ticketId: string) => {
         try {
-            const success = await deleteTicket(tickedIdToDelete);
+            const success = await deleteTicket(ticketId);
 
             if (success) {
                 alert("Ticket eliminado con éxito");
@@ -43,7 +41,7 @@ const Tickets: React.FC = () => {
         }
     };
 
-    const handleAssignTicket = async (ticketId: string | number, userId: string | number) => {
+    const handleAssignTicket = async (ticketId: string, userId: string | number) => {
         try {
         // 1. Normalizamos los IDs
             const tId = ticketId.toString();

@@ -19,7 +19,7 @@ export interface Ticket {
   /**
    * ID único del ticket
    */
-  id: string | number;
+  id: string;
 
   /**
    * Usuario que creó el ticket
@@ -67,12 +67,12 @@ export interface TicketsTablePanelProps {
   /**
   * Callback cuando se confirma la cancelación definitiva de un ticket
   */
-  onDelete?: (ticketId: string | number) => void | Promise<void>;
+  onDelete?: (ticketId: string) => void | Promise<void>;
 
   /**
   * Callback para asignar/reasignar un ticket a un usuario
   */
-  onAssign?: (ticketId: string | number, userId: string) => void | Promise<void>;
+  onAssign?: (ticketId: string, userId: string) => void | Promise<void>;
 
   /**
    * Callback cuando se exporta la tabla

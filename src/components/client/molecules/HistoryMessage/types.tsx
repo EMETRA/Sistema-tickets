@@ -18,6 +18,6 @@ export interface HistoryItem {
 }
 
 export interface HistoryMessageProps {
-    historyItems: HistoryItem[];
+    ticketId: string;
     className?: string;
 }

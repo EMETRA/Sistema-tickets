@@ -9,7 +9,7 @@ import { ChatProps } from "./types";
 
 import type { MessageTextProps } from "@/components/client/molecules/MessageText";
 
-const Chat: React.FC<ChatProps> = ({ ticketId }) => {
+const Chat: React.FC<ChatProps> = ({ ticketId, classname }) => {
     const messagesContainerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -126,7 +126,7 @@ const Chat: React.FC<ChatProps> = ({ ticketId }) => {
 
 
     return (
-        <div className={styles.chatContainer}>
+        <div className={`${styles.chatContainer} ${classname}`} >
             <div className={styles.messagesContainer} ref={messagesContainerRef}>
                 {messages.map((message, index) => (
                     <MessageText key={index} {...message} />

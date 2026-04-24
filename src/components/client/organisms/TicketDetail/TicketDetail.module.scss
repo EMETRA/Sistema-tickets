@@ -1,0 +1,90 @@
+.popOver {
+  height: 90%;
+  width: 90%;
+  overflow: auto;
+  padding: 20px;
+}
+
+.ticketDetailContainer {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.headerInfo {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+}
+
+.title {
+    color: #7F8D9F;
+}
+
+.closeButton {
+    background-color: transparent;
+    border: 1px solid #7F8D9F;
+    color: #7F8D9F;
+    cursor: pointer;
+    padding: 8px;
+}
+
+.content {
+    display: grid;
+    grid-template-columns: 4.5fr 0.5fr;
+    gap: 20px;
+}
+
+.ticketDetails {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    height: 100%;
+}
+
+.chat {
+    height: 100%;
+    max-height: 50vh;
+    padding-bottom: 20px;
+}
+
+.ticketInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.ticketTitleInfo, .ticketInfoDescription {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    max-height: min-content;
+}
+
+.ticketInfoFiles {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+.ticketHistory {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.ticketActions {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 10px;
+}

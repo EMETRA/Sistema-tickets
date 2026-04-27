@@ -1,29 +1,29 @@
 /**
  * Query GraphQL para obtener un ticket por ID
  *
- * Variables: { id: ID! }
+ * Variables: { ticketId: ID! }
  * Respuesta: { ticket: Ticket }
  *
  * Descripción:
  * - Obtiene un ticket específico por su ID
- * - Retorna todos los campos del ticket o null si no existe
+ * - Retorna todos los campos del ticket
  */
 export const GET_TICKET_BY_ID_QUERY = `
-  query GetTicketById($id: ID!) {
-    ticket(id: $id) {
-      id
-      codigo
-      titulo
-      descripcion
-      tiempoEstimado
-      usuarioCreadorId
-      usuarioAsignadoId
+  query GetTicketById($ticketId: ID!) {
+    ticket(id: $ticketId) {
       categoriaId
-      prioridadId
+      codigo
+      descripcion
       estadoId
-      fechaCreacion
       fechaActualizacion
       fechaCierre
+      fechaCreacion
+      id
+      prioridadId
+      tiempoEstimado
+      titulo
+      usuarioAsignadoId
+      usuarioCreadorId
     }
   }
 `;

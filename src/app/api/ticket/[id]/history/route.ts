@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { graphqlRequest } from '@/api/graphql/client';
 import {
-    GET_TICKET_BY_ID_QUERY,
-    type GetTicketByIdResponse,
+    GET_TICKET_HISTORY_QUERY,
+    type GetTicketHistoryResponse,
 } from '@/api/graphql/tickets';
 
 interface RouteParams {
@@ -12,12 +12,12 @@ interface RouteParams {
 }
 
 /**
- * GET /api/ticket/[id]
+ * GET /api/ticket/[id]/history
  *
- * Obtiene un ticket específico por su ID
+ * Obtiene el historial de cambios de un ticket específico
  *
  * Ejemplo:
- * GET /api/ticket/1
+ * GET /api/ticket/1/history
  */
 export async function GET(_request: NextRequest, { params }: RouteParams) {
     try {
@@ -31,13 +31,13 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
         }
 
         const result = await graphqlRequest<Record<string, unknown>>(
-            GET_TICKET_BY_ID_QUERY,
+            GET_TICKET_HISTORY_QUERY,
             {
                 variables: { ticketId: id },
             }
         );
 
-        const typedResult = result as unknown as GetTicketByIdResponse;
+        const typedResult = result as unknown as GetTicketHistoryResponse;
 
         return NextResponse.json(typedResult);
     } catch (error) {

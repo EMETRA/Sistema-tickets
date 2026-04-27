@@ -53,6 +53,21 @@ export interface GetTicketCommentsResponse {
 }
 
 // ========================================
+// MENSAJES DE TICKET (CHAT)
+// ========================================
+
+export interface TicketChatMessage {
+  archivos: TicketAdjunto[];
+  fechaEnvio: string;
+  textoMensaje: string;
+  usuario: number;
+}
+
+export interface GetTicketMessagesResponse {
+  ticketMessages: TicketChatMessage[];
+}
+
+// ========================================
 // HISTORIAL DE TICKET
 // ========================================
 

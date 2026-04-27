@@ -5,12 +5,13 @@ export { GET_TICKETS_QUERY } from './getTickets';
 export { GET_TICKET_BY_ID_QUERY } from './ticketById';
 
 // ========================================
-// QUERIES - Comentarios, Historial, Adjuntos, Tags
+// QUERIES - Comentarios, Historial, Adjuntos, Tags, Mensajes
 // ========================================
 export { GET_TICKET_COMMENTS_QUERY } from './ticketComments';
 export { GET_TICKET_HISTORY_QUERY } from './ticketHistory';
 export { GET_TICKET_ATTACHMENTS_QUERY } from './ticketAttachments';
 export { GET_TICKET_TAGS_QUERY } from './ticketTags';
+export { GET_TICKET_MESSAGES_QUERY } from './ticketMessages';
 
 // ========================================
 // QUERIES - Catálogos (Categories, Priorities, Statuses, Tags)
@@ -36,6 +37,9 @@ export type {
     // Comments
     TicketComentario,
     GetTicketCommentsResponse,
+    // Messages
+    TicketChatMessage,
+    GetTicketMessagesResponse,
     // History
     TicketHistorial,
     GetTicketHistoryResponse,

@@ -1,10 +1,24 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
-import type { TicketHistorial } from '@/api/graphql/tickets';
+/**
+ * Hook useGetTicketMessages
+ *
+ * Flujo:
+ * 1. Hook llama a fetch('/api/ticket/{id}/messages')
+ * 2. Route handler ejecuta GET_TICKET_MESSAGES_QUERY en servidor
+ * 3. Hook retorna { data, loading, error, refetch }
+ */
 
-export function useGetTicketHistory(initialTicketId?: string) {
-    const [data, setData] = useState<TicketHistorial[]>([]);
+import { useState, useCallback, useEffect } from 'react';
+import { type TicketChatMessage } from '@/api/graphql/tickets';
+
+/**
+ * Hook para obtener los mensajes del chat de un ticket específico
+ * @param initialTicketId ID del ticket (string)
+ * @returns { data, loading, error, refetch }
+ */
+export function useGetTicketMessages(initialTicketId?: string) {
+    const [data, setData] = useState<TicketChatMessage[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
 
@@ -16,14 +30,14 @@ export function useGetTicketHistory(initialTicketId?: string) {
         setError(null);
 
         try {
-            const response = await fetch(`/api/ticket/${initialTicketId}/history`);
+            const response = await fetch(`/api/ticket/${initialTicketId}/messages`);
 
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
 
             const result = await response.json();
-            setData(result.ticketHistory || []);
+            setData(result.ticketMessages || []);
         } catch (err) {
             const error = err instanceof Error ? err : new Error(String(err));
             setError(error);
@@ -32,12 +46,12 @@ export function useGetTicketHistory(initialTicketId?: string) {
         }
     }, [initialTicketId]);
 
-    // Auto-fetch cuando el ID del ticket cambie
+    // Auto-fetch cuando el ID del ticket cambia
     useEffect(() => {
         if (initialTicketId) {
             refetch();
         }
-    }, [initialTicketId, refetch]);
+    }, [refetch, initialTicketId]);
 
     return { data, loading, error, refetch };
 }

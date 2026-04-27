@@ -42,12 +42,13 @@ export { useUpdateRol } from './useUpdateRol';
 export { useAssignPermission } from './useAssignPermission';
 export { useCreateModule } from './useCreateModule';
 
-// Tickets hooks - Details, Comments, History, Attachments, Tags
+// Tickets hooks - Details, Comments, History, Attachments, Tags, Messages
 export { useGetTicketById } from './useGetTicketById';
 export { useGetTicketComments } from './useGetTicketComments';
 export { useGetTicketHistory } from './useGetTicketHistory';
 export { useGetTicketAttachments } from './useGetTicketAttachments';
 export { useGetTicketTags } from './useGetTicketTags';
+export { useGetTicketMessages } from './useGetTicketMessages';
 
 // Tickets hooks - Mutations
 export { useCreateTicket } from './useCreateTicket';

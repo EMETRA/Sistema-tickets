@@ -1,39 +1,36 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import type { GetTicketAttachmentsResponse, TicketAdjunto } from '@/api/graphql/tickets';
+import type { TicketAdjunto } from '@/api/graphql/tickets';
 
 export function useGetTicketAttachments(initialTicketId?: string) {
     const [data, setData] = useState<TicketAdjunto[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
 
-    const refetch = useCallback(
-        async (ticketId?: string) => {
-            const id = ticketId || initialTicketId;
-            if (!id) {
-                setError(new Error('ID de ticket requerido'));
-                return;
+    const refetch = useCallback(async () => {
+        // No hacer nada si no hay ticket ID
+        if (!initialTicketId) return;
+
+        setLoading(true);
+        setError(null);
+
+        try {
+            const response = await fetch(`/api/ticket/${initialTicketId}/attachments`);
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
 
-            setLoading(true);
-            setError(null);
-            try {
-                const response = await fetch(`/api/ticket-attachments/${id}`);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const result: GetTicketAttachmentsResponse = await response.json();
-                setData(result.ticketAttachments || []);
-            } catch (err) {
-                const error = err instanceof Error ? err : new Error(String(err));
-                setError(error);
-            } finally {
-                setLoading(false);
-            }
-        },
-        [initialTicketId]
-    );
+            const result = await response.json();
+            setData(result.ticketAttachments || []);
+        } catch (err) {
+            const error = err instanceof Error ? err : new Error(String(err));
+            setError(error);
+        } finally {
+            setLoading(false);
+        }
+    }, [initialTicketId]);
 
     // Auto-fetch cuando el ID del ticket cambie
     useEffect(() => {

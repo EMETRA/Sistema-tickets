@@ -4,8 +4,11 @@ import { Icon } from "@/components/client/atoms/Icon";
 import { Title } from "@/components/client/atoms/Title";
 import { Text } from "@/components/client/atoms/Text";
 
+import { useGetTicketHistory } from "@/api/hooks";
+
 import styles from "./HistoryMessage.module.scss";
-import { HistoryItem, HistoryMessageProps } from "./types";
+import { HistoryMessageProps } from "./types";
+import type { TicketHistorial } from "@/api/graphql";
 
 const HistoryMessage: React.FC<HistoryMessageProps> = ({ ticketId, className }) => {
     const iconMap: Record<string, string> = {
@@ -32,42 +35,7 @@ const HistoryMessage: React.FC<HistoryMessageProps> = ({ ticketId, className }) 
         FINALIZED: "#93EDB6"
     };
 
-    const historyItems: HistoryItem[] = [
-        {
-            user: "John Doe",
-            ticketId: "123",
-            timestamp: "2024-06-01T10:00:00Z",
-            action: "CREATED",
-            ticketStatus: "espera",
-        },
-        {
-            user: "Jane Smith",
-            ticketId: "123",
-            timestamp: "2024-05-31T10:00:00Z",
-            action: "ASSIGNED",
-            assignedTo: "John Doe",
-        },
-        {
-            user: "John Doe",
-            ticketId: "123",
-            timestamp: "2024-05-30T10:00:00Z",
-            action: "TAGGED",
-            tag: "Urgente",
-        },
-        {
-            user: "Jane Smith",
-            ticketId: "123",
-            timestamp: "2024-05-29T10:00:00Z",
-            action: "IN_PROGRESS",
-        },
-        {
-            user: "John Doe",
-            ticketId: "123",
-            timestamp: "2024-05-28T10:00:00Z",
-            action: "FINALIZED",
-            ticketStatus: "Finalizado",
-        },
-    ]
+    const { data: historyItems, loading: isHistoryLoading } = useGetTicketHistory(ticketId);
 
     const actionText = (action: string) => {
         switch (action) {
@@ -101,15 +69,16 @@ const HistoryMessage: React.FC<HistoryMessageProps> = ({ ticketId, className }) 
         }
     }
 
-    const renderHistoryItemText = (item: HistoryItem) => {
+    const renderHistoryItemText = (item: TicketHistorial) => {
         return (
             <div className={styles.textContainer}>
-                <Text className={styles.user}>{item.user} </Text>
-                <Text className={styles.action}>{actionText(item.action)} </Text>
-                {item.tag && <Text className={styles.tag}><Text className={styles.tagName}>{item.tag}</Text> a el ticket</Text>}
+                <Text className={styles.user}>{item.usuarioId} </Text>
+                <Text className={styles.action}>{actionText(item.accion)} </Text>
+                {/* No vienen del back. Cambios solicitados */}
+                {/* {item.tag && <Text className={styles.tag}><Text className={styles.tagName}>{item.tag}</Text> a el ticket</Text>} */}
                 <Text className={styles.ticket}> #{item.ticketId}</Text>
-                {item.ticketStatus && <Text className={styles.status}>, en estado de <Text className={styles.statusName}>{item.ticketStatus}</Text></Text>}
-                {item.assignedTo && <Text className={styles.assignedTo}> a <Text className={styles.assignedToName}>{item.assignedTo}</Text></Text>}
+                {/* {item.ticketStatus && <Text className={styles.status}>, en estado de <Text className={styles.statusName}>{item.ticketStatus}</Text></Text>} */}
+                {/* {item.assignedTo && <Text className={styles.assignedTo}> a <Text className={styles.assignedToName}>{item.assignedTo}</Text></Text>} */}
             </div>
         );
     };
@@ -117,18 +86,23 @@ const HistoryMessage: React.FC<HistoryMessageProps> = ({ ticketId, className }) 
     return (
         <div className={`${styles.HistoryMessage} ${className}`}>
             <Title>Historial</Title>
-            {historyItems.map((item, index) => (
-                <div key={index} className={styles.historyItemContainer}>
-                    <div key={index} className={styles.historyItem}>
-                        <Icon name={iconMap[item.action]} backgroundColor={iconBackgroundColorMap[item.action]} color={iconColorMap[item.action]} variant="status" className={styles.icon} />
-                        <div className={styles.content}>
-                            {renderHistoryItemText(item)}
-                            <Text variant="caption" className={styles.timestamp}>{timestampConverter(item.timestamp)}</Text>
+            {isHistoryLoading ? (
+                <p>Cargando historial...</p>
+            ) : historyItems.length === 0 ? (
+                <p>No hay historial disponible para este ticket.</p>
+            ) : (
+                historyItems.map((item, index) => (
+                    <div key={index} className={styles.historyItemContainer}>
+                        <div key={index} className={styles.historyItem}>
+                            <Icon name={iconMap[item.accion]} backgroundColor={iconBackgroundColorMap[item.accion]} color={iconColorMap[item.accion]} variant="status" className={styles.icon} />
+                            <div className={styles.content}>
+                                {renderHistoryItemText(item)}
+                                <Text variant="caption" className={styles.timestamp}>{timestampConverter(item.fecha)}</Text>
+                            </div>
                         </div>
+                        {index < historyItems.length - 1 && <div className={styles.conector} /> }
                     </div>
-                    {index < historyItems.length - 1 && <div className={styles.conector} /> }
-                </div>
-            ))}
+                )))}
         </div>
     );
 };

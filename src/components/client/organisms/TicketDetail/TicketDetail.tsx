@@ -12,22 +12,17 @@ import { HistoryMessage } from "@/components/client/molecules/HistoryMessage";
 
 import { useAuthStore } from "@/store/useAuthStore";
 
+import { useGetTicketById } from "@/api/hooks";
+import { useGetTicketAttachments } from "@/api/hooks";
+
 import styles from "./TicketDetail.module.scss";
 import { TicketDetailProps, type TicketDetail } from "./types";
 
 const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, isOpen, onClose }) => {
     const { getRole } = useAuthStore();
 
-    const ticketDetail: TicketDetail = {
-        name: "Problema con el pedido #123",
-        status: "resolved",
-        description:
-            "El producto llegó dañado y necesito un reemplazo. Por favor, ayúdenme a resolver este problema lo antes posible. Gracias. Adjunto una foto del producto dañado. Espero su pronta respuesta. Saludos. Agradezco de antemano su ayuda. Quedo atento a sus comentarios. Gracias por su atención. Espero una solución rápida. Saludos cordiales. Adjunto la factura de compra. Quedo a la espera de su respuesta. Gracias por su comprensión.",
-        files: [
-            { id: "file1", name: "captura_pantalla.png" },
-            { id: "file2", name: "factura.pdf" }
-        ]
-    };
+    const { data: ticketData, loading: isTicketLoading } = useGetTicketById(ticketId);
+    const { data: ticketAttachments, loading: isTicketAttachmentsLoading } = useGetTicketAttachments(ticketId);
 
     const handleOnFileClick = (fileId: string) => {
         alert("Archivo clickeado: " + fileId);
@@ -62,50 +57,63 @@ const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, isOpen, onClose }
                 </div>
                 <div className={styles.content}>
                     <div className={styles.ticketDetails}>
-                        <div className={styles.ticketInfo}>
-                            <div className={styles.ticketTitleInfo}>
-                                <Text variant="muted">Asunto</Text>
-                                <Title variant="large">{ticketDetail.name}</Title>
+                        {isTicketLoading ? (
+                            <p>Cargando detalles del ticket...</p>
+                        ) : ticketData ? (
+                            <div className={styles.ticketInfo}>
+                                <div className={styles.ticketTitleInfo}>
+                                    <Text variant="muted">Asunto</Text>
+                                    <Title variant="large">{ticketData.titulo}</Title>
+                                </div>
+                                <div className={styles.ticketInfoDescription}>
+                                    <Text variant="muted">Descripción</Text>
+                                    <Text variant="body">{ticketData.descripcion}</Text>
+                                </div>
+                                <div className={styles.ticketInfoFiles}>
+                                    {isTicketAttachmentsLoading ? (
+                                        <p>Cargando archivos adjuntos...</p>
+                                    ) : ticketAttachments.length === 0 ? (
+                                        <p>No hay archivos adjuntos.</p>
+                                    ) : (
+                                        ticketAttachments.map((file) => (
+                                            <File
+                                                key={file.id}
+                                                id={file.id}
+                                                name={file.nombreArchivo || "Archivo adjunto"}
+                                                onClick={(id) => handleOnFileClick(id)}
+                                                variant="outlined"
+                                            />
+                                        )))}
+                                </div>
                             </div>
-                            <div className={styles.ticketInfoDescription}>
-                                <Text variant="muted">Descripción</Text>
-                                <Text variant="body">{ticketDetail.description}</Text>
-                            </div>
-                            <div className={styles.ticketInfoFiles}>
-                                {ticketDetail.files.map((file) => (
-                                    <File
-                                        key={file.id}
-                                        id={file.id}
-                                        name={file.name}
-                                        onClick={(id) => handleOnFileClick(id)}
-                                        variant="outlined"
-                                    />
-                                ))}
-                            </div>
-                        </div>
+                        ) : (
+                            <p>No se encontraron detalles para este ticket.</p>
+                        )}
                         <Chat ticketId={ticketId} classname={styles.chat} />
                     </div>
-                    <div className={styles.ticketHistory}>
-                        <HistoryMessage ticketId={ticketId} />
-                        {getRole() === "TECH" || getRole() === "DEV" && (
-                            <div className={styles.ticketActions}>
-                                {ticketDetail.status !== "canceled" && ticketDetail.status !== "resolved" ? (
-                                    <Button variant="contained" color="danger" onClick={handleOnTicketCancel} fullWidth>
-                                        Cancelar
-                                    </Button>
-                                ) : null}
-                                {ticketDetail.status === "created" || ticketDetail.status === "assigned" ? (
-                                    <Button variant="contained" color="default" onClick={handleOnTicketProcess} fullWidth>
-                                        En Proceso
-                                    </Button>
-                                ) : ticketDetail.status === "in_progress" ? (
-                                    <Button variant="contained" color="default" onClick={handleOnTicketFinish} fullWidth>
-                                        Finalizado
-                                    </Button>
-                                ) : <Text variant="body" className={styles.noActionsText}>No hay acciones disponibles</Text>}
-                            </div>
-                        )}
-                    </div>
+                    {ticketData && (
+                        <div className={styles.ticketHistory}>
+                            <HistoryMessage ticketId={ticketId} />
+                            {getRole() === "TECH" || getRole() === "DEV" && (
+                                <div className={styles.ticketActions}>
+                                    {ticketData.estadoId !== "canceled" && ticketData.estadoId !== "resolved" ? (
+                                        <Button variant="contained" color="danger" onClick={handleOnTicketCancel} fullWidth>
+                                            Cancelar
+                                        </Button>
+                                    ) : null}
+                                    {ticketData.estadoId === "created" || ticketData.estadoId === "assigned" ? (
+                                        <Button variant="contained" color="default" onClick={handleOnTicketProcess} fullWidth>
+                                            En Proceso
+                                        </Button>
+                                    ) : ticketData.estadoId === "in_progress" ? (
+                                        <Button variant="contained" color="default" onClick={handleOnTicketFinish} fullWidth>
+                                            Finalizado
+                                        </Button>
+                                    ) : <Text variant="body" className={styles.noActionsText}>No hay acciones disponibles</Text>}
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
             </div>
         </PopOver>

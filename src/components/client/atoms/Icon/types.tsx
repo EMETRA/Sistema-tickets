@@ -12,4 +12,5 @@ export interface IconProps {
     active?: boolean;
     color?: string; 
     backgroundColor?: string;
+    raw?: boolean;
 }

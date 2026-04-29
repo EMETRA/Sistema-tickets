@@ -42,7 +42,9 @@ export function getGraphQLClient(): GraphQLClient {
  * Interfaz de opciones para graphqlRequest
  */
 export interface GraphQLRequestOptions {
-  variables?: Record<string, unknown>;
+    variables?: Record<string, unknown>;
+    files?: File[];
+    onProgress?: (percent: number) => void;
 }
 
 /**
@@ -130,52 +132,104 @@ export async function graphqlRequest<TData extends Record<string, unknown> = Rec
  * const { data } = await graphqlRequestClient<MyType>(QUERY);
  * ```
  */
+export interface GraphQLRequestOptions {
+    variables?: Record<string, unknown>;
+    files?: File[];
+}
+
 export async function graphqlRequestClient<TData extends Record<string, unknown> = Record<string, unknown>>(
     query: string,
     options?: GraphQLRequestOptions
 ): Promise<TData> {
     try {
         const graphqlEndpoint = process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT;
-
-        if (!graphqlEndpoint) {
-            throw new Error(
-                'GraphQL endpoint not configured. Set NEXT_PUBLIC_GRAPHQL_ENDPOINT in .env.local'
-            );
-        }
+        if (!graphqlEndpoint) throw new Error('GraphQL endpoint not configured.');
 
         const config = getEnvConfig();
-
-        // Obtener token de Zustand (en cliente)
         const { useAuthStore } = await import('@/store/useAuthStore');
         const token = useAuthStore.getState().token;
 
-        // Crear instancia nueva del cliente con headers específicos
-        const client = new GraphQLClient(graphqlEndpoint, {
+        const files = options?.files ?? [];
+        const variables = options?.variables ?? {};
+
+        if (files.length > 0) {
+            // Use XHR for real upload progress
+            return new Promise((resolve, reject) => {
+                const map: Record<string, string[]> = {};
+                files.forEach((_, i) => {
+                    map[String(i)] = [`variables.files.${i}`];
+                });
+
+                const formData = new FormData();
+                formData.append('operations', JSON.stringify({
+                    query,
+                    variables: { ...variables, files: files.map(() => null) }
+                }));
+                formData.append('map', JSON.stringify(map));
+                files.forEach((file, i) => {
+                    formData.append(String(i), file);
+                });
+
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', graphqlEndpoint);
+
+                if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+                xhr.setRequestHeader('apollo-require-preflight', 'true');
+
+                xhr.upload.onprogress = (event) => {
+                    if (event.lengthComputable) {
+                        const percent = Math.round((event.loaded / event.total) * 100);
+                        options?.onProgress?.(percent);
+                    }
+                };
+
+                xhr.onload = () => {
+                    try {
+                        const json = JSON.parse(xhr.responseText);
+                        if (json.errors) {
+                            reject(new Error(json.errors[0].message));
+                        } else {
+                            resolve(json.data as TData);
+                        }
+                    } catch {
+                        reject(new Error('Failed to parse response'));
+                    }
+                };
+
+                xhr.onerror = () => reject(new Error('Network error'));
+                xhr.ontimeout = () => reject(new Error('Request timeout'));
+                xhr.timeout = config.graphqlTimeoutMs;
+
+                xhr.send(formData);
+            });
+        }
+
+        // Regular fetch for non-file requests
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), config.graphqlTimeoutMs);
+
+        const response = await fetch(graphqlEndpoint, {
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 ...(token && { 'Authorization': `Bearer ${token}` })
             },
+            body: JSON.stringify({ query, variables }),
+            signal: controller.signal,
         });
 
-        // Realizar request con timeout
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), config.graphqlTimeoutMs);
+        clearTimeout(timeoutId);
+        const json = await response.json();
 
-        try {
-            const data = await client.request<TData>(query, options?.variables ?? {});
-            clearTimeout(timeoutId);
-            return data;
-        } catch (error) {
-            clearTimeout(timeoutId);
-            throw error;
-        }
+        if (json.errors) throw new Error(json.errors[0].message);
+
+        return json.data as TData;
+
     } catch (error: unknown) {
-        // Loguear error
         ErrorHandler.log(error, 'graphqlRequestClient');
         throw error;
     }
 }
-
 /**
  * Función para hacer requests REST con autenticación automática (Cliente)
  * El token se obtiene automáticamente de Zustand

@@ -3,6 +3,7 @@
  * Estados.
  */
 export type FileItemStatus = 
+    | "ready"
     | "uploading"
     | "done";
 

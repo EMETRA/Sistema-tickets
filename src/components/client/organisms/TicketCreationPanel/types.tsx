@@ -24,6 +24,8 @@ export interface UploadedFile {
    * Progreso de subida (0-100)
    */
   progress?: number;
+
+  file: File;
 }
 
 /**
@@ -84,4 +86,5 @@ export interface TicketCreationPanelProps {
    * Clase CSS adicional
    */
   className?: string;
+  uploadProgress?: number; 
 }

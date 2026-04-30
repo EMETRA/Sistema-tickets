@@ -200,7 +200,20 @@ export interface AddTicketCommentInput {
 // RESPUESTAS DE MUTACIONES DE TICKET
 // ========================================
 
-export interface CreateTicketResponse { createTicket: Ticket; [key: string]: unknown; }
+export interface CreateTicketPayload {
+    ticket: Ticket;
+    adjuntos: TicketAdjunto[];
+    departamentoCreador: {
+        id_departamento: string;
+        nombre: string;
+    };
+}
+
+export interface CreateTicketResponse {
+    createTicket: CreateTicketPayload;
+    [key: string]: unknown;
+}
+
 export interface UpdateTicketResponse { updateTicket: Ticket; [key: string]: unknown; }
 export interface DeleteTicketResponse { deleteTicket: boolean; [key: string]: unknown; }
 export interface AddTicketCommentResponse { addTicketComment: TicketComentario; [key: string]: unknown; }

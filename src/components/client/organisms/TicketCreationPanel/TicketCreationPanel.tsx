@@ -25,6 +25,7 @@ export const TicketCreationPanel: React.FC<TicketCreationPanelProps> = ({
     onSubmit,
     onCancel,
     loading = false,
+    uploadProgress = 0,
     initialValues,
     className,
 }) => {
@@ -33,14 +34,30 @@ export const TicketCreationPanel: React.FC<TicketCreationPanelProps> = ({
     const [departmentId, setDepartmentId] = useState(initialValues?.departmentId?.toString() || "");
     const [description, setDescription] = useState(initialValues?.description || "");
     const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>(initialValues?.files || []);
+    const [rejectedFiles, setRejectedFiles] = useState<string[]>([]);
+    const ALLOWED_EXTENSIONS = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'csv', 'ppt', 'pptx', 'jpg', 'jpeg', 'png', 'gif'];
 
     // Manejar archivos desde el dropzone
     const handleFiles = (files: File[]) => {
-        const newFiles: UploadedFile[] = files.map((file, index) => ({
+        const rejected: string[] = [];
+
+        const validFiles = files.filter(file => {
+            const ext = file.name.split('.').pop()?.toLowerCase();
+            if (!ext || !ALLOWED_EXTENSIONS.includes(ext)) {
+                rejected.push(file.name);
+                return false;
+            }
+            return true;
+        });
+
+        setRejectedFiles(rejected);
+
+        const newFiles: UploadedFile[] = validFiles.map((file, index) => ({
             id: Date.now() + index,
             name: file.name,
-            status: "uploading" as const,
+            status: "ready" as const,
             progress: 0,
+            file,
         }));
 
         setUploadedFiles(prev => [...prev, ...newFiles]);
@@ -58,7 +75,7 @@ export const TicketCreationPanel: React.FC<TicketCreationPanelProps> = ({
         const formData: TicketFormData = {
             subject,
             departmentId,
-            description, // 👈 Este ya lleva el Markdown con **, __, etc.
+            description,
             files: uploadedFiles,
         };
 
@@ -117,7 +134,8 @@ export const TicketCreationPanel: React.FC<TicketCreationPanelProps> = ({
 
                 {/* Archivos */}
                 <div className={styles.filesSection}>
-                    <FileDropzone onFiles={handleFiles} />
+                    <FileDropzone onFiles={handleFiles} rejectedFiles={rejectedFiles} />
+
 
                     {uploadedFiles.length > 0 && (
                         <div className={styles.filesList}>
@@ -125,8 +143,8 @@ export const TicketCreationPanel: React.FC<TicketCreationPanelProps> = ({
                                 <FileItem
                                     key={file.id}
                                     name={file.name}
-                                    status={file.status}
-                                    progress={file.progress}
+                                    status={loading ? "uploading" : file.status}
+                                    progress={loading ? uploadProgress : file.progress}
                                     onRemove={() => handleRemoveFile(file.id)}
                                 />
                             ))}

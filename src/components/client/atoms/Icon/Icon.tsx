@@ -2,6 +2,7 @@ import React from "react";
 import { IconProps } from "./types";
 import styles from "./Icon.module.scss";
 import classNames from "classnames";
+import Image from "next/image";
 
 export const Icon = ({ 
     name, 
@@ -10,7 +11,8 @@ export const Icon = ({
     className,
     active = false,
     color,
-    backgroundColor
+    backgroundColor,
+    raw = false,
 }: IconProps) => {
 
     const isCustom = !!(color || backgroundColor);
@@ -32,13 +34,22 @@ export const Icon = ({
                 height: backgroundColor ? size * 1.8 : size,
             } as React.CSSProperties}
         >
-            <div 
-                className={styles.iconMask}
-                style={{ 
-                    maskImage: `url(/svgs/${name}.svg)`,
-                    WebkitMaskImage: `url(/svgs/${name}.svg)`,
-                }}
-            />
+            {raw ? (
+                <Image
+                    src={`/svgs/${name}.svg`}
+                    width={size}
+                    height={size}
+                    alt={name}
+                />
+            ) : (
+                <div 
+                    className={styles.iconMask}
+                    style={{ 
+                        maskImage: `url(/svgs/${name}.svg)`,
+                        WebkitMaskImage: `url(/svgs/${name}.svg)`,
+                    }}
+                />
+            )}
         </div>
     );
 };

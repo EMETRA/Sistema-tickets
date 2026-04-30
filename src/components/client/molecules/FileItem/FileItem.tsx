@@ -13,13 +13,35 @@ const FileItem: React.FC<FileItemProps> = ({
     onRemove,
     className
 }) => {
+    const getFileIcon = (filename: string): { icon: string; color?: string } => {
+        const ext = filename.split('.').pop()?.toLowerCase();
+        switch (ext) {
+        case 'pdf':
+            return { icon: 'file-pdf-solid-full', color: '#E63946' };
+        case 'doc':
+        case 'docx':
+            return { icon: 'docx' };
+        case 'xls':
+        case 'xlsx':
+        case 'csv':
+            return { icon: 'xlsx' };
+        case 'ppt':
+        case 'pptx':
+            return { icon: 'ppt' };
+        case 'jpg':
+        case 'jpeg':
+        case 'png':
+        case 'gif':
+            return { icon: 'image' };
+        default:
+            return { icon: 'archivo' };
+        }
+    };
+    const { icon, color } = getFileIcon(name);
     return (
         <div className={classNames(styles.FileItem, className)}>
-
             <div className={styles.left}>
-
-                <Icon name="file-pdf-solid-full" size={50} color="#E63946"/>
-
+                <Icon name={icon} size={50} color={color} raw />
                 <div className={styles.info}>
                     <span className={styles.name}>{name}</span>
                     {status === "done" && (
@@ -31,27 +53,15 @@ const FileItem: React.FC<FileItemProps> = ({
                             <div className={styles.progressBar}>
                                 <div className={styles.progress} style={{ width: `${progress}%` }}/>
                             </div>
-
-                            <span className={styles.percent}>
-                                {progress}%
-                            </span>
-
+                            <span className={styles.percent}>{progress}%</span>
                         </div>
-                
                     )}
-
                 </div>
-
             </div>
-
             {onRemove && (
                 <IconButton icon={status === "done" ? "trash-solid" : "xmark-solid"} onClick={onRemove} />
             )}
-
-            
-
         </div>
-
     )
 };
 

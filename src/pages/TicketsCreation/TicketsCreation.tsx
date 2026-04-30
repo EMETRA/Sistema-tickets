@@ -9,7 +9,7 @@ import styles from "./TicketsCreation.module.scss";
 
 export default function CreateTicketPage() {
     const router = useRouter();
-    const { createTicket, loading, error } = useCreateTicket();
+    const { createTicket, loading, error, uploadProgress } = useCreateTicket();
     const [formKey, setFormKey] = useState(0);
 
     const departments = [
@@ -18,30 +18,29 @@ export default function CreateTicketPage() {
         { label: "Recursos Humanos", value: "3" },
         { label: "Administración", value: "4" },
     ];
-
     const handleTicketSubmit = async (data: TicketFormData) => {
         try {
+            const files = data.files.map(f => f.file);
+
             await createTicket({
                 titulo: data.subject,
                 descripcion: data.description,
-                categoriaId: typeof data.departmentId === "string" ? parseInt(data.departmentId, 10) : data.departmentId,
-                prioridadId: 2, 
-                estadoId: 1, 
+                categoriaId: typeof data.departmentId === "string"
+                    ? parseInt(data.departmentId, 10)
+                    : data.departmentId,
+                prioridadId: 2,
+                estadoId: 1,
                 usuarioCreadorId: 100,
-                usuarioAsignadoId: 101, 
+                usuarioAsignadoId: 101,
                 tiempoEstimado: 60,
-            });
+            }, files);
 
-            console.log("Ticket creado con éxito");
-            alert("Ticket creado con éxito. Puedes ingresar el siguiente.");
-            
+            alert("Ticket creado con éxito.");
             setFormKey(prev => prev + 1);
-
         } catch (err) {
             console.error("Error al crear el ticket:", err);
         }
     };
-
     const handleCancel = () => {
         router.back();
     };
@@ -50,12 +49,13 @@ export default function CreateTicketPage() {
         <div className={styles.pageContainer}>
             {error && <p className={styles.errorMessage}>{error.message}</p>}
             
-            <TicketCreationPanel 
+            <TicketCreationPanel
                 key={formKey}
                 departments={departments}
                 onSubmit={handleTicketSubmit}
                 onCancel={handleCancel}
-                loading={loading} 
+                loading={loading}
+                uploadProgress={uploadProgress}
                 className={styles.formWrapper}
             />
         </div>

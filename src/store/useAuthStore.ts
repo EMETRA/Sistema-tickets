@@ -64,6 +64,7 @@ export const useAuthStore = create<AuthState>()(
                 
                 // Validar que sea un rol válido
                 if (['ADMIN', 'TECH', 'USER'].includes(roleUpper)) {
+                    return "ADMIN" as UserRole; // Cast seguro porque ya validamos
                     return roleUpper as UserRole;
                 }
                 

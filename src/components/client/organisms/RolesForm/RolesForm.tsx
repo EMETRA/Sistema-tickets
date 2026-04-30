@@ -134,15 +134,16 @@ const RolesForm: React.FC<RolesFormProps> = ({
                             onChange={(e) => setDescription(e.target.value)}
                         />
                     </FormField>
-
-                    <Title variant="mid">
-                        Asignar permisos
-                    </Title>
-
-                    <Text variant="muted">
-                        Los permisos que le asignes al rol, serán los permisos a los que un usuario con este rol tendrá acceso
-                    </Text>
-
+                    <div className={styles.titleSeparator}>
+                        <Title variant="mid">
+                            Asignar permisos
+                        </Title>
+                    </div>
+                    <div className={styles.separator}>
+                        <Text variant="muted">
+                            Los permisos que le asignes al rol, serán los permisos a los que un usuario con este rol tendrá acceso
+                        </Text>
+                    </div> 
                     <div className={styles.table}>
                         <TableRow
                             variant="permission"

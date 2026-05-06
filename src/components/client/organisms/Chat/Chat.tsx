@@ -1,3 +1,4 @@
+"use client";
 
 import React, { useEffect, useRef } from "react";
 
@@ -7,11 +8,14 @@ import { SendMessage } from "@/components/client/molecules/SendMessage";
 import styles from "./Chat.module.scss";
 import { ChatProps } from "./types";
 
-import { useGetTicketMessages } from "@/api/hooks";
+import { useGetTicketMessages, useGetUser } from "@/api/hooks";
+import { useSendTicketMessage } from "@/api/hooks";
 
 const Chat: React.FC<ChatProps> = ({ ticketId, classname }) => {
     const messagesContainerRef = useRef<HTMLDivElement>(null);
     const { data: ticketMessages, loading: isTicketMessagesLoading } = useGetTicketMessages(ticketId);
+    const { sendMessage, loading: isSending } = useSendTicketMessage();
+    const { data: userData } = useGetUser();
 
     useEffect(() => {
         if (messagesContainerRef.current && ticketMessages.length > 0) {
@@ -23,12 +27,25 @@ const Chat: React.FC<ChatProps> = ({ ticketId, classname }) => {
         alert("Archivo clickeado: " + fileId);
     }
 
-    const handleSendMessage = (message: string, files: File[]) => {
-        alert("Mensaje enviado: " + message + " con " + files.length + " archivos adjuntos.");
+    const handleSendMessage = async (message: string, files: File[]) => {
+        if (!message.trim()) return;
+
+        try {
+            await sendMessage(
+                {
+                    ticketId: Number(ticketId),
+                    usuarioId: Number(userData?.id_usuario) || 100,
+                    textoMensaje: message,
+                },
+                files.length > 0 ? files : undefined
+            );
+        } catch (err) {
+            console.error("Error al enviar mensaje:", err);
+        }
     }
 
     return (
-        <div className={`${styles.chatContainer} ${classname}`} >
+        <div className={`${styles.chatContainer} ${classname}`}>
             <div className={styles.messagesContainer} ref={messagesContainerRef}>
                 {isTicketMessagesLoading ? (
                     <p>Cargando mensajes...</p>
@@ -47,14 +64,17 @@ const Chat: React.FC<ChatProps> = ({ ticketId, classname }) => {
                                 }))
                             }
                             timestamp={message.fechaEnvio}
-                            // Datos quemados, ya que el backend no los está enviando. Cambios solicitados.
                             userName="usuario"
                             avatarProps={{ initials: "US" }}
                         />
                     ))
                 )}
             </div>
-            <SendMessage onSend={handleSendMessage} className={styles.inputContainer} />
+            <SendMessage
+                onSend={handleSendMessage}
+                className={styles.inputContainer}
+                disabled={isSending}
+            />
         </div>
     );
 }

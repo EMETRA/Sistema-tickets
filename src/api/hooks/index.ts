@@ -55,6 +55,7 @@ export { useCreateTicket } from './useCreateTicket';
 export { useUpdateTicket } from './useUpdateTicket';
 export { useDeleteTicket } from './useDeleteTicket';
 export { useAddTicketComment } from './useAddTicketComment';
+export { useSendTicketMessage } from './useSendTicketMessage';
 
 // Tickets hooks - Mutations - Tags
 export { useAddTagToTicket } from './useAddTagToTicket';

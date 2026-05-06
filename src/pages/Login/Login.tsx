@@ -46,19 +46,15 @@ const Login: React.FC = () => {
         try {
             const response = await login(email, clave);
 
-            let userInfo = await fetchUserInfo();
+            const userInfo = await fetchUserInfo();     
+            console.log("Información del usuario obtenida:", userInfo);
 
             // DUMMY: En desarrollo, si el backend retorna null, usar datos de prueba
-            if (process.env.NODE_ENV === "development") {
-                // Descomentar para usar este dummy cuando el backend retorne null:
-                userInfo = {
-                    id_usuario: userInfo?.id_usuario || "999",
-                    nombre: userInfo?.nombre || "Juan Perez",
-                    email: email,
-                    rol: "tech",
-                    departamento: userInfo?.departamento || "Desarrollo",
-                    avatar: userInfo?.avatar || undefined,
-                };
+            if (userInfo === null) {
+                setError("No se pudo obtener la información del usuario.");
+                // evitar continuar si no se obtiene la info del usuario
+                return;
+
             }
 
             if (!userInfo) {

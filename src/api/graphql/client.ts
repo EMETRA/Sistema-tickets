@@ -249,6 +249,7 @@ export async function graphqlRequestClient<TData extends Record<string, unknown>
  */
 export async function apiFetch<TData extends Record<string, unknown> = Record<string, unknown>>(
     url: string,
+    sentToken?: string,
     options?: RequestInit
 ): Promise<TData> {
     try {
@@ -256,7 +257,7 @@ export async function apiFetch<TData extends Record<string, unknown> = Record<st
 
         // Obtener token de Zustand
         const { useAuthStore } = await import('@/store/useAuthStore');
-        const token = useAuthStore.getState().token;
+        const token = useAuthStore.getState().token || sentToken;
 
         // Preparar headers con token si está disponible
         const headers = new Headers(options?.headers || {});

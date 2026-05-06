@@ -28,10 +28,11 @@ const Login: React.FC = () => {
      * Obtener información del usuario desde el backend
      * El token se envía automáticamente via apiFetch
      */
-    const fetchUserInfo = async (): Promise<UsuarioPerfil | null> => {
+    const fetchUserInfo = async (token: string): Promise<UsuarioPerfil | null> => {
         try {
             const response = await apiFetch<{ usuario: UsuarioPerfil }>(
-                "/api/usuario"
+                "/api/usuario",
+                token
             );
             return response.usuario || null;
         } catch {
@@ -46,20 +47,7 @@ const Login: React.FC = () => {
         try {
             const response = await login(email, clave);
 
-            let userInfo = await fetchUserInfo();
-
-            // DUMMY: En desarrollo, si el backend retorna null, usar datos de prueba
-            if (process.env.NODE_ENV === "development") {
-                // Descomentar para usar este dummy cuando el backend retorne null:
-                userInfo = {
-                    id_usuario: userInfo?.id_usuario || "999",
-                    nombre: userInfo?.nombre || "Juan Perez",
-                    email: email,
-                    rol: "tech",
-                    departamento: userInfo?.departamento || "Desarrollo",
-                    avatar: userInfo?.avatar || undefined,
-                };
-            }
+            const userInfo = await fetchUserInfo(response.token);
 
             if (!userInfo) {
                 setError("Ocurrió un error. Intenta nuevamente.");

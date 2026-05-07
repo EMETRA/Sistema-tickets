@@ -19,10 +19,15 @@ export interface Ticket {
   descripcion: string;
   tiempoEstimado: number;
   usuarioCreadorId: string;
+  usuarioCreadorNombre: string;
   usuarioAsignadoId: string | null;
+  usuarioAsignadoNombre: string | null;
   categoriaId: string;
+  categoriaNombre: string;
   prioridadId: string;
+  prioridadNombre: string;
   estadoId: string;
+  estadoNombre: string;
   fechaCreacion: string;
   fechaActualizacion: string;
   fechaCierre: string | null;

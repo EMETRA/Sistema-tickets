@@ -126,12 +126,12 @@ const AdminHome: React.FC = () => {
         })) || [];
 
     // DUMMY - ELIMINAR: para interpretar el id retornaod del query
-    const estadoMap: Record<number, { status: ChipState; label: string }> = {
-        1: { status: "ingressed", label: "Ingresado" },
-        2: { status: "assigned", label: "Asignado" },
-        3: { status: "inwork", label: "En Trabajo" },
-        4: { status: "resolved", label: "Resuelto" },
-        5: { status: "canceled", label: "Cancelado" },
+    const estadoMap: Record<string, { status: ChipState; label: string }> = {
+        "Estado 1": { status: "ingressed", label: "Ingresado" },
+        "Estado 2": { status: "assigned", label: "Asignado" },
+        "Estado 3": { status: "inwork", label: "En Trabajo" },
+        "Estado 4": { status: "resolved", label: "Resuelto" },
+        "Estado 5": { status: "canceled", label: "Cancelado" },
     };
 
     // Transformar LastTicket a TicketData[]
@@ -140,15 +140,7 @@ const AdminHome: React.FC = () => {
             // Mapear estado a ChipState
             const estadoInfo = estadoMap[ticket.estado] || { status: "ingressed", label: "Ingresado" };
 
-            // DUMMY - ELIMINAR: para interpretar el id retornaod del query
-            const categoriaMap: Record<number, string> = {
-                1: "Soporte",
-                2: "Desarrollo",
-                3: "Mantenimiento",
-                4: "Consultoría",
-            };
-
-            const tipo = categoriaMap[ticket.categoria] || "Normal";
+            const tipo = ticket.categoria || "Normal";
 
             return {
                 id: index,
@@ -165,7 +157,7 @@ const AdminHome: React.FC = () => {
 
     const ticketsResolvedData: DonutChartDataItem[] = dashboardStats?.por_estado
         ?.map(estado => ({
-            label: estadoMap[Number(estado.estado)].label, // DUMMY: interpretar el id de estado
+            label: estado.estado,
             value: estado.cantidad,
         })) || [];
 

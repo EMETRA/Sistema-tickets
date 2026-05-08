@@ -10,6 +10,7 @@
  */
 
 import { useState, useCallback, useEffect } from "react";
+import { apiFetch } from "@/api/graphql/client";
 import { type TechnicianEventRow } from "@/api/graphql/technician";
 
 interface TechnicianEventsFilters {
@@ -37,14 +38,9 @@ export function useGetTechnicianEvents(filters?: TechnicianEventsFilters) {
             if (filters?.fecha_fin) params.append("fecha_fin", filters.fecha_fin);
 
             const url = `/api/technician-events${params.toString() ? `?${params.toString()}` : ""}`;
-            const response = await fetch(url);
+            const response = await apiFetch<{ TechnicianEvents: TechnicianEventRow[] }>(url);
 
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-
-            const result = await response.json();
-            setData(result.TechnicianEvents || []);
+            setData(response.TechnicianEvents || []);
         } catch (err) {
             const error = err instanceof Error ? err : new Error(String(err));
             setError(error);

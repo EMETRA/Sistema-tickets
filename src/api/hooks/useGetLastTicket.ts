@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
+import { apiFetch } from "@/api/graphql/client";
 import { TicketSummaryRow } from '@/api/graphql/admin-dashboard';
 
 export interface LastTicketFilters {
@@ -19,10 +20,9 @@ export function useGetLastTicket(filters?: LastTicketFilters) {
             if (filters?.limit) params.append('limit', String(filters.limit));
 
             const url = `/api/admin-dashboard/last-ticket${params.toString() ? `?${params.toString()}` : ''}`;
-            const response = await fetch(url);
-            if (!response.ok) throw new Error(`Error: ${response.status}`);
-            const result = await response.json();
-            setData(result);
+            const response = await apiFetch(url) as unknown as TicketSummaryRow[];
+            console.log('Respuesta de last-ticket:', response);
+            setData(response || []);
         } catch (err) {
             const error = err instanceof Error ? err : new Error(String(err));
             setError(error);

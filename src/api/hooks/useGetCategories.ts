@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { apiFetch } from "@/api/graphql/client";
 import { TicketCategoria } from '@/api/graphql/catalogs';
 
 export function useGetCategories() {
@@ -10,10 +11,8 @@ export function useGetCategories() {
         setLoading(true);
         setError(null);
         try {
-            const response = await fetch('/api/catalogs/categories');
-            if (!response.ok) throw new Error(`Error: ${response.status}`);
-            const result = await response.json();
-            setData(result);
+            const response = await apiFetch<{ categories: TicketCategoria[] }>('/api/catalogs/categories');
+            setData(response.categories || []);
         } catch (err) {
             const error = err instanceof Error ? err : new Error(String(err));
             setError(error);

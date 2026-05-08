@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { apiFetch } from "@/api/graphql/client";
 import type { ModuleRow } from '@/api/graphql/configuration';
 
 export function useGetModules() {
@@ -12,12 +13,8 @@ export function useGetModules() {
         setLoading(true);
         setError(null);
         try {
-            const response = await fetch('/api/configuration/modules');
-            if (!response.ok) {
-                throw new Error(`Error: ${response.status}`);
-            }
-            const result = await response.json();
-            setData(result);
+            const response = await apiFetch<{ modules: ModuleRow[] }>('/api/configuration/modules');
+            setData(response.modules || []);
         } catch (err) {
             const error = err instanceof Error ? err : new Error(String(err));
             setError(error);

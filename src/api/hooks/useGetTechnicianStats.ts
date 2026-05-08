@@ -10,6 +10,7 @@
  */
 
 import { useState, useCallback, useEffect } from "react";
+import { apiFetch } from "@/api/graphql/client";
 import { type TechnicianStats } from "@/api/graphql/technician";
 
 interface TechnicianStatsFilters {
@@ -36,14 +37,9 @@ export function useGetTechnicianStats(filters?: TechnicianStatsFilters) {
             if (filters?.rango) params.append("rango", filters.rango);
 
             const url = `/api/technician-stats${params.toString() ? `?${params.toString()}` : ""}`;
-            const response = await fetch(url);
+            const response = await apiFetch<{ technicianStats: TechnicianStats }>(url);
 
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-
-            const result = await response.json();
-            setData(result.technicianStats || null);
+            setData(response.technicianStats || null);
         } catch (err) {
             const error = err instanceof Error ? err : new Error(String(err));
             setError(error);

@@ -10,6 +10,7 @@
  */
 
 import { useState, useCallback, useEffect } from "react";
+import { apiFetch } from "@/api/graphql/client";
 import { type TechnicianTicketRow } from "@/api/graphql/technician";
 
 interface TechnicianLastTicketsFilters {
@@ -35,14 +36,8 @@ export function useGetTechnicianLastTickets(filters?: TechnicianLastTicketsFilte
             if (filters?.limit) params.append("limit", String(filters.limit));
 
             const url = `/api/technician-last-tickets${params.toString() ? `?${params.toString()}` : ""}`;
-            const response = await fetch(url);
-
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-
-            const result = await response.json();
-            setData(result.technicianLastTickets || []);
+            const response = await apiFetch<{ technicianLastTickets: TechnicianTicketRow[] }>(url);
+            setData(response.technicianLastTickets || []);
         } catch (err) {
             const error = err instanceof Error ? err : new Error(String(err));
             setError(error);

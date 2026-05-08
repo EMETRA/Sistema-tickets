@@ -10,6 +10,7 @@ export const GET_USERS_QUERY = `
       name
       status
       updatedAt
+      avatar
     }
   }
 `;

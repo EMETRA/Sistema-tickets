@@ -67,6 +67,8 @@ export const EventItem: React.FC<EventItemProps> = (props) => {
             label 
         } = props;
 
+        const userNameDisplay = userName.split(' ').length > 2 ? userName.split(' ')[0] + ' ' + userName.split(' ')[1] : userName;
+
         // Determinar el texto del label
         const labelText = typeof label === "string" 
             ? label 
@@ -83,7 +85,7 @@ export const EventItem: React.FC<EventItemProps> = (props) => {
         
                 <div className={styles.content}>
                     <Text variant="body" className={styles.userName}>
-                        {userName}
+                        {userNameDisplay}
                     </Text>
                     <Text variant="muted" className={styles.label}>
                         {labelText}

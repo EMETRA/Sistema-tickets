@@ -10,6 +10,7 @@
  */
 
 import { useState, useCallback, useEffect } from "react";
+import { apiFetch } from "@/api/graphql/client";
 import { type AnnualReport } from "@/api/graphql/technician";
 
 interface AnnualReportFilters {
@@ -36,14 +37,9 @@ export function useGetAnnualReport(filters: AnnualReportFilters) {
             }
 
             const url = `/api/annual-report?anio=${filters.anio}`;
-            const response = await fetch(url);
+            const response = await apiFetch<{ annualReport: AnnualReport }>(url);
 
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-
-            const result = await response.json();
-            setData(result.annualReport || null);
+            setData(response.annualReport || null);
         } catch (err) {
             const error = err instanceof Error ? err : new Error(String(err));
             setError(error);

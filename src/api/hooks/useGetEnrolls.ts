@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { apiFetch } from "@/api/graphql/client";
 import type { EnrollRow } from '@/api/graphql/configuration';
 
 export function useGetEnrolls() {
@@ -12,12 +13,8 @@ export function useGetEnrolls() {
         setLoading(true);
         setError(null);
         try {
-            const response = await fetch('/api/configuration/enrolls');
-            if (!response.ok) {
-                throw new Error(`Error: ${response.status}`);
-            }
-            const result = await response.json();
-            setData(result);
+            const response = await apiFetch<{ enrolls: EnrollRow[] }>('/api/configuration/enrolls');
+            setData(response.enrolls || []);
         } catch (err) {
             const error = err instanceof Error ? err : new Error(String(err));
             setError(error);

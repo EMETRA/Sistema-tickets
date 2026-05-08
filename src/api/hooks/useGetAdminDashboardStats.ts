@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
+import { apiFetch } from "@/api/graphql/client";
 import { AdminDashboardStats } from '@/api/graphql/admin-dashboard';
 
 export interface AdminDashboardStatsOptions {
@@ -23,10 +24,8 @@ export function useGetAdminDashboardStats(options?: AdminDashboardStatsOptions) 
             if (options?.id_departamento) params.append('id_departamento', String(options.id_departamento));
 
             const url = `/api/admin-dashboard/stats${params.toString() ? `?${params.toString()}` : ''}`;
-            const response = await fetch(url);
-            if (!response.ok) throw new Error(`Error: ${response.status}`);
-            const result = await response.json();
-            setData(result);
+            const response = await apiFetch(url) as unknown as AdminDashboardStats;
+            setData(response);
         } catch (err) {
             const error = err instanceof Error ? err : new Error(String(err));
             setError(error);

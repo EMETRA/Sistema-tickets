@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
+import { apiFetch } from "@/api/graphql/client";
 import type { Ticket } from '@/api/graphql/tickets';
 
 export function useGetTicketById(initialId?: string) {
@@ -16,14 +17,9 @@ export function useGetTicketById(initialId?: string) {
         setError(null);
 
         try {
-            const response = await fetch(`/api/ticket/${initialId}`);
+            const response = await apiFetch<{ ticket: Ticket | null }>(`/api/ticket/${initialId}`);
 
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-
-            const result = await response.json();
-            setData(result.ticket || null);
+            setData(response.ticket || null);
         } catch (err) {
             const error = err instanceof Error ? err : new Error(String(err));
             setError(error);

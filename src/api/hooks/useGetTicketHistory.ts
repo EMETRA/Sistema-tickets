@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
+import { apiFetch } from "@/api/graphql/client";
 import type { TicketHistorial } from '@/api/graphql/tickets';
 
 export function useGetTicketHistory(initialTicketId?: string) {
@@ -16,14 +17,9 @@ export function useGetTicketHistory(initialTicketId?: string) {
         setError(null);
 
         try {
-            const response = await fetch(`/api/ticket/${initialTicketId}/history`);
+            const response = await apiFetch<{ ticketHistory: TicketHistorial[] }>(`/api/ticket/${initialTicketId}/history`);
 
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-
-            const result = await response.json();
-            setData(result.ticketHistory || []);
+            setData(response.ticketHistory || []);
         } catch (err) {
             const error = err instanceof Error ? err : new Error(String(err));
             setError(error);

@@ -10,6 +10,7 @@
  */
 
 import { useState } from "react";
+import { apiFetch } from "@/api/graphql/client";
 import { type DepartamentoPerfil } from "@/api/graphql/home";
 
 /**
@@ -26,14 +27,8 @@ export function useGetPerfilEquipo() {
         setError(null);
 
         try {
-            const response = await fetch("/api/perfil-equipo");
-
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-
-            const result = await response.json();
-            setData(result.perfilequipo || []);
+            const response = await apiFetch<{ perfilequipo: DepartamentoPerfil[] }>("/api/perfil-equipo");
+            setData(response.perfilequipo || []);
         } catch (err) {
             const error = err instanceof Error ? err : new Error(String(err));
             setError(error);

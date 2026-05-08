@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
+import { apiFetch } from "@/api/graphql/client";
 import { TeamMemberRow } from '@/api/graphql/admin-dashboard';
 
 export interface TeamsFiltersOptions {
@@ -25,10 +26,8 @@ export function useGetTeamMembers(filters?: TeamsFiltersOptions) {
             if (filters?.limit) params.append('limit', String(filters.limit));
 
             const url = `/api/admin-dashboard/team-members${params.toString() ? `?${params.toString()}` : ''}`;
-            const response = await fetch(url);
-            if (!response.ok) throw new Error(`Error: ${response.status}`);
-            const result = await response.json();
-            setData(result);
+            const response = await apiFetch(url) as unknown as TeamMemberRow[];
+            setData(response || []);
         } catch (err) {
             const error = err instanceof Error ? err : new Error(String(err));
             setError(error);

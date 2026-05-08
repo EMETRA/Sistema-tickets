@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { apiFetch } from "@/api/graphql/client";
 import type { GetTicketTagCatalogResponse, TicketTag } from '@/api/graphql/tickets';
 
 export function useGetTicketTagCatalog() {
@@ -12,12 +13,8 @@ export function useGetTicketTagCatalog() {
         setLoading(true);
         setError(null);
         try {
-            const response = await fetch('/api/ticket-tag-catalog');
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            const result: GetTicketTagCatalogResponse = await response.json();
-            setData(result.ticketTagCatalog || []);
+            const response = await apiFetch<{ ticketTagCatalogResponse: GetTicketTagCatalogResponse }>('/api/ticket-tag-catalog');
+            setData(response.ticketTagCatalogResponse.ticketTagCatalog || []);
         } catch (err) {
             const error = err instanceof Error ? err : new Error(String(err));
             setError(error);

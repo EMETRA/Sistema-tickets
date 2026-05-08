@@ -10,6 +10,7 @@
  */
 
 import { useState } from "react";
+import { apiFetch } from "@/api/graphql/client";
 import { type MyStats } from "@/api/graphql/home";
 
 /**
@@ -27,14 +28,8 @@ export function useGetMyStats() {
         setError(null);
 
         try {
-            const response = await fetch("/api/my-stats");
-
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-
-            const result = await response.json();
-            setData(result.myStats || null);
+            const response = await apiFetch<{ myStats: MyStats | null }>("/api/my-stats");
+            setData(response.myStats || null);
         } catch (err) {
             const error = err instanceof Error ? err : new Error(String(err));
             setError(error);

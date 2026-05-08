@@ -10,6 +10,7 @@
  */
 
 import { useState } from "react";
+import { apiFetch } from "@/api/graphql/client";
 import { type AppLink } from "@/api/graphql/home";
 
 /**
@@ -26,14 +27,9 @@ export function useGetAppsByRole() {
         setError(null);
 
         try {
-            const response = await fetch("/api/apps");
+            const response = await apiFetch<{ appsByRole: AppLink[] }>("/api/apps");
 
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-
-            const result = await response.json();
-            setData(result.appsByRole || []);
+            setData(response.appsByRole || []);
         } catch (err) {
             const error = err instanceof Error ? err : new Error(String(err));
             setError(error);

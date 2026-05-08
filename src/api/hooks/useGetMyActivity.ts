@@ -10,6 +10,7 @@
  */
 
 import { useState, useCallback, useEffect } from "react";
+import { apiFetch } from "@/api/graphql/client";
 import { type ActivityRow } from "@/api/graphql/technician";
 
 interface MyActivityFilters {
@@ -35,14 +36,9 @@ export function useGetMyActivity(filters?: MyActivityFilters) {
             if (filters?.limit) params.append("limit", String(filters.limit));
 
             const url = `/api/my-activity${params.toString() ? `?${params.toString()}` : ""}`;
-            const response = await fetch(url);
+            const response = await apiFetch<{ myActivity: ActivityRow[] }>(url);
 
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-
-            const result = await response.json();
-            setData(result.myActivity || []);
+            setData(response.myActivity || []);
         } catch (err) {
             const error = err instanceof Error ? err : new Error(String(err));
             setError(error);

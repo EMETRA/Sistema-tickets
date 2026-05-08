@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { apiFetch } from "@/api/graphql/client";
 import type { GetTicketPrioritiesResponse, TicketPrioridad } from '@/api/graphql/tickets';
 
 export function useGetTicketPriorities() {
@@ -12,12 +13,9 @@ export function useGetTicketPriorities() {
         setLoading(true);
         setError(null);
         try {
-            const response = await fetch('/api/ticket-priorities');
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            const result: GetTicketPrioritiesResponse = await response.json();
-            setData(result.ticketPriorities || []);
+            const response = await apiFetch<{ ticketPrioritiesResponse: GetTicketPrioritiesResponse }>('/api/ticket-priorities');
+            
+            setData(response.ticketPrioritiesResponse.ticketPriorities || []);
         } catch (err) {
             const error = err instanceof Error ? err : new Error(String(err));
             setError(error);

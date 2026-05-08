@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
-import { UserPerformanceResponse } from '@/api/graphql/admin-dashboard';
+import { apiFetch } from "@/api/graphql/client";
+import { UserPerformanceRow } from '@/api/graphql/admin-dashboard';
 
 export interface UserPerformanceOptions {
     fecha_inicio?: string;
@@ -9,7 +10,7 @@ export interface UserPerformanceOptions {
 }
 
 export function useGetUserPerformance(options?: UserPerformanceOptions) {
-    const [data, setData] = useState<UserPerformanceResponse | null>(null);
+    const [data, setData] = useState<UserPerformanceRow[] | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
 
@@ -25,10 +26,8 @@ export function useGetUserPerformance(options?: UserPerformanceOptions) {
             if (options?.id_usuario) params.append('id_usuario', String(options.id_usuario));
 
             const url = `/api/admin-dashboard/user-performance${params.toString() ? `?${params.toString()}` : ''}`;
-            const response = await fetch(url);
-            if (!response.ok) throw new Error(`Error: ${response.status}`);
-            const result = await response.json();
-            setData(result);
+            const response = await apiFetch<{ rows: UserPerformanceRow[] }>(url);
+            setData(response.rows || null);
         } catch (err) {
             const error = err instanceof Error ? err : new Error(String(err));
             setError(error);

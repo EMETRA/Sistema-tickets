@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
+import { apiFetch } from "@/api/graphql/client";
 import type { PendingRequestRow } from '@/api/graphql/configuration';
 
 export interface PendingRequestsFilters {
@@ -21,12 +22,8 @@ export function useGetPendingRequests(filters?: PendingRequestsFilters) {
             if (filters?.limit) params.append('limit', String(filters.limit));
 
             const url = `/api/configuration/pending-requests${params.toString() ? `?${params.toString()}` : ''}`;
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error(`Error: ${response.status}`);
-            }
-            const result = await response.json();
-            setData(result);
+            const response = await apiFetch<{ pendingRequests: PendingRequestRow[] }>(url);
+            setData(response.pendingRequests || []);
         } catch (err) {
             const error = err instanceof Error ? err : new Error(String(err));
             setError(error);

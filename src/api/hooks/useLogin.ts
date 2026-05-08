@@ -47,55 +47,41 @@ export function useLogin() {
      * @returns Promesa con el resultado del login (token, refresh_token, expires_in)
      * @throws Error si hay problema en el login
      */
-    const login = useCallback(async (email: string, clave: string): Promise<LoginResponse> => {
-        // Actualizar estado: cargando
-        setState({
-            loading: true,
-            error: null,
-            success: false,
-        });
+    const login = useCallback(async (email: string, clave: string): Promise<LoginResponse | null> => {
+        setState({ loading: true, error: null, success: false });
+
+        // 👇 Validate before try/catch, set error and return null directly
+        if (!email || !clave) {
+            setState({ loading: false, error: 'Email y contraseña son requeridos', success: false });
+            return null;
+        }
+
+        if (!email.includes('@')) {
+            setState({ loading: false, error: 'Email inválido', success: false });
+            return null;
+        }
+
+        if (clave.trim().length === 0) {
+            setState({ loading: false, error: 'Contraseña no puede estar vacía', success: false });
+            return null;
+        }
 
         try {
-            if (!email || !clave) {
-                throw new Error('Email y contraseña son requeridos');
-            }
-
-            if (!email.includes('@')) {
-                throw new Error('Email inválido');
-            }
-
-            if (clave.trim().length === 0) {
-                throw new Error('Contraseña no puede estar vacía');
-            }
-
             const response = await graphqlRequestClient<{ login: LoginResponse }>(
                 LOGIN_MUTATION,
-                {
-                    variables: {
-                        input: {
-                            email: email.trim().toLowerCase(),
-                            clave,
-                        } as LoginInput,
-                    },
-                }
+                { variables: { input: { email: email.trim().toLowerCase(), clave } as LoginInput } }
             );
 
             if (!response?.login?.token) {
-                throw new Error('No se recibió token de autenticación');
+                setState({ loading: false, error: 'No se recibió token de autenticación', success: false });
+                return null;
             }
 
-            setState({
-                loading: false,
-                error: null,
-                success: true,
-            });
-
+            setState({ loading: false, error: null, success: true });
             return response.login;
-        } catch (err: unknown) {
-            // Extraer mensaje de error de forma segura
-            const errorMessage = ErrorHandler.getUserMessage(err);
 
-            // Determinar error específico
+        } catch (err: unknown) {
+            const errorMessage = ErrorHandler.getUserMessage(err);
             let userError = errorMessage || 'Error al iniciar sesión';
 
             if (ErrorHandler.isAuthError(err)) {
@@ -103,14 +89,9 @@ export function useLogin() {
             } else if (err instanceof Error && err.message.includes('Email')) {
                 userError = err.message;
             }
-            
-            setState({
-                loading: false,
-                error: userError,
-                success: false,
-            });
 
-            throw err;
+            setState({ loading: false, error: userError, success: false });
+            return null; // 👈 no throw
         }
     }, []);
 

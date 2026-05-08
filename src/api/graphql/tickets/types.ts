@@ -57,6 +57,17 @@ export interface GetTicketCommentsResponse {
   ticketComments: TicketComentario[];
 }
 
+
+export interface SendTicketMessageInput {
+    ticketId: number;
+    usuarioId: number;
+    textoMensaje: string;
+}
+
+export interface SendTicketMessageResponse {
+    sendTicketMessage: TicketChatMessage;
+    [key: string]: unknown;
+}
 // ========================================
 // MENSAJES DE TICKET (CHAT)
 // ========================================

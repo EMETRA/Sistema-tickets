@@ -23,10 +23,10 @@ export function useGetTicketMessages(initialTicketId?: string) {
     const [error, setError] = useState<Error | null>(null);
 
     const refetch = useCallback(async () => {
-        // No hacer nada si no hay ticket ID
         if (!initialTicketId) return;
 
-        setLoading(true);
+        // Si ya hay datos, no mostrar loading (silent refresh)
+        if (data.length === 0) setLoading(true);
         setError(null);
 
         try {
@@ -44,7 +44,7 @@ export function useGetTicketMessages(initialTicketId?: string) {
         } finally {
             setLoading(false);
         }
-    }, [initialTicketId]);
+    }, [initialTicketId, data.length]);
 
     // Auto-fetch cuando el ID del ticket cambia
     useEffect(() => {

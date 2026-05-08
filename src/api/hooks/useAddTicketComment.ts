@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useState } from 'react';
-import { graphqlRequest } from '@/api/graphql/client';
+import { graphqlRequestClient} from '@/api/graphql/client';
 import { ADD_TICKET_COMMENT_MUTATION } from '@/api/graphql/tickets/addTicketComment';
 import { 
     type AddTicketCommentInput, 
@@ -20,7 +20,7 @@ export function useAddTicketComment() {
 
             try {
                 // Aplicamos la técnica de la guía: Record -> unknown -> Response
-                const result = await graphqlRequest<Record<string, unknown>>(
+                const result = await graphqlRequestClient<Record<string, unknown>>(
                     ADD_TICKET_COMMENT_MUTATION,
                     { variables: { input } }
                 );

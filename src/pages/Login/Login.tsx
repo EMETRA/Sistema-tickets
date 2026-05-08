@@ -47,10 +47,17 @@ const Login: React.FC = () => {
         try {
             const response = await login(email, clave);
 
+            if (!response) {
+                setError("Ocurrió un error. Intenta nuevamente.");
+                setClave("");
+                return;
+            }
+
             const userInfo = await fetchUserInfo(response.token);
 
             if (!userInfo) {
                 setError("Ocurrió un error. Intenta nuevamente.");
+                setClave("");
                 return;
             }
 
@@ -66,6 +73,7 @@ const Login: React.FC = () => {
         } catch (err) {
             console.error("Error en login:", err);
             setError("Error al iniciar sesión. Verifica tus credenciales.");
+            setClave("");
         }
     };
 

@@ -71,6 +71,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                             onClick={togglePasswordVisibility}
                             disabled={state === "disabled"}
                             borderless={true}
+                            iconColor="#000000"
                             className={styles.IconButton}
                         />
                     </div>

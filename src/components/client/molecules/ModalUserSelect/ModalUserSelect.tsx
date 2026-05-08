@@ -10,7 +10,8 @@ import { Icon } from "@/components/client/atoms/Icon";
 import { UserChip } from "@/components/client/atoms/UserChip";
 import { Button } from "@/components/client/atoms/Button";
 import { Divider } from "@/components/client/atoms/Divider";
-import { AssignableUser, getAssignableUsersDummy } from "@/api/graphql/queries/getAssignableUsers";
+import { useGetUsers } from '@/api/hooks';
+import type { User } from '@/api/graphql/users';
 
 import { useAuthStore } from "@/store/useAuthStore";
 
@@ -24,8 +25,8 @@ export const ModalUserSelect = ({
 }: ModalUserSelectProps) => {
     const [selectedUserId, setSelectedUserId] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
-    const [users, setUsers] = useState<AssignableUser[]>([]);
-    const [isLoadingUsers, setIsLoadingUsers] = useState(false);
+    const [users, setUsers] = useState<User[]>([]);
+    const { data: usersList = [], loading: isLoadingUsers, error: usersErr } = useGetUsers();
     const [usersError, setUsersError] = useState("");
 
     const [currentUserId, setCurrentUserId] = useState<string>("1"); // Valor inicial por defecto
@@ -45,38 +46,26 @@ export const ModalUserSelect = ({
             return;
         }
 
-        let isCancelled = false;
-        const debounceId = setTimeout(async () => {
-            try {
-                setIsLoadingUsers(true);
-                setUsersError("");
-                const fetchedUsers = await getAssignableUsersDummy(searchTerm);
+        // Sync error from hook
+        if (usersErr) setUsersError(usersErr.message);
+        else setUsersError("");
 
-                if (!isCancelled) {
-                    setUsers(fetchedUsers);
-                    setSelectedUserId((previousSelectedUserId) => (
-                        fetchedUsers.some((user) => user.id === previousSelectedUserId)
-                            ? previousSelectedUserId
-                            : ""
-                    ));
-                }
-            } catch (error) {
-                console.error("Error cargando usuarios:", error);
-                if (!isCancelled) {
-                    setUsersError("No fue posible cargar los usuarios.");
-                }
-            } finally {
-                if (!isCancelled) {
-                    setIsLoadingUsers(false);
-                }
-            }
+        const debounceId = setTimeout(() => {
+            const normalized = searchTerm.trim().toLowerCase();
+            const filtered = normalized
+                ? usersList.filter((u) =>
+                    u.name.toLowerCase().includes(normalized) || u.email.toLowerCase().includes(normalized)
+                )
+                : usersList;
+
+            setUsers(filtered);
+            setSelectedUserId((previousSelectedUserId) => (
+                filtered.some((user) => user.id === previousSelectedUserId) ? previousSelectedUserId : ""
+            ));
         }, 300);
 
-        return () => {
-            isCancelled = true;
-            clearTimeout(debounceId);
-        };
-    }, [isOpen, searchTerm]);
+        return () => clearTimeout(debounceId);
+    }, [isOpen, searchTerm, usersList, usersErr]);
 
     const handleConfirm = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
@@ -104,7 +93,7 @@ export const ModalUserSelect = ({
                     />
                 </div>
                 <div className={styles.usersContainer}>
-                    {isLoadingUsers && !users && <Text variant="caption">Buscando usuarios...</Text>}
+                    {isLoadingUsers && <Text variant="caption">Buscando usuarios...</Text>}
                     {!isLoadingUsers && usersError && <Text variant="caption">{usersError}</Text>}
                     {!isLoadingUsers && !usersError && users.length === 0 && (
                         <Text variant="caption">No se encontraron usuarios para tu busqueda.</Text>
@@ -112,11 +101,12 @@ export const ModalUserSelect = ({
                     {users.map((user) => (
                         <div key={user.id} onClick={() => setSelectedUserId(user.id)} className={classNames(styles.userItem, { [styles.selected]: selectedUserId === user.id })}>
                             <UserChip
-                                {...user.userInfo}
+                                userName={user.name}
+                                avatarProps={user.avatar ? { src: user.avatar } : { initials: user.name?.charAt(0) ?? "U" }}
                             />
                             {currentUserId === user.id && <Text variant="caption">(Tu)</Text>}
                             <Text variant="body">
-                                {user.workstation}
+                                {user.email}
                             </Text>
                         </div>
                     ))}

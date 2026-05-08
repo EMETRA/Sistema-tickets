@@ -7,6 +7,7 @@ export { useGetUser } from './useGetUser';
 export { useGetPerfilEquipo } from './useGetPerfilEquipo';
 export { useGetMyStats } from './useGetMyStats';
 export { useGetAppsByRole } from './useGetAppsByRole';
+export { useGetUsers } from './useGetUsers';
 
 // Technician hooks
 export { useGetTechnicianEvents } from './useGetTechnicianEvents';

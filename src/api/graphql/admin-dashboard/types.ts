@@ -78,12 +78,13 @@ export interface TicketSummaryRow {
   id_ticket: number;
   codigo?: string | null;
   titulo: string;
-  categoria: number;
-  prioridad: number;
-  estado: number;
-  creador: number;
-  asignado?: number | null;
+  categoria: string;
+  prioridad: string;
+  estado: string;
+  creador: string;
+  asignado?: string | null;
   fecha_creacion: string;
+  fecha_asignacion?: string | null;
 }
 
 export interface GetLastTicketResponse {

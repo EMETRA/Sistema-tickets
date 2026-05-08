@@ -107,6 +107,7 @@ const Login: React.FC = () => {
                                     onChange={(e) => setClave(e.target.value)}
                                     disabled={loading}
                                     required
+                                    iconcolor="#000000"
                                 />
                             </FormField>
                             <Link href="/forgot-password" className={styles.forgotPasswordLink}>

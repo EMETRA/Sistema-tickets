@@ -258,12 +258,14 @@ export async function apiFetch<TData extends Record<string, unknown> = Record<st
         // Obtener token de Zustand
         const { useAuthStore } = await import('@/store/useAuthStore');
         const token = useAuthStore.getState().token || sentToken;
+        console.log('apiFetch - token:', token); // Debug token presence
 
         // Preparar headers con token si está disponible
         const headers = new Headers(options?.headers || {});
         
         if (token) {
             headers.set('Authorization', `Bearer ${token}`);
+            console.log('apiFetch - Authorization header set'); // Debug header set
         }
         
         if (!headers.has('Content-Type') && options?.body) {

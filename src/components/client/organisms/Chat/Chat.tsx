@@ -13,7 +13,7 @@ import { useSendTicketMessage } from "@/api/hooks";
 
 const Chat: React.FC<ChatProps> = ({ ticketId, classname }) => {
     const messagesContainerRef = useRef<HTMLDivElement>(null);
-    const { data: ticketMessages, loading: isTicketMessagesLoading } = useGetTicketMessages(ticketId);
+    const { data: ticketMessages, loading: isTicketMessagesLoading, refetch } = useGetTicketMessages(ticketId);
     const { sendMessage, loading: isSending } = useSendTicketMessage();
     const { data: userData } = useGetUser();
 
@@ -39,6 +39,7 @@ const Chat: React.FC<ChatProps> = ({ ticketId, classname }) => {
                 },
                 files.length > 0 ? files : undefined
             );
+            await refetch();
         } catch (err) {
             console.error("Error al enviar mensaje:", err);
         }

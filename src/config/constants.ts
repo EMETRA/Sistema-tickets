@@ -14,3 +14,13 @@ export const ERROR_MESSAGES = {
     UNKNOWN_ERROR: 'Error desconocido. Intenta nuevamente.',
     VALIDATION_ERROR: 'Verifica los datos ingresados.',
 } as const;
+
+/**
+ * Roles de usuario
+ */
+export const USER_ROLES = {
+    USUARIO: 'USUARIO',
+    TECNICO: 'TECNICO',
+    ADMINISTRADOR: 'ADMINISTRADOR',
+    DESARROLLADOR: 'DESARROLLADOR',
+} as const;

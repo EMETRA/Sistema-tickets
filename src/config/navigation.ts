@@ -1,4 +1,4 @@
-export type UserRole = "admin" | "tech" | "user";
+import { UserRole } from "../types/roles";
 
 export interface PageMetadata {
     label: string;
@@ -24,7 +24,7 @@ export const PAGES_CONFIG: Record<string, PageMetadata> = {
 
 // Orden del Sidebar y páginas accesibles por rol
 export const ROLE_LAYOUTS: Record<UserRole, string[]> = {
-    admin: [
+    ADMINISTRADOR: [
         "home",
         "equipo", 
         "usuarios",
@@ -36,7 +36,7 @@ export const ROLE_LAYOUTS: Record<UserRole, string[]> = {
         // "reportes", 
         "estadistica"
     ],
-    tech: [
+    TECNICO: [
         "home",
         "mis_tickets",
         // "planifica",
@@ -44,13 +44,21 @@ export const ROLE_LAYOUTS: Record<UserRole, string[]> = {
         "usuarios",
         // "historial"
     ],
-    user: [
+    USUARIO: [
         "home",
         "crear_ticket",
         // "historial",
         "usuarios",
         // "reportes"
-    ]
+    ],
+    DESARROLLADOR: [
+        "home",
+        "mis_tickets",
+        "equipo",
+        "usuarios",
+        // "historial",
+        // "planifica"
+    ],
 };
 
 // 3. HELPER: Mapea los IDs al objeto de metadata real

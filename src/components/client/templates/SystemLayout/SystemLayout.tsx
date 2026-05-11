@@ -3,7 +3,7 @@
 import { usePathname, useRouter } from "next/navigation";
 import { SideBarNavigation } from "../../organisms/SideBarNavigation";
 import { TopBar } from "../../organisms/TopBar";
-import { PAGES_CONFIG, UserRole } from "@/config/navigation";
+import { PAGES_CONFIG } from "@/config/navigation";
 import styles from "./SystemLayout.module.scss";
 import classNames from "classnames";
 import { useMemo } from "react";
@@ -16,7 +16,7 @@ export const SystemLayout = ({ children, className }: { children: React.ReactNod
     const getRole = useAuthStore((state) => state.getRole);
     const user = useAuthStore((state) => state.user);
 
-    const currentRole = getRole().toLowerCase() as UserRole;
+    const currentRole = getRole();
 
     // Buscamos la metadata de la página actual para el TopBar
     const activePage = useMemo(() => {

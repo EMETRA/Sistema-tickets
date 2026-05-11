@@ -61,7 +61,7 @@ const Login: React.FC = () => {
                 return;
             }
 
-            const userRole = userInfo.rol || "USER";
+            const userRole = userInfo.rol || "USUARIO";
             const normalizedUser: UsuarioPerfil = {
                 ...userInfo,
                 rol: userRole,

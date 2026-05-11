@@ -1,4 +1,4 @@
-export type UserRole = "admin" | "tech" | "user";
+import type { UserRole } from "@/types/roles";
 
 export interface NavConfigItem {
     iconName: string;

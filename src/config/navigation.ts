@@ -22,7 +22,6 @@ export const PAGES_CONFIG: Record<string, PageMetadata> = {
     crear_ticket: { path: "/tickets-creation", label: "CREAR TICKET", title: "Nuevo Ticket", iconName: "file-circle-plus-solid" },
 };
 
-// Orden del Sidebar y páginas accesibles por rol
 export const ROLE_LAYOUTS: Record<UserRole, string[]> = {
     ADMINISTRADOR: [
         "home",
@@ -30,7 +29,8 @@ export const ROLE_LAYOUTS: Record<UserRole, string[]> = {
         "usuarios",
         "tickets", 
         "config", 
-        "mis_tickets", 
+        "mis_tickets",
+        "crear_ticket", 
         // "historial",
         // "planifica",
         // "reportes", 
@@ -39,6 +39,7 @@ export const ROLE_LAYOUTS: Record<UserRole, string[]> = {
     TECNICO: [
         "home",
         "mis_tickets",
+        "crear_ticket",
         // "planifica",
         "equipo",
         "usuarios",
@@ -54,15 +55,17 @@ export const ROLE_LAYOUTS: Record<UserRole, string[]> = {
     DESARROLLADOR: [
         "home",
         "mis_tickets",
+        "crear_ticket",
+        // "planifica",
         "equipo",
         "usuarios",
-        // "historial",
-        // "planifica"
+        // "historial"
     ],
 };
 
 // 3. HELPER: Mapea los IDs al objeto de metadata real
 export const getMenuByRole = (role: UserRole): PageMetadata[] => {
-    const layout = ROLE_LAYOUTS[role];
+    console.log("Obteniendo menú para rol:", role);
+    const layout = ROLE_LAYOUTS[role] ?? ROLE_LAYOUTS['USUARIO'];
     return layout.map(id => PAGES_CONFIG[id]);
 };

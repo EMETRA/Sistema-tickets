@@ -3,7 +3,7 @@ import { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { MarkdownViewer } from "./MarkdownViewer";
 
 const meta: Meta<typeof MarkdownViewer> = {
-    title: "Molecules/MarkdownViewer",
+    title: "atoms/MarkdownViewer",
     component: MarkdownViewer,
 };
 

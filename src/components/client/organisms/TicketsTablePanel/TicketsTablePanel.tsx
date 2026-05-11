@@ -15,6 +15,7 @@ import ModalUserSelect from "@/components/client/molecules/ModalUserSelect";
 import { TicketDetail } from "@/components/client/organisms/TicketDetail";
 import type { TicketsTablePanelProps, Ticket } from "./types";
 import styles from "./TicketsTablePanel.module.scss";
+import { MarkdownViewer } from "../../atoms/MarkdownViewer";
 
 // Constantes
 const COMMON_GRID = "minmax(0, 1.8fr) minmax(0, 1fr) minmax(0, 1.4fr) minmax(0, 0.6fr) minmax(0, 0.9fr) minmax(0, 1.2fr) minmax(0, 1fr)";
@@ -222,7 +223,7 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
                         ),
                     },
                     { content: <Text variant="muted">{ticket.title}</Text> },
-                    { content: <Text variant="muted">{ticket.description}</Text> },
+                    { content: <MarkdownViewer content={ticket.description} color="#666" /> },
                     { content: <Text variant="muted">{ticket.date}</Text> },
                     {
                         content: <Chip label={ticket.status.label} state={ticket.status.state} />,

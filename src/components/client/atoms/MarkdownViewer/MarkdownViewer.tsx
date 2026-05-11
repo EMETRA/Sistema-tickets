@@ -12,9 +12,10 @@ import styles from "./MarkdownViewer.module.scss";
 interface MarkdownViewerProps {
     content: string;
     className?: string;
+    color?: string;
 }
 
-export const MarkdownViewer: React.FC<MarkdownViewerProps> = ({ content, className }) => {
+export const MarkdownViewer: React.FC<MarkdownViewerProps> = ({ content, className, color }) => {
     const editor = useEditor({
         extensions: [
             StarterKit.configure({
@@ -40,7 +41,7 @@ export const MarkdownViewer: React.FC<MarkdownViewerProps> = ({ content, classNa
     if (!editor) return null;
 
     return (
-        <div className={classNames(styles.MarkdownViewer, className)}>
+        <div className={classNames(styles.MarkdownViewer, className) } style={{ color: color }}>
             <EditorContent editor={editor} />
         </div>
     );

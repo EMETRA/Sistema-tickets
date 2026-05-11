@@ -17,6 +17,7 @@ import { useGetTicketAttachments } from "@/api/hooks";
 
 import styles from "./TicketDetail.module.scss";
 import { TicketDetailProps, type TicketDetail } from "./types";
+import { MarkdownViewer } from "../../atoms/MarkdownViewer";
 
 const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, isOpen, onClose }) => {
     const { getRole } = useAuthStore();
@@ -67,7 +68,7 @@ const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, isOpen, onClose }
                                 </div>
                                 <div className={styles.ticketInfoDescription}>
                                     <Text variant="muted">Descripción</Text>
-                                    <Text variant="body">{ticketData.descripcion}</Text>
+                                    <MarkdownViewer content={ticketData.descripcion} />
                                 </div>
                                 <div className={styles.ticketInfoFiles}>
                                     {isTicketAttachmentsLoading ? (

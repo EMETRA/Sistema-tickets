@@ -6,22 +6,31 @@ import { TicketCreationPanel } from "@/components/client/organisms/TicketCreatio
 import { useCreateTicket } from "@/api/hooks/useCreateTicket";
 import { TicketFormData } from "@/components/client/organisms/TicketCreationPanel/types";
 import styles from "./TicketsCreation.module.scss";
+import { useAuthStore } from "@/store/useAuthStore";
 
 export default function CreateTicketPage() {
     const router = useRouter();
     const { createTicket, loading, error, uploadProgress } = useCreateTicket();
     const [formKey, setFormKey] = useState(0);
 
+    const userId = useAuthStore((state) => state.getUserId());
+    const role = useAuthStore((state) => state.getRole());
+
     const departments = [
-        { label: "Informática / IT", value: "1" },
-        { label: "Mantenimiento", value: "2" },
-        { label: "Recursos Humanos", value: "3" },
-        { label: "Administración", value: "4" },
+        { label: "Técnico", value: "1" },
+        { label: "Desarrollador", value: "2" },
     ];
+
     const handleTicketSubmit = async (data: TicketFormData) => {
         try {
             const files = data.files.map(f => f.file);
 
+            const usuarioAsignadoId = ['ADMINISTRADOR', 'TECNICO', 'DESARROLLADOR'].includes(role)
+                ? userId ? parseInt(userId, 10) : undefined
+                : undefined;
+
+            console.log("usuarioAsignadoId:", usuarioAsignadoId);
+            console.log("userId:", userId);
             await createTicket({
                 titulo: data.subject,
                 descripcion: data.description,
@@ -30,8 +39,8 @@ export default function CreateTicketPage() {
                     : data.departmentId,
                 prioridadId: 2,
                 estadoId: 1,
-                usuarioCreadorId: 100,
-                usuarioAsignadoId: 101,
+                usuarioCreadorId: userId ? parseInt(userId, 10) : 1,
+                usuarioAsignadoId: usuarioAsignadoId ? usuarioAsignadoId : undefined,
                 tiempoEstimado: 60,
             }, files);
 
@@ -41,6 +50,7 @@ export default function CreateTicketPage() {
             console.error("Error al crear el ticket:", err);
         }
     };
+
     const handleCancel = () => {
         router.back();
     };
@@ -48,7 +58,7 @@ export default function CreateTicketPage() {
     return (
         <div className={styles.pageContainer}>
             {error && <p className={styles.errorMessage}>{error.message}</p>}
-            
+
             <TicketCreationPanel
                 key={formKey}
                 departments={departments}

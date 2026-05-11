@@ -39,7 +39,7 @@ export const SystemLayout = ({ children, className }: { children: React.ReactNod
                         title={activePage.title}
                         iconName={activePage.iconName}
                         userName={user?.nombre || "Usuario"} 
-                        userRole={currentRole.charAt(0).toUpperCase() + currentRole.slice(1)}
+                        userRole={currentRole.charAt(0).toUpperCase() + currentRole.slice(1).toLowerCase()}
                         userAvatarUrl={user?.avatar}
                         userStatus="online"
                     />

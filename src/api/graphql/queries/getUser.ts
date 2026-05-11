@@ -1,23 +1,21 @@
-import { graphqlClient } from "../client";
+import { graphqlRequestClient } from "../client";
 
 export async function getUser(id: string) {
-
-    const response = await graphqlClient.post('', {
-        query: `
-            query GetUser ($id: ID) {
-                user (id: $id) {
-                    id,
-                    name,
-                    lastname,
+    const response = await graphqlRequestClient<{ user: { id: string; name: string; lastname: string; email: string } }>(
+        `
+            query GetUser($id: ID) {
+                user(id: $id) {
+                    id
+                    name
+                    lastname
                     email
                 }
             }
         `,
-        variables: {
-            id
+        {
+            variables: { id }
         }
-    });
+    );
 
-    return response.data.data.user;
-
+    return response.user;
 }

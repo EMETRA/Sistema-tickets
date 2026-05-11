@@ -54,20 +54,20 @@ export const useAuthStore = create<AuthState>()(
 
             /**
              * Obtener el rol del usuario normalizado a mayúsculas
-             * Si no existe rol o es inválido, retorna 'USER' como default
+             * Si no existe rol o es inválido, retorna 'USUARIO' como default
              */
             getRole: () => {
                 const user = get().user;
                 if (!user?.rol) return 'USUARIO';
-    
+                
                 const roleUpper = user.rol.toUpperCase();
     
                 // Validar que sea un rol válido
                 if (['ADMINISTRADOR', 'TECNICO', 'DESARROLLADOR', 'USUARIO'].includes(roleUpper)) {
                     return roleUpper as UserRole;
                 }
-    
-                // Default a USUARIO si no es válido
+                
+                // Default a USER si no es válido
                 return 'USUARIO';
             },
 

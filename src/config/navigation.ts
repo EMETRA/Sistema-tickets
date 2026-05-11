@@ -1,13 +1,4 @@
-// types/roles.ts
-export type UserRole = "ADMINISTRADOR" | "TECNICO" | "DESARROLLADOR" | "USUARIO";
-
-// Roles que tienen comportamiento de "TECH" (mismos permisos)
-export const TECH_ROLES: UserRole[] = ["TECNICO", "DESARROLLADOR"];
-export const ADMIN_ROLES: UserRole[] = ["ADMINISTRADOR"];
-
-// Helper para saber si es técnico (cualquiera de los dos)
-export const isTechRole = (role: UserRole) => TECH_ROLES.includes(role);
-export const isAdminRole = (role: UserRole) => ADMIN_ROLES.includes(role);
+import { UserRole } from "../types/roles";
 
 export interface PageMetadata {
     label: string;
@@ -54,6 +45,13 @@ export const ROLE_LAYOUTS: Record<UserRole, string[]> = {
         "usuarios",
         // "historial"
     ],
+    USUARIO: [
+        "home",
+        "crear_ticket",
+        // "historial",
+        "usuarios",
+        // "reportes"
+    ],
     DESARROLLADOR: [
         "home",
         "mis_tickets",
@@ -63,13 +61,6 @@ export const ROLE_LAYOUTS: Record<UserRole, string[]> = {
         "usuarios",
         // "historial"
     ],
-    USUARIO: [
-        "home",
-        "crear_ticket",
-        // "historial",
-        "usuarios",
-        // "reportes"
-    ]
 };
 
 // 3. HELPER: Mapea los IDs al objeto de metadata real

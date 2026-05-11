@@ -1,5 +1,4 @@
-// src/types/roles.ts
-export type UserRole = 'ADMINISTRADOR' | 'TECNICO' | 'DESARROLLADOR' | 'USUARIO';
+import type { UserRole } from "@/types/roles";
 
 export interface NavConfigItem {
     iconName: string;

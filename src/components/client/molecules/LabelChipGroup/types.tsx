@@ -1,6 +1,6 @@
 import { LabelChipVariant } from "../../atoms/LabelChip";
 
-export type LabelChipGroupRole = "user" | "tech" | "admin";
+export type LabelChipGroupRole = "USUARIO" | "TECNICO" | "ADMINISTRADOR" | "DESARROLLADOR";
 
 export interface LabelOption {
     value: string;

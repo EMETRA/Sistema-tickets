@@ -40,7 +40,7 @@ const UserHome: React.FC = () => {
     const user = userData
         ? {
             name: userData.nombre,
-            role: userData.rol || "user",
+            role: userData.rol || "USUARIO",
         }
         : { name: "", role: "" };
 

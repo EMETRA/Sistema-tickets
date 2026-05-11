@@ -7,7 +7,6 @@ import { useCreateTicket } from "@/api/hooks/useCreateTicket";
 import { TicketFormData } from "@/components/client/organisms/TicketCreationPanel/types";
 import styles from "./TicketsCreation.module.scss";
 import { useAuthStore } from "@/store/useAuthStore";
-import { isAdminRole, isTechRole } from "@/config/navigation";
 
 export default function CreateTicketPage() {
     const router = useRouter();
@@ -26,9 +25,8 @@ export default function CreateTicketPage() {
         try {
             const files = data.files.map(f => f.file);
 
-            const usuarioAsignadoId = (isAdminRole(role) || isTechRole(role)) 
-                ? userId ? parseInt(userId, 10) 
-                    : undefined
+            const usuarioAsignadoId = ['ADMINISTRADOR', 'TECNICO', 'DESARROLLADOR'].includes(role)
+                ? userId ? parseInt(userId, 10) : undefined
                 : undefined;
 
             await createTicket({

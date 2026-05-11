@@ -16,7 +16,7 @@ export const SystemLayout = ({ children, className }: { children: React.ReactNod
     const getRole = useAuthStore((state) => state.getRole);
     const user = useAuthStore((state) => state.user);
 
-    const currentRole = getRole().toLowerCase() as UserRole;
+    const currentRole = getRole() as UserRole;
 
     // Buscamos la metadata de la página actual para el TopBar
     const activePage = useMemo(() => {
@@ -39,7 +39,7 @@ export const SystemLayout = ({ children, className }: { children: React.ReactNod
                         title={activePage.title}
                         iconName={activePage.iconName}
                         userName={user?.nombre || "Usuario"} 
-                        userRole={currentRole.charAt(0).toUpperCase() + currentRole.slice(1)}
+                        userRole={currentRole.charAt(0).toUpperCase() + currentRole.slice(1).toLowerCase()}
                         userAvatarUrl={user?.avatar}
                         userStatus="online"
                     />

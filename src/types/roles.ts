@@ -1,2 +1,2 @@
 // src/types/roles.ts
-export type UserRole = 'ADMIN' | 'TECH' | 'DEV' | 'USER';
+export type UserRole = 'ADMINISTRADOR' | 'TECNICO' | 'DESARROLLADOR' | 'USUARIO';

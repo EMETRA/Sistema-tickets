@@ -1,4 +1,5 @@
-export type UserRole = "admin" | "tech" | "user";
+// src/types/roles.ts
+export type UserRole = 'ADMINISTRADOR' | 'TECNICO' | 'DESARROLLADOR' | 'USUARIO';
 
 export interface NavConfigItem {
     iconName: string;

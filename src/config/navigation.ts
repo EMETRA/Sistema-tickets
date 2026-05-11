@@ -1,4 +1,13 @@
-export type UserRole = "admin" | "tech" | "user";
+// types/roles.ts
+export type UserRole = "ADMINISTRADOR" | "TECNICO" | "DESARROLLADOR" | "USUARIO";
+
+// Roles que tienen comportamiento de "TECH" (mismos permisos)
+export const TECH_ROLES: UserRole[] = ["TECNICO", "DESARROLLADOR"];
+export const ADMIN_ROLES: UserRole[] = ["ADMINISTRADOR"];
+
+// Helper para saber si es técnico (cualquiera de los dos)
+export const isTechRole = (role: UserRole) => TECH_ROLES.includes(role);
+export const isAdminRole = (role: UserRole) => ADMIN_ROLES.includes(role);
 
 export interface PageMetadata {
     label: string;
@@ -22,29 +31,39 @@ export const PAGES_CONFIG: Record<string, PageMetadata> = {
     crear_ticket: { path: "/tickets-creation", label: "CREAR TICKET", title: "Nuevo Ticket", iconName: "file-circle-plus-solid" },
 };
 
-// Orden del Sidebar y páginas accesibles por rol
 export const ROLE_LAYOUTS: Record<UserRole, string[]> = {
-    admin: [
+    ADMINISTRADOR: [
         "home",
         "equipo", 
         "usuarios",
         "tickets", 
         "config", 
-        "mis_tickets", 
+        "mis_tickets",
+        "crear_ticket", 
         // "historial",
         // "planifica",
         // "reportes", 
         "estadistica"
     ],
-    tech: [
+    TECNICO: [
         "home",
         "mis_tickets",
+        "crear_ticket",
         // "planifica",
         "equipo",
         "usuarios",
         // "historial"
     ],
-    user: [
+    DESARROLLADOR: [
+        "home",
+        "mis_tickets",
+        "crear_ticket",
+        // "planifica",
+        "equipo",
+        "usuarios",
+        // "historial"
+    ],
+    USUARIO: [
         "home",
         "crear_ticket",
         // "historial",
@@ -55,6 +74,7 @@ export const ROLE_LAYOUTS: Record<UserRole, string[]> = {
 
 // 3. HELPER: Mapea los IDs al objeto de metadata real
 export const getMenuByRole = (role: UserRole): PageMetadata[] => {
-    const layout = ROLE_LAYOUTS[role];
+    console.log("Obteniendo menú para rol:", role);
+    const layout = ROLE_LAYOUTS[role] ?? ROLE_LAYOUTS['USUARIO'];
     return layout.map(id => PAGES_CONFIG[id]);
 };

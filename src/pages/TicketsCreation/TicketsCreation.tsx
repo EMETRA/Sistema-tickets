@@ -29,6 +29,8 @@ export default function CreateTicketPage() {
                 ? userId ? parseInt(userId, 10) : undefined
                 : undefined;
 
+            console.log("usuarioAsignadoId:", usuarioAsignadoId);
+            console.log("userId:", userId);
             await createTicket({
                 titulo: data.subject,
                 descripcion: data.description,

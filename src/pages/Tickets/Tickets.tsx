@@ -3,13 +3,12 @@
 import React, { useEffect, useRef } from "react";
 import { TicketsTablePanel } from "@/components/client/organisms/TicketsTablePanel";
 import { Ticket } from "@/components/client/organisms/TicketsTablePanel/types";
-import { useDeleteTicket, useGetTickets, useUpdateTicket } from "@/api/hooks";
+import { useDeleteTicket, useTicketsByRole, useUpdateTicket } from "@/api/hooks";
 import styles from "./Tickets.module.scss";
-import { ASSIGNABLE_USERS } from "@/api/graphql/queries/getAssignableUsers";
 
 const Tickets: React.FC = () => {
-    // Hook para obtener tickets
-    const { data: ticketsData, loading: isLoading, error: loadError, refetch: refetchTickets } = useGetTickets();
+    // Hook que obtiene tickets filtrados automáticamente según el rol del usuario
+    const { data: ticketsData, loading: isLoading, error: loadError, refetch: refetchTickets } = useTicketsByRole();
     const { deleteTicket, loading: isDeleting } = useDeleteTicket();
     const { updateTicket, loading: isAssigning } = useUpdateTicket();
 
@@ -96,24 +95,18 @@ const Tickets: React.FC = () => {
         }
     };
 
-    // Usuario quemado para todos los tickets (mismo para todos)
-    const defaultUser = {
-        id: "1",
-        name: "Usuario",
-        email: "usuario@example.com",
-        department: "General"
-    };
-
     // Mapear tickets del API al tipo esperado por TicketsTablePanel
     const transformedTickets: Ticket[] = ticketsData?.map(ticket => {
-        // TODO cambiar por la query real de usuarios asignables cuando esté lista
-        const assignedUserFound = ASSIGNABLE_USERS.find(
-            (u) => u.id === ticket.usuarioAsignadoId?.toString()
-        );
-
         return {
             id: ticket.id,
-            user: defaultUser,
+            user: {
+                id: ticket.usuarioCreadorId,
+                name: ticket.creador.nombre,
+                email: "email@example.com",
+                department: "Departamento", // ticket.creador.department
+                initials: ticket.creador.nombre.charAt(0) + (ticket.creador.nombre.split(" ")[1]?.charAt(0) || ""),
+                avatar: ticket.creador.avatar,
+            },
             title: ticket.titulo,
             description: ticket.descripcion,
             date: formatTicketDate(ticket.fechaCreacion),
@@ -121,11 +114,11 @@ const Tickets: React.FC = () => {
                 label: `Estado ${ticket.estadoId}`,
                 state: "ingressed" as const, 
             },
-            assignedTo: assignedUserFound ? {
-                id: assignedUserFound.id,
-                name: assignedUserFound.userInfo.userName,
-                initials: assignedUserFound.userInfo.avatarProps ? assignedUserFound.userInfo.avatarProps.initials : "U",
-                avatarSrc: assignedUserFound.userInfo.avatarProps ? assignedUserFound.userInfo.avatarProps.src : ""
+            assignedTo: ticket.asignado ? {
+                id: ticket.asignado.id,
+                name: ticket.asignado.nombre,
+                initials: ticket.asignado.nombre.charAt(0) + (ticket.asignado.nombre.split(" ")[1]?.charAt(0) || ""),
+                avatarSrc: ticket.asignado.avatar || undefined,
             } : null,
         };
     }) || [];

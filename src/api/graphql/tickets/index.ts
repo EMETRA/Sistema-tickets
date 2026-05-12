@@ -3,6 +3,7 @@
 // ========================================
 export { GET_TICKETS_QUERY } from './getTickets';
 export { GET_TICKET_BY_ID_QUERY } from './ticketById';
+export { GET_TICKETS_BY_USER_ID_QUERY } from './getTicketsByUserId';
 
 // ========================================
 // QUERIES - Comentarios, Historial, Adjuntos, Tags, Mensajes

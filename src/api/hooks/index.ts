@@ -1,5 +1,6 @@
 export { useLogin, type LoginState } from './useLogin';
 export { useGetTickets } from './useGetTickets';
+export { useTicketsByRole } from './useTicketsByRole';
 export { useMutation, type MutationState, type UseMutationOptions } from './useMutation';
 
 // Home hooks
@@ -8,6 +9,7 @@ export { useGetPerfilEquipo } from './useGetPerfilEquipo';
 export { useGetMyStats } from './useGetMyStats';
 export { useGetAppsByRole } from './useGetAppsByRole';
 export { useGetUsers } from './useGetUsers';
+export { useGetUserById } from './useGetUserById';
 
 // Technician hooks
 export { useGetTechnicianEvents } from './useGetTechnicianEvents';
@@ -45,6 +47,7 @@ export { useCreateModule } from './useCreateModule';
 
 // Tickets hooks - Details, Comments, History, Attachments, Tags, Messages
 export { useGetTicketById } from './useGetTicketById';
+export { useGetTicketsByUserId } from './useGetTicketsByUserId';
 export { useGetTicketComments } from './useGetTicketComments';
 export { useGetTicketHistory } from './useGetTicketHistory';
 export { useGetTicketAttachments } from './useGetTicketAttachments';

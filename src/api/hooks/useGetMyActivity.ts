@@ -37,6 +37,7 @@ export function useGetMyActivity(filters?: MyActivityFilters) {
 
             const url = `/api/my-activity${params.toString() ? `?${params.toString()}` : ""}`;
             const response = await apiFetch<{ myActivity: ActivityRow[] }>(url);
+            console.log("Respuesta de /api/my-activity:", response);
 
             setData(response.myActivity || []);
         } catch (err) {

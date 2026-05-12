@@ -25,7 +25,7 @@ export const TicketCreationPanel: React.FC<TicketCreationPanelProps> = ({
     onSubmit,
     onCancel,
     loading = false,
-    uploadProgress = 0,
+    // uploadProgress = 0,
     initialValues,
     className,
 }) => {
@@ -37,7 +37,8 @@ export const TicketCreationPanel: React.FC<TicketCreationPanelProps> = ({
     const [rejectedFiles, setRejectedFiles] = useState<string[]>([]);
     const ALLOWED_EXTENSIONS = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'csv', 'ppt', 'pptx', 'jpg', 'jpeg', 'png', 'gif'];
 
-    // Manejar archivos desde el dropzone
+    // const [simulatedProgress, setSimulatedProgress] = useState(0);
+
     const handleFiles = (files: File[]) => {
         const rejected: string[] = [];
 
@@ -52,17 +53,44 @@ export const TicketCreationPanel: React.FC<TicketCreationPanelProps> = ({
 
         setRejectedFiles(rejected);
 
+        if (validFiles.length === 0) return;
+
         const newFiles: UploadedFile[] = validFiles.map((file, index) => ({
             id: Date.now() + index,
             name: file.name,
-            status: "ready" as const,
+            status: "uploading" as const,
             progress: 0,
             file,
         }));
 
         setUploadedFiles(prev => [...prev, ...newFiles]);
-    };
 
+        // Simulate upload progress
+        let progress = 0;
+        const interval = setInterval(() => {
+            progress += Math.floor(Math.random() * 20) + 10;
+            if (progress >= 100) {
+                progress = 100;
+                clearInterval(interval);
+                // Mark files as ready when done
+                setUploadedFiles(prev =>
+                    prev.map(f =>
+                        newFiles.find(nf => nf.id === f.id)
+                            ? { ...f, status: "ready" as const, progress: 100 }
+                            : f
+                    )
+                );
+            } else {
+                setUploadedFiles(prev =>
+                    prev.map(f =>
+                        newFiles.find(nf => nf.id === f.id)
+                            ? { ...f, progress }
+                            : f
+                    )
+                );
+            }
+        }, 150);
+    };
     // Eliminar archivo
     const handleRemoveFile = (fileId: string | number) => {
         setUploadedFiles(prev => prev.filter(file => file.id !== fileId));
@@ -143,8 +171,8 @@ export const TicketCreationPanel: React.FC<TicketCreationPanelProps> = ({
                                 <FileItem
                                     key={file.id}
                                     name={file.name}
-                                    status={loading ? "uploading" : file.status}
-                                    progress={loading ? uploadProgress : file.progress}
+                                    status={file.status}
+                                    progress={file.progress}
                                     onRemove={() => handleRemoveFile(file.id)}
                                 />
                             ))}

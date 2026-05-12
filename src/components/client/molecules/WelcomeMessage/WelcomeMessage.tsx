@@ -16,7 +16,7 @@ export const WelcomeMessage = ({ userName }: WelcomeMessageProps) => {
                     {userName}
                 </Text>
             </Title>
-            <Text variant="caption">
+            <Text variant="caption" className={styles.caption}>
                 Bienvenido, al sistema de tickets 
             </Text>
             <Text variant="body" className={styles.description}>

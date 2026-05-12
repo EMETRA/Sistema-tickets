@@ -4,6 +4,7 @@ import { AppCard } from "../../molecules/AppCard";
 import styles from "./AppsGrid.module.scss";
 import classNames from "classnames";
 import { Title } from "../../atoms/Title";
+import { Text } from "../../atoms/Text";
 
 export const AppsGrid = ({
     title,
@@ -12,19 +13,23 @@ export const AppsGrid = ({
 }: AppsGridProps) => {
     return (
         <section className={classNames(styles.container, className)}>
-            <Title
-                className={styles.header}
-            >
+            <Title className={styles.header}>
                 {title}
             </Title>
             <div className={styles.grid}>
-                {apps.map((app, index) => (
-                    <AppCard 
-                        key={index}
-                        {...app}
-                        className={styles.card}
-                    />
-                ))}
+                {apps.length === 0 ? (
+                    <Text variant="body" className={styles.title}>
+                        No hay apps asignadas.
+                    </Text>
+                ) : (
+                    apps.map((app, index) => (
+                        <AppCard
+                            key={index}
+                            {...app}
+                            className={styles.card}
+                        />
+                    ))
+                )}
             </div>
         </section>
     );

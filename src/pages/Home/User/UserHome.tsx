@@ -17,7 +17,7 @@ const UserHome: React.FC = () => {
     const { data: userData, loading: loadingUser, error: errorUser, refetch: refetchUser } = useGetUser();
     const { data: statsData, loading: loadingStats, error: errorStats, refetch: refetchMyStats } = useGetMyStats();
     const { data: appsData, loading: loadingApps, error: errorApps, refetch: refetchAppsByRole } = useGetAppsByRole();
-    const { data: myActivityData, loading: loadingMyActivity, error: errorMyActivity, refetch: refetchMyActivity } = useGetMyActivity();
+    const { data: myActivityData, loading: loadingMyActivity, error: errorMyActivity, refetch: refetchMyActivity } = useGetMyActivity({ limit: 10 });
 
     const hasRunOnce = useRef(false);
         

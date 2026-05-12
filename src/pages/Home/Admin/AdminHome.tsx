@@ -76,6 +76,12 @@ const AdminHome: React.FC = () => {
         fecha_inicio: dateRange.fecha_inicio,
         fecha_fin: dateRange.fecha_fin,
     });
+
+    useEffect(() => {
+        if (performanceData) {
+            console.log("Performance data:", performanceData);
+        }
+    }, [performanceData]);
     const { data: lastMovements, loading: loadingMovements, error: errorMovements, refetch: refetchLastMovements } = useGetLastMovements();
     const { data: lastTickets, loading: loadingTickets, error: errorTickets, refetch: refetchLastTickets } = useGetLastTicket();
 

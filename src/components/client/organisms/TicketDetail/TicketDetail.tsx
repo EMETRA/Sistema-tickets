@@ -92,27 +92,25 @@ const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, isOpen, onClose }
                         )}
                         <Chat ticketId={ticketId} classname={styles.chat} />
                     </div>
-                    {ticketData && (
+                    {getRole() !== "USUARIO" && ticketData && (
                         <div className={styles.ticketHistory}>
                             <HistoryMessage ticketId={ticketId} />
-                            {getRole() === "TECH" || getRole() === "DEV" && (
-                                <div className={styles.ticketActions}>
-                                    {ticketData.estadoId !== "canceled" && ticketData.estadoId !== "resolved" ? (
-                                        <Button variant="contained" color="danger" onClick={handleOnTicketCancel} fullWidth>
-                                            Cancelar
-                                        </Button>
-                                    ) : null}
-                                    {ticketData.estadoId === "created" || ticketData.estadoId === "assigned" ? (
-                                        <Button variant="contained" color="default" onClick={handleOnTicketProcess} fullWidth>
-                                            En Proceso
-                                        </Button>
-                                    ) : ticketData.estadoId === "in_progress" ? (
-                                        <Button variant="contained" color="default" onClick={handleOnTicketFinish} fullWidth>
-                                            Finalizado
-                                        </Button>
-                                    ) : <Text variant="body" className={styles.noActionsText}>No hay acciones disponibles</Text>}
-                                </div>
-                            )}
+                            <div className={styles.ticketActions}>
+                                {ticketData.estadoNombre !== "canceled" && ticketData.estadoNombre !== "resolved" ? (
+                                    <Button variant="contained" color="danger" onClick={handleOnTicketCancel} fullWidth>
+                                        Cancelar
+                                    </Button>
+                                ) : null}
+                                {ticketData.estadoNombre === "created" || ticketData.estadoNombre === "assigned" ? (
+                                    <Button variant="contained" color="default" onClick={handleOnTicketProcess} fullWidth>
+                                        En Proceso
+                                    </Button>
+                                ) : ticketData.estadoNombre === "in_progress" ? (
+                                    <Button variant="contained" color="default" onClick={handleOnTicketFinish} fullWidth>
+                                        Finalizado
+                                    </Button>
+                                ) : <Text variant="body" className={styles.noActionsText}>No hay acciones disponibles</Text>}
+                            </div>
                         </div>
                     )}
                 </div>

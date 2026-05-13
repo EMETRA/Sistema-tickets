@@ -8,14 +8,15 @@ import { SendMessage } from "@/components/client/molecules/SendMessage";
 import styles from "./Chat.module.scss";
 import { ChatProps } from "./types";
 
-import { useGetTicketMessages, useGetUser } from "@/api/hooks";
+import { useGetTicketMessages } from "@/api/hooks";
 import { useSendTicketMessage } from "@/api/hooks";
+import { useAuthStore } from "@/store/useAuthStore";
 
 const Chat: React.FC<ChatProps> = ({ ticketId, classname }) => {
+    const userId = useAuthStore((state) => state.getUserId());
     const messagesContainerRef = useRef<HTMLDivElement>(null);
     const { data: ticketMessages, loading: isTicketMessagesLoading, refetch } = useGetTicketMessages(ticketId);
     const { sendMessage, loading: isSending } = useSendTicketMessage();
-    const { data: userData } = useGetUser();
 
     useEffect(() => {
         if (messagesContainerRef.current && ticketMessages.length > 0) {
@@ -34,7 +35,7 @@ const Chat: React.FC<ChatProps> = ({ ticketId, classname }) => {
             await sendMessage(
                 {
                     ticketId: Number(ticketId),
-                    usuarioId: Number(userData?.id_usuario) || 100,
+                    usuarioId: Number(userId),
                     textoMensaje: message,
                 },
                 files.length > 0 ? files : undefined

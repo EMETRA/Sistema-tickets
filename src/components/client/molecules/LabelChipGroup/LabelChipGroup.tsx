@@ -4,7 +4,7 @@ import type { LabelChipGroupProps, LabelChipGroupRole, LabelOption } from "./typ
 import styles from "./LabelChipGroup.module.scss";
 import { LabelChip } from "../../atoms/LabelChip";
 
-const EDITABLE_ROLES: LabelChipGroupRole[] = ["tech", "admin"];
+const EDITABLE_ROLES: LabelChipGroupRole[] = ["DESARROLLADOR", "TECNICO", "ADMINISTRADOR"];
 
 export const LabelChipGroup = ({
     labels,
@@ -18,14 +18,12 @@ export const LabelChipGroup = ({
     const containerRef = useRef<HTMLDivElement>(null);
 
     const unselectedOptions = useMemo(
-        () =>
-            availableOptions.filter(
-                (opt) => !labels.some((l) => l.value === opt.value)
-            ),
+        () => availableOptions.filter(
+            (opt) => !labels.some((l) => l.value === opt.value)
+        ),
         [availableOptions, labels]
     );
 
-    // Close dropdown when clicking outside
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
             if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
@@ -56,7 +54,8 @@ export const LabelChipGroup = ({
                             <LabelChip
                                 key={l.value}
                                 label={l.label}
-                                variant={l.variant ?? "default"}
+                                color={l.color}
+                                backgroundColor={l.backgroundColor}
                             />
                         ))
                     )}
@@ -89,7 +88,8 @@ export const LabelChipGroup = ({
                     <LabelChip
                         key={l.value}
                         label={l.label}
-                        variant={l.variant ?? "default"}
+                        color={l.color}
+                        backgroundColor={l.backgroundColor}
                         onRemove={() => handleRemove(l.value)}
                     />
                 ))}
@@ -122,7 +122,8 @@ export const LabelChipGroup = ({
                         >
                             <LabelChip
                                 label={opt.label}
-                                variant={opt.variant ?? "default"}
+                                color={opt.color}
+                                backgroundColor={opt.backgroundColor}
                             />
                         </li>
                     ))}
@@ -132,4 +133,4 @@ export const LabelChipGroup = ({
     );
 };
 
-export default LabelChipGroup;
+export default LabelChipGroup;  

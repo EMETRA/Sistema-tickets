@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useState } from 'react';
-import { graphqlRequest } from '@/api/graphql/client';
+import { graphqlRequestClient } from '@/api/graphql/client';
 import { REMOVE_TAG_FROM_TICKET_MUTATION } from '@/api/graphql/tickets/removeTagFromTicket';
 import { type RemoveTagFromTicketResponse } from '@/api/graphql/tickets/types';
 
@@ -16,7 +16,7 @@ export function useRemoveTagFromTicket() {
 
             try {
                 // Patrón de la guía: Record -> unknown -> Response
-                const result = await graphqlRequest<Record<string, unknown>>(
+                const result = await graphqlRequestClient<Record<string, unknown>>(
                     REMOVE_TAG_FROM_TICKET_MUTATION,
                     { variables: { ticketId, tagId } }
                 );

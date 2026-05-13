@@ -13,42 +13,39 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const ALL_OPTIONS: LabelOption[] = [
-    { value: "bug", label: "Bug", variant: "bug" },
-    { value: "maintenance", label: "Mantenimiento", variant: "maintenance" },
-    { value: "feature", label: "Feature", variant: "feature" },
-    { value: "urgent", label: "Urgente", variant: "urgent" },
+    { value: "bug", label: "Bug", color: "#ffffff", backgroundColor: "#e53935" },
+    { value: "maintenance", label: "Mantenimiento", color: "#ffffff", backgroundColor: "#FB8C00" },
+    { value: "feature", label: "Feature", color: "#ffffff", backgroundColor: "#43A047" },
+    { value: "urgent", label: "Urgente", color: "#ffffff", backgroundColor: "#E53935" },
 ];
 
 const INITIAL_LABELS: LabelOption[] = [
-    { value: "bug", label: "Bug", variant: "bug" },
-    { value: "maintenance", label: "Mantenimiento", variant: "maintenance" },
+    { value: "bug", label: "Bug", color: "#ffffff", backgroundColor: "#e53935" },
+    { value: "maintenance", label: "Mantenimiento", color: "#ffffff", backgroundColor: "#FB8C00" },
 ];
 
-// Read-only — user role can only see labels
 export const UserReadonly: Story = {
     args: {
-        role: "user",
+        role: "USUARIO",
         labels: INITIAL_LABELS,
         availableOptions: ALL_OPTIONS,
     },
 };
 
-// Read-only with no labels assigned
 export const UserReadonlyEmpty: Story = {
     args: {
-        role: "user",
+        role: "USUARIO",
         labels: [],
         availableOptions: ALL_OPTIONS,
     },
 };
 
-// Editable — tech/admin can add and remove
 export const TechEditable: Story = {
     render: () => {
         const [labels, setLabels] = useState<LabelOption[]>(INITIAL_LABELS);
         return (
             <LabelChipGroup
-                role="tech"
+                role="TECNICO"
                 labels={labels}
                 availableOptions={ALL_OPTIONS}
                 onChange={setLabels}
@@ -57,13 +54,12 @@ export const TechEditable: Story = {
     },
 };
 
-// Editable starting empty
 export const TechEditableEmpty: Story = {
     render: () => {
         const [labels, setLabels] = useState<LabelOption[]>([]);
         return (
             <LabelChipGroup
-                role="tech"
+                role="TECNICO"
                 labels={labels}
                 availableOptions={ALL_OPTIONS}
                 onChange={setLabels}
@@ -72,13 +68,12 @@ export const TechEditableEmpty: Story = {
     },
 };
 
-// Admin — same editing rights as tech
 export const AdminEditable: Story = {
     render: () => {
         const [labels, setLabels] = useState<LabelOption[]>(INITIAL_LABELS);
         return (
             <LabelChipGroup
-                role="admin"
+                role="ADMINISTRADOR"
                 labels={labels}
                 availableOptions={ALL_OPTIONS}
                 onChange={setLabels}
@@ -87,13 +82,12 @@ export const AdminEditable: Story = {
     },
 };
 
-// All options already selected — add dropdown disappears
 export const AllLabelsSelected: Story = {
     render: () => {
         const [labels, setLabels] = useState<LabelOption[]>(ALL_OPTIONS);
         return (
             <LabelChipGroup
-                role="tech"
+                role="TECNICO"
                 labels={labels}
                 availableOptions={ALL_OPTIONS}
                 onChange={setLabels}

@@ -20,8 +20,8 @@ export function useGetTicketTags(initialTicketId?: string) {
             setLoading(true);
             setError(null);
             try {
-                const response = await apiFetch<{ ticketTagsResponse: GetTicketTagsResponse }>(`/api/ticket-tags/${id}`);
-                setData(response.ticketTagsResponse.ticketTags || []);
+                const response = await apiFetch<Record<string, unknown>>(`/api/ticket-tags/${id}`);
+                setData((response.ticketTags as TicketTag[]) || []);
             } catch (err) {
                 const error = err instanceof Error ? err : new Error(String(err));
                 setError(error);

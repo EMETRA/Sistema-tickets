@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useState } from 'react';
-import { graphqlRequest } from '@/api/graphql/client';
+import { graphqlRequestClient } from '@/api/graphql/client';
 import { ADD_TAG_TO_TICKET_MUTATION } from '@/api/graphql/tickets/addTagToTicket';
 import { type AddTagToTicketResponse } from '@/api/graphql/tickets/types';
 
@@ -15,11 +15,12 @@ export function useAddTagToTicket() {
             setError(null);
 
             try {
-                const result = await graphqlRequest<Record<string, unknown>>(
+                const result = await graphqlRequestClient<Record<string, unknown>>(
                     ADD_TAG_TO_TICKET_MUTATION,
                     { variables: { ticketId, tagId } }
                 );
                 
+                console.log("Add Tag Result:", result);
                 const typedResult = result as unknown as AddTagToTicketResponse;
                 setLoading(false);
                 return typedResult.addTagToTicket;

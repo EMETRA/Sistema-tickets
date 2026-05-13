@@ -12,18 +12,64 @@ import { HistoryMessage } from "@/components/client/molecules/HistoryMessage";
 
 import { useAuthStore } from "@/store/useAuthStore";
 
-import { useGetTicketById } from "@/api/hooks";
+import { useAddTagToTicket, useGetTicketById, useGetTicketTagCatalog, useGetTicketTags, useRemoveTagFromTicket } from "@/api/hooks";
 import { useGetTicketAttachments } from "@/api/hooks";
 
 import styles from "./TicketDetail.module.scss";
 import { TicketDetailProps, type TicketDetail } from "./types";
 import { MarkdownViewer } from "../../atoms/MarkdownViewer";
+import { LabelChipGroup, LabelOption } from "../../molecules/LabelChipGroup";
+
+const COLOR_MAP: Record<string, string> = {
+    ROJO: "#e53935",
+    CELESTE: "#00BCD4",
+    MORADO: "#9C27B0",
+    NARANJA: "#FB8C00",
+    AMARILLO: "#FDD835",
+};
 
 const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, isOpen, onClose }) => {
-    const { getRole } = useAuthStore();
-
+    const role = useAuthStore((state) => state.getRole());
     const { data: ticketData, loading: isTicketLoading } = useGetTicketById(ticketId);
     const { data: ticketAttachments, loading: isTicketAttachmentsLoading } = useGetTicketAttachments(ticketId);
+    const { data: ticketTags, refetch: refetchTags, loading: isTagsLoading } = useGetTicketTags(ticketId);
+    const { data: tagCatalog } = useGetTicketTagCatalog();
+    const { addTag } = useAddTagToTicket();
+    const { removeTag } = useRemoveTagFromTicket();
+
+    const labels: LabelOption[] = ticketTags.map(tag => ({
+        value: tag.id,
+        label: tag.nombre,
+        color: "#ffffff",
+        backgroundColor: COLOR_MAP[tag.color ?? ""] ?? tag.color ?? undefined,
+    }));
+
+
+    const availableOptions: LabelOption[] = tagCatalog.map(tag => ({
+        value: tag.id,
+        label: tag.nombre,
+        color: "#ffffff",
+        backgroundColor: COLOR_MAP[tag.color ?? ""] ?? tag.color ?? undefined,
+    }));
+
+
+    const handleLabelsChange = async (newLabels: LabelOption[]) => {
+        const currentIds = ticketTags.map(t => t.id);
+        const newIds = newLabels.map(l => l.value);
+
+        const added = newIds.filter(id => !currentIds.includes(id));
+        const removed = currentIds.filter(id => !newIds.includes(id));
+
+        try {
+            await Promise.all([
+                ...added.map(id => addTag(ticketId, parseInt(id, 10))),
+                ...removed.map(id => removeTag(ticketId, parseInt(id, 10))),
+            ]);
+            await refetchTags();
+        } catch (err) {
+            console.error("Error actualizando etiquetas:", err);
+        }
+    };
 
     const handleOnFileClick = (fileId: string) => {
         alert("Archivo clickeado: " + fileId);
@@ -56,7 +102,7 @@ const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, isOpen, onClose }
                         X
                     </Button>
                 </div>
-                <div className={styles.content}>
+                <div className={role === "USUARIO" ? styles.contentFullWidth : styles.content}>
                     <div className={styles.ticketDetails}>
                         {isTicketLoading ? (
                             <p>Cargando detalles del ticket...</p>
@@ -92,8 +138,18 @@ const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, isOpen, onClose }
                         )}
                         <Chat ticketId={ticketId} classname={styles.chat} />
                     </div>
-                    {getRole() !== "USUARIO" && ticketData && (
+                    {role !== "USUARIO" && ticketData && (
                         <div className={styles.ticketHistory}>
+                            {isTagsLoading ? (
+                                <p>Cargando etiquetas...</p>
+                            ) : (
+                                <LabelChipGroup
+                                    role={role}
+                                    labels={labels}
+                                    availableOptions={availableOptions}
+                                    onChange={handleLabelsChange}
+                                />
+                            )}
                             <HistoryMessage ticketId={ticketId} />
                             <div className={styles.ticketActions}>
                                 {ticketData.estadoNombre !== "canceled" && ticketData.estadoNombre !== "resolved" ? (

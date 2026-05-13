@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { apiFetch } from "@/api/graphql/client";
-import type { GetTicketTagCatalogResponse, TicketTag } from '@/api/graphql/tickets';
+import type { TicketTag } from '@/api/graphql/tickets';
 
 export function useGetTicketTagCatalog() {
     const [data, setData] = useState<TicketTag[]>([]);
@@ -13,15 +13,18 @@ export function useGetTicketTagCatalog() {
         setLoading(true);
         setError(null);
         try {
-            const response = await apiFetch<{ ticketTagCatalogResponse: GetTicketTagCatalogResponse }>('/api/ticket-tag-catalog');
-            setData(response.ticketTagCatalogResponse.ticketTagCatalog || []);
-        } catch (err) {
+            const response = await apiFetch<Record<string, unknown>>('/api/ticket-tag-catalog');
+            setData((response.ticketTagCatalog as TicketTag[]) || []);        } catch (err) {
             const error = err instanceof Error ? err : new Error(String(err));
             setError(error);
         } finally {
             setLoading(false);
         }
     }, []);
+
+    useEffect(() => {
+        refetch();
+    }, [refetch]);
 
     return { data, loading, error, refetch };
 }

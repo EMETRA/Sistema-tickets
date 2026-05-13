@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import classNames from "classnames";
 import { IconFilterTabs } from "../../molecules/IconFilterTabs";
-import { MemberSelect } from "../../molecules/MemberSelect";
 import { Button } from "../../atoms/Button";
 import type { TicketsFilterBarProps } from "./types";
 import styles from "./TicketsFilterBar.module.scss";
+
+import { useAuthStore } from "@/store/useAuthStore";
 
 /**
  * Componente TicketsFilterBar - Barra de filtros y acciones para tickets
@@ -19,61 +20,48 @@ export const TicketsFilterBar: React.FC<TicketsFilterBarProps> = ({
     selectedFilter,
     onFilterChange,
     onExport,
-    members,
-    selectedMemberId,
-    onMemberSelect,
     disabled = false,
     className,
 }) => {
-    const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const { getRole } = useAuthStore();
 
-    const handleToggleFilter = () => {
-        if (!disabled) {
-            setIsFilterOpen(!isFilterOpen);
+    const filterByRole = (options: TicketsFilterBarProps["filterOptions"]): TicketsFilterBarProps["filterOptions"] => {
+        const role = getRole();
+
+        if (role === "ADMINISTRADOR") {
+            return options; // Sin filtrar para ADMINISTRADOR
         }
-    };
+
+        if (role === "TECNICO") {
+            return options.filter(option => option.value === "assigned" || option.value === "resolved" || option.value === "canceled") || []; // Solo "Asignados", "Finalizados" y "Cancelados" para TECNICO
+        }
+
+        return options.filter(option => option.value === "canceled") || []; // Solo "Asignados" para USUARIO
+    }
 
     return (
         <div className={classNames(styles.TicketsFilterBar, className)}>
             <IconFilterTabs
-                options={filterOptions}
+                options={filterByRole(filterOptions)}
                 value={selectedFilter}
                 onChange={onFilterChange}
                 disabled={disabled}
             />
 
-            <div className={styles.actions}>
-                <Button
-                    variant="contained"
-                    color="success"
-                    icon="file-excel-regular"
-                    left
-                    onClick={onExport}
-                    state={disabled ? "disabled" : "default"}
-                >
-                    Exportar
-                </Button>
-
-                <MemberSelect
-                    members={members}
-                    selectedId={selectedMemberId}
-                    onSelect={onMemberSelect}
-                    isOpen={isFilterOpen}
-                    onOpenChange={setIsFilterOpen}
-                    disabled={disabled}
-                >
+            {getRole() === "ADMINISTRADOR" || getRole() === "TECNICO" && (
+                <div className={styles.actions}>
                     <Button
-                        variant="outlined"
-                        color="neutral-light"
-                        icon="arrow-down-wide-short-gray"
+                        variant="contained"
+                        color="success"
+                        icon="file-excel-regular"
                         left
-                        onClick={handleToggleFilter}
+                        onClick={onExport}
                         state={disabled ? "disabled" : "default"}
                     >
-                        Filtrar
+                        Exportar
                     </Button>
-                </MemberSelect>
-            </div>
+                </div>
+            )}
         </div>
     );
 };

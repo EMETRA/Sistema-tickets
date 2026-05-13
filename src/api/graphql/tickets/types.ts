@@ -7,6 +7,17 @@ export interface TicketFilterInput {
   estadoId?: number;
   prioridadId?: number;
   usuarioAsignadoId?: number;
+  usuarioCreadorId?: number;
+}
+
+/**
+ * Información de usuario en un Ticket
+ */
+export interface TicketUser {
+  avatar: string | null;
+  nombre: string;
+  id: string;
+  department?: string;
 }
 
 /**
@@ -18,9 +29,9 @@ export interface Ticket {
   titulo: string;
   descripcion: string;
   tiempoEstimado: number;
-  usuarioCreadorId: string;
+  usuarioCreadorId: number;
   usuarioCreadorNombre: string;
-  usuarioAsignadoId: string | null;
+  usuarioAsignadoId: number | null;
   usuarioAsignadoNombre: string | null;
   categoriaId: string;
   categoriaNombre: string;
@@ -31,6 +42,8 @@ export interface Ticket {
   fechaCreacion: string;
   fechaActualizacion: string;
   fechaCierre: string | null;
+  asignado: TicketUser | null;
+  creador: TicketUser;
 }
 
 /**

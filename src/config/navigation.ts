@@ -12,9 +12,8 @@ export const PAGES_CONFIG: Record<string, PageMetadata> = {
     home: { path: "/home", label: "INICIO", title: "Panel de Inicio", iconName: "house-solid" },
     equipo: { path: "/equipo", label: "EQUIPO", title: "Gestión de Personal", iconName: "people-group-solid" },
     usuarios: { path: "/usuarios", label: "USUARIOS", title: "Administración de Usuarios", iconName: "user-solid" },
-    tickets: { path: "/tickets", label: "TICKETS", title: "Listado de Tickets", iconName: "clipboard-list-solid" },
+    tickets: { path: "/tickets", label: "TICKETS", title: "Listado de Tickets", iconName: "ticket-solid" },
     config: { path: "/config", label: "CONFIG", title: "Configuración", iconName: "network-wired-solid" },
-    mis_tickets: { path: "/mis-tickets", label: "MIS TICKETS", title: "Mis Asignaciones", iconName: "ticket-solid" },
     historial: { path: "/historial", label: "HISTORIAL", title: "Historial de Actividad", iconName: "clock-rotate-left-solid" },
     planifica: { path: "/planifica", label: "PLANIFICA", title: "Planificación", iconName: "person-chalkboard-solid" },
     reportes: { path: "/reportes", label: "REPORTES", title: "Módulo de Reportes", iconName: "chart-pie-solid" },
@@ -29,7 +28,6 @@ export const ROLE_LAYOUTS: Record<UserRole, string[]> = {
         "equipo", 
         "tickets", 
         "config", 
-        "mis_tickets",
         "crear_ticket", 
         // "historial",
         // "planifica",
@@ -48,13 +46,14 @@ export const ROLE_LAYOUTS: Record<UserRole, string[]> = {
     USUARIO: [
         "home",
         "crear_ticket",
+        "tickets",
         // "historial",
         "equipo",
         // "reportes"
     ],
     DESARROLLADOR: [
         "home",
-        "mis_tickets",
+        "tickets",
         "crear_ticket",
         // "planifica",
         "usuarios",
@@ -65,7 +64,6 @@ export const ROLE_LAYOUTS: Record<UserRole, string[]> = {
 
 // 3. HELPER: Mapea los IDs al objeto de metadata real
 export const getMenuByRole = (role: UserRole): PageMetadata[] => {
-    console.log("Obteniendo menú para rol:", role);
     const layout = ROLE_LAYOUTS[role] ?? ROLE_LAYOUTS['USUARIO'];
     return layout.map(id => PAGES_CONFIG[id]);
 };

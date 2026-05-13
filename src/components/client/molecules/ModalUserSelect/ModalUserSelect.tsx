@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import classNames from "classnames";
 import { PopOver } from "@/components/client/atoms/PopOver";
 import { Title } from "@/components/client/atoms/Title";
@@ -26,7 +26,7 @@ export const ModalUserSelect = ({
     const [selectedUserId, setSelectedUserId] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
     const [users, setUsers] = useState<User[]>([]);
-    const { data: usersList = [], loading: isLoadingUsers, error: usersErr } = useGetUsers();
+    const { data: usersList, loading: isLoadingUsers, error: usersErr, refetch: refetchUsers } = useGetUsers();
     const [usersError, setUsersError] = useState("");
 
     const [currentUserId, setCurrentUserId] = useState<string>("1"); // Valor inicial por defecto
@@ -40,6 +40,15 @@ export const ModalUserSelect = ({
         }
     }, [getUserId]);
 
+    // Auto-ejecutar refetch al montar el componente (solo una vez)
+    const hasRunOnce = useRef(false);
+
+    useEffect(() => {
+        if (!hasRunOnce.current) {
+            hasRunOnce.current = true;
+            refetchUsers();
+        }
+    }, [refetchUsers]);
 
     useEffect(() => {
         if (!isOpen) {
@@ -95,10 +104,10 @@ export const ModalUserSelect = ({
                 <div className={styles.usersContainer}>
                     {isLoadingUsers && <Text variant="caption">Buscando usuarios...</Text>}
                     {!isLoadingUsers && usersError && <Text variant="caption">{usersError}</Text>}
-                    {!isLoadingUsers && !usersError && users.length === 0 && (
+                    {!isLoadingUsers && !usersError && !users && (
                         <Text variant="caption">No se encontraron usuarios para tu busqueda.</Text>
                     )}
-                    {users.map((user) => (
+                    {users && users.length > 0 ? users.map((user) => (
                         <div key={user.id} onClick={() => setSelectedUserId(user.id)} className={classNames(styles.userItem, { [styles.selected]: selectedUserId === user.id })}>
                             <UserChip
                                 userName={user.name}
@@ -109,7 +118,7 @@ export const ModalUserSelect = ({
                                 {user.email}
                             </Text>
                         </div>
-                    ))}
+                    )) : !isLoadingUsers && <Text variant="caption">No se encontraron usuarios para tu busqueda.</Text>}
                 </div>
                 <Divider />
                 <div className={styles.actions}>

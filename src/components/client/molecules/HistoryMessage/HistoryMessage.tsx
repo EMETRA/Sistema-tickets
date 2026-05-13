@@ -94,7 +94,7 @@ const HistoryMessage: React.FC<HistoryMessageProps> = ({ ticketId, className }) 
                 historyItems.map((item, index) => (
                     <div key={index} className={styles.historyItemContainer}>
                         <div key={index} className={styles.historyItem}>
-                            <Icon name={iconMap[item.accion]} backgroundColor={iconBackgroundColorMap[item.accion]} color={iconColorMap[item.accion]} variant="status" className={styles.icon} />
+                            <Icon name={iconMap[item.accion] || "file"} backgroundColor={iconBackgroundColorMap[item.accion]} color={iconColorMap[item.accion]} variant="status" className={styles.icon} />
                             <div className={styles.content}>
                                 {renderHistoryItemText(item)}
                                 <Text variant="caption" className={styles.timestamp}>{timestampConverter(item.fecha)}</Text>

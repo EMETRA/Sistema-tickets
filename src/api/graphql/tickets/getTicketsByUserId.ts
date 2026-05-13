@@ -1,28 +1,19 @@
 /**
- * Query GraphQL para obtener tickets
+ * Query GraphQL para obtener tickets de un usuario específico
  *
- * Variables: GetTicketsInput (filtros opcionales)
+ * Variables: { idUsuario: Int! }
  * Respuesta: { tickets: [Ticket...] }
  *
  * Descripción:
- * - Obtiene lista de tickets
- * - Soporta filtros: estadoId, categoriaId, usuarioAsignadoId, prioridadId.
+ * - Obtiene lista de tickets creados por un usuario específico
  * - Retorna todos los campos del ticket
  */
-export const GET_TICKETS_QUERY = `
-  query Tickets($filters: TicketFilterInput) {
-    tickets(filters: $filters) {
-      asignado {
-        avatar
-        nombre
-      }
+export const GET_TICKETS_BY_USER_ID_QUERY = `
+  query TicketsByUsuarioCreador($idUsuario: Int!) {
+    ticketsByUsuarioCreador(id_usuario: $idUsuario) {
       categoriaId
       categoriaNombre
       codigo
-      creador {
-        avatar
-        nombre
-      }
       descripcion
       estadoId
       estadoNombre

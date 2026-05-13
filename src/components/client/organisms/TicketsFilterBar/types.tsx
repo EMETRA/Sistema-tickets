@@ -1,5 +1,4 @@
 import { FilterOption } from "../../molecules/IconFilterTabs/types";
-import { Member } from "../../molecules/MemberSelect/types";
 
 /**
  * Props del componente TicketsFilterBar
@@ -25,22 +24,6 @@ export interface TicketsFilterBarProps {
    * Callback cuando se presiona el botón Exportar
    */
   onExport: () => void;
-
-  /**
-   * Lista de miembros disponibles para filtrar por persona
-   */
-  members: Member[];
-
-  /**
-   * ID del miembro seleccionado actualmente para filtrar
-   */
-  selectedMemberId?: string | number;
-
-  /**
-   * Callback cuando se selecciona o deselecciona un miembro para filtrar
-   * Si member es undefined, significa que se quitó el filtro
-   */
-  onMemberSelect: (member: Member | undefined) => void;
 
   /**
    * Si los controles están deshabilitados

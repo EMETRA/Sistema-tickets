@@ -14,14 +14,28 @@ import { IconButton } from "../../atoms/IconButton";
 import ModalUserSelect from "@/components/client/molecules/ModalUserSelect";
 import { TicketDetail } from "@/components/client/organisms/TicketDetail";
 import type { TicketsTablePanelProps, Ticket } from "./types";
+import type { TableCellConfig } from "../../molecules/TableRow/types";
 import styles from "./TicketsTablePanel.module.scss";
 import { MarkdownViewer } from "../../atoms/MarkdownViewer";
 
+import { useAuthStore } from "@/store/useAuthStore";
+
 // Constantes
-const COMMON_GRID = "minmax(0, 1.8fr) minmax(0, 1fr) minmax(0, 1.4fr) minmax(0, 0.6fr) minmax(0, 0.9fr) minmax(0, 1.2fr) minmax(0, 1fr)";
+const ADMIN_GRID = "minmax(0, 1.8fr) minmax(0, 1fr) minmax(0, 1.4fr) minmax(0, 0.6fr) minmax(0, 0.9fr) minmax(0, 1.2fr) minmax(0, 1fr)";
+const TECH_DEV_GRID = "minmax(0, 1.8fr) minmax(0, 1fr) minmax(0, 1.4fr) minmax(0, 0.6fr) minmax(0, 0.9fr) minmax(0, 1fr)";
+const USER_GRID = "minmax(0, 1.8fr) minmax(0, 1fr) minmax(0, 1.4fr) minmax(0, 0.6fr) minmax(0, 0.9fr) minmax(0, 1fr)";
+
+const COMMON_GRID = {
+    "ADMINISTRADOR": ADMIN_GRID,
+    "TECNICO": TECH_DEV_GRID,
+    "DESARROLLADOR": TECH_DEV_GRID,
+    "USUARIO": USER_GRID,
+}
 
 const FILTER_OPTIONS = [
     { label: "Asignados", value: "assigned", icon: "user-tag-solid" as const },
+    { label: "Sin asignar", value: "unassigned", icon: "user-clock-solid" as const },
+    { label: "Finalizados", value: "resolved", icon: "check-solid" as const },
     { label: "Cancelados", value: "cancelled", icon: "xmark-solid" as const },
 ];
 
@@ -40,7 +54,6 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
     className,
 }) => {
     const [selectedFilter, setSelectedFilter] = useState<string>("all");
-    const [selectedMemberId, setSelectedMemberId] = useState<string | number | undefined>();
     const [ticketToDelete, setTicketToDelete] = useState<string | null>(null);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [hiddenTicketIds, setHiddenTicketIds] = useState<Array<string | number>>([]);
@@ -51,57 +64,29 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
 
     const [selectedTickedId, setSelectedTicketId] = useState<string | null>(null);
 
+    const { getRole } = useAuthStore();
+
     const visibleTickets = useMemo(() => (
         tickets.filter((ticket) => !hiddenTicketIds.includes(ticket.id))
     ), [tickets, hiddenTicketIds]);
-
-    // Extraer miembros únicos de los tickets para el filtro
-    const members = useMemo(() => {
-        const uniqueUsers = new Map();
-    
-        visibleTickets.forEach(ticket => {
-            if (!uniqueUsers.has(ticket.user.id)) {
-                uniqueUsers.set(ticket.user.id, {
-                    id: ticket.user.id,
-                    name: ticket.user.name,
-                    initials: ticket.user.initials,
-                    avatarSrc: ticket.user.avatarSrc,
-                });
-            }
-            if (ticket.assignedTo && !uniqueUsers.has(ticket.assignedTo.id)) {
-                uniqueUsers.set(ticket.assignedTo.id, {
-                    id: ticket.assignedTo.id,
-                    name: ticket.assignedTo.name,
-                    initials: ticket.assignedTo.initials,
-                    avatarSrc: ticket.assignedTo.avatarSrc,
-                });
-            }
-        });
-    
-        return Array.from(uniqueUsers.values());
-    }, [visibleTickets]);
 
     // Filtrar tickets según el filtro seleccionado y el miembro seleccionado
     const filteredTickets = useMemo(() => {
         let filtered = visibleTickets;
 
-        // Filtrar por tipo (Asignados/Cancelados)
+        // Filtrar por tipo (Asignados/Sin Asignar/Finalizados/Cancelados)
         if (selectedFilter === "assigned") {
             filtered = filtered.filter(ticket => ticket.assignedTo !== null && ticket.assignedTo !== undefined);
+        } else if (selectedFilter === "unassigned") {
+            filtered = filtered.filter(ticket => ticket.assignedTo === null || ticket.assignedTo === undefined);
+        } else if (selectedFilter === "resolved") {
+            filtered = filtered.filter(ticket => ticket.status.state === "resolved");
         } else if (selectedFilter === "cancelled") {
             filtered = filtered.filter(ticket => ticket.status.state === "canceled");
         }
 
-        // Filtrar por miembro seleccionado
-        if (selectedMemberId) {
-            filtered = filtered.filter(ticket => 
-                ticket.user.id === selectedMemberId || 
-        ticket.assignedTo?.id === selectedMemberId
-            );
-        }
-
         return filtered;
-    }, [visibleTickets, selectedFilter, selectedMemberId]);
+    }, [visibleTickets, selectedFilter]);
 
     // Manejar apertura del modal de eliminación
     const handleDeleteClick = (ticketId: string) => {
@@ -197,79 +182,200 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
 
     // Renderizar una fila de ticket
     const renderTicketRow = (ticket: Ticket) => {
+        const userCells = [
+            {
+                content: (
+                    <div className={styles.userMenu}>
+                        <Avatar
+                            initials={ticket.user.initials}
+                            src={ticket.user.avatarSrc}
+                            size="sm"
+                        />
+                        <div className={styles.info}>
+                            <Text variant="body" className={styles.name}>
+                                {ticket.user.name}
+                            </Text>
+                            <Text variant="caption" className={styles.role}>
+                                {ticket.user.department}
+                            </Text>
+                        </div>
+                    </div>
+                ),
+            },
+            { content: <Text variant="muted">{ticket.title}</Text> },
+            { content: <MarkdownViewer content={ticket.description} color="#666" /> },
+            { content: <Text variant="muted">{ticket.date}</Text> },
+            {
+                content: <Chip label={ticket.status.label} state={ticket.status.state} />,
+                align: "center",
+            },
+            {
+                content: (
+                    <div className={styles.actions}>
+                        {!ticket.assignedTo && (
+                            <IconButton
+                                icon="trash-solid"
+                                size={24}
+                                iconColor="#BDBDBD"
+                                disabled={!!pendingCancellation || isAssigning}
+                                onClick={() => handleDeleteClick(ticket.id)}
+                            />
+                        )}
+                        <IconButton
+                            icon="eye"
+                            size={24}
+                            iconColor="#BDBDBD"
+                            disabled={!!pendingCancellation || isAssigning}
+                            onClick={() => setSelectedTicketId(ticket.id)}
+                        />
+                    </div>
+                ),
+                align: "center",
+            },
+        ] as TableCellConfig[];
+
+        const techCells = [
+            {
+                content: (
+                    <div className={styles.userMenu}>
+                        <Avatar
+                            initials={ticket.user.initials}
+                            src={ticket.user.avatarSrc}
+                            size="sm"
+                        />
+                        <div className={styles.info}>
+                            <Text variant="body" className={styles.name}>
+                                {ticket.user.name}
+                            </Text>
+                            <Text variant="caption" className={styles.role}>
+                                {ticket.user.department}
+                            </Text>
+                        </div>
+                    </div>
+                ),
+            },
+            { content: <Text variant="muted">{ticket.title}</Text> },
+            { content: <MarkdownViewer content={ticket.description} color="#666" /> },
+            { content: <Text variant="muted">{ticket.date}</Text> },
+            {
+                content: <Chip label={ticket.status.label} state={ticket.status.state} />,
+                align: "center",
+            },
+        ] as TableCellConfig[];
+
+        const adminCells = [
+            {
+                content: (
+                    <div className={styles.userMenu}>
+                        <Avatar
+                            initials={ticket.user.initials}
+                            src={ticket.user.avatarSrc}
+                            size="sm"
+                        />
+                        <div className={styles.info}>
+                            <Text variant="body" className={styles.name}>
+                                {ticket.user.name}
+                            </Text>
+                            <Text variant="caption" className={styles.role}>
+                                {ticket.user.department}
+                            </Text>
+                        </div>
+                    </div>
+                ),
+            },
+            { content: <Text variant="muted">{ticket.title}</Text> },
+            { content: <MarkdownViewer content={ticket.description} color="#666" /> },
+            { content: <Text variant="muted">{ticket.date}</Text> },
+            {
+                content: <Chip label={ticket.status.label} state={ticket.status.state} />,
+                align: "center",
+            },
+            {
+                content: (
+                    <AssignedChip
+                        assigned={!!ticket.assignedTo}
+                        userName={ticket.assignedTo?.name}
+                        avatarSrc={ticket.assignedTo?.avatarSrc}
+                        avatarInitials={ticket.assignedTo?.initials}
+                        onClick={() => {
+                            if (!isAssigning) {
+                                handleAssignClick(ticket.id);
+                            }
+                        }}
+                    />
+                ),
+                align: "center",
+            },
+            {
+                content: (
+                    <div className={styles.actions}>
+                        <IconButton
+                            icon="trash-solid"
+                            size={24}
+                            iconColor="#BDBDBD"
+                            disabled={!!pendingCancellation || isAssigning}
+                            onClick={() => handleDeleteClick(ticket.id)}
+                        />
+                        <IconButton
+                            icon="eye"
+                            size={24}
+                            iconColor="#BDBDBD"
+                            disabled={!!pendingCancellation || isAssigning}
+                            onClick={() => setSelectedTicketId(ticket.id)}
+                        />
+                    </div>
+                ),
+                align: "center",
+            },
+        ] as TableCellConfig[];
+
+        const cells = getRole() === "ADMINISTRADOR" ? adminCells : getRole() === "TECNICO" ? techCells : userCells;
+
         return (
             <TableRow
                 key={ticket.id}
-                gridTemplate={COMMON_GRID}
+                gridTemplate={COMMON_GRID[getRole()]}
                 scale={0.8}
-                cells={[
-                    {
-                        content: (
-                            <div className={styles.userMenu}>
-                                <Avatar
-                                    initials={ticket.user.initials}
-                                    src={ticket.user.avatarSrc}
-                                    size="sm"
-                                />
-                                <div className={styles.info}>
-                                    <Text variant="body" className={styles.name}>
-                                        {ticket.user.name}
-                                    </Text>
-                                    <Text variant="caption" className={styles.role}>
-                                        {ticket.user.department}
-                                    </Text>
-                                </div>
-                            </div>
-                        ),
-                    },
-                    { content: <Text variant="muted">{ticket.title}</Text> },
-                    { content: <MarkdownViewer content={ticket.description} color="#666" /> },
-                    { content: <Text variant="muted">{ticket.date}</Text> },
-                    {
-                        content: <Chip label={ticket.status.label} state={ticket.status.state} />,
-                        align: "center",
-                    },
-                    {
-                        content: (
-                            <AssignedChip
-                                assigned={!!ticket.assignedTo}
-                                userName={ticket.assignedTo?.name}
-                                avatarSrc={ticket.assignedTo?.avatarSrc}
-                                avatarInitials={ticket.assignedTo?.initials}
-                                onClick={() => {
-                                    if (!isAssigning) {
-                                        handleAssignClick(ticket.id);
-                                    }
-                                }}
-                            />
-                        ),
-                        align: "center",
-                    },
-                    {
-                        content: (
-                            <div className={styles.actions}>
-                                <IconButton
-                                    icon="trash-solid"
-                                    size={24}
-                                    iconColor="#BDBDBD"
-                                    disabled={!!pendingCancellation || isAssigning}
-                                    onClick={() => handleDeleteClick(ticket.id)}
-                                />
-                                <IconButton
-                                    icon="eye"
-                                    size={24}
-                                    iconColor="#BDBDBD"
-                                    disabled={!!pendingCancellation || isAssigning}
-                                    onClick={() => setSelectedTicketId(ticket.id)}
-                                />
-                            </div>
-                        ),
-                        align: "center",
-                    },
-                ]}
+                cells={cells}
             />
         );
     };
+
+    const headersRow: Record<string, TableCellConfig[]> = {
+        ADMINISTRADOR: [
+            { icon: "user-regular", label: "Usuario" },
+            { icon: "clipboard-regular", label: "Titulo" },
+            { icon: "file-lines-regular", label: "Descripción" },
+            { icon: "calendar-regular", label: "Fecha" },
+            { icon: "magnifying-glass-solid", label: "Status Actual" },
+            { icon: "circle-user-regular", label: "Asignación" },
+            { icon: "hand-regular", label: "Acciones" },
+        ],
+        TECNICO: [
+            { icon: "user-regular", label: "Usuario" },
+            { icon: "clipboard-regular", label: "Titulo" },
+            { icon: "file-lines-regular", label: "Descripción" },
+            { icon: "calendar-regular", label: "Fecha" },
+            { icon: "magnifying-glass-solid", label: "Status Actual" },
+            { icon: "hand-regular", label: "Acciones" },
+        ],
+        DESARROLLADOR: [
+            { icon: "user-regular", label: "Usuario" },
+            { icon: "clipboard-regular", label: "Titulo" },
+            { icon: "file-lines-regular", label: "Descripción" },
+            { icon: "calendar-regular", label: "Fecha" },
+            { icon: "magnifying-glass-solid", label: "Status Actual" },
+            { icon: "hand-regular", label: "Acciones" },
+        ],
+        USUARIO: [
+            { icon: "user-regular", label: "Usuario" },
+            { icon: "clipboard-regular", label: "Titulo" },
+            { icon: "file-lines-regular", label: "Descripción" },
+            { icon: "calendar-regular", label: "Fecha" },
+            { icon: "magnifying-glass-solid", label: "Status Actual" },
+            { icon: "hand-regular", label: "Acciones" },
+        ],
+    }
 
     return (
         <div className={classNames(styles.TicketsTablePanel, className)}>
@@ -279,9 +385,6 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
                 selectedFilter={selectedFilter}
                 onFilterChange={setSelectedFilter}
                 onExport={onExport || (() => {})}
-                members={members}
-                selectedMemberId={selectedMemberId}
-                onMemberSelect={(member) => setSelectedMemberId(member?.id)}
                 disabled={loading || !!pendingCancellation || isAssigning || tickets.length === 0}
             />
 
@@ -290,16 +393,8 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
                 {/* Header */}
                 <TableRow
                     isHeader
-                    gridTemplate={COMMON_GRID}
-                    cells={[
-                        { icon: "user-regular", label: "Usuario" },
-                        { icon: "clipboard-regular", label: "Titulo" },
-                        { icon: "file-lines-regular", label: "Descripción" },
-                        { icon: "calendar-regular", label: "Fecha" },
-                        { icon: "magnifying-glass-solid", label: "Status Actual" },
-                        { icon: "circle-user-regular", label: "Asignación" },
-                        { icon: "hand-regular", label: "Acciones" },
-                    ]}
+                    gridTemplate={COMMON_GRID[getRole()]}
+                    cells={headersRow[getRole()] || headersRow["USUARIO"]}
                 />
 
                 {/* Filas de datos */}

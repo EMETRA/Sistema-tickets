@@ -11,19 +11,32 @@
 export const GET_TICKET_BY_ID_QUERY = `
   query GetTicketById($ticketId: ID!) {
     ticket(id: $ticketId) {
+      asignado {
+        avatar
+        nombre
+      }
       categoriaId
+      categoriaNombre
       codigo
+      creador {
+        avatar
+        nombre
+      }
       descripcion
       estadoId
+      estadoNombre
       fechaActualizacion
       fechaCierre
       fechaCreacion
       id
       prioridadId
+      prioridadNombre
       tiempoEstimado
       titulo
       usuarioAsignadoId
+      usuarioAsignadoNombre
       usuarioCreadorId
+      usuarioCreadorNombre
     }
   }
 `;

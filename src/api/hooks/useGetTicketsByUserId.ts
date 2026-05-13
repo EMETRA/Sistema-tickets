@@ -1,20 +1,20 @@
 'use client';
 
 /**
- * Hook useGetTickets
+ * Hook useGetTicketsByUserId
  * ==================
- * Hook personalizado para obtener tickets con soporte de filtros
+ * Hook personalizado para obtener tickets de un usuario específico
  *
  * Flujo:
- * 1. Hook llama a fetch('/api/tickets?filtros')
- * 2. Route handler (src/app/api/tickets/route.ts) recibe request
+ * 1. Hook llama a fetch('/api/tickets/usuario/{userId}')
+ * 2. Route handler (src/app/api/tickets/usuario/[userId]/route.ts) recibe request
  * 3. Handler ejecuta query GraphQL en servidor (sin CORS)
  * 4. Hook retorna { data, loading, error, refetch }
  */
 
 import { useState, useCallback, useEffect } from 'react';
 import { apiFetch } from "@/api/graphql/client";
-import { type Ticket, type TicketFilterInput } from '@/api/graphql/tickets';
+import { type Ticket } from '@/api/graphql/tickets';
 
 /**
  * Hook para obtener tickets desde el servidor
@@ -24,11 +24,10 @@ import { type Ticket, type TicketFilterInput } from '@/api/graphql/tickets';
  *
  * Ejemplo de uso:
  * ```ts
- * const { data, loading, error } = useGetTickets();
- * const { data: filtered } = useGetTickets({ estadoId: '1', prioridadId: '2' });
+ * const { data, loading, error } = useGetTicketsByUserId('123');
  * ```
  */
-export function useGetTickets(filters?: TicketFilterInput) {
+export function useGetTicketsByUserId(userId: string) {
     const [data, setData] = useState<Ticket[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
@@ -41,22 +40,8 @@ export function useGetTickets(filters?: TicketFilterInput) {
         setError(null);
 
         try {
-            // Construir query params de filtros
-            const params = new URLSearchParams();
-
-            if (filters) {
-                // Para cada filtro, convertir a número si es necesario
-                if (filters.categoriaId) params.append('categoriaId', String(filters.categoriaId));
-                if (filters.estadoId) params.append('estadoId', String(filters.estadoId));
-                if (filters.prioridadId) params.append('prioridadId', String(filters.prioridadId));
-                if (filters.usuarioAsignadoId)
-                    params.append('usuarioAsignadoId', String(filters.usuarioAsignadoId));
-                if (filters.usuarioCreadorId)
-                    params.append('usuarioCreadorId', String(filters.usuarioCreadorId));
-            }
-
             // Construir URL
-            const url = `/api/tickets${params.toString() ? `?${params.toString()}` : ''}`;
+            const url = `/api/tickets/usuario/${userId}`;
 
             // Hacer request al route handler
             const response = await apiFetch<{ tickets: Ticket[] }>(url);
@@ -68,7 +53,7 @@ export function useGetTickets(filters?: TicketFilterInput) {
         } finally {
             setLoading(false);
         }
-    }, [filters]);
+    }, [userId]);
 
     // Auto-fetch cuando los filtros cambien
     useEffect(() => {

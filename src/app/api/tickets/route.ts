@@ -30,6 +30,7 @@ export async function GET(request: NextRequest) {
         const numericFields = new Set([
             'estadoId',
             'usuarioAsignadoId',
+            'usuarioCreadorId',
             'categoriaId',
             'prioridadId',
         ]);
@@ -39,6 +40,7 @@ export async function GET(request: NextRequest) {
             'estadoId',
             'prioridadId',
             'usuarioAsignadoId',
+            'usuarioCreadorId',
         ];
 
         for (const key of filterKeys) {

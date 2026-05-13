@@ -114,8 +114,8 @@ const AdminHome: React.FC = () => {
         : [];
 
     // Transformar UserPerformance a datos para el gráfico
-    const dataByFilter: PerformancePoint[] = performanceData?.rows
-        ? performanceData.rows.map(user => ({
+    const dataByFilter: PerformancePoint[] = performanceData
+        ? performanceData.map(user => ({
             label: user.nombre || "Sin nombre",
             value: user.tickets_resueltos,
         }))

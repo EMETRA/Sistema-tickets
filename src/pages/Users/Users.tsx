@@ -64,17 +64,17 @@ const Users: React.FC = () => {
         <div className={style.mainContainer}>
             <div className={style.teamContainer}>
                 <FilterUsersBar 
-                    variant="filter-button"
+                    variant="categories"
                     searchValue={search}
                     onSearchChange={setSearch}
                     onSearchSubmit={() => {}}
                     selectedCategory={cat}
                     onCategoryChange={setCat}
-                    categories={[
-                        { label: "Todos", value: "todos" },
-                        { label: "Técnicos", value: "tecnicos" },
-                        { label: "Desarrolladores", value: "desarrolladores" }
-                    ]}
+                    // categories={[
+                    //     { label: "Todos", value: "todos" },
+                    //     { label: "Técnicos", value: "tecnicos" },
+                    //     { label: "Desarrolladores", value: "desarrolladores" }
+                    // ]}
                 />
                 <div className={style.users}>
                     <UsersGrid 

@@ -2,9 +2,8 @@ export type LabelChipVariant = "default" | "bug" | "maintenance" | "feature" | "
 
 export interface LabelChipProps {
     label: string;
-    variant?: LabelChipVariant;
-    onRemove?: (label: string) => void;
-    className?: string;
     color?: string;
     backgroundColor?: string;
+    onRemove?: (label: string) => void;
+    className?: string;
 }

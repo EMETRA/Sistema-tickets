@@ -24,8 +24,8 @@ export const PAGES_CONFIG: Record<string, PageMetadata> = {
 export const ROLE_LAYOUTS: Record<UserRole, string[]> = {
     ADMINISTRADOR: [
         "home",
-        "equipo", 
         "usuarios",
+        "equipo", 
         "tickets", 
         "config", 
         "crear_ticket", 
@@ -39,8 +39,8 @@ export const ROLE_LAYOUTS: Record<UserRole, string[]> = {
         "mis_tickets",
         "crear_ticket",
         // "planifica",
-        "equipo",
         "usuarios",
+        "equipo",
         // "historial"
     ],
     USUARIO: [
@@ -48,7 +48,7 @@ export const ROLE_LAYOUTS: Record<UserRole, string[]> = {
         "crear_ticket",
         "tickets",
         // "historial",
-        "usuarios",
+        "equipo",
         // "reportes"
     ],
     DESARROLLADOR: [
@@ -56,8 +56,8 @@ export const ROLE_LAYOUTS: Record<UserRole, string[]> = {
         "tickets",
         "crear_ticket",
         // "planifica",
-        "equipo",
         "usuarios",
+        "equipo",
         // "historial"
     ],
 };

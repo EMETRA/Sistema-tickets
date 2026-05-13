@@ -27,6 +27,7 @@ export const UserCard: React.FC<UserCardProps & { id: string }> = ({
     name,
     email,
     role,
+    department,
     avatarSrc,
     avatarInitials,
     status,
@@ -118,10 +119,16 @@ export const UserCard: React.FC<UserCardProps & { id: string }> = ({
                 <Text className={styles.role}>
                     {role}
                 </Text>
+                <Text className={styles.role}>
+                    {department}
+                </Text>
             </div>
 
             {/* Estadísticas */}
             <div className={styles.stats}>
+                {(assignedCount === 0 && resolvedCount === 0) && (
+                    <div className={styles.statsCover} />
+                )}
                 <StatInLine
                     label="Asignados"
                     value={assignedCount}

@@ -43,6 +43,8 @@ export interface UserCardProps {
    */
   role: string;
 
+  department: string;
+
   /**
    * URL de la imagen del avatar (opcional)
    */

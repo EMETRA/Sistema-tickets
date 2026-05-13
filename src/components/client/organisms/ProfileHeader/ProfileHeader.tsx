@@ -3,7 +3,7 @@ import { ProfileHeaderProps } from "./types";
 import { Avatar } from "../../atoms/Avatar";
 import { Text } from "../../atoms/Text";
 import { Image } from "../../atoms/Image";
-import { CardSwitch } from "../../molecules/CardSwitch";
+// import { CardSwitch } from "../../molecules/CardSwitch";
 import styles from "./ProfileHeader.module.scss";
 
 export const ProfileHeader = ({
@@ -12,9 +12,9 @@ export const ProfileHeader = ({
     initials,
     name,
     role,
-    switchOptions,
-    switchValue,
-    onSwitchChange
+    // switchOptions,
+    // switchValue,
+    // onSwitchChange
 }: ProfileHeaderProps) => {
     return (
         <header className={styles.headerContainer}>
@@ -51,13 +51,13 @@ export const ProfileHeader = ({
                 </div>
 
                 {/* Switch de navegación entre vistas */}
-                <div className={styles.actions}>
+                {/* <div className={styles.actions}>
                     <CardSwitch 
                         options={switchOptions} 
                         value={switchValue} 
                         onChange={onSwitchChange} 
                     />
-                </div>
+                </div> */}
             </div>
         </header>
     );

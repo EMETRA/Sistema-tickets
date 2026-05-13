@@ -31,6 +31,7 @@ const Users: React.FC = () => {
             name: member.nombre || "Sin nombre",
             email: member.departamento || "Sin departamento",
             role: member.rol || "Sin rol",
+            department: member.departamento || "Sin departamento",
             avatar: undefined,
             assignedCount: member.tickets_asignados,
             resolvedCount: member.tickets_resueltos,

@@ -51,7 +51,7 @@ export const TicketsFilterBar: React.FC<TicketsFilterBarProps> = ({
                 disabled={disabled}
             />
 
-            {getRole() === "ADMINISTRADOR" || getRole() === "TECNICO" && (
+            {getRole() === "ADMINISTRADOR" || getRole() === "TECNICO" || getRole() === "DESARROLLADOR" ? (
                 <div className={styles.actions}>
                     <Button
                         variant="contained"
@@ -64,7 +64,7 @@ export const TicketsFilterBar: React.FC<TicketsFilterBarProps> = ({
                         Exportar
                     </Button>
                 </div>
-            )}
+            ) : null}
         </div>
     );
 };

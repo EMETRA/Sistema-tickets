@@ -133,8 +133,45 @@ const Tickets: React.FC = () => {
         return <div className={styles.mainContainer}>{error}</div>;
     }
 
+    const handleExportTickets = () => {
+        if (!transformedTickets.length) return;
 
+        const headers = [
+            "ID",
+            "Usuario",
+            "Departamento",
+            "Título",
+            "Descripción",
+            "Fecha",
+            "Estado",
+            "Asignado a",
+        ];
 
+        const rows = transformedTickets.map(ticket => [
+            ticket.id,
+            ticket.user.name,
+            ticket.user.department,
+            ticket.title,
+            // Strip markdown and wrap in quotes to handle commas/newlines
+            `"${ticket.description.replace(/"/g, '""').replace(/\n/g, ' ')}"`,
+            ticket.date,
+            ticket.status.label,
+            ticket.assignedTo?.name ?? "Sin asignar",
+        ]);
+
+        const csvContent = [
+            headers.join(","),
+            ...rows.map(row => row.join(",")),
+        ].join("\n");
+
+        const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" }); // \uFEFF = BOM for Excel UTF-8
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `tickets_${new Date().toISOString().split("T")[0]}.csv`;
+        link.click();
+        URL.revokeObjectURL(url);
+    };
 
     return (
         <div className={styles.mainContainer}>
@@ -143,7 +180,7 @@ const Tickets: React.FC = () => {
                 loading={isLoading || isDeleting || isAssigning}
                 onAssign={handleAssignTicket}
                 onDelete={handleDeleteTicket}
-                onExport={() => console.log("Exportar tickets")}
+                onExport={handleExportTickets}
                 onTicketUpdated={refetchTickets}
             />
         </div>

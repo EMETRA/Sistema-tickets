@@ -61,11 +61,12 @@ export const ModalUserSelect = ({
 
         const debounceId = setTimeout(() => {
             const normalized = searchTerm.trim().toLowerCase();
+            const techUsers = usersList.filter(user => user.rol === "TECNICO");
             const filtered = normalized
-                ? usersList.filter((u) =>
+                ? techUsers.filter((u) =>
                     u.name.toLowerCase().includes(normalized) || u.email.toLowerCase().includes(normalized)
                 )
-                : usersList;
+                : techUsers;
 
             setUsers(filtered);
             setSelectedUserId((previousSelectedUserId) => (

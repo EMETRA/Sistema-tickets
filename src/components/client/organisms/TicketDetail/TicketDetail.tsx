@@ -38,8 +38,6 @@ const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, isOpen, onClose, 
     const { addTag } = useAddTagToTicket();
     const { removeTag } = useRemoveTagFromTicket();
 
-    console.log("Ticket data:", ticketData);
-
     const labels: LabelOption[] = ticketTags.map(tag => ({
         value: tag.id,
         label: tag.nombre,

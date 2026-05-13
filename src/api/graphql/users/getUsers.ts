@@ -2,15 +2,15 @@
  * Query GraphQL para obtener todos los usuarios
  */
 export const GET_USERS_QUERY = `
-  query GetUsers {
+  query Users {
     users {
-      createdAt
+      avatar
+      departamento
       email
       id
       name
+      rol
       status
-      updatedAt
-      avatar
     }
   }
 `;

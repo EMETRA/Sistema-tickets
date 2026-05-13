@@ -3,12 +3,12 @@
  */
 export interface  User {
   avatar?: string | null;
-  createdAt: string;
   email: string;
   id: string;
   name: string;
   status: string;
-  updatedAt: string;
+  rol: string | null;
+  departamento: string | null;
 }
 
 export interface GetUsersResponse {

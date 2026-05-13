@@ -38,7 +38,7 @@ export default function CreateTicketPage() {
                     ? parseInt(data.departmentId, 10)
                     : data.departmentId,
                 prioridadId: 2,
-                estadoId: 1,
+                estadoId: 2,
                 usuarioCreadorId: userId ? parseInt(userId, 10) : 1,
                 usuarioAsignadoId: usuarioAsignadoId ? usuarioAsignadoId : undefined,
                 tiempoEstimado: 60,

@@ -12,4 +12,5 @@ export interface TicketDetailProps {
   ticketId: string;
   isOpen: boolean;
   onClose: () => void;
+  onTicketUpdated?: () => void;
 }

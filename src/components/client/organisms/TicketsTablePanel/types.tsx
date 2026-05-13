@@ -88,4 +88,5 @@ export interface TicketsTablePanelProps {
    * Clase CSS adicional
    */
   className?: string;
+  onTicketUpdated?: () => void; 
 }

@@ -12,6 +12,7 @@ export function useGetStatuses() {
         setError(null);
         try {
             const response = await apiFetch<{ statuses: TicketEstado[] }>('/api/catalogs/statuses');
+            console.log("API response for statuses 😂:", response);
             setData(response.statuses || []);
         } catch (err) {
             const error = err instanceof Error ? err : new Error(String(err));

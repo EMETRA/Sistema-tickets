@@ -1,6 +1,6 @@
 'use client';
 import { useCallback, useState } from 'react';
-import { graphqlRequest } from '@/api/graphql/client';
+import { graphqlRequestClient } from '@/api/graphql/client';
 import { UPDATE_TICKET_MUTATION } from '@/api/graphql/tickets/updateTicket';
 import { type UpdateTicketInput, type UpdateTicketResponse } from '@/api/graphql/tickets/types';
 
@@ -12,7 +12,7 @@ export function useUpdateTicket() {
         setLoading(true);
         setError(null);
         try {
-            const result = await graphqlRequest<UpdateTicketResponse>(
+            const result = await graphqlRequestClient<UpdateTicketResponse>(
                 UPDATE_TICKET_MUTATION,
                 { variables: { id, input } }
             );

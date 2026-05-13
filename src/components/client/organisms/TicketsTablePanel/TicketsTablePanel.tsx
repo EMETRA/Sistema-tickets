@@ -52,6 +52,7 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
     onExport,
     loading = false,
     className,
+    onTicketUpdated,
 }) => {
     const [selectedFilter, setSelectedFilter] = useState<string>("all");
     const [ticketToDelete, setTicketToDelete] = useState<string | null>(null);
@@ -447,6 +448,7 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
                 isOpen={!!selectedTickedId}
                 onClose={() => setSelectedTicketId(null)}
                 ticketId={selectedTickedId || ""}
+                onTicketUpdated={onTicketUpdated}
             />
         </div>
     );

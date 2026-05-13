@@ -131,32 +131,18 @@ const AdminHome: React.FC = () => {
             date: new Date(movement.fecha),
         })) || [];
 
-    // DUMMY - ELIMINAR: para interpretar el id retornaod del query
-    const estadoMap: Record<string, { status: ChipState; label: string }> = {
-        "Estado 1": { status: "ingressed", label: "Ingresado" },
-        "Estado 2": { status: "assigned", label: "Asignado" },
-        "Estado 3": { status: "inwork", label: "En Trabajo" },
-        "Estado 4": { status: "resolved", label: "Resuelto" },
-        "Estado 5": { status: "canceled", label: "Cancelado" },
-    };
-
     // Transformar LastTicket a TicketData[]
     const sampleTickets: TicketData[] = lastTickets
-        ?.map((ticket, index) => {
-            // Mapear estado a ChipState
-            const estadoInfo = estadoMap[ticket.estado] || { status: "ingressed", label: "Ingresado" };
-
-            const tipo = ticket.categoria || "Normal";
-
+        ?.map((ticket) => {
             return {
-                id: index,
+                id: ticket.id_ticket,
                 description: ticket.titulo,
-                userName: "Admin",
-                avatarInitials: "A",
+                userName: ticket.creador,
+                avatarInitials: ticket.creador ? ticket.creador.charAt(0) : "U",
                 assigned: !!ticket.asignado,
-                type: tipo,
-                status: estadoInfo.status,
-                statusLabel: estadoInfo.label,
+                type: ticket.categoria || "Normal",
+                status: ticket.estado.toLowerCase() as ChipState,
+                statusLabel: ticket.estado,
                 dateIngress: new Date(ticket.fecha_creacion),
             };
         }) || [];

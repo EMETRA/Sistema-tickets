@@ -96,16 +96,16 @@ const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, isOpen, onClose }
                         <div className={styles.ticketHistory}>
                             <HistoryMessage ticketId={ticketId} />
                             <div className={styles.ticketActions}>
-                                {ticketData.estadoNombre !== "canceled" && ticketData.estadoNombre !== "resolved" ? (
+                                {ticketData.estadoNombre.toLowerCase() !== "cancelado" && ticketData.estadoNombre.toLowerCase() !== "completado" ? (
                                     <Button variant="contained" color="danger" onClick={handleOnTicketCancel} fullWidth>
                                         Cancelar
                                     </Button>
                                 ) : null}
-                                {ticketData.estadoNombre === "created" || ticketData.estadoNombre === "assigned" ? (
+                                {ticketData.estadoNombre.toLowerCase() === "creado" || ticketData.estadoNombre.toLowerCase() === "asignados" ? (
                                     <Button variant="contained" color="default" onClick={handleOnTicketProcess} fullWidth>
                                         En Proceso
                                     </Button>
-                                ) : ticketData.estadoNombre === "in_progress" ? (
+                                ) : ticketData.estadoNombre.toLowerCase() === "en trabajo" ? (
                                     <Button variant="contained" color="default" onClick={handleOnTicketFinish} fullWidth>
                                         Finalizado
                                     </Button>

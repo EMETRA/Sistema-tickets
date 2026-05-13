@@ -12,7 +12,6 @@ export function useGetLastMovements() {
         setError(null);
         try {
             const response = await apiFetch('/api/admin-dashboard/last-movements') as unknown as MovementRow[];
-            console.log('Respuesta de last-movements:', response);
             setData(response || []);
         } catch (err) {
             const error = err instanceof Error ? err : new Error(String(err));

@@ -33,10 +33,10 @@ const COMMON_GRID = {
 }
 
 const FILTER_OPTIONS = [
-    { label: "Asignados", value: "assigned", icon: "user-tag-solid" as const },
-    { label: "Sin asignar", value: "unassigned", icon: "user-clock-solid" as const },
-    { label: "Finalizados", value: "resolved", icon: "check-solid" as const },
-    { label: "Cancelados", value: "cancelled", icon: "xmark-solid" as const },
+    { label: "Asignados", value: "asignado", icon: "user-tag-solid" as const },
+    { label: "Sin asignar", value: "sin_asignar", icon: "user-clock-solid" as const },
+    { label: "Completados", value: "completado", icon: "check-solid" as const },
+    { label: "Cancelados", value: "cancelado", icon: "xmark-solid" as const },
 ];
 
 /**
@@ -75,14 +75,14 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
         let filtered = visibleTickets;
 
         // Filtrar por tipo (Asignados/Sin Asignar/Finalizados/Cancelados)
-        if (selectedFilter === "assigned") {
+        if (selectedFilter === "asignado") {
             filtered = filtered.filter(ticket => ticket.assignedTo !== null && ticket.assignedTo !== undefined);
-        } else if (selectedFilter === "unassigned") {
+        } else if (selectedFilter === "sin_asignar") {
             filtered = filtered.filter(ticket => ticket.assignedTo === null || ticket.assignedTo === undefined);
-        } else if (selectedFilter === "resolved") {
-            filtered = filtered.filter(ticket => ticket.status.state === "resolved");
-        } else if (selectedFilter === "cancelled") {
-            filtered = filtered.filter(ticket => ticket.status.state === "canceled");
+        } else if (selectedFilter === "completado") {
+            filtered = filtered.filter(ticket => ticket.status.state === "completado");
+        } else if (selectedFilter === "cancelado") {
+            filtered = filtered.filter(ticket => ticket.status.state === "cancelado");
         }
 
         return filtered;

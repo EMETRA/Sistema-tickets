@@ -12,42 +12,47 @@ import type { TicketHistorial } from "@/api/graphql";
 
 const HistoryMessage: React.FC<HistoryMessageProps> = ({ ticketId, className }) => {
     const iconMap: Record<string, string> = {
-        CREATED: "ticket-solid",
-        ASSIGNED: "user-add",
+        CREACION: "ticket-solid",
+        ASIGNACION: "user-add",
         TAGGED: "tag",
-        IN_PROGRESS: "in-progress",
-        FINALIZED: "check-solid"
+        EN_TRABAJO: "in-progress",
+        CAMBIO_ESTADO: "hourglass-half-solid",
+        COMPLETADO: "check-solid"
     };
 
     const iconBackgroundColorMap: Record<string, string> = {
-        CREATED: "#A9DAFF",
-        ASSIGNED: "#FFEFC8",
+        CREACION: "#A9DAFF",
+        ASIGNACION: "#FFEFC8",
         TAGGED: "#D0F4DE",
-        IN_PROGRESS: "#FFEFC8",
-        FINALIZED: "#D0F4DE"
+        EN_TRABAJO: "#FFEFC8",
+        CAMBIO_ESTADO: "#FCAB64",
+        COMPLETADO: "#D0F4DE"
     };
 
     const iconColorMap: Record<string, string> = {
-        CREATED: "#82BCE9",
-        ASSIGNED: "#FFCD52",
+        CREACION: "#82BCE9",
+        ASIGNACION: "#FFCD52",
         TAGGED: "#93EDB6",
-        IN_PROGRESS: "#FFCD52",
-        FINALIZED: "#93EDB6"
+        EN_TRABAJO: "#FFCD52",
+        CAMBIO_ESTADO: "#FCD29F",
+        COMPLETADO: "#93EDB6"
     };
 
     const { data: historyItems, loading: isHistoryLoading } = useGetTicketHistory(ticketId);
 
     const actionText = (action: string) => {
         switch (action) {
-        case "CREATED":
+        case "CREACION":
             return "ha creado el ticket";
-        case "ASSIGNED":
+        case "ASIGNACION":
             return `asignó el ticket`;
         case "TAGGED":
             return `ha asignado la etiqueta`;
-        case "IN_PROGRESS":
+        case "EN_TRABAJO":
             return "marcó como en progreso el ticket";
-        case "FINALIZED":
+        case "CAMBIO_ESTADO":
+            return "cambió el estado del ticket";
+        case "COMPLETADO":
             return "finalizó el ticket";
         default:
             return "";
@@ -74,11 +79,10 @@ const HistoryMessage: React.FC<HistoryMessageProps> = ({ ticketId, className }) 
             <div className={styles.textContainer}>
                 <Text className={styles.user}>{item.usuarioId} </Text>
                 <Text className={styles.action}>{actionText(item.accion)} </Text>
-                {/* No vienen del back. Cambios solicitados */}
-                {/* {item.tag && <Text className={styles.tag}><Text className={styles.tagName}>{item.tag}</Text> a el ticket</Text>} */}
+                {item.tag && <Text className={styles.tag}><Text className={styles.tagName}>{item.tag}</Text> a el ticket</Text>}
                 <Text className={styles.ticket}> #{item.ticketId}</Text>
-                {/* {item.ticketStatus && <Text className={styles.status}>, en estado de <Text className={styles.statusName}>{item.ticketStatus}</Text></Text>} */}
-                {/* {item.assignedTo && <Text className={styles.assignedTo}> a <Text className={styles.assignedToName}>{item.assignedTo}</Text></Text>} */}
+                {item.status && <Text className={styles.status}>, en estado de <Text className={styles.statusName}>{item.status}</Text></Text>}
+                {item.asignado_a && <Text className={styles.assignedTo}> a <Text className={styles.assignedToName}>{item.asignado_a}</Text></Text>}
             </div>
         );
     };

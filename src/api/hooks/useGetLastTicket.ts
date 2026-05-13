@@ -21,7 +21,6 @@ export function useGetLastTicket(filters?: LastTicketFilters) {
 
             const url = `/api/admin-dashboard/last-ticket${params.toString() ? `?${params.toString()}` : ''}`;
             const response = await apiFetch(url) as unknown as TicketSummaryRow[];
-            console.log('Respuesta de last-ticket:', response);
             setData(response || []);
         } catch (err) {
             const error = err instanceof Error ? err : new Error(String(err));

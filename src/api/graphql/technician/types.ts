@@ -17,10 +17,12 @@ export interface TechnicianEventRow {
  */
 export interface TechnicianTicketRow {
     codigo: string;
+    categoria: string | null;
     titulo: string;
-    prioridad: number;
-    estado: number;
+    prioridad: string | null;
+    estado: string | null;
     fecha_creacion: string;
+    fecha_asignacion?: string;
 }
 
 /**

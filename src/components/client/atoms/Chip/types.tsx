@@ -1,5 +1,5 @@
 export type ChipVariant = "default" | "outlined";
-export type ChipState = "ingressed" | "assigned" | "inwork" | "resolved" | "canceled";
+export type ChipState = "ingresado" | "asignado" | "en_trabajo" | "completado" | "cancelado";
 
 export interface ChipProps {
     label: string;

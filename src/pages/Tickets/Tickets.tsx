@@ -6,6 +6,8 @@ import { Ticket } from "@/components/client/organisms/TicketsTablePanel/types";
 import { useDeleteTicket, useTicketsByRole, useUpdateTicket } from "@/api/hooks";
 import styles from "./Tickets.module.scss";
 
+import type { ChipState } from "@/components/client/atoms/Chip/types";
+
 const Tickets: React.FC = () => {
     // Hook que obtiene tickets filtrados automáticamente según el rol del usuario
     const { data: ticketsData, loading: isLoading, error: loadError, refetch: refetchTickets } = useTicketsByRole();
@@ -111,8 +113,8 @@ const Tickets: React.FC = () => {
             description: ticket.descripcion,
             date: formatTicketDate(ticket.fechaCreacion),
             status: {
-                label: `Estado ${ticket.estadoId}`,
-                state: "ingressed" as const, 
+                label: ticket.estadoNombre,
+                state: ticket.estadoNombre.toLowerCase() === "en trabajo" ? "en_trabajo" as ChipState : ticket.estadoNombre.toLowerCase() as ChipState,
             },
             assignedTo: ticket.asignado ? {
                 id: ticket.asignado.id,

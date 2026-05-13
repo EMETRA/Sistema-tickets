@@ -74,36 +74,15 @@ const TechHome: React.FC = () => {
     // Transformar tickets del técnico a TicketData
     const sampleTickets: TicketData[] = technicianTicketsData
         ?.map((ticket, index) => {
-            // DUMMY - ELIMINAR: para interpretar el estado retornaod del query
-            const estadoMap: Record<number, { status: ChipState; label: string }> = {
-                1: { status: "ingressed", label: "Ingresado" },
-                2: { status: "assigned", label: "Asignado" },
-                3: { status: "inwork", label: "En Trabajo" },
-                4: { status: "resolved", label: "Resuelto" },
-                5: { status: "canceled", label: "Cancelado" },
-            };
-            
-            const estadoInfo = estadoMap[ticket.estado] || { status: "ingressed", label: "Ingresado" };
-
-            // DUMMY - ELIMINAR: para interpretar el id retornaod del query
-            const prioridadMap: Record<number, string> = {
-                1: "Baja",
-                2: "Normal",
-                3: "Alta",
-                4: "Urgente",
-            };
-            
-            const tipo = prioridadMap[ticket.prioridad] || "Normal";
-
             return {
                 id: index,
                 description: ticket.titulo,
                 userName: userData?.nombre || "Usuario",
                 avatarInitials: userData?.nombre ? userData.nombre.charAt(0) : "U",
                 assigned: true,
-                type: tipo,
-                status: estadoInfo.status,
-                statusLabel: estadoInfo.label,
+                type: ticket.prioridad || "Normal",
+                status: ticket.estado ? ticket.estado.toLowerCase() as ChipState : "ingresado",
+                statusLabel: ticket.estado || "Ingresado",
                 dateIngress: new Date(ticket.fecha_creacion),
             };
         }) || [];

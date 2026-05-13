@@ -108,6 +108,9 @@ export interface TicketHistorial {
   valorAnterior: string | null;
   valorNuevo: string | null;
   fecha: string;
+  asignado_a?: string | null;
+  status?: string | null;
+  tag?: string | null;
 }
 
 export interface GetTicketHistoryResponse {

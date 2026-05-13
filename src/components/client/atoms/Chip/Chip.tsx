@@ -6,9 +6,10 @@ import classNames from "classnames";
 export const Chip = ({ 
     label, 
     variant = "default", 
-    state = "assigned", 
+    state = "ingresado", 
     className 
 }: ChipProps) => {
+    console.log("state", state);
     return (
         <div className={classNames(styles.chip, styles[variant], styles[state], className)}>
             {variant !== 'outlined' && <span className={styles.dot}></span>}

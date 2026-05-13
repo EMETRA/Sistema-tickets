@@ -11,13 +11,16 @@
 export const GET_TICKET_HISTORY_QUERY = `
   query GetTicketHistory($ticketId: ID!) {
     ticketHistory(ticketId: $ticketId) {
+      accion
+      asignado_a
+      fecha
       id
+      status
+      tag
       ticketId
       usuarioId
-      accion
       valorAnterior
       valorNuevo
-      fecha
     }
   }
 `;

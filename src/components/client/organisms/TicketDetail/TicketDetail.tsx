@@ -12,7 +12,7 @@ import { HistoryMessage } from "@/components/client/molecules/HistoryMessage";
 
 import { useAuthStore } from "@/store/useAuthStore";
 
-import { useAddTagToTicket, useGetTicketById, useGetTicketTagCatalog, useGetTicketTags, useRemoveTagFromTicket } from "@/api/hooks";
+import { useAddTagToTicket, useGetTicketById, useGetTicketTagCatalog, useGetTicketTags, useRemoveTagFromTicket, useUpdateTicket } from "@/api/hooks";
 import { useGetTicketAttachments } from "@/api/hooks";
 
 import styles from "./TicketDetail.module.scss";
@@ -28,14 +28,17 @@ const COLOR_MAP: Record<string, string> = {
     AMARILLO: "#FDD835",
 };
 
-const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, isOpen, onClose }) => {
+const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, isOpen, onClose, onTicketUpdated }) => {
     const role = useAuthStore((state) => state.getRole());
+    const { updateTicket, loading: isUpdating } = useUpdateTicket();
     const { data: ticketData, loading: isTicketLoading } = useGetTicketById(ticketId);
     const { data: ticketAttachments, loading: isTicketAttachmentsLoading } = useGetTicketAttachments(ticketId);
     const { data: ticketTags, refetch: refetchTags, loading: isTagsLoading } = useGetTicketTags(ticketId);
     const { data: tagCatalog } = useGetTicketTagCatalog();
     const { addTag } = useAddTagToTicket();
     const { removeTag } = useRemoveTagFromTicket();
+
+    console.log("Ticket data:", ticketData);
 
     const labels: LabelOption[] = ticketTags.map(tag => ({
         value: tag.id,
@@ -75,20 +78,38 @@ const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, isOpen, onClose }
         alert("Archivo clickeado: " + fileId);
     }
 
-    const handleOnTicketCancel = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const handleOnTicketCancel = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
-        alert("Cancelar ticket");
-    }
+        try {
+            await updateTicket(ticketId, { estadoId: 4 });
+            onTicketUpdated?.();
+            onClose();
+        } catch (err) {
+            console.error("Error cancelando ticket:", err);
+        }
+    };
 
-    const handleOnTicketProcess = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const handleOnTicketProcess = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
-        alert("Poner ticket en proceso");
-    }
+        try {
+            await updateTicket(ticketId, { estadoId: 3 }); // En trabajo
+            onTicketUpdated?.();
+            onClose();
+        } catch (err) {
+            console.error("Error poniendo ticket en proceso:", err);
+        }
+    };
 
-    const handleOnTicketFinish = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const handleOnTicketFinish = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
-        alert("Finalizar ticket");
-    }
+        try {
+            await updateTicket(ticketId, { estadoId: 5 }); // Completado
+            onTicketUpdated?.();
+            onClose();
+        } catch (err) {
+            console.error("Error finalizando ticket:", err);
+        }
+    };
 
     return (
         <PopOver isOpen={isOpen} onClose={onClose} position="center" className={styles.popOver}>
@@ -105,7 +126,7 @@ const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, isOpen, onClose }
                 <div className={role === "USUARIO" ? styles.contentFullWidth : styles.content}>
                     <div className={styles.ticketDetails}>
                         {isTicketLoading ? (
-                            <p>Cargando detalles del ticket...</p>
+                            <div>Cargando detalles del ticket...</div>
                         ) : ticketData ? (
                             <div className={styles.ticketInfo}>
                                 <div className={styles.ticketTitleInfo}>
@@ -152,20 +173,43 @@ const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, isOpen, onClose }
                             )}
                             <HistoryMessage ticketId={ticketId} />
                             <div className={styles.ticketActions}>
-                                {ticketData.estadoNombre.toLowerCase() !== "cancelado" && ticketData.estadoNombre.toLowerCase() !== "completado" ? (
-                                    <Button variant="contained" color="danger" onClick={handleOnTicketCancel} fullWidth>
-                                        Cancelar
+                                {ticketData.estadoNombre.toLowerCase() !== "asignado" && ticketData.estadoNombre.toLowerCase() !== "completado" && ticketData.estadoNombre.toLowerCase() !== "cancelado" ? (
+                                    <Button
+                                        variant="contained"
+                                        color="danger"
+                                        onClick={handleOnTicketCancel}
+                                        fullWidth
+                                        state={isUpdating ? "loading" : "default"}
+                                    >
+                                        {isUpdating ? "Cancelando..." : "Cancelado"}
                                     </Button>
                                 ) : null}
-                                {ticketData.estadoNombre.toLowerCase() === "creado" || ticketData.estadoNombre.toLowerCase() === "asignados" ? (
-                                    <Button variant="contained" color="default" onClick={handleOnTicketProcess} fullWidth>
-                                        En Proceso
+
+                                {ticketData.estadoNombre.toLowerCase() === "creado" || ticketData.estadoNombre.toLowerCase() === "asignado" ? (
+                                    <Button
+                                        variant="contained"
+                                        color="default"
+                                        onClick={handleOnTicketProcess}
+                                        fullWidth
+                                        state={isUpdating ? "loading" : "default"}
+                                    >
+                                        {isUpdating ? "Actualizando..." : "En Proceso"}
                                     </Button>
                                 ) : ticketData.estadoNombre.toLowerCase() === "en trabajo" ? (
-                                    <Button variant="contained" color="default" onClick={handleOnTicketFinish} fullWidth>
-                                        Finalizado
+                                    <Button
+                                        variant="contained"
+                                        color="default"
+                                        onClick={handleOnTicketFinish}
+                                        fullWidth
+                                        state={isUpdating ? "loading" : "default"}
+                                    >
+                                        {isUpdating ? "Finalizando..." : "Finalizado"}
                                     </Button>
-                                ) : <Text variant="body" className={styles.noActionsText}>No hay acciones disponibles</Text>}
+                                ) : (
+                                    <Text variant="body" className={styles.noActionsText}>
+                                        No hay acciones disponibles
+                                    </Text>
+                                )}
                             </div>
                         </div>
                     )}

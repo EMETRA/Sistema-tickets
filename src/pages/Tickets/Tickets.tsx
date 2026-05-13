@@ -144,6 +144,7 @@ const Tickets: React.FC = () => {
                 onAssign={handleAssignTicket}
                 onDelete={handleDeleteTicket}
                 onExport={() => console.log("Exportar tickets")}
+                onTicketUpdated={refetchTickets}
             />
         </div>
     );

@@ -46,6 +46,28 @@ const COLOR_GRADIENTS = {
     ],
 };
 
+const CustomXAxisTick = ({ x, y, payload }: { x?: number; y?: number; payload?: { value: string } }) => {
+    const MAX_LENGTH = 11;
+    const label = payload?.value ?? "";
+    const truncated = label.length > MAX_LENGTH ? `${label.slice(0, MAX_LENGTH)}...` : label;
+
+    return (
+        <g transform={`translate(${x},${y})`}>
+            <text
+                x={0}
+                y={0}
+                dy={16}
+                textAnchor="middle"
+                fill="#262626"
+                fontSize={12}
+            >
+                <title>{label}</title>
+                {truncated}
+            </text>
+        </g>
+    );
+};
+
 /**
  * Componente de gráfica de barras
  *
@@ -127,7 +149,7 @@ export const BarChart: React.FC<BarChartProps> = ({
                     />
                     <XAxis
                         dataKey="label"
-                        tick={{ fill: "#262626", fontSize: 12 }}
+                        tick={<CustomXAxisTick />}
                         angle={verticalLabels ? -90 : 0}
                         textAnchor={verticalLabels ? "end" : "middle"}
                         height={verticalLabels ? 100 : 50}

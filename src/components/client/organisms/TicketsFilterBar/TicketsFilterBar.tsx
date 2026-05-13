@@ -28,15 +28,18 @@ export const TicketsFilterBar: React.FC<TicketsFilterBarProps> = ({
     const filterByRole = (options: TicketsFilterBarProps["filterOptions"]): TicketsFilterBarProps["filterOptions"] => {
         const role = getRole();
 
+        console.log("Role del usuario:", role);
+
         if (role === "ADMINISTRADOR") {
             return options; // Sin filtrar para ADMINISTRADOR
         }
 
-        if (role === "TECNICO") {
-            return options.filter(option => option.value === "assigned" || option.value === "resolved" || option.value === "canceled") || []; // Solo "Asignados", "Finalizados" y "Cancelados" para TECNICO
+        if (role === "TECNICO" || role === "DESARROLLADOR") {
+            console.log("Filtrando opciones para TECNICO/DESARROLLADOR");
+            return options.filter(option => option.value === "asignado" || option.value === "completado" || option.value === "cancelado") || []; // Solo "Asignados", "Finalizados" y "Cancelados" para TECNICO y DESARROLLADOR
         }
 
-        return options.filter(option => option.value === "canceled") || []; // Solo "Asignados" para USUARIO
+        return options.filter(option => option.value === "cancelado") || []; // Solo "Asignados" para USUARIO
     }
 
     return (

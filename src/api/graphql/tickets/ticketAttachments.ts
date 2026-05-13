@@ -11,12 +11,13 @@
 export const GET_TICKET_ATTACHMENTS_QUERY = `
   query GetTicketAttachments($ticketId: ID!) {
     ticketAttachments(ticketId: $ticketId) {
-      id
-      ticketId
-      usuarioId
-      nombreArchivo
-      keyStorage
       fecha
+      id
+      keyStorage
+      nombreArchivo
+      ticketId
+      url_descarga
+      usuarioId
     }
   }
 `;

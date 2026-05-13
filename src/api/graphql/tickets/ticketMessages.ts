@@ -18,9 +18,11 @@ export const GET_TICKET_MESSAGES_QUERY = `
         keyStorage
         nombreArchivo
         ticketId
+        url_descarga
         usuarioId
       }
       fechaEnvio
+      nombre_usuario
       textoMensaje
       usuario
     }

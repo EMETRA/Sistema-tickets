@@ -74,8 +74,8 @@ const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, isOpen, onClose, 
         }
     };
 
-    const handleOnFileClick = (fileId: string) => {
-        alert("Archivo clickeado: " + fileId);
+    const handleOnFileClick = (url_descarga: string) => {
+        window.open(url_descarga, "_blank");
     }
 
     const handleOnTicketCancel = async (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -148,7 +148,7 @@ const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, isOpen, onClose, 
                                                 key={file.id}
                                                 id={file.id}
                                                 name={file.nombreArchivo || "Archivo adjunto"}
-                                                onClick={(id) => handleOnFileClick(id)}
+                                                onClick={() => handleOnFileClick(file.url_descarga || "")}
                                                 variant="outlined"
                                             />
                                         )))}

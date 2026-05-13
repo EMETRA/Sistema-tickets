@@ -90,6 +90,7 @@ export interface TicketChatMessage {
   fechaEnvio: string;
   textoMensaje: string;
   usuario: number;
+  nombre_usuario: string;
 }
 
 export interface GetTicketMessagesResponse {
@@ -127,6 +128,7 @@ export interface TicketAdjunto {
   usuarioId: number;
   nombreArchivo: string | null;
   keyStorage: string | null;
+  url_descarga: string | null;
   fecha: string;
 }
 

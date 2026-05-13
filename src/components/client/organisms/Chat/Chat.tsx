@@ -24,8 +24,8 @@ const Chat: React.FC<ChatProps> = ({ ticketId, classname }) => {
         }
     }, [ticketMessages]);
 
-    const onFileClick = (fileId: string) => {
-        alert("Archivo clickeado: " + fileId);
+    const onFileClick = (url_descarga: string) => {
+        window.open(url_descarga, "_blank");
     }
 
     const handleSendMessage = async (message: string, files: File[]) => {
@@ -62,12 +62,12 @@ const Chat: React.FC<ChatProps> = ({ ticketId, classname }) => {
                                 message.archivos.map((archivo) => ({
                                     id: archivo.id,
                                     name: archivo.nombreArchivo || "Archivo adjunto",
-                                    onClick: onFileClick
+                                    onClick: () => onFileClick(archivo.url_descarga || "")
                                 }))
                             }
                             timestamp={message.fechaEnvio}
-                            userName="usuario"
-                            avatarProps={{ initials: "US" }}
+                            userName={message.nombre_usuario}
+                            avatarProps={{ initials: message.nombre_usuario.charAt(0).toUpperCase() + (message.nombre_usuario.split(" ")[1]?.charAt(0).toUpperCase() || "") }}
                         />
                     ))
                 )}

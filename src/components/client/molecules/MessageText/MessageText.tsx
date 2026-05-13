@@ -16,12 +16,6 @@ const MessageText: React.FC<MessageTextProps> = ({
     files,
     className
 }) => {
-
-    const handleFileClick = (fileId: string) => {
-        // Implement file click handling logic here
-        alert("File clicked:" + fileId);
-    }
-
     const timestampConverter = (timestamp: string) => {
         // Si la fecha es de hoy, colocar "Hoy, HH:mm"; ayera, colocar "Ayer, HH:mm"; si es de hace más de un día, colocar "DD/MM/YYYY, HH:mm"
         const now = new Date();
@@ -51,7 +45,7 @@ const MessageText: React.FC<MessageTextProps> = ({
                 {files && (
                     <div className={styles.filesContainer}>
                         {files.map((file, index) => (
-                            <File key={index} {...file} onClick={handleFileClick} />
+                            <File key={index} {...file} onClick={file.onClick} />
                         ))}
                     </div>
                 )}

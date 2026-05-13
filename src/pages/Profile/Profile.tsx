@@ -8,14 +8,17 @@ import { MaintenanceRecordPanel } from "@/components/client/organisms/Maintenanc
 import { EquipmentReportPanel } from "@/components/client/organisms/EquipmentReportPanel";
 
 import styles from "./Profile.module.scss";
+import { useGetUserById } from "@/api/hooks";
 
 interface ProfileProps {
     userId?: string; // 👈 ID opcional para ver otros perfiles
 }
 
 export default function Profile({ userId }: ProfileProps) {
+    console.log("Renderizando Profile con userId:", userId);
     // Estado para controlar la conmutación de vistas
     const [view, setView] = useState<"perfil" | "mantenimiento">("perfil");
+    const { data: userData } = useGetUserById(Number(userId));
 
     // Lógica de carga (Placeholder para GraphQL)
     useEffect(() => {
@@ -58,8 +61,8 @@ export default function Profile({ userId }: ProfileProps) {
             <ProfileHeader 
                 bannerSrc="/images/city.png"
                 initials={mockData.user.initials}
-                name={mockData.user.name}
-                role={mockData.user.role}
+                name={userData?.nombre || "Sin nombre"}
+                role={userData?.rol || "Sin rol"}
                 switchOptions={[
                     { label: 'Perfil', value: 'perfil' },
                     { label: 'Mantenimiento', value: 'mantenimiento' }
@@ -71,10 +74,10 @@ export default function Profile({ userId }: ProfileProps) {
             <div className={styles.content}>
                 {view === "perfil" ? (
                     <div className={styles.viewLayout}>
-                        <UserInfoPanel 
+                        {/* <UserInfoPanel 
                             locations={mockData.user.locations}
                             vacationDays={mockData.user.vacationDays}
-                        />
+                        /> */}
                         <UserPerformance 
                             enteredTickets={mockData.user.stats.entered}
                             solvedTickets={mockData.user.stats.solved}

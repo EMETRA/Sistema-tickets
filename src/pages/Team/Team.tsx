@@ -1,39 +1,48 @@
 "use client"
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { FilterUsersBar } from "@/components/client/organisms/FilterUsersBar";
 import style from "./Team.module.scss";
 import { UsersGrid } from "@/components/client/organisms/UsersGrid";
 import { UserCardProps } from "@/components/client/molecules/UserCard";
 import { useState } from "react";
 import { useGetTeamMembers } from "@/api/hooks";
+import { useAuthStore } from "@/store/useAuthStore";
+import { useGetDepartments } from "@/api/hooks/useGetDepartments";
 
 const Team: React.FC = () => {
-
     const [cat, setCat] = useState("todos");
     const [search, setSearch] = useState("");
 
-    // Hook para obtener miembros del equipo
-    const { data: teamMembers, loading: loadingMembers, error: errorMembers, refetch: refetchTeamMembers } = useGetTeamMembers();
+    const userDepartamento = useAuthStore((state) => state.user?.departamento);
+    const { data: departments, loading: loadingDepartments } = useGetDepartments();
 
-    const hasRunOnce = useRef(false);
+    const userDepartmentId = useMemo(() => {
+        if (!userDepartamento || !departments.length) return undefined;
+        const match = departments.find(
+            d => d.nombre_departamento.toLowerCase() === userDepartamento.toLowerCase()
+        );
+        return match ? parseInt(match.id_departamento, 10) : undefined;
+    }, [userDepartamento, departments]);
 
-    useEffect(() => {
-        if (!hasRunOnce.current) {
-            hasRunOnce.current = true;
-            refetchTeamMembers();
-        }
-    }, [refetchTeamMembers]);
+    const isReady = !loadingDepartments && userDepartmentId !== undefined;
 
-    // Derivar estados de carga y error
-    const isLoading = loadingMembers;
+    const { data: teamMembers, loading: isLoading, error: errorMembers } = useGetTeamMembers(
+        { id_departamento: userDepartmentId },
+        isReady
+    );
+
+    if (loadingDepartments || isLoading) {
+        return <div className={style.mainContainer}>Cargando usuarios...</div>;
+    }
+
+
     const error = errorMembers ? "No fue posible cargar los usuarios" : "";
 
-    // Transformar TeamMemberRow[] a UserCardProps[]
     const users: UserCardProps[] = teamMembers?.map(member => ({
         id: member.id_usuario.toString(),
         name: member.nombre || "Sin nombre",
-        email: "Sin email", // no viene del backend
+        email: "Sin email",
         role: member.rol || "Sin rol",
         department: member.departamento || "Sin departamento",
         assignedCount: member.tickets_asignados,
@@ -41,19 +50,18 @@ const Team: React.FC = () => {
     })) || [];
 
     const filteredUsers = users.filter((user) => {
-        
-        const matchesCategory = 
+        const matchesCategory =
             cat === "todos" ||
             (cat === "tecnicos" && user.role.toLowerCase().includes("tecnico")) ||
             (cat === "desarrolladores" && user.role.toLowerCase().includes("desarrollador"));
 
-        const matchesSearch = 
+        const matchesSearch =
             user.name.toLowerCase().includes(search.toLowerCase()) ||
             user.email.toLowerCase().includes(search.toLowerCase());
 
         return matchesCategory && matchesSearch;
-
     });
+
 
     if (isLoading) {
         return <div className={style.mainContainer}>Cargando usuarios...</div>
@@ -73,11 +81,11 @@ const Team: React.FC = () => {
                     onSearchSubmit={() => {}}
                     selectedCategory={cat}
                     onCategoryChange={setCat}
-                    categories={[
-                        { label: "Todos", value: "todos" },
-                        { label: "Técnicos", value: "tecnicos" },
-                        { label: "Desarrolladores", value: "desarrolladores" }
-                    ]}
+                    // categories={[
+                    //     { label: "Todos", value: "todos" },
+                    //     { label: "Técnicos", value: "tecnicos" },
+                    //     { label: "Desarrolladores", value: "desarrolladores" }
+                    // ]}
                     disabled={isLoading || !!error || users.length === 0}
                 />
                 <div className={style.users}>

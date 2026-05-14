@@ -141,7 +141,7 @@ const AdminHome: React.FC = () => {
                 avatarInitials: ticket.creador ? ticket.creador.charAt(0) : "U",
                 assigned: !!ticket.asignado,
                 type: ticket.categoria || "Normal",
-                status: ticket.estado.toLowerCase() as ChipState,
+                status: ticket.estado.toLowerCase() === "en trabajo" ? "en_trabajo" as ChipState : ticket.estado.toLowerCase() as ChipState,
                 statusLabel: ticket.estado,
                 dateIngress: new Date(ticket.fecha_creacion),
             };

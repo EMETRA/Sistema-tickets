@@ -51,10 +51,10 @@ const TechHome: React.FC = () => {
     // Transformar datos de estadísticas
     const statisticInfo = technicianStatsData
         ? {
-            percentage: Math.round((technicianStatsData.resueltos / technicianStatsData.tickets) * 100),
-            resolvedTickets: technicianStatsData.resueltos,
-            assignedTickets: technicianStatsData.asignados,
-            inProgressTickets: technicianStatsData.pendientes,
+            percentage: Math.round((technicianTicketsData.filter(ticket => ticket.estado && ticket.estado.toLowerCase() === "completado").length / technicianTicketsData.length) * 100),
+            resolvedTickets: technicianTicketsData.filter(ticket => ticket.estado && ticket.estado.toLowerCase() === "completado").length,
+            assignedTickets: technicianTicketsData.filter(ticket => ticket.estado && ticket.estado.toLowerCase() === "asignado").length,
+            inProgressTickets: technicianTicketsData.filter(ticket => ticket.estado && ticket.estado.toLowerCase() === "en trabajo").length,
         }
         : {
             percentage: 0,

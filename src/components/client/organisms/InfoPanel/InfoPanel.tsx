@@ -43,7 +43,6 @@ export const InfoPanel: React.FC<InfoPanelProps> = ({
 
     // Limitar a máximo 10 items
     const limitedItems = items.slice(0, 10);
-    console.log("InfoPanel items:", items);
 
     return (
         <div className={classNames(styles.InfoPanel, className)}>

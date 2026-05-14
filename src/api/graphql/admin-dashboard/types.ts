@@ -68,6 +68,8 @@ export interface TeamMemberRow {
   tickets_asignados: number;
   tickets_resueltos: number;
   tickets_pendientes: number;
+  avatar: string | null;
+  email: string | null;
 }
 
 export interface GetTeamMembersResponse {

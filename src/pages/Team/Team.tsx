@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useMemo } from "react";
 import { FilterUsersBar } from "@/components/client/organisms/FilterUsersBar";
 import style from "./Team.module.scss";
 import { UsersGrid } from "@/components/client/organisms/UsersGrid";

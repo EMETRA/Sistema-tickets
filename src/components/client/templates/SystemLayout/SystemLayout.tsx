@@ -17,7 +17,6 @@ export const SystemLayout = ({ children, className }: { children: React.ReactNod
     const user = useAuthStore((state) => state.user);
 
     const currentRole = getRole();
-    console.log("Current role in SystemLayout:", currentRole);
 
     // Buscamos la metadata de la página actual para el TopBar
     const activePage = useMemo(() => {

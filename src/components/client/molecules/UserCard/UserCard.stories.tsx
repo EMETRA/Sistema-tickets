@@ -75,6 +75,7 @@ export const WithAvatar: Story = {
         status: "online",
         assignedCount: 25,
         resolvedCount: 18,
+        
     },
 };
 

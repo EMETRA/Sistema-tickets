@@ -126,7 +126,7 @@ export const UserCard: React.FC<UserCardProps & { id: string }> = ({
 
             {/* Estadísticas */}
             <div className={styles.stats}>
-                {(assignedCount === 0 && resolvedCount === 0) && (
+                {(role === "USUARIO") && (
                     <div className={styles.statsCover} />
                 )}
                 <StatInLine

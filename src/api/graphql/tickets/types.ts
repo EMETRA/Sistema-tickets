@@ -17,7 +17,7 @@ export interface TicketUser {
   avatar: string | null;
   nombre: string;
   id: string;
-  department?: string;
+  department: string | null;
 }
 
 /**

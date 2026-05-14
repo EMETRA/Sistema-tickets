@@ -105,7 +105,7 @@ const Tickets: React.FC = () => {
                 id: ticket.usuarioCreadorId,
                 name: ticket.creador.nombre,
                 email: "email@example.com",
-                department: "Departamento", // ticket.creador.department
+                department: ticket.creador.department || "Sin departamento",
                 initials: ticket.creador.nombre.charAt(0) + (ticket.creador.nombre.split(" ")[1]?.charAt(0) || ""),
                 avatar: ticket.creador.avatar,
             },

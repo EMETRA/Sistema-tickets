@@ -40,16 +40,6 @@ export const ModalUserSelect = ({
         }
     }, [getUserId]);
 
-    // Auto-ejecutar refetch al montar el componente (solo una vez)
-    const hasRunOnce = useRef(false);
-
-    useEffect(() => {
-        if (!hasRunOnce.current) {
-            hasRunOnce.current = true;
-            refetchUsers();
-        }
-    }, [refetchUsers]);
-
     useEffect(() => {
         if (!isOpen) {
             return;

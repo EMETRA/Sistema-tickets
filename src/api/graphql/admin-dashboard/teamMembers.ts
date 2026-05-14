@@ -2,8 +2,10 @@ import { gql } from 'graphql-request';
 import { GetTeamMembersResponse } from './types';
 
 export const GET_TEAM_MEMBERS_QUERY = gql`
-  query teamMembers($id_departamento: Int, $id_rol: Int, $search: String, $limit: Int) {
-    teamMembers(id_departamento: $id_departamento, id_rol: $id_rol, search: $search, limit: $limit) {
+  query TeamMembers($idDepartamento: Int, $idRol: Int, $limit: Int, $search: String) {
+    teamMembers(id_departamento: $idDepartamento, id_rol: $idRol, limit: $limit, search: $search) {
+      email
+      avatar
       id_usuario
       nombre
       departamento

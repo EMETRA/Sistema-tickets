@@ -15,6 +15,7 @@ export const GET_TICKETS_QUERY = `
       asignado {
         avatar
         nombre
+        departamento
       }
       categoriaId
       categoriaNombre
@@ -22,6 +23,7 @@ export const GET_TICKETS_QUERY = `
       creador {
         avatar
         nombre
+        departamento
       }
       descripcion
       estadoId

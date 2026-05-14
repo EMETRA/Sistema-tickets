@@ -13,7 +13,6 @@ export function useGetTeamMembers(filters?: TeamsFiltersOptions, enabled = true)
     const [data, setData] = useState<TeamMemberRow[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
-    console.log("useGetTeamMembers called with filters:", filters, "enabled:", enabled);
 
     const refetch = useCallback(async () => {
         setLoading(true);
@@ -26,9 +25,10 @@ export function useGetTeamMembers(filters?: TeamsFiltersOptions, enabled = true)
             if (filters?.limit) params.append('limit', String(filters.limit));
 
             const url = `/api/admin-dashboard/team-members${params.toString() ? `?${params.toString()}` : ''}`;
-            const response = await apiFetch(url) as unknown as TeamMemberRow[];
-            console.log("Response from /api/admin-dashboard/team-members:", response);
-            setData(response || []);
+            
+            const response = await apiFetch(url);
+            const teamMembersArray = Array.isArray(response) ? response : (response as unknown as { teamMembers?: TeamMemberRow[] })?.teamMembers || [];
+            setData(teamMembersArray || []);
         } catch (err) {
             const error = err instanceof Error ? err : new Error(String(err));
             setError(error);

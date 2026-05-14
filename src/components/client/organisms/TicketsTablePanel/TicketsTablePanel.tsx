@@ -235,7 +235,7 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
             },
         ] as TableCellConfig[];
 
-        const techCells = [
+        const techDevCells = [
             {
                 content: (
                     <div className={styles.userMenu}>
@@ -260,6 +260,20 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
             { content: <Text variant="muted">{ticket.date}</Text> },
             {
                 content: <Chip label={ticket.status.label} state={ticket.status.state} />,
+                align: "center",
+            },
+            {
+                content: (
+                    <div className={styles.actions}>
+                        <IconButton
+                            icon="eye"
+                            size={24}
+                            iconColor="#BDBDBD"
+                            disabled={!!pendingCancellation || isAssigning}
+                            onClick={() => setSelectedTicketId(ticket.id)}
+                        />
+                    </div>
+                ),
                 align: "center",
             },
         ] as TableCellConfig[];
@@ -330,7 +344,7 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
             },
         ] as TableCellConfig[];
 
-        const cells = getRole() === "ADMINISTRADOR" ? adminCells : getRole() === "TECNICO" ? techCells : userCells;
+        const cells = getRole() === "ADMINISTRADOR" ? adminCells : getRole() === "TECNICO" || getRole() === "DESARROLLADOR" ? techDevCells : userCells;
 
         return (
             <TableRow

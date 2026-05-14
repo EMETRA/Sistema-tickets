@@ -257,7 +257,7 @@ export async function apiFetch<TData extends Record<string, unknown> = Record<st
 
         // Obtener token de Zustand
         const { useAuthStore } = await import('@/store/useAuthStore');
-        const token = useAuthStore.getState().token || sentToken;
+        const token = sentToken || useAuthStore.getState().token;
 
         // Preparar headers con token si está disponible
         const headers = new Headers(options?.headers || {});

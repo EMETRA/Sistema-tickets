@@ -81,7 +81,7 @@ const TechHome: React.FC = () => {
                 avatarInitials: userData?.nombre ? userData.nombre.charAt(0) : "U",
                 assigned: true,
                 type: ticket.prioridad || "Normal",
-                status: ticket.estado ? ticket.estado.toLowerCase() as ChipState : "ingresado",
+                status: ticket.estado ? (ticket.estado.toLowerCase() === "en trabajo" ? "en_trabajo" as ChipState : ticket.estado.toLowerCase() as ChipState) : "ingresado" as ChipState,
                 statusLabel: ticket.estado || "Ingresado",
                 dateIngress: new Date(ticket.fecha_creacion),
             };

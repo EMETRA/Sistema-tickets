@@ -51,7 +51,7 @@ export const ModalUserSelect = ({
 
         const debounceId = setTimeout(() => {
             const normalized = searchTerm.trim().toLowerCase();
-            const techUsers = usersList.filter(user => user.rol === "TECNICO");
+            const techUsers = usersList.filter(user => user.rol === "TECNICO" || user.rol === "DESARROLLADOR");
             const filtered = normalized
                 ? techUsers.filter((u) =>
                     u.name.toLowerCase().includes(normalized) || u.email.toLowerCase().includes(normalized)

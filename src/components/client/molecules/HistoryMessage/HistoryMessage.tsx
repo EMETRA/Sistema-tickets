@@ -79,10 +79,10 @@ const HistoryMessage: React.FC<HistoryMessageProps> = ({ ticketId, className }) 
             <div className={styles.textContainer}>
                 <Text className={styles.user}>{item.usuarioId} </Text>
                 <Text className={styles.action}>{actionText(item.accion)} </Text>
-                {item.tag && <Text className={styles.tag}><Text className={styles.tagName}>{item.tag}</Text> a el ticket</Text>}
+                {item.tag && <div className={styles.tag}><Text className={styles.tagName}>{item.tag}</Text> a el ticket</div>}
                 <Text className={styles.ticket}> #{item.ticketId}</Text>
-                {item.status && <Text className={styles.status}>, en estado de <Text className={styles.statusName}>{item.status}</Text></Text>}
-                {item.asignado_a && <Text className={styles.assignedTo}> a <Text className={styles.assignedToName}>{item.asignado_a}</Text></Text>}
+                {item.status && <div className={styles.status}>, en estado de <Text className={styles.statusName}>{item.status}</Text></div>}
+                {item.asignado_a && <div className={styles.assignedTo}> a <Text className={styles.assignedToName}>{item.asignado_a}</Text></div>}
             </div>
         );
     };

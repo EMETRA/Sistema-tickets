@@ -137,9 +137,9 @@ const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, isOpen, onClose, 
                                 </div>
                                 <div className={styles.ticketInfoFiles}>
                                     {isTicketAttachmentsLoading ? (
-                                        <p>Cargando archivos adjuntos...</p>
+                                        <div>Cargando archivos adjuntos...</div>
                                     ) : ticketAttachments.length === 0 ? (
-                                        <p>No hay archivos adjuntos.</p>
+                                        <div>No hay archivos adjuntos.</div>
                                     ) : (
                                         ticketAttachments.map((file) => (
                                             <File
@@ -153,14 +153,14 @@ const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, isOpen, onClose, 
                                 </div>
                             </div>
                         ) : (
-                            <p>No se encontraron detalles para este ticket.</p>
+                            <div>No se encontraron detalles para este ticket.</div>
                         )}
                         <Chat ticketId={ticketId} classname={styles.chat} />
                     </div>
                     {role !== "USUARIO" && ticketData && (
                         <div className={styles.ticketHistory}>
                             {isTagsLoading ? (
-                                <p>Cargando etiquetas...</p>
+                                <div>Cargando etiquetas...</div>
                             ) : (
                                 <LabelChipGroup
                                     role={role}

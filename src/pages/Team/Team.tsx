@@ -96,6 +96,7 @@ const Team: React.FC = () => {
                         pathActive="equipo"
                     />
                 </div>
+                <div className={style.footer} />
             </div>
         </div>
     );

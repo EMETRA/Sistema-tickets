@@ -85,6 +85,7 @@ const Users: React.FC = () => {
                         pathActive="usuarios"
                     />
                 </div>
+                <div className={style.footer} />
             </div>
         </div>
     );

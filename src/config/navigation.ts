@@ -36,7 +36,7 @@ export const ROLE_LAYOUTS: Record<UserRole, string[]> = {
     ],
     TECNICO: [
         "home",
-        "mis_tickets",
+        "tickets",
         "crear_ticket",
         // "planifica",
         "usuarios",

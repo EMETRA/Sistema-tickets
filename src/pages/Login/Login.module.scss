@@ -24,7 +24,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 100px;
+  gap: 20px;
   padding: 100px 0 0 0;
 }
 
@@ -49,6 +49,13 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
+}
+
+.captchaContainer {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 20px 0;
 }
 
 .forgotPasswordLink {

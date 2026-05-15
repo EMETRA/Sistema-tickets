@@ -44,6 +44,9 @@ dependencies:
   react-dom:
     specifier: 19.2.3
     version: 19.2.3(react@19.2.3)
+  react-turnstile:
+    specifier: ^1.1.5
+    version: 1.1.5(react-dom@19.2.3)(react@19.2.3)
   recharts:
     specifier: ^3.7.0
     version: 3.7.0(@types/react@19.2.14)(react-dom@19.2.3)(react-is@17.0.2)(react@19.2.3)(redux@5.0.1)
@@ -4779,6 +4782,16 @@ packages:
       react: 19.2.3
       redux: 5.0.1
       use-sync-external-store: 1.6.0(react@19.2.3)
+    dev: false
+
+  /react-turnstile@1.1.5(react-dom@19.2.3)(react@19.2.3):
+    resolution: {integrity: sha512-VTL5OeHAatzCEVQxAZox70/TPmhKxEbNgtr++dg+8zm9QrWKuoU9E0+7gqmycOSCDZuJFzvMMLKQb5PVUPLV6w==}
+    peerDependencies:
+      react: '>= 16.13.1'
+      react-dom: '>= 16.13.1'
+    dependencies:
+      react: 19.2.3
+      react-dom: 19.2.3(react@19.2.3)
     dev: false
 
   /react@19.2.3:

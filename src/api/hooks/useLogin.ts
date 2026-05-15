@@ -44,10 +44,15 @@ export function useLogin() {
      * Función para hacer login
      * @param email Email del usuario
      * @param clave Contraseña
+     * @param captchaToken Token del captcha de Turnstile (opcional)
      * @returns Promesa con el resultado del login (token, refresh_token, expires_in)
      * @throws Error si hay problema en el login
      */
-    const login = useCallback(async (email: string, clave: string): Promise<LoginResponse | null> => {
+    const login = useCallback(async (
+        email: string,
+        clave: string,
+        captchaToken?: string
+    ): Promise<LoginResponse | null> => {
         setState({ loading: true, error: null, success: false });
 
         // 👇 Validate before try/catch, set error and return null directly
@@ -63,6 +68,11 @@ export function useLogin() {
 
         if (clave.trim().length === 0) {
             setState({ loading: false, error: 'Contraseña no puede estar vacía', success: false });
+            return null;
+        }
+
+        if (!captchaToken) {
+            setState({ loading: false, error: 'Por favor, completa el captcha', success: false });
             return null;
         }
 

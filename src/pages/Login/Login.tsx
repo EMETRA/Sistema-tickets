@@ -9,6 +9,7 @@ import { Input } from "@/components/client/atoms/Input";
 import { Button } from "@/components/client/atoms/Button";
 import { Link } from "@/components/client/atoms/Link";
 import { Image } from "@/components/client/atoms/Image";
+import { Turnstile } from "@/components/client/atoms/Turnstile/Turnstile";
 import { useLogin } from "@/api/hooks/useLogin";
 import { useAuthStore } from "@/store/useAuthStore";
 import { apiFetch } from "@/api/graphql/client";
@@ -23,6 +24,7 @@ const Login: React.FC = () => {
     const [email, setEmail] = useState("");
     const [clave, setClave] = useState("");
     const [error, setError] = useState<string | null>(null);
+    const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
     /**
      * Obtener información del usuario desde el backend
@@ -45,7 +47,12 @@ const Login: React.FC = () => {
         setError(null);
 
         try {
-            const response = await login(email, clave);
+            if (!captchaToken) {
+                setError("Por favor, completa el captcha para continuar.");
+                return;
+            }
+
+            const response = await login(email, clave, captchaToken ?? undefined);
 
             if (!response) {
                 setError("Ocurrió un error. Intenta nuevamente.");
@@ -61,7 +68,6 @@ const Login: React.FC = () => {
                 return;
             }
 
-            console.log("Información del usuario obtenida:", userInfo);
             const userRole = userInfo.rol || "USUARIO";
             const normalizedUser: UsuarioPerfil = {
                 ...userInfo,
@@ -75,6 +81,7 @@ const Login: React.FC = () => {
             console.error("Error en login:", err);
             setError("Error al iniciar sesión. Verifica tus credenciales.");
             setClave("");
+            setCaptchaToken(null);
         }
     };
 
@@ -114,6 +121,17 @@ const Login: React.FC = () => {
                             <Link href="/forgot-password" className={styles.forgotPasswordLink}>
                                 ¿Olvidaste tu contraseña?
                             </Link>
+                            <div className={styles.captchaContainer}>
+                                <Turnstile
+                                    onSuccess={(token) => setCaptchaToken(token)}
+                                    onError={() => {
+                                        setCaptchaToken(null);
+                                        setError("Error al validar el captcha. Por favor, intenta de nuevo.");
+                                    }}
+                                    onExpire={() => setCaptchaToken(null)}
+                                    disabled={loading}
+                                />
+                            </div>
                             {(loginError || error) && (
                                 <Text variant="caption" className={styles.errorText}>
                                     {error || loginError}

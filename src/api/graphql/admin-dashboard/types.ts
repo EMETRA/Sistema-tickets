@@ -39,6 +39,7 @@ export interface UserPerformanceFilters {
   fecha_fin?: string | null;
   id_departamento?: number | null;
   id_usuario?: number | null;
+  periodo: "ANUAL" | "MENSUAL" | "SEMANAL" | "HOY";
 }
 
 export interface UserPerformanceRow {
@@ -49,6 +50,12 @@ export interface UserPerformanceRow {
   tickets_asignados: number;
   tickets_resueltos: number;
   porcentaje_efectividad: number;
+}
+
+export interface listaUsuarios {
+  avatar: string | null;
+  tickets: number;
+  usuario: string;
 }
 
 export interface UserPerformanceResponse {
@@ -75,7 +82,6 @@ export interface TeamMemberRow {
 export interface GetTeamMembersResponse {
   teamMembers: TeamMemberRow[];
 }
-
 export interface TicketSummaryRow {
   id_ticket: number;
   codigo?: string | null;

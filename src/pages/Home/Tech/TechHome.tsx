@@ -21,7 +21,8 @@ const TechHome: React.FC = () => {
     // Hooks para obtener datos del API
     const { data: userData, loading: loadingUser, error: errorUser, refetch: refetchUser } = useGetUser();
     const { data: technicianStatsData, loading: loadingStats, error: errorStats, refetch: refetchTechnicianStats } = useGetTechnicianStats();
-    const { data: technicianEventsData, loading: loadingEvents, error: errorEvents, refetch: refetchTechnicianEvents } = useGetTechnicianEvents({ fecha_inicio: new Date().toISOString().split('T')[0] });
+    // fecha_inicio hoy de Guatemala
+    const { data: technicianEventsData, loading: loadingEvents, error: errorEvents, refetch: refetchTechnicianEvents } = useGetTechnicianEvents({ fecha_inicio: new Intl.DateTimeFormat('fr-CA', { timeZone: 'America/Guatemala', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date()) });
     const { data: technicianTicketsData, loading: loadingTickets, error: errorTickets, refetch: refetchTechnicianLastTickets } = useGetTechnicianLastTickets({ limit: 10 });
 
     const hasRunOnce = useRef(false);
@@ -75,7 +76,7 @@ const TechHome: React.FC = () => {
     const sampleTickets: TicketData[] = technicianTicketsData
         ?.map((ticket, index) => {
             return {
-                id: index,
+                id: isNaN(Number(ticket.codigo)) ? index : Number(ticket.codigo),
                 description: ticket.titulo,
                 userName: userData?.nombre || "Usuario",
                 avatarInitials: userData?.nombre ? userData.nombre.charAt(0) : "U",

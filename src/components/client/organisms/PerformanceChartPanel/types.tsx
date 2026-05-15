@@ -9,7 +9,7 @@ export type PerformanceChartVariant = "primary" | "secondary";
 /**
  * Filtros disponibles para la variante primary
  */
-export type PrimaryFilter = "annual" | "monthly" | "weekly" | "today";
+export type PrimaryFilter = "ANUAL" | "MENSUAL" | "SEMANAL" | "HOY";
 
 /**
  * Estructura de filtros para la variante secondary

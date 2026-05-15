@@ -12,6 +12,7 @@ export const GET_LAST_TICKET_QUERY = gql`
       estado
       creador
       asignado
+      fecha_asignacion
       fecha_creacion
     }
   }

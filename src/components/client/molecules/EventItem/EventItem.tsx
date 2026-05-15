@@ -12,7 +12,7 @@ import styles from "./EventItem.module.scss";
  * Formatea la fecha: si es hoy muestra solo hora, sino muestra solo fecha
  */
 const formatDate = (date: Date): string => {
-    const today = new Date();
+    const today = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Guatemala" }));
     const isToday = 
     date.getDate() === today.getDate() &&
     date.getMonth() === today.getMonth() &&
@@ -35,10 +35,10 @@ const formatDate = (date: Date): string => {
 };
 
 /**
- * Calcula los días faltantes desde hoy hasta la fecha objetivo
+ * Calcula los días faltantes desde hoy hasta la fecha objetivo (Fecha de Guatemala)
  */
 const calculateDaysRemaining = (targetDate: Date): number => {
-    const today = new Date();
+    const today = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Guatemala" }));
     today.setHours(0, 0, 0, 0);
   
     const target = new Date(targetDate);

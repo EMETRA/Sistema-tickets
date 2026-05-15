@@ -8,6 +8,7 @@
 export interface LoginInput {
   email: string;
   clave: string;
+  captchaToken?: string;
 }
 
 /**

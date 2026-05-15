@@ -12,10 +12,10 @@ import styles from "./PerformanceChartPanel.module.scss";
  * Opciones de filtro para la variante primary
  */
 const PRIMARY_FILTER_OPTIONS = [
-    { label: "Anual", value: "annual" as PrimaryFilter },
-    { label: "Mensual", value: "monthly" as PrimaryFilter },
-    { label: "Semanal", value: "weekly" as PrimaryFilter },
-    { label: "Hoy", value: "today" as PrimaryFilter },
+    { label: "Anual", value: "ANUAL" as PrimaryFilter },
+    { label: "Mensual", value: "MENSUAL" as PrimaryFilter },
+    { label: "Semanal", value: "SEMANAL" as PrimaryFilter },
+    { label: "Hoy", value: "HOY" as PrimaryFilter },
 ];
 
 /**
@@ -42,7 +42,6 @@ export const PerformanceChartPanel: React.FC<PerformanceChartPanelProps> = (prop
                         variant="primary"
                         options={PRIMARY_FILTER_OPTIONS}
                         value={selectedFilter}
-                        disabled={data.length === 0}
                         onChange={(value) => onFilterChange(value as PrimaryFilter)}
                     />
                 </div>

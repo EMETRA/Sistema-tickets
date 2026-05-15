@@ -13,7 +13,8 @@ import { TicketStatData } from "@/components/client/organisms/DashboardStatsBar"
 import { EventItemProps } from "@/components/client/molecules/EventItem";
 import { TicketData } from "@/components/client/organisms/TicketsPanel";
 import { ChipState } from "@/components/client/atoms/Chip/types";
-import type { PerformanceFilter, PerformancePoint } from "@/api/graphql/queries/getAdminHome";
+import type { PerformancePoint } from "@/api/graphql/queries/getAdminHome";
+import type { PrimaryFilter } from "@/components/client/organisms/PerformanceChartPanel/types";
 import {
     useGetAdminDashboardStats,
     useGetUserPerformance,
@@ -22,73 +23,17 @@ import {
 } from "@/api/hooks";
 
 const AdminHome: React.FC = () => {
-    const [filter, setFilter] = useState<PerformanceFilter>("today");
-
-    const getDateRangeByFilter = (filterType: PerformanceFilter): { fecha_inicio: string; fecha_fin: string } => {
-        const today = new Date();
-        const currentYear = today.getFullYear();
-        const currentMonth = today.getMonth();
-
-        const formatDate = (date: Date): string => date.toISOString().split('T')[0];
-
-        switch (filterType) {
-        case "today":
-            // Hoy a hoy
-            const todayStr = formatDate(today);
-            return { fecha_inicio: todayStr, fecha_fin: todayStr };
-
-        case "weekly":
-            // Últimos 7 días (desde hace 6 días a hoy)
-            const sevenDaysAgo = new Date(today);
-            sevenDaysAgo.setDate(today.getDate() - 6);
-            return {
-                fecha_inicio: formatDate(sevenDaysAgo),
-                fecha_fin: formatDate(today),
-            };
-
-        case "monthly":
-            // Desde el primer día del mes actual a hoy
-            const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
-            return {
-                fecha_inicio: formatDate(firstDayOfMonth),
-                fecha_fin: formatDate(today),
-            };
-
-        case "annual":
-            // Desde el primer día del año actual a hoy
-            const firstDayOfYear = new Date(currentYear, 0, 1);
-            return {
-                fecha_inicio: formatDate(firstDayOfYear),
-                fecha_fin: formatDate(today),
-            };
-
-        default:
-            const defaultDate = formatDate(today);
-            return { fecha_inicio: defaultDate, fecha_fin: defaultDate };
-        }
-    };
-
-    // Calcular las fechas según el filtro actual
-    const dateRange = getDateRangeByFilter(filter);
+    const [filter, setFilter] = useState<PrimaryFilter>("HOY");
 
     const { data: dashboardStats, loading: loadingStats, error: errorStats, refetch: refetchDashboardStats } = useGetAdminDashboardStats();
-    const { data: performanceData, loading: loadingPerformance, error: errorPerformance, refetch: refetchUserPerformance } = useGetUserPerformance({
-        fecha_inicio: dateRange.fecha_inicio,
-        fecha_fin: dateRange.fecha_fin,
-    });
-
-    useEffect(() => {
-        if (performanceData) {
-            console.log("Performance data:", performanceData);
-        }
-    }, [performanceData]);
+    const { data: performanceData, loading: loadingPerformance, error: errorPerformance, refetch: refetchUserPerformance } = useGetUserPerformance({ periodo: filter });
     const { data: lastMovements, loading: loadingMovements, error: errorMovements, refetch: refetchLastMovements } = useGetLastMovements();
     const { data: lastTickets, loading: loadingTickets, error: errorTickets, refetch: refetchLastTickets } = useGetLastTicket();
 
     const hasRunOnce = useRef(false);
 
     useEffect(() => {
-        if (!hasRunOnce.current) {
+        if (!hasRunOnce.current || !refetchUserPerformance || !refetchDashboardStats || !refetchLastMovements || !refetchLastTickets) {
             hasRunOnce.current = true;
             refetchDashboardStats();
             refetchUserPerformance();
@@ -132,6 +77,7 @@ const AdminHome: React.FC = () => {
         })) || [];
 
     // Transformar LastTicket a TicketData[]
+    console.log("Last tickets obtenidos:", lastTickets);
     const sampleTickets: TicketData[] = lastTickets
         ?.map((ticket) => {
             return {

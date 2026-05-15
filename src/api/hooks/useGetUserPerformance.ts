@@ -1,12 +1,14 @@
 import { useState, useCallback, useEffect } from 'react';
 import { apiFetch } from "@/api/graphql/client";
 import { UserPerformanceRow } from '@/api/graphql/admin-dashboard';
+import type { UserPerformanceFilters } from '@/api/graphql/admin-dashboard/types';
 
 export interface UserPerformanceOptions {
-    fecha_inicio?: string;
-    fecha_fin?: string;
-    id_departamento?: number;
-    id_usuario?: number;
+    fechaInicio?: UserPerformanceFilters['fecha_inicio'];
+    fechaFin?: UserPerformanceFilters['fecha_fin'];
+    idDepartamento?: UserPerformanceFilters['id_departamento'];
+    idUsuario?: UserPerformanceFilters['id_usuario'];
+    periodo?: UserPerformanceFilters['periodo'];
 }
 
 export function useGetUserPerformance(options?: UserPerformanceOptions) {
@@ -20,10 +22,11 @@ export function useGetUserPerformance(options?: UserPerformanceOptions) {
         try {
             // Construir query params
             const params = new URLSearchParams();
-            if (options?.fecha_inicio) params.append('fecha_inicio', options.fecha_inicio);
-            if (options?.fecha_fin) params.append('fecha_fin', options.fecha_fin);
-            if (options?.id_departamento) params.append('id_departamento', String(options.id_departamento));
-            if (options?.id_usuario) params.append('id_usuario', String(options.id_usuario));
+            if (options?.fechaInicio) params.append('fecha_inicio', options.fechaInicio);
+            if (options?.fechaFin) params.append('fecha_fin', options.fechaFin);
+            if (options?.idDepartamento) params.append('id_departamento', String(options.idDepartamento));
+            if (options?.idUsuario) params.append('id_usuario', String(options.idUsuario));
+            if (options?.periodo) params.append('periodo', options.periodo);
 
             const url = `/api/admin-dashboard/user-performance${params.toString() ? `?${params.toString()}` : ''}`;
             const response = await apiFetch<{ rows: UserPerformanceRow[] }>(url);
@@ -34,7 +37,7 @@ export function useGetUserPerformance(options?: UserPerformanceOptions) {
         } finally {
             setLoading(false);
         }
-    }, [options?.fecha_inicio, options?.fecha_fin, options?.id_departamento, options?.id_usuario]);
+    }, [options?.fechaInicio, options?.fechaFin, options?.idDepartamento, options?.idUsuario, options?.periodo]);
 
     // Auto-fetch cuando las opciones cambien
     useEffect(() => {

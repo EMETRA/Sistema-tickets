@@ -79,7 +79,7 @@ export function useLogin() {
         try {
             const response = await graphqlRequestClient<{ login: LoginResponse }>(
                 LOGIN_MUTATION,
-                { variables: { input: { email: email.trim().toLowerCase(), clave } as LoginInput } }
+                { variables: { input: { email: email.trim().toLowerCase(), clave, captchaToken } as LoginInput } }
             );
 
             if (!response?.login?.token) {

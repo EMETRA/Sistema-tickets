@@ -32,7 +32,7 @@ export const ROLE_LAYOUTS: Record<UserRole, string[]> = {
         // "historial",
         // "planifica",
         // "reportes", 
-        "estadistica"
+        // "estadistica"
     ],
     TECNICO: [
         "home",

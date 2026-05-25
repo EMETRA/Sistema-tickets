@@ -10,7 +10,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   state?: InputState;
   className?: string;
   errorMessage?: string;
-  type?: "text" | "password" | "file";
+  type?: React.HTMLInputTypeAttribute;
   icon?: React.ReactNode;
   showIconLeft?: boolean;
   iconcolor?: string;

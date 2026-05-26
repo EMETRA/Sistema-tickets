@@ -150,3 +150,11 @@ export const TextWithIconDisabled: Story = {
         icon: <Icon name="settings" variant="action" size={20} />,
     },
 };
+
+export const Date: Story = {
+    args: {
+        type: "date",
+        placeholder: "Selecciona una fecha...",
+        state: "default",
+    },
+};

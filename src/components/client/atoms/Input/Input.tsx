@@ -131,7 +131,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                         )}
                         <input
                             ref={inputRef}
-                            type="text"
+                            type={type}
                             className={inputClasses}
                             disabled={state === "disabled"}
                             {...props}
@@ -155,7 +155,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             <>
                 <input
                     ref={inputRef}
-                    type="text"
+                    type={type}
                     className={inputClasses}
                     disabled={state === "disabled"}
                     {...props}

@@ -27,6 +27,7 @@ export const AppsGrid = ({
                             key={index}
                             {...app}
                             className={styles.card}
+                            iconColor="#000000"
                         />
                     ))
                 )}

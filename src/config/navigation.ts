@@ -10,6 +10,7 @@ export interface PageMetadata {
 // Metadata única de cada página
 export const PAGES_CONFIG: Record<string, PageMetadata> = {
     home: { path: "/home", label: "INICIO", title: "Panel de Inicio", iconName: "house-solid" },
+    "home/proc01": { path: "/home/proc01", label: "PROC01", title: "Proceso de grabación unificada de remisiones de cámara LPR", iconName: "chart-bar-solid" },
     equipo: { path: "/equipo", label: "EQUIPO", title: "Gestión de Personal", iconName: "people-group-solid" },
     usuarios: { path: "/usuarios", label: "USUARIOS", title: "Administración de Usuarios", iconName: "user-solid" },
     tickets: { path: "/tickets", label: "TICKETS", title: "Listado de Tickets", iconName: "ticket-solid" },

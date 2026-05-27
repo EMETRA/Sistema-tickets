@@ -31,7 +31,7 @@ export interface BarChartProps {
    * Ancho de la gráfica en píxeles
    * @default 700
    */
-  width?: number;
+  width?: number | `${number}%` | undefined;
   
   /**
    * Alto de la gráfica en píxeles

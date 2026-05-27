@@ -1,0 +1,25 @@
+.StatusChip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+.verde {
+    background: #2d6a2d;
+    color: #fff;
+}
+
+.amarillo {
+    background: #c9922a;
+    color: #fff;
+}
+
+.rojo {
+    background: #b53a3a;
+    color: #fff;
+}

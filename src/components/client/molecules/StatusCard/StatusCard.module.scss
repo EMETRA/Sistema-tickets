@@ -1,0 +1,39 @@
+.StatusCard {
+    background: #fff;
+    border: 2px solid #e5e5e5;
+    border-radius: 10px;
+    border-top-width: 4px;
+    padding: 2rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.green {
+    border-top-color: #4a7c3f;
+}
+
+.yellow {
+    border-top-color: #c9922a;
+}
+
+.red {
+    border-top-color: #b53a3a;
+}
+
+.blue {
+    border-top-color: #1700A5;
+}
+
+.label {
+    font-size: 15px;
+    font-weight: 500;
+    margin: 0;
+}
+
+.value {
+    font-size: 24px;
+    font-weight: 500;
+    margin: 0;
+}

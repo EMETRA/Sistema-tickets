@@ -70,6 +70,11 @@ const UserHome: React.FC = () => {
             iconLabel: "MOD10",
             title: "Formulario reporte de visa nóminas",
         },
+        {
+            icon: "clipboard-solid" as IconName,
+            iconLabel: "MOD01",
+            title: "Reporte semanal informática",
+        },
         // add more here as you build them
 
         // 👇 real apps from API

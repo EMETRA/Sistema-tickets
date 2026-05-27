@@ -8,6 +8,7 @@ import styles from "./MOD01.module.scss";
 import { Select } from "@/components/client/atoms/Select";
 import { TextArea } from "@/components/client/atoms/TextArea";
 import { Button } from "@/components/client/atoms/Button";
+import { useRouter } from "next/navigation";
 
 // interface TaskItem {
 //     id: number;
@@ -134,6 +135,7 @@ const TaskSection: React.FC<TaskSectionProps> = ({
 };
 
 const MOD01: React.FC = () => {
+    const router = useRouter();
     const [tareasPlanificadas, setTareasPlanificadas] = useState<TaskRecord[]>([]);
     const [tareasCompletadas, setTareasCompletadas] = useState<TaskRecord[]>([]);
     const [formData, setFormData] = useState({
@@ -425,6 +427,22 @@ const MOD01: React.FC = () => {
                         Exportación
                     </Button>
                 </div>
+
+                <hr className={styles.dividerS} />
+                {/* Navegación */}
+                <section className={styles.formSection}>
+                    <Title variant="mid" tag="h3" className={styles.sectionTitle}>
+                        Navegación
+                    </Title>
+                    <div className={styles.navActions}>
+                        <Button variant="contained" color="success" onClick={() => router.push("/home/dashboard-proyectos")}>
+                            Dashboard proyectos
+                        </Button>
+                        <Button variant="outlined" color="default" onClick={() => router.push("/home/dashboard-colaboradores")}>
+                            Dashboard Colaboradores
+                        </Button>
+                    </div>
+                </section>
 
             </div>
         </div>

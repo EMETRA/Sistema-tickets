@@ -15,6 +15,7 @@ export const PAGES_CONFIG: Record<string, PageMetadata> = {
     "home/mod01": { path: "/home/mod01", label: "MOD01", title: "Reporte semanal informática", iconName: "clipboard-solid" },
     "home/dashboard-proyectos": { path: "/home/dashboard-proyectos", label: "dashboard-proyectos", title: "Dashboard de indicadores - Informática", iconName: "chart-bar-solid" },
     "home/dashboard-colaboradores": { path: "/home/dashboard-colaboradores", label: "dashboard-colaboradores", title: "Dashboard por colaborador - Informática", iconName: "chart-bar-solid" },
+    "home/exportmod01": { path: "/home/exportmod01", label: "exportmod01", title: "Exportar reporte semanal informática", iconName: "layer-group-solid" },
     equipo: { path: "/equipo", label: "EQUIPO", title: "Gestión de Personal", iconName: "people-group-solid" },
     usuarios: { path: "/usuarios", label: "USUARIOS", title: "Administración de Usuarios", iconName: "user-solid" },
     tickets: { path: "/tickets", label: "TICKETS", title: "Listado de Tickets", iconName: "ticket-solid" },

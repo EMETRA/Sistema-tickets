@@ -136,8 +136,8 @@ const TaskSection: React.FC<TaskSectionProps> = ({
 
 const MOD01: React.FC = () => {
     const router = useRouter();
-    const [tareasPlanificadas, setTareasPlanificadas] = useState<TaskRecord[]>([]);
-    const [tareasCompletadas, setTareasCompletadas] = useState<TaskRecord[]>([]);
+    const [, setTareasPlanificadas] = useState<TaskRecord[]>([]);
+    const [, setTareasCompletadas] = useState<TaskRecord[]>([]);
     const [formData, setFormData] = useState({
         colaborador: "",
         cargo: "",
@@ -182,61 +182,6 @@ const MOD01: React.FC = () => {
     // mutation({ variables: { ...formData } });
         console.log(formData);
         window.alert("Reporte guardado correctamente");
-    };
-
-    const handleExport = () => {
-        const rows: string[][] = [
-            ["Campo", "Valor"],
-            ["Colaborador", collaboratorOptions.find(c => c.value === formData.colaborador)?.label || ""],
-            ["Cargo", formData.cargo],
-            ["Proyecto asignado", formData.proyecto],
-            ["Fecha inicio", formData.fechaInicio],
-            ["Fecha fin", formData.fechaFin],
-            ["Jefe inmediato", formData.jefe],
-            ["Porcentaje avance general", formData.avance],
-            ["Tareas planificadas", formData.tareasP],
-            ["Tareas completadas", formData.tareasC],
-            ["Tareas en fecha", formData.tareasEnFecha],
-            ["Bloqueos activos", formData.bloqueosActivos],
-            ["Horas estimadas total", formData.horasEstimadas],
-            ["Horas reales total", formData.horasReales],
-            ["Porcentaje avance planificado", formData.avancePlanificado],
-            ["Porcentaje avance real", formData.avanceReal],
-            [],
-            ["# Tareas planificadas detalle"],
-            ["Descripcion", "Horas estimadas", "Fecha compromiso", "Estado"],
-            ...tareasPlanificadas.map(t => [
-            t.descripcion as string,
-            t.horasEstimadas as string,
-            t.fechaCompromiso as string,
-            t.estado as string,
-            ]),
-            [],
-            ["# Tareas completadas detalle"],
-            ["Descripcion", "Horas reales", "Fecha finalización"],
-            ...tareasCompletadas.map(t => [
-            t.descripcion as string,
-            t.horasReales as string,
-            t.fechaFinalizacion as string,
-            ]),
-            [],
-            ["Bloqueo descripcion", formData.bloqueoDescripcion],
-            ["Bloqueo impacto", formData.bloqueoImpacto],
-            ["Accion requerida", formData.bloqueoAccion],
-            ["Observaciones técnicas", formData.metricasObservaciones],
-            ["Plan tarea planificada", formData.planTarea],
-            ["Plan horas estimadas", formData.planHoras],
-            ["Plan fecha compromiso", formData.planCompromiso],
-        ];
-
-        const csv = rows.map(r => r.map(v => `"${v ?? ""}"`).join(",")).join("\n");
-        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = "reporte.csv";
-        link.click();
-        URL.revokeObjectURL(url);
     };
     return (
         <div className={styles.mainContainer}>
@@ -423,7 +368,7 @@ const MOD01: React.FC = () => {
                     <Button variant="contained" color="success" onClick={handleSave}>
                         Guardar reporte
                     </Button>
-                    <Button variant="outlined" color="default" onClick={handleExport}>
+                    <Button variant="outlined" color="default" onClick={() => router.push("/home/exportmod01")}>
                         Exportación
                     </Button>
                 </div>

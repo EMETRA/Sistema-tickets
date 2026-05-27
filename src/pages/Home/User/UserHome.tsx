@@ -51,15 +51,8 @@ const UserHome: React.FC = () => {
         value: point.tickets,
     })) || [];
 
-    // const transformedApps: AppCardProps[] = appsData
-    //     ?.map(app => ({
-    //         icon: app.icono as IconName,
-    //         iconLabel: app.nombre,
-    //         title: app.nombre,
-    //     })) || [];
-
     const transformedApps: AppCardProps[] = [
-    // 👇 dummy/hardcoded apps
+        // 👇 dummy/hardcoded apps REMOVE
         {
             icon: "chart-bar-solid" as IconName,
             iconLabel: "PROC01",
@@ -75,9 +68,6 @@ const UserHome: React.FC = () => {
             iconLabel: "MOD01",
             title: "Reporte semanal informática",
         },
-        // add more here as you build them
-
-        // 👇 real apps from API
         ...(appsData?.map(app => ({
             icon: app.icono as IconName,
             iconLabel: app.nombre,
@@ -108,9 +98,9 @@ const UserHome: React.FC = () => {
         return <div className={styles.mainContainer}>Cargando información...</div>;
     }
 
-    // if (error) {
-    //     return <div className={styles.mainContainer}>{error}</div>;
-    // }
+    if (error) {
+        return <div className={styles.mainContainer}>{error}</div>;
+    }
 
 
     return (

@@ -1,7 +1,6 @@
+"use client";
+
 import React, { useState } from 'react';
-
-
-
 import { Title } from '../../components/client/atoms/Title';
 import { FormField } from '../../components/client/molecules/FormField';
 import { Input } from '../../components/client/atoms/Input';

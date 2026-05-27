@@ -29,6 +29,11 @@
   }
 }
 
+// INPUT tipo date - estilos específicos para el selector de fecha
+:global(input[type="date"]::-webkit-calendar-picker-indicator) {
+    filter: invert(1);
+}
+
 // Input tipo text con icono
 .InputText {
   padding-right: 40px;

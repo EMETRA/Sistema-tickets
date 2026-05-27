@@ -30,6 +30,7 @@ export const AppCard = ({
                     className={classNames(styles.bookmarkButton, {
                         [styles.bookmarked]: bookmarked,
                     })}
+                    iconColor={bookmarked ? "#0070f3" : "#666666"}
                 />
             </div>
 

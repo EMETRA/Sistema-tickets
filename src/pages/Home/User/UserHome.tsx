@@ -12,8 +12,10 @@ import { IconName } from "@/components/client/atoms/Icon/types";
 import { useGetUser, useGetMyStats, useGetAppsByRole, useGetMyActivity } from "@/api/hooks";
 
 import styles from "./UserHome.module.scss";
+import { useRouter } from "next/navigation";
 
 const UserHome: React.FC = () => {
+    const router = useRouter();
     const { data: userData, loading: loadingUser, error: errorUser, refetch: refetchUser } = useGetUser();
     const { data: statsData, loading: loadingStats, error: errorStats, refetch: refetchMyStats } = useGetMyStats();
     const { data: appsData, loading: loadingApps, error: errorApps, refetch: refetchAppsByRole } = useGetAppsByRole();
@@ -49,12 +51,29 @@ const UserHome: React.FC = () => {
         value: point.tickets,
     })) || [];
 
-    const transformedApps: AppCardProps[] = appsData
-        ?.map(app => ({
+    const transformedApps: AppCardProps[] = [
+        // 👇 dummy/hardcoded apps REMOVE
+        {
+            icon: "chart-bar-solid" as IconName,
+            iconLabel: "PROC01",
+            title: "Proceso de grabación unificada de remisiones de cámara LPR",
+        },
+        {
+            icon: "chart-bar-solid" as IconName,
+            iconLabel: "MOD10",
+            title: "Formulario reporte de visa nóminas",
+        },
+        {
+            icon: "clipboard-solid" as IconName,
+            iconLabel: "MOD01",
+            title: "Reporte semanal informática",
+        },
+        ...(appsData?.map(app => ({
             icon: app.icono as IconName,
             iconLabel: app.nombre,
             title: app.nombre,
-        })) || [];
+        })) || []),
+    ];
 
     const eventItems: EventItemProps[] = myActivityData
         ? myActivityData.map(activity => ({
@@ -71,7 +90,8 @@ const UserHome: React.FC = () => {
     };
 
     const handleAppClick = (title: string) => {
-        alert(`Abriendo: ${title}`);
+        const slug = title.toLowerCase();
+        router.push(`/home/${slug}`);
     };
 
     if (isLoading) {
@@ -92,7 +112,7 @@ const UserHome: React.FC = () => {
                         apps={transformedApps.map((app) => ({
                             ...app,
                             onBookmarkClick: () => handleBookmarkToggle(),
-                            onButtonClick: () => handleAppClick(app.title),
+                            onButtonClick: () => handleAppClick(app.iconLabel),
                         }))}
                     />
                     <WelcomeCard

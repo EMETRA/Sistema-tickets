@@ -18,10 +18,16 @@ export const SystemLayout = ({ children, className }: { children: React.ReactNod
 
     const currentRole = getRole();
 
-    // Buscamos la metadata de la página actual para el TopBar
     const activePage = useMemo(() => {
-        // Buscamos en el diccionario qué página coincide con el path actual
-        return Object.values(PAGES_CONFIG).find(p => p.path === pathname) || PAGES_CONFIG.home;
+        if (!pathname) return PAGES_CONFIG.home;
+
+        const exact = Object.values(PAGES_CONFIG).find(p => p.path === pathname);
+        if (exact) return exact;
+
+        const slugMatch = Object.values(PAGES_CONFIG).find(p => pathname.startsWith(p.path) && p.path !== "/home");
+        if (slugMatch) return slugMatch;
+
+        return PAGES_CONFIG.home;
     }, [pathname]);
 
     return (

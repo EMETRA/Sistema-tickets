@@ -65,6 +65,11 @@ const UserHome: React.FC = () => {
             iconLabel: "PROC01",
             title: "Proceso de grabación unificada de remisiones de cámara LPR",
         },
+        {
+            icon: "chart-bar-solid" as IconName,
+            iconLabel: "MOD10",
+            title: "Formulario reporte de visa nóminas",
+        },
         // add more here as you build them
 
         // 👇 real apps from API

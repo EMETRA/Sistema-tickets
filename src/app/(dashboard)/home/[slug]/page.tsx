@@ -1,9 +1,10 @@
+import MOD10 from "@/pages/MOD10";
 import PROC01 from "@/pages/PROC01/PROC01";
 import { notFound } from "next/navigation";
 
 const APP_REGISTRY: Record<string, React.ComponentType> = {
     "proc01": PROC01,
-    // "proc02": PROC02, // 👈 and here
+    "mod10": MOD10,
 };
 
 export default async function AppPage({ params }: { params: Promise<{ slug: string }> }) {

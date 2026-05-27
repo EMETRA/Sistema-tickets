@@ -217,7 +217,7 @@ const MOD01: React.FC = () => {
                         <FormField label="Jefe inmediato" htmlFor="jefe">
                             <Input id="jefe" type="text" placeholder="Ingrese jefe inmediato" onChange={(e) => handleField("jefe", e.target.value)} />
                         </FormField>
-                        <FormField label="% Avance general" htmlFor="avance">
+                        <FormField label="Porcentaje de avance general" htmlFor="avance">
                             <Input id="avance" type="number" min={0} max={100} placeholder="Ingrese avance" onChange={(e) => handleField("avance", e.target.value)} />
                         </FormField>
                     </div>
@@ -248,10 +248,10 @@ const MOD01: React.FC = () => {
                         <FormField label="Horas reales total" htmlFor="horas-reales">
                             <Input id="horas-reales" type="number" min={0} placeholder="" onChange={(e) => handleField("horasReales", e.target.value)} />
                         </FormField>
-                        <FormField label="Avance planificado" htmlFor="avance-planificado">
+                        <FormField label="Porcentaje de avance planificado" htmlFor="avance-planificado">
                             <Input id="avance-planificado" type="number" min={0} max={100} placeholder="" onChange={(e) => handleField("avancePlanificado", e.target.value)} />
                         </FormField>
-                        <FormField label="Avance real" htmlFor="avance-real">
+                        <FormField label="Porcentaje de avance real" htmlFor="avance-real">
                             <Input id="avance-real" type="number" min={0} max={100} placeholder="" onChange={(e) => handleField("avanceReal", e.target.value)} />
                         </FormField>
                     </div>

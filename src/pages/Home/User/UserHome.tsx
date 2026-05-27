@@ -98,9 +98,9 @@ const UserHome: React.FC = () => {
         return <div className={styles.mainContainer}>Cargando información...</div>;
     }
 
-    if (error) {
-        return <div className={styles.mainContainer}>{error}</div>;
-    }
+    // if (error) {
+    //     return <div className={styles.mainContainer}>{error}</div>;
+    // }
 
 
     return (

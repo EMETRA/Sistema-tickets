@@ -22,13 +22,13 @@ const destinyAreas = [
 
 export const MOD10: React.FC = () => {
     // Estados del formulario
-    const [destinyArea, setDestinyArea] = useState<string | undefined>();
-    const [documentDate, setDocumentDate] = useState<string | undefined>();
-    const [issuedBy, setIssuedBy] = useState<string | undefined>();
-    const [caseNumber, setCaseNumber] = useState<string | undefined>();
+    const [destinyArea, setDestinyArea] = useState<string>('');
+    const [documentDate, setDocumentDate] = useState<string>('');
+    const [issuedBy, setIssuedBy] = useState<string>('');
+    const [caseNumber, setCaseNumber] = useState<string>('');
     const [pageNumbers, setPageNumbers] = useState<number | undefined>();
-    const [name, setName] = useState<string | undefined>();
-    const [reference, setReference] = useState<string | undefined>();
+    const [name, setName] = useState<string>('');
+    const [reference, setReference] = useState<string>('');
     const [uploadedFile, setUploadedFile] = useState<UploadedFile>();
     const [rejectedFiles, setRejectedFiles] = useState<string[]>([]);
     
@@ -43,6 +43,7 @@ export const MOD10: React.FC = () => {
         if (files.length === 0) return;
 
         const file = files[0];
+        setRejectedFiles([]);
 
         // El archivo debe ser PDF 
         if (!ALLOWED_EXTENSIONS.some(ext => file.name.toLowerCase().endsWith(`.${ext}`))) {
@@ -87,7 +88,7 @@ export const MOD10: React.FC = () => {
             return;
         }
 
-        if (!destinyArea || !documentDate || !issuedBy || !caseNumber || !pageNumbers || !name || !reference) {
+        if (destinyArea==='' || documentDate==='' || issuedBy==='' || caseNumber==='' || pageNumbers===undefined || name==='' || reference==='') {
             alert("Por favor, completa todos los campos obligatorios antes de enviar el formulario.");
             return;
         }
@@ -123,6 +124,16 @@ export const MOD10: React.FC = () => {
         );
         setIsModalOpen(false);
         setPendingFormData(null);
+
+        // Limpiar formulario
+        setDestinyArea('');
+        setDocumentDate('');
+        setIssuedBy('');
+        setCaseNumber('');
+        setPageNumbers(undefined);
+        setName('');
+        setReference('');
+        setUploadedFile(undefined);
     };
 
     return (
@@ -217,6 +228,7 @@ export const MOD10: React.FC = () => {
                             onChange={(e) => setReference(e.target.value)}
                             placeholder="Ingresa una referencia o descripción adicional (opcional)"
                             rows={4}
+                            required
                         />
                     </FormField>
                 </div>

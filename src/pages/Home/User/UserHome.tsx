@@ -68,6 +68,11 @@ const UserHome: React.FC = () => {
             iconLabel: "MOD01",
             title: "Reporte semanal informática",
         },
+        {
+            icon: "clipboard-solid" as IconName,
+            iconLabel: "MOD08",
+            title: "Generador de reportes Sistema Financiero",
+        },
         ...(appsData?.map(app => ({
             icon: app.icono as IconName,
             iconLabel: app.nombre,

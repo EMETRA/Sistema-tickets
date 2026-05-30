@@ -2,12 +2,14 @@ import DashboardCollaborators from "@/pages/DashboardCollaborators/DashboardColl
 import DashboardProjects from "@/pages/DashboardProjects";
 import ExportMOD01 from "@/pages/ExportMOD01";
 import MOD01 from "@/pages/MOD01";
+import MOD08 from "@/pages/MOD08";
 import MOD10 from "@/pages/MOD10";
 import PROC01 from "@/pages/PROC01/PROC01";
 import { notFound } from "next/navigation";
 
 const APP_REGISTRY: Record<string, React.ComponentType> = {
     "proc01": PROC01,
+    "mod08": MOD08,
     "mod10": MOD10,
     "mod01": MOD01,
     "dashboard-proyectos": DashboardProjects, 

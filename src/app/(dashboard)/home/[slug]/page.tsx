@@ -8,6 +8,7 @@ import MOD06 from "@/pages/MOD06";
 import MOD08 from "@/pages/MOD08";
 import MOD10 from "@/pages/MOD10";
 import PROC01 from "@/pages/PROC01/PROC01";
+import SaveMOD01 from "@/pages/SaveMOD01/ExportMOD01";
 import { notFound } from "next/navigation";
 
 const APP_REGISTRY: Record<string, React.ComponentType> = {
@@ -21,6 +22,7 @@ const APP_REGISTRY: Record<string, React.ComponentType> = {
     "dashboard-proyectos": DashboardProjects, 
     "dashboard-colaboradores": DashboardCollaborators,
     "exportmod01": ExportMOD01,
+    "save-mod01": SaveMOD01,
 };
 
 export default async function AppPage({ params }: { params: Promise<{ slug: string }> }) {

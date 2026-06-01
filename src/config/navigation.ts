@@ -20,6 +20,7 @@ export const PAGES_CONFIG: Record<string, PageMetadata> = {
     "home/exportmod04": { path: "/home/exportmod04", label: "exportmod04", title: "Formulario reporte de visa nóminas", iconName: "layer-group-solid" },
     "home/exportmod05": { path: "/home/exportmod05", label: "exportmod05", title: "Reporte general RRHH - EMETRA", iconName: "layer-group-solid" },
     "home/exportmod06": { path: "/home/exportmod06", label: "exportmod06", title: "Asignación de permisos por usuario", iconName: "layer-group-solid" },
+    "home/save-mod01": { path: "/home/save-mod01", label: "save-mod01", title: "Reporte Guardado", iconName: "clipboard-solid" },
     equipo: { path: "/equipo", label: "EQUIPO", title: "Gestión de Personal", iconName: "people-group-solid" },
     usuarios: { path: "/usuarios", label: "USUARIOS", title: "Administración de Usuarios", iconName: "user-solid" },
     tickets: { path: "/tickets", label: "TICKETS", title: "Listado de Tickets", iconName: "ticket-solid" },

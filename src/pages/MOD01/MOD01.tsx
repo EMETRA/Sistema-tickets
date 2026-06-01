@@ -9,6 +9,7 @@ import { Select } from "@/components/client/atoms/Select";
 import { TextArea } from "@/components/client/atoms/TextArea";
 import { Button } from "@/components/client/atoms/Button";
 import { useRouter } from "next/navigation";
+import { Text } from "@/components/client/atoms/Text";
 
 // interface TaskItem {
 //     id: number;
@@ -136,8 +137,8 @@ const TaskSection: React.FC<TaskSectionProps> = ({
 
 const MOD01: React.FC = () => {
     const router = useRouter();
-    const [, setTareasPlanificadas] = useState<TaskRecord[]>([]);
-    const [, setTareasCompletadas] = useState<TaskRecord[]>([]);
+    const [tareasPlanificadas, setTareasPlanificadas] = useState<TaskRecord[]>([]);
+    const [tareasCompletadas, setTareasCompletadas] = useState<TaskRecord[]>([]);
     const [formData, setFormData] = useState({
         colaborador: "",
         cargo: "",
@@ -146,8 +147,8 @@ const MOD01: React.FC = () => {
         fechaFin: "",
         jefe: "",
         avance: "",
-        tareasP: "",
-        tareasC: "",
+        tareasPlanificadas: "",
+        tareasCompletadas: "",
         tareasEnFecha: "",
         bloqueosActivos: "",
         horasEstimadas: "",
@@ -163,6 +164,58 @@ const MOD01: React.FC = () => {
         planCompromiso: "",
     });
 
+    const [errors, setErrors] = useState<string[]>([]);
+
+    const validate = (): boolean => {
+        const newErrors: string[] = [];
+
+        // Información general
+        if (!formData.colaborador) newErrors.push("Colaborador es requerido");
+        if (!formData.cargo) newErrors.push("Cargo es requerido");
+        if (!formData.proyecto) newErrors.push("Proyecto asignado es requerido");
+        if (!formData.fechaInicio) newErrors.push("Fecha inicio es requerida");
+        if (!formData.fechaFin) newErrors.push("Fecha fin es requerida");
+        if (!formData.jefe) newErrors.push("Jefe inmediato es requerido");
+        if (!formData.avance) newErrors.push("Porcentaje de avance general es requerido");
+
+        // Indicadores base
+        if (!formData.tareasPlanificadas) newErrors.push("Tareas planificadas es requerido");
+        if (!formData.tareasCompletadas) newErrors.push("Tareas completadas es requerido");
+        if (!formData.tareasEnFecha) newErrors.push("Tareas en fecha es requerido");
+        if (!formData.bloqueosActivos) newErrors.push("Bloqueos activos es requerido");
+        if (!formData.horasEstimadas) newErrors.push("Horas estimadas total es requerido");
+        if (!formData.horasReales) newErrors.push("Horas reales total es requerido");
+        if (!formData.avancePlanificado) newErrors.push("Avance planificado es requerido");
+        if (!formData.avanceReal) newErrors.push("Avance real es requerido");
+
+        // Plan próxima semana
+        if (!formData.planTarea) newErrors.push("Tarea planificada (plan próxima semana) es requerida");
+        if (!formData.planHoras) newErrors.push("Horas estimadas (plan próxima semana) es requerido");
+        if (!formData.planCompromiso) newErrors.push("Fecha compromiso (plan próxima semana) es requerida");
+
+        // At least one tareas planificadas filled
+        const tpFilled = tareasPlanificadas.find(t =>
+            t.descripcion && t.horasEstimadas && t.fechaCompromiso && t.estado
+        );
+        if (!tpFilled) newErrors.push("Debe completar al menos una tarea planificada");
+
+        // At least one tareas completadas filled
+        const tcFilled = tareasCompletadas.find(t =>
+            t.descripcion && t.horasReales && t.fechaFinalizacion
+        );
+        if (!tcFilled) newErrors.push("Debe completar al menos una tarea completada");
+
+        setErrors(newErrors);
+        return newErrors.length === 0;
+    };
+
+    const handleSave = () => {
+        if (!validate()) return;
+        router.push("/home/save-mod01");
+    };
+
+    
+
     const handleField = (field: string, value: string) =>
         setFormData(prev => ({ ...prev, [field]: value }));
     const collaboratorOptions = [
@@ -176,13 +229,6 @@ const MOD01: React.FC = () => {
     // const { data: collaborators } = useGetCollaborators();
     // const collaboratorOptions = collaborators?.map(c => ({ label: c.nombre, value: c.id })) || [];
 
-
-    const handleSave = () => {
-    // TODO: replace with GraphQL mutation
-    // mutation({ variables: { ...formData } });
-        console.log(formData);
-        window.alert("Reporte guardado correctamente");
-    };
     return (
         <div className={styles.mainContainer}>
             <div className={styles.card}>
@@ -195,8 +241,8 @@ const MOD01: React.FC = () => {
                         <FormField label="Colaborador" htmlFor="colaborador">
                             <Select
                                 id="colaborador"
-                                value={colaborador}
-                                onChange={(e) => setColaborador(e.target.value)}
+                                value={formData.colaborador}
+                                onChange={(e) => handleField("colaborador", e.target.value)}
                                 options={collaboratorOptions}
                                 placeholder="Seleccionar colaborador"
                             />
@@ -364,6 +410,13 @@ const MOD01: React.FC = () => {
                 </section>
                 <hr className={styles.divider} />
                 {/* Buttons */}
+                {errors.length > 0 && (
+                    <div className={styles.errorList}>
+                        {errors.map((e, i) => (
+                            <Text key={i} className={styles.errorItem}>• {e}</Text>
+                        ))}
+                    </div>
+                )}
                 <div className={styles.formActions}>
                     <Button variant="contained" color="success" onClick={handleSave}>
                         Guardar reporte

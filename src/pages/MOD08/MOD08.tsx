@@ -13,9 +13,9 @@ import { SuccessModal } from '../../components/client/organisms/SucessModal';
 import styles from './MOD08.module.scss';
 
 const reportTypes = [
-    { label: "Tipo 1", value: 1 },
-    { label: "Tipo 2", value: 2 },
-    { label: "Tipo 3", value: 3 },
+    { label: "Recibos de Pago", value: 'pago' },
+    { label: "Ticket Parqueos", value: 'parqueo' },
+    { label: "Paralelo Formas", value: 'formas' },
 ];
 
 const MOD08: React.FC = () => {

@@ -223,7 +223,6 @@ const MOD01: React.FC = () => {
         { label: "María García", value: "2" },
         { label: "Carlos López", value: "3" },
     ];
-    const [colaborador, setColaborador] = useState("");
 
     // TODO: replace dummy data with real query
     // const { data: collaborators } = useGetCollaborators();

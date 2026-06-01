@@ -27,6 +27,18 @@ const PROC01: React.FC = () => {
     const currentProcess = selectedProcess ? PROCESS_CONFIG[selectedProcess] : null;
 
     const handleExecute = () => {
+        if (currentProcess) {
+            if (currentProcess.requiresUser && !usuario) {
+                alert('Por favor, ingrese el usuario requerido para este proceso.');
+                return;
+            }
+            if (currentProcess.requiresCorrelative && !correlativo) {
+                alert('Por favor, ingrese el correlativo requerido para este proceso.');
+                return;
+            }
+        }
+        
+
         console.log({
             proceso: selectedProcess,
             usuario,

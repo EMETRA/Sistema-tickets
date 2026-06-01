@@ -1,0 +1,44 @@
+.mainContainer {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.formContainer {
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px 40px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+}
+
+.title {
+    width: 100%;
+    text-align: start;
+}
+
+.generalInfomationContainer, .userPermissionsContainer {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+}
+
+.fieldsSelection {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.fieldCompany, .fieldGeneralUser, .fieldApplication, .fieldUserOrigin, .fieldUserDestiny {
+    width: 100%;
+}
+

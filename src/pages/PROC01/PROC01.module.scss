@@ -1,16 +1,18 @@
 .mainContainer {
+    height: 100%;
     display: grid;
     grid-template-columns: 1fr 4fr;
     align-items: center;
-    justify-content: center;
+    justify-items: center;
     gap: 20px;
+    padding: 20px;
 }
 
 .formContainer {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    width: 400px;
+    min-width: 400px;
     padding: 20px;
 }
 
@@ -19,9 +21,11 @@
 }
 
 .cardsContainer {
+    width: fit-content;
     display: flex;
     flex-direction: row;
     gap: 20px;
+    padding: 20px;
 }
 
 .formContainer, .cardsContainer {

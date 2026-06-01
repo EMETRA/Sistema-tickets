@@ -68,6 +68,21 @@ const UserHome: React.FC = () => {
             iconLabel: "MOD01",
             title: "Reporte semanal informática",
         },
+        {
+            icon: "clipboard-solid" as IconName,
+            iconLabel: "MOD08",
+            title: "Generador de reportes Sistema Financiero",
+        },
+        {
+            icon: "clipboard-solid" as IconName,
+            iconLabel: "MOD04",
+            title: "Exportar reporte de visa nóminas",
+        },
+        {
+            icon: "clipboard-solid" as IconName,
+            iconLabel: "MOD06",
+            title: "Asignación de permisos por usuario",
+        },
         ...(appsData?.map(app => ({
             icon: app.icono as IconName,
             iconLabel: app.nombre,
@@ -98,9 +113,9 @@ const UserHome: React.FC = () => {
         return <div className={styles.mainContainer}>Cargando información...</div>;
     }
 
-    if (error) {
-        return <div className={styles.mainContainer}>{error}</div>;
-    }
+    // if (error) {
+    //     return <div className={styles.mainContainer}>{error}</div>;
+    // }
 
     return (
         <div className={styles.mainContainer}>

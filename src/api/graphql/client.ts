@@ -44,6 +44,7 @@ export function getGraphQLClient(): GraphQLClient {
 export interface GraphQLRequestOptions {
     variables?: Record<string, unknown>;
     files?: File[];
+    fileMap?: Record<string, string[]>;
     onProgress?: (percent: number) => void;
 }
 
@@ -132,10 +133,6 @@ export async function graphqlRequest<TData extends Record<string, unknown> = Rec
  * const { data } = await graphqlRequestClient<MyType>(QUERY);
  * ```
  */
-export interface GraphQLRequestOptions {
-    variables?: Record<string, unknown>;
-    files?: File[];
-}
 
 export async function graphqlRequestClient<TData extends Record<string, unknown> = Record<string, unknown>>(
     query: string,
@@ -155,15 +152,19 @@ export async function graphqlRequestClient<TData extends Record<string, unknown>
         if (files.length > 0) {
             // Use XHR for real upload progress
             return new Promise((resolve, reject) => {
-                const map: Record<string, string[]> = {};
-                files.forEach((_, i) => {
-                    map[String(i)] = [`variables.files.${i}`];
-                });
-
+                const map: Record<string, string[]> = options?.fileMap ?? {};
+        
+                if (!options?.fileMap) {
+                    files.forEach((_, i) => {
+                        map[String(i)] = [`variables.files.${i}`];
+                    });
+                }
                 const formData = new FormData();
                 formData.append('operations', JSON.stringify({
                     query,
-                    variables: { ...variables, files: files.map(() => null) }
+                    variables: options?.fileMap 
+                        ? { ...variables }  // variables already has null placeholders
+                        : { ...variables, files: files.map(() => null) }
                 }));
                 formData.append('map', JSON.stringify(map));
                 files.forEach((file, i) => {

@@ -23,8 +23,9 @@ export function useSendEmailNotification() {
                 const result = await graphqlRequestClient<SendEmailNotificationResponse>(
                     SEND_EMAIL_NOTIFICATION_MUTATION,
                     {
-                        variables: { input },
+                        variables: { input, pdf: null },
                         files: [pdf],
+                        fileMap: { "0": ["variables.pdf"] },
                         onProgress: (percent) => setUploadProgress(percent),
                     }
                 );

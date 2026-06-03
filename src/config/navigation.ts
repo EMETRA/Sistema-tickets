@@ -16,6 +16,7 @@ export const PAGES_CONFIG: Record<string, PageMetadata> = {
     "home/mod04": { path: "/home/mod04", label: "mod04", title: "Formulario reporte de visa nóminas", iconName: "layer-group-solid" },
     "home/mod05": { path: "/home/mod05", label: "mod05", title: "Reporte general RRHH - EMETRA", iconName: "layer-group-solid" },
     "home/mod06": { path: "/home/mod06", label: "mod06", title: "Asignación de permisos por usuario", iconName: "layer-group-solid" },
+    "home/mod07": { path: "/home/mod07", label: "MANUALES", title: "Visor de manuales de usuario | EMETRA", iconName: "chart-bar-solid" },
     "home/mod08": { path: "/home/mod08", label: "MOD08", title: "Generador de Reportes Sistema Financiero- Recibos/Tickets anulados", iconName: "clipboard-solid" },
     "home/dashboard-proyectos": { path: "/home/dashboard-proyectos", label: "dashboard-proyectos", title: "Dashboard de indicadores - Informática", iconName: "chart-bar-solid" },
     "home/dashboard-colaboradores": { path: "/home/dashboard-colaboradores", label: "dashboard-colaboradores", title: "Dashboard por colaborador - Informática", iconName: "chart-bar-solid" },

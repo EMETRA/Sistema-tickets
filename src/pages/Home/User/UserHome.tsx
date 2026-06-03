@@ -83,6 +83,11 @@ const UserHome: React.FC = () => {
             iconLabel: "MOD06",
             title: "Asignación de permisos por usuario",
         },
+        {
+            icon: "chart-bar-solid" as IconName,
+            iconLabel: "MOD07",
+            title: "Visor de manuales de usuario | EMETRA",
+        },
         ...(appsData?.map(app => ({
             icon: app.icono as IconName,
             iconLabel: app.nombre,
@@ -113,9 +118,9 @@ const UserHome: React.FC = () => {
         return <div className={styles.mainContainer}>Cargando información...</div>;
     }
 
-    if (error) {
-        return <div className={styles.mainContainer}>{error}</div>;
-    }
+    // if (error) {
+    //     return <div className={styles.mainContainer}>{error}</div>;
+    // }
 
     return (
         <div className={styles.mainContainer}>

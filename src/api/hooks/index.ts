@@ -80,3 +80,5 @@ export { useCreateStatus } from './useCreateStatus';
 // MOD10 - Apps hooks
 export { useSendEmailNotification } from './useSendEmailNotification';
 
+// PROC01 - Apps hooks
+export { useExecuteLprRemission } from './useExecuteLprRemission';

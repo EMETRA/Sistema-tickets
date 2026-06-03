@@ -10,6 +10,7 @@ import { Select } from '../../components/client/atoms/Select';
 
 import styles from './PROC01.module.scss';
 import type { ProcessConfig } from './types';
+import { useExecuteLprRemission } from '@/api/hooks';
 
 const PROCESS_CONFIG: Record<string, ProcessConfig> = {
     semaforos: { label: 'Semáforos', requiresUser: true, requiresCorrelative: true },
@@ -20,32 +21,48 @@ const PROCESS_CONFIG: Record<string, ProcessConfig> = {
 };
 
 const PROC01: React.FC = () => {
+    const { executeLprRemission, loading} = useExecuteLprRemission();
+
+    const [processResult, setProcessResult] = useState({
+        totalProcesados: "—",
+        totalActualizados: "—",
+        totalFallidos: "—",
+    });
+
     const [selectedProcess, setSelectedProcess] = useState<string>('');
     const [usuario, setUsuario] = useState<string>('');
     const [correlativo, setCorrelativo] = useState<string>('');
 
     const currentProcess = selectedProcess ? PROCESS_CONFIG[selectedProcess] : null;
 
-    const handleExecute = () => {
-        if (currentProcess) {
-            if (currentProcess.requiresUser && !usuario) {
-                alert('Por favor, ingrese el usuario requerido para este proceso.');
-                return;
-            }
-            if (currentProcess.requiresCorrelative && !correlativo) {
-                alert('Por favor, ingrese el correlativo requerido para este proceso.');
-                return;
-            }
+    const handleExecute = async () => {
+        if (!selectedProcess) return;
+
+        if (currentProcess?.requiresUser && !usuario) {
+            alert('Por favor, ingrese el usuario requerido para este proceso.');
+            return;
         }
-        
+        if (currentProcess?.requiresCorrelative && !correlativo) {
+            alert('Por favor, ingrese el correlativo requerido para este proceso.');
+            return;
+        }
 
-        console.log({
-            proceso: selectedProcess,
-            usuario,
-            correlativo,
-        });
+        try {
+            const result = await executeLprRemission({
+                origen: selectedProcess.toUpperCase(),
+                ...(usuario && { usuario }),
+                ...(correlativo && { correlativo }),
+            });
+
+            setProcessResult({
+                totalProcesados: result.totalProcesados.toString(),
+                totalActualizados: result.totalActualizados.toString(),
+                totalFallidos: result.totalFallidos.toString(),
+            });
+        } catch (err) {
+            console.error("Error executing process:", err);
+        }
     };
-
     return (
         <div className={styles.mainContainer}>
             <div className={styles.formContainer}>
@@ -97,6 +114,8 @@ const PROC01: React.FC = () => {
                     color="default"
                     onClick={handleExecute}
                     className={styles.executeButton}
+                    state={loading ? "loading" : "default"}
+                    loadingText="Ejecutando..."
                 >
                     Ejecutar proceso
                 </Button>
@@ -104,18 +123,21 @@ const PROC01: React.FC = () => {
             <div className={styles.cardsContainer}>
                 <Card
                     title="Total Procesados"
-                    value="150"
+                    value={loading ? "..." : processResult.totalProcesados}
                     variant="info"
+                    className={loading ? styles.cardLoading : ""}
                 />
                 <Card
                     title="Total Actualizados"
-                    value="15"
+                    value={loading ? "..." : processResult.totalActualizados}
                     variant="info"
+                    className={loading ? styles.cardLoading : ""}
                 />
                 <Card
                     title="Total Fallidos"
-                    value="0"
+                    value={loading ? "..." : processResult.totalFallidos}
                     variant="info"
+                    className={loading ? styles.cardLoading : ""}
                 />
             </div>
         </div>

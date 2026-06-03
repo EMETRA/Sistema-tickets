@@ -30,7 +30,7 @@ const SearchField: React.FC<SearchFieldProps> = ({
                     disabled={disabled}
                 />
 
-                <IconButton icon="magnifying-glass-solid" borderless type="submit" disabled={disabled} className={styles.searchButton}/>
+                <IconButton icon="magnifying-glass-solid" iconColor="#000000" borderless type="submit" disabled={disabled} className={styles.searchButton}/>
             </div>
         </form>
     );

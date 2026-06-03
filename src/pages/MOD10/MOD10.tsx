@@ -13,20 +13,24 @@ import MOD10Modal from "../../components/client/organisms/MOD10Modal";
 
 import styles from "./MOD10.module.scss";
 import type { casesNotificationFormData, UploadedFile } from "./types";
+import { useSendEmailNotification } from "@/api/hooks";
 
 const destinyAreas = [
-    { label: "PMT", value: "hgodoy@muniguate.com" },
-    { label: "Semaforización", value: "gzamora@muniguate.com" },
-    { label: "Jurídico", value: "jgis@muniguate.com" },
+    { label: "PMT", value: "PMT" },
+    { label: "Semaforización", value: "SEMAFORIZACION" },
+    { label: "Jurídico", value: "JURIDICO" },
 ];
 
 export const MOD10: React.FC = () => {
+    // Mutations
+    const { sendNotification } = useSendEmailNotification();
+
     // Estados del formulario
     const [destinyArea, setDestinyArea] = useState<string>('');
     const [documentDate, setDocumentDate] = useState<string>('');
     const [issuedBy, setIssuedBy] = useState<string>('');
     const [caseNumber, setCaseNumber] = useState<string>('');
-    const [pageNumbers, setPageNumbers] = useState<number | undefined>();
+    const [pageNumbers, setPageNumbers] = useState<number | undefined>(0);
     const [name, setName] = useState<string>('');
     const [reference, setReference] = useState<string>('');
     const [uploadedFile, setUploadedFile] = useState<UploadedFile>();
@@ -109,31 +113,26 @@ export const MOD10: React.FC = () => {
         setIsModalOpen(true);
     };
 
-    // Manejar envío desde el modal
-    const handleModalSubmit = (data: casesNotificationFormData) => {
-        alert(
-            `✅ Formulario enviado exitosamente\n\n` +
-            `Área destino: ${data.destinyArea}\n` +
-            `Fecha: ${data.documentDate}\n` +
-            `Emitido por: ${data.issuedBy}\n` +
-            `Expediente: ${data.caseNumber}\n` +
-            `Folios: ${data.pageNumbers}\n` +
-            `Nombre: ${data.name}\n` +
-            `Referencia: ${data.reference}\n` +
-            `Archivo: ${data.file.name}`
-        );
-        setIsModalOpen(false);
-        setPendingFormData(null);
-
-        // Limpiar formulario
-        setDestinyArea('');
-        setDocumentDate('');
-        setIssuedBy('');
-        setCaseNumber('');
-        setPageNumbers(undefined);
-        setName('');
-        setReference('');
-        setUploadedFile(undefined);
+    const handleModalSubmit = async (data: casesNotificationFormData) => {
+        try {
+            const result = await sendNotification(
+                {
+                    areaDestino: data.destinyArea,
+                    fechaDocumento: data.documentDate,
+                    emitidoPor: data.issuedBy,
+                    numeroExpediente: data.caseNumber,
+                    numeroFolio: data.pageNumbers,
+                    nombre: data.name,
+                    referencia: data.reference,
+                },
+                data.file.file
+            );
+            console.log("Success:", result);
+            setIsModalOpen(false);
+            setPendingFormData(null);
+        } catch (err) {
+            console.error("Error sending notification:", err);
+        }
     };
 
     return (

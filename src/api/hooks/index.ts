@@ -75,5 +75,8 @@ export { useCreateCategory } from './useCreateCategory';
 export { useCreatePriority } from './useCreatePriority';
 export { useCreateStatus } from './useCreateStatus';
 
+///////// APPS HOOKS //////////
 
+// MOD10 - Apps hooks
+export { useSendEmailNotification } from './useSendEmailNotification';
 

@@ -11,6 +11,8 @@ import { Button } from "@/components/client/atoms/Button";
 import { useRouter } from "next/navigation";
 import { Text } from "@/components/client/atoms/Text";
 
+import { useGetReporteSemanalColaboradores } from "@/api/hooks/useGetReporteSemanalColaboradores";
+
 // interface TaskItem {
 //     id: number;
 //     descripcion: string;
@@ -136,6 +138,9 @@ const TaskSection: React.FC<TaskSectionProps> = ({
 };
 
 const MOD01: React.FC = () => {
+    const { data: collaborators, loading: isColaboradoresLoading, error: colaboradoresError } = useGetReporteSemanalColaboradores();
+
+
     const router = useRouter();
     const [tareasPlanificadas, setTareasPlanificadas] = useState<TaskRecord[]>([]);
     const [tareasCompletadas, setTareasCompletadas] = useState<TaskRecord[]>([]);
@@ -214,19 +219,18 @@ const MOD01: React.FC = () => {
         router.push("/home/save-mod01");
     };
 
-    
+    if (colaboradoresError) {
+        return (
+            <div className={styles.mainContainer}>
+                <Text>Error al cargar colaboradores: {colaboradoresError.message}</Text>
+            </div>
+        );
+    }
 
     const handleField = (field: string, value: string) =>
         setFormData(prev => ({ ...prev, [field]: value }));
-    const collaboratorOptions = [
-        { label: "Juan Pérez", value: "1" },
-        { label: "María García", value: "2" },
-        { label: "Carlos López", value: "3" },
-    ];
 
-    // TODO: replace dummy data with real query
-    // const { data: collaborators } = useGetCollaborators();
-    // const collaboratorOptions = collaborators?.map(c => ({ label: c.nombre, value: c.id })) || [];
+    const collaboratorOptions = collaborators?.map(c => ({ label: c.nombre, value: c.id })) || [];
 
     return (
         <div className={styles.mainContainer}>
@@ -244,6 +248,7 @@ const MOD01: React.FC = () => {
                                 onChange={(e) => handleField("colaborador", e.target.value)}
                                 options={collaboratorOptions}
                                 placeholder="Seleccionar colaborador"
+                                state={isColaboradoresLoading ? "disabled" : "default"}
                             />
                         </FormField>
                         <FormField label="Cargo" htmlFor="cargo">

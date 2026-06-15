@@ -44,3 +44,48 @@ export interface ExecuteLprRemissionResult {
 export interface ExecuteLprRemissionResponse extends Record<string, unknown> {
     ejecutarGrabacionRemisionLpr: ExecuteLprRemissionResult;
 }
+
+
+// MOD01 - Reporte semanal
+export interface TareaPlanInput {
+    descripcion: string;
+    horasEstimadas: number;
+    fechaCompromiso: string;
+    estado: string;
+}
+
+export interface TareaCompletadaInput {
+    descripcion: string;
+    horasReales: number;
+    fechaFinalizacion: string;
+}
+
+export interface GuardarReporteSemanalInput {
+    idColaborador: number;
+    cargo: string;
+    proyecto: string;
+    fechaInicio: string;
+    fechaFin: string;
+    jefeInmediato: string;
+    tareasPlanificadas: number;
+    tareasCompletadas: number;
+    tareasEnFecha: number;
+    bloqueosActivos: number;
+    horasEstimadasTotal: number;
+    horasRealesTotal: number;
+    avancePlanificado: number;
+    avanceReal: number;
+    observaciones: string;
+    tareasPlan: TareaPlanInput[];
+    tareasCompletadasDetalle: TareaCompletadaInput[];
+}
+
+export interface GuardarReporteSemanalResponse {
+    success: boolean;
+    message: string;
+    idReporte: number;
+    reporte: {
+        estadoProyecto: string;
+        indProductividad: number;
+    };
+}

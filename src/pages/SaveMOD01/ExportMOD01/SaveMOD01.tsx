@@ -9,31 +9,56 @@ import StatusChip from "@/components/client/atoms/StatusChip";
 import type { TableCellConfig } from "@/components/client/molecules/TableRow/types";
 import { useRouter } from "next/navigation";
 import styles from "./SaveMOD01.module.scss";
+import { useReporteSemanalStore } from "@/store/useSaveWeeklyReportStore";
 
 const GRID = "minmax(0, 1fr) minmax(0, 2fr)";
 
-// TODO: replace with real data from mutation response
-const DUMMY_REPORT = {
-    id: 704,
-    proyecto: "Migración de procesos",
-    cargo: "Programador",
-    avanceGeneral: "35.00%",
-    indicadorProductividad: "100.00%",
-    estado: "verde" as const,
-    situacion: "El proyecto presenta avance conforme a lo planificado, cumplimiento adecuado de tareas y fechas, sin bloqueos críticos reportados.",
-};
+// // TODO: replace with real data from mutation response
+// const DUMMY_REPORT = {
+//     id: 704,
+//     proyecto: "Migración de procesos",
+//     cargo: "Programador",
+//     avanceGeneral: "35.00%",
+//     indicadorProductividad: "100.00%",
+//     estado: "verde" as const,
+//     situacion: "",
+// };
 
 const SaveMOD01: React.FC = () => {
     const router = useRouter();
 
+    const { lastResult, lastInput } = useReporteSemanalStore();
+
+    console.log("Last saved report result:", lastResult);
+
     const rows: { label: string; content: React.ReactNode }[] = [
-        { label: "ID Reporte", content: <Text variant="muted">{DUMMY_REPORT.id}</Text> },
-        { label: "Proyecto", content: <Text variant="muted">{DUMMY_REPORT.proyecto}</Text> },
-        { label: "Cargo", content: <Text variant="muted">{DUMMY_REPORT.cargo}</Text> },
-        { label: "Porcentaje de avance general", content: <Text variant="muted">{DUMMY_REPORT.avanceGeneral}</Text> },
-        { label: "Índice de productividad", content: <Text variant="muted">{DUMMY_REPORT.indicadorProductividad}</Text> },
-        { label: "Estado del proyecto", content: <StatusChip variant={DUMMY_REPORT.estado} /> },
-        { label: "Situación actual", content: <Text variant="muted">{DUMMY_REPORT.situacion}</Text> },
+        {
+            label: "ID Reporte",
+            content: <Text variant="muted">{lastResult?.idReporte ?? "—"}</Text>
+        },
+        {
+            label: "Proyecto",
+            content: <Text variant="muted">{lastInput?.proyecto ?? "—"}</Text>
+        },
+        {
+            label: "Cargo",
+            content: <Text variant="muted">{lastInput?.cargo ?? "—"}</Text>
+        },
+        {
+            label: "Porcentaje de avance general",
+            content: <Text variant="muted">{lastInput?.avanceReal != null ? `${lastInput.avanceReal.toFixed(2)}%` : "—"}</Text>
+        },
+        {
+            label: "Índice de productividad",
+            content: <Text variant="muted">{lastResult?.reporte.indProductividad != null ? `${lastResult.reporte.indProductividad.toFixed(2)}%` : "—"}</Text>
+        },
+        {
+            label: "Estado del proyecto",
+            content: <StatusChip variant={"verde"} /> },
+        {
+            label: "Observaciones",
+            content: <Text variant="muted">{"El proyecto presenta avance conforme a lo planificado, cumplimiento adecuado de tareas y fechas, sin bloqueos críticos reportados."}</Text>
+        },
     ];
 
     return (

@@ -14,13 +14,7 @@ import { Text } from "@/components/client/atoms/Text";
 import { useGetReporteSemanalColaboradores } from "@/api/hooks/useGetReporteSemanalColaboradores";
 import { useGuardarReporteSemanal } from "@/api/hooks/useSaveWeeklyReport";
 import { GuardarReporteSemanalInput } from "@/api/graphql/apps/types";
-
-// interface TaskItem {
-//     id: number;
-//     descripcion: string;
-//     fechaFinalizacion: string;
-//     [key: string]: string | number; // extra fields
-// }
+import { useReporteSemanalStore } from "@/store/useSaveWeeklyReportStore";
 
 interface ExtraField {
     key: string;
@@ -76,7 +70,6 @@ const TaskSection: React.FC<TaskSectionProps> = ({
         setTasks(updated);
         onTasksChange?.(updated);
     };
-
     return (
         <section className={styles.formSection}>
             <div className={styles.sectionHeader}>
@@ -93,7 +86,6 @@ const TaskSection: React.FC<TaskSectionProps> = ({
                             </Button>
                         </div>
                     )}
-
                     <FormField label={textAreaLabel} htmlFor={`desc-${title}-${task.id}`}>
                         <TextArea
                             id={`desc-${title}-${task.id}`}
@@ -142,6 +134,7 @@ const TaskSection: React.FC<TaskSectionProps> = ({
 
 const MOD01: React.FC = () => {
     const { data: collaborators, loading: isColaboradoresLoading, error: colaboradoresError } = useGetReporteSemanalColaboradores();
+    const setLastResult = useReporteSemanalStore(s => s.setLastResult);
     const { guardarReporte, loading: isSaving } = useGuardarReporteSemanal();
     const router = useRouter();
     const [tareasPlanificadas, setTareasPlanificadas] = useState<TaskRecord[]>([]);
@@ -254,6 +247,7 @@ const MOD01: React.FC = () => {
 
             const result = await guardarReporte(input);
             if (result.success) {
+                setLastResult(result, input);
                 router.push("/home/save-mod01");
             } else {
                 setErrors([result.message || "Error saving the report"]);
@@ -263,24 +257,24 @@ const MOD01: React.FC = () => {
         }
     };
 
-    // if (colaboradoresError) {
-    //     return (
-    //         <div className={styles.mainContainer}>
-    //             <Text>Error al cargar colaboradores: {colaboradoresError.message}</Text>
-    //         </div>
-    //     );
-    // }
+    if (colaboradoresError) {
+        return (
+            <div className={styles.mainContainer}>
+                <Text>Error al cargar colaboradores: {colaboradoresError.message}</Text>
+            </div>
+        );
+    }
 
     const handleField = (field: string, value: string) =>
         setFormData(prev => ({ ...prev, [field]: value }));
 
-    // const collaboratorOptions = collaborators?.map(c => ({ label: c.nombre, value: c.id })) || [];
-    // Dummy options until API is ready
-    const collaboratorOptions = [
-        { label: "Juan Pérez", value: "1" },
-        { label: "María Gómez", value: "2" },
-        { label: "Carlos Rodríguez", value: "3" },
-    ];
+    const collaboratorOptions = collaborators?.map(c => ({ label: c.nombre, value: c.id })) || [];
+    // // Dummy options until API is ready
+    // const collaboratorOptions = [
+    //     { label: "Juan Pérez", value: "1" },
+    //     { label: "María Gómez", value: "2" },
+    //     { label: "Carlos Rodríguez", value: "3" },
+    // ];
 
     return (
         <div className={styles.mainContainer}>

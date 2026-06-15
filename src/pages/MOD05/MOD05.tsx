@@ -7,50 +7,17 @@ import { Checkbox } from '../../components/client/atoms/Checkbox';
 import { Input } from "../../components/client/atoms/Input";
 import { Select } from '../../components/client/atoms/Select';
 import { Button } from '../../components/client/atoms/Button';
+import { Text } from '../../components/client/atoms/Text';
 
 import { SuccessModal } from '../../components/client/organisms/SucessModal';
 
 import styles from './MOD05.module.scss';
 
-const reportStatus = [
-    { label: "Archivo", value: "archivo" },
-    { label: "Baja", value: "baja" },
-    { label: "Suspendido", value: "suspendido" },
-];
-
-const availableFields = [
-    { label: "Empleado", value: "empleado" },
-    { label: "Primer nombre", value: "primer_nombre" },
-    { label: "Segundo nombre", value: "segundo_nombre" },
-    { label: "Tercer nombre", value: "tercer_nombre" },
-    { label: "Primer apellido", value: "primer_apellido" },
-    { label: "Segundo apellido", value: "segundo_apellido" },
-    { label: "Sueldo personal", value: "sueldo_personal" },
-    { label: "Sueldo puesto", value: "sueldo_puesto" },
-    { label: "Sueldo total", value: "sueldo_total" },
-    { label: "Reglón", value: "reglon" },
-    { label: "Fuente", value: "fuente" },
-    { label: "Puesto", value: "puesto" },
-    { label: "Centro costo", value: "centro_costo" },
-    { label: "NIT", value: "nit" },
-    { label: "Cédula", value: "cedula" },
-    { label: "DPI", value: "dpi" },
-    { label: "Dirección", value: "direccion" },
-    { label: "Teléfono", value: "telefono" },
-    { label: "Sexo", value: "sexo" },
-    { label: "Partida Presup.", value: "partida_presup" },
-    { label: "Edad", value: "edad" },
-    { label: "Fecha ingreso", value: "fecha_ingreso" },
-    { label: "Tipo sangre", value: "tipo_sangre" },
-    { label: "IGSS", value: "igss" },
-    { label: "Estatus", value: "estatus" },
-    { label: "Agente", value: "agente" },
-    { label: "Unidad", value: "unidad" },
-    { label: "Fecha nacimiento", value: "fecha_nacimiento" },
-    { label: "P. funcional", value: "p_funcional" },
-    { label: "Estado civil", value: "estado_civil" },
-    { label: "Correo", value: "correo" },
-];
+import {
+    useGetReporteRhEstatusOpciones,
+    useGetReporteRhCamposDisponibles,
+    useGetReporteRhExportExcel,
+} from '@/api/hooks';
 
 const MOD05: React.FC = () => {
     const [status, setStatus] = useState<string>('');
@@ -59,6 +26,26 @@ const MOD05: React.FC = () => {
     const [selectedFields, setSelectedFields] = useState<Set<string>>(new Set());
 
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+    const [exportSuccess, setExportSuccess] = useState<boolean>(false);
+
+    // Hooks para obtener datos del servidor
+    const {
+        data: estatusOpciones,
+        loading: loadingEstatus,
+        error: errorEstatus,
+    } = useGetReporteRhEstatusOpciones();
+
+    const {
+        data: camposDisponibles,
+        loading: loadingCampos,
+        error: errorCampos,
+    } = useGetReporteRhCamposDisponibles();
+
+    const {
+        loading: exportLoading,
+        error: exportError,
+        exportar,
+    } = useGetReporteRhExportExcel();
 
     const handleFieldToggle = (value: string) => {
         setSelectedFields(prevState => {
@@ -72,9 +59,14 @@ const MOD05: React.FC = () => {
         });
     };
 
-    const handleExecute = () => {
-        if (status === '' || startDate === '' || endDate === '') {
-            alert('Por favor, complete todos los campos antes de ejecutar el proceso.');
+    const handleExecute = async () => {
+        if (!status) {
+            alert('Por favor, selecciona un estatus antes de ejecutar el proceso.');
+            return;
+        }
+
+        if (!startDate || !endDate) {
+            alert('Por favor, completa ambas fechas antes de ejecutar el proceso.');
             return;
         }
 
@@ -89,8 +81,18 @@ const MOD05: React.FC = () => {
         }
 
         const selectedFieldsArray = Array.from(selectedFields);
-        alert(`Ejecutando proceso con:\nEstado: ${status}\nFecha de inicio: ${startDate}\nFecha de fin: ${endDate}\nCampos seleccionados: ${selectedFieldsArray.join(', ')}`);
-        setIsModalOpen(true);
+
+        const result = await exportar({
+            estatus: status,
+            fechaIngresoDesde: startDate,
+            fechaIngresoHasta: endDate,
+            campos: selectedFieldsArray,
+        });
+
+        if (result) {
+            setExportSuccess(true);
+            setIsModalOpen(true);
+        }
     };
 
     return (
@@ -102,13 +104,21 @@ const MOD05: React.FC = () => {
 
                     {/* Estatus */}
                     <FormField label="Estatus" htmlFor="status" required className={styles.fieldStatus}>
+                        {errorEstatus && (
+                            <Text variant="caption" className={styles.errorText}>
+                                {errorEstatus.message}
+                            </Text>
+                        )}
                         <Select
                             id="status"
                             value={status}
                             onChange={(e) => setStatus(e.target.value)}
-                            options={reportStatus}
-                            placeholder="Selecciona un área"
-                            // state={loading ? "disabled" : "default"}
+                            options={estatusOpciones.map((opt) => ({
+                                label: opt.etiqueta,
+                                value: opt.codigo,
+                            }))}
+                            placeholder="Selecciona un estatus"
+                            disabled={loadingEstatus}
                             required
                         />
                     </FormField>
@@ -121,7 +131,6 @@ const MOD05: React.FC = () => {
                             value={startDate}
                             onChange={(e) => setStartDate(e.target.value)}
                             placeholder="Ingresa la fecha de inicio"
-                            // state={loading ? "disabled" : "default"}
                             required
                         />
                     </FormField>
@@ -134,21 +143,26 @@ const MOD05: React.FC = () => {
                             value={endDate}
                             onChange={(e) => setEndDate(e.target.value)}
                             placeholder="Ingresa la fecha de fin"
-                            // state={loading ? "disabled" : "default"}
                             required
                         />
                     </FormField>
                 </div>
 
                 <Title variant="mid" tag="h3" className={styles.title}>Seleccione los campos a mostrar</Title>
+                {errorCampos && (
+                    <Text variant="caption" className={styles.errorText}>
+                        {errorCampos.message}
+                    </Text>
+                )}
+                {loadingCampos && <Text>Cargando campos disponibles...</Text>}
                 <div className={styles.fieldsSelection}>
-                    {availableFields.map((field) => (
+                    {camposDisponibles.map((campo) => (
                         <Checkbox
-                            key={field.value}
-                            id={field.value}
-                            label={field.label}
-                            checked={selectedFields.has(field.value)}
-                            onChange={() => handleFieldToggle(field.value)}
+                            key={campo.codigo}
+                            id={campo.codigo}
+                            label={campo.etiqueta}
+                            checked={selectedFields.has(campo.codigo)}
+                            onChange={() => handleFieldToggle(campo.codigo)}
                         />
                     ))}
                 </div>
@@ -159,16 +173,25 @@ const MOD05: React.FC = () => {
                     onClick={handleExecute}
                     className={styles.executeButton}
                 >
-                    Generar Excel
+                    {exportLoading ? 'Generando Excel...' : 'Generar Excel'}
                 </Button>
+
+                {exportError && (
+                    <Text variant="caption" className={styles.errorText}>
+                        Error: {exportError.message}
+                    </Text>
+                )}
             </div>
             <SuccessModal
                 isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                message="Excel generado correctamente"
+                onClose={() => {
+                    setIsModalOpen(false);
+                    setExportSuccess(false);
+                }}
+                message={exportSuccess ? "Excel generado correctamente" : "Error al generar Excel"}
             />
         </div>
-    )
-}
+    );
+};
 
 export default MOD05;

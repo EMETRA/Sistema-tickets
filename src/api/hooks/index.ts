@@ -38,6 +38,12 @@ export { useGetModules } from './useGetModules';
 export { useGetPermissions } from './useGetPermissions';
 export { useGetEnrolls } from './useGetEnrolls';
 
+// MOD05 - Reporte RRHH hooks
+export { useGetReporteRhCamposDisponibles } from './useGetReporteRhCamposDisponibles';
+export { useGetReporteRhEstatusOpciones } from './useGetReporteRhEstatusOpciones';
+export { useGetReporteRhResultados } from './useGetReporteRhResultados';
+export { useGetReporteRhExportExcel } from './useGetReporteRhExportExcel';
+
 // MOD07 - Manuales hooks
 export { useGetManualesCategorias } from './useGetManualesCategorias';
 export { useGetManualesDisponibles } from './useGetManualesDisponibles';

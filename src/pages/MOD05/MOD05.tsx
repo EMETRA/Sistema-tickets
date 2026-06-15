@@ -26,7 +26,6 @@ const MOD05: React.FC = () => {
     const [selectedFields, setSelectedFields] = useState<Set<string>>(new Set());
 
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-    const [exportSuccess, setExportSuccess] = useState<boolean>(false);
 
     // Hooks para obtener datos del servidor
     const {
@@ -90,8 +89,9 @@ const MOD05: React.FC = () => {
         });
 
         if (result) {
-            setExportSuccess(true);
             setIsModalOpen(true);
+        } else {
+            alert('Error al generar el reporte. Por favor, intenta nuevamente.');
         }
     };
 
@@ -186,9 +186,7 @@ const MOD05: React.FC = () => {
                 isOpen={isModalOpen}
                 onClose={() => {
                     setIsModalOpen(false);
-                    setExportSuccess(false);
                 }}
-                message={exportSuccess ? "Excel generado correctamente" : "Error al generar Excel"}
             />
         </div>
     );

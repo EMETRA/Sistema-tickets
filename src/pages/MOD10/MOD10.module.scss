@@ -1,0 +1,32 @@
+.mainContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+.form {
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.fieldsRow {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.fieldsColumn {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.filesSection {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}

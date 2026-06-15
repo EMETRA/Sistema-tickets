@@ -1,0 +1,27 @@
+@use "../../../../theme/colors.scss" as *;
+
+.TicketsResolvePanel {
+  font-family: "Montserrat", sans-serif;
+  display: flex;
+  flex-direction: column;
+  background-color: #FFFFFF;
+  border: 1px solid #7A7A7A40;
+  border-radius: 10px;
+  padding: 24px;
+  width: 100%;
+  max-width: 500px;
+  height: fit-content;
+  gap: 24px;
+}
+
+.header {
+  margin: 0;
+}
+
+.chartContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 16px 0;
+}

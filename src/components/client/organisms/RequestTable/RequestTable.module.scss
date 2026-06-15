@@ -1,0 +1,27 @@
+.RequestTable {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.table {
+    display: flex;
+    flex-direction: column;
+}
+
+.user {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.actions {
+    display: flex;
+    justify-content: flex-end;
+}

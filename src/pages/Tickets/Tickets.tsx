@@ -1,0 +1,190 @@
+"use client";
+
+import React, { useEffect, useRef } from "react";
+import { TicketsTablePanel } from "@/components/client/organisms/TicketsTablePanel";
+import { Ticket } from "@/components/client/organisms/TicketsTablePanel/types";
+import { useDeleteTicket, useTicketsByRole, useUpdateTicket } from "@/api/hooks";
+import styles from "./Tickets.module.scss";
+
+import type { ChipState } from "@/components/client/atoms/Chip/types";
+
+const Tickets: React.FC = () => {
+    // Hook que obtiene tickets filtrados automáticamente según el rol del usuario
+    const { data: ticketsData, loading: isLoading, error: loadError, refetch: refetchTickets } = useTicketsByRole();
+    const { deleteTicket, loading: isDeleting } = useDeleteTicket();
+    const { updateTicket, loading: isAssigning } = useUpdateTicket();
+
+    // Auto-ejecutar refetch al montar el componente (solo una vez)
+
+    const hasRunOnce = useRef(false);
+
+    useEffect(() => {
+        if (!hasRunOnce.current) {
+            hasRunOnce.current = true;
+            refetchTickets();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+    
+
+    const handleDeleteTicket = async (ticketId: string) => {
+        try {
+            const success = await deleteTicket(ticketId);
+
+            if (success) {
+                alert("Ticket eliminado con éxito");
+                await refetchTickets?.();            } else {
+                alert("No se pudo eliminar el ticket.");
+            }
+        } catch (err) {
+            console.error("Error al eliminar ticket:", err);
+            alert("Ocurrió un error técnico al intentar eliminar el ticket.");
+        }
+    };
+
+    const handleAssignTicket = async (ticketId: string, userId: string | number) => {
+        try {
+        // 1. Normalizamos los IDs
+            const tId = ticketId.toString();
+            // El backend espera un Int para el ID de usuario según el README
+            const uId = typeof userId === "string" ? parseInt(userId, 10) : userId;
+
+            // 2. Llamamos a tu hook pasando el ID y el objeto 'input'
+            // Tu hook espera: updateTicket(id, input)
+            const response = await updateTicket(tId, {
+                usuarioAsignadoId: uId,
+            // Aquí podrías pasar también un estadoId si quisieras 
+            // cambiar el estado a "Asignado" (ej: estadoId: 2)
+            });
+
+            if (response) {
+            // No usamos alert para no interrumpir, pero podrías si prefieres
+                console.log("Ticket asignado con éxito");
+                await refetchTickets?.();
+            }
+        } catch (err) {
+            console.error("Error al asignar ticket:", err);
+            alert("No se pudo realizar la asignación.");
+        }
+    };
+
+    // Derivar estados
+    const error = loadError ? "No fue posible cargar los tickets. Intenta nuevamente." : "";
+
+    // Función para formatear fecha
+    // Si es hoy, retorna solo la hora; si no, retorna fecha y hora
+    const formatTicketDate = (dateString: string ): string => {
+        const ticketDate = new Date(dateString);
+        const today = new Date();
+        
+        const isToday = 
+            ticketDate.getDate() === today.getDate() &&
+            ticketDate.getMonth() === today.getMonth() &&
+            ticketDate.getFullYear() === today.getFullYear();
+
+        if (isToday) {
+            // Mostrar solo la hora
+            return ticketDate.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
+        } else {
+            // Mostrar fecha y hora
+            return ticketDate.toLocaleString('es-CO', { 
+                day: '2-digit', 
+                month: '2-digit', 
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+    };
+
+    // Mapear tickets del API al tipo esperado por TicketsTablePanel
+    const transformedTickets: Ticket[] = ticketsData?.map(ticket => {
+        return {
+            id: ticket.id,
+            user: {
+                id: ticket.usuarioCreadorId,
+                name: ticket.creador.nombre,
+                email: "email@example.com",
+                department: ticket.creador.department || "Sin departamento",
+                initials: ticket.creador.nombre.charAt(0) + (ticket.creador.nombre.split(" ")[1]?.charAt(0) || ""),
+                avatar: ticket.creador.avatar,
+            },
+            title: ticket.titulo,
+            description: ticket.descripcion,
+            date: formatTicketDate(ticket.fechaCreacion),
+            status: {
+                label: ticket.estadoNombre,
+                state: ticket.estadoNombre.toLowerCase() === "en trabajo" ? "en_trabajo" as ChipState : ticket.estadoNombre.toLowerCase() as ChipState,
+            },
+            assignedTo: ticket.asignado ? {
+                id: ticket.asignado.id,
+                name: ticket.asignado.nombre,
+                initials: ticket.asignado.nombre.charAt(0) + (ticket.asignado.nombre.split(" ")[1]?.charAt(0) || ""),
+                avatarSrc: ticket.asignado.avatar || undefined,
+            } : null,
+        };
+    }) || [];
+
+    if (isLoading) {
+        return <div className={styles.mainContainer}>Cargando tickets...</div>;
+    }
+
+    if (error) {
+        return <div className={styles.mainContainer}>{error}</div>;
+    }
+
+    const handleExportTickets = () => {
+        if (!transformedTickets.length) return;
+
+        const headers = [
+            "ID",
+            "Usuario",
+            "Departamento",
+            "Título",
+            "Descripción",
+            "Fecha",
+            "Estado",
+            "Asignado a",
+        ];
+
+        const rows = transformedTickets.map(ticket => [
+            ticket.id,
+            ticket.user.name,
+            ticket.user.department,
+            ticket.title,
+            // Strip markdown and wrap in quotes to handle commas/newlines
+            `"${ticket.description.replace(/"/g, '""').replace(/\n/g, ' ')}"`,
+            ticket.date,
+            ticket.status.label,
+            ticket.assignedTo?.name ?? "Sin asignar",
+        ]);
+
+        const csvContent = [
+            headers.join(","),
+            ...rows.map(row => row.join(",")),
+        ].join("\n");
+
+        const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" }); // \uFEFF = BOM for Excel UTF-8
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `tickets_${new Date().toISOString().split("T")[0]}.csv`;
+        link.click();
+        URL.revokeObjectURL(url);
+    };
+
+    return (
+        <div className={styles.mainContainer}>
+            <TicketsTablePanel
+                tickets={transformedTickets}
+                loading={isLoading || isDeleting || isAssigning}
+                onAssign={handleAssignTicket}
+                onDelete={handleDeleteTicket}
+                onExport={handleExportTickets}
+                onTicketUpdated={refetchTickets}
+            />
+        </div>
+    );
+};
+
+export default Tickets;

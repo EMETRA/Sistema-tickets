@@ -1,0 +1,35 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  justify-content: center;
+  padding: 20px;
+  background-color: transparent;
+}
+
+.header {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+
+.name {
+  color: #AACC00;
+  margin-left: 10px;
+  font-size: 1.5rem; 
+}
+
+.description {
+  margin-top: 0px;
+  text-align: justify;
+  // color: #333333;
+}
+
+.caption {
+  margin-top: 8px;
+  margin-bottom: 8px;
+  color: #666666;
+  text-align: center;
+  justify-content: center;
+  align-self: center;
+}

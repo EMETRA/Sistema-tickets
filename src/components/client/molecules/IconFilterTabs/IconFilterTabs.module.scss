@@ -1,0 +1,52 @@
+@use "../../../../theme/colors.scss" as *;
+
+.IconFilterTabs {
+  font-family: "Montserrat", sans-serif;
+  display: inline-flex;
+  gap: 0;
+  align-items: center;
+  background-color: #F2F2F2;
+  border-radius: 10px;
+  padding: 4px;
+
+  &--disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &__button {
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+
+    &--selected {
+      background-color: #FFFFFF !important;
+      color: #000000 !important;
+      
+      // Sobrescribir el color del ícono
+      svg {
+        color: #000000 !important;
+      }
+    }
+
+    &--unselected {
+      background-color: transparent !important;
+      color: #A9A9A9 !important;
+      
+      svg {
+        color: #A9A9A9 !important;
+      }
+
+      &:hover:not(:disabled) {
+        background-color: rgba(#A9A9A9, 0.1) !important;
+      }
+
+      &:active:not(:disabled) {
+        background-color: rgba(#A9A9A9, 0.15) !important;
+      }
+    }
+  }
+}

@@ -1,0 +1,22 @@
+// Estilos base del searchfield
+.SearchField {
+    width: 100%;
+}
+
+.inputWrapper {
+    position: relative;
+    width: 100%;
+}
+
+.input {
+    padding-right: 40px;
+}
+
+.searchButton {
+    position: absolute;
+    top: 50%;
+    right: 6px;
+    transform: translateY(-50%);
+    height: 28px;
+    width: 28px;
+}

@@ -11,6 +11,7 @@ interface CheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>
   className?: string;
   errorMessage?: string;
   label?: string;
+  size?: number;
 }
 
 export type { CheckboxProps, CheckboxState };

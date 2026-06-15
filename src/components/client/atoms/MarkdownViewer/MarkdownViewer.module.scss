@@ -1,0 +1,33 @@
+.MarkdownViewer {
+    // Usamos :global(.tiptap) porque Tiptap inyecta su propio div interno
+    :global(.tiptap) {
+        white-space: pre-line; // 👈 Esto ayuda a reconocer los saltos de línea simples
+        outline: none;
+
+        p {
+            margin: 0 0 1rem 0; // Separación entre párrafos
+        }
+
+        // --- ESTILOS DE LISTAS (Lo que te falta) ---
+        ul {
+            list-style-type: disc !important; // Obligamos a que salga el punto
+            padding-left: 1.5rem !important; // Espacio para que el punto no se salga del contenedor
+            margin: 1rem 0;
+            display: block;
+
+            li {
+                display: list-item !important; // Asegura que se comporte como item de lista
+                margin-bottom: 0.25rem;
+                
+                // Por si hay párrafos dentro de los li
+                p { margin: 0; } 
+            }
+        }
+
+        // --- COMBOS DE ESTILOS ---
+        strong { font-weight: bold; }
+        em { font-style: italic; }
+        u { text-decoration: underline; }
+        s { text-decoration: line-through; }
+    }
+}

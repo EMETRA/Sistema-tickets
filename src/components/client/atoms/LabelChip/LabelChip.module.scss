@@ -1,0 +1,73 @@
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px 7px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 500;
+  line-height: 1.4;
+  white-space: nowrap;
+  transition: background-color 0.15s ease-in-out, opacity 0.15s ease-in-out;
+  user-select: none;
+
+  // Default variant (neutral gray)
+  &.default {
+    background-color: #e9eaec;
+    color: #3a3d42;
+  }
+
+  &.bug {
+    background-color: #fde8e8;
+    color: #b91c1c;
+  }
+
+  &.maintenance {
+    background-color: #e8f0fd;
+    color: #1c4db9;
+  }
+
+  &.feature {
+    background-color: #e8fdf0;
+    color: #166534;
+  }
+
+  &.urgent {
+    background-color: #fff3e8;
+    color: #b95c1c;
+  }
+}
+
+.label {
+  line-height: 1;
+}
+
+.removeButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.5;
+  line-height: 1;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  transition: opacity 0.15s ease-in-out;
+  flex-shrink: 0;
+
+  &:hover {
+    opacity: 1;
+  }
+
+  &:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 1px;
+    border-radius: 2px;
+  }
+}

@@ -12,32 +12,32 @@ import { TextAreaProps } from "./types";
  * @returns {JSX.Element} El componente de textarea renderizado.
  */
 const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
-  ({ className, state = "default", errorMessage, ...props }, ref) => {
+    ({ className, state = "default", errorMessage, ...props }, ref) => {
     // Referencia interna al textarea
-    const textareaRef = useRef<HTMLTextAreaElement>(null);
+        const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-    // Combina la referencia interna con la referencia pasada
-    useImperativeHandle(ref, () => textareaRef.current as HTMLTextAreaElement, []);
+        // Combina la referencia interna con la referencia pasada
+        useImperativeHandle(ref, () => textareaRef.current as HTMLTextAreaElement, []);
 
-    // Construir las clases CSS dinámicamente usando classnames
-    const textareaClasses = classNames(styles.TextArea, {
-      [styles.TextAreaError]: state === "error",
-    }, className);
+        // Construir las clases CSS dinámicamente usando classnames
+        const textareaClasses = classNames(styles.TextArea, {
+            [styles.TextAreaError]: state === "error",
+        }, className);
 
-    return (
-      <>
-        <textarea
-          ref={textareaRef}
-          className={textareaClasses}
-          disabled={state === "disabled"}
-          {...props}
-        />
-        {state === "error" && errorMessage && (
-          <span className={styles.ErrorMessage}>{errorMessage}</span>
-        )}
-      </>
-    );
-  }
+        return (
+            <>
+                <textarea
+                    ref={textareaRef}
+                    className={textareaClasses}
+                    disabled={state === "disabled"}
+                    {...props}
+                />
+                {state === "error" && errorMessage && (
+                    <span className={styles.ErrorMessage}>{errorMessage}</span>
+                )}
+            </>
+        );
+    }
 );
 
 TextArea.displayName = "TextArea";

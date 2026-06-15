@@ -1,0 +1,46 @@
+'use client';
+
+/**
+ * Hook useGetPerfilEquipo
+ *
+ * Flujo:
+ * 1. Hook llama a fetch('/api/perfil-equipo')
+ * 2. Route handler ejecuta GET_PERFIL_EQUIPO_QUERY en servidor
+ * 3. Hook retorna { data, loading, error, refetch }
+ */
+
+import { useState } from "react";
+import { apiFetch } from "@/api/graphql/client";
+import { type DepartamentoPerfil } from "@/api/graphql/home";
+
+/**
+ * Hook para obtener el perfil del equipo/departamento
+ * @returns { data, loading, error, refetch }
+ */
+export function useGetPerfilEquipo() {
+    const [data, setData] = useState<DepartamentoPerfil[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<Error | null>(null);
+
+    async function refetch() {
+        setLoading(true);
+        setError(null);
+
+        try {
+            const response = await apiFetch<{ perfilequipo: DepartamentoPerfil[] }>("/api/perfil-equipo");
+            setData(response.perfilequipo || []);
+        } catch (err) {
+            const error = err instanceof Error ? err : new Error(String(err));
+            setError(error);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    return {
+        data,
+        loading,
+        error,
+        refetch,
+    };
+}

@@ -1,0 +1,71 @@
+@use "../../../../theme/colors.scss" as *;
+
+.PerformanceChartPanel {
+  font-family: "Montserrat", sans-serif;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: fit-content;
+  gap: 24px;
+
+  // ============================================
+  // VARIANTE PRIMARY
+  // ============================================
+  &.primary {
+    background-color: #FFFFFF;
+    border: 1px solid #7A7A7A40;
+    border-radius: 10px;
+    padding: 24px 24px 0 24px;
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .chartContainer {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+    }
+  }
+
+  // ============================================
+  // VARIANTE SECONDARY
+  // ============================================
+  &.secondary {
+    .parentFilters {
+      display: flex;
+      justify-content: center;
+    }
+
+    .ToggleButtonFather {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    .contentContainer {
+      background-color: #FFFFFF;
+      border: 1px solid #7A7A7A40;
+      border-radius: 10px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .childFilters {
+      display: flex;
+      justify-content: center;
+    }
+
+    .chartContainer {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+    }
+  }
+}

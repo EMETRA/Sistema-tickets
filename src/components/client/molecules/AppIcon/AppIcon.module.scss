@@ -1,0 +1,24 @@
+@use "../../../../theme/colors.scss" as *;
+
+.AppIcon {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.iconWrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid $gris-1;
+  padding: 8px;
+  border-radius: 50%;
+}
+
+.label {
+  color: #8D8DA8;
+  font-weight: 600;
+  font-size: 14px;
+  text-align: center;
+}

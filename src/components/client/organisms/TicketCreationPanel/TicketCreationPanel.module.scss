@@ -1,0 +1,63 @@
+@use "../../../../theme/colors.scss" as *;
+
+.TicketCreationPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  padding: 24px;
+  background-color: #FFFFFF;
+  border-radius: 8px;
+}
+
+.title {
+  margin: 0;
+  padding: 0;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.fieldsRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.fieldAsunto {
+  flex: 1;
+}
+
+.fieldDepartamento {
+  flex: 1;
+}
+
+// Sección de archivos
+.filesSection {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.filesList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 16px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.rejectedMessage {
+    color: #E63946;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+}

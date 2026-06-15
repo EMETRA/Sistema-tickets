@@ -1,0 +1,33 @@
+.mainContainer {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.card {
+    background: #fff;
+    border: 0.5px solid #e5e5e5;
+    border-radius: 12px;
+    padding: 2rem;
+}
+
+.formSection {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.sectionTitle {
+    margin: 0;
+}
+
+.fieldsGridTwo {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem 1.5rem;
+}
+
+.formActions {
+    display: flex;
+    gap: 1rem;
+}

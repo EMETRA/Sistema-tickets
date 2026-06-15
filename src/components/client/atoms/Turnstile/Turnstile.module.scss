@@ -1,0 +1,15 @@
+.turnstile {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+
+  /* Asegurar que el iframe de Turnstile se ajuste bien */
+  :global(iframe) {
+    border-radius: 4px;
+  }
+}
+
+.disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}

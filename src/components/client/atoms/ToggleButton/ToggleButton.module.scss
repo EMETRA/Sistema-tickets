@@ -11,6 +11,32 @@
     cursor: not-allowed;
   }
 
+  &--withNavigation {
+    gap: 8px;
+  }
+
+  &__options {
+    display: inline-flex;
+    gap: 12px;
+    align-items: center;
+    animation: slideIn 0.25s ease-out;
+  }
+
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateX(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  &__navButton {
+    flex-shrink: 0;
+  }
+
   &__unselected {
     background-color: transparent;
     border: none;
@@ -21,6 +47,8 @@
     cursor: pointer;
     transition: all 0.2s ease;
     white-space: nowrap;
+    font-family: "Montserrat", sans-serif;
+    font-size: 14px;
 
     &:hover:not(:disabled) {
       background-color: rgba($gris-1, 0.3);

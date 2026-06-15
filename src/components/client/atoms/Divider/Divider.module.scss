@@ -1,0 +1,17 @@
+.divider {
+    background-color: #E5E7EB; // Un gris claro estándar de UI
+    border: none;
+}
+
+.horizontal {
+    width: 100%;
+    height: 1px;
+    margin: 12px 0; // Espaciado por defecto
+}
+
+.vertical {
+    width: 1px;
+    height: auto;
+    align-self: stretch; // Se estira al alto de su contenedor (como en el Login)
+    margin: 0 16px;
+}

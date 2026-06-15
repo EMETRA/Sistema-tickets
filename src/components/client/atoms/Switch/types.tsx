@@ -6,6 +6,11 @@ import { InputHTMLAttributes } from "react";
 export type SwitchState = "default" | "error" | "disabled";
 
 /**
+ * Tamaño del switch.
+ */
+export type SwitchSize = "small" | "medium" | "large";
+
+/**
  * Propiedades del componente Switch.
  *
  * Extiende las propiedades nativas de HTMLInputElement con el tipo "checkbox".
@@ -31,4 +36,10 @@ export interface SwitchProps extends Omit<InputHTMLAttributes<HTMLInputElement>,
    * Clase CSS adicional para el contenedor.
    */
   className?: string;
+
+  /**
+   * Tamaño del switch.
+   * @default "medium"
+   */
+  switchSize?: SwitchSize;
 }

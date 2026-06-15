@@ -1,0 +1,30 @@
+.AssignedChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px 4px 4px;
+  border-radius: 24px;
+  transition: all 0.2s ease;
+  font-family: "Montserrat", sans-serif;
+  background-color: #F5F5F5;  
+  cursor: pointer;
+  max-width: 100%;
+  overflow: hidden;
+
+  &:hover {
+    background-color: #E0E0E0;
+  }
+}
+
+.avatar {
+  flex-shrink: 0;
+}
+
+.userName {
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #737373;
+  font-size: 14px;
+}

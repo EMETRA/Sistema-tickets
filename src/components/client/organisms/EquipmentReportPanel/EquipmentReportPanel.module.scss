@@ -1,0 +1,51 @@
+.reportCard {
+    background-color: #FFFFFF;
+    border: 1px solid #E0E0E0;
+    border-radius: 16px;
+    display: flex;
+    padding: 32px;
+    gap: 32px;
+    width: 100%;
+    max-width: 1000px;
+}
+
+.statusSection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 200px;
+
+    .title {
+        align-self: flex-start;
+        margin-bottom: 24px;
+        font-size: 18px;
+        color: #333333;
+    }
+
+    .ringWrapper {
+        margin-bottom: 16px;
+        :global(.ProgressRing_progressRing__svg) { 
+        stroke: #99cc33; 
+        }
+    }
+
+    .statusText {
+        color: #666666;
+    }
+}
+
+.divider {
+    width: 1px;
+    background-color: #E0E0E0;
+    align-self: stretch;
+}
+
+.gridSection {
+    flex: 1;
+    display: grid;
+    // Usamos el gap horizontal que discutimos antes
+    grid-template-columns: repeat(2, 1fr);
+    column-gap: 20px;
+    row-gap: 12px;
+    align-content: center;
+}

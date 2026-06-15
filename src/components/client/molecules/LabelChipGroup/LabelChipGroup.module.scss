@@ -1,0 +1,94 @@
+.container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+// --- Editable input box ---
+.inputBox {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    min-height: 38px;
+    border: 2px solid #EDF0F2;
+    border-radius: 8px;
+    background-color: #ffffff;
+    cursor: pointer;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    outline: none;
+
+    &:not(.readonly) {
+        &:hover {
+        border-color: #9ca3af;
+        }
+
+        &:focus-visible {
+        border-color: #6366f1;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+        }
+
+        &.inputBoxOpen {
+        border-color: #6366f1;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+        }
+    }
+
+    &.readonly {
+        cursor: default;
+    }
+}
+
+.placeholder {
+    font-size: 13px;
+    font-family: "Montserrat", sans-serif;
+    color: #9ca3af;
+    pointer-events: none;
+    user-select: none;
+}
+
+// --- Custom dropdown ---
+.dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    z-index: 50;
+    margin: 0;
+    padding: 4px;
+    list-style: none;
+    background-color: #ffffff;
+    border: 2px solid #EDF0F2;
+    border-radius: 8px;
+    box-shadow:
+        0 4px 6px -1px rgba(0, 0, 0, 0.07),
+        0 10px 15px -3px rgba(0, 0, 0, 0.07);
+    overflow: hidden;
+}
+
+.dropdownItem {
+    display: flex;
+    align-items: center;
+    padding: 6px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.1s ease-in-out;
+    outline: none;
+
+    &:hover {
+        background-color: #f3f4f6;
+    }
+
+    &:focus-visible {
+        background-color: #eff6ff;
+    }
+}
+
+// --- Empty state ---
+.empty {
+    font-size: 15px;
+    color: #9ca3af;
+    font-family: "Montserrat", sans-serif;
+}

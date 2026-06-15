@@ -1,0 +1,47 @@
+@use "../../../../theme/colors.scss" as *;
+
+.StatInLine {
+  font-family: "Montserrat", sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.Label {
+  font-weight: 400;
+  color: $primary-text;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.Value {
+  font-weight: 600;
+  margin: 0;
+  line-height: 1;
+}
+
+// Tamaño small: 20px valor (semibold), 14px label
+.small {
+  .Label {
+    font-size: 14px;
+  }
+
+  .Value {
+    font-size: 20px;
+  }
+}
+
+// Tamaño medium: 26px valor, 16px label
+.medium {
+  flex-direction: column-reverse;
+  gap: 21px;
+
+  .Label {
+    font-size: 16px;
+  }
+
+  .Value {
+    font-size: 26px;
+  }
+}

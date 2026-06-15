@@ -1,0 +1,16 @@
+@use "../../../../theme/colors.scss" as *;
+
+.TicketsFilterBar {
+  font-family: "Montserrat", sans-serif;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: 24px;
+
+  .actions {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+  }
+}

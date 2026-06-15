@@ -1,0 +1,49 @@
+.sidebar {
+    width: 100px;
+    height: 100vh;
+    background-color: #4361EE;
+    display: flex;
+    flex-direction: column;
+    // position: fixed;
+    // left: 0;
+    // top: 0;
+    flex-shrink: 0;
+}
+
+.logoSection {
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    z-index: 10;
+}
+
+.navContainer {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;    
+    overflow-y: auto;
+    scrollbar-width: none;
+    &::-webkit-scrollbar { width: 0; }
+    &::before {
+        content: "";
+        margin-top: auto; 
+    }
+    &::after {
+        content: "";
+        margin-bottom: auto;
+        min-height: 80px; 
+    }
+
+    .navItemsGroup {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        width: 100%;
+        align-items: center;
+        flex-shrink: 0; 
+    }
+}

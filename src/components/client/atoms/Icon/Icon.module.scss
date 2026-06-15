@@ -1,0 +1,37 @@
+.container {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease-in-out;
+  flex-shrink: 0;
+
+  &.hasBg {
+    border-radius: 50%; // Para el estilo circular de tu captura
+  }
+}
+
+.iconMask {
+  width: var(--icon-size);
+  height: var(--icon-size);
+  background-color: var(--icon-color, currentColor);
+  mask-repeat: no-repeat;
+  mask-size: contain;
+  mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  -webkit-mask-position: center;
+}
+
+// Mantener compatibilidad con tus variantes anteriores
+.navigation {
+  --icon-color: rgba(255, 255, 255, 0.8);
+  &.active {
+    --icon-color: #ffffff;
+    transform: scale(1.1);
+  }
+}
+
+.action {
+  cursor: pointer;
+  &:hover { opacity: 0.7; }
+}

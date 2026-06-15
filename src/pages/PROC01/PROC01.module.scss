@@ -1,0 +1,47 @@
+.mainContainer {
+    height: 100%;
+    display: grid;
+    grid-template-columns: 1fr 4fr;
+    align-items: center;
+    justify-items: center;
+    gap: 20px;
+    padding: 20px;
+}
+
+.formContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 400px;
+    padding: 20px;
+}
+
+.executeButton {
+    margin-top: 24px;
+}
+
+.cardsContainer {
+    width: fit-content;
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    padding: 20px;
+}
+
+.formContainer, .cardsContainer {
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+}
+
+.cardLoading {
+    animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.4;
+    }
+}

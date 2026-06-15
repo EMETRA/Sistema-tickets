@@ -1,0 +1,51 @@
+.mainContainer {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.filterBar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: #fff;
+    border: 2px solid #e5e5e5;
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+}
+
+.filterField {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.filterLabel {
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.cardsGrid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.5rem;
+}
+
+.chartContainer {
+    background: #fff;
+    border: 2px solid #e5e5e5;
+    border-radius: 12px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    overflow: hidden;
+}
+
+.tableContainer {
+    background: #fff;
+    overflow: hidden;
+}
+
+.chartTitle { font-size: 18px; font-weight: 700; margin-bottom: 1rem; }

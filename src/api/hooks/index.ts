@@ -38,6 +38,9 @@ export { useGetModules } from './useGetModules';
 export { useGetPermissions } from './useGetPermissions';
 export { useGetEnrolls } from './useGetEnrolls';
 
+// MOD04 - Reporte VISA Nómina hooks
+export { useGetVisaNominaExportExcel } from './useGetVisaNominaExportExcel';
+
 // MOD05 - Reporte RRHH hooks
 export { useGetReporteRhCamposDisponibles } from './useGetReporteRhCamposDisponibles';
 export { useGetReporteRhEstatusOpciones } from './useGetReporteRhEstatusOpciones';

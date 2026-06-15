@@ -9,9 +9,13 @@ import { Text } from '../../components/client/atoms/Text';
 
 import { SuccessModal } from '../../components/client/organisms/SucessModal';
 
+import { useGetVisaNominaExportExcel } from '@/api/hooks';
+
 import styles from './MOD04.module.scss';
 
 const MOD04: React.FC = () => {
+    const { exportar, loading: exportLoading, error: exportError } = useGetVisaNominaExportExcel();
+
     const [company, setCompany] = useState<string>('');
     const [paystubType, setPaystubType] = useState<string>('');
     const [playrollManager, setPlayrollManager] = useState<string>('');
@@ -20,14 +24,27 @@ const MOD04: React.FC = () => {
 
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
-    const handleExecute = () => {
+    const handleExecute = async () => {
         if (company === '' || paystubType === '' || playrollManager === '' || paymentType === '' || budgetUnit === '') {
             alert('Por favor, complete todos los campos antes de ejecutar el proceso.');
             return;
         }
 
         alert(`Ejecutando proceso con:\nEmpresa: ${company}\nTipo de Recibo: ${paystubType}\nGerente de Nómina: ${playrollManager}\nTipo de Pago: ${paymentType}\nUnidad de Presupuesto: ${budgetUnit}`);
-        setIsModalOpen(true);
+        
+        const result = await exportar({
+            empresa: company,
+            tipoNomina: paystubType,
+            maestroNomina: playrollManager,
+            tipoPago: paymentType,
+            unidadPresupuestaria: budgetUnit,
+        });
+
+        if (result) {
+            setIsModalOpen(true);
+        } else {
+            alert(`Proceso finalizado. Resultado: ${result ? 'Éxito' : 'Error'}`);
+        }
     };
 
     return (
@@ -106,8 +123,14 @@ const MOD04: React.FC = () => {
                     onClick={handleExecute}
                     className={styles.executeButton}
                 >
-                    Generar Reporte en Excel
+                    {exportLoading ? 'Generando Excel...' : 'Generar Reporte en Excel'}
                 </Button>
+
+                {exportError && (
+                    <Text variant="caption" className={styles.errorText}>
+                        Error: {exportError.message}
+                    </Text>
+                )}
 
                 <Text variant="caption" className={styles.footerText}>
                     Dirección de Informática · Municipalidad de Guatemala

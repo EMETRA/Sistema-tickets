@@ -44,6 +44,12 @@ export { useGetReporteRhEstatusOpciones } from './useGetReporteRhEstatusOpciones
 export { useGetReporteRhResultados } from './useGetReporteRhResultados';
 export { useGetReporteRhExportExcel } from './useGetReporteRhExportExcel';
 
+// MOD06 - Funciones por usuario
+export { useGetFuncionesPorUsuarioAplicaciones } from './useGetFuncionesPorUsuarioAplicaciones';
+export { useGetFuncionesPorUsuarioEmpresas } from './useGetFuncionesPorUsuarioEmpresas';
+export { useGetFuncionesPorUsuarioUsuarios } from './useGetFuncionesPorUsuarioUsuarios';
+export { useGetFuncionesPorUsuarioPermisos } from './useGetFuncionesPorUsuarioPermisos';
+
 // MOD07 - Manuales hooks
 export { useGetManualesCategorias } from './useGetManualesCategorias';
 export { useGetManualesDisponibles } from './useGetManualesDisponibles';

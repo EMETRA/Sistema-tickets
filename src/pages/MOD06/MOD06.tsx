@@ -8,41 +8,19 @@ import { Select } from '../../components/client/atoms/Select';
 
 import { SuccessModal } from '../../components/client/organisms/SucessModal';
 
+import {
+    useGetFuncionesPorUsuarioEmpresas,
+    useGetFuncionesPorUsuarioUsuarios,
+    useGetFuncionesPorUsuarioAplicaciones,
+} from '@/api/hooks';
+
 import styles from './MOD06.module.scss';
 
-
-// Dummy data - La data tiene que venir del back
-const company = [
-    { label: "Empresa 1", value: '1' },
-    { label: "Empresa 2", value: '2' },
-    { label: "Empresa 3", value: '3' },
-];
-
-const user = [
-    { label: "Usuario 1", value: '1' },
-    { label: "Usuario 2", value: '2' },
-    { label: "Usuario 3", value: '3' },
-];
-
-const application = [
-    { label: "Aplicación 1", value: '1' },
-    { label: "Aplicación 2", value: '2' },
-    { label: "Aplicación 3", value: '3' },
-];
-
-const userOrigin = [
-    { label: "Usuario 1", value: '1' },
-    { label: "Usuario 2", value: '2' },
-    { label: "Usuario 3", value: '3' },
-];
-
-const userDestiny = [
-    { label: "Usuario 1", value: '1' },
-    { label: "Usuario 2", value: '2' },
-    { label: "Usuario 3", value: '3' },
-];
-
 const MOD06: React.FC = () => {
+    const { data: empresasData, loading: empresasLoading, error: empresasError } = useGetFuncionesPorUsuarioEmpresas();
+    const { data: usuariosData, loading: usuariosLoading, error: usuariosError } = useGetFuncionesPorUsuarioUsuarios();
+    const { data: aplicacionesData, loading: aplicacionesLoading, error: aplicacionesError } = useGetFuncionesPorUsuarioAplicaciones();
+
     const [selectedCompany, setSelectedCompany] = useState<string>('');
     const [selectedGeneralUser, setSelectedGeneralUser] = useState<string>('');
     const [selectedApplication, setSelectedApplication] = useState<string>('');
@@ -61,6 +39,18 @@ const MOD06: React.FC = () => {
         setIsModalOpen(true);
     };
 
+    if (empresasLoading || usuariosLoading || aplicacionesLoading) {
+        return <div className={styles.loadingContainer}>
+            Cargando datos...
+        </div>;
+    }
+
+    if (empresasError || usuariosError || aplicacionesError) {
+        return <div className={styles.errorContainer}>
+            Ocurrió un error al cargar los datos. Por favor, intente nuevamente.
+        </div>;
+    }
+
     return (
         <div className={styles.mainContainer}>
             <div className={styles.formContainer}>
@@ -75,7 +65,7 @@ const MOD06: React.FC = () => {
                             onChange={(e) => {
                                 setSelectedCompany(e.target.value);
                             }}
-                            options={company}
+                            options={empresasData.map((item) => ({ label: item.nombre, value: item.empresa }))}
                             placeholder="Seleccionar empresa"
                         />
                     </FormField>
@@ -88,7 +78,7 @@ const MOD06: React.FC = () => {
                             onChange={(e) => {
                                 setSelectedGeneralUser(e.target.value);
                             }}
-                            options={user}
+                            options={usuariosData.map((item) => ({ label: item.usuario, value: item.asignaUsuario }))}
                             placeholder="Seleccionar usuario general"
                         />
                     </FormField>
@@ -101,7 +91,7 @@ const MOD06: React.FC = () => {
                             onChange={(e) => {
                                 setSelectedApplication(e.target.value);
                             }}
-                            options={application}
+                            options={aplicacionesData.map((item) => ({ label: item.nombre, value: item.aplicacion }))}
                             placeholder="Seleccionar aplicación"
                         />
                     </FormField>
@@ -117,7 +107,7 @@ const MOD06: React.FC = () => {
                             onChange={(e) => {
                                 setSelectedUserOrigin(e.target.value);
                             }}
-                            options={userOrigin}
+                            options={usuariosData.map((item) => ({ label: item.usuario, value: item.asignaUsuario }))}
                             placeholder="Seleccionar usuario origen"
                         />
                     </FormField>
@@ -130,7 +120,7 @@ const MOD06: React.FC = () => {
                             onChange={(e) => {
                                 setSelectedUserDestiny(e.target.value);
                             }}
-                            options={userDestiny}
+                            options={usuariosData.map((item) => ({ label: item.usuario, value: item.asignaUsuario }))}
                             placeholder="Seleccionar usuario destino"
                         />
                     </FormField>

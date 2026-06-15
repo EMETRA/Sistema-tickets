@@ -9,13 +9,16 @@ import { Select } from '../../components/client/atoms/Select';
 import { Text } from '../../components/client/atoms/Text';
 
 import { SuccessModal } from '../../components/client/organisms/SucessModal';
+import { useGetReporteAnuladosExcel } from '@/api/hooks/useGetReporteAnuladosExcel';
 
 import styles from './MOD08.module.scss';
 
+import type { TipoReporteAnulado } from '@/api/graphql/MOD08';
+
 const reportTypes = [
-    { label: "Recibos de Pago", value: 'pago' },
-    { label: "Ticket Parqueos", value: 'parqueo' },
-    { label: "Paralelo Formas", value: 'formas' },
+    { label: "Recibos de Pago", value: 'RECIBOS_PAGO' },
+    { label: "Ticket Parqueos", value: 'TICKET_PARQUEOS' },
+    { label: "Paralelo Formas", value: 'PARALELO_FORMAS' },
 ];
 
 const MOD08: React.FC = () => {
@@ -24,15 +27,23 @@ const MOD08: React.FC = () => {
     const [selectedReportType, setSelectedReportType] = useState<string>('');
 
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+    const { exportar, loading, error } = useGetReporteAnuladosExcel();
 
-    const handleExecute = () => {
+    const handleExecute = async () => {
         if (startDate === '' || endDate === '' || selectedReportType === '') {
             alert('Por favor, complete todos los campos antes de ejecutar el proceso.');
             return;
         }
-        
-        alert(`Ejecutando proceso con:\nFecha Inicio: ${startDate}\nFecha Fin: ${endDate}\nTipo de Reporte: ${selectedReportType}`);
-        setIsModalOpen(true);
+
+        const success = await exportar({
+            fechaInicio: startDate,
+            fechaFin: endDate,
+            tipoReporte: selectedReportType as TipoReporteAnulado,
+        });
+
+        if (success) {
+            setIsModalOpen(true);
+        }
     };
 
     return (
@@ -70,9 +81,7 @@ const MOD08: React.FC = () => {
                     <Select
                         id="reportType"
                         value={selectedReportType}
-                        onChange={(e) => {
-                            setSelectedReportType(e.target.value);
-                        }}
+                        onChange={(e) => setSelectedReportType(e.target.value)}
                         options={reportTypes}
                         placeholder="Seleccionar tipo de reporte"
                     />
@@ -83,9 +92,16 @@ const MOD08: React.FC = () => {
                     color="default"
                     onClick={handleExecute}
                     className={styles.executeButton}
+                    state={loading ? "loading" : "default"}
                 >
-                    Generar Reporte en Excel
+                    {loading ? 'Generando...' : 'Generar Reporte en Excel'}
                 </Button>
+
+                {error && (
+                    <Text variant="caption" className={styles.errorText}>
+                        {error.message}
+                    </Text>
+                )}
 
                 <Text variant="caption" className={styles.footerText}>
                     Dirección de Informática · Municipalidad de Guatemala

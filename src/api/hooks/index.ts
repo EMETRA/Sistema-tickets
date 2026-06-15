@@ -38,6 +38,12 @@ export { useGetModules } from './useGetModules';
 export { useGetPermissions } from './useGetPermissions';
 export { useGetEnrolls } from './useGetEnrolls';
 
+// MOD07 - Manuales hooks
+export { useGetManualesCategorias } from './useGetManualesCategorias';
+export { useGetManualesDisponibles } from './useGetManualesDisponibles';
+export { useGetManualesAgrupados } from './useGetManualesAgrupados';
+export { useGetManual } from './useGetManual';
+
 // RBAC hooks
 export { useGetRoles } from './useGetRoles';
 export { useCreateRol } from './useCreateRol';

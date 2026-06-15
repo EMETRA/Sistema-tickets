@@ -24,7 +24,7 @@ const reportTypes = [
 const MOD08: React.FC = () => {
     const [startDate, setStartDate] = useState<string>('');
     const [endDate, setEndDate] = useState<string>('');
-    const [selectedReportType, setSelectedReportType] = useState<string>('');
+    const [selectedReportType, setSelectedReportType] = useState<TipoReporteAnulado | ''>('');
 
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const { exportar, loading, error } = useGetReporteAnuladosExcel();
@@ -81,7 +81,7 @@ const MOD08: React.FC = () => {
                     <Select
                         id="reportType"
                         value={selectedReportType}
-                        onChange={(e) => setSelectedReportType(e.target.value)}
+                        onChange={(e) => setSelectedReportType(e.target.value as TipoReporteAnulado)}
                         options={reportTypes}
                         placeholder="Seleccionar tipo de reporte"
                     />

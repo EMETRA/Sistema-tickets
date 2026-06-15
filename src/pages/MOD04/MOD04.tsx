@@ -15,13 +15,13 @@ const MOD04: React.FC = () => {
     const [company, setCompany] = useState<string>('');
     const [paystubType, setPaystubType] = useState<string>('');
     const [playrollManager, setPlayrollManager] = useState<string>('');
-    const [paymentType, setPaymentType] = useState<number | undefined>();
-    const [budgetUnit, setBudgetUnit] = useState<number | undefined>();
+    const [paymentType, setPaymentType] = useState<string>('');
+    const [budgetUnit, setBudgetUnit] = useState<string>('');
 
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
     const handleExecute = () => {
-        if (company === '' || paystubType === '' || playrollManager === '' || paymentType === undefined || budgetUnit === undefined) {
+        if (company === '' || paystubType === '' || playrollManager === '' || paymentType === '' || budgetUnit === '') {
             alert('Por favor, complete todos los campos antes de ejecutar el proceso.');
             return;
         }
@@ -78,12 +78,9 @@ const MOD04: React.FC = () => {
                 <FormField label="Tipo de Pago (Ej. % o 01%)" htmlFor="paymentType" required className={styles.fieldPaymentType}>
                     <Input
                         id="paymentType"
-                        type="number"
-                        min={0}
-                        max={100}
-                        step={0.01}
+                        type="text"
                         value={paymentType}
-                        onChange={(e) => setPaymentType(+e.target.value)}
+                        onChange={(e) => setPaymentType(e.target.value)}
                         placeholder="Ingresa el tipo de pago"
                         // state={loading ? "disabled" : "default"}
                         required
@@ -94,12 +91,9 @@ const MOD04: React.FC = () => {
                 <FormField label="Unidad Presupuestaria (Ej. 12% o %)" htmlFor="budgetUnit" required className={styles.fieldBudgetUnit}>
                     <Input
                         id="budgetUnit"
-                        type="number"
-                        min={0}
-                        max={100}
-                        step={0.01}
+                        type="text"
                         value={budgetUnit}
-                        onChange={(e) => setBudgetUnit(+e.target.value)}
+                        onChange={(e) => setBudgetUnit(e.target.value)}
                         placeholder="Ingresa el nombre de la unidad presupuestaria"
                         // state={loading ? "disabled" : "default"}
                         required

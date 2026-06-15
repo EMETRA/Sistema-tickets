@@ -12,13 +12,9 @@ import { useRouter } from "next/navigation";
 import { Text } from "@/components/client/atoms/Text";
 
 import { useGetReporteSemanalColaboradores } from "@/api/hooks/useGetReporteSemanalColaboradores";
-
-// interface TaskItem {
-//     id: number;
-//     descripcion: string;
-//     fechaFinalizacion: string;
-//     [key: string]: string | number; // extra fields
-// }
+import { useGuardarReporteSemanal } from "@/api/hooks/useSaveWeeklyReport";
+import { GuardarReporteSemanalInput } from "@/api/graphql/apps/types";
+import { useReporteSemanalStore } from "@/store/useSaveWeeklyReportStore";
 
 interface ExtraField {
     key: string;
@@ -26,6 +22,7 @@ interface ExtraField {
     type?: "text" | "date" | "select" | "number";
     options?: { label: string; value: string }[];
     placeholder?: string;
+    step?: string;
 }
 
 interface TaskSectionProps {
@@ -34,8 +31,7 @@ interface TaskSectionProps {
     textAreaLabel: string;
     extraFields: ExtraField[];
     initialItem: Record<string, string>;
-    onTasksChange?: (tasks: TaskRecord[]) => void; // 👈 add this
-
+    onTasksChange?: (tasks: TaskRecord[]) => void;
 }
 
 const estadoOptions = [
@@ -74,7 +70,6 @@ const TaskSection: React.FC<TaskSectionProps> = ({
         setTasks(updated);
         onTasksChange?.(updated);
     };
-
     return (
         <section className={styles.formSection}>
             <div className={styles.sectionHeader}>
@@ -91,7 +86,6 @@ const TaskSection: React.FC<TaskSectionProps> = ({
                             </Button>
                         </div>
                     )}
-
                     <FormField label={textAreaLabel} htmlFor={`desc-${title}-${task.id}`}>
                         <TextArea
                             id={`desc-${title}-${task.id}`}
@@ -122,6 +116,7 @@ const TaskSection: React.FC<TaskSectionProps> = ({
                                         id={`${field.key}-${task.id}`}
                                         type={field.type || "text"}
                                         min={field.type === "number" ? 0 : undefined}
+                                        step={field.step}
                                         value={task[field.key] as string}
                                         onChange={(e) => handleChange(task.id, field.key, e.target.value)}
                                     />
@@ -139,8 +134,8 @@ const TaskSection: React.FC<TaskSectionProps> = ({
 
 const MOD01: React.FC = () => {
     const { data: collaborators, loading: isColaboradoresLoading, error: colaboradoresError } = useGetReporteSemanalColaboradores();
-
-
+    const setLastResult = useReporteSemanalStore(s => s.setLastResult);
+    const { guardarReporte, loading: isSaving } = useGuardarReporteSemanal();
     const router = useRouter();
     const [tareasPlanificadas, setTareasPlanificadas] = useState<TaskRecord[]>([]);
     const [tareasCompletadas, setTareasCompletadas] = useState<TaskRecord[]>([]);
@@ -214,9 +209,52 @@ const MOD01: React.FC = () => {
         return newErrors.length === 0;
     };
 
-    const handleSave = () => {
+
+    const to2Dec = (val: string) => Math.round(parseFloat(val) * 100) / 100;
+
+    const handleSave = async () => {
         if (!validate()) return;
-        router.push("/home/save-mod01");
+
+        try {
+            const input: GuardarReporteSemanalInput = {
+                idColaborador: Number(formData.colaborador),
+                cargo: formData.cargo,
+                proyecto: formData.proyecto,
+                fechaInicio: formData.fechaInicio,
+                fechaFin: formData.fechaFin,
+                jefeInmediato: formData.jefe,
+                tareasPlanificadas: Number(formData.tareasPlanificadas),
+                tareasCompletadas: Number(formData.tareasCompletadas),
+                tareasEnFecha: Number(formData.tareasEnFecha),
+                bloqueosActivos: Number(formData.bloqueosActivos),
+                horasEstimadasTotal: to2Dec(formData.horasEstimadas),
+                horasRealesTotal: to2Dec(formData.horasReales),
+                avancePlanificado: to2Dec(formData.avancePlanificado),
+                avanceReal: to2Dec(formData.avanceReal),
+                observaciones: formData.metricasObservaciones,
+                tareasPlan: tareasPlanificadas.map(t => ({
+                    descripcion: t.descripcion as string,
+                    horasEstimadas: to2Dec(t.horasEstimadas as string),
+                    fechaCompromiso: t.fechaCompromiso as string,
+                    estado: (t.estado as string).toUpperCase(),
+                })),
+                tareasCompletadasDetalle: tareasCompletadas.map(t => ({
+                    descripcion: t.descripcion as string,
+                    horasReales: to2Dec(t.horasReales as string),
+                    fechaFinalizacion: t.fechaFinalizacion as string,
+                })),
+            };
+
+            const result = await guardarReporte(input);
+            if (result.success) {
+                setLastResult(result, input);
+                router.push("/home/save-mod01");
+            } else {
+                setErrors([result.message || "Error saving the report"]);
+            }
+        } catch {
+            setErrors(["Connection error while saving the report"]);
+        }
     };
 
     if (colaboradoresError) {
@@ -231,6 +269,12 @@ const MOD01: React.FC = () => {
         setFormData(prev => ({ ...prev, [field]: value }));
 
     const collaboratorOptions = collaborators?.map(c => ({ label: c.nombre, value: c.id })) || [];
+    // // Dummy options until API is ready
+    // const collaboratorOptions = [
+    //     { label: "Juan Pérez", value: "1" },
+    //     { label: "María Gómez", value: "2" },
+    //     { label: "Carlos Rodríguez", value: "3" },
+    // ];
 
     return (
         <div className={styles.mainContainer}>
@@ -268,7 +312,7 @@ const MOD01: React.FC = () => {
                             <Input id="jefe" type="text" placeholder="Ingrese jefe inmediato" onChange={(e) => handleField("jefe", e.target.value)} />
                         </FormField>
                         <FormField label="Porcentaje de avance general" htmlFor="avance">
-                            <Input id="avance" type="number" min={0} max={100} placeholder="Ingrese avance" onChange={(e) => handleField("avance", e.target.value)} />
+                            <Input id="avance" type="number" min={0} max={100} step="0.01" placeholder="Ingrese avance" onChange={(e) => handleField("avance", e.target.value)} />
                         </FormField>
                     </div>
                 </section>
@@ -293,16 +337,16 @@ const MOD01: React.FC = () => {
                             <Input id="bloqueos-activos" type="number" min={0} placeholder="" onChange={(e) => handleField("bloqueosActivos", e.target.value)} />
                         </FormField>
                         <FormField label="Horas estimadas total" htmlFor="horas-estimadas">
-                            <Input id="horas-estimadas" type="number" min={0} placeholder="" onChange={(e) => handleField("horasEstimadas", e.target.value)} />
+                            <Input id="horas-estimadas" type="number" min={0} step="0.01" placeholder="" onChange={(e) => handleField("horasEstimadas", e.target.value)} />
                         </FormField>
                         <FormField label="Horas reales total" htmlFor="horas-reales">
-                            <Input id="horas-reales" type="number" min={0} placeholder="" onChange={(e) => handleField("horasReales", e.target.value)} />
+                            <Input id="horas-reales" type="number" min={0} step="0.01" placeholder="" onChange={(e) => handleField("horasReales", e.target.value)} />
                         </FormField>
                         <FormField label="Porcentaje de avance planificado" htmlFor="avance-planificado">
-                            <Input id="avance-planificado" type="number" min={0} max={100} placeholder="" onChange={(e) => handleField("avancePlanificado", e.target.value)} />
+                            <Input id="avance-planificado" type="number" min={0} max={100} step="0.01" placeholder="" onChange={(e) => handleField("avancePlanificado", e.target.value)} />
                         </FormField>
                         <FormField label="Porcentaje de avance real" htmlFor="avance-real">
-                            <Input id="avance-real" type="number" min={0} max={100} placeholder="" onChange={(e) => handleField("avanceReal", e.target.value)} />
+                            <Input id="avance-real" type="number" min={0} max={100} step="0.01" placeholder="" onChange={(e) => handleField("avanceReal", e.target.value)} />
                         </FormField>
                     </div>
                 </section>
@@ -314,7 +358,7 @@ const MOD01: React.FC = () => {
                     textAreaLabel="Descripción técnica"
                     initialItem={{ descripcion: "", horasEstimadas: "", fechaCompromiso: "", estado: "" }}
                     extraFields={[
-                        { key: "horasEstimadas", label: "Horas estimadas", type: "number" },
+                        { key: "horasEstimadas", label: "Horas estimadas", type: "number", step: "0.01" },
                         { key: "fechaCompromiso", label: "Fecha compromiso", type: "date" },
                         { key: "estado", label: "Estado", type: "select", options: estadoOptions, placeholder: "Seleccionar estado" },
                     ]}
@@ -328,7 +372,7 @@ const MOD01: React.FC = () => {
                     textAreaLabel="Descripción técnica completada"
                     initialItem={{ descripcion: "", horasReales: "", fechaFinalizacion: "" }}
                     extraFields={[
-                        { key: "horasReales", label: "Horas reales invertidas", type: "number" },
+                        { key: "horasReales", label: "Horas reales invertidas", type: "number", step: "0.01" },
                         { key: "fechaFinalizacion", label: "Fecha finalización", type: "date" },
                     ]}
                     onTasksChange={setTareasCompletadas}
@@ -405,7 +449,7 @@ const MOD01: React.FC = () => {
                     </FormField>
                     <div className={`${styles.fieldsGrid} ${styles.fieldsGridTwo}`}>
                         <FormField label="Horas estimadas" htmlFor="plan-horas">
-                            <Input id="plan-horas" type="number" min={0} onChange={(e) => handleField("planHoras", e.target.value)} />
+                            <Input id="plan-horas" type="number" min={0} step="0.01"onChange={(e) => handleField("planHoras", e.target.value)} />
                         </FormField>
                         <FormField label="Fecha compromiso" htmlFor="plan-compromiso">
                             <Input id="plan-compromiso" type="date" placeholder="Selecciona una fecha..." onChange={(e) => handleField("planCompromiso", e.target.value)} />
@@ -422,8 +466,13 @@ const MOD01: React.FC = () => {
                     </div>
                 )}
                 <div className={styles.formActions}>
-                    <Button variant="contained" color="success" onClick={handleSave}>
-                        Guardar reporte
+                    <Button
+                        variant="contained"
+                        color="success"
+                        onClick={handleSave}
+                        state={isSaving ? "loading" : "default"}
+                    >
+                        {isSaving ? "Saving..." : "Guardar reporte"}
                     </Button>
                     <Button variant="outlined" color="default" onClick={() => router.push("/home/exportmod01")}>
                         Exportación

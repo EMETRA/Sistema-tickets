@@ -42,7 +42,6 @@ export const MOD10: React.FC = () => {
     
     const ALLOWED_EXTENSIONS = ['pdf'];
 
-
     const handleFile = (files: File[]) => {
         if (files.length === 0) return;
 

@@ -10,9 +10,9 @@ import { type LoginInput, type LoginResponse } from '@/api/graphql/auth/types';
  * Estado del login
  */
 export interface LoginState {
-  loading: boolean;
-  error: string | null;
-  success: boolean;
+    loading: boolean;
+    error: string | null;
+    success: boolean;
 }
 
 /**

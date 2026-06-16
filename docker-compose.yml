@@ -8,7 +8,7 @@ services:
       - .:/app
       - /app/node_modules
     ports:
-      - "3000:3000"
-      - "6006:6006"
+      - "${APP_PORT:-3000}:${APP_PORT:-3000}"
+      - "${STORYBOOK_PORT:-6006}:${STORYBOOK_PORT:-6006}"
     env_file:
       - .env

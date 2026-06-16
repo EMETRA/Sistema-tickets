@@ -17,10 +17,13 @@ Y luego:
 docker-compose up
 ```
 
-## Como verlo (Desarrollo)
-Para el desarrollo de componentes se debe utilizar Storybook: [Abrir Storybook](http://localhost:6006)
+## Puertos
+Los puertos se configuran en `.env` mediante `APP_PORT` (aplicacion) y `STORYBOOK_PORT` (Storybook en modo DEV). Por defecto: `3000` y `6006`.
 
-Y para abrir la vista de desarrollo completa: [Abrir Proyecto](http://localhost:3000)
+## Como verlo (Desarrollo)
+Para el desarrollo de componentes se debe utilizar Storybook en el puerto definido por `STORYBOOK_PORT`.
+
+Y para abrir la vista de desarrollo completa en el puerto definido por `APP_PORT`.
 
 ## Observaciones
 Para desarrollar si es recomendable que se instalen primero las dependencias y se inicie el proyecto al menos una vez de forma local para el Intellisense:

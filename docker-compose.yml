@@ -1,0 +1,14 @@
+services:
+  sistema-tickets-web:
+    container_name: sistema-tickets-web
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+      - "6006:6006"
+    env_file:
+      - .env

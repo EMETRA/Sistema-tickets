@@ -1,5 +1,4 @@
-# dependencies
-/node_modules
+# dependencies (node_modules se copia desde el host en docker compose build)
 /.pnp
 .pnp.js
 .yarn/install-state.gz

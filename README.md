@@ -2,14 +2,20 @@
 Aplicacion web para gestion de tickets
 
 ## Requisitos
+
+### Produccion (Docker)
 * Docker
 * Docker Compose
-* Node.js 20 y pnpm 8 (para instalar dependencias en el host)
+* Node.js 20 y pnpm 8 (para instalar dependencias en el host antes del build)
 * Inicializar `.env` a partir de `.env.example`
 
-## Para iniciarlo
+### Desarrollo local (sin Docker)
+* Node.js 20 y pnpm 8
+* Inicializar `.env` a partir de `.env.example`
 
-Las dependencias se instalan **en el host**, no dentro del contenedor. El proyecto se monta como volumen y el contenedor reutiliza `node_modules` del host.
+## Produccion con Docker
+
+Docker es solo para produccion. Las dependencias se instalan en el host y se copian a la imagen al construirla. El `typecheck` y el `build` se ejecutan en **`docker compose build`**: si fallan, la imagen no se crea.
 
 ```bash
 corepack enable
@@ -18,38 +24,33 @@ docker compose build
 docker compose up
 ```
 
-Si cambias dependencias en `package.json`, vuelve a ejecutar `pnpm install` en el host antes de levantar el contenedor.
-
-Antes de arrancar, el contenedor limpia `.next`, ejecuta `pnpm typecheck` y `pnpm build`. Si cualquiera falla, el contenedor termina con error y no inicia la aplicacion.
+Si cambias dependencias en `package.json`:
 
 ```bash
-docker compose up --abort-on-container-exit --exit-code-from sistema-tickets-web
+pnpm install
+docker compose build
 ```
 
-Con `-d`, revisa el estado con `docker compose ps` y los logs con:
+`docker compose up` solo inicia la aplicacion ya compilada.
+
+El puerto se configura en `.env` con `APP_PORT` (por defecto `3000`).
+
+## Desarrollo local
+
+Sin Docker:
 
 ```bash
-docker compose logs -f
+corepack enable
+pnpm install
+pnpm dev
 ```
 
-Si migraste de `src/pages` a `src/views`, elimina en el host cualquier `.next` antiguo:
+Storybook:
 
 ```bash
-rm -rf .next
+pnpm storybook
 ```
-
-## Puertos
-Los puertos se configuran en `.env` mediante `APP_PORT` (aplicacion) y `STORYBOOK_PORT` (Storybook en modo DEV). Por defecto: `3000` y `6006`.
-
-## Como verlo (Desarrollo)
-Para el desarrollo de componentes se debe utilizar Storybook en el puerto definido por `STORYBOOK_PORT`.
-
-Y para abrir la vista de desarrollo completa en el puerto definido por `APP_PORT`.
 
 ## Observaciones
-El contenedor usa `node:20-slim` (glibc) para compatibilidad con `node_modules` instalados en un Linux estándar. Si el host no es Linux o usa otra arquitectura, instala las dependencias en un entorno equivalente al contenedor.
 
-Para desarrollo local sin Docker (Intellisense, etc.):
-```bash
-pnpm install && pnpm dev
-```
+El contenedor usa `node:20-slim` (glibc). Instala `node_modules` en un entorno Linux equivalente al contenedor antes de `docker compose build`.

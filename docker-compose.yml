@@ -5,14 +5,7 @@ services:
       context: .
       dockerfile: Dockerfile
     restart: "no"
-    volumes:
-      - .:/app
-      - next_build:/app/.next
     ports:
       - "${APP_PORT:-3000}:${APP_PORT:-3000}"
-      - "${STORYBOOK_PORT:-6006}:${STORYBOOK_PORT:-6006}"
     env_file:
       - .env
-
-volumes:
-  next_build:

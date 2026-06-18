@@ -4,7 +4,7 @@ ENV MODE=${MODE:+DEV}
 ENV APP_PORT=3000
 ENV STORYBOOK_PORT=6006
 
-RUN corepack enable pnpm
+RUN corepack enable && corepack prepare pnpm@8.15.0 --activate
 
 WORKDIR /app
 

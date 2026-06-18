@@ -20,10 +20,22 @@ docker compose up
 
 Si cambias dependencias en `package.json`, vuelve a ejecutar `pnpm install` en el host antes de levantar el contenedor.
 
-Antes de arrancar, el contenedor ejecuta `pnpm typecheck` y `pnpm build`. Si hay errores de tipado o compilacion, el contenedor termina con error y no inicia la aplicacion. Revisa los logs con:
+Antes de arrancar, el contenedor limpia `.next`, ejecuta `pnpm typecheck` y `pnpm build`. Si cualquiera falla, el contenedor termina con error y no inicia la aplicacion.
+
+```bash
+docker compose up --abort-on-container-exit --exit-code-from sistema-tickets-web
+```
+
+Con `-d`, revisa el estado con `docker compose ps` y los logs con:
 
 ```bash
 docker compose logs -f
+```
+
+Si migraste de `src/pages` a `src/views`, elimina en el host cualquier `.next` antiguo:
+
+```bash
+rm -rf .next
 ```
 
 ## Puertos

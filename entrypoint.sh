@@ -12,21 +12,21 @@ else
   export NODE_ENV=production
 fi
 
+echo "Limpiando artefactos de build anteriores..."
+rm -rf .next
+
 echo "Verificando tipos..."
 pnpm typecheck
 
-if [ "$MODE" = "DEV" ]; then
-  echo "Verificando build..."
-  pnpm build
+echo "Compilando aplicacion..."
+pnpm build
 
+if [ "$MODE" = "DEV" ]; then
   echo "Iniciando en modo DEV..."
-  pnpm concurrently \
+  exec pnpm concurrently \
     "pnpm dev -- -p ${APP_PORT}" \
     "pnpm storybook --ci -- -p ${STORYBOOK_PORT}"
 else
-  echo "Compilando para produccion..."
-  pnpm build
-
   echo "Iniciando servidor..."
-  pnpm start -- -p "${APP_PORT}"
+  exec pnpm start -- -p "${APP_PORT}"
 fi

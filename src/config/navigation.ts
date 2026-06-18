@@ -1,5 +1,7 @@
 import { UserRole } from "../types/roles";
 
+export type { UserRole };
+
 export interface PageMetadata {
     label: string;
     title: string;

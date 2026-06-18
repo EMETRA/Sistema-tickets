@@ -33,10 +33,10 @@ export const TicketsFilterBar: React.FC<TicketsFilterBarProps> = ({
         }
 
         if (role === "TECNICO" || role === "DESARROLLADOR") {
-            return options.filter(option => option.value === "asignado" || option.value === "completado" || option.value === "cancelado") || []; // Solo "Asignados", "Finalizados" y "Cancelados" para TECNICO y DESARROLLADOR
+            return options?.filter(option => option.value === "asignado" || option.value === "completado" || option.value === "cancelado") ?? [];
         }
 
-        return options.filter(option => option.value === "cancelado") || []; // Solo "Asignados" para USUARIO
+        return options?.filter(option => option.value === "cancelado") ?? [];
     }
 
     return (

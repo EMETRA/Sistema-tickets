@@ -20,6 +20,12 @@ docker compose up
 
 Si cambias dependencias en `package.json`, vuelve a ejecutar `pnpm install` en el host antes de levantar el contenedor.
 
+Antes de arrancar, el contenedor ejecuta `pnpm typecheck` y `pnpm build`. Si hay errores de tipado o compilacion, el contenedor termina con error y no inicia la aplicacion. Revisa los logs con:
+
+```bash
+docker compose logs -f
+```
+
 ## Puertos
 Los puertos se configuran en `.env` mediante `APP_PORT` (aplicacion) y `STORYBOOK_PORT` (Storybook en modo DEV). Por defecto: `3000` y `6006`.
 

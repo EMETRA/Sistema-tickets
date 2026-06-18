@@ -101,7 +101,7 @@ const EnrollTable: React.FC<EnrollTableProps> = ({
                             { content: <Text>{en.permission}</Text> },
                             { 
                                 content: (
-                                    <Chip label={en.status} state="ingressed" />
+                                    <Chip label={en.status} state="ingresado" />
                                 ),
                                 align: "center"
                             },

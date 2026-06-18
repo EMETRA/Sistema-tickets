@@ -99,7 +99,7 @@ const ModulesTable: React.FC<ModulesTableProps> = ({
                             { content: <Text>{mod.name}</Text> },
                             {
                                 content: (
-                                    <Chip label={mod.status} state="ingressed" />
+                                    <Chip label={mod.status} state="ingresado" />
                                 ), 
                                 align: "center"
                             },

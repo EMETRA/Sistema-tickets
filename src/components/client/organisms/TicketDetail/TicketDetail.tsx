@@ -16,7 +16,7 @@ import { useAddTagToTicket, useGetTicketById, useGetTicketTagCatalog, useGetTick
 import { useGetTicketAttachments } from "@/api/hooks";
 
 import styles from "./TicketDetail.module.scss";
-import { TicketDetailProps, type TicketDetail } from "./types";
+import { TicketDetailProps } from "./types";
 import { MarkdownViewer } from "../../atoms/MarkdownViewer";
 import { LabelChipGroup, LabelOption } from "../../molecules/LabelChipGroup";
 

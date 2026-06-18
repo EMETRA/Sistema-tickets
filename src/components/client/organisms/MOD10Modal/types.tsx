@@ -1,5 +1,5 @@
 
-import type { casesNotificationFormData } from "../../../../pages/MOD10";
+import type { casesNotificationFormData } from "../../../../views/MOD10/types";
 
 export interface MOD10ModalProps extends casesNotificationFormData {
     isOpen: boolean;

@@ -1,9 +1,9 @@
 "use client";
 
 import { useAuthStore } from "@/store/useAuthStore";
-import AdminHome from "@/pages/Home/Admin";
-import TechHome from "@/pages/Home/Tech";
-import UserHome from "@/pages/Home/User";
+import AdminHome from "@/views/Home/Admin";
+import TechHome from "@/views/Home/Tech";
+import UserHome from "@/views/Home/User";
 
 export default function HomePage() {
     const role = useAuthStore((state) => state.getRole());

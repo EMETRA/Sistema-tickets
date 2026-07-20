@@ -3,6 +3,20 @@ import { ErrorHandler } from './errors';
 import { getEnvConfig } from '@/api/config/env';
 
 /**
+ * Si hay sesión activa y el backend responde 401/UNAUTHENTICATED,
+ * limpia estado y redirige a login. No hace nada si aún no hay token
+ * (p.ej. fallo de login).
+ */
+function handleClientAuthFailure() {
+    if (typeof window === 'undefined') return;
+
+    void import('@/store/useAuthStore').then(({ useAuthStore }) => {
+        const { token, logout } = useAuthStore.getState();
+        if (token) logout();
+    });
+}
+
+/**
  * Crear cliente GraphQL configurado
  */
 function createGraphQLClient(): GraphQLClient {
@@ -186,8 +200,17 @@ export async function graphqlRequestClient<TData extends Record<string, unknown>
 
                 xhr.onload = () => {
                     try {
+                        if (xhr.status === 401) {
+                            handleClientAuthFailure();
+                            reject(new Error('Unauthorized'));
+                            return;
+                        }
                         const json = JSON.parse(xhr.responseText);
                         if (json.errors) {
+                            const code = json.errors[0]?.extensions?.code;
+                            if (code === 'UNAUTHENTICATED') {
+                                handleClientAuthFailure();
+                            }
                             reject(new Error(json.errors[0].message));
                         } else {
                             resolve(json.data as TData);
@@ -220,9 +243,21 @@ export async function graphqlRequestClient<TData extends Record<string, unknown>
         });
 
         clearTimeout(timeoutId);
+
+        if (response.status === 401) {
+            handleClientAuthFailure();
+            throw new Error('Unauthorized');
+        }
+
         const json = await response.json();
 
-        if (json.errors) throw new Error(json.errors[0].message);
+        if (json.errors) {
+            const code = json.errors[0]?.extensions?.code;
+            if (code === 'UNAUTHENTICATED') {
+                handleClientAuthFailure();
+            }
+            throw new Error(json.errors[0].message);
+        }
 
         return json.data as TData;
 
@@ -284,6 +319,11 @@ export async function apiFetch<TData extends Record<string, unknown> = Record<st
             });
 
             clearTimeout(timeoutId);
+
+            if (response.status === 401) {
+                handleClientAuthFailure();
+                throw new Error('HTTP error! status: 401');
+            }
 
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);

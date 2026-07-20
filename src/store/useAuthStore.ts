@@ -2,8 +2,13 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import Cookies from 'js-cookie';
 import { UsuarioPerfil } from '@/api/graphql/home/types';
-
 import { UserRole } from '@/types/roles';
+import {
+    AUTH_COOKIE_NAME,
+    AUTH_COOKIE_OPTIONS,
+    AUTH_ROLE_COOKIE_NAME,
+} from '@/auth/constants';
+import { normalizeRole } from '@/auth/normalizeRole';
 
 interface AuthState {
     token: string | null;
@@ -11,12 +16,10 @@ interface AuthState {
     userId: UsuarioPerfil['id_usuario'] | null;
     isHydrated: boolean;
 
-    // Acciones (El "Set" y "Get")
     setAuth: (token: string, user: UsuarioPerfil) => void;
     logout: () => void;
     setHydrated: () => void;
 
-    // RBAC: Helpers de Roles
     hasRole: (roles: UserRole | UserRole[]) => boolean;
     getRole: () => UserRole;
     getUserId: () => UsuarioPerfil['id_usuario'] | null;
@@ -31,45 +34,28 @@ export const useAuthStore = create<AuthState>()(
             isHydrated: false,
 
             setAuth: (token, user) => {
-                set({ token, user, userId: user.id_usuario });
-                // 1. Sincronización con Cookies para el Middleware
-                // Usamos una cookie estándar (accesible por JS) para que tu compa no peleé
-                Cookies.set('auth_token', token, { 
-                    expires: 1, // 1 día
-                    secure: process.env.NODE_ENV === 'production',
-                    sameSite: 'strict' 
+                const role = normalizeRole(user.rol);
+                set({
+                    token,
+                    user: { ...user, rol: role },
+                    userId: user.id_usuario,
                 });
+
+                Cookies.set(AUTH_COOKIE_NAME, token, AUTH_COOKIE_OPTIONS);
+                Cookies.set(AUTH_ROLE_COOKIE_NAME, role, AUTH_COOKIE_OPTIONS);
             },
 
             logout: () => {
                 set({ token: null, user: null, userId: null });
-                // Limpiamos tanto la Cookie como el Storage
-                Cookies.remove('auth_token');
+                Cookies.remove(AUTH_COOKIE_NAME);
+                Cookies.remove(AUTH_ROLE_COOKIE_NAME);
                 localStorage.removeItem('auth-storage');
-                // Redirección forzada al login
                 window.location.href = '/login';
             },
 
             setHydrated: () => set({ isHydrated: true }),
 
-            /**
-             * Obtener el rol del usuario normalizado a mayúsculas
-             * Si no existe rol o es inválido, retorna 'USUARIO' como default
-             */
-            getRole: () => {
-                const user = get().user;
-                if (!user?.rol) return 'USUARIO';
-                
-                const roleUpper = user.rol.toUpperCase();
-    
-                // Validar que sea un rol válido
-                if (['ADMINISTRADOR', 'TECNICO', 'DESARROLLADOR', 'USUARIO'].includes(roleUpper)) {
-                    return roleUpper as UserRole;
-                }
-                
-                // Default a USER si no es válido
-                return 'USUARIO';
-            },
+            getRole: () => normalizeRole(get().user?.rol),
 
             hasRole: (roles) => {
                 const currentRole = get().getRole();
@@ -79,9 +65,14 @@ export const useAuthStore = create<AuthState>()(
             getUserId: () => get().userId,
         }),
         {
-            name: 'auth-storage', // Nombre en LocalStorage
+            name: 'auth-storage',
             storage: createJSONStorage(() => localStorage),
             onRehydrateStorage: () => (state) => {
+                if (state?.token && state.user) {
+                    const role = normalizeRole(state.user.rol);
+                    Cookies.set(AUTH_COOKIE_NAME, state.token, AUTH_COOKIE_OPTIONS);
+                    Cookies.set(AUTH_ROLE_COOKIE_NAME, role, AUTH_COOKIE_OPTIONS);
+                }
                 state?.setHydrated();
             },
         }

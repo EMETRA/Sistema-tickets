@@ -4,9 +4,10 @@ import { usePathname, useRouter } from "next/navigation";
 import { SideBarNavigation } from "../../organisms/SideBarNavigation";
 import { TopBar } from "../../organisms/TopBar";
 import { PAGES_CONFIG } from "@/config/navigation";
+import { canAccessPath } from "@/config/route-access";
 import styles from "./SystemLayout.module.scss";
 import classNames from "classnames";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { RoleProvider } from "@/context/RoleContext";
 import { useAuthStore } from "@/store/useAuthStore";
 
@@ -15,8 +16,23 @@ export const SystemLayout = ({ children, className }: { children: React.ReactNod
     const router = useRouter();
     const getRole = useAuthStore((state) => state.getRole);
     const user = useAuthStore((state) => state.user);
+    const isHydrated = useAuthStore((state) => state.isHydrated);
+    const token = useAuthStore((state) => state.token);
 
     const currentRole = getRole();
+
+    useEffect(() => {
+        if (!isHydrated || !pathname) return;
+
+        if (!token) {
+            router.replace("/login");
+            return;
+        }
+
+        if (!canAccessPath(currentRole, pathname)) {
+            router.replace("/unauthorized");
+        }
+    }, [isHydrated, token, currentRole, pathname, router]);
 
     const activePage = useMemo(() => {
         if (!pathname) return PAGES_CONFIG.home;
@@ -29,6 +45,14 @@ export const SystemLayout = ({ children, className }: { children: React.ReactNod
 
         return PAGES_CONFIG.home;
     }, [pathname]);
+
+    if (!isHydrated) {
+        return null;
+    }
+
+    if (!token || !canAccessPath(currentRole, pathname ?? "/home")) {
+        return null;
+    }
 
     return (
         <RoleProvider role={currentRole}>

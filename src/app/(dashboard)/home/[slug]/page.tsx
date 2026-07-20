@@ -1,15 +1,15 @@
-import DashboardCollaborators from "@/pages/DashboardCollaborators/DashboardCollaborators";
-import DashboardProjects from "@/pages/DashboardProjects";
-import ExportMOD01 from "@/pages/ExportMOD01";
-import MOD01 from "@/pages/MOD01";
-import MOD04 from "@/pages/MOD04";
-import MOD05 from "@/pages/MOD05";
-import MOD06 from "@/pages/MOD06";
-import MOD07 from "@/pages/MOD07";
-import MOD08 from "@/pages/MOD08";
-import MOD10 from "@/pages/MOD10";
-import PROC01 from "@/pages/PROC01/PROC01";
-import SaveMOD01 from "@/pages/SaveMOD01/ExportMOD01";
+import DashboardCollaborators from "@/views/DashboardCollaborators/DashboardCollaborators";
+import DashboardProjects from "@/views/DashboardProjects";
+import ExportMOD01 from "@/views/ExportMOD01";
+import MOD01 from "@/views/MOD01";
+import MOD04 from "@/views/MOD04";
+import MOD05 from "@/views/MOD05";
+import MOD06 from "@/views/MOD06";
+import MOD07 from "@/views/MOD07";
+import MOD08 from "@/views/MOD08";
+import MOD10 from "@/views/MOD10";
+import PROC01 from "@/views/PROC01/PROC01";
+import SaveMOD01 from "@/views/SaveMOD01/ExportMOD01";
 import { notFound } from "next/navigation";
 
 const APP_REGISTRY: Record<string, React.ComponentType> = {

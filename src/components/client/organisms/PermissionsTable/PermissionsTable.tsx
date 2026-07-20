@@ -101,7 +101,7 @@ const PermissionsTable: React.FC<PermissionsTableProps> = ({
                             { content: <Text>{perm.name}</Text> },
                             {
                                 content: (
-                                    <Chip label={perm.status} state="assigned" />
+                                    <Chip label={perm.status} state="asignado" />
                                 ),
                                 align: "center"
                             },

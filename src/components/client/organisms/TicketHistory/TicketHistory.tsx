@@ -5,11 +5,10 @@ import type { TicketHistoryProps } from "./types";
 import styles from "./TicketHistory.module.scss";
 
 export const TicketHistory = ({
-    // ticketId,
+    ticketId,
     role,
     labels,
     availableOptions = [],
-    historyItems,
     onLabelsChange,
     className,
 }: TicketHistoryProps) => {
@@ -22,9 +21,7 @@ export const TicketHistory = ({
                 onChange={onLabelsChange}
             />
 
-            <HistoryMessage
-                historyItems={historyItems}
-            />
+            <HistoryMessage ticketId={ticketId} />
         </div>
     );
 };

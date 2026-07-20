@@ -1,2 +1,2 @@
 export { default as TicketDetail } from "./TicketDetail";
-export * from "./types";
+export type { TicketDetailProps } from "./types";

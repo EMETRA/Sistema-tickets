@@ -1,4 +1,4 @@
-import TicketsCreation from "@/pages/TicketsCreation/TicketsCreation";
+import TicketsCreation from "@/views/TicketsCreation/TicketsCreation";
 
 export default function TicketsCreationPage() {
     return <TicketsCreation />;

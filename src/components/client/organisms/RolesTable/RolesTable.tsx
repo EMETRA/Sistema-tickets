@@ -107,7 +107,7 @@ const RolesTable: React.FC<RolesTableProps> = ({
                             { content: <Text>{rol.roleCode}</Text> },
                             {
                                 content: (
-                                    <Chip label={rol.status} state="ingressed" />
+                                    <Chip label={rol.status} state="ingresado" />
                                 ),
                                 align: "center"
                             },

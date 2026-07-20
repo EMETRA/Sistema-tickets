@@ -3,7 +3,7 @@ import { useState } from "react";
 import MOD10Modal from "./MOD10Modal";
 import { Button } from "../../atoms/Button";
 import type { UploadedFile } from "../TicketCreationPanel/types";
-import type { casesNotificationFormData } from "../../../../pages/MOD10";
+import type { casesNotificationFormData } from "../../../../views/MOD10/types";
 import type { MOD10ModalProps } from "./types";
 
 const meta = {

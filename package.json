@@ -7,8 +7,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "typecheck": "tsc --noEmit -p tsconfig.typecheck.json",
     "lint": "eslint",
-    "storybook": "storybook dev -p 6006",
+    "storybook": "storybook dev",
     "build-storybook": "storybook build"
   },
   "dependencies": {

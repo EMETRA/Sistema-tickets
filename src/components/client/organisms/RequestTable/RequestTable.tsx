@@ -103,7 +103,7 @@ const RequestTable: React.FC<RequestTableProps> = ({
                             { content: <Text>{req.position}</Text>},
                             {
                                 content: (
-                                    <Chip label={req.status} state="assigned" />
+                                    <Chip label={req.status} state="asignado" />
                                 ),
                                 align: "center"
                             },

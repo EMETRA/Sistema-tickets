@@ -16,7 +16,7 @@ const TICKETS_DB: Ticket[] = [
         date: "Hoy, 17:24",
         status: {
             label: "Ingresado",
-            state: "ingressed",
+            state: "ingresado",
         },
         assignedTo: null,
     },
@@ -34,7 +34,7 @@ const TICKETS_DB: Ticket[] = [
         date: "Hoy, 16:30",
         status: {
             label: "Asignado",
-            state: "assigned",
+            state: "asignado",
         },
         assignedTo: {
             id: "3",
@@ -58,7 +58,7 @@ const TICKETS_DB: Ticket[] = [
         date: "Ayer, 14:32",
         status: {
             label: "En Trabajo",
-            state: "inwork",
+            state: "en_trabajo",
         },
         assignedTo: {
             id: "11",
@@ -82,7 +82,7 @@ const TICKETS_DB: Ticket[] = [
         date: "03/02/2026, 08:12",
         status: {
             label: "Ingresado",
-            state: "ingressed",
+            state: "ingresado",
         },
         assignedTo: null,
     },
@@ -100,7 +100,7 @@ const TICKETS_DB: Ticket[] = [
         date: "01/02/2026, 12:10",
         status: {
             label: "Resuelto",
-            state: "resolved",
+            state: "completado",
         },
         assignedTo: {
             id: "7",
@@ -124,7 +124,7 @@ const TICKETS_DB: Ticket[] = [
         date: "Hoy, 15:40",
         status: {
             label: "Ingresado",
-            state: "ingressed",
+            state: "ingresado",
         },
         assignedTo: null,
     },
@@ -142,7 +142,7 @@ const TICKETS_DB: Ticket[] = [
         date: "Hoy, 14:10",
         status: {
             label: "Asignado",
-            state: "assigned",
+            state: "asignado",
         },
         assignedTo: {
             id: "15",
@@ -166,7 +166,7 @@ const TICKETS_DB: Ticket[] = [
         date: "Hoy, 13:32",
         status: {
             label: "En Trabajo",
-            state: "inwork",
+            state: "en_trabajo",
         },
         assignedTo: {
             id: "7",
@@ -190,7 +190,7 @@ const TICKETS_DB: Ticket[] = [
         date: "Ayer, 17:58",
         status: {
             label: "Ingresado",
-            state: "ingressed",
+            state: "ingresado",
         },
         assignedTo: null,
     },
@@ -208,7 +208,7 @@ const TICKETS_DB: Ticket[] = [
         date: "Ayer, 16:20",
         status: {
             label: "Resuelto",
-            state: "resolved",
+            state: "completado",
         },
         assignedTo: {
             id: "11",
@@ -232,7 +232,7 @@ const TICKETS_DB: Ticket[] = [
         date: "Ayer, 11:45",
         status: {
             label: "Asignado",
-            state: "assigned",
+            state: "asignado",
         },
         assignedTo: {
             id: "3",
@@ -256,7 +256,7 @@ const TICKETS_DB: Ticket[] = [
         date: "12/03/2026, 15:12",
         status: {
             label: "Ingresado",
-            state: "ingressed",
+            state: "ingresado",
         },
         assignedTo: null,
     },
@@ -274,7 +274,7 @@ const TICKETS_DB: Ticket[] = [
         date: "12/03/2026, 10:18",
         status: {
             label: "En Trabajo",
-            state: "inwork",
+            state: "en_trabajo",
         },
         assignedTo: {
             id: "11",
@@ -298,7 +298,7 @@ const TICKETS_DB: Ticket[] = [
         date: "11/03/2026, 17:02",
         status: {
             label: "Asignado",
-            state: "assigned",
+            state: "asignado",
         },
         assignedTo: {
             id: "15",
@@ -322,7 +322,7 @@ const TICKETS_DB: Ticket[] = [
         date: "11/03/2026, 13:27",
         status: {
             label: "Resuelto",
-            state: "resolved",
+            state: "completado",
         },
         assignedTo: {
             id: "7",
@@ -346,7 +346,7 @@ const TICKETS_DB: Ticket[] = [
         date: "10/03/2026, 18:44",
         status: {
             label: "Ingresado",
-            state: "ingressed",
+            state: "ingresado",
         },
         assignedTo: null,
     },
@@ -364,7 +364,7 @@ const TICKETS_DB: Ticket[] = [
         date: "10/03/2026, 16:05",
         status: {
             label: "Asignado",
-            state: "assigned",
+            state: "asignado",
         },
         assignedTo: {
             id: "11",
@@ -388,7 +388,7 @@ const TICKETS_DB: Ticket[] = [
         date: "10/03/2026, 11:33",
         status: {
             label: "En Trabajo",
-            state: "inwork",
+            state: "en_trabajo",
         },
         assignedTo: {
             id: "3",
@@ -412,7 +412,7 @@ const TICKETS_DB: Ticket[] = [
         date: "09/03/2026, 15:22",
         status: {
             label: "Ingresado",
-            state: "ingressed",
+            state: "ingresado",
         },
         assignedTo: null,
     },
@@ -430,7 +430,7 @@ const TICKETS_DB: Ticket[] = [
         date: "09/03/2026, 09:50",
         status: {
             label: "Asignado",
-            state: "assigned",
+            state: "asignado",
         },
         assignedTo: {
             id: "15",
@@ -486,8 +486,8 @@ export async function assignTicketDummy(ticketId: string | number, userId: strin
             avatarSrc: selectedUser.userInfo.avatarProps?.src,
             department: selectedUser.workstation,
         },
-        status: current.status.state === "ingressed"
-            ? { label: "Asignado", state: "assigned" }
+        status: current.status.state === "ingresado"
+            ? { label: "Asignado", state: "asignado" }
             : current.status,
     };
 
@@ -509,7 +509,7 @@ export async function cancelTicketDummy(ticketId: string | number): Promise<void
         ...TICKETS_DB[index],
         status: {
             label: "Cancelado",
-            state: "canceled",
+            state: "cancelado",
         },
     };
 }

@@ -7,7 +7,8 @@ export async function getTeamUsersDummy(): Promise<UserCardProps[]> {
                 { 
                     name: "Gildder Alberto Caceres Urizar", 
                     email: "albertourizar94@gmail.com", 
-                    role: "Administrador", 
+                    role: "Administrador",
+                    department: "Informatica",
                     avatarInitials: "G", 
                     status: "online", 
                     assignedCount: 100, 
@@ -16,7 +17,8 @@ export async function getTeamUsersDummy(): Promise<UserCardProps[]> {
                 { 
                     name: "Feyzer Emilio Caceres Urizar", 
                     email: "feyzeremiliocaceres@gmail.com", 
-                    role: "Desarrollador", 
+                    role: "Desarrollador",
+                    department: "Informatica",
                     avatarInitials: "F", 
                     status: "offline", 
                     assignedCount: 500, 
@@ -25,7 +27,8 @@ export async function getTeamUsersDummy(): Promise<UserCardProps[]> {
                 { 
                     name: "Jose Hernandez", 
                     email: "josehernandez@muniguate.com", 
-                    role: "Tecnico", 
+                    role: "Tecnico",
+                    department: "Informatica",
                     avatarInitials: "J", 
                     status: "online", 
                     assignedCount: 50, 
@@ -34,7 +37,8 @@ export async function getTeamUsersDummy(): Promise<UserCardProps[]> {
                 { 
                     name: "Usuario 1", 
                     email: "joseherndez@muniguate.com", 
-                    role: "Tecnico", 
+                    role: "Tecnico",
+                    department: "Informatica",
                     avatarInitials: "G", 
                     status: "online", 
                     assignedCount: 50, 
@@ -43,7 +47,8 @@ export async function getTeamUsersDummy(): Promise<UserCardProps[]> {
                 { 
                     name: "Usuario 2", 
                     email: "jehernandez@muniguate.com", 
-                    role: "Tecnico", 
+                    role: "Tecnico",
+                    department: "Informatica",
                     avatarInitials: "S", 
                     status: "online", 
                     assignedCount: 50, 
@@ -52,7 +57,8 @@ export async function getTeamUsersDummy(): Promise<UserCardProps[]> {
                 { 
                     name: "Usuario 3", 
                     email: "josehernand@muniguate.com", 
-                    role: "Desarrollador", 
+                    role: "Desarrollador",
+                    department: "Informatica",
                     avatarInitials: "T", 
                     status: "online", 
                     assignedCount: 50, 
@@ -61,7 +67,8 @@ export async function getTeamUsersDummy(): Promise<UserCardProps[]> {
                 { 
                     name: "Usuario 4", 
                     email: "josehernande@muniguate.com", 
-                    role: "Tecnico", 
+                    role: "Tecnico",
+                    department: "Informatica",
                     avatarInitials: "P", 
                     status: "online", 
                     assignedCount: 50, 
@@ -70,7 +77,8 @@ export async function getTeamUsersDummy(): Promise<UserCardProps[]> {
                 { 
                     name: "Usuario 5", 
                     email: "joseherande@muniguate.com", 
-                    role: "Tecnico", 
+                    role: "Tecnico",
+                    department: "Informatica",
                     avatarInitials: "R", 
                     status: "online", 
                     assignedCount: 50, 
@@ -79,7 +87,8 @@ export async function getTeamUsersDummy(): Promise<UserCardProps[]> {
                 { 
                     name: "Usuario 6", 
                     email: "rqty@muniguate.com", 
-                    role: "Desarrollador", 
+                    role: "Desarrollador",
+                    department: "Informatica",
                     avatarInitials: "L", 
                     status: "online", 
                     assignedCount: 50, 

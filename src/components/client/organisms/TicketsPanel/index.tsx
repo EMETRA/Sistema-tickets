@@ -1,2 +1,2 @@
-export { TicketTable } from "./TicketsPanel";
-export type { TicketTableProps, TicketTableVariant, TicketData } from "./types";
+export { default as TicketsPanel } from "./TicketsPanel";
+export type { TicketsPanelProps, TicketsPanelVariant, TicketData } from "./types";

@@ -1,36 +1,56 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sistema Tickets
+Aplicacion web para gestion de tickets
 
-## Getting Started
+## Requisitos
 
-First, run the development server:
+### Produccion (Docker)
+* Docker
+* Docker Compose
+* Node.js 20 y pnpm 8 (para instalar dependencias en el host antes del build)
+* Inicializar `.env` a partir de `.env.example`
+
+### Desarrollo local (sin Docker)
+* Node.js 20 y pnpm 8
+* Inicializar `.env` a partir de `.env.example`
+
+## Produccion con Docker
+
+Docker es solo para produccion. Las dependencias se instalan en el host y se copian a la imagen al construirla. El `typecheck` y el `build` se ejecutan en **`docker compose build`**: si fallan, la imagen no se crea.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+corepack enable
+pnpm install
+docker compose build
+docker compose up
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Si cambias dependencias en `package.json`:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm install
+docker compose build
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+`docker compose up` solo inicia la aplicacion ya compilada.
 
-## Learn More
+El puerto se configura en `.env` con `APP_PORT` (por defecto `3000`).
 
-To learn more about Next.js, take a look at the following resources:
+## Desarrollo local
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Sin Docker:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+corepack enable
+pnpm install
+pnpm dev
+```
 
-## Deploy on Vercel
+Storybook:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+pnpm storybook
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Observaciones
+
+El contenedor usa `node:20-slim` (glibc). Instala `node_modules` en un entorno Linux equivalente al contenedor antes de `docker compose build`.

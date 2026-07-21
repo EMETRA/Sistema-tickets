@@ -21,10 +21,10 @@ const meta: Meta<typeof AppCard> = {
             control: "text",
             description: "Título principal de la card",
         },
-        bookmarked: {
-            control: "boolean",
-            description: "Si el bookmark está activo (color amarillo)",
-        },
+        // bookmarked: {
+        //     control: "boolean",
+        //     description: "Si el bookmark está activo (color amarillo)",
+        // },
         iconColor: {
             control: "color",
             description: "Color del icono (opcional)",
@@ -41,7 +41,7 @@ export const Default: Story = {
         iconLabel: "Emetra",
         iconColor: "#AACC00",
         title: "Sistema de tickets",
-        bookmarked: false,
+        // bookmarked: false,
     },
 };
 
@@ -51,7 +51,7 @@ export const Bookmarked: Story = {
         iconLabel: "Emetra",
         iconColor: "#AACC00",
         title: "Sistema de tickets",
-        bookmarked: true,
+        // bookmarked: true,
     },
 };
 
@@ -60,6 +60,6 @@ export const DashboardApp: Story = {
         icon: "home",
         iconLabel: "Dashboard",
         title: "Panel de control",
-        bookmarked: false,
+        // bookmarked: false,
     },
 };

@@ -5,7 +5,7 @@ import classNames from "classnames";
 import { AppCardProps } from "./types";
 import styles from "./AppCard.module.scss";
 import { AppIcon } from "../AppIcon";
-import { IconButton } from "../../atoms/IconButton";
+// import { IconButton } from "../../atoms/IconButton";
 import { Text } from "../../atoms/Text";
 import { Button } from "../../atoms/Button";
 
@@ -13,8 +13,8 @@ export const AppCard = ({
     icon,
     iconLabel,
     title,
-    bookmarked = false,
-    onBookmarkClick,
+    // bookmarked = false,
+    // onBookmarkClick,
     onButtonClick,
     iconColor,
     className,
@@ -22,7 +22,7 @@ export const AppCard = ({
     return (
         <div className={classNames(styles.AppCard, className)}>
             <div className={styles.header}>
-                <IconButton
+                {/* <IconButton
                     icon={bookmarked ? 'bookmark-solid-full' : 'bookmark-regular'}
                     size={20}
                     onClick={onBookmarkClick}
@@ -31,7 +31,7 @@ export const AppCard = ({
                         [styles.bookmarked]: bookmarked,
                     })}
                     iconColor={bookmarked ? "#0070f3" : "#666666"}
-                />
+                /> */}
             </div>
 
             <div className={styles.content}>

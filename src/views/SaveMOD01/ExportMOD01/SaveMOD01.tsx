@@ -83,13 +83,13 @@ const SaveMOD01: React.FC = () => {
                 </div>
 
                 <div className={styles.formActions}>
-                    <Button variant="contained" color="default" onClick={() => router.push("/home/mod01")}>
+                    <Button variant="contained" color="default" onClick={() => router.push("/home/informatica/reportes/mod01")}>
                         Nuevo reporte
                     </Button>
-                    <Button variant="contained" color="default" onClick={() => router.push("/home/dashboard-proyectos")}>
+                    <Button variant="contained" color="default" onClick={() => router.push("/home/informatica/reportes/dashboard-proyectos")}>
                         Ver dashboard proyectos
                     </Button>
-                    <Button variant="contained" color="default" onClick={() => router.push("/home/dashboard-colaboradores")}>
+                    <Button variant="contained" color="default" onClick={() => router.push("/home/informatica/reportes/dashboard-colaboradores")}>
                         Ver dashboard colaboradores
                     </Button>
                 </div>

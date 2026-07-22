@@ -248,7 +248,7 @@ const MOD01: React.FC = () => {
             const result = await guardarReporte(input);
             if (result.success) {
                 setLastResult(result, input);
-                router.push("/home/save-mod01");
+                router.push("/home/informatica/reportes/save-mod01");
             } else {
                 setErrors([result.message || "Error saving the report"]);
             }
@@ -474,7 +474,7 @@ const MOD01: React.FC = () => {
                     >
                         {isSaving ? "Saving..." : "Guardar reporte"}
                     </Button>
-                    <Button variant="outlined" color="default" onClick={() => router.push("/home/exportmod01")}>
+                    <Button variant="outlined" color="default" onClick={() => router.push("/home/informatica/reportes/exportmod01")}>
                         Exportación
                     </Button>
                 </div>
@@ -486,10 +486,10 @@ const MOD01: React.FC = () => {
                         Navegación
                     </Title>
                     <div className={styles.navActions}>
-                        <Button variant="contained" color="success" onClick={() => router.push("/home/dashboard-proyectos")}>
+                        <Button variant="contained" color="success" onClick={() => router.push("/home/informatica/reportes/dashboard-proyectos")}>
                             Dashboard proyectos
                         </Button>
-                        <Button variant="outlined" color="default" onClick={() => router.push("/home/dashboard-colaboradores")}>
+                        <Button variant="outlined" color="default" onClick={() => router.push("/home/informatica/reportes/dashboard-colaboradores")}>
                             Dashboard Colaboradores
                         </Button>
                     </div>

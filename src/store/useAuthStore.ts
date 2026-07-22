@@ -7,6 +7,7 @@ import {
     AUTH_COOKIE_NAME,
     AUTH_COOKIE_OPTIONS,
     AUTH_ROLE_COOKIE_NAME,
+    AUTH_DEPARTAMENTO_COOKIE_NAME,
 } from '@/auth/constants';
 import { normalizeRole } from '@/auth/normalizeRole';
 
@@ -23,6 +24,17 @@ interface AuthState {
     hasRole: (roles: UserRole | UserRole[]) => boolean;
     getRole: () => UserRole;
     getUserId: () => UsuarioPerfil['id_usuario'] | null;
+    getDepartamento: () => string | null;
+}
+
+function syncAuthCookies(token: string, role: UserRole, departamento?: string | null) {
+    Cookies.set(AUTH_COOKIE_NAME, token, AUTH_COOKIE_OPTIONS);
+    Cookies.set(AUTH_ROLE_COOKIE_NAME, role, AUTH_COOKIE_OPTIONS);
+    if (departamento) {
+        Cookies.set(AUTH_DEPARTAMENTO_COOKIE_NAME, departamento, AUTH_COOKIE_OPTIONS);
+    } else {
+        Cookies.remove(AUTH_DEPARTAMENTO_COOKIE_NAME);
+    }
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -41,14 +53,14 @@ export const useAuthStore = create<AuthState>()(
                     userId: user.id_usuario,
                 });
 
-                Cookies.set(AUTH_COOKIE_NAME, token, AUTH_COOKIE_OPTIONS);
-                Cookies.set(AUTH_ROLE_COOKIE_NAME, role, AUTH_COOKIE_OPTIONS);
+                syncAuthCookies(token, role, user.departamento);
             },
 
             logout: () => {
                 set({ token: null, user: null, userId: null });
                 Cookies.remove(AUTH_COOKIE_NAME);
                 Cookies.remove(AUTH_ROLE_COOKIE_NAME);
+                Cookies.remove(AUTH_DEPARTAMENTO_COOKIE_NAME);
                 localStorage.removeItem('auth-storage');
                 window.location.href = '/login';
             },
@@ -63,6 +75,8 @@ export const useAuthStore = create<AuthState>()(
             },
 
             getUserId: () => get().userId,
+
+            getDepartamento: () => get().user?.departamento ?? null,
         }),
         {
             name: 'auth-storage',
@@ -70,8 +84,7 @@ export const useAuthStore = create<AuthState>()(
             onRehydrateStorage: () => (state) => {
                 if (state?.token && state.user) {
                     const role = normalizeRole(state.user.rol);
-                    Cookies.set(AUTH_COOKIE_NAME, state.token, AUTH_COOKIE_OPTIONS);
-                    Cookies.set(AUTH_ROLE_COOKIE_NAME, role, AUTH_COOKIE_OPTIONS);
+                    syncAuthCookies(state.token, role, state.user.departamento);
                 }
                 state?.setHydrated();
             },

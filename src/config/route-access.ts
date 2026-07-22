@@ -15,7 +15,7 @@ function getAllowedPathsForRole(role: UserRole): string[] {
 
 /**
  * Indica si un rol puede acceder a un pathname.
- * Match por igualdad o prefijo (p.ej. /home → /home/mod01, /equipo → /equipo/123).
+ * Match por igualdad o prefijo (p.ej. /home → /home/informatica/..., /equipo → /equipo/123).
  * Rutas no listadas en ROLE_LAYOUTS se deniegan.
  */
 export function canAccessPath(role: UserRole | null | undefined, pathname: string): boolean {

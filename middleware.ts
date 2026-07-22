@@ -7,6 +7,7 @@ import {
 } from "@/config/protected-routes";
 import { getSessionFromRequest } from "@/auth/session";
 import { canAccessPath } from "@/config/route-access";
+import { canAccessAppPath } from "@/config/apps-access";
 
 function isInternalPath(pathname: string) {
     return (
@@ -50,6 +51,14 @@ export function middleware(request: NextRequest) {
     }
 
     if (isProtectedRoute && session && !canAccessPath(session.role, pathname)) {
+        return NextResponse.redirect(new URL("/unauthorized", request.url));
+    }
+
+    if (
+        isProtectedRoute &&
+        session &&
+        !canAccessAppPath(session.departamento, pathname)
+    ) {
         return NextResponse.redirect(new URL("/unauthorized", request.url));
     }
 

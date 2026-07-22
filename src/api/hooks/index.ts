@@ -7,7 +7,7 @@ export { useMutation, type MutationState, type UseMutationOptions } from './useM
 export { useGetUser } from './useGetUser';
 export { useGetPerfilEquipo } from './useGetPerfilEquipo';
 export { useGetMyStats } from './useGetMyStats';
-export { useGetAppsByRole } from './useGetAppsByRole';
+export { useGetAppsCatalog } from './useGetAppsCatalog';
 export { useGetUsers } from './useGetUsers';
 export { useGetUserById } from './useGetUserById';
 

@@ -58,21 +58,3 @@ export interface MyStats {
   grafico_mensual: MonthlyTicketsPoint[];
 }
 
-/**
- * Link a aplicación según rol del usuario
- */
-export interface AppLink {
-  nombre: string;
-  icono: string;
-  ruta: string;
-}
-
-/**
- * Respuesta agregada para Home Usuario
- */
-export interface HomeUsuarioData {
-  usuario: UsuarioPerfil;
-  perfilequipo: DepartamentoPerfil[];
-  myStats: MyStats;
-  appsByRole: AppLink[];
-}

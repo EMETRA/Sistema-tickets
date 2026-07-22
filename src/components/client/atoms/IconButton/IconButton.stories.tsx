@@ -11,8 +11,8 @@ const meta = {
     argTypes: {
         icon: {
             control: "select",
-            options: ["home", "users", "ticket", "settings", "bell", "logout", "eye", "eye-off", "file"],
-            description: "Nombre del icono a mostrar",
+            options: ["home", "users", "ticket", "settings", "bell-regular", "user-lock-solid", "eye", "eye-off", "file"],
+            description: "Nombre del icono a mostrar (debe coincidir con el SVG en /public/svgs)",
         },
         size: {
             control: { type: "number", min: 16, max: 64, step: 4 },
@@ -80,17 +80,17 @@ export const Ticket: Story = {
  */
 export const Bell: Story = {
     args: {
-        icon: "bell",
+        icon: "bell-regular",
         size: 24,
     },
 };
 
 /**
- * IconButton con icono de logout
+ * IconButton con icono de bloqueo de usuario
  */
-export const Logout: Story = {
+export const UserLock: Story = {
     args: {
-        icon: "logout",
+        icon: "user-lock-solid",
         size: 24,
     },
 };

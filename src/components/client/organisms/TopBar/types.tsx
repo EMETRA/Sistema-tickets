@@ -1,6 +1,8 @@
+import type { IconNameInput } from "../../atoms/Icon/types";
+
 export interface TopBarProps {
     title: string;
-    iconName: string;
+    iconName: IconNameInput;
     userName: string;
     userRole: string;
     userAvatarUrl?: string;

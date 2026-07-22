@@ -1,7 +1,7 @@
-import { IconName } from "../../atoms/Icon/types";
+import type { IconNameInput } from "../../atoms/Icon/types";
 
 export interface NavItemProps {
-    iconName: IconName;
+    iconName: IconNameInput;
     label: string;
     active?: boolean;
     onClick?: () => void;

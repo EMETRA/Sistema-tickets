@@ -1,7 +1,7 @@
-import { IconName } from "../../atoms/Icon/types";
+import type { IconNameInput } from "../../atoms/Icon/types";
 
 export interface EquipmentItemProps {
-    iconName: IconName;
+    iconName: IconNameInput;
     title: string;
     description: string;
     iconColor?: string;

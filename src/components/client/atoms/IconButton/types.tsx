@@ -1,10 +1,10 @@
-import { IconName } from "../Icon/types";
+import { IconNameInput } from "../Icon/types";
 
 export interface IconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   /**
    * Nombre del icono a mostrar
    */
-  icon: IconName;
+  icon: IconNameInput;
   
   /**
    * Tamaño del icono en píxeles

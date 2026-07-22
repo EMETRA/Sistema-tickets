@@ -64,9 +64,9 @@ export const DataRow: Story = {
                 }">Cancelación Remisión</Text> },
             { content: <Text variant="muted">Remisión errónea a vehículo</Text> },
             { content: <Text variant="muted">Hoy, 17:24</Text> },
-            { content: <Chip label="Ingresado" state="assigned" /> },
+            { content: <Chip label="Ingresado" state="asignado" /> },
             { content: <AssignedChip assigned={false} /> },
-            { content: <IconButton icon="logout" size={24} /> },
+            { content: <IconButton icon="user-lock-solid" size={24} /> },
         ]
     }
 };
@@ -121,7 +121,7 @@ export const TableExample: Story = {
                     { content: <Text variant="muted">Solicitud de Mantenimiento</Text> },
                     { content: <Text variant="muted">Mantenimiento a computadora</Text> },
                     { content: <Text variant="muted">Ayer, 14:32</Text> },
-                    { content: <Chip label="Asignado" state="assigned" />, align:"center" },
+                    { content: <Chip label="Asignado" state="asignado" />, align:"center" },
                     { content: <AssignedChip assigned={false} />, align:"center" },
                     { content: <IconButton icon="trash-solid" size={24} iconColor="#BDBDBD" />, align:"center" },
                 ]}
@@ -169,7 +169,7 @@ export const SelectableTableExample: Story = {
             { content: <Text variant="muted">Cancelación Remisión</Text> },
             { content: <Text variant="muted">Remisión errónea a vehículo</Text> },
             { content: <Text variant="muted">Hoy, 17:24</Text> },
-            { content: <Chip label="Ingresado" state="assigned" />, align: "center" as const },
+            { content: <Chip label="Ingresado" state="asignado" />, align: "center" as const },
             { content: <AssignedChip assigned={false} />, align: "center" as const },
             { content: <IconButton icon="trash-solid" size={24} iconColor="#BDBDBD" />, align: "center" as const },
         ];

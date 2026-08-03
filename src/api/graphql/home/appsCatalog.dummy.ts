@@ -153,8 +153,8 @@ export const APPS_CATALOG_DUMMY: AppsCatalog = {
                     {
                         id: "mod13",
                         label: "MOD13",
-                        title: "Módulo de proyectos",
-                        iconName: "clipboard-solid",
+                        title: "Consulta de remisiones pendientes por nombre",
+                        iconName: "chart-bar-solid",
                     },
                 ],
             },

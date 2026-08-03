@@ -13,7 +13,7 @@ import { useCreateModule } from "@/api/hooks/useCreateModule"; // Importamos el 
 import { useAproveRequest, useAssignPermission, useCreateRol, useUpdateRol } from "@/api/hooks";
 import { UpdateRolInput } from "@/api/graphql/rbac";
 /**
- import {
+import {
     useGetPendingRequests,
     useGetModules,
     useGetPermissions,

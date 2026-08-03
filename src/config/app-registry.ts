@@ -11,6 +11,7 @@ import MOD08 from "@/views/MOD08";
 import MOD10 from "@/views/MOD10";
 import PROC01 from "@/views/PROC01/PROC01";
 import SaveMOD01 from "@/views/SaveMOD01/ExportMOD01";
+import MOD13 from "@/views/MOD13";
 
 /**
  * Registro de vistas de módulos (hojas del árbol de apps).
@@ -25,6 +26,7 @@ export const APP_REGISTRY: Record<string, ComponentType> = {
     mod07: MOD07,
     mod08: MOD08,
     mod10: MOD10,
+    mod13: MOD13,
     "dashboard-proyectos": DashboardProjects,
     "dashboard-colaboradores": DashboardCollaborators,
     exportmod01: ExportMOD01,

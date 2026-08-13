@@ -140,9 +140,6 @@ const ConsultaVehiculos: React.FC = () => {
                     Consultar
                 </Button>
 
-                <p className={styles.hint}>
-                    La consulta se realiza en línea contra SAT y puede tardar varios segundos.
-                </p>
             </div>
 
             <div className={styles.resultsContainer}>

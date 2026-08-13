@@ -1,4 +1,5 @@
 import type { ComponentType } from "react";
+import ConsultaVehiculos from "@/views/ConsultaVehiculos";
 import DashboardCollaborators from "@/views/DashboardCollaborators/DashboardCollaborators";
 import DashboardProjects from "@/views/DashboardProjects";
 import ExportMOD01 from "@/views/ExportMOD01";
@@ -31,6 +32,7 @@ export const APP_REGISTRY: Record<string, ComponentType> = {
     "dashboard-colaboradores": DashboardCollaborators,
     exportmod01: ExportMOD01,
     "save-mod01": SaveMOD01,
+    "consulta-vehiculos": ConsultaVehiculos,
 };
 
 export function getAppComponent(moduleId: string): ComponentType | null {

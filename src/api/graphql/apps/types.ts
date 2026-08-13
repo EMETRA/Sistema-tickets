@@ -46,6 +46,43 @@ export interface ExecuteLprRemissionResponse extends Record<string, unknown> {
 }
 
 
+// Consulta Vehículos SAT (consultaVeh, ambiente municipalidades)
+export type TipoUsoVehiculo =
+    | "P0"
+    | "A0"
+    | "C0"
+    | "O0"
+    | "M0"
+    | "U0"
+    | "MI"
+    | "CC"
+    | "CD"
+    | "TC"
+    | "TE"
+    | "00"
+    | "TRC";
+
+export interface ConsultaVehiculoMuniInput {
+    uso: TipoUsoVehiculo;
+    placa: string;
+}
+
+export interface VehiculoMuni {
+    color?: string;
+    marca?: string;
+    modelo?: string;
+    nitPropietario?: string;
+    nombrePropietario?: string;
+    direccion?: string;
+    correo?: string;
+    telefono?: string;
+}
+
+export interface ConsultaVehiculoMuniResponse extends Record<string, unknown> {
+    consultaVehiculoMuni: VehiculoMuni;
+}
+
+
 // MOD01 - Reporte semanal
 export interface TareaPlanInput {
     descripcion: string;

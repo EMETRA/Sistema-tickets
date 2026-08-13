@@ -158,6 +158,22 @@ export const APPS_CATALOG_DUMMY: AppsCatalog = {
                     },
                 ],
             },
+            consultas: {
+                meta: {
+                    id: "consultas",
+                    label: "CONSULTAS",
+                    title: "Consultas",
+                    iconName: "magnifying-glass-solid",
+                },
+                modules: [
+                    {
+                        id: "consulta-vehiculos",
+                        label: "CONSULTA VEHÍCULOS",
+                        title: "Consulta de vehículos SAT",
+                        iconName: "car-solid",
+                    },
+                ],
+            },
         },
     },
     financiero: {

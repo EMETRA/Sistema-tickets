@@ -103,3 +103,6 @@ export { useSendEmailNotification } from './useSendEmailNotification';
 
 // PROC01 - Apps hooks
 export { useExecuteLprRemission } from './useExecuteLprRemission';
+
+// Consulta Vehículos SAT - Apps hooks
+export { useConsultaVehiculoMuni } from './useConsultaVehiculoMuni';

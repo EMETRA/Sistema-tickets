@@ -1,5 +1,12 @@
 import { BarChartDataPoint } from "@/components/client/atoms/BarChart/types";
+import { DropdownMenuItem } from "@/components/client/molecules/DropdownMenu";
 import { SecondaryFilterConfig } from "@/components/client/organisms/PerformanceChartPanel/types";
+
+const SYSTEMS_DATA: DropdownMenuItem[] = [
+    { label: "Sistema Tickets", value: "option1" },
+    { label: "Sistema de Gestión", value: "option2" },
+    { label: "Sistema de Facturación", value: "option3" },
+];
 
 const SECONDARY_FILTER_CONFIG: SecondaryFilterConfig = {
     parentOptions: [
@@ -115,6 +122,10 @@ const SECONDARY_PERFORMANCE_DATA: Record<string, Record<string, BarChartDataPoin
         ],
     },
 };
+
+export async function getSystemsDummy(): Promise<DropdownMenuItem[]> {
+    return SYSTEMS_DATA.map((item) => ({ ...item }));
+}
 
 export async function getStatisticsFilterConfigDummy(): Promise<SecondaryFilterConfig> {
     return {

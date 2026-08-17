@@ -6,6 +6,7 @@ import { PerformanceChartPanel } from "@/components/client/organisms/Performance
 import { InfoPanel } from "@/components/client/organisms/InfoPanel";
 import { TicketsResolvePanel } from "@/components/client/organisms/TicketsResolvePanel";
 import type { DonutChartDataItem } from "@/components/client/atoms/DonutChart";
+import type { BarChartDataPoint } from "@/components/client/atoms/BarChart";
 import TicketsPanel from "@/components/client/organisms/TicketsPanel/TicketsPanel";
 import styles from "./AdminHome.module.scss";
 
@@ -13,7 +14,6 @@ import { TicketStatData } from "@/components/client/organisms/DashboardStatsBar"
 import { EventItemProps } from "@/components/client/molecules/EventItem";
 import { TicketData } from "@/components/client/organisms/TicketsPanel";
 import { ChipState } from "@/components/client/atoms/Chip/types";
-import type { PerformancePoint } from "@/api/graphql/queries/getAdminHome";
 import type { PrimaryFilter } from "@/components/client/organisms/PerformanceChartPanel/types";
 import {
     useGetAdminDashboardStats,
@@ -59,7 +59,7 @@ const AdminHome: React.FC = () => {
         : [];
 
     // Transformar UserPerformance a datos para el gráfico
-    const dataByFilter: PerformancePoint[] = performanceData
+    const dataByFilter: BarChartDataPoint[] = performanceData
         ? performanceData.map(user => ({
             label: user.nombre || "Sin nombre",
             value: user.tickets_resueltos,

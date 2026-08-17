@@ -12,8 +12,8 @@ import { BarChartDataPoint } from "@/components/client/atoms/BarChart/types";
 import {
     getStatisticsFilterConfigDummy,
     getStatisticsPerformanceDummy,
+    getSystemsDummy,
 } from "@/api/graphql/queries/getStatistics";
-import { getSystemsDummy } from "@/api/graphql/queries/getSystems";
 import styles from "./Statistics.module.scss";
 
 export const Statistics = () => {

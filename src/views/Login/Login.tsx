@@ -124,9 +124,9 @@ const Login: React.FC = () => {
                             <div className={styles.captchaContainer}>
                                 <Turnstile
                                     onSuccess={(token) => setCaptchaToken(token)}
-                                    onError={() => {
+                                    onError={(message) => {
                                         setCaptchaToken(null);
-                                        setError("Error al validar el captcha. Por favor, intenta de nuevo.");
+                                        setError(message);
                                     }}
                                     onExpire={() => setCaptchaToken(null)}
                                     disabled={loading}

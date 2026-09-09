@@ -43,7 +43,7 @@
 
 .placeholder {
     font-size: 13px;
-    font-family: "Montserrat", sans-serif;
+    font-family: var(--font-montserrat), sans-serif;
     color: #9ca3af;
     pointer-events: none;
     user-select: none;
@@ -90,5 +90,5 @@
 .empty {
     font-size: 15px;
     color: #9ca3af;
-    font-family: "Montserrat", sans-serif;
+    font-family: var(--font-montserrat), sans-serif;
 }

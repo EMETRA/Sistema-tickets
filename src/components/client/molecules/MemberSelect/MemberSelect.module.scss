@@ -1,6 +1,6 @@
 .MemberSelect {
   position: relative;
-  font-family: "Montserrat", sans-serif;
+  font-family: var(--font-montserrat), sans-serif;
   display: inline-block;
 
   &:has(.trigger) {

@@ -5,7 +5,7 @@
   padding: 7px 10px 7px 10px;
   border-radius: 6px;
   font-size: 13px;
-  font-family: "Montserrat", sans-serif;
+  font-family: var(--font-montserrat), sans-serif;
   font-weight: 500;
   line-height: 1.4;
   white-space: nowrap;
@@ -55,7 +55,7 @@
   color: inherit;
   opacity: 0.5;
   line-height: 1;
-  font-family: "Montserrat", sans-serif;
+  font-family: var(--font-montserrat), sans-serif;
   font-weight: 500;
   font-size: 14px;
   transition: opacity 0.15s ease-in-out;

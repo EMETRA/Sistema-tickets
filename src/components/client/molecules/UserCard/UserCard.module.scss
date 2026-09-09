@@ -5,7 +5,7 @@
   border: 1px solid #C5C5C5;
   border-radius: 10px;
   padding: 30px;
-  font-family: "Montserrat", sans-serif;
+  font-family: var(--font-montserrat), sans-serif;
   width: 100%;
   max-width: 380px;
   gap: 25px;
@@ -53,7 +53,7 @@
       border: none;
       background: none;
       cursor: pointer;
-      font-family: "Montserrat", sans-serif;
+      font-family: var(--font-montserrat), sans-serif;
       font-size: 14px;
       color: #262626;
       text-align: left;

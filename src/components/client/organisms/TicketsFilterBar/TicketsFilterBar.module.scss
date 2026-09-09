@@ -1,7 +1,7 @@
 @use "../../../../theme/colors.scss" as *;
 
 .TicketsFilterBar {
-  font-family: "Montserrat", sans-serif;
+  font-family: var(--font-montserrat), sans-serif;
   display: flex;
   justify-content: space-between;
   align-items: center;

@@ -106,3 +106,6 @@ export { useExecuteLprRemission } from './useExecuteLprRemission';
 
 // COM03 - Apps hooks
 export { useGetNoticias } from './useGetNoticias';
+export { useGetNoticia } from './useGetNoticia';
+export { useGetCategoriasNoticia } from './useGetCategoriasNoticia';
+export { useGetEtiquetasNoticia } from './useGetEtiquetasNoticia';

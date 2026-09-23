@@ -1,2 +1,2 @@
 export { default as FileDropzone } from "./FileDropzone";
-export type { FileDropzoneProps } from "./types";
+export type { FileDropzoneProps, FileDropzoneVariant } from "./types";

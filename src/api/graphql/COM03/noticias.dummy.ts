@@ -24,7 +24,7 @@ export const NOTICIAS_DUMMY: NoticiaListItem[] = [
     {
         id: '3',
         titulo: 'Cierre vial por mantenimiento',
-        estado: EstadoNoticia.PUBLICADA,
+        estado: EstadoNoticia.PROGRAMADA,
         estadoNotificacion: EstadoNotificacion.PENDIENTE,
         autor: 'Comunicación EMETRA',
         fecha: '2026-09-22T08:00:00.000Z',
@@ -32,7 +32,7 @@ export const NOTICIAS_DUMMY: NoticiaListItem[] = [
     {
         id: '4',
         titulo: 'Aviso de suspensión temporal de rutas',
-        estado: EstadoNoticia.PUBLICADA,
+        estado: EstadoNoticia.PROGRAMADA,
         estadoNotificacion: EstadoNotificacion.ERROR,
         autor: 'Comunicación EMETRA',
         fecha: '2026-09-21T08:00:00.000Z',

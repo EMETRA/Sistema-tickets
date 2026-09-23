@@ -89,6 +89,7 @@ const NewsContentSection: React.FC<NewsContentSectionProps> = ({
                     onChange={(e) => onChange("encabezado", e.target.value)}
                     state={errors.encabezado ? "error" : "default"}
                     errorMessage={errors.encabezado}
+                    aria-invalid={Boolean(errors.encabezado)}
                 />
             </FormField>
 
@@ -100,6 +101,7 @@ const NewsContentSection: React.FC<NewsContentSectionProps> = ({
                     onChange={(e) => onChange("contenido", e.target.value)}
                     state={errors.contenido ? "error" : "default"}
                     errorMessage={errors.contenido}
+                    aria-invalid={Boolean(errors.contenido)}
                 />
             </FormField>
 

@@ -51,7 +51,12 @@ const NewsForm: React.FC<NewsFormProps> = ({
     const [rejectedMain, setRejectedMain] = useState<string[]>([]);
     const [rejectedGallery, setRejectedGallery] = useState<string[]>([]);
 
-    const fieldState = (path: string) => (errors[path] ? "error" : "default");
+    // Props de error de un campo. aria-invalid también permite ubicar el primer error para hacer scroll.
+    const errorProps = (path: string) => ({
+        state: errors[path] ? ("error" as const) : ("default" as const),
+        errorMessage: errors[path],
+        "aria-invalid": Boolean(errors[path]),
+    });
 
     const sectionErrors = (index: number): Partial<Record<NewsSectionField, string>> => ({
         encabezado: errors[`secciones.${index}.encabezado`],
@@ -96,8 +101,7 @@ const NewsForm: React.FC<NewsFormProps> = ({
                         id="noticia-titulo"
                         value={values.titulo}
                         onChange={(e) => onTitleChange(e.target.value)}
-                        state={fieldState("titulo")}
-                        errorMessage={errors.titulo}
+                        {...errorProps("titulo")}
                     />
                 </FormField>
 
@@ -107,8 +111,7 @@ const NewsForm: React.FC<NewsFormProps> = ({
                         rows={2}
                         value={values.resumen}
                         onChange={(e) => onFieldChange("resumen", e.target.value)}
-                        state={fieldState("resumen")}
-                        errorMessage={errors.resumen}
+                        {...errorProps("resumen")}
                     />
                 </FormField>
 
@@ -117,8 +120,7 @@ const NewsForm: React.FC<NewsFormProps> = ({
                         id="noticia-autor"
                         value={values.autor}
                         onChange={(e) => onFieldChange("autor", e.target.value)}
-                        state={fieldState("autor")}
-                        errorMessage={errors.autor}
+                        {...errorProps("autor")}
                     />
                 </FormField>
 
@@ -130,8 +132,7 @@ const NewsForm: React.FC<NewsFormProps> = ({
                             options={options.categorias}
                             value={values.categoriaId}
                             onChange={(e) => onFieldChange("categoriaId", e.target.value)}
-                            state={fieldState("categoriaId")}
-                            errorMessage={errors.categoriaId}
+                            {...errorProps("categoriaId")}
                         />
                     </FormField>
 
@@ -164,8 +165,7 @@ const NewsForm: React.FC<NewsFormProps> = ({
                             options={options.idiomas}
                             value={values.idioma}
                             onChange={(e) => onFieldChange("idioma", e.target.value)}
-                            state={fieldState("idioma")}
-                            errorMessage={errors.idioma}
+                            {...errorProps("idioma")}
                         />
                     </FormField>
 
@@ -176,8 +176,7 @@ const NewsForm: React.FC<NewsFormProps> = ({
                             options={options.visibilidades}
                             value={values.visibilidad}
                             onChange={(e) => onFieldChange("visibilidad", e.target.value)}
-                            state={fieldState("visibilidad")}
-                            errorMessage={errors.visibilidad}
+                            {...errorProps("visibilidad")}
                         />
                     </FormField>
                 </div>
@@ -189,8 +188,7 @@ const NewsForm: React.FC<NewsFormProps> = ({
                             type="date"
                             value={values.fechaPublicacion}
                             onChange={(e) => onFieldChange("fechaPublicacion", e.target.value)}
-                            state={fieldState("fechaPublicacion")}
-                            errorMessage={errors.fechaPublicacion}
+                            {...errorProps("fechaPublicacion")}
                         />
                     </FormField>
 
@@ -199,8 +197,7 @@ const NewsForm: React.FC<NewsFormProps> = ({
                             id="noticia-slug"
                             value={values.slug}
                             onChange={(e) => onSlugChange(e.target.value)}
-                            state={fieldState("slug")}
-                            errorMessage={errors.slug}
+                            {...errorProps("slug")}
                         />
                         <span className={styles.helper}>
                             Sugerido a partir del título. Puedes editarlo; el valor que quede aquí es el que se guarda.
@@ -217,8 +214,7 @@ const NewsForm: React.FC<NewsFormProps> = ({
                             placeholder="Ej. 4"
                             value={values.tiempoLectura}
                             onChange={(e) => onFieldChange("tiempoLectura", e.target.value)}
-                            state={fieldState("tiempoLectura")}
-                            errorMessage={errors.tiempoLectura}
+                            {...errorProps("tiempoLectura")}
                         />
                         <span className={styles.helper}>Puede dejarse vacío.</span>
                     </FormField>
@@ -252,7 +248,7 @@ const NewsForm: React.FC<NewsFormProps> = ({
                     />
                 )}
                 {errors.archivoPrincipal && (
-                    <span className={styles.error}>{errors.archivoPrincipal}</span>
+                    <span className={styles.error} data-error="true">{errors.archivoPrincipal}</span>
                 )}
             </section>
 
@@ -282,7 +278,7 @@ const NewsForm: React.FC<NewsFormProps> = ({
                         />
                     ))}
                 </div>
-                {errors.secciones && <span className={styles.error}>{errors.secciones}</span>}
+                {errors.secciones && <span className={styles.error} data-error="true">{errors.secciones}</span>}
 
                 <div className={styles.addSection}>
                     <Button type="button" variant="outlined" rounded onClick={onAddSection} className={styles.addSectionButton}>

@@ -1,5 +1,12 @@
 @use "../../../theme/colors.scss" as *;
 
+// Envuelve formulario / vista previa; es el punto de referencia para subir el scroll
+.screen {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
 .status.status {
     margin: 0;
     font-size: 0.75rem;

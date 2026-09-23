@@ -1,11 +1,14 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { scrollToTop } from "@/helpers/scrollToTop";
+import { scrollToFirstError } from "@/helpers/scrollToFirstError";
 import { useGetCategoriasNoticia, useGetEtiquetasNoticia, useGetNoticia } from "@/api/hooks";
 import type { CategoriaNoticia, EtiquetaNoticia, NoticiaDetalle } from "@/api/graphql/COM03";
 import { Button } from "@/components/client/atoms/Button";
 import { Text } from "@/components/client/atoms/Text";
 import { NewsForm, type NewsFormOptions } from "@/components/client/organisms/NewsForm";
+import { NewsPreview } from "@/components/client/organisms/NewsPreview";
 import {
     IDIOMA_OPTIONS,
     NEWS_FORM_ACCEPT,
@@ -77,8 +80,18 @@ interface NewsFormContentProps {
 
 function NewsFormContent({ initial, categorias, etiquetas, onBack }: NewsFormContentProps) {
     const form = useNewsForm(initial);
+    // La vista previa es un modo de esta pantalla (no otra URL) para no perder el estado ni los archivos.
+    const [isPreview, setIsPreview] = useState(false);
+    const screenRef = useRef<HTMLDivElement>(null);
+    // Cuenta los intentos con errores; cada cambio lleva al primer error ya pintado.
+    const [failedAttempts, setFailedAttempts] = useState(0);
+
+    useEffect(() => {
+        if (failedAttempts === 0) return;
+        scrollToFirstError(screenRef.current);
+    }, [failedAttempts]);
     const hasErrors = Object.keys(form.errors).length > 0;
-    const { categoriaId } = form.values;
+    const { categoriaId, subcategoriaId, etiquetaIds } = form.values;
 
     const options: NewsFormOptions = useMemo(() => ({
         // Árbol TB_CATEGORIA: raíces en Categoría, hijas de la elegida en Subcategoría.
@@ -100,25 +113,67 @@ function NewsFormContent({ initial, categorias, etiquetas, onBack }: NewsFormCon
         })),
     }), [categorias, etiquetas, categoriaId]);
 
+    // Nombres para los chips de la vista previa
+    const categoryLabels = useMemo(
+        () => [categoriaId, subcategoriaId]
+            .filter(Boolean)
+            .map((id) => categorias.find((categoria) => categoria.id === id)?.nombre)
+            .filter((nombre): nombre is string => Boolean(nombre)),
+        [categorias, categoriaId, subcategoriaId]
+    );
+    const tagLabels = useMemo(
+        () => etiquetaIds
+            .map((id) => etiquetas.find((etiqueta) => etiqueta.id === id)?.nombre)
+            .filter((nombre): nombre is string => Boolean(nombre)),
+        [etiquetas, etiquetaIds]
+    );
+
+    // Valida y, si hay errores, pide llevar al primero.
+    const validate = (mode: "publicar" | "borrador") => {
+        const isValid = form.validate(mode);
+        if (!isValid) setFailedAttempts((count) => count + 1);
+        return isValid;
+    };
+
     const handleSaveDraft = () => {
-        if (!form.validate("borrador")) return;
+        if (!validate("borrador")) return;
         // TODO [COM03-FLUJO]: abrir modal "Guardar borrador" (4139:704) y guardar.
         // Al enviar, convertir el contenido de cada sección con textToHtml (TB_SECCION_NOTICIA.contenido_html).
     };
 
+    // Al cambiar entre formulario y vista previa se sube al inicio de la pantalla.
+    const showPreview = (value: boolean) => {
+        scrollToTop(screenRef.current);
+        setIsPreview(value);
+    };
+
     const handlePreview = () => {
-        if (!form.validate("publicar")) return;
-        // TODO [COM03-FLUJO]: mostrar la vista previa (4136:662).
+        if (!validate("publicar")) return;
+        showPreview(true);
     };
 
     const handlePublish = () => {
-        if (!form.validate("publicar")) return;
+        if (!validate("publicar")) return;
         // TODO [COM03-FLUJO]: según form.publishIntent abrir "Confirmar publicación" (4052:1355)
         // o "Confirmar publicación programada" (4155:750).
     };
 
+    if (isPreview) {
+        return (
+            <div ref={screenRef} className={styles.screen}>
+                <NewsPreview
+                    values={form.values}
+                    categoryLabels={categoryLabels}
+                    tagLabels={tagLabels}
+                    onBack={() => showPreview(false)}
+                    onPublish={handlePublish}
+                />
+            </div>
+        );
+    }
+
     return (
-        <>
+        <div ref={screenRef} className={styles.screen}>
             {hasErrors && (
                 <Text variant="caption" className={styles.errorSummary}>
                     Revisa los campos marcados antes de continuar.
@@ -148,6 +203,6 @@ function NewsFormContent({ initial, categorias, etiquetas, onBack }: NewsFormCon
                 onPreview={handlePreview}
                 onPublish={handlePublish}
             />
-        </>
+        </div>
     );
 }

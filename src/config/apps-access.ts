@@ -24,6 +24,8 @@ export function normalizeDepartment(value?: string | null): string | null {
         recaudacion: "recaudacion",
         financiero: "financiero",
         juridico: "juridico",
+        // TODO [COM03-BACKEND]: confirmar el valor real de `departamento` para Comunicación.
+        comunicacion: "comunicacion",
     };
 
     return aliases[key] ?? null;

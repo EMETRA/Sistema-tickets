@@ -53,6 +53,7 @@ export const ToggleButton = forwardRef<HTMLDivElement, ToggleButtonProps>(
                 className={classNames(styles.ToggleButton, {
                     [styles["ToggleButton--disabled"]]: disabled,
                     [styles["ToggleButton--withNavigation"]]: needsNavigation,
+                    [styles["ToggleButton--segmented"]]: variant === "segmented",
                 }, className)}
             >
                 {needsNavigation && (
@@ -69,6 +70,23 @@ export const ToggleButton = forwardRef<HTMLDivElement, ToggleButtonProps>(
                 <div key={startIndex} className={styles.ToggleButton__options}>
                     {visibleOptions.map((option) => {
                         const isSelected = option.value === value;
+
+                        if (variant === "segmented") {
+                            return (
+                                <button
+                                    key={option.value}
+                                    type="button"
+                                    className={classNames(styles.ToggleButton__segment, {
+                                        [styles["ToggleButton__segment--selected"]]: isSelected,
+                                    })}
+                                    onClick={() => handleClick(option.value)}
+                                    disabled={disabled}
+                                    aria-pressed={isSelected}
+                                >
+                                    {option.label}
+                                </button>
+                            );
+                        }
 
                         if (isSelected) {
                             return (

@@ -103,3 +103,6 @@ export { useSendEmailNotification } from './useSendEmailNotification';
 
 // PROC01 - Apps hooks
 export { useExecuteLprRemission } from './useExecuteLprRemission';
+
+// COM03 - Apps hooks
+export { useGetNoticias } from './useGetNoticias';

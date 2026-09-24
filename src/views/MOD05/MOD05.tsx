@@ -9,7 +9,7 @@ import { Select } from '../../components/client/atoms/Select';
 import { Button } from '../../components/client/atoms/Button';
 import { Text } from '../../components/client/atoms/Text';
 
-import { SuccessModal } from '../../components/client/organisms/SucessModal';
+import { PopUp } from '@/components/client/molecules/PopUp';
 
 import styles from './MOD05.module.scss';
 
@@ -182,11 +182,14 @@ const MOD05: React.FC = () => {
                     </Text>
                 )}
             </div>
-            <SuccessModal
+            <PopUp
                 isOpen={isModalOpen}
                 onClose={() => {
                     setIsModalOpen(false);
                 }}
+                title="Excel generado correctamente"
+                description="El excel ha sido generado correctamente"
+                variant="success"
             />
         </div>
     );

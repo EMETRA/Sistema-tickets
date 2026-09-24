@@ -6,7 +6,7 @@ import { FormField } from '../../components/client/molecules/FormField';
 import { Button } from '../../components/client/atoms/Button';
 import { Select } from '../../components/client/atoms/Select';
 
-import { SuccessModal } from '../../components/client/organisms/SucessModal';
+import { PopUp } from '@/components/client/molecules/PopUp';
 
 import {
     useGetFuncionesPorUsuarioEmpresas,
@@ -135,10 +135,12 @@ const MOD06: React.FC = () => {
                     </Button>
                 </div>
             </div>
-            <SuccessModal
+            <PopUp
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                message="Cambios realizados exitosamente"
+                title="Cambios realizados exitosamente"
+                description="Los cambios han sido realizados exitosamente"
+                variant="success"
             />
         </div>
     )

@@ -8,7 +8,7 @@ import { Button } from '../../components/client/atoms/Button';
 import { Select } from '../../components/client/atoms/Select';
 import { Text } from '../../components/client/atoms/Text';
 
-import { SuccessModal } from '../../components/client/organisms/SucessModal';
+import { PopUp } from '@/components/client/molecules/PopUp';
 import { useGetReporteAnuladosExcel } from '@/api/hooks/useGetReporteAnuladosExcel';
 
 import styles from './MOD08.module.scss';
@@ -107,10 +107,12 @@ const MOD08: React.FC = () => {
                     Dirección de Informática · Municipalidad de Guatemala
                 </Text>
             </div>
-            <SuccessModal
+            <PopUp
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                message="Excel generado correctamente"
+                title="Excel generado correctamente"
+                description="El excel ha sido generado correctamente"
+                variant="success"
             />
         </div>
     )

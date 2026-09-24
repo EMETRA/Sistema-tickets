@@ -7,7 +7,7 @@ import { Input } from "../../components/client/atoms/Input";
 import { Button } from '../../components/client/atoms/Button';
 import { Text } from '../../components/client/atoms/Text';
 
-import { SuccessModal } from '../../components/client/organisms/SucessModal';
+import { PopUp } from '@/components/client/molecules/PopUp';
 
 import { useGetVisaNominaExportExcel } from '@/api/hooks';
 
@@ -136,10 +136,12 @@ const MOD04: React.FC = () => {
                     Dirección de Informática · Municipalidad de Guatemala
                 </Text>
             </div>
-            <SuccessModal
+            <PopUp
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                message="Excel generado correctamente"
+                title="Excel generado correctamente"
+                description="El excel ha sido generado correctamente"
+                variant="success"
             />
         </div>
     )

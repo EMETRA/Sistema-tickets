@@ -10,22 +10,10 @@ import { Title } from "../../atoms/Title";
 import { FormActions } from "../../molecules/FormActions";
 import type { NewsFormFile } from "../NewsForm/types";
 import { textToHtml } from "@/helpers/textHtml";
+import { formatLongDate } from "@/helpers/formatLongDate";
 import { useObjectUrl } from "./useObjectUrl";
 import type { NewsPreviewProps } from "./types";
 import styles from "./NewsPreview.module.scss";
-
-const MONTHS = [
-    "enero", "febrero", "marzo", "abril", "mayo", "junio",
-    "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
-];
-
-/** "2026-09-21" → "21 de septiembre del 2026" (sin conversión de zona horaria) */
-function formatLongDate(isoDate: string): string | null {
-    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(isoDate);
-    if (!match) return null;
-    const [, year, month, day] = match;
-    return `${Number(day)} de ${MONTHS[Number(month) - 1]} del ${year}`;
-}
 
 interface PreviewMediaProps {
     media: NewsFormFile;

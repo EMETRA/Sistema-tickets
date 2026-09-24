@@ -1,4 +1,4 @@
-import type { NoticiaListItem } from "@/api/graphql/COM03";
+import type { NoticiaListRow } from "@/api/graphql/COM03";
 
 /**
  * Filtro de tabs del listado de noticias.
@@ -12,13 +12,19 @@ export interface NewsTablePanelProps {
     /**
      * Noticias ya filtradas a mostrar en la tabla
      */
-    noticias: NoticiaListItem[];
+    noticias: NoticiaListRow[];
 
     /**
      * Si es true muestra las filas skeleton
      * @default false
      */
     loading?: boolean;
+
+    /**
+     * Si es true, la columna Notificación muestra un skeleton (se consulta aparte a VIVI)
+     * @default false
+     */
+    notificationsLoading?: boolean;
 
     /**
      * Si es true muestra el estado "Aún no hay noticias"

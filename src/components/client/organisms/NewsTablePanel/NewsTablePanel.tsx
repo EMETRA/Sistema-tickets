@@ -1,6 +1,6 @@
 import React from "react";
 import classNames from "classnames";
-import { EstadoNoticia, EstadoNotificacion, type NoticiaListItem } from "@/api/graphql/COM03";
+import { EstadoNoticia, EstadoNotificacion, type NoticiaListRow } from "@/api/graphql/COM03";
 import { ToggleButton } from "../../atoms/ToggleButton";
 import type { ToggleButtonOption } from "../../atoms/ToggleButton";
 import { LabelChip } from "../../atoms/LabelChip";
@@ -86,6 +86,7 @@ function formatFecha(fecha: string | null): string {
 const NewsTablePanel: React.FC<NewsTablePanelProps> = ({
     noticias,
     loading = false,
+    notificationsLoading = false,
     isEmpty = false,
     filter,
     onFilterChange,
@@ -98,7 +99,22 @@ const NewsTablePanel: React.FC<NewsTablePanelProps> = ({
     onRestore,
     className,
 }) => {
-    const renderActions = (noticia: NoticiaListItem) => {
+    const renderNotification = (noticia: NoticiaListRow) => {
+        if (notificationsLoading) {
+            return <span className={classNames(styles.skeleton, styles["skeleton--short"])} aria-label="Cargando" />;
+        }
+        if (!noticia.estadoNotificacion) {
+            return <span className={styles.muted}>{EMPTY_VALUE}</span>;
+        }
+        return (
+            <LabelChip
+                label={ESTADO_NOTIFICACION_LABEL[noticia.estadoNotificacion]}
+                className={classNames(styles.pill, PILL_CLASS[noticia.estadoNotificacion])}
+            />
+        );
+    };
+
+    const renderActions = (noticia: NoticiaListRow) => {
         if (noticia.estado === EstadoNoticia.ARCHIVADA) {
             return (
                 <Button rounded color="success" className={styles.actionButton} onClick={() => onRestore?.(noticia.id)}>
@@ -133,7 +149,7 @@ const NewsTablePanel: React.FC<NewsTablePanelProps> = ({
         );
     };
 
-    const buildRowCells = (noticia: NoticiaListItem): TableCellConfig[] => [
+    const buildRowCells = (noticia: NoticiaListRow): TableCellConfig[] => [
         { content: <span className={styles.title}>{noticia.titulo}</span> },
         {
             content: (
@@ -143,16 +159,7 @@ const NewsTablePanel: React.FC<NewsTablePanelProps> = ({
                 />
             ),
         },
-        {
-            content: noticia.estadoNotificacion ? (
-                <LabelChip
-                    label={ESTADO_NOTIFICACION_LABEL[noticia.estadoNotificacion]}
-                    className={classNames(styles.pill, PILL_CLASS[noticia.estadoNotificacion])}
-                />
-            ) : (
-                <span className={styles.muted}>{EMPTY_VALUE}</span>
-            ),
-        },
+        { content: renderNotification(noticia) },
         { content: <span className={styles.text}>{noticia.autor}</span> },
         { content: <span className={styles.text}>{formatFecha(noticia.fecha)}</span> },
         { content: <div className={styles.actions}>{renderActions(noticia)}</div> },

@@ -21,7 +21,11 @@ import { validateNewsForm, type NewsValidationMode } from "../schemas/newsForm.s
 export type PublishIntent = "publicar" | "programar";
 
 let localIdSequence = 0;
-const newLocalId = (prefix: string) => `${prefix}-nuevo-${Date.now()}-${localIdSequence++}`;
+const LOCAL_ID_MARK = "-nuevo-";
+const newLocalId = (prefix: string) => `${prefix}${LOCAL_ID_MARK}${Date.now()}-${localIdSequence++}`;
+
+/** true si el id lo generó el formulario (sección o archivo que aún no existe en backend) */
+export const isLocalId = (id: string) => id.includes(LOCAL_ID_MARK);
 
 const emptySection = (): NewsFormSection => ({
     id: newLocalId("seccion"),

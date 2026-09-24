@@ -28,7 +28,8 @@ export const APP_REGISTRY: Record<string, ComponentType> = {
     mod08: MOD08,
     mod10: MOD10,
     mod13: MOD13,
-    com03: COM03,
+    // COM-03: la clave es el id del módulo en la ruta /home/comunicacion/contenido/noticias
+    noticias: COM03,
     "dashboard-proyectos": DashboardProjects,
     "dashboard-colaboradores": DashboardCollaborators,
     exportmod01: ExportMOD01,

@@ -29,6 +29,11 @@
     justify-content: flex-end;
 }
 
+.warningText.warningText {
+    margin: 0;
+    color: $naranja-1;
+}
+
 .errorText.errorText {
     margin: 0;
     color: $rojo-1;

@@ -3,12 +3,24 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { scrollToTop } from "@/helpers/scrollToTop";
 import { scrollToFirstError } from "@/helpers/scrollToFirstError";
-import { useGetCategoriasNoticia, useGetEtiquetasNoticia, useGetNoticia } from "@/api/hooks";
-import type { CategoriaNoticia, EtiquetaNoticia, NoticiaDetalle } from "@/api/graphql/COM03";
+import { createIdempotencyKey } from "@/helpers/createIdempotencyKey";
+import {
+    useGetCategoriasNoticia,
+    useGetEtiquetasNoticia,
+    useGetNoticia,
+    useGuardarNoticia,
+} from "@/api/hooks";
+import { AccionNoticia, type CategoriaNoticia, type EtiquetaNoticia, type NoticiaDetalle } from "@/api/graphql/COM03";
 import { Button } from "@/components/client/atoms/Button";
 import { Text } from "@/components/client/atoms/Text";
+import { Title } from "@/components/client/atoms/Title";
+import { ModalContent } from "@/components/client/molecules/ModalContent";
+import { LoadingModal } from "@/components/client/molecules/LoadingModal";
 import { NewsForm, type NewsFormOptions } from "@/components/client/organisms/NewsForm";
 import { NewsPreview } from "@/components/client/organisms/NewsPreview";
+import { NewsResultCard } from "@/components/client/organisms/NewsResultCard";
+import { buildGuardarNoticiaPayload } from "../utils/buildGuardarNoticiaPayload";
+import { ERROR_DESCRIPTION, ERROR_REFERENCE, getFlowTexts } from "./flowTexts";
 import {
     IDIOMA_OPTIONS,
     NEWS_FORM_ACCEPT,
@@ -135,10 +147,64 @@ function NewsFormContent({ initial, categorias, etiquetas, onBack }: NewsFormCon
         return isValid;
     };
 
+    // Flujo de guardado: confirmar → guardando → éxito / error
+    const { guardarNoticia } = useGuardarNoticia();
+    const [accion, setAccion] = useState<AccionNoticia | null>(null);
+    const [step, setStep] = useState<"idle" | "confirm" | "saving" | "success" | "error">("idle");
+    const texts = accion ? getFlowTexts(accion, form.values.fechaPublicacion) : null;
+
+    // Evita envíos repetidos:
+    // - savingRef bloquea cualquier clic mientras hay un envío en curso (doble clic, Reintentar).
+    // - La clave de idempotencia se repite en cada reintento de la misma acción, para que backend
+    //   descarte el duplicado si el primer envío sí llegó pero la respuesta falló.
+    const savingRef = useRef(false);
+    const idempotencyRef = useRef<{ accion: AccionNoticia; key: string } | null>(null);
+
+    // Mientras se envía, el navegador pide confirmación antes de refrescar o cerrar la pestaña.
+    useEffect(() => {
+        if (step !== "saving") return;
+        const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+            event.preventDefault();
+        };
+        window.addEventListener("beforeunload", handleBeforeUnload);
+        return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+    }, [step]);
+
+    const askConfirmation = (nextAccion: AccionNoticia) => {
+        if (idempotencyRef.current?.accion !== nextAccion) {
+            idempotencyRef.current = { accion: nextAccion, key: createIdempotencyKey() };
+        }
+        setAccion(nextAccion);
+        setStep("confirm");
+    };
+
+    const save = async () => {
+        if (!accion || !idempotencyRef.current || savingRef.current) return;
+        savingRef.current = true;
+        setStep("saving");
+        const { input, files, fileMap } = buildGuardarNoticiaPayload(
+            form.values,
+            initial?.id ?? null,
+            accion,
+            idempotencyRef.current.key,
+        );
+        let succeeded = false;
+        try {
+            await guardarNoticia(input, files, fileMap);
+            succeeded = true;
+        } catch {
+            succeeded = false;
+        } finally {
+            savingRef.current = false;
+        }
+        // La pantalla de resultado reemplaza al formulario: se muestra desde arriba.
+        scrollToTop(screenRef.current);
+        setStep(succeeded ? "success" : "error");
+    };
+
     const handleSaveDraft = () => {
         if (!validate("borrador")) return;
-        // TODO [COM03-FLUJO]: abrir modal "Guardar borrador" (4139:704) y guardar.
-        // Al enviar, convertir el contenido de cada sección con textToHtml (TB_SECCION_NOTICIA.contenido_html).
+        askConfirmation(AccionNoticia.BORRADOR);
     };
 
     // Al cambiar entre formulario y vista previa se sube al inicio de la pantalla.
@@ -154,9 +220,57 @@ function NewsFormContent({ initial, categorias, etiquetas, onBack }: NewsFormCon
 
     const handlePublish = () => {
         if (!validate("publicar")) return;
-        // TODO [COM03-FLUJO]: según form.publishIntent abrir "Confirmar publicación" (4052:1355)
-        // o "Confirmar publicación programada" (4155:750).
+        askConfirmation(form.publishIntent === "programar" ? AccionNoticia.PROGRAMAR : AccionNoticia.PUBLICAR);
     };
+
+    const handleBackToForm = () => {
+        setStep("idle");
+        showPreview(false);
+    };
+
+    if (texts && (step === "success" || step === "error")) {
+        const isSuccess = step === "success";
+        return (
+            <div ref={screenRef} className={styles.screen}>
+                <Title variant="mid" tag="h1" className={styles.resultHeading}>Comunicación</Title>
+                <NewsResultCard
+                    status={isSuccess ? "success" : "error"}
+                    title={isSuccess ? texts.success.title : texts.errorTitle}
+                    description={isSuccess ? texts.success.description : ERROR_DESCRIPTION}
+                    badge={isSuccess ? texts.success.badge : undefined}
+                    note={isSuccess ? texts.success.note : undefined}
+                    reference={isSuccess ? undefined : ERROR_REFERENCE}
+                    primaryAction={
+                        isSuccess
+                            ? { label: "Ver listado de noticias", onClick: onBack }
+                            : { label: "Reintentar", onClick: save }
+                    }
+                    secondaryAction={
+                        isSuccess ? undefined : { label: "Volver al formulario", onClick: handleBackToForm }
+                    }
+                />
+            </div>
+        );
+    }
+
+    const flowModals = texts && (
+        <>
+            <ModalContent
+                variant="compact"
+                align={texts.confirm.align}
+                isOpen={step === "confirm"}
+                title={texts.confirm.title}
+                description={texts.confirm.description}
+                onClose={() => setStep("idle")}
+                onConfirm={save}
+            />
+            <LoadingModal
+                isOpen={step === "saving"}
+                title={texts.loading.title}
+                description={texts.loading.description}
+            />
+        </>
+    );
 
     if (isPreview) {
         return (
@@ -168,6 +282,7 @@ function NewsFormContent({ initial, categorias, etiquetas, onBack }: NewsFormCon
                     onBack={() => showPreview(false)}
                     onPublish={handlePublish}
                 />
+                {flowModals}
             </div>
         );
     }
@@ -203,6 +318,7 @@ function NewsFormContent({ initial, categorias, etiquetas, onBack }: NewsFormCon
                 onPreview={handlePreview}
                 onPublish={handlePublish}
             />
+            {flowModals}
         </div>
     );
 }

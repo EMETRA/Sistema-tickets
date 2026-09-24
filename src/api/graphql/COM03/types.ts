@@ -17,8 +17,8 @@ export enum EstadoNoticia {
 }
 
 /**
- * TODO [COM03-BACKEND]: TB_NOTICIA no tiene un campo de estado de la notificación push.
- * Confirmar de dónde sale (¿servicio de push / VIVI?) o si se elimina la columna del listado.
+ * Estado de la notificación push. Viene de la API de VIVI (confirmado), no de TB_NOTICIA.
+ * TODO [COM03-BACKEND]: confirmar los valores reales que devuelve VIVI y mapearlos aquí.
  */
 export enum EstadoNotificacion {
   ENVIADO = 'ENVIADO',
@@ -40,16 +40,26 @@ export enum TipoRecurso {
   EXTERNO = 'externo',
 }
 
+/** Noticia del listado (TB_NOTICIA). No incluye la notificación push: esa viene de VIVI. */
 export interface NoticiaListItem {
   id: string;
   titulo: string;
   estado: EstadoNoticia;
-  /** null = la noticia no tiene notificación push */
-  estadoNotificacion: EstadoNotificacion | null;
   /** Nombre del autor (texto libre) */
   autor: string;
   /** ISO 8601; null cuando aún no aplica (p. ej. borradores) */
   fecha: string | null;
+}
+
+/** Estado de la push de una noticia, según VIVI */
+export interface EstadoNotificacionNoticia {
+  noticiaId: string;
+  estado: EstadoNotificacion;
+}
+
+/** Fila del listado: la noticia + el estado de su push (null = sin notificación o sin dato) */
+export interface NoticiaListRow extends NoticiaListItem {
+  estadoNotificacion: EstadoNotificacion | null;
 }
 
 export interface NoticiasFilterInput {
@@ -148,4 +158,90 @@ export interface NoticiaDetalle {
 
 export interface GetNoticiaResponse {
   noticia: NoticiaDetalle | null;
+}
+
+// ============================================
+// MUTACIONES
+// ============================================
+
+/**
+ * TODO [COM03-BACKEND]: inputs y respuestas propuestos. Confirmar nombres, cómo se reciben
+ * los archivos (Upload por multipart) y si hay una sola mutación con acción o varias.
+ */
+export enum AccionNoticia {
+  BORRADOR = 'BORRADOR',
+  PUBLICAR = 'PUBLICAR',
+  PROGRAMAR = 'PROGRAMAR',
+}
+
+/**
+ * Recurso de la noticia: uno existente (recursoId) o un archivo nuevo (archivo, Upload).
+ * `archivo` va en null en las variables y el archivo real se envía por multipart (fileMap).
+ */
+export interface RecursoNoticiaInput {
+  recursoId: string | null;
+  archivo: null;
+}
+
+export interface SeccionNoticiaInput {
+  /** null = sección nueva */
+  id: string | null;
+  orden: number;
+  encabezado: string;
+  contenidoHtml: string;
+  recurso: RecursoNoticiaInput | null;
+}
+
+export interface GuardarNoticiaInput {
+  /** null = crear; con valor = editar */
+  id: string | null;
+  /**
+   * TODO [COM03-BACKEND]: UUID del intento de envío. Se repite igual en cada "Reintentar"
+   * para que backend descarte duplicados (p. ej. si publicó pero la respuesta no llegó).
+   * Backend debe implementar la deduplicación por esta clave.
+   */
+  claveIdempotencia: string;
+  accion: AccionNoticia;
+  titulo: string;
+  resumen: string;
+  autor: string;
+  categoriaId: string | null;
+  subcategoriaId: string | null;
+  etiquetaIds: string[];
+  idioma: string;
+  visibilidad: string;
+  /** YYYY-MM-DD */
+  fechaPublicacion: string | null;
+  slug: string;
+  tiempoLectura: number | null;
+  recursoPrincipal: RecursoNoticiaInput | null;
+  secciones: SeccionNoticiaInput[];
+  /** El orden de la lista es el orden de la galería (TB_NOTICIA_RECURSO.orden, rol galeria) */
+  galeria: RecursoNoticiaInput[];
+}
+
+export interface GuardarNoticiaResponse {
+  guardarNoticia: {
+    id: string;
+    estado: EstadoNoticia;
+  };
+}
+
+export interface ArchivarNoticiaResponse {
+  archivarNoticia: {
+    id: string;
+    estado: EstadoNoticia;
+  };
+}
+
+/** restaurarNoticia devuelve la noticia en BORRADOR */
+export interface RestaurarNoticiaResponse {
+  restaurarNoticia: {
+    id: string;
+    estado: EstadoNoticia;
+  };
+}
+
+export interface EliminarNoticiaResponse {
+  eliminarNoticia: boolean;
 }

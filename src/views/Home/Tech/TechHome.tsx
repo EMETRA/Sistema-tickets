@@ -7,7 +7,7 @@ import { InfoPanel } from "@/components/client/organisms/InfoPanel";
 import TicketsPanel from "@/components/client/organisms/TicketsPanel/TicketsPanel";
 import { EventItemProps } from "@/components/client/molecules/EventItem";
 import { TicketData } from "@/components/client/organisms/TicketsPanel";
-import { ChipState } from "@/components/client/atoms/Chip/types";
+import { ChipState } from "@/components/client/atoms/TicketStateChip/types";
 import {
     useGetUser,
     useGetTechnicianStats,

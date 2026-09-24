@@ -8,7 +8,7 @@ import { ModalContent } from "../../molecules/ModalContent";
 import { InlineAlert } from "../../molecules/InlineAlert";
 import { Avatar } from "../../atoms/Avatar";
 import { Text } from "../../atoms/Text";
-import { Chip } from "../../atoms/Chip";
+import { TicketStateChip } from "../../atoms/TicketStateChip";
 import { AssignedChip } from "../../molecules/AssignedChip";
 import { IconButton } from "../../atoms/IconButton";
 import ModalUserSelect from "@/components/client/molecules/ModalUserSelect";
@@ -207,7 +207,7 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
             { content: <MarkdownViewer content={ticket.description} color="#666" /> },
             { content: <Text variant="muted">{ticket.date}</Text> },
             {
-                content: <Chip label={ticket.status.label} state={ticket.status.state} />,
+                content: <TicketStateChip label={ticket.status.label} state={ticket.status.state} />,
                 align: "center",
             },
             {
@@ -259,7 +259,7 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
             { content: <MarkdownViewer content={ticket.description} color="#666" /> },
             { content: <Text variant="muted">{ticket.date}</Text> },
             {
-                content: <Chip label={ticket.status.label} state={ticket.status.state} />,
+                content: <TicketStateChip label={ticket.status.label} state={ticket.status.state} />,
                 align: "center",
             },
             {
@@ -302,7 +302,7 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
             { content: <MarkdownViewer content={ticket.description} color="#666" /> },
             { content: <Text variant="muted">{ticket.date}</Text> },
             {
-                content: <Chip label={ticket.status.label} state={ticket.status.state} />,
+                content: <TicketStateChip label={ticket.status.label} state={ticket.status.state} />,
                 align: "center",
             },
             {

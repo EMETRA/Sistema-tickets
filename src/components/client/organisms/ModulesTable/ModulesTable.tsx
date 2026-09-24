@@ -4,7 +4,7 @@ import classNames from "classnames";
 import { TableHeader } from "../../molecules/TableHeader";
 import { TableRow } from "../../molecules/TableRow";
 import { Text } from "../../atoms/Text";
-import { Chip } from "../../atoms/Chip";
+import { TicketStateChip } from "../../atoms/TicketStateChip";
 import { IconButton } from "../../atoms/IconButton";
 import { useState } from "react";
 import { ModulesForm } from "../ModulesForm";
@@ -99,7 +99,7 @@ const ModulesTable: React.FC<ModulesTableProps> = ({
                             { content: <Text>{mod.name}</Text> },
                             {
                                 content: (
-                                    <Chip label={mod.status} state="ingresado" />
+                                    <TicketStateChip label={mod.status} state="ingresado" />
                                 ), 
                                 align: "center"
                             },

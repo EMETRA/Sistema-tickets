@@ -12,7 +12,7 @@ import styles from "./AdminHome.module.scss";
 import { TicketStatData } from "@/components/client/organisms/DashboardStatsBar";
 import { EventItemProps } from "@/components/client/molecules/EventItem";
 import { TicketData } from "@/components/client/organisms/TicketsPanel";
-import { ChipState } from "@/components/client/atoms/Chip/types";
+import { ChipState } from "@/components/client/atoms/TicketStateChip/types";
 import type { PrimaryFilter } from "@/components/client/organisms/PerformanceChartPanel/types";
 import {
     useGetAdminDashboardStats,

@@ -6,7 +6,7 @@ import { Ticket } from "@/components/client/organisms/TicketsTablePanel/types";
 import { useDeleteTicket, useTicketsByRole, useUpdateTicket } from "@/api/hooks";
 import styles from "./Tickets.module.scss";
 
-import type { ChipState } from "@/components/client/atoms/Chip/types";
+import type { ChipState } from "@/components/client/atoms/TicketStateChip/types";
 
 const Tickets: React.FC = () => {
     // Hook que obtiene tickets filtrados automáticamente según el rol del usuario

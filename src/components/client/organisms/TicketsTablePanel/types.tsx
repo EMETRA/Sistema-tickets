@@ -1,5 +1,5 @@
 import { Member } from "../../molecules/MemberSelect/types";
-import { ChipState } from "../../atoms/Chip/types";
+import { ChipState } from "../../atoms/TicketStateChip/types";
 
 /**
  * Información de un usuario en el sistema

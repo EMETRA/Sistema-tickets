@@ -1,4 +1,4 @@
-import { ChipState } from "../../atoms/Chip/types";
+import { ChipState } from "../../atoms/TicketStateChip/types";
 
 /**
  * Variantes de la tabla de tickets

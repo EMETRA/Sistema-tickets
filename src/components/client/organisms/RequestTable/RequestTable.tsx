@@ -6,7 +6,7 @@ import { TableRow } from "../../molecules/TableRow";
 import { useState } from "react";
 import { Avatar } from "../../atoms/Avatar";
 import { Text } from "../../atoms/Text";
-import { Chip } from "../../atoms/Chip";
+import { TicketStateChip } from "../../atoms/TicketStateChip";
 import { IconButton } from "../../atoms/IconButton";
 import { Button } from "../../atoms/Button";
 
@@ -103,7 +103,7 @@ const RequestTable: React.FC<RequestTableProps> = ({
                             { content: <Text>{req.position}</Text>},
                             {
                                 content: (
-                                    <Chip label={req.status} state="asignado" />
+                                    <TicketStateChip label={req.status} state="asignado" />
                                 ),
                                 align: "center"
                             },

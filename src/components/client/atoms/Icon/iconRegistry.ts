@@ -46,6 +46,7 @@ export const ICON_FILES = [
     "computer-solid",
     "desktop-solid",
     "docx",
+    "download-solid",
     "ellipsis-vertical-solid",
     "emetra-solid",
     "envelope-circle-check-solid",

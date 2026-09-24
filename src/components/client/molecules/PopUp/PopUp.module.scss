@@ -19,6 +19,10 @@
     align-items: center;
 }
 
+.title {
+    text-align: left;
+}
+
 .descriptionWrapper {
     display: flex;
     flex-direction: column;
@@ -27,6 +31,7 @@
 
 .description {
     white-space: pre-line;
+    text-align: left;
 }
 
 .mainIcon {

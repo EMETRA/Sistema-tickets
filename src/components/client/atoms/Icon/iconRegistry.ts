@@ -41,6 +41,7 @@ export const ICON_FILES = [
     "clipboard-regular",
     "clipboard-solid",
     "clock-rotate-left-solid",
+    "cross-solid",
     "computer-mouse-solid",
     "computer-solid",
     "desktop-solid",

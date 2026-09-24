@@ -82,6 +82,18 @@
       }
     }
 
+    &.Button--warning {
+      background-color: $amarillo-1;
+
+      &:hover:not(.Button--disabled):not(.Button--loading) {
+        background-color: color.adjust($amarillo-1, $lightness: -10%);
+      }
+
+      &:active:not(.Button--disabled):not(.Button--loading) {
+        background-color: color.adjust($amarillo-1, $lightness: -20%);
+      }
+    }
+
     &.Button--neutral-light {
       background-color: #D3D3D366;
       color: $negro-1;

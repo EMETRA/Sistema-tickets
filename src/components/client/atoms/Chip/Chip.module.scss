@@ -1,59 +1,21 @@
 .chip {
   font-family: var(--font-montserrat), sans-serif;
   display: inline-flex;
-  align-items: center; // Centra el círculo y el texto verticalmente
+  align-items: center;
   justify-content: center;
-  padding: 6px 12px; // Un poco más de padding vertical
+  padding: 6px 12px;
   border-radius: 16px;
   font-size: 0.75rem;
-  font-weight: 700; // Un poco más grueso para que se lea bien
+  font-weight: 700;
   white-space: nowrap;
-  gap: 8px; // Espacio entre el círculo y el texto
-}
-
-// Estilos del círculo indicador
-.dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: currentColor; 
-  flex-shrink: 0;
-}
-  
-.ingresado { 
-  background-color: #80B91866; 
-  color: #80B918           
-}
-
-.asignado { 
-  background-color: #FB850066; 
-  color: #FB8500;           
-}
-
-.en_trabajo { 
-  background-color: #FFB70366; 
-  color: #FFB703;           
-}
-
-.completado { 
-  background-color: #0318ff66; 
-  color: #0320ff; 
-}
-
-.cancelado { 
-  background-color: #E6394666; 
-  color: #E63946;
+  gap: 8px;
+  background-color: var(--chip-color, #0318ff);
+  color: #ffffff;
 }
 
 .outlined {
   background-color: transparent;
-  color: #666;
-  padding: 5px 11px; // Ajuste por el borde
-  
-  // Cuando un filtro está seleccionado
-  &.active {
-    background-color: #4361EE; // Fondo azul muy claro
-    color: #E3F2FD;           // Azul EMETRA
-    border-color: #4361EE;
-  }
+  color: var(--chip-color, #666);
+  padding: 5px 11px;
+  border: 1px solid var(--chip-color, #666);
 }

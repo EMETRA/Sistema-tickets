@@ -543,7 +543,8 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
 
     const [currentCase, setCurrentCase] = useState<Case | null>(null);
     const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<{ message: string } | null>(null);
+    const [error, setError] = useState<{ message: string } | null>(null); // Error al cargar el caso
+    const [errorSendResolution, setErrorSendResolution] = useState<{ message: string } | null>(null); // Error al enviar la resolución
     const router = useRouter();
 
     const [showConfirmReceiptModal, setShowConfirmReceiptModal] = useState(false);
@@ -581,20 +582,26 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
     }
 
     const handleSendResolution = () => {
+        setErrorSendResolution(null);
         if (fundament.trim() === "") {
             alert("El fundamento es requerido para enviar la resolución");
             setShowSendResolutionModal(false);
             return;
         }
 
-        console.log("Enviar resolución con:");
-        console.log(resolveCaseValue);
-        console.log(fundament);
         setShowSendResolutionModal(false);
         setIsSendingResolution(true);
+        if (Math.random() > 0.5) {
+            setErrorSendResolution({ message: "Error al enviar la resolución" });
+            setIsSendingResolution(false);
+            return;
+        }
         setTimeout(() => {
             setIsSendingResolution(false);
         }, 5000);
+        console.log("Resolucion enviada con:");
+        console.log(resolveCaseValue);
+        console.log(fundament);
     }
 
     if (isLoading) {
@@ -767,6 +774,20 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
                         color: "danger",
                         onClick: () => setShowSendResolutionModal(false),
                     }
+                ]}
+            />
+
+            <PopUp
+                isOpen={!!errorSendResolution}
+                onClose={() => setErrorSendResolution(null)}
+                title="Error al enviar la resolución"
+                description={errorSendResolution?.message ?? "Ocurrió un error al enviar la resolución. Por favor, inténtelo nuevamente."}
+                actions={[
+                    {
+                        text: "Reintentar",
+                        color: "success",
+                        onClick: () => handleSendResolution(),
+                    },
                 ]}
             />
         </div>

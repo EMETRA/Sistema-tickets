@@ -8,6 +8,7 @@ import { Text } from "@/components/client/atoms/Text";
 import { Button } from "@/components/client/atoms/Button";
 import { Chip } from "@/components/client/atoms/Chip";
 import { MediaGrid, type MediaGridItem } from "@/components/client/molecules/MediaGrid";
+import { File } from "@/components/client/atoms/File";
 import { ButtonTab } from "@/components/client/atoms/ButtonTab";
 import { FormField } from '@/components/client/molecules/FormField';
 import { TableRow } from "@/components/client/molecules/TableRow";
@@ -469,7 +470,7 @@ const cases: Case[] = [
             comentario: "Analizando la denuncia y la defensa determiné que el conductor no se detuvo y continuó conduciendo. La imagen de la placa del vehículo es P123DFB. La imagen de la escena del accidente es la siguiente: ...",
             file: {
                 id: "1",
-                name: "Resolución",
+                name: "Resolución.pdf",
                 sourceUrl: "/images/no-user.png",
                 size: "100KB",
             }
@@ -651,7 +652,7 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
                     <Chip key={tag.id} label={tag.nombre} color={tag.color} />
                 ))}
             </div>
-            {currentCase.status !== "ACOGIDO" && currentCase.status !== "NO_ACOGIDA" && !showResolveDefense && (
+            {currentCase.status !== "ACOGIDO" && currentCase.status !== "NO_ACOGIDA" && !showResolveDefense ? (
                 <div className={styles.actions}>
                     <Title variant="mid" className={styles.title}>Acciones disponibles</Title>
                     {currentCase.status === "CREADO" ? (
@@ -659,6 +660,66 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
                     ) : currentCase.status === "EN_JUZGADO" ? (
                         <Button variant="contained" onClick={() => setShowResolveDefense(true)}>Resolver defensa</Button>
                     ) : <Text variant="body">No hay acciones disponibles</Text>}
+                </div>
+            ) : (
+                <div className={styles.resolution}>
+                    {currentCase.resolucion ? (
+                        <>
+                            <Title variant="mid">Resolución - {currentCase.resolucion?.id}</Title>
+                            <Text variant="caption">{currentCase.resolucion?.fecha}</Text>
+                            <Text variant="body">{currentCase.resolucion?.comentario}</Text>
+                            <File
+                                id={currentCase.resolucion?.file.id}
+                                name={currentCase.resolucion?.file.name}
+                                onClick={() => alert(`Descargar archivo id: ${currentCase.resolucion?.file.id}`)}
+                            />
+                        </>
+                    ) : (
+                        <Text variant="body">La resolución aún no está disponible</Text>
+                    )}
+                    {currentCase.multa && (
+                        <div className={styles.remissionContainer}>
+                            <Title variant="mid" className={styles.title}>Remisión</Title>
+                            <div className={styles.remissionData}>
+                                <div className={styles.remissionDataItem}>
+                                    <Text variant="body"><strong>Ciudad</strong></Text>
+                                    <Text variant="body">{currentCase.multa.ciudad}</Text>
+                                </div>
+                                <div className={styles.remissionDataItem}>
+                                    <Text variant="body"><strong>Serie</strong></Text>
+                                    <Text variant="body">{currentCase.multa.serie}</Text>
+                                </div>
+                                <div className={styles.remissionDataItem}>
+                                    <Text variant="body"><strong>Número</strong></Text>
+                                    <Text variant="body">{currentCase.multa.numero}</Text>
+                                </div>
+                                <div className={styles.remissionDataItem}>
+                                    <Text variant="body"><strong>Placa</strong></Text>
+                                    <Text variant="body">{currentCase.multa.placa}</Text>
+                                </div>
+                                <div className={styles.remissionDataItem}>
+                                    <Text variant="body"><strong>Monto (Q)</strong></Text>
+                                    <Text variant="body">{currentCase.multa.monto}</Text>
+                                </div>
+                            </div>
+                            <Title variant="mid" className={styles.title}>Datos de pago</Title>
+                            <div className={styles.remissionData}>
+                                <div className={styles.remissionDataItem}>
+                                    <Text variant="body"><strong>Estado</strong></Text>
+                                    <Text variant="body">{currentCase.multa.datosPago.estado}</Text>
+                                </div>
+                                <div className={styles.remissionDataItem}>
+                                    <Text variant="body"><strong>Monto (Q)</strong></Text>
+                                    <Text variant="body">{currentCase.multa.datosPago.monto}</Text>
+                                </div>
+                                <div className={styles.remissionDataItem}>
+                                    <Text variant="body"><strong>Referencia</strong></Text>
+                                    <Text variant="body">{currentCase.multa.datosPago.referencia}</Text>
+                                </div>
+                            </div>
+                            <Title variant="mid">Caso</Title>
+                        </div>
+                    )}
                 </div>
             )}
             <Title variant="mid" className={styles.title}>Descripción</Title>

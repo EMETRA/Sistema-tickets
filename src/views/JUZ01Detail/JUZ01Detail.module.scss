@@ -41,18 +41,35 @@
     gap: 10px;
 }
 
-.defensePersonalData {
+.remissionContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 10px;
+}
+
+.defensePersonalData, .remissionData {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 20px;
 }
 
-.defensePersonalDataItem {
+.remissionData {
+    column-gap: 20px;
+    row-gap: 5px;
+}
+
+.defensePersonalDataItem, .remissionDataItem {
     display: flex;
     flex-direction: row;
     align-items: flex-start;
     justify-content: flex-start;
     gap: 15px;
+}
+
+.remissionDataItem {
+    gap: 5px;
 }
 
 .resolveCaseForm {

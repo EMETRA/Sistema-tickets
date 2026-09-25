@@ -1,0 +1,96 @@
+@use "../../../../theme/colors.scss" as *;
+
+.NewsResultCard {
+    width: min(35rem, 100%);
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1.75rem 1.5rem 1.5rem;
+    background-color: $card-background;
+    border: 1px solid $gris-2;
+    border-radius: 0.75rem;
+    text-align: center;
+    font-family: var(--font-montserrat), sans-serif;
+}
+
+.statusIcon {
+    width: 2.75rem;
+    height: 2.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #FFFFFF;
+}
+
+.success {
+    background-color: #7AB93F;
+}
+
+.error {
+    background-color: #D9534F;
+}
+
+.title {
+    margin: 0.5rem 0 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: $negro-2;
+}
+
+.description.description {
+    margin: 0.25rem 0 0.25rem;
+    font-size: 0.8125rem;
+    color: $secondary-text;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.3125rem 0.75rem;
+    border-radius: 1rem;
+    background-color: $naranja-10;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #B45309;
+}
+
+.note.note {
+    margin: 0.25rem 0 0;
+    font-size: 0.75rem;
+    color: $tertiary-text;
+}
+
+.reference {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+    background-color: #F4F5F8;
+    font-size: 0.75rem;
+    color: $gris-4;
+    text-align: left;
+}
+
+.referenceBadge.referenceBadge {
+    flex-shrink: 0;
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.25rem;
+    font-size: 0.625rem;
+    font-weight: 700;
+    background-color: $amarillo-9;
+    color: #6B4E00;
+}
+
+.actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+}

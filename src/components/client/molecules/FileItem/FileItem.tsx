@@ -10,6 +10,7 @@ const FileItem: React.FC<FileItemProps> = ({
     name,
     status,
     progress = 0,
+    description,
     onRemove,
     className
 }) => {
@@ -44,7 +45,9 @@ const FileItem: React.FC<FileItemProps> = ({
                 <Icon name={icon} size={50} color={color} raw />
                 <div className={styles.info}>
                     <span className={styles.name}>{name}</span>
-                    {status === "done" && (
+                    {description ? (
+                        <span className={styles.state}>{description}</span>
+                    ) : status === "done" && (
                         <span className={styles.state}>Cargado</span>
                     )}
 

@@ -1,87 +1,48 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { useGetNoticias } from "@/api/hooks";
-import { Title } from "@/components/client/atoms/Title";
-import { Text } from "@/components/client/atoms/Text";
-import { Button } from "@/components/client/atoms/Button";
-import { NewsTablePanel } from "@/components/client/organisms/NewsTablePanel";
-import type { NewsFilter } from "./types";
+import { Suspense } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import NewsListView from "./NewsListView/NewsListView";
+import NewsFormView from "./NewsFormView/NewsFormView";
 import styles from "./COM03.module.scss";
 
-export default function COM03() {
-    const { data: noticias, loading, error } = useGetNoticias();
-    const [filter, setFilter] = useState<NewsFilter>("all");
-    const [search, setSearch] = useState("");
+/**
+ * COM03 - Comunicación / Noticias.
+ * APP_REGISTRY no tiene subrutas, así que la pantalla se elige con parámetros de URL:
+ * - (sin parámetros)        → listado
+ * - ?vista=crear            → formulario de creación
+ * - ?vista=editar&id=<id>   → formulario de edición
+ */
+function COM03Content() {
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
 
-    const filteredNoticias = useMemo(() => {
-        const term = search.trim().toLowerCase();
-        return noticias.filter((noticia) => {
-            if (filter !== "all" && noticia.estado !== filter) return false;
-            if (term && !noticia.titulo.toLowerCase().includes(term)) return false;
-            return true;
-        });
-    }, [noticias, filter, search]);
+    const vista = searchParams.get("vista");
+    const id = searchParams.get("id");
 
-    const isEmpty = !loading && !error && noticias.length === 0;
+    const goToList = () => router.push(pathname);
+    const goToCreate = () => router.push(`${pathname}?vista=crear`);
+    const goToEdit = (noticiaId: string) =>
+        router.push(`${pathname}?vista=editar&id=${encodeURIComponent(noticiaId)}`);
 
-    // TODO [COM03-FLUJO]: navegar al formulario de creación (siguiente paso).
-    const handleCreate = () => {};
-    // TODO [COM03-FLUJO]: abrir el formulario en modo edición.
-    const handleEdit = (id: string) => {
-        void id;
-    };
-    // TODO [COM03-FLUJO]: abrir modal "Archivar noticia" (4125:646).
-    const handleArchive = (id: string) => {
-        void id;
-    };
-    // TODO [COM03-FLUJO]: abrir modal "Eliminar noticia" (4127:713).
-    const handleDelete = (id: string) => {
-        void id;
-    };
-    // TODO [COM03-FLUJO]: restaurar noticia archivada.
-    const handleRestore = (id: string) => {
-        void id;
-    };
+    const isForm = vista === "crear" || (vista === "editar" && Boolean(id));
 
     return (
         <div className={styles.content}>
-            <div className={styles.header}>
-                <Title variant="mid" tag="h1" className={styles.title}>Noticias</Title>
-                <Text variant="caption" className={styles.subtitle}>
-                    Publica avisos que se muestran en el Portal y se envían como push a VIVI.
-                </Text>
-                {loading && <Text variant="caption" className={styles.loadingText}>Cargando noticias...</Text>}
-            </div>
-
-            {!loading && !isEmpty && (
-                <div className={styles.headerActions}>
-                    <Button rounded onClick={handleCreate}>
-                        Crear noticia
-                    </Button>
-                </div>
+            {isForm ? (
+                <NewsFormView noticiaId={vista === "editar" ? id : null} onBack={goToList} />
+            ) : (
+                <NewsListView onCreate={goToCreate} onEdit={goToEdit} />
             )}
-
-            {error && (
-                <Text variant="caption" className={styles.errorText}>
-                    No fue posible cargar las noticias. Intenta nuevamente.
-                </Text>
-            )}
-
-            <NewsTablePanel
-                noticias={filteredNoticias}
-                loading={loading}
-                isEmpty={isEmpty}
-                filter={filter}
-                onFilterChange={setFilter}
-                search={search}
-                onSearchChange={setSearch}
-                onCreate={handleCreate}
-                onEdit={handleEdit}
-                onArchive={handleArchive}
-                onDelete={handleDelete}
-                onRestore={handleRestore}
-            />
         </div>
+    );
+}
+
+export default function COM03() {
+    return (
+        <Suspense fallback={null}>
+            <COM03Content />
+        </Suspense>
     );
 }

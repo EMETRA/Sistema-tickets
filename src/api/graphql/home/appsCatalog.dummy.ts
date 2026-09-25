@@ -221,17 +221,18 @@ export const APPS_CATALOG_DUMMY: AppsCatalog = {
             iconName: "paper-plane-solid",
         },
         sections: {
-            inicio: {
+            // Ruta definida en los criterios de aceptación: /home/comunicacion/contenido/noticias
+            contenido: {
                 meta: {
-                    id: "inicio",
-                    label: "INICIO",
-                    title: "Inicio",
-                    iconName: "house-solid",
+                    id: "contenido",
+                    label: "CONTENIDO",
+                    title: "Contenido",
+                    iconName: "layer-group-solid",
                 },
                 modules: [
                     {
-                        id: "com03",
-                        label: "COM03",
+                        id: "noticias",
+                        label: "NOTICIAS",
                         title: "Noticias",
                         iconName: "file-lines-regular",
                     },

@@ -525,7 +525,7 @@ const toMediaGridItem = (file: File): MediaGridItem => {
         name: file.name,
         download: true,
         onClick: () => {
-            window.open(file.sourceUrl, "_blank");
+            alert(`Descargar archivo id: ${file.id}`);
         },
     };
 };

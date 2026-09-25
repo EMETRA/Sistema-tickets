@@ -602,6 +602,12 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
         console.log("Resolucion enviada con:");
         console.log(resolveCaseValue);
         console.log(fundament);
+
+        if (resolveCaseValue === "acogido") {
+            router.replace(`/home/juridico/juz01/juz01/detail?caseNumber=3`);
+        } else {
+            router.replace(`/home/juridico/juz01/juz01/detail?caseNumber=4`);
+        }
     }
 
     if (isLoading) {
@@ -688,7 +694,7 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
                 columns={3}
                 items={currentCase.defensa.anexos.map(toMediaGridItem)}
             />
-            {showResolveDefense && (
+            {showResolveDefense && currentCase.status === "EN_JUZGADO" && (
                 <>
                     <Title variant="large">Resolver</Title>
                     <div className={styles.resolveCaseForm}>

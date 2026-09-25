@@ -1,0 +1,79 @@
+.mainContainer {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 20px;
+    
+    &.notFound, &.loading, &.error {
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+.header {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.headerInfo {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.title {
+    color: #7F8D9F !important;
+}
+
+.tags {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+}
+
+.defensePersonalData {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.defensePersonalDataItem {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 15px;
+}
+
+.resolveCaseForm {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 10px;
+}
+
+.fundamentFormField {
+    width: 100%;
+}
+
+.fundamentTextArea {
+    width: 100%;
+    height: 100px;
+    max-height: 200px;
+}
+
+.tableContainer { 
+    width: 100%;
+}

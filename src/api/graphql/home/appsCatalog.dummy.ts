@@ -210,6 +210,22 @@ export const APPS_CATALOG_DUMMY: AppsCatalog = {
                     },
                 ],
             },
+            juz01: {
+                meta: {
+                    id: "juz01",
+                    label: "JUZ01",
+                    title: "Consultar caso",
+                    iconName: "chart-bar-solid",
+                },
+                modules: [
+                    {
+                        id: "juz01",
+                        label: "JUZ01",
+                        title: "Consultar caso",
+                        iconName: "chart-bar-solid",
+                    }
+                ]
+            },
         },
     },
     // TODO [COM03-BACKEND]: entrada dummy; debe venir del catálogo real de backend.

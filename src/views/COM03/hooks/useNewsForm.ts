@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import type { NoticiaDetalle, RecursoNoticia } from "@/api/graphql/COM03";
+import { TipoRecurso, type NoticiaDetalle, type RecursoNoticia } from "@/api/graphql/COM03";
 import type {
     NewsFormErrors,
     NewsFormFile,
@@ -10,13 +10,15 @@ import type {
     NewsFormValues,
     NewsSectionField,
 } from "@/components/client/organisms/NewsForm";
+import { apiDateToDdMmYyyy, ddMmYyyyToIsoDate, todayIsoDateGuatemala } from "@/helpers/dateInput";
 import { slugify } from "@/helpers/slugify";
+import { parseYouTubeId, toYouTubeWatchUrl } from "@/helpers/youtube";
 import { htmlToText } from "@/helpers/textHtml";
 import { NEWS_FORM_DEFAULTS } from "../constants";
 import { validateNewsForm, type NewsValidationMode } from "../schemas/newsForm.schema";
 
 /**
- * Qué hace el botón Publicar según la fecha: fecha futura = programar.
+ * Qué hace el botón Publicar según la fecha (dd/mm/aaaa): fecha futura = programar.
  */
 export type PublishIntent = "publicar" | "programar";
 
@@ -48,14 +50,33 @@ const nameFromUrl = (url: string, fallback: string) => {
     return lastSegment ? decodeURIComponent(lastSegment) : fallback;
 };
 
-const fromRecurso = (recurso: RecursoNoticia): NewsFormFile => ({
-    id: recurso.id,
-    name: nameFromUrl(recurso.url, recurso.textoAlternativo ?? `Recurso ${recurso.id}`),
+/** Video de YouTube agregado por enlace (no es un archivo: no se sube). */
+const YOUTUBE_NAME = "Video de YouTube";
+const YOUTUBE_MIME = "video/youtube";
+
+const fromYouTube = (url: string, youtubeId: string, id = newLocalId("video")): NewsFormFile => ({
+    id,
+    name: YOUTUBE_NAME,
     sizeBytes: null,
-    mimeType: recurso.tipoMime ?? "",
+    mimeType: YOUTUBE_MIME,
     file: null,
-    url: recurso.url,
+    url,
+    youtubeId,
 });
+
+const fromRecurso = (recurso: RecursoNoticia): NewsFormFile => {
+    // Los videos guardados son enlaces de YouTube (ya no hay MP4).
+    const youtubeId = recurso.tipo === TipoRecurso.VIDEO ? parseYouTubeId(recurso.url) : null;
+    if (youtubeId) return fromYouTube(toYouTubeWatchUrl(youtubeId), youtubeId, recurso.id);
+    return {
+        id: recurso.id,
+        name: nameFromUrl(recurso.url, recurso.textoAlternativo ?? `Recurso ${recurso.id}`),
+        sizeBytes: null,
+        mimeType: recurso.tipoMime ?? "",
+        file: null,
+        url: recurso.url,
+    };
+};
 
 const emptyValues = (): NewsFormValues => ({
     titulo: "",
@@ -83,7 +104,8 @@ const valuesFromDetalle = (noticia: NoticiaDetalle): NewsFormValues => ({
     etiquetaIds: noticia.etiquetaIds,
     idioma: noticia.idioma,
     visibilidad: noticia.visibilidad,
-    fechaPublicacion: noticia.fechaPublicacion ?? "",
+    // La API guarda ISO; el formulario muestra dd/mm/aaaa.
+    fechaPublicacion: apiDateToDdMmYyyy(noticia.fechaPublicacion),
     slug: noticia.slug,
     tiempoLectura: noticia.tiempoLectura !== null ? String(noticia.tiempoLectura) : "",
     archivoPrincipal: noticia.recursoPrincipal ? fromRecurso(noticia.recursoPrincipal) : null,
@@ -101,14 +123,6 @@ const valuesFromDetalle = (noticia: NoticiaDetalle): NewsFormValues => ({
     // La UI muestra galería y adjuntos en una sola lista ("Galería y adjuntos").
     galeria: [...noticia.galeria, ...noticia.adjuntos].map(fromRecurso),
 });
-
-/** Fecha local de hoy en formato YYYY-MM-DD */
-const todayIso = () => {
-    const now = new Date();
-    const month = String(now.getMonth() + 1).padStart(2, "0");
-    const day = String(now.getDate()).padStart(2, "0");
-    return `${now.getFullYear()}-${month}-${day}`;
-};
 
 /**
  * Estado del formulario de noticias (crear / editar).
@@ -228,6 +242,30 @@ export function useNewsForm(initial: NoticiaDetalle | null = null) {
         setValues((prev) => ({ ...prev, galeria: [...prev.galeria, ...files.map(fromFile)] }));
     }, []);
 
+    // Videos de YouTube: en el recurso principal y en la sección reemplazan lo que había.
+    const setMainVideo = useCallback((url: string, youtubeId: string) => {
+        setValues((prev) => ({ ...prev, archivoPrincipal: fromYouTube(url, youtubeId) }));
+        clearErrors("archivoPrincipal");
+    }, [clearErrors]);
+
+    const setSectionVideo = useCallback((sectionId: string, url: string, youtubeId: string) => {
+        setValues((prev) => ({
+            ...prev,
+            secciones: prev.secciones.map((section) =>
+                section.id === sectionId ? { ...section, imagen: fromYouTube(url, youtubeId) } : section
+            ),
+        }));
+    }, []);
+
+    const addGalleryVideo = useCallback((url: string, youtubeId: string) => {
+        setValues((prev) => ({ ...prev, galeria: [...prev.galeria, fromYouTube(url, youtubeId)] }));
+    }, []);
+
+    /** Marca un error que viene de backend en un campo (p. ej. slug repetido). */
+    const setFieldError = useCallback((path: string, message: string) => {
+        setErrors((prev) => ({ ...prev, [path]: message }));
+    }, []);
+
     const removeGalleryFile = useCallback((fileId: string) => {
         setValues((prev) => ({ ...prev, galeria: prev.galeria.filter((file) => file.id !== fileId) }));
     }, []);
@@ -241,10 +279,11 @@ export function useNewsForm(initial: NoticiaDetalle | null = null) {
         return Object.keys(nextErrors).length === 0;
     }, [values]);
 
-    const publishIntent: PublishIntent = useMemo(
-        () => (values.fechaPublicacion && values.fechaPublicacion > todayIso() ? "programar" : "publicar"),
-        [values.fechaPublicacion]
-    );
+    // Fecha posterior a hoy (hora de Guatemala) = programar; hoy o antes = publicar ya.
+    const publishIntent: PublishIntent = useMemo(() => {
+        const fecha = ddMmYyyyToIsoDate(values.fechaPublicacion);
+        return fecha && fecha > todayIsoDateGuatemala() ? "programar" : "publicar";
+    }, [values.fechaPublicacion]);
 
     return {
         values,
@@ -263,5 +302,9 @@ export function useNewsForm(initial: NoticiaDetalle | null = null) {
         removeSection,
         addGalleryFiles,
         removeGalleryFile,
+        setMainVideo,
+        setSectionVideo,
+        addGalleryVideo,
+        setFieldError,
     };
 }

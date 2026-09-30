@@ -1,68 +1,49 @@
 'use client';
 
 import { useCallback, useState } from 'react';
-// TODO [COM03-BACKEND]: descomentar cuando exista la mutación `guardarNoticia` en backend.
+// TODO [COM03-BACKEND]: descomentar cuando `guardarNoticiaCms` esté disponible en api-tickets.
 // import { graphqlRequestClient } from '@/api/graphql/client';
-// import { GUARDAR_NOTICIA_MUTATION } from '@/api/graphql/COM03';
+// import { GUARDAR_NOTICIA_CMS_MUTATION } from '@/api/graphql/COM03';
 import {
-    AccionNoticia,
-    EstadoNoticia,
-    type GuardarNoticiaInput,
-    type GuardarNoticiaResponse,
+    toNoticiaCmsError,
+    type GuardarNoticiaCmsResult,
+    type GuardarNoticiaCmsVariables,
+    type NoticiaCmsError,
 } from '@/api/graphql/COM03';
-import { simularMutacion } from '@/api/graphql/COM03/mutations.dummy';
-
-const ESTADO_POR_ACCION: Record<AccionNoticia, EstadoNoticia> = {
-    [AccionNoticia.BORRADOR]: EstadoNoticia.BORRADOR,
-    [AccionNoticia.PUBLICAR]: EstadoNoticia.PUBLICADA,
-    [AccionNoticia.PROGRAMAR]: EstadoNoticia.PROGRAMADA,
-};
+import { simularGuardarNoticiaCms } from '@/api/graphql/COM03/mutations.dummy';
 
 /**
- * Crea o actualiza una noticia (borrador, publicar o programar) con sus archivos.
- * Va directo a GraphQL desde el cliente (multipart por XHR con fileMap), igual que la creación de tickets.
+ * Crea o actualiza una noticia con `guardarNoticiaCms` (README de backend).
+ * Devuelve el resultado ("guardada" | "publicada", idempotente). Si falla, lanza NoticiaCmsError
+ * con el código del README cuando se reconoce.
  */
 export function useGuardarNoticia() {
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<Error | null>(null);
-    const [uploadProgress, setUploadProgress] = useState(0);
+    const [error, setError] = useState<NoticiaCmsError | null>(null);
 
     const guardarNoticia = useCallback(
-        async (input: GuardarNoticiaInput, files: File[], fileMap: Record<string, string[]>) => {
+        async (variables: GuardarNoticiaCmsVariables): Promise<GuardarNoticiaCmsResult> => {
             setLoading(true);
             setError(null);
-            setUploadProgress(0);
 
             try {
                 // TODO [COM03-BACKEND]: reemplazar la simulación por la llamada real:
-                // const result = await graphqlRequestClient<GuardarNoticiaResponse>(
-                //     GUARDAR_NOTICIA_MUTATION,
-                //     {
-                //         variables: { input },
-                //         files,
-                //         fileMap,
-                //         onProgress: (percent) => setUploadProgress(percent),
-                //     }
+                // const result = await graphqlRequestClient<GuardarNoticiaCmsResponse>(
+                //     GUARDAR_NOTICIA_CMS_MUTATION,
+                //     { variables }
                 // );
-                void files;
-                void fileMap;
-                const result = await simularMutacion<GuardarNoticiaResponse>({
-                    guardarNoticia: {
-                        id: input.id ?? `nueva-${Date.now()}`,
-                        estado: ESTADO_POR_ACCION[input.accion],
-                    },
-                });
+                const result = await simularGuardarNoticiaCms(variables);
                 setLoading(false);
-                return result.guardarNoticia;
+                return result.guardarNoticiaCms;
             } catch (err) {
-                const error = err instanceof Error ? err : new Error(String(err));
-                setError(error);
+                const cmsError = toNoticiaCmsError(err);
+                setError(cmsError);
                 setLoading(false);
-                throw error;
+                throw cmsError;
             }
         },
         []
     );
 
-    return { guardarNoticia, loading, error, uploadProgress };
+    return { guardarNoticia, loading, error };
 }

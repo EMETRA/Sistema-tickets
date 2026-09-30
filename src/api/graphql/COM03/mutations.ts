@@ -1,18 +1,36 @@
 /**
  * Mutaciones GraphQL de COM03 - Comunicación / Noticias
  *
- * TODO [COM03-BACKEND]: mutaciones propuestas, confirmar nombres, inputs y respuestas.
+ * `guardarNoticiaCms` sigue el README de backend. Archivar, restaurar y eliminar siguen siendo
+ * propuestas: TODO [COM03-BACKEND] hoy solo existen en REST de Portal con la key interna
+ * (archivar y eliminar) y restaurar no existe; consultado con backend.
  */
 
 /**
- * Crea o actualiza una noticia y la deja como borrador, publicada o programada según `accion`.
- * Los archivos nuevos se envían por multipart (fileMap apunta a los campos `archivo`).
+ * Crea (sin `noticia.id`) o actualiza una noticia en api-tickets (README de backend, 2026-09-30).
+ * El `estado` del input define si queda como borrador, programada o publicada.
+ * Una mutación = una sola llamada interna a Portal.
  */
-export const GUARDAR_NOTICIA_MUTATION = `
-  mutation GuardarNoticia($input: GuardarNoticiaInput!) {
-    guardarNoticia(input: $input) {
-      id
-      estado
+export const GUARDAR_NOTICIA_CMS_MUTATION = `
+  mutation GuardarNoticia($claveIdempotente: String!, $noticia: NoticiaCmsInput!) {
+    guardarNoticiaCms(claveIdempotente: $claveIdempotente, noticia: $noticia) {
+      resultado
+      idempotente
+      noticia {
+        id
+        slug
+        idioma
+        estado
+        visibilidad
+        fecha_publicacion
+      }
+      publicacion {
+        idNoticia
+        version
+        claveIdempotente
+        idEvento
+        idUsuario
+      }
     }
   }
 `;

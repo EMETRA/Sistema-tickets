@@ -13,8 +13,11 @@ export function formatFileSize(bytes: number): string {
  * Texto secundario de un archivo del formulario:
  * - nuevo: "8.4 MB"
  * - guardado en backend: "Cargado" (los recursos guardados no incluyen tamaño)
+ * - video de YouTube: "www.youtube.com/watch?v=ID"
  */
 export function fileDescription(file: NewsFormFile): string {
+    // Video de YouTube: se muestra el enlace (sin https://).
+    if (file.youtubeId) return (file.url ?? "").replace(/^https?:\/\//, "");
     const parts: string[] = [];
     if (file.sizeBytes !== null) parts.push(formatFileSize(file.sizeBytes));
     if (!file.file) parts.push("Cargado");

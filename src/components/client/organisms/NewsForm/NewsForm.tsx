@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import classNames from "classnames";
 import { Button } from "../../atoms/Button";
+import { IconButton } from "../../atoms/IconButton";
 import { Input } from "../../atoms/Input";
 import { TextArea } from "../../atoms/TextArea";
 import { Select } from "../../atoms/Select";
@@ -14,10 +15,68 @@ import { FormActions } from "../../molecules/FormActions";
 import { FileDropzone } from "../../molecules/FileDropzone";
 import { FileItem } from "../../molecules/FileItem";
 import { LabelChipGroup } from "../../molecules/LabelChipGroup";
+import { YouTubeLinkField } from "../../molecules/YouTubeLinkField";
 import { NewsContentSection } from "../NewsContentSection";
+import { apiDateToDdMmYyyy, ddMmYyyyToIsoDate, maskDateInput } from "@/helpers/dateInput";
 import { fileDescription, filterAcceptedFiles } from "./utils";
+import { mediaThumbnail } from "./mediaThumbnail";
 import type { NewsFormProps, NewsSectionField } from "./types";
 import styles from "./NewsForm.module.scss";
+
+interface CalendarPickerButtonProps {
+    /** Fecha actual del campo, dd/mm/aaaa */
+    value: string;
+    disabled: boolean;
+    /** Fecha elegida, dd/mm/aaaa */
+    onPick: (fecha: string) => void;
+}
+
+/**
+ * Botón de calendario para el campo de fecha. Abre el selector nativo del navegador sobre un
+ * input type="date" oculto (su valor siempre es YYYY-MM-DD) y devuelve la fecha en dd/mm/aaaa.
+ */
+function CalendarPickerButton({ value, disabled, onPick }: CalendarPickerButtonProps) {
+    const pickerRef = useRef<HTMLInputElement>(null);
+
+    const openPicker = () => {
+        const picker = pickerRef.current;
+        if (!picker) return;
+        try {
+            picker.showPicker();
+        } catch {
+            // Navegadores sin showPicker: se intenta abrir con foco y clic.
+            picker.focus();
+            picker.click();
+        }
+    };
+
+    return (
+        <>
+            <IconButton
+                icon="calendar-regular"
+                size={18}
+                // Color explícito (mismo del texto del Input): sin él, el ícono toma el color del
+                // botón y en modo oscuro (color-scheme: dark en globals.css) sale blanco.
+                iconColor="#262626"
+                borderless
+                disabled={disabled}
+                onClick={openPicker}
+                aria-label="Elegir fecha en el calendario"
+            />
+            <input
+                ref={pickerRef}
+                type="date"
+                tabIndex={-1}
+                aria-hidden="true"
+                className={styles.hiddenDatePicker}
+                value={ddMmYyyyToIsoDate(value) ?? ""}
+                onChange={(e) => {
+                    if (e.target.value) onPick(apiDateToDdMmYyyy(e.target.value));
+                }}
+            />
+        </>
+    );
+}
 
 /**
  * Componente NewsForm - Formulario de creación / edición de noticias.
@@ -42,6 +101,9 @@ const NewsForm: React.FC<NewsFormProps> = ({
     onRemoveSection,
     onAddGalleryFiles,
     onRemoveGalleryFile,
+    onMainVideoAdd,
+    onSectionVideoAdd,
+    onAddGalleryVideo,
     onCancel,
     onSaveDraft,
     onPreview,
@@ -183,11 +245,24 @@ const NewsForm: React.FC<NewsFormProps> = ({
 
                 <div className={styles.row}>
                     <FormField label="Fecha de publicación" htmlFor="noticia-fecha" required>
+                        {/* Se escribe dd/mm/aaaa (no type="date": su formato depende del navegador)
+                            o se elige en el calendario del botón. */}
                         <Input
                             id="noticia-fecha"
-                            type="date"
+                            type="text"
+                            inputMode="numeric"
+                            autoComplete="off"
+                            placeholder="dd/mm/aaaa"
+                            maxLength={10}
                             value={values.fechaPublicacion}
-                            onChange={(e) => onFieldChange("fechaPublicacion", e.target.value)}
+                            onChange={(e) => onFieldChange("fechaPublicacion", maskDateInput(e.target.value))}
+                            icon={
+                                <CalendarPickerButton
+                                    value={values.fechaPublicacion}
+                                    disabled={disabled}
+                                    onPick={(fecha) => onFieldChange("fechaPublicacion", fecha)}
+                                />
+                            }
                             {...errorProps("fechaPublicacion")}
                         />
                     </FormField>
@@ -233,19 +308,29 @@ const NewsForm: React.FC<NewsFormProps> = ({
                         name={values.archivoPrincipal.name}
                         status={values.archivoPrincipal.file ? "ready" : "done"}
                         description={fileDescription(values.archivoPrincipal)}
+                        thumbnail={mediaThumbnail(values.archivoPrincipal)}
                         onRemove={() => onMainFileChange(null)}
                     />
                 ) : (
-                    <FileDropzone
-                        variant="compact"
-                        multiple={false}
-                        accept={accept.principal}
-                        title="Arrastra la imagen o video principal aquí"
-                        subtitle="Se usa como portada en el listado y en el detalle. Obligatorio."
-                        onFiles={handleMainFiles}
-                        rejectedFiles={rejectedMain}
-                        hasError={Boolean(errors.archivoPrincipal)}
-                    />
+                    <div className={styles.mediaPicker}>
+                        <FileDropzone
+                            variant="compact"
+                            multiple={false}
+                            accept={accept.principal}
+                            title="Arrastra la imagen principal aquí"
+                            subtitle="Se usa como portada en el listado y en el detalle. Obligatorio."
+                            onFiles={handleMainFiles}
+                            rejectedFiles={rejectedMain}
+                            hasError={Boolean(errors.archivoPrincipal)}
+                        />
+                        {onMainVideoAdd && (
+                            <YouTubeLinkField
+                                id="noticia-principal-video"
+                                disabled={disabled}
+                                onAdd={onMainVideoAdd}
+                            />
+                        )}
+                    </div>
                 )}
                 {errors.archivoPrincipal && (
                     <span className={styles.error} data-error="true">{errors.archivoPrincipal}</span>
@@ -272,6 +357,9 @@ const NewsForm: React.FC<NewsFormProps> = ({
                             canRemove={values.secciones.length > 1}
                             onChange={(field, value) => onSectionChange(section.id, field, value)}
                             onImageChange={(file) => onSectionImageChange(section.id, file)}
+                            onVideoAdd={onSectionVideoAdd
+                                ? (url, youtubeId) => onSectionVideoAdd(section.id, url, youtubeId)
+                                : undefined}
                             onMoveUp={() => onMoveSection(section.id, "up")}
                             onMoveDown={() => onMoveSection(section.id, "down")}
                             onRemove={() => onRemoveSection(section.id)}
@@ -294,14 +382,24 @@ const NewsForm: React.FC<NewsFormProps> = ({
                     <LabelChip label="Varios, opcional" className={styles.badge} />
                 </div>
 
-                <FileDropzone
-                    variant="compact"
-                    accept={accept.galeria}
-                    title="Arrastra imágenes o videos adicionales aquí"
-                    subtitle={`Opcional. ${accept.formatsLabel}`}
-                    onFiles={handleGalleryFiles}
-                    rejectedFiles={rejectedGallery}
-                />
+                <div className={styles.mediaPicker}>
+                    <FileDropzone
+                        variant="compact"
+                        accept={accept.galeria}
+                        title="Arrastra imágenes adicionales aquí"
+                        subtitle={`Opcional. ${accept.formatsLabel}`}
+                        onFiles={handleGalleryFiles}
+                        rejectedFiles={rejectedGallery}
+                    />
+                    {onAddGalleryVideo && (
+                        <YouTubeLinkField
+                            id="noticia-galeria-video"
+                            label="¿Quieres agregar un video? Pega el enlace de YouTube"
+                            disabled={disabled}
+                            onAdd={onAddGalleryVideo}
+                        />
+                    )}
+                </div>
 
                 {values.galeria.length > 0 && (
                     <div className={styles.fileList}>
@@ -311,6 +409,7 @@ const NewsForm: React.FC<NewsFormProps> = ({
                                 name={file.name}
                                 status={file.file ? "ready" : "done"}
                                 description={fileDescription(file)}
+                                thumbnail={mediaThumbnail(file)}
                                 onRemove={() => onRemoveGalleryFile(file.id)}
                             />
                         ))}

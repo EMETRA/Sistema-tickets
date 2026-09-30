@@ -1,0 +1,54 @@
+@use "../../../../theme/colors.scss" as *;
+
+.PlayBadge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.circle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: #ffffff;
+}
+
+// Triángulo con bordes; se corre un poco a la derecha para verse centrado.
+.triangle {
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-color: transparent transparent transparent $negro-2;
+}
+
+// Miniatura en listas: recuadro oscuro del tamaño del ícono de FileItem.
+.sm {
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+    background-color: $negro-2;
+
+    .circle {
+        width: 22px;
+        height: 22px;
+    }
+
+    .triangle {
+        margin-left: 2px;
+        border-width: 5px 0 5px 8px;
+    }
+}
+
+// Sobre un recuadro de video.
+.md .circle {
+    width: 48px;
+    height: 48px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.md .triangle {
+    margin-left: 4px;
+    border-width: 9px 0 9px 15px;
+}

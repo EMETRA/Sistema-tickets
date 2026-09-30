@@ -38,19 +38,20 @@ export const NEWS_FORM_DEFAULTS = {
 };
 
 /**
- * Formatos permitidos (confirmado por backend): imágenes JPG, PNG o GIF y video MP4.
+ * Formatos de archivo permitidos: imágenes JPG, PNG o GIF.
+ * Ya no se suben videos MP4 (decisión 2026-09-30, indicada por Feyser): los videos serán enlaces
+ * de YouTube en el recurso principal, las secciones y la galería.
+ * TODO [COM03-FLUJO]: agregar el campo del enlace de YouTube cuando diseño lo defina.
  * Se listan MIME y extensión porque algunos sistemas no informan el MIME al arrastrar archivos.
  */
 const IMAGE_ACCEPT = "image/jpeg,image/png,image/gif,.jpg,.jpeg,.png,.gif";
-const VIDEO_ACCEPT = "video/mp4,.mp4";
 
 /**
  * TODO [COM03-BACKEND]: tamaño máximo por archivo pendiente de definir (hoy sin límite).
- * Las secciones solo aceptan imagen ("Imagen de esta sección").
  */
 export const NEWS_FORM_ACCEPT: NewsFormAccept = {
-    principal: `${IMAGE_ACCEPT},${VIDEO_ACCEPT}`,
+    principal: IMAGE_ACCEPT,
     seccion: IMAGE_ACCEPT,
-    galeria: `${IMAGE_ACCEPT},${VIDEO_ACCEPT}`,
-    formatsLabel: "Formatos: JPG, PNG, GIF o MP4. Tamaño máximo: [por definir]",
+    galeria: IMAGE_ACCEPT,
+    formatsLabel: "Formatos: JPG, PNG o GIF. Tamaño máximo: [por definir]",
 };

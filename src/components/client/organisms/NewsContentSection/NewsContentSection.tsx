@@ -8,7 +8,9 @@ import { TextArea } from "../../atoms/TextArea";
 import { FormField } from "../../molecules/FormField";
 import { FileDropzone } from "../../molecules/FileDropzone";
 import { FileItem } from "../../molecules/FileItem";
+import { YouTubeLinkField } from "../../molecules/YouTubeLinkField";
 import { fileDescription, filterAcceptedFiles } from "../NewsForm/utils";
+import { mediaThumbnail } from "../NewsForm/mediaThumbnail";
 import type { NewsContentSectionProps } from "./types";
 import styles from "./NewsContentSection.module.scss";
 
@@ -26,6 +28,7 @@ const NewsContentSection: React.FC<NewsContentSectionProps> = ({
     canRemove,
     onChange,
     onImageChange,
+    onVideoAdd,
     onMoveUp,
     onMoveDown,
     onRemove,
@@ -110,18 +113,24 @@ const NewsContentSection: React.FC<NewsContentSectionProps> = ({
                     name={section.imagen.name}
                     status={section.imagen.file ? "ready" : "done"}
                     description={fileDescription(section.imagen)}
+                    thumbnail={mediaThumbnail(section.imagen)}
                     onRemove={() => onImageChange(null)}
                 />
             ) : (
-                <FileDropzone
-                    variant="compact"
-                    multiple={false}
-                    accept={accept}
-                    title="Imagen de esta sección (opcional)"
-                    subtitle="Puedes dejarla vacía."
-                    onFiles={handleFiles}
-                    rejectedFiles={rejectedFiles}
-                />
+                <div className={styles.media}>
+                    <FileDropzone
+                        variant="compact"
+                        multiple={false}
+                        accept={accept}
+                        title={onVideoAdd ? "Imagen o video de esta sección (opcional)" : "Imagen de esta sección (opcional)"}
+                        subtitle={onVideoAdd ? "Arrastra una imagen o pega abajo el enlace de un video. Puedes dejarla vacía." : "Puedes dejarla vacía."}
+                        onFiles={handleFiles}
+                        rejectedFiles={rejectedFiles}
+                    />
+                    {onVideoAdd && (
+                        <YouTubeLinkField id={`seccion-${section.id}-video`} onAdd={onVideoAdd} />
+                    )}
+                </div>
             )}
         </div>
     );

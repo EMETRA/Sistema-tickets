@@ -27,6 +27,11 @@ export interface NewsContentSectionProps {
 
     onChange: (field: NewsSectionField, value: string) => void;
     onImageChange: (file: File | null) => void;
+    /**
+     * Agrega un video de YouTube como recurso de la sección (reemplaza la imagen).
+     * Opcional: sin él, la sección solo acepta imagen.
+     */
+    onVideoAdd?: (url: string, youtubeId: string) => void;
     onMoveUp: () => void;
     onMoveDown: () => void;
     onRemove: () => void;

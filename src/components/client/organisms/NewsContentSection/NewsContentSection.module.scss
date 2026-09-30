@@ -46,3 +46,10 @@
     font-weight: 600;
     background-color: $card-background;
 }
+
+// Zona de carga de la imagen + campo del enlace de YouTube.
+.media {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}

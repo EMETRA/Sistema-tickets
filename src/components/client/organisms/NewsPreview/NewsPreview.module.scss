@@ -179,6 +179,38 @@
     margin-top: 0.5rem;
 }
 
+// Video en una sección: formato 16:9 en lugar del recuadro bajo de imagen.
+.sectionMedia.sectionVideo {
+    height: auto;
+    aspect-ratio: 16 / 9;
+}
+
+// Video de YouTube: recuadro oscuro con ▶ (mismo estilo que el Portal).
+.videoBox {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: $negro-2;
+}
+
+.videoButton {
+    border: none;
+    padding: 0;
+    cursor: pointer;
+
+    &:focus-visible {
+        outline: 3px solid $azul-5;
+        outline-offset: 2px;
+    }
+}
+
+.videoFrame {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+}
+
 .gallery {
     display: flex;
     flex-wrap: wrap;

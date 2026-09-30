@@ -98,6 +98,11 @@ export interface NewsFormAccept {
     galeria: string;
     /** Texto de ayuda con los formatos y el tamaño permitidos */
     formatsLabel: string;
+    /**
+     * Máximo de bytes entre todas las imágenes nuevas de la noticia (principal, secciones y
+     * galería). Opcional: sin él no hay límite.
+     */
+    maxTotalBytes?: number;
 }
 
 /**

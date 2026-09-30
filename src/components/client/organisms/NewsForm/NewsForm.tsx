@@ -18,7 +18,13 @@ import { LabelChipGroup } from "../../molecules/LabelChipGroup";
 import { YouTubeLinkField } from "../../molecules/YouTubeLinkField";
 import { NewsContentSection } from "../NewsContentSection";
 import { apiDateToDdMmYyyy, ddMmYyyyToIsoDate, maskDateInput } from "@/helpers/dateInput";
-import { fileDescription, filterAcceptedFiles } from "./utils";
+import {
+    fileDescription,
+    filterAcceptedFiles,
+    fitFilesInLimit,
+    newImagesBytes,
+    sizeLimitMessage,
+} from "./utils";
 import { mediaThumbnail } from "./mediaThumbnail";
 import type { NewsFormProps, NewsSectionField } from "./types";
 import styles from "./NewsForm.module.scss";
@@ -112,6 +118,9 @@ const NewsForm: React.FC<NewsFormProps> = ({
 }) => {
     const [rejectedMain, setRejectedMain] = useState<string[]>([]);
     const [rejectedGallery, setRejectedGallery] = useState<string[]>([]);
+    // Imágenes que no se agregaron por superar el límite total (accept.maxTotalBytes)
+    const [sizeErrorMain, setSizeErrorMain] = useState<string | null>(null);
+    const [sizeErrorGallery, setSizeErrorGallery] = useState<string | null>(null);
 
     // Props de error de un campo. aria-invalid también permite ubicar el primer error para hacer scroll.
     const errorProps = (path: string) => ({
@@ -136,13 +145,32 @@ const NewsForm: React.FC<NewsFormProps> = ({
     const handleMainFiles = (files: File[]) => {
         const { accepted, rejected } = filterAcceptedFiles(files, accept.principal);
         setRejectedMain(rejected);
-        if (accepted.length > 0) onMainFileChange(accepted[0]);
+        // La imagen principal reemplaza a la anterior: la anterior no cuenta para el límite.
+        const used = newImagesBytes(values, values.archivoPrincipal);
+        const { fitting, tooLarge } = fitFilesInLimit(accepted.slice(0, 1), used, accept.maxTotalBytes);
+        setSizeErrorMain(tooLarge.length > 0 && accept.maxTotalBytes
+            ? sizeLimitMessage(tooLarge, used, accept.maxTotalBytes)
+            : null);
+        if (fitting.length > 0) onMainFileChange(fitting[0]);
     };
 
     const handleGalleryFiles = (files: File[]) => {
         const { accepted, rejected } = filterAcceptedFiles(files, accept.galeria);
         setRejectedGallery(rejected);
-        if (accepted.length > 0) onAddGalleryFiles(accepted);
+        const used = newImagesBytes(values);
+        const { fitting, tooLarge } = fitFilesInLimit(accepted, used, accept.maxTotalBytes);
+        const usedAfter = used + fitting.reduce((total, file) => total + file.size, 0);
+        setSizeErrorGallery(tooLarge.length > 0 && accept.maxTotalBytes
+            ? sizeLimitMessage(tooLarge, usedAfter, accept.maxTotalBytes)
+            : null);
+        if (fitting.length > 0) onAddGalleryFiles(fitting);
+    };
+
+    /** Bytes que puede usar la imagen de una sección (su imagen actual no cuenta: se reemplaza). */
+    const sectionImageLimit = (index: number) => {
+        if (accept.maxTotalBytes === undefined) return undefined;
+        const used = newImagesBytes(values, values.secciones[index]?.imagen);
+        return { usedBytes: used, maxBytes: accept.maxTotalBytes };
     };
 
     return (
@@ -323,6 +351,7 @@ const NewsForm: React.FC<NewsFormProps> = ({
                             rejectedFiles={rejectedMain}
                             hasError={Boolean(errors.archivoPrincipal)}
                         />
+                        {sizeErrorMain && <span className={styles.error} role="alert">{sizeErrorMain}</span>}
                         {onMainVideoAdd && (
                             <YouTubeLinkField
                                 id="noticia-principal-video"
@@ -357,6 +386,7 @@ const NewsForm: React.FC<NewsFormProps> = ({
                             canRemove={values.secciones.length > 1}
                             onChange={(field, value) => onSectionChange(section.id, field, value)}
                             onImageChange={(file) => onSectionImageChange(section.id, file)}
+                            imageLimit={sectionImageLimit(index)}
                             onVideoAdd={onSectionVideoAdd
                                 ? (url, youtubeId) => onSectionVideoAdd(section.id, url, youtubeId)
                                 : undefined}
@@ -391,6 +421,7 @@ const NewsForm: React.FC<NewsFormProps> = ({
                         onFiles={handleGalleryFiles}
                         rejectedFiles={rejectedGallery}
                     />
+                    {sizeErrorGallery && <span className={styles.error} role="alert">{sizeErrorGallery}</span>}
                     {onAddGalleryVideo && (
                         <YouTubeLinkField
                             id="noticia-galeria-video"

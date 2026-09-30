@@ -39,19 +39,24 @@ export const NEWS_FORM_DEFAULTS = {
 
 /**
  * Formatos de archivo permitidos: imágenes JPG, PNG o GIF.
- * Ya no se suben videos MP4 (decisión 2026-09-30, indicada por Feyser): los videos serán enlaces
- * de YouTube en el recurso principal, las secciones y la galería.
- * TODO [COM03-FLUJO]: agregar el campo del enlace de YouTube cuando diseño lo defina.
+ * Ya no se suben videos MP4 (decisión 2026-09-30, indicada por Feyser): los videos son enlaces de
+ * YouTube en el recurso principal, las secciones y la galería (YouTubeLinkField).
  * Se listan MIME y extensión porque algunos sistemas no informan el MIME al arrastrar archivos.
  */
 const IMAGE_ACCEPT = "image/jpeg,image/png,image/gif,.jpg,.jpeg,.png,.gif";
 
 /**
- * TODO [COM03-BACKEND]: tamaño máximo por archivo pendiente de definir (hoy sin límite).
+ * Límite de 20 MB entre todas las imágenes de la noticia (principal, secciones y galería),
+ * decisión del usuario 2026-09-30. Los videos de YouTube no cuentan (son enlaces).
+ * TODO [COM03-BACKEND]: las imágenes ya guardadas no traen tamaño, así que al editar solo se
+ * cuentan las nuevas; backend también debe validar el límite.
  */
+export const NEWS_MAX_IMAGES_BYTES = 20 * 1024 * 1024;
+
 export const NEWS_FORM_ACCEPT: NewsFormAccept = {
     principal: IMAGE_ACCEPT,
     seccion: IMAGE_ACCEPT,
     galeria: IMAGE_ACCEPT,
-    formatsLabel: "Formatos: JPG, PNG o GIF. Tamaño máximo: [por definir]",
+    formatsLabel: "Formatos: JPG, PNG o GIF. Máximo 20 MB entre todas las imágenes de la noticia.",
+    maxTotalBytes: NEWS_MAX_IMAGES_BYTES,
 };

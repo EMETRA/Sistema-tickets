@@ -57,9 +57,17 @@ const MediaGrid = ({ items, columns = 1 }: MediaGridProps) => {
                         const { type, ...videoProps } = item;
                         return <Video key={`video-${index}`} {...videoProps} />;
                     }
-
-                    const { type, ...fileProps } = item;
-                    return <File key={fileProps.id} download {...fileProps} />;
+                })}
+            </div>
+            <div
+                className={styles.grid}
+                style={{ "--columns": columns } as React.CSSProperties}
+            >
+                {items.map((item, index) => {
+                    if (item.type === "file") {
+                        const { type, ...fileProps } = item;
+                        return <File key={fileProps.id} download {...fileProps} />;
+                    }
                 })}
             </div>
 

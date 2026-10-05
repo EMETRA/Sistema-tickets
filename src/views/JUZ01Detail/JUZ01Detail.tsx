@@ -365,7 +365,7 @@ const cases: Case[] = [
             comentario: "Analizando la denuncia y la defensa determiné que el conductor no se detuvo y continuó conduciendo. La imagen de la placa del vehículo es P123DFB. La imagen de la escena del accidente es la siguiente: ...",
             file: {
                 id: "1",
-                name: "Resolución",
+                name: "Resolución.pdf",
                 sourceUrl: "/images/no-user.png",
                 size: "100KB",
             }

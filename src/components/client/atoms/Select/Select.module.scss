@@ -21,11 +21,6 @@
   outline: none;
   cursor: pointer;
   transition: border-color 0.2s ease;
-  
-  /* Remover la flecha nativa del select */
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
 
   &:focus {
     border-color: #000000;
@@ -58,27 +53,6 @@
   &:focus {
     border-color: #262626;
   }
-}
-
-.DropdownIcon {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  pointer-events: none;
-  color: #262626;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.2s ease;
-}
-
-.Select:focus + .DropdownIcon {
-  transform: translateY(-50%) rotate(180deg);
-}
-
-.SelectDisabled + .DropdownIcon {
-  opacity: 0.5;
 }
 
 .ErrorMessage {

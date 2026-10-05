@@ -718,9 +718,9 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
                                     <Text variant="body">{currentCase.multa.datosPago.referencia}</Text>
                                 </div>
                             </div>
-                            <Title variant="mid">Caso</Title>
                         </div>
                     )}
+                    <Title variant="mid">Caso</Title>
                 </div>
             )}
             <Title variant="mid" className={styles.title}>Descripción</Title>

@@ -652,7 +652,7 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
                     <Chip key={tag.id} label={tag.nombre} color={tag.color} />
                 ))}
             </div>
-            {currentCase.status !== "ACOGIDO" && currentCase.status !== "NO_ACOGIDA" && !showResolveDefense ? (
+            {currentCase.status === "CREADO" || currentCase.status === "EN_JUZGADO" && !showResolveDefense ? (
                 <div className={styles.actions}>
                     <Title variant="mid" className={styles.title}>Acciones disponibles</Title>
                     {currentCase.status === "CREADO" ? (
@@ -661,7 +661,7 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
                         <Button variant="contained" onClick={() => setShowResolveDefense(true)}>Resolver defensa</Button>
                     ) : <Text variant="body">No hay acciones disponibles</Text>}
                 </div>
-            ) : (
+            ) : !showResolveDefense && (
                 <div className={styles.resolution}>
                     {currentCase.resolucion ? (
                         <>

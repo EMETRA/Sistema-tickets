@@ -2,9 +2,11 @@ import type { SelectOption } from "../../atoms/Select/types";
 import type { LabelOption } from "../../molecules/LabelChipGroup/types";
 
 /**
- * Archivo del formulario de noticias.
- * - `file` con valor: archivo nuevo seleccionado por el usuario (pendiente de subir)
- * - `file` null: recurso ya guardado en backend (modo edición)
+ * Recurso del formulario de noticias: imagen o video de YouTube.
+ * - `file` con valor: imagen nueva seleccionada por el usuario (pendiente de subir)
+ * - `file` null y sin `youtubeId`: imagen ya guardada en backend (modo edición)
+ * - `youtubeId` con valor: video de YouTube; `url` es https://www.youtube.com/watch?v=ID
+ *   (los videos no se suben: se guardan como enlace)
  */
 export interface NewsFormFile {
     id: string;
@@ -14,6 +16,7 @@ export interface NewsFormFile {
     mimeType: string;
     file: File | null;
     url?: string;
+    youtubeId?: string;
 }
 
 /**
@@ -23,6 +26,7 @@ export interface NewsFormSection {
     id: string;
     encabezado: string;
     contenido: string;
+    /** Imagen o video de YouTube de la sección (el nombre se conserva por compatibilidad). */
     imagen: NewsFormFile | null;
 }
 
@@ -42,7 +46,7 @@ export interface NewsFormValues {
     etiquetaIds: string[];
     idioma: string;
     visibilidad: string;
-    /** YYYY-MM-DD */
+    /** Como la escribe la persona: dd/mm/aaaa (a la API se envía en ISO) */
     fechaPublicacion: string;
     slug: string;
     /** Texto del input; vacío = sin tiempo de lectura */
@@ -94,6 +98,11 @@ export interface NewsFormAccept {
     galeria: string;
     /** Texto de ayuda con los formatos y el tamaño permitidos */
     formatsLabel: string;
+    /**
+     * Máximo de bytes entre todas las imágenes nuevas de la noticia (principal, secciones y
+     * galería). Opcional: sin él no hay límite.
+     */
+    maxTotalBytes?: number;
 }
 
 /**
@@ -132,6 +141,14 @@ export interface NewsFormProps {
 
     onAddGalleryFiles: (files: File[]) => void;
     onRemoveGalleryFile: (fileId: string) => void;
+
+    /**
+     * Videos de YouTube (enlace normalizado + id). Opcionales: si no se envían, no se muestra el
+     * campo "¿Es un video? Pega el enlace de YouTube" en ese lugar.
+     */
+    onMainVideoAdd?: (url: string, youtubeId: string) => void;
+    onSectionVideoAdd?: (sectionId: string, url: string, youtubeId: string) => void;
+    onAddGalleryVideo?: (url: string, youtubeId: string) => void;
 
     onCancel: () => void;
     onSaveDraft: () => void;

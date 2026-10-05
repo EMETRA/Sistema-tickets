@@ -1,7 +1,11 @@
 import { z } from "zod";
 import type { NewsFormErrors } from "@/components/client/organisms/NewsForm";
+import { ddMmYyyyToIsoDate } from "@/helpers/dateInput";
 
 const requiredText = (message: string) => z.string().trim().min(1, message);
+
+const FECHA_INVALIDA = "Ingresa una fecha válida con el formato dd/mm/aaaa";
+const isValidFecha = (value: string) => ddMmYyyyToIsoDate(value) !== null;
 
 const fileSchema = z.object({
     id: z.string(),
@@ -10,6 +14,8 @@ const fileSchema = z.object({
     mimeType: z.string(),
     file: z.custom<File>().nullable(),
     url: z.string().optional(),
+    /** Video de YouTube (el enlace ya se validó al agregarlo con YouTubeLinkField). */
+    youtubeId: z.string().optional(),
 });
 
 const sectionSchema = z.object({
@@ -31,8 +37,9 @@ export const newsPublishSchema = z.object({
     etiquetaIds: z.array(z.string()),
     idioma: requiredText("Selecciona un idioma"),
     visibilidad: requiredText("Selecciona la visibilidad"),
+    // Se escribe dd/mm/aaaa; al enviar se convierte a ISO (buildGuardarNoticiaPayload).
     fechaPublicacion: requiredText("La fecha de publicación es obligatoria")
-        .regex(/^\d{4}-\d{2}-\d{2}$/, "Fecha inválida"),
+        .refine(isValidFecha, FECHA_INVALIDA),
     slug: requiredText("La URL (slug) es obligatoria")
         .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Usa solo minúsculas, números y guiones"),
     tiempoLectura: z.string().trim().refine(
@@ -48,10 +55,15 @@ export const newsPublishSchema = z.object({
 });
 
 /**
- * Validación de borrador: solo exige el título.
+ * Validación de borrador: solo exige el título. La fecha es opcional, pero si se escribe
+ * debe ser válida (si no, se perdería en silencio al enviarla).
  */
 export const newsDraftSchema = z.object({
     titulo: requiredText("El título es obligatorio"),
+    fechaPublicacion: z.string().trim().refine(
+        (value) => value === "" || isValidFecha(value),
+        FECHA_INVALIDA,
+    ),
 });
 
 export type NewsValidationMode = "publicar" | "borrador";

@@ -46,3 +46,17 @@
     font-weight: 600;
     background-color: $card-background;
 }
+
+// Zona de carga de la imagen + campo del enlace de YouTube.
+.media {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+// Imagen que no se agregó por superar el límite total (mismo estilo que .error de NewsForm).
+.error {
+    margin-top: 0.25rem;
+    font-size: 0.75rem;
+    color: $rojo-1;
+}

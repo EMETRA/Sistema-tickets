@@ -39,6 +39,12 @@ export interface FileItemProps {
     onRemove?: () => void;
 
     /**
+     * Reemplaza el ícono que se elige por la extensión del nombre (p. ej. la miniatura de un
+     * video de YouTube, que no tiene extensión). Opcional; sin él, el comportamiento no cambia.
+     */
+    thumbnail?: React.ReactNode;
+
+    /**
      * Clase CSS adicional.
      */
     className?: string;

@@ -8,7 +8,9 @@ import { TextArea } from "../../atoms/TextArea";
 import { FormField } from "../../molecules/FormField";
 import { FileDropzone } from "../../molecules/FileDropzone";
 import { FileItem } from "../../molecules/FileItem";
-import { fileDescription, filterAcceptedFiles } from "../NewsForm/utils";
+import { YouTubeLinkField } from "../../molecules/YouTubeLinkField";
+import { fileDescription, filterAcceptedFiles, fitFilesInLimit, sizeLimitMessage } from "../NewsForm/utils";
+import { mediaThumbnail } from "../NewsForm/mediaThumbnail";
 import type { NewsContentSectionProps } from "./types";
 import styles from "./NewsContentSection.module.scss";
 
@@ -26,19 +28,28 @@ const NewsContentSection: React.FC<NewsContentSectionProps> = ({
     canRemove,
     onChange,
     onImageChange,
+    onVideoAdd,
+    imageLimit,
     onMoveUp,
     onMoveDown,
     onRemove,
     className,
 }) => {
     const [rejectedFiles, setRejectedFiles] = useState<string[]>([]);
+    // Imagen que no se agregó por superar el límite total de la noticia
+    const [sizeError, setSizeError] = useState<string | null>(null);
     const headingId = `seccion-${section.id}-encabezado`;
     const contentId = `seccion-${section.id}-contenido`;
 
     const handleFiles = (files: File[]) => {
         const { accepted, rejected } = filterAcceptedFiles(files, accept);
         setRejectedFiles(rejected);
-        if (accepted.length > 0) onImageChange(accepted[0]);
+        const used = imageLimit?.usedBytes ?? 0;
+        const { fitting, tooLarge } = fitFilesInLimit(accepted.slice(0, 1), used, imageLimit?.maxBytes);
+        setSizeError(tooLarge.length > 0 && imageLimit
+            ? sizeLimitMessage(tooLarge, used, imageLimit.maxBytes)
+            : null);
+        if (fitting.length > 0) onImageChange(fitting[0]);
     };
 
     return (
@@ -110,18 +121,25 @@ const NewsContentSection: React.FC<NewsContentSectionProps> = ({
                     name={section.imagen.name}
                     status={section.imagen.file ? "ready" : "done"}
                     description={fileDescription(section.imagen)}
+                    thumbnail={mediaThumbnail(section.imagen)}
                     onRemove={() => onImageChange(null)}
                 />
             ) : (
-                <FileDropzone
-                    variant="compact"
-                    multiple={false}
-                    accept={accept}
-                    title="Imagen de esta sección (opcional)"
-                    subtitle="Puedes dejarla vacía."
-                    onFiles={handleFiles}
-                    rejectedFiles={rejectedFiles}
-                />
+                <div className={styles.media}>
+                    <FileDropzone
+                        variant="compact"
+                        multiple={false}
+                        accept={accept}
+                        title={onVideoAdd ? "Imagen o video de esta sección (opcional)" : "Imagen de esta sección (opcional)"}
+                        subtitle={onVideoAdd ? "Arrastra una imagen o pega abajo el enlace de un video. Puedes dejarla vacía." : "Puedes dejarla vacía."}
+                        onFiles={handleFiles}
+                        rejectedFiles={rejectedFiles}
+                    />
+                    {sizeError && <span className={styles.error} role="alert">{sizeError}</span>}
+                    {onVideoAdd && (
+                        <YouTubeLinkField id={`seccion-${section.id}-video`} onAdd={onVideoAdd} />
+                    )}
+                </div>
             )}
         </div>
     );

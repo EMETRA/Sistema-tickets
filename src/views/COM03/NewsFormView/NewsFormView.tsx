@@ -10,7 +10,15 @@ import {
     useGetNoticia,
     useGuardarNoticia,
 } from "@/api/hooks";
-import { AccionNoticia, type CategoriaNoticia, type EtiquetaNoticia, type NoticiaDetalle } from "@/api/graphql/COM03";
+import {
+    AccionNoticia,
+    toNoticiaCmsError,
+    type CategoriaNoticia,
+    type EtiquetaNoticia,
+    type GuardarNoticiaCmsResult,
+    type NoticiaCmsError,
+    type NoticiaDetalle,
+} from "@/api/graphql/COM03";
 import { Button } from "@/components/client/atoms/Button";
 import { Text } from "@/components/client/atoms/Text";
 import { Title } from "@/components/client/atoms/Title";
@@ -20,7 +28,13 @@ import { NewsForm, type NewsFormOptions } from "@/components/client/organisms/Ne
 import { NewsPreview } from "@/components/client/organisms/NewsPreview";
 import { NewsResultCard } from "@/components/client/organisms/NewsResultCard";
 import { buildGuardarNoticiaPayload } from "../utils/buildGuardarNoticiaPayload";
-import { ERROR_DESCRIPTION, ERROR_REFERENCE, getFlowTexts } from "./flowTexts";
+import {
+    PUBLICADA_NO_VISIBLE_SUCCESS,
+    SLUG_CONFLICT_MESSAGE,
+    errorReference,
+    getErrorTexts,
+    getFlowTexts,
+} from "./flowTexts";
 import {
     IDIOMA_OPTIONS,
     NEWS_FORM_ACCEPT,
@@ -152,6 +166,9 @@ function NewsFormContent({ initial, categorias, etiquetas, onBack }: NewsFormCon
     const [accion, setAccion] = useState<AccionNoticia | null>(null);
     const [step, setStep] = useState<"idle" | "confirm" | "saving" | "success" | "error">("idle");
     const texts = accion ? getFlowTexts(accion, form.values.fechaPublicacion) : null;
+    // Último resultado o error de guardarNoticiaCms (README).
+    const [resultado, setResultado] = useState<GuardarNoticiaCmsResult | null>(null);
+    const [saveError, setSaveError] = useState<NoticiaCmsError | null>(null);
 
     // Evita envíos repetidos:
     // - savingRef bloquea cualquier clic mientras hay un envío en curso (doble clic, Reintentar).
@@ -182,20 +199,38 @@ function NewsFormContent({ initial, categorias, etiquetas, onBack }: NewsFormCon
         if (!accion || !idempotencyRef.current || savingRef.current) return;
         savingRef.current = true;
         setStep("saving");
-        const { input, files, fileMap } = buildGuardarNoticiaPayload(
+        // TODO [COM03-BACKEND]: `archivosPendientes` (imágenes nuevas) aún no se envían: falta
+        // definir cómo se suben para obtener su recurso_id (Feyser y backend).
+        const { variables } = buildGuardarNoticiaPayload(
             form.values,
             initial?.id ?? null,
             accion,
             idempotencyRef.current.key,
         );
         let succeeded = false;
+        let cmsError: NoticiaCmsError | null = null;
         try {
-            await guardarNoticia(input, files, fileMap);
+            // "guardada", "publicada" e `idempotente: true` son éxito (README).
+            setResultado(await guardarNoticia(variables));
+            setSaveError(null);
             succeeded = true;
-        } catch {
+        } catch (err) {
+            cmsError = toNoticiaCmsError(err);
+            setSaveError(cmsError);
             succeeded = false;
         } finally {
             savingRef.current = false;
+        }
+
+        // Slug repetido: se corrige en el formulario, no en una pantalla de error. Se vuelve al
+        // formulario con el campo marcado y se lleva hasta él. El siguiente envío lleva otra clave.
+        if (cmsError?.codigo === "SLUG_IDIOMA_CONFLICT") {
+            idempotencyRef.current = null;
+            setStep("idle");
+            setIsPreview(false);
+            form.setFieldError("slug", SLUG_CONFLICT_MESSAGE);
+            setFailedAttempts((count) => count + 1);
+            return;
         }
         // La pantalla de resultado reemplaza al formulario: se muestra desde arriba.
         scrollToTop(screenRef.current);
@@ -223,30 +258,57 @@ function NewsFormContent({ initial, categorias, etiquetas, onBack }: NewsFormCon
         askConfirmation(form.publishIntent === "programar" ? AccionNoticia.PROGRAMAR : AccionNoticia.PUBLICAR);
     };
 
+    const errorTexts = getErrorTexts(saveError?.codigo ?? null);
+
     const handleBackToForm = () => {
+        // Si backend rechazó el contenido, la persona lo va a corregir: el siguiente envío es otro
+        // intento y lleva otra clave. Si fue un fallo transitorio, se conserva la misma clave.
+        if (step === "error" && !errorTexts.retryable) idempotencyRef.current = null;
         setStep("idle");
         showPreview(false);
     };
 
-    if (texts && (step === "success" || step === "error")) {
-        const isSuccess = step === "success";
+    if (texts && step === "success") {
+        // "Publicar" una noticia privada: backend la guarda como publicada pero no la hace visible.
+        const success = accion === AccionNoticia.PUBLICAR && resultado?.resultado === "guardada"
+            ? PUBLICADA_NO_VISIBLE_SUCCESS
+            : texts.success;
         return (
             <div ref={screenRef} className={styles.screen}>
                 <Title variant="mid" tag="h1" className={styles.resultHeading}>Comunicación</Title>
                 <NewsResultCard
-                    status={isSuccess ? "success" : "error"}
-                    title={isSuccess ? texts.success.title : texts.errorTitle}
-                    description={isSuccess ? texts.success.description : ERROR_DESCRIPTION}
-                    badge={isSuccess ? texts.success.badge : undefined}
-                    note={isSuccess ? texts.success.note : undefined}
-                    reference={isSuccess ? undefined : ERROR_REFERENCE}
+                    status="success"
+                    title={success.title}
+                    description={success.description}
+                    badge={success.badge}
+                    note={success.note}
+                    primaryAction={{ label: "Ver listado de noticias", onClick: onBack }}
+                />
+            </div>
+        );
+    }
+
+    if (texts && step === "error") {
+        const noticiaNoExiste = saveError?.codigo === "NEWS_NOT_FOUND";
+        return (
+            <div ref={screenRef} className={styles.screen}>
+                <Title variant="mid" tag="h1" className={styles.resultHeading}>Comunicación</Title>
+                <NewsResultCard
+                    status="error"
+                    title={texts.errorTitle}
+                    description={errorTexts.description}
+                    reference={errorReference(saveError?.codigo ?? null)}
                     primaryAction={
-                        isSuccess
-                            ? { label: "Ver listado de noticias", onClick: onBack }
-                            : { label: "Reintentar", onClick: save }
+                        errorTexts.retryable
+                            ? { label: "Reintentar", onClick: save }
+                            : noticiaNoExiste
+                                ? { label: "Ver listado de noticias", onClick: onBack }
+                                : { label: "Volver al formulario", onClick: handleBackToForm }
                     }
                     secondaryAction={
-                        isSuccess ? undefined : { label: "Volver al formulario", onClick: handleBackToForm }
+                        errorTexts.retryable
+                            ? { label: "Volver al formulario", onClick: handleBackToForm }
+                            : undefined
                     }
                 />
             </div>
@@ -313,6 +375,9 @@ function NewsFormContent({ initial, categorias, etiquetas, onBack }: NewsFormCon
                 onRemoveSection={form.removeSection}
                 onAddGalleryFiles={form.addGalleryFiles}
                 onRemoveGalleryFile={form.removeGalleryFile}
+                onMainVideoAdd={form.setMainVideo}
+                onSectionVideoAdd={form.setSectionVideo}
+                onAddGalleryVideo={form.addGalleryVideo}
                 onCancel={onBack}
                 onSaveDraft={handleSaveDraft}
                 onPreview={handlePreview}

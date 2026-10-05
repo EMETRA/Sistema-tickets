@@ -149,3 +149,24 @@
 .previewButton.previewButton.previewButton {
     background-color: $azul-1;
 }
+
+// Input type="date" oculto del botón de calendario: solo sirve para abrir el selector nativo.
+// No usa display: none porque showPicker() necesita un input renderizado.
+.hiddenDatePicker {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    border: 0;
+    opacity: 0;
+    pointer-events: none;
+}
+
+// Zona de carga + campo del enlace de YouTube (recurso principal y galería).
+.mediaPicker {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}

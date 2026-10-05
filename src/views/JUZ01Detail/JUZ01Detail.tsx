@@ -672,6 +672,7 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
                                 id={currentCase.resolucion?.file.id}
                                 name={currentCase.resolucion?.file.name}
                                 onClick={() => alert(`Descargar archivo id: ${currentCase.resolucion?.file.id}`)}
+                                download
                             />
                         </>
                     ) : (

@@ -1,6 +1,6 @@
-import { notFound } from "next/navigation";
-import { getAppsCatalog } from "@/api/graphql/home/getAppsCatalog";
+import { notFound, redirect } from "next/navigation";
 import { getModule } from "@/config/apps-catalog";
+import { requireAppCatalog } from "@/config/require-app-catalog";
 import JUZ01Detail from "@/views/JUZ01Detail/JUZ01Detail";
 
 type PageProps = {
@@ -11,10 +11,14 @@ type PageProps = {
 export default async function ModuleDetailPage({ params, searchParams }: PageProps) {
     const { appId, sectionId, moduleId } = await params;
     const { caseNumber } = await searchParams;
-    const catalog = await getAppsCatalog();
+    const catalog = await requireAppCatalog(
+        `/home/${appId}/${sectionId}/${moduleId}/detail`
+    );
 
     const moduleMeta = getModule(appId, sectionId, moduleId, catalog);
-    if (!moduleMeta || moduleId !== "juz01") return notFound();
+    if (!moduleMeta) redirect("/unauthorized");
+
+    if (moduleId !== "juz01") return notFound();
 
     if (typeof caseNumber !== "string" || caseNumber.trim() === "") return notFound();
 

@@ -10,7 +10,6 @@ import { EventItemProps } from "@/components/client/molecules/EventItem";
 import { IconName } from "@/components/client/atoms/Icon/types";
 import { useGetUser, useGetMyStats, useGetMyActivity } from "@/api/hooks";
 import { getMainApps } from "@/config/apps-catalog";
-import { canAccessMainApp } from "@/config/apps-access";
 import { useAppsCatalogContext } from "@/context/AppsCatalogContext";
 import { useAuthStore } from "@/store/useAuthStore";
 
@@ -60,9 +59,8 @@ const UserHome: React.FC = () => {
 
     const mainApps = useMemo(() => {
         if (!catalog) return [];
-        const dept = user.departamento || departamento;
-        return getMainApps(catalog).filter((app) => canAccessMainApp(dept, app.id));
-    }, [catalog, user.departamento, departamento]);
+        return getMainApps(catalog);
+    }, [catalog]);
 
     const eventItems: EventItemProps[] = myActivityData
         ? myActivityData.map((activity) => ({

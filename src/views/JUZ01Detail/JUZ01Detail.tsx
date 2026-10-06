@@ -59,14 +59,14 @@ type Case = {
         descripción: string,
         evidencias: File[]
     },
-    defensa: {
-        nombre: string,
-        dpi: string,
-        correo: string,
-        telefono: string,
-        argumentos: string,
-        anexos: File[]
-    }
+    // defensa: {
+    //     nombre: string,
+    //     dpi: string,
+    //     correo: string,
+    //     telefono: string,
+    //     argumentos: string,
+    //     anexos: File[]
+    // }
     logs: Log[],
     resolucion?: {
         id: string,
@@ -131,27 +131,27 @@ const cases: Case[] = [
                 },
             ],
         },
-        defensa: {
-            nombre: "Nombre de la defensa",
-            dpi: "1234567890",
-            correo: "defensa@gmail.com",
-            telefono: "1234567890",
-            argumentos: "Argumentos de la defensa",
-            anexos: [
-                {
-                    id: "1",
-                    name: "Anexo 1",
-                    sourceUrl: "/images/no-user.png",
-                    size: "100KB",
-                },
-                {
-                    id: "2",
-                    name: "Anexo 2",
-                    sourceUrl: "/images/login-info.png",
-                    size: "100KB",
-                },
-            ],
-        },
+        // defensa: {
+        //     nombre: "Nombre de la defensa",
+        //     dpi: "1234567890",
+        //     correo: "defensa@gmail.com",
+        //     telefono: "1234567890",
+        //     argumentos: "Argumentos de la defensa",
+        //     anexos: [
+        //         {
+        //             id: "1",
+        //             name: "Anexo 1",
+        //             sourceUrl: "/images/no-user.png",
+        //             size: "100KB",
+        //         },
+        //         {
+        //             id: "2",
+        //             name: "Anexo 2",
+        //             sourceUrl: "/images/login-info.png",
+        //             size: "100KB",
+        //         },
+        //     ],
+        // },
         logs: [
             {
                 userName: "Juan Perez",
@@ -221,27 +221,27 @@ const cases: Case[] = [
                 },
             ],
         },
-        defensa: {
-            nombre: "Nombre de la defensa",
-            dpi: "1234567890",
-            correo: "defensa@gmail.com",
-            telefono: "1234567890",
-            argumentos: "El vehículo se estacionó en la acera de la calle 123, y el conductor no se detuvo. La placa del vehículo es P123DFB. Se adjunta una imagen de la placa del vehículo. Y una imagen de la escena del accidente.. Además, se adjunta una imagen de la escena del accidente. Cabe destacar que el conductor no se detuvo y continuó conduciendo. La imagen de la placa del vehículo es P123DFB. La imagen de la escena del accidente es la siguiente: ...",
-            anexos: [
-                {
-                    id: "1",
-                    name: "Anexo 1",
-                    sourceUrl: "/images/no-user.png",
-                    size: "100KB",
-                },
-                {
-                    id: "2",
-                    name: "Anexo 2",
-                    sourceUrl: "/images/login-info.png",
-                    size: "100KB",
-                },
-            ],
-        },
+        // defensa: {
+        //     nombre: "Nombre de la defensa",
+        //     dpi: "1234567890",
+        //     correo: "defensa@gmail.com",
+        //     telefono: "1234567890",
+        //     argumentos: "El vehículo se estacionó en la acera de la calle 123, y el conductor no se detuvo. La placa del vehículo es P123DFB. Se adjunta una imagen de la placa del vehículo. Y una imagen de la escena del accidente.. Además, se adjunta una imagen de la escena del accidente. Cabe destacar que el conductor no se detuvo y continuó conduciendo. La imagen de la placa del vehículo es P123DFB. La imagen de la escena del accidente es la siguiente: ...",
+        //     anexos: [
+        //         {
+        //             id: "1",
+        //             name: "Anexo 1",
+        //             sourceUrl: "/images/no-user.png",
+        //             size: "100KB",
+        //         },
+        //         {
+        //             id: "2",
+        //             name: "Anexo 2",
+        //             sourceUrl: "/images/login-info.png",
+        //             size: "100KB",
+        //         },
+        //     ],
+        // },
         logs: [
             {
                 userName: "Juan Perez",
@@ -308,27 +308,27 @@ const cases: Case[] = [
                 },
             ],
         },
-        defensa: {
-            nombre: "Nombre de la defensa",
-            dpi: "1234567890",
-            correo: "defensa@gmail.com",
-            telefono: "1234567890",
-            argumentos: "El vehículo se estacionó en la acera de la calle 123, y el conductor no se detuvo. La placa del vehículo es P123DFB. Se adjunta una imagen de la placa del vehículo. Y una imagen de la escena del accidente.. Además, se adjunta una imagen de la escena del accidente. Cabe destacar que el conductor no se detuvo y continuó conduciendo. La imagen de la placa del vehículo es P123DFB. La imagen de la escena del accidente es la siguiente: ...",
-            anexos: [
-                {
-                    id: "1",
-                    name: "Anexo 1",
-                    sourceUrl: "/images/no-user.png",
-                    size: "100KB",
-                },
-                {
-                    id: "2",
-                    name: "Anexo 2",
-                    sourceUrl: "/images/login-info.png",
-                    size: "100KB",
-                },
-            ],
-        },
+        // defensa: {
+        //     nombre: "Nombre de la defensa",
+        //     dpi: "1234567890",
+        //     correo: "defensa@gmail.com",
+        //     telefono: "1234567890",
+        //     argumentos: "El vehículo se estacionó en la acera de la calle 123, y el conductor no se detuvo. La placa del vehículo es P123DFB. Se adjunta una imagen de la placa del vehículo. Y una imagen de la escena del accidente.. Además, se adjunta una imagen de la escena del accidente. Cabe destacar que el conductor no se detuvo y continuó conduciendo. La imagen de la placa del vehículo es P123DFB. La imagen de la escena del accidente es la siguiente: ...",
+        //     anexos: [
+        //         {
+        //             id: "1",
+        //             name: "Anexo 1",
+        //             sourceUrl: "/images/no-user.png",
+        //             size: "100KB",
+        //         },
+        //         {
+        //             id: "2",
+        //             name: "Anexo 2",
+        //             sourceUrl: "/images/login-info.png",
+        //             size: "100KB",
+        //         },
+        //     ],
+        // },
         logs: [
             {
                 userName: "Juan Perez",
@@ -413,27 +413,27 @@ const cases: Case[] = [
                 },
             ],
         },
-        defensa: {
-            nombre: "Nombre de la defensa",
-            dpi: "1234567890",
-            correo: "defensa@gmail.com",
-            telefono: "1234567890",
-            argumentos: "El vehículo se estacionó en la acera de la calle 123, y el conductor no se detuvo. La placa del vehículo es P123DFB. Se adjunta una imagen de la placa del vehículo. Y una imagen de la escena del accidente.. Además, se adjunta una imagen de la escena del accidente. Cabe destacar que el conductor no se detuvo y continuó conduciendo. La imagen de la placa del vehículo es P123DFB. La imagen de la escena del accidente es la siguiente: ...",
-            anexos: [
-                {
-                    id: "1",
-                    name: "Anexo 1",
-                    sourceUrl: "/images/no-user.png",
-                    size: "100KB",
-                },
-                {
-                    id: "2",
-                    name: "Anexo 2",
-                    sourceUrl: "/images/login-info.png",
-                    size: "100KB",
-                },
-            ],
-        },
+        // defensa: {
+        //     nombre: "Nombre de la defensa",
+        //     dpi: "1234567890",
+        //     correo: "defensa@gmail.com",
+        //     telefono: "1234567890",
+        //     argumentos: "El vehículo se estacionó en la acera de la calle 123, y el conductor no se detuvo. La placa del vehículo es P123DFB. Se adjunta una imagen de la placa del vehículo. Y una imagen de la escena del accidente.. Además, se adjunta una imagen de la escena del accidente. Cabe destacar que el conductor no se detuvo y continuó conduciendo. La imagen de la placa del vehículo es P123DFB. La imagen de la escena del accidente es la siguiente: ...",
+        //     anexos: [
+        //         {
+        //             id: "1",
+        //             name: "Anexo 1",
+        //             sourceUrl: "/images/no-user.png",
+        //             size: "100KB",
+        //         },
+        //         {
+        //             id: "2",
+        //             name: "Anexo 2",
+        //             sourceUrl: "/images/login-info.png",
+        //             size: "100KB",
+        //         },
+        //     ],
+        // },
         logs: [
             {
                 userName: "Juan Perez",
@@ -730,7 +730,7 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
                 columns={3}
                 items={currentCase.denuncia.evidencias.map(toMediaGridItem)}
             />
-            <Title variant="mid">Defensa</Title>
+            {/* <Title variant="mid">Defensa</Title>
             <div className={styles.defensePersonalData}>
                 <div className={styles.defensePersonalDataItem}>
                     <Text variant="body"><strong>Nombre</strong></Text>
@@ -755,7 +755,7 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
             <MediaGrid
                 columns={3}
                 items={currentCase.defensa.anexos.map(toMediaGridItem)}
-            />
+            /> */}
             {showResolveDefense && currentCase.status === "EN_JUZGADO" && (
                 <>
                     <Title variant="large">Resolver</Title>

@@ -44,7 +44,7 @@ export function useLogin() {
      * Función para hacer login
      * @param email Email del usuario
      * @param clave Contraseña
-     * @param captchaToken Token del captcha de Turnstile (opcional)
+     * @param captchaToken Token del captcha de Turnstile (opcional; hoy el login no lo envía)
      * @returns Promesa con el resultado del login (token, refresh_token, expires_in)
      * @throws Error si hay problema en el login
      */
@@ -71,15 +71,18 @@ export function useLogin() {
             return null;
         }
 
-        if (!captchaToken) {
-            setState({ loading: false, error: 'Por favor, completa el captcha', success: false });
-            return null;
-        }
+        // El captcha es opcional en el backend (`captchaToken?` en LoginInput): solo se envía si llega.
+        // TODO: Turnstile desactivado en el login (indicación de Elías y Feyser, 2026-10-07).
+        const input: LoginInput = {
+            email: email.trim().toLowerCase(),
+            clave,
+            ...(captchaToken ? { captchaToken } : {}),
+        };
 
         try {
             const response = await graphqlRequestClient<{ login: LoginResponse }>(
                 LOGIN_MUTATION,
-                { variables: { input: { email: email.trim().toLowerCase(), clave, captchaToken } as LoginInput } }
+                { variables: { input } }
             );
 
             if (!response?.login?.token) {

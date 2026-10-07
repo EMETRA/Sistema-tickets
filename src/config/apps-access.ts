@@ -24,7 +24,9 @@ export function normalizeDepartment(value?: string | null): string | null {
         recaudacion: "recaudacion",
         financiero: "financiero",
         juridico: "juridico",
-        // TODO [COM03-BACKEND]: confirmar el valor real de `departamento` para Comunicación.
+        // Departamento real de Comunicación: "SERVICIOS DE COMUNICACIÓN SOCIAL" (confirmado 2026-10-07).
+        "servicios de comunicacion social": "comunicacion",
+        // Nombre corto (sesión de prueba en desarrollo).
         comunicacion: "comunicacion",
     };
 

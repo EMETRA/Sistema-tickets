@@ -26,7 +26,7 @@ export interface NewsResultCardProps {
     note?: string;
 
     /**
-     * Nota de referencia del error (texto provisional mientras backend no lo defina)
+     * Referencia del error para soporte (p. ej. "Código de referencia: 403")
      */
     reference?: string;
 

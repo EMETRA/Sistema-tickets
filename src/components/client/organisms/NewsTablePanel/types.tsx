@@ -59,8 +59,20 @@ export interface NewsTablePanelProps {
     onCreate?: () => void;
     onEdit?: (id: string) => void;
     onArchive?: (id: string) => void;
-    onDelete?: (id: string) => void;
     onRestore?: (id: string) => void;
+
+    /**
+     * false = oculta la columna Notificación (estado del push a VIVI).
+     * @default true
+     */
+    showNotifications?: boolean;
+
+    /**
+     * false = oculta la columna Acciones y el botón "Crear noticia" del estado vacío
+     * (usuario sin permiso de editar).
+     * @default true
+     */
+    canEdit?: boolean;
 
     /**
      * Clase CSS adicional

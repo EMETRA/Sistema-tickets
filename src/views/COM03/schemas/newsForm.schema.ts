@@ -46,10 +46,10 @@ export const newsPublishSchema = z.object({
         (value) => value === "" || (/^\d+$/.test(value) && Number(value) > 0),
         "Ingresa un número entero mayor a 0",
     ),
-    archivoPrincipal: fileSchema.nullable().refine(
-        (value) => value !== null,
-        "La imagen o video principal es obligatorio",
-    ),
+    // TODO [COM03-BACKEND]: opcional mientras no exista la subida de imágenes (#3). Cuando exista,
+    // volver a exigirla: .refine((value) => value !== null, "La imagen o video principal es obligatorio")
+    // y quitar mainFileRequired={false} en NewsFormView.
+    archivoPrincipal: fileSchema.nullable(),
     secciones: z.array(sectionSchema).min(1, "Agrega al menos una sección"),
     galeria: z.array(fileSchema),
 });

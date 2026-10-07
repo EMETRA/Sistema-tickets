@@ -3,6 +3,7 @@
 import React, { useMemo, useRef, useState } from "react";
 import classNames from "classnames";
 import { Button } from "../../atoms/Button";
+import { Icon } from "../../atoms/Icon";
 import { IconButton } from "../../atoms/IconButton";
 import { Input } from "../../atoms/Input";
 import { TextArea } from "../../atoms/TextArea";
@@ -114,6 +115,9 @@ const NewsForm: React.FC<NewsFormProps> = ({
     onSaveDraft,
     onPreview,
     onPublish,
+    mainFileRequired = true,
+    notice,
+    canPublish = true,
     className,
 }) => {
     const [rejectedMain, setRejectedMain] = useState<string[]>([]);
@@ -328,7 +332,10 @@ const NewsForm: React.FC<NewsFormProps> = ({
             <section className={styles.card}>
                 <div className={styles.cardHeader}>
                     <h2 className={styles.cardTitle}>Imagen o video principal</h2>
-                    <LabelChip label="Único, obligatorio" className={styles.badge} />
+                    <LabelChip
+                        label={mainFileRequired ? "Único, obligatorio" : "Único, opcional"}
+                        className={styles.badge}
+                    />
                 </div>
 
                 {values.archivoPrincipal ? (
@@ -346,7 +353,7 @@ const NewsForm: React.FC<NewsFormProps> = ({
                             multiple={false}
                             accept={accept.principal}
                             title="Arrastra la imagen principal aquí"
-                            subtitle="Se usa como portada en el listado y en el detalle. Obligatorio."
+                            subtitle={`Se usa como portada en el listado y en el detalle. ${mainFileRequired ? "Obligatorio." : "Opcional."}`}
                             onFiles={handleMainFiles}
                             rejectedFiles={rejectedMain}
                             hasError={Boolean(errors.archivoPrincipal)}
@@ -448,6 +455,13 @@ const NewsForm: React.FC<NewsFormProps> = ({
                 )}
             </section>
 
+            {notice && (
+                <div className={styles.notice} role="status">
+                    <Icon name="circle-exclamation-solid" size={18} color="#8A6100" className={styles.noticeIcon} />
+                    <Text variant="caption" className={styles.noticeText}>{notice}</Text>
+                </div>
+            )}
+
             {/* ============ Acciones ============ */}
             <FormActions align="space-between" className={styles.actions}>
                 <Button type="button" variant="outlined" color="neutral-light" rounded onClick={onCancel} state={disabled ? "disabled" : "default"}>
@@ -461,9 +475,11 @@ const NewsForm: React.FC<NewsFormProps> = ({
                     <Button type="button" rounded onClick={onPreview} className={styles.previewButton} state={disabled ? "disabled" : "default"}>
                         Vista previa
                     </Button>
-                    <Button type="button" rounded onClick={onPublish} state={disabled ? "disabled" : "default"}>
-                        Publicar
-                    </Button>
+                    {canPublish && (
+                        <Button type="button" rounded onClick={onPublish} state={disabled ? "disabled" : "default"}>
+                            Publicar
+                        </Button>
+                    )}
                 </div>
             </FormActions>
         </div>

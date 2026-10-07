@@ -1,6 +1,21 @@
+@use "../../theme/colors.scss" as *;
+
 .content {
     display: flex;
     flex-direction: column;
     gap: 1rem;
     padding: 1.5rem 2rem;
+}
+
+// Mismo estilo que el estado de carga y el encabezado de resultado de NewsFormView
+.status.status {
+    margin: 0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: $azul-1;
+}
+
+.heading.heading {
+    font-size: 1.5rem;
+    color: $negro-2;
 }

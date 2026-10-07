@@ -1,6 +1,5 @@
-import { EstadoNoticia, TipoRecurso, VisibilidadNoticia, type NoticiaDetalle, type RecursoNoticia } from './types';
+import { EstadoNoticia, TipoRecurso, type NoticiaDetalle, type RecursoNoticia } from './types';
 import { NOTICIAS_DUMMY } from './noticias.dummy';
-import { slugify } from '@/helpers/slugify';
 
 const recursoDummy = (id: string, tipo: TipoRecurso, url: string, tipoMime: string): RecursoNoticia => ({
     id,
@@ -32,10 +31,10 @@ export function getNoticiaDummy(id: string): NoticiaDetalle | null {
         categoriaId: '1',
         subcategoriaId: null,
         etiquetaIds: ['1', '2'],
-        idioma: 'es-GT',
-        visibilidad: VisibilidadNoticia.PUBLICA,
+        idioma: item.idioma,
+        visibilidad: item.visibilidad,
         fechaPublicacion: item.fecha ? item.fecha.slice(0, 10) : null,
-        slug: slugify(item.titulo),
+        slug: item.slug,
         tiempoLectura: item.estado === EstadoNoticia.BORRADOR ? null : 4,
         recursoPrincipal: recursoDummy(`principal-${item.id}`, TipoRecurso.IMAGEN, '/recursos/portada.jpg', 'image/jpeg'),
         secciones: [

@@ -1,16 +1,16 @@
 import {
     AccionNoticia,
     type EstadoNoticiaCms,
-    type GaleriaItemCmsInput,
+    type GuardarNoticiaCmsInput,
     type GuardarNoticiaCmsVariables,
-    type NoticiaCmsInput,
+    type SeccionNoticiaCmsInput,
     type VisibilidadNoticiaCms,
 } from "@/api/graphql/COM03";
 import type { NewsFormFile, NewsFormValues } from "@/components/client/organisms/NewsForm";
 import { ddMmYyyyToApiDateTime } from "@/helpers/dateInput";
 import { textToHtml } from "@/helpers/textHtml";
 
-/** Qué `estado` se pide según el botón (tabla "Qué hace cada botón del editor" del README). */
+/** Qué `estado` se pide según el botón (README, "Qué hace cada botón del editor"). */
 export const ESTADO_POR_ACCION: Record<AccionNoticia, EstadoNoticiaCms> = {
     [AccionNoticia.BORRADOR]: "borrador",
     [AccionNoticia.PROGRAMAR]: "programada",
@@ -18,37 +18,49 @@ export const ESTADO_POR_ACCION: Record<AccionNoticia, EstadoNoticiaCms> = {
 };
 
 /**
- * Archivo nuevo del formulario que todavía no se puede enviar: la API recibe ids de recurso
- * (`recurso_principal_id`, `recurso_id`) y aún no está definido cómo se suben las imágenes.
+ * Recurso nuevo del formulario que todavía no se puede enviar: la API recibe ids de recurso y falta
+ * cómo obtenerlos desde api-tickets (subir imágenes y registrar videos; pendiente con backend).
+ * - imagen nueva;
+ * - video de YouTube agregado en el formulario.
  */
-export interface ArchivoPendiente {
+export interface RecursoPendiente {
     /** Dónde va: "recurso_principal", "secciones.0" o "galeria.1" */
     destino: string;
-    file: File;
+    tipo: "imagen" | "video";
+    /** Imagen nueva */
+    file?: File;
+    /** Video de YouTube (https://www.youtube.com/watch?v=ID) */
+    url?: string;
 }
 
 export interface GuardarNoticiaPayload {
     variables: GuardarNoticiaCmsVariables;
     /**
-     * TODO [COM03-BACKEND]: archivos nuevos sin subir. Feyser y backend definen cómo se suben
-     * para obtener su `recurso_id`; hasta entonces no se envían.
+     * TODO [COM03-BACKEND]: recursos nuevos que no se envían hasta que api-tickets permita subirlos.
+     * Sirven para avisar en el formulario y para subirlos cuando exista la operación.
      */
-    archivosPendientes: ArchivoPendiente[];
+    pendientes: RecursoPendiente[];
 }
 
-/** Id numérico de la API. Los ids que no son números (p. ej. del dummy) no se envían. */
+/** Id numérico de la API. Los ids que no son números (p. ej. locales o del dummy) no se envían. */
 const toApiId = (id: string): number | null => (/^\d+$/.test(id) ? Number(id) : null);
 
 /**
- * Convierte los valores del formulario en las variables de `guardarNoticiaCms` (README):
- * - `estado` según el botón; la fecha dd/mm/aaaa → ISO (00:00 hora de Guatemala).
+ * Convierte los valores del formulario en las variables de `guardarNoticiaCms`
+ * (README "Noticias CMS", 2026-10-06): `{ input: GuardarNoticiaCmsInput }`, en camelCase.
+ * - `estado` según el botón; `visibilidad` e `idioma` siempre (son obligatorios).
+ * - `slug` y `titulo` se envían siempre (son String! en el contrato).
+ * - Fecha dd/mm/aaaa → ISO, 00:00 hora de Guatemala.
  * - Categoría y subcategoría van juntas en `categoriasIds`.
- * - Imagen ya guardada → su `recurso_id`. Imagen nueva → queda en `archivosPendientes` y el campo
- *   no se envía (así backend conserva el recurso que tenía).
- * - Video de YouTube → `video_url` (recurso principal, sección y galería).
- * - El contenido de las secciones va como HTML (contenido_html).
- * TODO [COM03-BACKEND]: `video_url` y `galeria` siguen la propuesta enviada a backend
- * (2026-09-30), pendiente de confirmar. `autor` no se envía (no está en el input).
+ * - Recurso ya guardado (imagen o video, id numérico de la API) → su id (`recursoPrincipalId`,
+ *   `recursoId`, `galeriaRecursosIds`). Un video de YouTube es un recurso más (README "Noticias
+ *   CMS", sección 4). Imagen o video nuevo → va a `pendientes` y su campo no se envía (en el
+ *   recurso principal, backend conserva el que tenía).
+ * - Las secciones van completas (reemplazan las anteriores), con `contenidoHtml`.
+ * - La galería va como `galeriaRecursosIds`, en el orden de la pantalla. Es reemplazo total
+ *   (README, sección 3: `[]` borra), así que se omite si algún recurso guardado no tiene id
+ *   numérico (p. ej. datos de ejemplo): mejor conservar la galería que borrarla por error.
+ * TODO [COM03-BACKEND]: `autores` no se envía: falta cómo obtener el catálogo de autores.
  */
 export function buildGuardarNoticiaPayload(
     values: NewsFormValues,
@@ -56,79 +68,73 @@ export function buildGuardarNoticiaPayload(
     accion: AccionNoticia,
     claveIdempotente: string,
 ): GuardarNoticiaPayload {
-    const archivosPendientes: ArchivoPendiente[] = [];
+    const pendientes: RecursoPendiente[] = [];
 
     /**
-     * Imagen → recurso_id. undefined = no enviar el campo; null = quitar el recurso;
-     * número = recurso existente. (Los videos se envían aparte, como video_url.)
+     * Id del recurso para enviar. undefined = no enviar el campo (pendiente o id no numérico);
+     * null = sin recurso; número = recurso ya guardado.
      */
     const toRecursoId = (file: NewsFormFile | null, destino: string): number | null | undefined => {
         if (!file) return null;
         if (file.file) {
-            archivosPendientes.push({ destino, file: file.file });
+            pendientes.push({ destino, tipo: "imagen", file: file.file });
             return undefined;
         }
-        return toApiId(file.id) ?? undefined;
+        const apiId = toApiId(file.id);
+        // Video de YouTube agregado en el formulario: aún no está registrado como recurso.
+        if (file.youtubeId && file.url && apiId === null) {
+            pendientes.push({ destino, tipo: "video", url: file.url });
+            return undefined;
+        }
+        return apiId ?? undefined;
     };
-
-    /** URL del video de YouTube, si el recurso es un video. */
-    const videoUrl = (file: NewsFormFile | null) => (file?.youtubeId && file.url ? file.url : null);
 
     const tiempoLectura = values.tiempoLectura.trim();
 
-    const noticia: NoticiaCmsInput = {
+    const input: GuardarNoticiaCmsInput = {
+        claveIdempotente,
         slug: values.slug.trim(),
         titulo: values.titulo.trim(),
         resumen: values.resumen.trim(),
         estado: ESTADO_POR_ACCION[accion],
         visibilidad: values.visibilidad as VisibilidadNoticiaCms,
-        fecha_publicacion: ddMmYyyyToApiDateTime(values.fechaPublicacion),
+        fechaPublicacion: ddMmYyyyToApiDateTime(values.fechaPublicacion),
         idioma: values.idioma,
-        tiempo_lectura: tiempoLectura ? Number(tiempoLectura) : null,
+        tiempoLectura: tiempoLectura ? Number(tiempoLectura) : null,
         categoriasIds: [values.categoriaId, values.subcategoriaId]
             .map(toApiId)
             .filter((id): id is number => id !== null),
         etiquetasIds: values.etiquetaIds
             .map(toApiId)
             .filter((id): id is number => id !== null),
-        secciones: values.secciones.map((section, index) => {
-            const base = {
+        secciones: values.secciones.map((section, index): SeccionNoticiaCmsInput => {
+            const recursoId = toRecursoId(section.imagen, `secciones.${index}`);
+            return {
                 orden: index + 1,
                 encabezado: section.encabezado.trim(),
-                contenido_html: textToHtml(section.contenido),
+                contenidoHtml: textToHtml(section.contenido),
+                ...(recursoId !== undefined ? { recursoId } : {}),
             };
-            const video = videoUrl(section.imagen);
-            if (video) return { ...base, video_url: video };
-            const recursoId = toRecursoId(section.imagen, `secciones.${index}`);
-            return recursoId !== undefined ? { ...base, recurso_id: recursoId } : base;
         }),
     };
 
-    // Recurso principal: video (recurso_principal.video_url) o imagen (recurso_principal_id).
-    const videoPrincipal = videoUrl(values.archivoPrincipal);
-    if (videoPrincipal) {
-        noticia.recurso_principal = { video_url: videoPrincipal };
-    } else {
-        const recursoPrincipalId = toRecursoId(values.archivoPrincipal, "recurso_principal");
-        if (recursoPrincipalId !== undefined) noticia.recurso_principal_id = recursoPrincipalId;
-    }
+    const recursoPrincipalId = toRecursoId(values.archivoPrincipal, "recurso_principal");
+    if (recursoPrincipalId !== undefined) input.recursoPrincipalId = recursoPrincipalId;
 
     const id = noticiaId ? toApiId(noticiaId) : null;
-    if (id !== null) noticia.id = id;
+    if (id !== null) input.id = id;
 
-    // Galería mixta, en el orden del formulario: imagen guardada → recurso_id; video → video_url;
-    // imagen nueva → pendiente de subir (no se envía todavía).
-    const galeria: GaleriaItemCmsInput[] = [];
+    // Galería: ids guardados en orden; los nuevos quedan pendientes. Si un guardado no tiene id
+    // numérico (undefined), no se envía el campo para no borrar la galería.
+    const galeriaRecursosIds: number[] = [];
+    let sinIdConocido = false;
     values.galeria.forEach((file, index) => {
-        const video = videoUrl(file);
-        if (video) {
-            galeria.push({ orden: galeria.length + 1, video_url: video });
-            return;
-        }
+        const pendientesAntes = pendientes.length;
         const recursoId = toRecursoId(file, `galeria.${index}`);
-        if (typeof recursoId === "number") galeria.push({ orden: galeria.length + 1, recurso_id: recursoId });
+        if (typeof recursoId === "number") galeriaRecursosIds.push(recursoId);
+        else if (pendientes.length === pendientesAntes) sinIdConocido = true;
     });
-    noticia.galeria = galeria;
+    if (!sinIdConocido) input.galeriaRecursosIds = galeriaRecursosIds;
 
-    return { variables: { claveIdempotente, noticia }, archivosPendientes };
+    return { variables: { input }, pendientes };
 }

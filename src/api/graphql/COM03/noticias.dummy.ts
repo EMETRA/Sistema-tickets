@@ -1,4 +1,4 @@
-import { EstadoNoticia, EstadoNotificacion, type EstadoNotificacionNoticia, type NoticiaListItem } from './types';
+import { EstadoNoticia, EstadoNotificacion, VisibilidadNoticia, type EstadoNotificacionNoticia, type NoticiaListItem } from './types';
 
 /**
  * TODO [COM03-BACKEND]: datos dummy (mismas filas del diseño en Figma).
@@ -7,6 +7,9 @@ import { EstadoNoticia, EstadoNotificacion, type EstadoNotificacionNoticia, type
 export const NOTICIAS_DUMMY: NoticiaListItem[] = [
     {
         id: '1',
+        slug: 'nuevo-horario-de-circulacion-en-zona-10',
+        idioma: 'es-GT',
+        visibilidad: VisibilidadNoticia.PUBLICA,
         titulo: 'Nuevo horario de circulación en zona 10',
         estado: EstadoNoticia.PROGRAMADA,
         autor: 'Comunicación EMETRA',
@@ -14,6 +17,9 @@ export const NOTICIAS_DUMMY: NoticiaListItem[] = [
     },
     {
         id: '2',
+        slug: 'campana-de-educacion-vial-escolar',
+        idioma: 'es-GT',
+        visibilidad: VisibilidadNoticia.PUBLICA,
         titulo: 'Campaña de educación vial escolar',
         estado: EstadoNoticia.PUBLICADA,
         autor: 'Comunicación EMETRA',
@@ -21,6 +27,9 @@ export const NOTICIAS_DUMMY: NoticiaListItem[] = [
     },
     {
         id: '3',
+        slug: 'cierre-vial-por-mantenimiento',
+        idioma: 'es-GT',
+        visibilidad: VisibilidadNoticia.PUBLICA,
         titulo: 'Cierre vial por mantenimiento',
         estado: EstadoNoticia.PROGRAMADA,
         autor: 'Comunicación EMETRA',
@@ -28,6 +37,9 @@ export const NOTICIAS_DUMMY: NoticiaListItem[] = [
     },
     {
         id: '4',
+        slug: 'aviso-de-suspension-temporal-de-rutas',
+        idioma: 'es-GT',
+        visibilidad: VisibilidadNoticia.PUBLICA,
         titulo: 'Aviso de suspensión temporal de rutas',
         estado: EstadoNoticia.PROGRAMADA,
         autor: 'Comunicación EMETRA',
@@ -35,6 +47,9 @@ export const NOTICIAS_DUMMY: NoticiaListItem[] = [
     },
     {
         id: '5',
+        slug: 'actualizacion-del-sistema-de-remisiones',
+        idioma: 'es-GT',
+        visibilidad: VisibilidadNoticia.PUBLICA,
         titulo: 'Actualización del sistema de remisiones',
         estado: EstadoNoticia.BORRADOR,
         autor: 'Diego Hernández',
@@ -42,6 +57,9 @@ export const NOTICIAS_DUMMY: NoticiaListItem[] = [
     },
     {
         id: '6',
+        slug: 'aerometro',
+        idioma: 'es-GT',
+        visibilidad: VisibilidadNoticia.PUBLICA,
         titulo: 'Aerometro',
         estado: EstadoNoticia.ARCHIVADA,
         autor: 'John Doe',

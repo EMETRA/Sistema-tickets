@@ -155,5 +155,18 @@ export interface NewsFormProps {
     onPreview: () => void;
     onPublish: () => void;
 
+    /**
+     * false = la imagen o video principal es opcional (badge y texto de la zona de carga).
+     * Por defecto true, como en el Figma.
+     */
+    mainFileRequired?: boolean;
+    /** Aviso fijo sobre los botones de acción (p. ej. contenido que aún no se guarda). */
+    notice?: React.ReactNode;
+    /**
+     * false = oculta "Publicar" (usuario sin permiso de publicar o programar).
+     * @default true
+     */
+    canPublish?: boolean;
+
     className?: string;
 }

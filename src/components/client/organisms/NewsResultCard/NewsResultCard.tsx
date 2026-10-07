@@ -2,7 +2,6 @@ import React from "react";
 import classNames from "classnames";
 import { Button } from "../../atoms/Button";
 import { Icon } from "../../atoms/Icon";
-import { LabelChip } from "../../atoms/LabelChip";
 import { Text } from "../../atoms/Text";
 import type { NewsResultCardProps } from "./types";
 import styles from "./NewsResultCard.module.scss";
@@ -45,10 +44,7 @@ const NewsResultCard: React.FC<NewsResultCardProps> = ({
             {note && <Text variant="caption" className={styles.note}>{note}</Text>}
 
             {reference && (
-                <div className={styles.reference}>
-                    <LabelChip label="Texto provisional" className={styles.referenceBadge} />
-                    <span>{reference}</span>
-                </div>
+                <div className={styles.reference}>{reference}</div>
             )}
 
             <div className={styles.actions}>

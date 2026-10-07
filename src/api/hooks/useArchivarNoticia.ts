@@ -1,41 +1,24 @@
 'use client';
 
-import { useCallback, useState } from 'react';
-// TODO [COM03-BACKEND]: descomentar cuando exista la mutación `archivarNoticia` en backend.
-// import { graphqlRequestClient } from '@/api/graphql/client';
-// import { ARCHIVAR_NOTICIA_MUTATION } from '@/api/graphql/COM03';
-import { EstadoNoticia, type ArchivarNoticiaResponse } from '@/api/graphql/COM03';
-import { simularMutacion } from '@/api/graphql/COM03/mutations.dummy';
+import { useCallback } from 'react';
+import { createIdempotencyKey } from '@/helpers/createIdempotencyKey';
+import { cambioEstadoInput, type NoticiaListItem } from '@/api/graphql/COM03';
+import { useGuardarNoticia } from './useGuardarNoticia';
 
 /**
- * Archiva una noticia publicada o programada.
+ * Archiva una noticia publicada o programada: `guardarNoticiaCms` con estado "archivada"
+ * (README "Noticias CMS", 2026-10-06). Deja de mostrarse en el Portal.
+ * Cada confirmación es un intento nuevo: clave nueva. Si falla, lanza NoticiaCmsError.
  */
 export function useArchivarNoticia() {
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<Error | null>(null);
+    const { guardarNoticia, loading, error } = useGuardarNoticia();
 
-    const archivarNoticia = useCallback(async (id: string) => {
-        setLoading(true);
-        setError(null);
-
-        try {
-            // TODO [COM03-BACKEND]: reemplazar la simulación por la llamada real:
-            // const result = await graphqlRequestClient<ArchivarNoticiaResponse>(
-            //     ARCHIVAR_NOTICIA_MUTATION,
-            //     { variables: { id } }
-            // );
-            const result = await simularMutacion<ArchivarNoticiaResponse>({
-                archivarNoticia: { id, estado: EstadoNoticia.ARCHIVADA },
-            });
-            return result.archivarNoticia;
-        } catch (err) {
-            const error = err instanceof Error ? err : new Error(String(err));
-            setError(error);
-            throw error;
-        } finally {
-            setLoading(false);
-        }
-    }, []);
+    const archivarNoticia = useCallback(
+        (noticia: NoticiaListItem) => guardarNoticia({
+            input: cambioEstadoInput(noticia, 'archivada', createIdempotencyKey()),
+        }),
+        [guardarNoticia]
+    );
 
     return { archivarNoticia, loading, error };
 }

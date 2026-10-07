@@ -28,7 +28,9 @@ import { NewsForm, type NewsFormOptions } from "@/components/client/organisms/Ne
 import { NewsPreview } from "@/components/client/organisms/NewsPreview";
 import { NewsResultCard } from "@/components/client/organisms/NewsResultCard";
 import { buildGuardarNoticiaPayload } from "../utils/buildGuardarNoticiaPayload";
+import { claveParaIntento, contenidoDelIntento, type IntentoGuardado } from "../utils/claveIdempotente";
 import {
+    PENDING_MEDIA_NOTICE,
     PUBLICADA_NO_VISIBLE_SUCCESS,
     SLUG_CONFLICT_MESSAGE,
     errorReference,
@@ -49,13 +51,18 @@ interface NewsFormViewProps {
     /** null = crear; con valor = editar */
     noticiaId: string | null;
     onBack: () => void;
+    /**
+     * false = sin "Publicar" en el formulario ni en la vista previa (sin VIVI_NOTICIAS_PUBLICAR).
+     * @default true
+     */
+    canPublish?: boolean;
 }
 
 /**
  * Pantalla del formulario. Espera el detalle (en edición) y los catálogos antes de montar
  * el formulario, porque useNewsForm solo lee los valores iniciales al montarse.
  */
-export default function NewsFormView({ noticiaId, onBack }: NewsFormViewProps) {
+export default function NewsFormView({ noticiaId, onBack, canPublish = true }: NewsFormViewProps) {
     const { data: noticia, loading: loadingNoticia, error: noticiaError } = useGetNoticia(noticiaId);
     const { data: categorias, loading: loadingCategorias, error: categoriasError } = useGetCategoriasNoticia();
     const { data: etiquetas, loading: loadingEtiquetas, error: etiquetasError } = useGetEtiquetasNoticia();
@@ -93,6 +100,7 @@ export default function NewsFormView({ noticiaId, onBack }: NewsFormViewProps) {
             categorias={categorias}
             etiquetas={etiquetas}
             onBack={onBack}
+            canPublish={canPublish}
         />
     );
 }
@@ -102,9 +110,10 @@ interface NewsFormContentProps {
     categorias: CategoriaNoticia[];
     etiquetas: EtiquetaNoticia[];
     onBack: () => void;
+    canPublish: boolean;
 }
 
-function NewsFormContent({ initial, categorias, etiquetas, onBack }: NewsFormContentProps) {
+function NewsFormContent({ initial, categorias, etiquetas, onBack, canPublish }: NewsFormContentProps) {
     const form = useNewsForm(initial);
     // La vista previa es un modo de esta pantalla (no otra URL) para no perder el estado ni los archivos.
     const [isPreview, setIsPreview] = useState(false);
@@ -154,6 +163,14 @@ function NewsFormContent({ initial, categorias, etiquetas, onBack }: NewsFormCon
         [etiquetas, etiquetaIds]
     );
 
+    // TODO [COM03-BACKEND]: hay contenido que el guardado aún no envía (imágenes y videos nuevos).
+    // Se calcula con el mismo armado del envío para que el aviso nunca se desfase.
+    const hasPendingMedia = useMemo(
+        () => buildGuardarNoticiaPayload(form.values, initial?.id ?? null, AccionNoticia.BORRADOR, "")
+            .pendientes.length > 0,
+        [form.values, initial?.id]
+    );
+
     // Valida y, si hay errores, pide llevar al primero.
     const validate = (mode: "publicar" | "borrador") => {
         const isValid = form.validate(mode);
@@ -165,17 +182,18 @@ function NewsFormContent({ initial, categorias, etiquetas, onBack }: NewsFormCon
     const { guardarNoticia } = useGuardarNoticia();
     const [accion, setAccion] = useState<AccionNoticia | null>(null);
     const [step, setStep] = useState<"idle" | "confirm" | "saving" | "success" | "error">("idle");
-    const texts = accion ? getFlowTexts(accion, form.values.fechaPublicacion) : null;
+    const texts = accion ? getFlowTexts(accion, form.values.fechaPublicacion, initial?.estado ?? null) : null;
     // Último resultado o error de guardarNoticiaCms (README).
     const [resultado, setResultado] = useState<GuardarNoticiaCmsResult | null>(null);
     const [saveError, setSaveError] = useState<NoticiaCmsError | null>(null);
 
     // Evita envíos repetidos:
     // - savingRef bloquea cualquier clic mientras hay un envío en curso (doble clic, Reintentar).
-    // - La clave de idempotencia se repite en cada reintento de la misma acción, para que backend
-    //   descarte el duplicado si el primer envío sí llegó pero la respuesta falló.
+    // - La clave idempotente depende del contenido (claveParaIntento): si se reenvía lo mismo
+    //   (reintento por red o timeout) va la misma clave y backend no duplica; si cambió cualquier
+    //   dato, va una clave nueva (reusarla con otro contenido daría 409 IDEMPOTENCY_CONFLICT).
     const savingRef = useRef(false);
-    const idempotencyRef = useRef<{ accion: AccionNoticia; key: string } | null>(null);
+    const intentoRef = useRef<IntentoGuardado | null>(null);
 
     // Mientras se envía, el navegador pide confirmación antes de refrescar o cerrar la pestaña.
     useEffect(() => {
@@ -188,25 +206,24 @@ function NewsFormContent({ initial, categorias, etiquetas, onBack }: NewsFormCon
     }, [step]);
 
     const askConfirmation = (nextAccion: AccionNoticia) => {
-        if (idempotencyRef.current?.accion !== nextAccion) {
-            idempotencyRef.current = { accion: nextAccion, key: createIdempotencyKey() };
-        }
         setAccion(nextAccion);
         setStep("confirm");
     };
 
     const save = async () => {
-        if (!accion || !idempotencyRef.current || savingRef.current) return;
+        if (!accion || savingRef.current) return;
         savingRef.current = true;
         setStep("saving");
-        // TODO [COM03-BACKEND]: `archivosPendientes` (imágenes nuevas) aún no se envían: falta
-        // definir cómo se suben para obtener su recurso_id (Feyser y backend).
-        const { variables } = buildGuardarNoticiaPayload(
-            form.values,
-            initial?.id ?? null,
-            accion,
-            idempotencyRef.current.key,
+        // TODO [COM03-BACKEND]: `pendientes` (imágenes y videos nuevos) aún no se envían: falta
+        // subirlos desde api-tickets para obtener su id.
+        const { variables } = buildGuardarNoticiaPayload(form.values, initial?.id ?? null, accion, "");
+        const intento = claveParaIntento(
+            intentoRef.current,
+            contenidoDelIntento(variables.input),
+            createIdempotencyKey,
         );
+        intentoRef.current = intento;
+        variables.input.claveIdempotente = intento.clave;
         let succeeded = false;
         let cmsError: NoticiaCmsError | null = null;
         try {
@@ -222,10 +239,13 @@ function NewsFormContent({ initial, categorias, etiquetas, onBack }: NewsFormCon
             savingRef.current = false;
         }
 
+        // Conflicto de clave (misma clave con otro contenido): el siguiente intento usa una nueva.
+        if (cmsError?.codigo === "IDEMPOTENCY_CONFLICT") intentoRef.current = null;
+
         // Slug repetido: se corrige en el formulario, no en una pantalla de error. Se vuelve al
-        // formulario con el campo marcado y se lleva hasta él. El siguiente envío lleva otra clave.
+        // formulario con el campo marcado y se lleva hasta él. Al cambiar el slug cambia el
+        // contenido, así que el siguiente envío ya lleva otra clave.
         if (cmsError?.codigo === "SLUG_IDIOMA_CONFLICT") {
-            idempotencyRef.current = null;
             setStep("idle");
             setIsPreview(false);
             form.setFieldError("slug", SLUG_CONFLICT_MESSAGE);
@@ -254,16 +274,15 @@ function NewsFormContent({ initial, categorias, etiquetas, onBack }: NewsFormCon
     };
 
     const handlePublish = () => {
-        if (!validate("publicar")) return;
+        if (!canPublish || !validate("publicar")) return;
         askConfirmation(form.publishIntent === "programar" ? AccionNoticia.PROGRAMAR : AccionNoticia.PUBLICAR);
     };
 
-    const errorTexts = getErrorTexts(saveError?.codigo ?? null);
+    const errorTexts = getErrorTexts(saveError);
 
     const handleBackToForm = () => {
-        // Si backend rechazó el contenido, la persona lo va a corregir: el siguiente envío es otro
-        // intento y lleva otra clave. Si fue un fallo transitorio, se conserva la misma clave.
-        if (step === "error" && !errorTexts.retryable) idempotencyRef.current = null;
+        // La clave no se toca aquí: si la persona corrige algo, el contenido cambia y el siguiente
+        // envío lleva otra clave; si reenvía lo mismo, se reusa (claveParaIntento).
         setStep("idle");
         showPreview(false);
     };
@@ -297,7 +316,7 @@ function NewsFormContent({ initial, categorias, etiquetas, onBack }: NewsFormCon
                     status="error"
                     title={texts.errorTitle}
                     description={errorTexts.description}
-                    reference={errorReference(saveError?.codigo ?? null)}
+                    reference={errorReference(saveError)}
                     primaryAction={
                         errorTexts.retryable
                             ? { label: "Reintentar", onClick: save }
@@ -343,6 +362,7 @@ function NewsFormContent({ initial, categorias, etiquetas, onBack }: NewsFormCon
                     tagLabels={tagLabels}
                     onBack={() => showPreview(false)}
                     onPublish={handlePublish}
+                    canPublish={canPublish}
                 />
                 {flowModals}
             </div>
@@ -382,6 +402,10 @@ function NewsFormContent({ initial, categorias, etiquetas, onBack }: NewsFormCon
                 onSaveDraft={handleSaveDraft}
                 onPreview={handlePreview}
                 onPublish={handlePublish}
+                // TODO [COM03-BACKEND]: imagen principal opcional hasta que exista la subida de imágenes.
+                mainFileRequired={false}
+                canPublish={canPublish}
+                notice={hasPendingMedia ? PENDING_MEDIA_NOTICE : undefined}
             />
             {flowModals}
         </div>

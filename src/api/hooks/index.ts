@@ -113,4 +113,4 @@ export { useGetEtiquetasNoticia } from './useGetEtiquetasNoticia';
 export { useGuardarNoticia } from './useGuardarNoticia';
 export { useArchivarNoticia } from './useArchivarNoticia';
 export { useRestaurarNoticia } from './useRestaurarNoticia';
-export { useEliminarNoticia } from './useEliminarNoticia';
+export { useGetPermisosNoticias } from './useGetPermisosNoticias';

@@ -117,6 +117,7 @@ const NewsPreview: React.FC<NewsPreviewProps> = ({
     disabled = false,
     onBack,
     onPublish,
+    canPublish = true,
     className,
 }) => {
     const fechaIso = ddMmYyyyToIsoDate(values.fechaPublicacion);
@@ -228,9 +229,11 @@ const NewsPreview: React.FC<NewsPreviewProps> = ({
                 >
                     Volver a editar
                 </Button>
-                <Button type="button" rounded onClick={onPublish} state={disabled ? "disabled" : "default"}>
-                    Publicar
-                </Button>
+                {canPublish && (
+                    <Button type="button" rounded onClick={onPublish} state={disabled ? "disabled" : "default"}>
+                        Publicar
+                    </Button>
+                )}
             </FormActions>
         </div>
     );

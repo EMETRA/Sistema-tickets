@@ -49,6 +49,25 @@ export interface NoticiaListItem {
   autor: string;
   /** ISO 8601; null cuando aún no aplica (p. ej. borradores) */
   fecha: string | null;
+  /**
+   * slug, idioma y visibilidad: archivar y restaurar usan `guardarNoticiaCms`, que los pide siempre
+   * (String! en el contrato). TODO [COM03-BACKEND]: confirmar que GET /news los devuelve (#1).
+   */
+  slug: string;
+  /** Ej. "es-GT" */
+  idioma: string;
+  visibilidad: VisibilidadNoticia;
+}
+
+/**
+ * Permisos de noticias (PERMISOS_PANEL.md, sección 2). LEER: ver listado y detalle; EDITAR: crear,
+ * guardar borrador, archivar y restaurar; PUBLICAR: publicar o programar (junto con EDITAR).
+ */
+export type PermisoNoticia = 'VIVI_NOTICIAS_LEER' | 'VIVI_NOTICIAS_EDITAR' | 'VIVI_NOTICIAS_PUBLICAR';
+
+export interface GetPermisosNoticiasResponse {
+  usuario: { permisos: string[] | null } | null;
+  [key: string]: unknown;
 }
 
 /** Estado de la push de una noticia, según VIVI */
@@ -175,81 +194,82 @@ export enum AccionNoticia {
 }
 
 /**
- * Valores de `estado` y `visibilidad` en la API de noticias (README de backend, 2026-09-30).
+ * Enums `EstadoNoticiaCms` y `VisibilidadNoticiaCms` del README "Noticias CMS" (2026-10-06).
  * Van en minúsculas. TODO [COM03-BACKEND]: `EstadoNoticia` (mayúsculas) se alinea a estos
- * valores cuando se conecten las lecturas del listado (pendiente con backend).
+ * valores cuando se conecten las lecturas del listado (pendiente con backend, #1).
  */
 export type EstadoNoticiaCms = 'borrador' | 'programada' | 'publicada' | 'archivada';
 export type VisibilidadNoticiaCms = 'publica' | 'privada';
 
 /**
- * Sección en `NoticiaCmsInput`. Si se envía `secciones`, reemplaza todas las de la noticia.
- * Lleva `recurso_id` (imagen) **o** `video_url` (YouTube), nunca los dos.
+ * `SeccionNoticiaCmsInput` (README, sección 3). Si el input trae `secciones`, reemplaza todas
+ * las de la noticia; el orden lo da `orden`, no la posición en el arreglo.
  */
 export interface SeccionNoticiaCmsInput {
-  /** Obligatorio */
   orden: number;
   encabezado?: string;
-  contenido_html?: string;
-  /** Imagen de la sección; null la quita. */
-  recurso_id?: number | null;
-  /** TODO [COM03-BACKEND]: propuesta enviada a backend (2026-09-30), pendiente de confirmar. */
-  video_url?: string;
+  /** Obligatorio en el contrato (String!). */
+  contenidoHtml: string;
+  /** Imagen de la sección. */
+  recursoId?: number | null;
 }
 
 /**
- * Item de la galería: imagen (`recurso_id`) **o** video de YouTube (`video_url`).
- * TODO [COM03-BACKEND]: `galeria` aún no está en `NoticiaCmsInput`; propuesta enviada a backend
- * (2026-09-30). Si viene, reemplaza la galería completa; si no viene, queda igual.
- */
-export type GaleriaItemCmsInput =
-  | { orden: number; recurso_id: number }
-  | { orden: number; video_url: string };
-
-/**
- * Input de `guardarNoticiaCms` (README de backend, 2026-09-30).
+ * `GuardarNoticiaCmsInput` (README "Noticias CMS", 2026-10-07, sección 3). Campos en camelCase.
  * Sin `id` = crear (slug y titulo obligatorios); con `id` = actualizar.
- * TODO [COM03-BACKEND]: pendientes con backend:
- *   - `autor` (texto libre en el formulario) no está en el input.
- *   - `galeria` y los videos de YouTube (`video_url`): propuesta enviada (2026-09-30).
- *   - Cómo se suben las imágenes para obtener su `recurso_id` (lo definen Feyser y backend).
+ * No se envían `actor`, `idUsuario` ni `permisos`: el servidor resuelve al usuario por la sesión.
+ * Imágenes y videos son recursos con id: se envían en `recursoPrincipalId`, `secciones[].recursoId`
+ * y `galeriaRecursosIds` (README, sección 4).
+ *
+ * TODO [COM03-BACKEND]: pendientes con backend (preguntas enviadas a Jenny):
+ *   - Subir imágenes y registrar videos desde api-tickets para obtener su id (el Panel no puede
+ *     llamar a api-portal; regla de Feyser, 2026-10-07).
+ *   - `autores: [{ autorId, rol?, orden? }]`: falta cómo obtener el catálogo de autores.
  */
-export interface NoticiaCmsInput {
+export interface GuardarNoticiaCmsInput {
+  /** 1 a 64 caracteres. La genera el front por intento de guardado (ver NewsFormView). */
+  claveIdempotente: string;
+  /** Entero > 0. Ausente = crear. */
   id?: number;
+  /** Único junto con `idioma`. 1 a 180 caracteres. */
   slug: string;
+  /** 1 a 200 caracteres. */
   titulo: string;
   resumen?: string;
-  estado?: EstadoNoticiaCms;
-  visibilidad?: VisibilidadNoticiaCms;
-  /** ISO 8601, p. ej. "2026-09-30T06:00:00.000Z" (00:00 hora de Guatemala). Puede ir vacía. */
-  fecha_publicacion?: string | null;
-  idioma?: string;
-  tiempo_lectura?: number | null;
-  /** Imagen principal; null la quita. Excluyente con `recurso_principal`. */
-  recurso_principal_id?: number | null;
-  /**
-   * Video principal de YouTube; null quita el recurso principal.
-   * TODO [COM03-BACKEND]: propuesta enviada a backend (2026-09-30), pendiente de confirmar.
-   */
-  recurso_principal?: { video_url: string } | null;
+  estado: EstadoNoticiaCms;
+  visibilidad: VisibilidadNoticiaCms;
+  /** ISO 8601, p. ej. "2026-09-30T06:00:00.000Z". Obligatoria si se publica o programa. */
+  fechaPublicacion?: string | null;
+  /** Ej. "es-GT". */
+  idioma: string;
+  /** Minutos, ≥ 0. */
+  tiempoLectura?: number | null;
+  /** Máx. 200. No está en el diseño: no se envía. */
+  metaTitulo?: string;
+  /** Máx. 300. No está en el diseño: no se envía. */
+  metaDescripcion?: string;
+  /** Máx. 512. No está en el diseño: no se envía. */
+  urlCanonica?: string;
+  /** Recurso de portada (imagen principal). */
+  recursoPrincipalId?: number | null;
+  /** Recurso Open Graph. No está en el diseño: no se envía. */
+  recursoOgId?: number | null;
   /** Categoría y subcategoría (TB_CATEGORIA es un árbol). */
   categoriasIds?: number[];
   etiquetasIds?: number[];
   secciones?: SeccionNoticiaCmsInput[];
-  /** TODO [COM03-BACKEND]: propuesta enviada a backend, ver GaleriaItemCmsInput. */
-  galeria?: GaleriaItemCmsInput[];
+  /**
+   * Imágenes y videos de la galería, en el orden en que se muestran (README 2026-10-07, sección 3).
+   * Reemplazo total: omitir = conservar; `[]` = borrar la galería.
+   */
+  galeriaRecursosIds?: number[];
 }
 
 export interface GuardarNoticiaCmsVariables {
-  /**
-   * La genera el front por intento de guardado (1 a 180 caracteres) y se reenvía igual en cada
-   * reintento, para que backend responda `idempotente: true` en lugar de duplicar.
-   */
-  claveIdempotente: string;
-  noticia: NoticiaCmsInput;
+  input: GuardarNoticiaCmsInput;
 }
 
-/** `guardada` = borrador, programada, o publicada sin quedar visible (privada o fecha futura). */
+/** `guardada` = borrador, privada o programada; `publicada` = ya salió al outbox (README). */
 export type ResultadoGuardarNoticiaCms = 'guardada' | 'publicada';
 
 export interface PublicacionNoticiaCms {
@@ -260,17 +280,19 @@ export interface PublicacionNoticiaCms {
   idUsuario: number;
 }
 
+/** `GuardarNoticiaCmsPayload` (README, sección 3). */
 export interface GuardarNoticiaCmsResult {
   resultado: ResultadoGuardarNoticiaCms;
-  /** true = la misma clave ya se había procesado; también es éxito. */
+  /** true = reintento con la misma clave y el mismo contenido; no volvió a publicar. Es éxito. */
   idempotente: boolean;
+  /** `NoticiaCmsResumen` */
   noticia: {
     id: number;
     slug: string;
     idioma: string;
     estado: EstadoNoticiaCms;
     visibilidad: VisibilidadNoticiaCms;
-    fecha_publicacion: string | null;
+    fechaPublicacion: string | null;
   };
   /** Solo cuando `resultado` es "publicada". */
   publicacion: PublicacionNoticiaCms | null;
@@ -278,16 +300,20 @@ export interface GuardarNoticiaCmsResult {
 
 export interface GuardarNoticiaCmsResponse {
   guardarNoticiaCms: GuardarNoticiaCmsResult;
+  [key: string]: unknown;
 }
 
-/** Códigos de error de la API de noticias que el admin debe mostrar (README). */
+/**
+ * Códigos de error de `guardarNoticiaCms` (README "Noticias CMS", sección 5). Los demás errores
+ * (400 validación, 401 sesión, 403 permiso, 502/503 api-portal) se distinguen por `statusCode`.
+ */
 export type CodigoErrorNoticiaCms =
-  | 'VALIDATION_ERROR'
-  | 'INTERNAL_UNAUTHORIZED'
-  | 'NEWS_NOT_FOUND'
+  /** 409: ese slug ya existe en ese idioma. */
   | 'SLUG_IDIOMA_CONFLICT'
-  | 'NEWS_NOT_PUBLISHABLE'
-  | 'PUBLISH_TRANSACTION_FAILED';
+  /** 409: misma claveIdempotente con contenido distinto. */
+  | 'IDEMPOTENCY_CONFLICT'
+  /** 404: la noticia a actualizar no existe. */
+  | 'NEWS_NOT_FOUND';
 
 // ============================================
 // LECTURAS DEL EDITOR (api-portal REST, README de backend)
@@ -317,23 +343,4 @@ export interface ListaPaginadaCmsDto<T> {
   total: number;
   page: number;
   limit: number;
-}
-
-export interface ArchivarNoticiaResponse {
-  archivarNoticia: {
-    id: string;
-    estado: EstadoNoticia;
-  };
-}
-
-/** restaurarNoticia devuelve la noticia en BORRADOR */
-export interface RestaurarNoticiaResponse {
-  restaurarNoticia: {
-    id: string;
-    estado: EstadoNoticia;
-  };
-}
-
-export interface EliminarNoticiaResponse {
-  eliminarNoticia: boolean;
 }

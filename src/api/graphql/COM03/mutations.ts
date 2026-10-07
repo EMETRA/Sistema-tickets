@@ -1,19 +1,20 @@
 /**
  * Mutaciones GraphQL de COM03 - Comunicación / Noticias
  *
- * `guardarNoticiaCms` sigue el README de backend. Archivar, restaurar y eliminar siguen siendo
- * propuestas: TODO [COM03-BACKEND] hoy solo existen en REST de Portal con la key interna
- * (archivar y eliminar) y restaurar no existe; consultado con backend.
+ * `guardarNoticiaCms` sigue el README de backend. Archivar y restaurar también usan
+ * `guardarNoticiaCms` (cambian el `estado`; ver cambioEstado.ts). No hay eliminar: el Panel
+ * archiva, no borra (README "Noticias CMS" sección 3).
  */
 
 /**
- * Crea (sin `noticia.id`) o actualiza una noticia en api-tickets (README de backend, 2026-09-30).
- * El `estado` del input define si queda como borrador, programada o publicada.
- * Una mutación = una sola llamada interna a Portal.
+ * Crea (sin `input.id`) o actualiza una noticia en api-tickets.
+ * README "Noticias CMS — contrato para frontend" (2026-10-06), sección 3.
+ * El `estado` del input define si queda como borrador, programada, publicada o archivada.
+ * Una llamada = un intento de guardado.
  */
 export const GUARDAR_NOTICIA_CMS_MUTATION = `
-  mutation GuardarNoticia($claveIdempotente: String!, $noticia: NoticiaCmsInput!) {
-    guardarNoticiaCms(claveIdempotente: $claveIdempotente, noticia: $noticia) {
+  mutation GuardarNoticia($input: GuardarNoticiaCmsInput!) {
+    guardarNoticiaCms(input: $input) {
       resultado
       idempotente
       noticia {
@@ -22,7 +23,7 @@ export const GUARDAR_NOTICIA_CMS_MUTATION = `
         idioma
         estado
         visibilidad
-        fecha_publicacion
+        fechaPublicacion
       }
       publicacion {
         idNoticia
@@ -32,39 +33,5 @@ export const GUARDAR_NOTICIA_CMS_MUTATION = `
         idUsuario
       }
     }
-  }
-`;
-
-/**
- * Archiva una noticia publicada o programada (deja de mostrarse en el Portal).
- */
-export const ARCHIVAR_NOTICIA_MUTATION = `
-  mutation ArchivarNoticia($id: ID!) {
-    archivarNoticia(id: $id) {
-      id
-      estado
-    }
-  }
-`;
-
-/**
- * Restaura una noticia archivada. Vuelve a BORRADOR (decisión del front): así se puede
- * editar y volver a publicar, o eliminar (solo se eliminan borradores).
- */
-export const RESTAURAR_NOTICIA_MUTATION = `
-  mutation RestaurarNoticia($id: ID!) {
-    restaurarNoticia(id: $id) {
-      id
-      estado
-    }
-  }
-`;
-
-/**
- * Elimina un borrador. No se puede deshacer.
- */
-export const ELIMINAR_NOTICIA_MUTATION = `
-  mutation EliminarNoticia($id: ID!) {
-    eliminarNoticia(id: $id)
   }
 `;

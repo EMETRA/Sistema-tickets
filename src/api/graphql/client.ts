@@ -53,6 +53,26 @@ export function getGraphQLClient(): GraphQLClient {
 }
 
 /**
+ * Error de GraphQL tal como lo devuelve el servidor (`errors[]` de la respuesta).
+ */
+export interface GraphQLResponseError {
+    message: string;
+    extensions?: Record<string, unknown>;
+}
+
+/**
+ * Error que lanza graphqlRequestClient cuando la respuesta trae `errors`.
+ * Es un Error normal (mismo mensaje que antes) que además conserva la lista original en
+ * `graphQLErrors`, para que un módulo pueda leer su código (p. ej. COM-03 lee
+ * `extensions.originalError`). Quien no lo usa no nota ningún cambio.
+ */
+export type GraphQLClientError = Error & { graphQLErrors: GraphQLResponseError[] };
+
+function toGraphQLClientError(errors: GraphQLResponseError[]): GraphQLClientError {
+    return Object.assign(new Error(errors[0]?.message), { graphQLErrors: errors });
+}
+
+/**
  * Interfaz de opciones para graphqlRequest
  */
 export interface GraphQLRequestOptions {
@@ -211,7 +231,7 @@ export async function graphqlRequestClient<TData extends Record<string, unknown>
                             if (code === 'UNAUTHENTICATED') {
                                 handleClientAuthFailure();
                             }
-                            reject(new Error(json.errors[0].message));
+                            reject(toGraphQLClientError(json.errors));
                         } else {
                             resolve(json.data as TData);
                         }
@@ -256,7 +276,7 @@ export async function graphqlRequestClient<TData extends Record<string, unknown>
             if (code === 'UNAUTHENTICATED') {
                 handleClientAuthFailure();
             }
-            throw new Error(json.errors[0].message);
+            throw toGraphQLClientError(json.errors);
         }
 
         return json.data as TData;

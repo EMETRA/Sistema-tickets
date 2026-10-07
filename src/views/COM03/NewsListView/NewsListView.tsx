@@ -3,12 +3,10 @@
 import { useMemo, useRef, useState } from "react";
 import {
     useArchivarNoticia,
-    useEliminarNoticia,
-    useGetEstadosNotificacion,
     useGetNoticias,
     useRestaurarNoticia,
 } from "@/api/hooks";
-import type { NoticiaListRow } from "@/api/graphql/COM03";
+import { EstadoNoticia, type NoticiaListRow } from "@/api/graphql/COM03";
 import { Title } from "@/components/client/atoms/Title";
 import { Text } from "@/components/client/atoms/Text";
 import { Button } from "@/components/client/atoms/Button";
@@ -21,69 +19,71 @@ import styles from "./NewsListView.module.scss";
 interface NewsListViewProps {
     onCreate: () => void;
     onEdit: (id: string) => void;
+    /**
+     * false = solo lectura: sin "Crear noticia" ni acciones por fila (sin VIVI_NOTICIAS_EDITAR).
+     * @default true
+     */
+    canEdit?: boolean;
 }
 
-type ListAction = "archivar" | "eliminar" | "restaurar";
+/** No hay "eliminar": el Panel archiva, no borra (README "Noticias CMS" sección 3). */
+type ListAction = "archivar" | "restaurar";
 
 /**
- * Textos de las acciones de la lista. Archivar y Eliminar vienen del diseño.
- * Restaurar y todos los textos de carga no están en el diseño (siguen el estilo de "Programando tu noticia").
+ * TODO [COM03-BACKEND]: la columna Notificación se oculta hasta que exista el estado del push
+ * (README "Noticias CMS" sección 10, pendiente con otro equipo). Al activarla, volver a usar
+ * useGetEstadosNotificacion para llenar `estadoNotificacion`.
  */
-const ACTION_TEXTS: Record<ListAction, {
-    title: string;
-    description: string;
-    loadingTitle: string;
-    error: string;
-}> = {
-    archivar: {
-        title: "¿Archivar esta noticia?",
-        description: "Dejará de mostrarse en el Portal.",
-        loadingTitle: "Archivando la noticia",
-        error: "No fue posible archivar la noticia. Intenta nuevamente.",
-    },
-    eliminar: {
-        title: "¿Eliminar esta noticia?",
-        description: "Esta acción no se puede deshacer.",
-        loadingTitle: "Eliminando la noticia",
-        error: "No fue posible eliminar la noticia. Intenta nuevamente.",
-    },
-    restaurar: {
+const MOSTRAR_NOTIFICACIONES = false;
+
+/**
+ * Explicación de archivar según el estado de la noticia.
+ * El título viene del diseño; las descripciones de programada y borrador, el aviso del push y
+ * Restaurar no están en el Figma (TODO [COM03-FLUJO]: textos propuestos, los valida diseño).
+ * README sección 3: archivar o restaurar no deshace un push ya enviado.
+ */
+const ARCHIVAR_DESCRIPCION: Record<EstadoNoticia, string> = {
+    [EstadoNoticia.PUBLICADA]: "Dejará de mostrarse en el Portal. La notificación push que ya se envió a VIVI no se puede deshacer.",
+    [EstadoNoticia.PROGRAMADA]: "Ya no se publicará en la fecha programada. Podrás restaurarla después.",
+    [EstadoNoticia.BORRADOR]: "Saldrá de borradores. Podrás restaurarla después.",
+    [EstadoNoticia.ARCHIVADA]: "",
+};
+
+/** Los textos de carga no están en el diseño (siguen el estilo de "Programando tu noticia"). */
+function getActionTexts(type: ListAction, noticia: NoticiaListRow) {
+    if (type === "archivar") {
+        return {
+            title: "¿Archivar esta noticia?",
+            description: ARCHIVAR_DESCRIPCION[noticia.estado],
+            loadingTitle: "Archivando la noticia",
+            error: "No fue posible archivar la noticia. Intenta nuevamente.",
+        };
+    }
+    return {
         title: "¿Restaurar esta noticia?",
-        description: "Volverá a borradores. Podrás editarla y publicarla de nuevo, o eliminarla.",
+        description: "Volverá a borradores. Podrás editarla y publicarla de nuevo.",
         loadingTitle: "Restaurando la noticia",
         error: "No fue posible restaurar la noticia. Intenta nuevamente.",
-    },
-};
+    };
+}
 
 const LOADING_DESCRIPTION = "Esto tomará unos segundos";
 
-export default function NewsListView({ onCreate, onEdit }: NewsListViewProps) {
+export default function NewsListView({ onCreate, onEdit, canEdit = true }: NewsListViewProps) {
     const { data: noticias, loading, error, refetch } = useGetNoticias();
     const { archivarNoticia } = useArchivarNoticia();
-    const { eliminarNoticia } = useEliminarNoticia();
     const { restaurarNoticia } = useRestaurarNoticia();
     // Acción en curso: primero se confirma y luego se procesa con el modal de carga.
-    const [pendingAction, setPendingAction] = useState<{ type: ListAction; id: string } | null>(null);
+    const [pendingAction, setPendingAction] = useState<{ type: ListAction; noticia: NoticiaListRow } | null>(null);
     const [processing, setProcessing] = useState(false);
     const processingRef = useRef(false);
     const [actionError, setActionError] = useState<string | null>(null);
     const [filter, setFilter] = useState<NewsFilter>("all");
     const [search, setSearch] = useState("");
 
-    // El estado de la push viene de VIVI, aparte del listado; si falla, el listado se sigue mostrando.
-    const noticiaIds = useMemo(() => noticias.map((noticia) => noticia.id), [noticias]);
-    const {
-        data: estadosNotificacion,
-        loading: loadingNotificaciones,
-        error: notificacionesError,
-    } = useGetEstadosNotificacion(noticiaIds);
-
     const rows: NoticiaListRow[] = useMemo(
-        () => noticias.map((noticia) => ({
-            ...noticia,
-            estadoNotificacion: estadosNotificacion[noticia.id] ?? null,
-        })),
-        [noticias, estadosNotificacion]
+        () => noticias.map((noticia) => ({ ...noticia, estadoNotificacion: null })),
+        [noticias]
     );
 
     const filteredNoticias = useMemo(() => {
@@ -97,14 +97,16 @@ export default function NewsListView({ onCreate, onEdit }: NewsListViewProps) {
 
     const isEmpty = !loading && !error && noticias.length === 0;
 
+    // Archivar y restaurar necesitan la fila completa (slug, idioma, visibilidad) para guardarNoticiaCms.
     const openAction = (type: ListAction, id: string) => {
+        const noticia = rows.find((row) => row.id === id);
+        if (!noticia) return;
         setActionError(null);
-        setPendingAction({ type, id });
+        setPendingAction({ type, noticia });
     };
 
-    const actionHandlers: Record<ListAction, (id: string) => Promise<unknown>> = {
+    const actionHandlers: Record<ListAction, (noticia: NoticiaListRow) => Promise<unknown>> = {
         archivar: archivarNoticia,
-        eliminar: eliminarNoticia,
         restaurar: restaurarNoticia,
     };
 
@@ -115,12 +117,12 @@ export default function NewsListView({ onCreate, onEdit }: NewsListViewProps) {
         // Se cierra la confirmación y se muestra el modal de carga mientras se procesa.
         setProcessing(true);
         try {
-            await actionHandlers[pendingAction.type](pendingAction.id);
+            await actionHandlers[pendingAction.type](pendingAction.noticia);
             // TODO [COM03-BACKEND]: con los datos dummy el listado no cambia al recargar;
             // con la API real se verá la noticia archivada, restaurada o sin el borrador eliminado.
             await refetch();
         } catch {
-            setActionError(ACTION_TEXTS[pendingAction.type].error);
+            setActionError(getActionTexts(pendingAction.type, pendingAction.noticia).error);
         } finally {
             processingRef.current = false;
             setProcessing(false);
@@ -128,7 +130,7 @@ export default function NewsListView({ onCreate, onEdit }: NewsListViewProps) {
         }
     };
 
-    const pendingTexts = pendingAction ? ACTION_TEXTS[pendingAction.type] : null;
+    const pendingTexts = pendingAction ? getActionTexts(pendingAction.type, pendingAction.noticia) : null;
 
     return (
         <>
@@ -140,7 +142,7 @@ export default function NewsListView({ onCreate, onEdit }: NewsListViewProps) {
                 {loading && <Text variant="caption" className={styles.loadingText}>Cargando noticias...</Text>}
             </div>
 
-            {!loading && !isEmpty && (
+            {canEdit && !loading && !isEmpty && (
                 <div className={styles.headerActions}>
                     <Button rounded onClick={onCreate}>
                         Crear noticia
@@ -154,12 +156,6 @@ export default function NewsListView({ onCreate, onEdit }: NewsListViewProps) {
                 </Text>
             )}
 
-            {notificacionesError && !loading && (
-                <Text variant="caption" className={styles.warningText}>
-                    No fue posible consultar el estado de las notificaciones push. Se muestran como &quot;—&quot;.
-                </Text>
-            )}
-
             {actionError && (
                 <Text variant="caption" className={styles.errorText}>
                     {actionError}
@@ -169,7 +165,8 @@ export default function NewsListView({ onCreate, onEdit }: NewsListViewProps) {
             <NewsTablePanel
                 noticias={filteredNoticias}
                 loading={loading}
-                notificationsLoading={loadingNotificaciones}
+                showNotifications={MOSTRAR_NOTIFICACIONES}
+                canEdit={canEdit}
                 isEmpty={isEmpty}
                 filter={filter}
                 onFilterChange={setFilter}
@@ -178,7 +175,6 @@ export default function NewsListView({ onCreate, onEdit }: NewsListViewProps) {
                 onCreate={onCreate}
                 onEdit={onEdit}
                 onArchive={(id) => openAction("archivar", id)}
-                onDelete={(id) => openAction("eliminar", id)}
                 onRestore={(id) => openAction("restaurar", id)}
             />
 

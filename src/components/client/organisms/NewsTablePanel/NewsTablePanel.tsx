@@ -13,7 +13,17 @@ import type { TableCellConfig } from "../../molecules/TableRow/types";
 import type { NewsFilter, NewsTablePanelProps } from "./types";
 import styles from "./NewsTablePanel.module.scss";
 
-const GRID = "minmax(0, 2.2fr) minmax(0, 1.1fr) minmax(0, 1.1fr) minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1.8fr)";
+type ColumnKey = "titulo" | "estado" | "notificacion" | "autor" | "fecha" | "acciones";
+
+/** Columnas de la tabla, en orden. Notificación y Acciones se pueden ocultar por props. */
+const COLUMNS: { key: ColumnKey; label: string; width: string }[] = [
+    { key: "titulo", label: "Título", width: "minmax(0, 2.2fr)" },
+    { key: "estado", label: "Estado", width: "minmax(0, 1.1fr)" },
+    { key: "notificacion", label: "Notificación", width: "minmax(0, 1.1fr)" },
+    { key: "autor", label: "Autor", width: "minmax(0, 1.5fr)" },
+    { key: "fecha", label: "Fecha", width: "minmax(0, 1fr)" },
+    { key: "acciones", label: "Acciones", width: "minmax(0, 1.8fr)" },
+];
 const LOADING_GRID = "minmax(0, 1.2fr) minmax(0, 1.6fr) minmax(0, 1.2fr) minmax(0, 1.2fr) minmax(0, 1fr)";
 const SKELETON_ROWS = 3;
 
@@ -23,15 +33,6 @@ const FILTER_OPTIONS: ToggleButtonOption[] = [
     { label: "Borradores", value: EstadoNoticia.BORRADOR },
     { label: "Programadas", value: EstadoNoticia.PROGRAMADA },
     { label: "Archivadas", value: EstadoNoticia.ARCHIVADA },
-];
-
-const HEADER_CELLS: TableCellConfig[] = [
-    { label: "Título" },
-    { label: "Estado" },
-    { label: "Notificación" },
-    { label: "Autor" },
-    { label: "Fecha" },
-    { label: "Acciones" },
 ];
 
 const LOADING_HEADER_CELLS: TableCellConfig[] = [
@@ -95,8 +96,9 @@ const NewsTablePanel: React.FC<NewsTablePanelProps> = ({
     onCreate,
     onEdit,
     onArchive,
-    onDelete,
     onRestore,
+    showNotifications = true,
+    canEdit = true,
     className,
 }) => {
     const renderNotification = (noticia: NoticiaListRow) => {
@@ -123,8 +125,7 @@ const NewsTablePanel: React.FC<NewsTablePanelProps> = ({
             );
         }
 
-        const isDraft = noticia.estado === EstadoNoticia.BORRADOR;
-
+        // No hay borrado (README "Noticias CMS" sección 3): todas, incluidos los borradores, se archivan.
         return (
             <>
                 <Button
@@ -136,34 +137,43 @@ const NewsTablePanel: React.FC<NewsTablePanelProps> = ({
                 >
                     Editar
                 </Button>
-                {isDraft ? (
-                    <Button rounded color="danger" className={styles.actionButton} onClick={() => onDelete?.(noticia.id)}>
-                        Eliminar
-                    </Button>
-                ) : (
-                    <Button rounded className={styles.actionButton} onClick={() => onArchive?.(noticia.id)}>
-                        Archivar
-                    </Button>
-                )}
+                <Button rounded className={styles.actionButton} onClick={() => onArchive?.(noticia.id)}>
+                    Archivar
+                </Button>
             </>
         );
     };
 
-    const buildRowCells = (noticia: NoticiaListRow): TableCellConfig[] => [
-        { content: <span className={styles.title}>{noticia.titulo}</span> },
-        {
-            content: (
+    const visibleColumns = COLUMNS.filter((column) =>
+        (column.key !== "notificacion" || showNotifications) && (column.key !== "acciones" || canEdit)
+    );
+    const grid = visibleColumns.map((column) => column.width).join(" ");
+    const headerCells: TableCellConfig[] = visibleColumns.map((column) => ({ label: column.label }));
+
+    const renderCell = (key: ColumnKey, noticia: NoticiaListRow) => {
+        switch (key) {
+        case "titulo":
+            return <span className={styles.title}>{noticia.titulo}</span>;
+        case "estado":
+            return (
                 <LabelChip
                     label={ESTADO_NOTICIA_LABEL[noticia.estado]}
                     className={classNames(styles.pill, PILL_CLASS[noticia.estado])}
                 />
-            ),
-        },
-        { content: renderNotification(noticia) },
-        { content: <span className={styles.text}>{noticia.autor}</span> },
-        { content: <span className={styles.text}>{formatFecha(noticia.fecha)}</span> },
-        { content: <div className={styles.actions}>{renderActions(noticia)}</div> },
-    ];
+            );
+        case "notificacion":
+            return renderNotification(noticia);
+        case "autor":
+            return <span className={styles.text}>{noticia.autor}</span>;
+        case "fecha":
+            return <span className={styles.text}>{formatFecha(noticia.fecha)}</span>;
+        case "acciones":
+            return <div className={styles.actions}>{renderActions(noticia)}</div>;
+        }
+    };
+
+    const buildRowCells = (noticia: NoticiaListRow): TableCellConfig[] =>
+        visibleColumns.map((column) => ({ content: renderCell(column.key, noticia) }));
 
     const renderBody = () => {
         if (loading) {
@@ -193,19 +203,23 @@ const NewsTablePanel: React.FC<NewsTablePanelProps> = ({
                 <div className={styles.emptyState}>
                     <Icon name="file-lines-regular" size={24} />
                     <Text variant="body" className={styles.emptyTitle}>Aún no hay noticias</Text>
-                    <Text variant="caption" className={styles.emptyDescription}>
-                        Crea la primera noticia para que aparezca en el Portal.
-                    </Text>
-                    <Button rounded onClick={onCreate}>
-                        Crear noticia
-                    </Button>
+                    {canEdit && (
+                        <>
+                            <Text variant="caption" className={styles.emptyDescription}>
+                                Crea la primera noticia para que aparezca en el Portal.
+                            </Text>
+                            <Button rounded onClick={onCreate}>
+                                Crear noticia
+                            </Button>
+                        </>
+                    )}
                 </div>
             );
         }
 
         return (
             <div className={styles.table}>
-                <TableRow isHeader gridTemplate={GRID} cells={HEADER_CELLS} className={styles.headerRow} />
+                <TableRow isHeader gridTemplate={grid} cells={headerCells} className={styles.headerRow} />
                 {noticias.length === 0 ? (
                     <div className={styles.noResults}>
                         <Text variant="caption">No hay noticias que coincidan con el filtro.</Text>
@@ -215,7 +229,7 @@ const NewsTablePanel: React.FC<NewsTablePanelProps> = ({
                         <TableRow
                             key={noticia.id}
                             id={noticia.id}
-                            gridTemplate={GRID}
+                            gridTemplate={grid}
                             cells={buildRowCells(noticia)}
                             className={styles.row}
                         />

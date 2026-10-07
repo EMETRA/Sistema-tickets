@@ -5,12 +5,12 @@
 export { GET_NOTICIAS_QUERY } from './getNoticias';
 export { GET_NOTICIA_QUERY } from './getNoticia';
 export { GET_CATEGORIAS_NOTICIA_QUERY, GET_ETIQUETAS_NOTICIA_QUERY } from './getCatalogos';
+export { GET_PERMISOS_NOTICIAS_QUERY } from './getPermisos';
+export { PERMISOS_SIMULADOS } from './permisos.dummy';
 export {
     GUARDAR_NOTICIA_CMS_MUTATION,
-    ARCHIVAR_NOTICIA_MUTATION,
-    RESTAURAR_NOTICIA_MUTATION,
-    ELIMINAR_NOTICIA_MUTATION,
 } from './mutations';
+export { cambioEstadoInput } from './cambioEstado';
 export { NOTICIAS_DUMMY, NOTIFICACIONES_DUMMY } from './noticias.dummy';
 export { getNoticiaDummy } from './noticia.dummy';
 export { CATEGORIAS_NOTICIA_DUMMY, ETIQUETAS_NOTICIA_DUMMY } from './catalogos.dummy';
@@ -19,6 +19,8 @@ export { NoticiaCmsError, toNoticiaCmsError } from './noticiaCmsError';
 export type {
     NoticiaListItem,
     NoticiaListRow,
+    PermisoNoticia,
+    GetPermisosNoticiasResponse,
     EstadoNotificacionNoticia,
     NoticiasFilterInput,
     GetNoticiasResponse,
@@ -33,8 +35,7 @@ export type {
     EstadoNoticiaCms,
     VisibilidadNoticiaCms,
     SeccionNoticiaCmsInput,
-    GaleriaItemCmsInput,
-    NoticiaCmsInput,
+    GuardarNoticiaCmsInput,
     GuardarNoticiaCmsVariables,
     ResultadoGuardarNoticiaCms,
     PublicacionNoticiaCms,
@@ -44,9 +45,6 @@ export type {
     CategoriaCmsDto,
     EtiquetaCmsDto,
     ListaPaginadaCmsDto,
-    ArchivarNoticiaResponse,
-    RestaurarNoticiaResponse,
-    EliminarNoticiaResponse,
 } from './types';
 
 export {

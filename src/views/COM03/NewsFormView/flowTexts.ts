@@ -1,4 +1,4 @@
-import { AccionNoticia, type CodigoErrorNoticiaCms } from "@/api/graphql/COM03";
+import { AccionNoticia, EstadoNoticia, type NoticiaCmsError } from "@/api/graphql/COM03";
 import { ddMmYyyyToIsoDate } from "@/helpers/dateInput";
 import { formatLongDate } from "@/helpers/formatLongDate";
 
@@ -12,12 +12,23 @@ interface FlowTexts {
 /** Texto común de las pantallas de error (Error al programar / Error al guardar borrador). */
 export const ERROR_DESCRIPTION = "Tu contenido no se perdió. Puedes intentarlo de nuevo.";
 
-/** Referencia cuando el error no trae código (red, timeout). Texto provisional del diseño. */
-export const ERROR_REFERENCE = "Código de referencia: [por definir con backend]";
+/** Referencia cuando el error no trae código ni estado (red, timeout). Texto provisional. */
+export const ERROR_REFERENCE = "Código de referencia: sin respuesta del servidor";
 
-/** Con código del README, la referencia es ese código (p. ej. "SLUG_IDIOMA_CONFLICT"). */
-export const errorReference = (codigo: CodigoErrorNoticiaCms | null) =>
-    codigo ? `Código de referencia: ${codigo}` : ERROR_REFERENCE;
+/**
+ * Referencia para soporte: el código del README (p. ej. "SLUG_IDIOMA_CONFLICT") o, si no trae
+ * uno, el estado HTTP (p. ej. "403").
+ */
+export const errorReference = (error: NoticiaCmsError | null) => {
+    const referencia = error?.codigo ?? error?.statusCode;
+    return referencia ? `Código de referencia: ${referencia}` : ERROR_REFERENCE;
+};
+
+/** Qué permite cada permiso, para explicarlo en el 403 (README, sección 2). */
+const ACCION_POR_PERMISO: Record<string, string> = {
+    VIVI_NOTICIAS_EDITAR: "guardar o archivar noticias",
+    VIVI_NOTICIAS_PUBLICAR: "publicar o programar noticias",
+};
 
 /**
  * Error del campo "URL (slug)" cuando backend responde SLUG_IDIOMA_CONFLICT.
@@ -36,43 +47,70 @@ export interface ErrorTexts {
 }
 
 /**
- * Mensaje por código de error del README. Sin código (red, timeout), el texto genérico.
- * TODO [COM03-FLUJO]: estos textos no están en el Figma; validarlos con diseño.
+ * Mensaje según el error del README "Noticias CMS" (sección 5): primero por código y, si no trae
+ * uno, por estado HTTP. Sin código ni estado (red, timeout), el texto genérico.
+ * TODO [COM03-FLUJO]: estos textos no están en el Figma; los valida el usuario (diseño).
  */
-export function getErrorTexts(codigo: CodigoErrorNoticiaCms | null): ErrorTexts {
-    switch (codigo) {
+export function getErrorTexts(error: NoticiaCmsError | null): ErrorTexts {
+    switch (error?.codigo) {
     // SLUG_IDIOMA_CONFLICT no usa la pantalla de error: se marca en el campo (SLUG_CONFLICT_MESSAGE).
     case "SLUG_IDIOMA_CONFLICT":
         return { description: SLUG_CONFLICT_MESSAGE, retryable: false };
-    case "VALIDATION_ERROR":
+    case "IDEMPOTENCY_CONFLICT":
+        // El siguiente intento ya va con otra clave (NewsFormView): reintentar sí funciona.
         return {
-            description: "Algunos datos no son válidos. Revisa el formulario e inténtalo de nuevo.",
-            retryable: false,
-        };
-    case "NEWS_NOT_PUBLISHABLE":
-        return {
-            description: "La noticia no se puede publicar: debe ser pública y tener una fecha de hoy o anterior. Revisa la visibilidad y la fecha.",
-            retryable: false,
+            description: "La noticia cambió desde el intento anterior. Tu contenido no se perdió. Inténtalo de nuevo.",
+            retryable: true,
         };
     case "NEWS_NOT_FOUND":
         return {
             description: "La noticia que intentas editar ya no existe. Pudo haber sido eliminada.",
             retryable: false,
         };
-    case "PUBLISH_TRANSACTION_FAILED":
+    }
+
+    switch (error?.statusCode) {
+    case 400:
+        // Los mensajes de validación de backend ya vienen en español (README).
         return {
-            description: "No se pudo completar la publicación y la noticia no quedó visible. Tu contenido no se perdió. Puedes intentarlo de nuevo.",
-            retryable: true,
+            description: error.mensajes.length > 0
+                ? `No se pudo guardar: ${error.mensajes.join(" ")}`
+                : "Algunos datos no son válidos. Revisa el formulario e inténtalo de nuevo.",
+            retryable: false,
         };
-    case "INTERNAL_UNAUTHORIZED":
+    case 401:
         return {
-            description: "Hubo un problema de comunicación entre los sistemas; no es un error de tu formulario. Intenta de nuevo en unos minutos.",
+            description: "Tu sesión venció o no es válida. Inicia sesión de nuevo para guardar la noticia.",
+            retryable: false,
+        };
+    case 403: {
+        const accion = error.permisoFaltante ? ACCION_POR_PERMISO[error.permisoFaltante] : undefined;
+        return {
+            description: accion
+                ? `No tienes permiso para ${accion}. Pide a un administrador el permiso ${error.permisoFaltante}.`
+                : "No tienes permiso para realizar esta acción. Pide a un administrador el permiso necesario.",
+            retryable: false,
+        };
+    }
+    case 502:
+    case 503:
+        return {
+            description: "El servicio de noticias no está disponible en este momento. Tu contenido no se perdió. Intenta de nuevo en unos minutos.",
             retryable: true,
         };
     default:
         return { description: ERROR_DESCRIPTION, retryable: true };
     }
 }
+
+/**
+ * Aviso del formulario cuando hay contenido que todavía no se envía (`pendientes` de
+ * buildGuardarNoticiaPayload: imágenes y videos nuevos).
+ * TODO [COM03-BACKEND]: quitar cuando api-tickets permita subir imágenes y registrar videos.
+ * TODO [COM03-FLUJO]: texto provisional, no está en el Figma.
+ */
+export const PENDING_MEDIA_NOTICE =
+    "Las imágenes y los videos nuevos todavía no se guardan. El resto de la noticia sí se guarda, incluidas las imágenes y videos que ya estaban guardados; podrás agregar los nuevos cuando el sistema lo permita.";
 
 /**
  * Éxito de "Publicar" cuando backend responde `resultado: "guardada"`: la noticia quedó como
@@ -85,9 +123,30 @@ export const PUBLICADA_NO_VISIBLE_SUCCESS: FlowTexts["success"] = {
 };
 
 /**
- * Textos de confirmación, carga, éxito y error por acción (Figma, página Comunicación).
+ * "Guardar borrador" sobre una noticia ya publicada o programada la saca del Portal o cancela su
+ * publicación (se guarda con estado "borrador"). Se avisa en la confirmación y en el éxito.
+ * TODO [COM03-FLUJO]: textos propuestos (no están en el Figma); decisión del usuario 2026-10-07.
  */
-export function getFlowTexts(accion: AccionNoticia, fechaPublicacion: string): FlowTexts {
+const BORRADOR_DESDE: Partial<Record<EstadoNoticia, { confirm: string; success: string }>> = {
+    [EstadoNoticia.PUBLICADA]: {
+        confirm: "Esta noticia está publicada. Al guardarla como borrador dejará de mostrarse en el Portal. La notificación push que ya se envió no se puede deshacer.",
+        success: "La noticia ya no se muestra en el Portal. Puedes seguir editándola y volver a publicarla.",
+    },
+    [EstadoNoticia.PROGRAMADA]: {
+        confirm: "Esta noticia está programada. Al guardarla como borrador ya no se publicará en la fecha programada.",
+        success: "Ya no se publicará en la fecha programada. Puedes seguir editándola y volver a programarla.",
+    },
+};
+
+/**
+ * Textos de confirmación, carga, éxito y error por acción (Figma, página Comunicación).
+ * `estadoActual`: estado guardado de la noticia que se edita (null al crear).
+ */
+export function getFlowTexts(
+    accion: AccionNoticia,
+    fechaPublicacion: string,
+    estadoActual: EstadoNoticia | null = null,
+): FlowTexts {
     switch (accion) {
     case AccionNoticia.PROGRAMAR: {
         const fechaIso = ddMmYyyyToIsoDate(fechaPublicacion);
@@ -106,11 +165,12 @@ export function getFlowTexts(accion: AccionNoticia, fechaPublicacion: string): F
             errorTitle: "No pudimos programar la noticia",
         };
     }
-    case AccionNoticia.BORRADOR:
+    case AccionNoticia.BORRADOR: {
+        const aviso = estadoActual ? BORRADOR_DESDE[estadoActual] : undefined;
         return {
             confirm: {
                 title: "¿Guardar como borrador?",
-                description: "No se publicará ni se enviará push a VIVI. Podrás seguir editándolo después.",
+                description: aviso?.confirm ?? "No se publicará ni se enviará push a VIVI. Podrás seguir editándolo después.",
                 align: "center",
             },
             loading: {
@@ -119,10 +179,11 @@ export function getFlowTexts(accion: AccionNoticia, fechaPublicacion: string): F
             },
             success: {
                 title: "Borrador guardado",
-                description: "Puedes seguir editándolo cuando quieras. No se publicó ni se envió push a VIVI.",
+                description: aviso?.success ?? "Puedes seguir editándolo cuando quieras. No se publicó ni se envió push a VIVI.",
             },
             errorTitle: "No pudimos guardar tu borrador",
         };
+    }
     case AccionNoticia.PUBLICAR:
     default:
         return {

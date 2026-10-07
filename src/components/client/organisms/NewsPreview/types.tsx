@@ -28,5 +28,11 @@ export interface NewsPreviewProps {
     onBack: () => void;
     onPublish: () => void;
 
+    /**
+     * false = oculta "Publicar" (usuario sin permiso de publicar o programar).
+     * @default true
+     */
+    canPublish?: boolean;
+
     className?: string;
 }

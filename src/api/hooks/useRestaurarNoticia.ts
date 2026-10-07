@@ -1,41 +1,24 @@
 'use client';
 
-import { useCallback, useState } from 'react';
-// TODO [COM03-BACKEND]: descomentar cuando exista la mutación `restaurarNoticia` en backend.
-// import { graphqlRequestClient } from '@/api/graphql/client';
-// import { RESTAURAR_NOTICIA_MUTATION } from '@/api/graphql/COM03';
-import { EstadoNoticia, type RestaurarNoticiaResponse } from '@/api/graphql/COM03';
-import { simularMutacion } from '@/api/graphql/COM03/mutations.dummy';
+import { useCallback } from 'react';
+import { createIdempotencyKey } from '@/helpers/createIdempotencyKey';
+import { cambioEstadoInput, type NoticiaListItem } from '@/api/graphql/COM03';
+import { useGuardarNoticia } from './useGuardarNoticia';
 
 /**
- * Restaura una noticia archivada; vuelve a BORRADOR.
+ * Restaura una noticia archivada: `guardarNoticiaCms` con estado "borrador" (decisión del front:
+ * así se puede editar y volver a publicar). README sección 3: no deshace un push ya enviado.
+ * Cada confirmación es un intento nuevo: clave nueva. Si falla, lanza NoticiaCmsError.
  */
 export function useRestaurarNoticia() {
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<Error | null>(null);
+    const { guardarNoticia, loading, error } = useGuardarNoticia();
 
-    const restaurarNoticia = useCallback(async (id: string) => {
-        setLoading(true);
-        setError(null);
-
-        try {
-            // TODO [COM03-BACKEND]: reemplazar la simulación por la llamada real:
-            // const result = await graphqlRequestClient<RestaurarNoticiaResponse>(
-            //     RESTAURAR_NOTICIA_MUTATION,
-            //     { variables: { id } }
-            // );
-            const result = await simularMutacion<RestaurarNoticiaResponse>({
-                restaurarNoticia: { id, estado: EstadoNoticia.BORRADOR },
-            });
-            return result.restaurarNoticia;
-        } catch (err) {
-            const error = err instanceof Error ? err : new Error(String(err));
-            setError(error);
-            throw error;
-        } finally {
-            setLoading(false);
-        }
-    }, []);
+    const restaurarNoticia = useCallback(
+        (noticia: NoticiaListItem) => guardarNoticia({
+            input: cambioEstadoInput(noticia, 'borrador', createIdempotencyKey()),
+        }),
+        [guardarNoticia]
+    );
 
     return { restaurarNoticia, loading, error };
 }

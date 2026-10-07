@@ -19,7 +19,7 @@ export const ESTADO_POR_ACCION: Record<AccionNoticia, EstadoNoticiaCms> = {
 
 /**
  * Recurso nuevo del formulario que todavía no se puede enviar: la API recibe ids de recurso y falta
- * cómo obtenerlos desde api-tickets (subir imágenes y registrar videos; pendiente con backend).
+ * confirmar sus IDs en api-portal antes de guardar (prepareGuardarNoticiaPayload).
  * - imagen nueva;
  * - video de YouTube agregado en el formulario.
  */
@@ -36,8 +36,7 @@ export interface RecursoPendiente {
 export interface GuardarNoticiaPayload {
     variables: GuardarNoticiaCmsVariables;
     /**
-     * TODO [COM03-BACKEND]: recursos nuevos que no se envían hasta que api-tickets permita subirlos.
-     * Sirven para avisar en el formulario y para subirlos cuando exista la operación.
+     * Recursos que prepareGuardarNoticiaPayload confirma antes de enviar la mutación.
      */
     pendientes: RecursoPendiente[];
 }
@@ -60,7 +59,7 @@ const toApiId = (id: string): number | null => (/^\d+$/.test(id) ? Number(id) : 
  * - La galería va como `galeriaRecursosIds`, en el orden de la pantalla. Es reemplazo total
  *   (README, sección 3: `[]` borra), así que se omite si algún recurso guardado no tiene id
  *   numérico (p. ej. datos de ejemplo): mejor conservar la galería que borrarla por error.
- * TODO [COM03-BACKEND]: `autores` no se envía: falta cómo obtener el catálogo de autores.
+ * prepareGuardarNoticiaPayload agrega los autores confirmados del catálogo.
  */
 export function buildGuardarNoticiaPayload(
     values: NewsFormValues,
@@ -101,7 +100,7 @@ export function buildGuardarNoticiaPayload(
         fechaPublicacion: ddMmYyyyToApiDateTime(values.fechaPublicacion),
         idioma: values.idioma,
         tiempoLectura: tiempoLectura ? Number(tiempoLectura) : null,
-        categoriasIds: [values.categoriaId, values.subcategoriaId]
+        categoriasIds: [...new Set([values.categoriaId, values.subcategoriaId, ...(values.categoriaIdsAdicionales || [])])]
             .map(toApiId)
             .filter((id): id is number => id !== null),
         etiquetasIds: values.etiquetaIds
@@ -112,7 +111,8 @@ export function buildGuardarNoticiaPayload(
             return {
                 orden: index + 1,
                 encabezado: section.encabezado.trim(),
-                contenidoHtml: textToHtml(section.contenido),
+                contenidoHtml: section.contenidoHtmlOriginal !== undefined && section.contenido === section.contenidoOriginal
+                    ? section.contenidoHtmlOriginal : textToHtml(section.contenido),
                 ...(recursoId !== undefined ? { recursoId } : {}),
             };
         }),

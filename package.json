@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit -p tsconfig.typecheck.json",
     "lint": "eslint",
     "storybook": "storybook dev",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "test:integracion": "node --test test/integracion/cms.test.cjs"
   },
   "dependencies": {
     "@tiptap/extension-strike": "^3.20.4",

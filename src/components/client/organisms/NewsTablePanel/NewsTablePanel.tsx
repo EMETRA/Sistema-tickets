@@ -51,9 +51,14 @@ const ESTADO_NOTICIA_LABEL: Record<EstadoNoticia, string> = {
 };
 
 const ESTADO_NOTIFICACION_LABEL: Record<EstadoNotificacion, string> = {
-    [EstadoNotificacion.ENVIADO]: "Enviado",
+    [EstadoNotificacion.ENVIADO]: "Enviada al proveedor",
     [EstadoNotificacion.PENDIENTE]: "Pendiente",
     [EstadoNotificacion.ERROR]: "Error",
+    [EstadoNotificacion.PARCIAL]: "Envío parcial",
+    [EstadoNotificacion.INCIERTA]: "Envío incierto",
+    [EstadoNotificacion.SIN_DESTINATARIOS]: "Sin dispositivos",
+    [EstadoNotificacion.SIN_PUBLICACION]: "Sin publicación",
+    [EstadoNotificacion.NO_DISPONIBLE]: "Sin dato disponible",
 };
 
 const PILL_CLASS: Record<EstadoNoticia | EstadoNotificacion, string> = {
@@ -64,11 +69,17 @@ const PILL_CLASS: Record<EstadoNoticia | EstadoNotificacion, string> = {
     [EstadoNotificacion.ENVIADO]: styles["pill--success"],
     [EstadoNotificacion.PENDIENTE]: styles["pill--warning"],
     [EstadoNotificacion.ERROR]: styles["pill--danger"],
+    [EstadoNotificacion.PARCIAL]: styles["pill--warning"],
+    [EstadoNotificacion.INCIERTA]: styles["pill--warning"],
+    [EstadoNotificacion.SIN_DESTINATARIOS]: styles["pill--neutral"],
+    [EstadoNotificacion.SIN_PUBLICACION]: styles["pill--neutral"],
+    [EstadoNotificacion.NO_DISPONIBLE]: styles["pill--neutral"],
 };
 
 const EMPTY_VALUE = "—";
 
 const dateFormatter = new Intl.DateTimeFormat("es-GT", {
+    timeZone: "America/Guatemala",
     day: "2-digit",
     month: "2-digit",
     year: "numeric",

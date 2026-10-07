@@ -5,8 +5,8 @@ import { apiFetch } from '@/api/graphql/client';
 
 /**
  * Permisos de noticias del usuario de la sesión (api-tickets, `usuario { permisos }`).
- * `data` es null mientras carga o si la consulta falla: en ese caso la UI muestra todos los
- * botones, porque el backend vuelve a verificar cada operación (README "Noticias CMS", sección 2).
+ * `data` es null mientras carga o si la consulta falla. La UI permite reintentar sin
+ * asumir permisos; el backend verifica cada operación.
  */
 export function useGetPermisosNoticias() {
     const [data, setData] = useState<string[] | null>(null);

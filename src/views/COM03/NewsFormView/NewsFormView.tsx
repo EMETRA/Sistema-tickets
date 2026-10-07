@@ -27,10 +27,9 @@ import { LoadingModal } from "@/components/client/molecules/LoadingModal";
 import { NewsForm, type NewsFormOptions } from "@/components/client/organisms/NewsForm";
 import { NewsPreview } from "@/components/client/organisms/NewsPreview";
 import { NewsResultCard } from "@/components/client/organisms/NewsResultCard";
-import { buildGuardarNoticiaPayload } from "../utils/buildGuardarNoticiaPayload";
+import { crearCacheRecursos, prepareGuardarNoticiaPayload } from "../utils/prepareGuardarNoticiaPayload";
 import { claveParaIntento, contenidoDelIntento, type IntentoGuardado } from "../utils/claveIdempotente";
 import {
-    PENDING_MEDIA_NOTICE,
     PUBLICADA_NO_VISIBLE_SUCCESS,
     SLUG_CONFLICT_MESSAGE,
     errorReference,
@@ -163,14 +162,6 @@ function NewsFormContent({ initial, categorias, etiquetas, onBack, canPublish }:
         [etiquetas, etiquetaIds]
     );
 
-    // TODO [COM03-BACKEND]: hay contenido que el guardado aún no envía (imágenes y videos nuevos).
-    // Se calcula con el mismo armado del envío para que el aviso nunca se desfase.
-    const hasPendingMedia = useMemo(
-        () => buildGuardarNoticiaPayload(form.values, initial?.id ?? null, AccionNoticia.BORRADOR, "")
-            .pendientes.length > 0,
-        [form.values, initial?.id]
-    );
-
     // Valida y, si hay errores, pide llevar al primero.
     const validate = (mode: "publicar" | "borrador") => {
         const isValid = form.validate(mode);
@@ -194,6 +185,7 @@ function NewsFormContent({ initial, categorias, etiquetas, onBack, canPublish }:
     //   dato, va una clave nueva (reusarla con otro contenido daría 409 IDEMPOTENCY_CONFLICT).
     const savingRef = useRef(false);
     const intentoRef = useRef<IntentoGuardado | null>(null);
+    const recursosRef = useRef(crearCacheRecursos());
 
     // Mientras se envía, el navegador pide confirmación antes de refrescar o cerrar la pestaña.
     useEffect(() => {
@@ -214,19 +206,13 @@ function NewsFormContent({ initial, categorias, etiquetas, onBack, canPublish }:
         if (!accion || savingRef.current) return;
         savingRef.current = true;
         setStep("saving");
-        // TODO [COM03-BACKEND]: `pendientes` (imágenes y videos nuevos) aún no se envían: falta
-        // subirlos desde api-tickets para obtener su id.
-        const { variables } = buildGuardarNoticiaPayload(form.values, initial?.id ?? null, accion, "");
-        const intento = claveParaIntento(
-            intentoRef.current,
-            contenidoDelIntento(variables.input),
-            createIdempotencyKey,
-        );
-        intentoRef.current = intento;
-        variables.input.claveIdempotente = intento.clave;
         let succeeded = false;
         let cmsError: NoticiaCmsError | null = null;
         try {
+            const { variables } = await prepareGuardarNoticiaPayload(form.values, initial, accion, recursosRef.current);
+            const intento = claveParaIntento(intentoRef.current, contenidoDelIntento(variables.input), createIdempotencyKey);
+            intentoRef.current = intento;
+            variables.input.claveIdempotente = intento.clave;
             // "guardada", "publicada" e `idempotente: true` son éxito (README).
             setResultado(await guardarNoticia(variables));
             setSaveError(null);
@@ -402,10 +388,9 @@ function NewsFormContent({ initial, categorias, etiquetas, onBack, canPublish }:
                 onSaveDraft={handleSaveDraft}
                 onPreview={handlePreview}
                 onPublish={handlePublish}
-                // TODO [COM03-BACKEND]: imagen principal opcional hasta que exista la subida de imágenes.
+                // El contrato admite noticias sin imagen principal.
                 mainFileRequired={false}
                 canPublish={canPublish}
-                notice={hasPendingMedia ? PENDING_MEDIA_NOTICE : undefined}
             />
             {flowModals}
         </div>

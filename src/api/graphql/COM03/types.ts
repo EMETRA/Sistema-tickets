@@ -24,6 +24,11 @@ export enum EstadoNotificacion {
   ENVIADO = 'ENVIADO',
   PENDIENTE = 'PENDIENTE',
   ERROR = 'ERROR',
+  PARCIAL = 'PARCIAL',
+  INCIERTA = 'INCIERTA',
+  SIN_DESTINATARIOS = 'SIN_DESTINATARIOS',
+  SIN_PUBLICACION = 'SIN_PUBLICACION',
+  NO_DISPONIBLE = 'NO_DISPONIBLE',
 }
 
 /** TB_NOTICIA.VISIBILIDAD */
@@ -42,6 +47,7 @@ export enum TipoRecurso {
 
 /** Noticia del listado (TB_NOTICIA). No incluye la notificación push: esa viene de VIVI. */
 export interface NoticiaListItem {
+  estadoNotificacion?: EstadoNotificacion | null;
   id: string;
   titulo: string;
   estado: EstadoNoticia;
@@ -82,6 +88,8 @@ export interface NoticiaListRow extends NoticiaListItem {
 }
 
 export interface NoticiasFilterInput {
+  page?: number;
+  limit?: number;
   estado?: EstadoNoticia | null;
   busqueda?: string | null;
 }
@@ -152,6 +160,8 @@ export interface SeccionNoticia {
  * (TB_NOTICIA_RECURSO: principal, galeria, adjunto, og).
  */
 export interface NoticiaDetalle {
+  autores?: { id: number; nombre: string; rol: string; orden: number }[];
+  categoriaIdsAdicionales?: string[];
   id: string;
   estado: EstadoNoticia;
   titulo: string;
@@ -227,6 +237,7 @@ export interface SeccionNoticiaCmsInput {
  *   - `autores: [{ autorId, rol?, orden? }]`: falta cómo obtener el catálogo de autores.
  */
 export interface GuardarNoticiaCmsInput {
+  autores?: { autorId: number; rol?: string; orden?: number }[];
   /** 1 a 64 caracteres. La genera el front por intento de guardado (ver NewsFormView). */
   claveIdempotente: string;
   /** Entero > 0. Ausente = crear. */

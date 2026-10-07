@@ -1,33 +1,16 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { graphqlRequest } from "@/api/graphql/client";
 import { GET_USER_QUERY, type GetUserResponse } from "@/api/graphql/home";
-
-/**
- * GET /api/usuario
- *
- * Obtiene el perfil del usuario autenticado
- * El token se obtiene automáticamente del header Authorization
- */
-export async function GET(_request: NextRequest) {
+import { estadoErrorGraphql } from '@/api/graphql/server-error';
+export async function GET() {
+    const headers = { 'Cache-Control': 'private, no-store' };
     try {
-        const result = await graphqlRequest<Record<string, unknown>>(
-            GET_USER_QUERY
-        );
-
-        const typedResult = result as unknown as GetUserResponse;
-
-        return NextResponse.json(typedResult);
+        const result = await graphqlRequest<GetUserResponse>(GET_USER_QUERY);
+        return NextResponse.json(result, { headers });
     } catch (error) {
-        const message = error instanceof Error ? error.message : "Error desconocido";
-        const statusCode =
-            error instanceof Error && error.message.includes("401") ? 401 : 500;
-
-        return NextResponse.json(
-            {
-                error: message,
-                timestamp: new Date().toISOString(),
-            },
-            { status: statusCode }
-        );
+        const status = estadoErrorGraphql(error);
+        const message = error instanceof Error ? error.message : '';
+        console.error({ evento: 'PANEL_PERFIL_FALLIDO', status, codigosOracle: [...new Set(message.match(/ORA-\d{5}/g) || [])] });
+        return NextResponse.json({ error: status === 401 ? 'Sesión expirada o credenciales inválidas' : status === 403 ? 'No tienes permiso para consultar el perfil' : 'No se pudo consultar el perfil en api-tickets', timestamp: new Date().toISOString() }, { status, headers });
     }
 }

@@ -69,6 +69,7 @@ const FileItem: React.FC<FileItemProps> = ({
                     // (color-scheme: dark en globals.css) es blanco. #000000 = como se ve en modo claro.
                     iconColor="#000000"
                     onClick={onRemove}
+                    aria-label={`Quitar ${name}`}
                 />
             )}
         </div>

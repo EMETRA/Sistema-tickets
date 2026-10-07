@@ -104,15 +104,6 @@ export function getErrorTexts(error: NoticiaCmsError | null): ErrorTexts {
 }
 
 /**
- * Aviso del formulario cuando hay contenido que todavía no se envía (`pendientes` de
- * buildGuardarNoticiaPayload: imágenes y videos nuevos).
- * TODO [COM03-BACKEND]: quitar cuando api-tickets permita subir imágenes y registrar videos.
- * TODO [COM03-FLUJO]: texto provisional, no está en el Figma.
- */
-export const PENDING_MEDIA_NOTICE =
-    "Las imágenes y los videos nuevos todavía no se guardan. El resto de la noticia sí se guarda, incluidas las imágenes y videos que ya estaban guardados; podrás agregar los nuevos cuando el sistema lo permita.";
-
-/**
  * Éxito de "Publicar" cuando backend responde `resultado: "guardada"`: la noticia quedó como
  * publicada pero no es visible (es privada) y no se envía push (README).
  * TODO [COM03-FLUJO]: pantalla que no está en el Figma; texto provisional, validar con diseño.

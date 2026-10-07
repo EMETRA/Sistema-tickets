@@ -1,6 +1,6 @@
 import { GraphQLClient } from 'graphql-request';
 import { ErrorHandler } from './errors';
-import { getEnvConfig } from '@/api/config/env';
+import { getEnvConfig, getGraphqlEndpoint } from '@/api/config/env';
 
 /**
  * Si hay sesión activa y el backend responde 401/UNAUTHENTICATED,
@@ -20,14 +20,7 @@ function handleClientAuthFailure() {
  * Crear cliente GraphQL configurado
  */
 function createGraphQLClient(): GraphQLClient {
-    // Acceso directo a las variables - funciona tanto en server como en client
-    const graphqlEndpoint = process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT;
-
-    if (!graphqlEndpoint) {
-        throw new Error(
-            'GraphQL endpoint not configured. Set NEXT_PUBLIC_GRAPHQL_ENDPOINT in .env.local'
-        );
-    }
+    const graphqlEndpoint = getGraphqlEndpoint();
 
     const client = new GraphQLClient(graphqlEndpoint, {
         headers: {
@@ -102,18 +95,12 @@ export interface GraphQLRequestOptions {
  * }
  * ```
  */
-export async function graphqlRequest<TData extends Record<string, unknown> = Record<string, unknown>>(
+export async function graphqlRequest<TData = Record<string, unknown>>(
     query: string,
     options?: GraphQLRequestOptions
 ): Promise<TData> {
     try {
-        const graphqlEndpoint = process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT;
-
-        if (!graphqlEndpoint) {
-            throw new Error(
-                'GraphQL endpoint not configured. Set NEXT_PUBLIC_GRAPHQL_ENDPOINT in .env.local'
-            );
-        }
+        const graphqlEndpoint = getGraphqlEndpoint();
 
         const config = getEnvConfig();
 
@@ -121,13 +108,13 @@ export async function graphqlRequest<TData extends Record<string, unknown> = Rec
         // Import dinámico para evitar marcar el módulo como Server Component
         const { headers } = await import('next/headers');
         const headersList = await headers();
-        const token = headersList.get('Authorization')?.replace('Bearer ', '') || null;
+        const authorization = headersList.get('Authorization');
 
         // Crear instancia nueva del cliente con headers específicos
         const client = new GraphQLClient(graphqlEndpoint, {
             headers: {
                 'Content-Type': 'application/json',
-                ...(token && { 'Authorization': `Bearer ${token}` })
+                ...(authorization && { 'Authorization': authorization })
             },
         });
 
@@ -136,12 +123,10 @@ export async function graphqlRequest<TData extends Record<string, unknown> = Rec
         const timeoutId = setTimeout(() => controller.abort(), config.graphqlTimeoutMs);
 
         try {
-            const data = await client.request<TData>(query, options?.variables ?? {});
-            clearTimeout(timeoutId);
+            const data = await client.request<TData>({ document: query, variables: options?.variables ?? {}, signal: controller.signal });
             return data;
-        } catch (error) {
+        } finally {
             clearTimeout(timeoutId);
-            throw error;
         }
     } catch (error: unknown) {
         // Loguear error
@@ -173,8 +158,7 @@ export async function graphqlRequestClient<TData extends Record<string, unknown>
     options?: GraphQLRequestOptions
 ): Promise<TData> {
     try {
-        const graphqlEndpoint = process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT;
-        if (!graphqlEndpoint) throw new Error('GraphQL endpoint not configured.');
+        const graphqlEndpoint = '/api/graphql';
 
         const config = getEnvConfig();
         const { useAuthStore } = await import('@/store/useAuthStore');
@@ -252,7 +236,9 @@ export async function graphqlRequestClient<TData extends Record<string, unknown>
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), config.graphqlTimeoutMs);
 
-        const response = await fetch(graphqlEndpoint, {
+        let response: Response;
+        try {
+            response = await fetch(graphqlEndpoint, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -260,9 +246,10 @@ export async function graphqlRequestClient<TData extends Record<string, unknown>
             },
             body: JSON.stringify({ query, variables }),
             signal: controller.signal,
-        });
-
-        clearTimeout(timeoutId);
+            });
+        } finally {
+            clearTimeout(timeoutId);
+        }
 
         if (response.status === 401) {
             handleClientAuthFailure();
@@ -303,7 +290,7 @@ export async function graphqlRequestClient<TData extends Record<string, unknown>
  * const data = await apiFetch<{usuario: UsuarioPerfil}>('/api/usuario');
  * ```
  */
-export async function apiFetch<TData extends Record<string, unknown> = Record<string, unknown>>(
+export async function apiFetch<TData = Record<string, unknown>>(
     url: string,
     sentToken?: string,
     options?: RequestInit
@@ -322,7 +309,7 @@ export async function apiFetch<TData extends Record<string, unknown> = Record<st
             headers.set('Authorization', `Bearer ${token}`);
         }
         
-        if (!headers.has('Content-Type') && options?.body) {
+        if (!headers.has('Content-Type') && options?.body && !(options.body instanceof FormData)) {
             headers.set('Content-Type', 'application/json');
         }
 
@@ -346,7 +333,9 @@ export async function apiFetch<TData extends Record<string, unknown> = Record<st
             }
 
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                const body = await response.json().catch(() => ({})) as { message?: string | string[]; error?: string };
+                const messages = Array.isArray(body.message) ? body.message : [body.message || body.error || `HTTP ${response.status}`];
+                throw Object.assign(new Error(messages.join(' ')), { statusCode: response.status, body });
             }
 
             const data = await response.json() as TData;

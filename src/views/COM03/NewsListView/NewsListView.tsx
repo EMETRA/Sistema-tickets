@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
     useArchivarNoticia,
     useGetNoticias,
@@ -29,12 +29,8 @@ interface NewsListViewProps {
 /** No hay "eliminar": el Panel archiva, no borra (README "Noticias CMS" sección 3). */
 type ListAction = "archivar" | "restaurar";
 
-/**
- * TODO [COM03-BACKEND]: la columna Notificación se oculta hasta que exista el estado del push
- * (README "Noticias CMS" sección 10, pendiente con otro equipo). Al activarla, volver a usar
- * useGetEstadosNotificacion para llenar `estadoNotificacion`.
- */
-const MOSTRAR_NOTIFICACIONES = false;
+/** El listado REST incluye el estado real del push de cada publicación. */
+const MOSTRAR_NOTIFICACIONES = true;
 
 /**
  * Explicación de archivar según el estado de la noticia.
@@ -70,7 +66,19 @@ function getActionTexts(type: ListAction, noticia: NoticiaListRow) {
 const LOADING_DESCRIPTION = "Esto tomará unos segundos";
 
 export default function NewsListView({ onCreate, onEdit, canEdit = true }: NewsListViewProps) {
-    const { data: noticias, loading, error, refetch } = useGetNoticias();
+    const [filter, setFilter] = useState<NewsFilter>("all");
+    const [search, setSearch] = useState("");
+    const [appliedSearch, setAppliedSearch] = useState("");
+    const [page, setPage] = useState(1);
+    useEffect(() => {
+        const timer = setTimeout(() => { setAppliedSearch(search); setPage(1); }, 300);
+        return () => clearTimeout(timer);
+    }, [search]);
+    const { data: noticias, total, loading, error, refetch } = useGetNoticias({
+        estado: filter === 'all' ? null : filter as EstadoNoticia, busqueda: appliedSearch, page, limit: 20,
+    });
+    const pages = Math.max(1, Math.ceil(total / 20));
+    useEffect(() => { if (!loading && page > pages) setPage(pages); }, [loading, page, pages]);
     const { archivarNoticia } = useArchivarNoticia();
     const { restaurarNoticia } = useRestaurarNoticia();
     // Acción en curso: primero se confirma y luego se procesa con el modal de carga.
@@ -78,22 +86,11 @@ export default function NewsListView({ onCreate, onEdit, canEdit = true }: NewsL
     const [processing, setProcessing] = useState(false);
     const processingRef = useRef(false);
     const [actionError, setActionError] = useState<string | null>(null);
-    const [filter, setFilter] = useState<NewsFilter>("all");
-    const [search, setSearch] = useState("");
 
     const rows: NoticiaListRow[] = useMemo(
-        () => noticias.map((noticia) => ({ ...noticia, estadoNotificacion: null })),
+        () => noticias.map((noticia) => ({ ...noticia, estadoNotificacion: noticia.estadoNotificacion ?? null })),
         [noticias]
     );
-
-    const filteredNoticias = useMemo(() => {
-        const term = search.trim().toLowerCase();
-        return rows.filter((noticia) => {
-            if (filter !== "all" && noticia.estado !== filter) return false;
-            if (term && !noticia.titulo.toLowerCase().includes(term)) return false;
-            return true;
-        });
-    }, [rows, filter, search]);
 
     const isEmpty = !loading && !error && noticias.length === 0;
 
@@ -118,8 +115,6 @@ export default function NewsListView({ onCreate, onEdit, canEdit = true }: NewsL
         setProcessing(true);
         try {
             await actionHandlers[pendingAction.type](pendingAction.noticia);
-            // TODO [COM03-BACKEND]: con los datos dummy el listado no cambia al recargar;
-            // con la API real se verá la noticia archivada, restaurada o sin el borrador eliminado.
             await refetch();
         } catch {
             setActionError(getActionTexts(pendingAction.type, pendingAction.noticia).error);
@@ -163,13 +158,13 @@ export default function NewsListView({ onCreate, onEdit, canEdit = true }: NewsL
             )}
 
             <NewsTablePanel
-                noticias={filteredNoticias}
+                noticias={rows}
                 loading={loading}
                 showNotifications={MOSTRAR_NOTIFICACIONES}
                 canEdit={canEdit}
                 isEmpty={isEmpty}
                 filter={filter}
-                onFilterChange={setFilter}
+                onFilterChange={(value) => { setPage(1); setFilter(value); }}
                 search={search}
                 onSearchChange={setSearch}
                 onCreate={onCreate}
@@ -177,6 +172,14 @@ export default function NewsListView({ onCreate, onEdit, canEdit = true }: NewsL
                 onArchive={(id) => openAction("archivar", id)}
                 onRestore={(id) => openAction("restaurar", id)}
             />
+
+            {!error && total > 0 && (
+                <div className={styles.headerActions}>
+                    <Button variant="outlined" state={loading || page <= 1 ? 'disabled' : 'default'} onClick={() => setPage(p => p - 1)}>Anterior</Button>
+                    <Text variant="caption">Página {page} de {pages} · {total} noticias</Text>
+                    <Button variant="outlined" state={loading || page >= pages ? 'disabled' : 'default'} onClick={() => setPage(p => p + 1)}>Siguiente</Button>
+                </div>
+            )}
 
             {pendingTexts && (
                 <>

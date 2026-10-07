@@ -45,3 +45,52 @@
 
 }
 
+
+// ============================================
+// VARIANTE COMPACT
+// ============================================
+
+.compactCard {
+    width: min(27.5rem, 90vw);
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+    padding: 1.25rem 1rem 1rem;
+    text-align: center;
+}
+
+.alignLeft {
+    text-align: left;
+}
+
+.compactText {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.compactTitle.compactTitle {
+    margin: 0;
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+.compactDescription.compactDescription {
+    margin: 0;
+    font-size: 0.8125rem;
+    line-height: 1.45;
+    color: #666666;
+}
+
+.compactActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+}
+
+// Selector doble para ganar a los estilos base de Button
+.compactButton.compactButton {
+    padding: 0.5rem 1rem;
+    font-size: 0.8125rem;
+}

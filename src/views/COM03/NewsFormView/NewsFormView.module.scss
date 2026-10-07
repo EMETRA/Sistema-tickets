@@ -1,0 +1,42 @@
+@use "../../../theme/colors.scss" as *;
+
+// Envuelve formulario / vista previa; es el punto de referencia para subir el scroll
+.screen {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.resultHeading.resultHeading {
+    font-size: 1.5rem;
+    color: $negro-2;
+}
+
+.status.status {
+    margin: 0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: $azul-1;
+}
+
+.statusBlock {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+.error.error {
+    margin: 0;
+    color: $rojo-1;
+}
+
+.errorSummary.errorSummary {
+    margin: 0;
+    padding: 0.625rem 0.875rem;
+    border: 1px solid rgba($rojo-1, 0.4);
+    border-radius: 0.5rem;
+    background-color: rgba($rojo-1, 0.06);
+    font-size: 0.8125rem;
+    color: $rojo-1;
+}

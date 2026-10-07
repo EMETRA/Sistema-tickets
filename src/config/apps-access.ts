@@ -24,6 +24,10 @@ export function normalizeDepartment(value?: string | null): string | null {
         recaudacion: "recaudacion",
         financiero: "financiero",
         juridico: "juridico",
+        // Departamento real de Comunicación: "SERVICIOS DE COMUNICACIÓN SOCIAL" (confirmado 2026-10-07).
+        "servicios de comunicacion social": "comunicacion",
+        // Nombre corto (sesión de prueba en desarrollo).
+        comunicacion: "comunicacion",
     };
 
     return aliases[key] ?? null;

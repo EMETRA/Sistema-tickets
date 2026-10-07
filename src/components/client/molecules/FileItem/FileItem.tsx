@@ -10,7 +10,9 @@ const FileItem: React.FC<FileItemProps> = ({
     name,
     status,
     progress = 0,
+    description,
     onRemove,
+    thumbnail,
     className
 }) => {
     const getFileIcon = (filename: string): { icon: string; color?: string } => {
@@ -41,10 +43,12 @@ const FileItem: React.FC<FileItemProps> = ({
     return (
         <div className={classNames(styles.FileItem, className)}>
             <div className={styles.left}>
-                <Icon name={icon} size={50} color={color} raw />
+                {thumbnail ?? <Icon name={icon} size={50} color={color} raw />}
                 <div className={styles.info}>
                     <span className={styles.name}>{name}</span>
-                    {status === "done" && (
+                    {description ? (
+                        <span className={styles.state}>{description}</span>
+                    ) : status === "done" && (
                         <span className={styles.state}>Cargado</span>
                     )}
 
@@ -59,7 +63,13 @@ const FileItem: React.FC<FileItemProps> = ({
                 </div>
             </div>
             {onRemove && (
-                <IconButton icon={status === "done" ? "trash-solid" : "xmark-solid"} onClick={onRemove} />
+                <IconButton
+                    icon={status === "done" ? "trash-solid" : "xmark-solid"}
+                    // Color explícito: sin él el ícono toma el color del botón, que en modo oscuro
+                    // (color-scheme: dark en globals.css) es blanco. #000000 = como se ve en modo claro.
+                    iconColor="#000000"
+                    onClick={onRemove}
+                />
             )}
         </div>
     )

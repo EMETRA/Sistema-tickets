@@ -3,7 +3,7 @@ export interface ToggleButtonOption {
   value: string;
 }
 
-export type ToggleButtonVariant = "primary" | "secondary";
+export type ToggleButtonVariant = "primary" | "secondary" | "segmented";
 
 export interface ToggleButtonProps {
   options: ToggleButtonOption[];

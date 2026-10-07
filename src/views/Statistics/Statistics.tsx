@@ -13,8 +13,17 @@ import {
     getStatisticsFilterConfigDummy,
     getStatisticsPerformanceDummy,
 } from "@/api/graphql/queries/getStatistics";
-import { getSystemsDummy } from "@/api/graphql/queries/getSystems";
 import styles from "./Statistics.module.scss";
+
+/**
+ * TODO: sistemas del menú (dummy). Estaban en queries/getSystems.ts, que se eliminó como residual;
+ * se dejan aquí para no romper la pantalla hasta que exista la consulta real.
+ */
+const SYSTEMS_DUMMY = [
+    { label: "Sistema Tickets", value: "option1" },
+    { label: "Sistema de Gestión", value: "option2" },
+    { label: "Sistema de Facturación", value: "option3" },
+];
 
 export const Statistics = () => {
     const [systems, setSystems] = useState<Array<{ label: string; value: string }>>([]);
@@ -32,7 +41,7 @@ export const Statistics = () => {
                 setIsLoading(true);
                 setError("");
 
-                const systemsData = await getSystemsDummy();
+                const systemsData = SYSTEMS_DUMMY;
                 const config = await getStatisticsFilterConfigDummy();
                 const defaultParent = config.parentOptions[0]?.value || "";
                 const defaultChild = config.childOptionsByParent[defaultParent]?.[0]?.value || "";

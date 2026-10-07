@@ -9,11 +9,12 @@ const EDITABLE_ROLES: LabelChipGroupRole[] = ["DESARROLLADOR", "TECNICO", "ADMIN
 export const LabelChipGroup = ({
     labels,
     role,
+    editable,
     availableOptions = [],
     onChange,
     className,
 }: LabelChipGroupProps) => {
-    const isEditable = EDITABLE_ROLES.includes(role);
+    const isEditable = editable ?? (role ? EDITABLE_ROLES.includes(role) : false);
     const [isOpen, setIsOpen] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
 

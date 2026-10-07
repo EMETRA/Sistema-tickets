@@ -103,3 +103,14 @@ export { useSendEmailNotification } from './useSendEmailNotification';
 
 // PROC01 - Apps hooks
 export { useExecuteLprRemission } from './useExecuteLprRemission';
+
+// COM03 - Apps hooks
+export { useGetNoticias } from './useGetNoticias';
+export { useGetEstadosNotificacion } from './useGetEstadosNotificacion';
+export { useGetNoticia } from './useGetNoticia';
+export { useGetCategoriasNoticia } from './useGetCategoriasNoticia';
+export { useGetEtiquetasNoticia } from './useGetEtiquetasNoticia';
+export { useGuardarNoticia } from './useGuardarNoticia';
+export { useArchivarNoticia } from './useArchivarNoticia';
+export { useRestaurarNoticia } from './useRestaurarNoticia';
+export { useGetPermisosNoticias } from './useGetPermisosNoticias';

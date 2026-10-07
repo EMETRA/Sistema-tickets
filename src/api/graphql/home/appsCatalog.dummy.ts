@@ -212,4 +212,32 @@ export const APPS_CATALOG_DUMMY: AppsCatalog = {
             },
         },
     },
+    // TODO [COM03-BACKEND]: entrada dummy; debe venir del catálogo real de backend.
+    comunicacion: {
+        meta: {
+            id: "comunicacion",
+            label: "COMUNICACIÓN",
+            title: "Aplicaciones de Comunicación",
+            iconName: "paper-plane-solid",
+        },
+        sections: {
+            // Ruta definida en los criterios de aceptación: /home/comunicacion/contenido/noticias
+            contenido: {
+                meta: {
+                    id: "contenido",
+                    label: "CONTENIDO",
+                    title: "Contenido",
+                    iconName: "layer-group-solid",
+                },
+                modules: [
+                    {
+                        id: "noticias",
+                        label: "NOTICIAS",
+                        title: "Noticias",
+                        iconName: "file-lines-regular",
+                    },
+                ],
+            },
+        },
+    },
 };

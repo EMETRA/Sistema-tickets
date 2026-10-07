@@ -3,22 +3,32 @@
 import classNames from "classnames";
 import styles from "./FileDropzone.module.scss";
 import { FileDropzoneProps } from "./types";
-import { ChangeEvent, DragEvent, useRef, useState } from "react";
+import { ChangeEvent, DragEvent, MouseEvent, useRef, useState } from "react";
 import { Icon } from "../../atoms/Icon";
+import { Button } from "../../atoms/Button";
 
 const FileDropzone: React.FC<FileDropzoneProps> = ({
     onFiles,
     className,
-    rejectedFiles
+    rejectedFiles,
+    variant = "default",
+    title = "Arrastra tu archivo o da click aquí",
+    subtitle = "900MB tamaño máximo del archivo",
+    buttonLabel = "Seleccionar archivo",
+    multiple = true,
+    accept,
+    hasError = false,
 }) => {
 
     const inputRef = useRef<HTMLInputElement>(null);
     const [isDragging, setIsDragging] = useState(false);
+    const isCompact = variant === "compact";
 
     const handleDrop = (e: DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         setIsDragging(false);
-        onFiles(Array.from(e.dataTransfer.files));
+        const files = Array.from(e.dataTransfer.files);
+        onFiles(multiple ? files : files.slice(0, 1));
     };
 
     const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
@@ -32,6 +42,11 @@ const FileDropzone: React.FC<FileDropzoneProps> = ({
         inputRef.current?.click();
     };
 
+    const handleButtonClick = (e: MouseEvent<HTMLButtonElement>) => {
+        e.stopPropagation();
+        inputRef.current?.click();
+    };
+
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         if (!e.target.files) return;
 
@@ -40,8 +55,12 @@ const FileDropzone: React.FC<FileDropzoneProps> = ({
     };
 
     return (
-        <div 
-            className={classNames(styles.Dropzone, {[styles.dragging]: isDragging}, className)}
+        <div
+            className={classNames(styles.Dropzone, {
+                [styles.dragging]: isDragging,
+                [styles.compact]: isCompact,
+                [styles.error]: hasError,
+            }, className)}
             onDrop={handleDrop}
             onDragOver={handleDragOver}
             onDragEnter={handleDragEnter}
@@ -50,22 +69,37 @@ const FileDropzone: React.FC<FileDropzoneProps> = ({
             role="button"
             tabIndex={0}
         >
-            <input 
+            <input
                 ref={inputRef}
                 type="file"
-                multiple
+                multiple={multiple}
+                accept={accept}
                 className={styles.input}
                 onChange={handleChange}
             />
             <div className={styles.content}>
-                <Icon name="file-arrow-up-solid-full" size={75} color="#4361EE" />
-        
+                {!isCompact && (
+                    <Icon name="file-arrow-up-solid-full" size={75} color="#4361EE" />
+                )}
+
                 <p className={styles.title}>
-                    Arrastra tu archivo o da click aquí
+                    {title}
                 </p>
                 <p className={styles.subtitle}>
-                    900MB tamaño máximo del archivo
+                    {subtitle}
                 </p>
+
+                {isCompact && (
+                    <Button
+                        type="button"
+                        variant="outlined"
+                        rounded
+                        onClick={handleButtonClick}
+                        className={styles.button}
+                    >
+                        {buttonLabel}
+                    </Button>
+                )}
 
                 {rejectedFiles && rejectedFiles.length > 0 && ( // 👈
                     <p className={styles.rejected}>

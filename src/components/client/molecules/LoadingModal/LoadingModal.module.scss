@@ -1,0 +1,47 @@
+@use "../../../../theme/colors.scss" as *;
+
+.LoadingModal {
+    width: min(19.5rem, 90vw);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 1rem 1rem 1.25rem;
+    text-align: center;
+    font-family: var(--font-montserrat), sans-serif;
+}
+
+.spinner {
+    width: 2.25rem;
+    height: 2.25rem;
+    margin-bottom: 0.75rem;
+    border: 3px solid rgba($azul-5, 0.2);
+    border-top-color: $azul-5;
+    border-radius: 50%;
+    animation: spin 0.9s linear infinite;
+}
+
+.title.title {
+    margin: 0;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: $negro-2;
+}
+
+.description.description {
+    margin: 0;
+    font-size: 0.75rem;
+    color: $secondary-text;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .spinner {
+        animation-duration: 2.5s;
+    }
+}

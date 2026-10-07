@@ -10,13 +10,12 @@ import {
     type GuardarNoticiaCmsVariables,
     type NoticiaCmsError,
 } from '@/api/graphql/COM03';
-import { USAR_SIMULACION, simularGuardarNoticiaCms } from '@/api/graphql/COM03/mutations.dummy';
 
 /**
  * Crea o actualiza una noticia con `guardarNoticiaCms` (README "Noticias CMS", 2026-10-06).
  * Devuelve el resultado ("guardada" | "publicada", idempotente). Si falla, lanza NoticiaCmsError
  * con el código o el estado del README.
- * Con USAR_SIMULACION = true usa la simulación (mutations.dummy.ts) en lugar de la API.
+ * Las respuestas y errores siempre provienen de la API real.
  */
 export function useGuardarNoticia() {
     const [loading, setLoading] = useState(false);
@@ -28,12 +27,16 @@ export function useGuardarNoticia() {
             setError(null);
 
             try {
-                const result = USAR_SIMULACION
-                    ? await simularGuardarNoticiaCms(variables)
-                    : await graphqlRequestClient<GuardarNoticiaCmsResponse>(
+                const result = await graphqlRequestClient<GuardarNoticiaCmsResponse>(
                         GUARDAR_NOTICIA_CMS_MUTATION,
-                        { variables: { input: variables.input } }
+                        { variables: { input: {
+                            ...variables.input,
+                            estado: variables.input.estado.toUpperCase(),
+                            visibilidad: variables.input.visibilidad.toUpperCase(),
+                        } } }
                     );
+                result.guardarNoticiaCms.noticia.estado = result.guardarNoticiaCms.noticia.estado.toLowerCase() as typeof variables.input.estado;
+                result.guardarNoticiaCms.noticia.visibilidad = result.guardarNoticiaCms.noticia.visibilidad.toLowerCase() as typeof variables.input.visibilidad;
                 setLoading(false);
                 return result.guardarNoticiaCms;
             } catch (err) {

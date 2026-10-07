@@ -43,32 +43,15 @@ function isValidEnvironment(
  * Cargar y validar configuración de entorno
  */
 export function loadEnvConfig(): EnvironmentConfig {
-    const ticketsApiUrl = process.env.NEXT_PUBLIC_TICKETS_API_URL;
-    const graphqlEndpoint = process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT;
-    const authApiUrl = process.env.NEXT_PUBLIC_AUTH_API_URL;
+    const ticketsApiUrl = process.env.TICKETS_API_URL || process.env.NEXT_PUBLIC_TICKETS_API_URL || '';
+    const graphqlEndpoint = getGraphqlEndpoint();
+    const authApiUrl = process.env.NEXT_PUBLIC_AUTH_API_URL || '';
     const authLoginPath = process.env.NEXT_PUBLIC_AUTH_LOGIN_PATH || '/login';
     const graphqlDebug = (process.env.NEXT_PUBLIC_GRAPHQL_DEBUG || 'false').toLowerCase() === 'true';
     const graphqlTimeoutMs = parseInt(process.env.NEXT_PUBLIC_GRAPHQL_TIMEOUT_MS || '8000', 10);
     const fetchTimeoutMs = parseInt(process.env.NEXT_PUBLIC_FETCH_TIMEOUT_MS || '10000', 10);
     const envValue = process.env.NEXT_PUBLIC_ENV || 'development';
     const environment = isValidEnvironment(envValue) ? envValue : 'development';
-
-    // Validar que existan (solo en server)
-    if (!ticketsApiUrl) {
-        throw new Error(
-            `Missing required environment variable: NEXT_PUBLIC_TICKETS_API_URL. Check .env.local or .env.example`
-        );
-    }
-    if (!graphqlEndpoint) {
-        throw new Error(
-            `Missing required environment variable: NEXT_PUBLIC_GRAPHQL_ENDPOINT. Check .env.local or .env.example`
-        );
-    }
-    if (!authApiUrl) {
-        throw new Error(
-            `Missing required environment variable: NEXT_PUBLIC_AUTH_API_URL. Check .env.local or .env.example`
-        );
-    }
 
     return {
         // Backend GraphQL
@@ -91,6 +74,18 @@ export function loadEnvConfig(): EnvironmentConfig {
         isDevelopment: environment === 'development',
         isProduction: environment === 'production',
     };
+}
+
+/** El navegador siempre llama al mismo origen; la URL de Tickets vive en el servidor. */
+export function getGraphqlEndpoint(): string {
+    if (typeof window !== 'undefined') return '/api/graphql';
+    const base = process.env.TICKETS_API_URL || process.env.NEXT_PUBLIC_TICKETS_API_URL;
+    const endpoint = process.env.GRAPHQL_ENDPOINT || process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT ||
+        (base ? `${base.replace(/\/$/, '')}/graphql` : '');
+    if (!endpoint) throw new Error('Configurar GRAPHQL_ENDPOINT en el servidor del Panel');
+    const url = new URL(endpoint);
+    if (!['http:', 'https:'].includes(url.protocol)) throw new Error('GRAPHQL_ENDPOINT debe usar HTTP o HTTPS');
+    return url.toString();
 }
 
 /**

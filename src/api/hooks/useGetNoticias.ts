@@ -1,63 +1,31 @@
 'use client';
-
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { apiFetch } from '@/api/graphql/client';
 import type { NoticiaListItem, NoticiasFilterInput } from '@/api/graphql/COM03';
 
-interface UseGetNoticiasReturn {
-  data: NoticiaListItem[];
-  loading: boolean;
-  error: Error | null;
-  refetch: () => Promise<void>;
-}
-
-/**
- * Obtiene el listado de noticias (COM03).
- *
- * TODO [COM03-BACKEND]: hoy la vista llama sin filtros y filtra en cliente por tab y búsqueda
- * (no hay paginación). Si backend pagina o filtra, pasar `filters` desde la vista.
- */
-export function useGetNoticias(filters?: NoticiasFilterInput): UseGetNoticiasReturn {
+export function useGetNoticias(filters?: NoticiasFilterInput) {
     const [data, setData] = useState<NoticiaListItem[]>([]);
+    const [total, setTotal] = useState(0);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
-
+    const seq = useRef(0);
+    const estado = filters?.estado || '', busqueda = filters?.busqueda || '';
+    const page = filters?.page || 1, limit = filters?.limit || 20;
     const fetchData = useCallback(async () => {
-        setLoading(true);
-        setError(null);
-
+        const current = ++seq.current;
+        setLoading(true); setError(null);
         try {
-            const params = new URLSearchParams();
-
-            if (filters?.estado) {
-                params.set('estado', filters.estado);
-            }
-
-            if (filters?.busqueda) {
-                params.set('busqueda', filters.busqueda);
-            }
-
-            const url = `/api/COM03/noticias${params.toString() ? `?${params.toString()}` : ''}`;
-            const response = await apiFetch<{ data: NoticiaListItem[] }>(url);
-
-            setData(response.data || []);
+            const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+            if (estado) params.set('estado', estado);
+            if (busqueda) params.set('busqueda', busqueda);
+            const response = await apiFetch<{ data: NoticiaListItem[]; total: number }>(`/api/COM03/noticias?${params}`);
+            if (current !== seq.current) return;
+            setData(response.data || []); setTotal(response.total);
         } catch (err) {
-            const error = err instanceof Error ? err : new Error(String(err));
-            setError(error);
-            setData([]);
-        } finally {
-            setLoading(false);
-        }
-    }, [filters]);
-
-    useEffect(() => {
-        fetchData();
-    }, [fetchData]);
-
-    return {
-        data,
-        loading,
-        error,
-        refetch: fetchData,
-    };
+            if (current !== seq.current) return;
+            setError(err instanceof Error ? err : new Error(String(err))); setData([]); setTotal(0);
+        } finally { if (current === seq.current) setLoading(false); }
+    }, [estado, busqueda, page, limit]);
+    useEffect(() => { void fetchData(); return () => { seq.current++; }; }, [fetchData]);
+    return { data, total, loading, error, refetch: fetchData };
 }

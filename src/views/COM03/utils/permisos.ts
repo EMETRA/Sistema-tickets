@@ -8,19 +8,19 @@ export interface PermisosNoticiasUI {
     puedePublicar: boolean;
 }
 
-/** Sin dato de permisos se muestra todo: el backend igual verifica cada operación. */
-export const TODOS_LOS_PERMISOS: PermisosNoticiasUI = {
-    puedeLeer: true,
-    puedeEditar: true,
-    puedePublicar: true,
+/** Sin permisos confirmados, los controles permanecen deshabilitados. */
+export const SIN_PERMISOS: PermisosNoticiasUI = {
+    puedeLeer: false,
+    puedeEditar: false,
+    puedePublicar: false,
 };
 
 /**
  * Traduce los códigos de `usuario.permisos` a lo que la UI muestra u oculta.
- * null = no se pudo consultar → TODOS_LOS_PERMISOS (ocultar un botón no autoriza; el backend sí).
+ * null = no se pudo consultar; nunca se presume autorización.
  */
 export function permisosParaUI(permisos: readonly string[] | null): PermisosNoticiasUI {
-    if (!permisos) return TODOS_LOS_PERMISOS;
+    if (!permisos) return SIN_PERMISOS;
     const tiene = (codigo: string) => permisos.includes(codigo);
     const puedeEditar = tiene("VIVI_NOTICIAS_EDITAR");
     return {

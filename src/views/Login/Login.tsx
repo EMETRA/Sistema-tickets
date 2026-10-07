@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Title } from "@/components/client/atoms/Title";
 import { Text } from "@/components/client/atoms/Text";
 import { FormField } from "@/components/client/molecules/FormField";
@@ -26,6 +26,9 @@ const Login: React.FC = () => {
     const [email, setEmail] = useState("");
     const [clave, setClave] = useState("");
     const [error, setError] = useState<string | null>(null);
+    const [submitting, setSubmitting] = useState(false);
+    const submittingRef = useRef(false);
+    const busy = loading || submitting;
     // const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
     /**
@@ -46,6 +49,9 @@ const Login: React.FC = () => {
 
     const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
         e.preventDefault();
+        if (submittingRef.current) return;
+        submittingRef.current = true;
+        setSubmitting(true);
         setError(null);
 
         try {
@@ -80,10 +86,12 @@ const Login: React.FC = () => {
             
             router.push("/home");
         } catch (err) {
-            console.error("Error en login:", err);
             setError("Error al iniciar sesión. Verifica tus credenciales.");
             setClave("");
             // setCaptchaToken(null);
+        } finally {
+            submittingRef.current = false;
+            setSubmitting(false);
         }
     };
 
@@ -104,7 +112,7 @@ const Login: React.FC = () => {
                                     placeholder="email@ejemplo.com"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    disabled={loading}
+                                    disabled={busy}
                                     required
                                 />
                             </FormField>
@@ -115,7 +123,7 @@ const Login: React.FC = () => {
                                     placeholder="Contraseña"
                                     value={clave}
                                     onChange={(e) => setClave(e.target.value)}
-                                    disabled={loading}
+                                    disabled={busy}
                                     required
                                     iconcolor="#000000"
                                 />
@@ -145,9 +153,9 @@ const Login: React.FC = () => {
                                 color="cancel" 
                                 fullWidth 
                                 type="submit"
-                                state={loading ? "loading" : "default"}
+                                state={busy ? "loading" : "default"}
                             >
-                                {loading ? "Iniciando..." : "Iniciar Sesión"}
+                                {busy ? "Iniciando..." : "Iniciar Sesión"}
                             </Button>
                         </FormActions>
                     </form>

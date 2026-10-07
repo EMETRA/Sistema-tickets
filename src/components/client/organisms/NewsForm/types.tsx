@@ -23,6 +23,8 @@ export interface NewsFormFile {
  * Sección de contenido de la noticia.
  */
 export interface NewsFormSection {
+    contenidoHtmlOriginal?: string;
+    contenidoOriginal?: string;
     id: string;
     encabezado: string;
     contenido: string;
@@ -34,6 +36,7 @@ export interface NewsFormSection {
  * Valores del formulario. Los nombres de campo siguen el input GraphQL (en español).
  */
 export interface NewsFormValues {
+    categoriaIdsAdicionales?: string[];
     titulo: string;
     resumen: string;
     /** Texto libre */

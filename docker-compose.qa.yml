@@ -1,0 +1,24 @@
+# Archivo independiente: no combinar con el Compose de producción.
+services:
+  panel:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: sistema-tickets:qa
+    container_name: panel-vivi-qa
+    ports:
+      - "${FRONT_PORT:-4011}:3000"
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      GRAPHQL_ENDPOINT: "http://api-tickets-vivi-qa:3003/graphql"
+      API_PORTAL_URL: "http://api-portal-vivi-qa:4001"
+      APP_PORT: "3000"
+    restart: unless-stopped
+    init: true
+    networks:
+      - vivi-qa-cierre
+networks:
+  vivi-qa-cierre:
+    external: true

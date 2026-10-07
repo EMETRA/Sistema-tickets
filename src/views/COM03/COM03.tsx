@@ -34,13 +34,13 @@ const SIN_PERMISO = {
  * - ?vista=editar&id=<id>   → formulario de edición
  *
  * Los botones se muestran según `usuario.permisos` (README "Noticias CMS", sección 2). Ocultarlos no
- * autoriza: el backend verifica cada operación. Si los permisos no se pueden consultar, se muestra todo.
+ * autoriza: el backend verifica cada operación. Si los permisos no se pueden consultar, se permite reintentar la consulta.
  */
 function COM03Content() {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
-    const { data: permisos, loading: loadingPermisos } = useGetPermisosNoticias();
+    const { data: permisos, loading: loadingPermisos, error: errorPermisos, refetch: refetchPermisos } = useGetPermisosNoticias();
 
     const vista = searchParams.get("vista");
     const id = searchParams.get("id");
@@ -61,6 +61,7 @@ function COM03Content() {
         );
     }
 
+    if (errorPermisos) return <div className={styles.content}><NewsResultCard status="error" title="No se pudieron consultar los permisos" description="Intenta consultar de nuevo para continuar." primaryAction={{ label: 'Reintentar', onClick: () => void refetchPermisos() }} /></div>;
     const { puedeLeer, puedeEditar, puedePublicar } = permisosParaUI(permisos);
 
     const sinPermiso = !puedeLeer

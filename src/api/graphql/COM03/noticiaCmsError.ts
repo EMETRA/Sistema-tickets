@@ -73,6 +73,11 @@ export function toNoticiaCmsError(error: unknown): NoticiaCmsError {
     if (error instanceof NoticiaCmsError) return error;
 
     const mensajeError = error instanceof Error ? error.message : String(error);
+    if (esRegistro(error) && typeof error.statusCode === 'number') {
+        const body = esRegistro(error.body) ? error.body : {};
+        const mensajes = aTextos(body.message);
+        return new NoticiaCmsError(buscarCodigo([...aTextos(body.error), ...mensajes]), error.statusCode, mensajes.length ? mensajes : [mensajeError]);
+    }
     const graphQLErrors = esRegistro(error) && Array.isArray(error.graphQLErrors) ? error.graphQLErrors : [];
     const primero = esRegistro(graphQLErrors[0]) ? graphQLErrors[0] : null;
     const extensions = primero && esRegistro(primero.extensions) ? primero.extensions : null;

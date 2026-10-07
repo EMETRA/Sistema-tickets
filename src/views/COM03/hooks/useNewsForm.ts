@@ -96,6 +96,7 @@ const emptyValues = (): NewsFormValues => ({
 });
 
 const valuesFromDetalle = (noticia: NoticiaDetalle): NewsFormValues => ({
+    categoriaIdsAdicionales: noticia.categoriaIdsAdicionales,
     titulo: noticia.titulo,
     resumen: noticia.resumen,
     autor: noticia.autor,
@@ -117,6 +118,8 @@ const valuesFromDetalle = (noticia: NoticiaDetalle): NewsFormValues => ({
                 encabezado: seccion.encabezado,
                 // El textarea edita texto plano; al guardar se vuelve a convertir con textToHtml.
                 contenido: htmlToText(seccion.contenidoHtml),
+                contenidoOriginal: htmlToText(seccion.contenidoHtml),
+                contenidoHtmlOriginal: seccion.contenidoHtml,
                 imagen: seccion.recurso ? fromRecurso(seccion.recurso) : null,
             }))
         : [emptySection()],

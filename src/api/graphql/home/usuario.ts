@@ -12,6 +12,9 @@ export const GET_USER_QUERY = `
       email
       rol
       departamento
+      direccion
+      puesto
+      permisos
     }
   }
 `;

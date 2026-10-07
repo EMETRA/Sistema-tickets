@@ -11,6 +11,9 @@ export interface UsuarioPerfil {
   email: string;
   rol?: string;
   departamento?: string;
+  direccion?: string | null;
+  puesto?: string | null;
+  permisos?: string[];
   avatar?: string;
 }
 

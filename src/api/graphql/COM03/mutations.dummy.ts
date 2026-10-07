@@ -18,7 +18,7 @@ export const SIMULAR_ERROR = false;
  */
 // TODO [COM03-BACKEND]: pasar a false cuando NEXT_PUBLIC_GRAPHQL_ENDPOINT apunte a api-tickets con
 // guardarNoticiaCms desplegada (decisión del usuario, 2026-10-06).
-export const USAR_SIMULACION = true;
+export const USAR_SIMULACION = false;
 
 /**
  * Errores de `guardarNoticiaCms` según la tabla del README "Noticias CMS" (sección 5):

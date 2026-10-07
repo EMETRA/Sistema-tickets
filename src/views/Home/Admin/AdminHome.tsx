@@ -6,6 +6,7 @@ import { PerformanceChartPanel } from "@/components/client/organisms/Performance
 import { InfoPanel } from "@/components/client/organisms/InfoPanel";
 import { TicketsResolvePanel } from "@/components/client/organisms/TicketsResolvePanel";
 import type { DonutChartDataItem } from "@/components/client/atoms/DonutChart";
+import type { BarChartDataPoint } from "@/components/client/atoms/BarChart";
 import TicketsPanel from "@/components/client/organisms/TicketsPanel/TicketsPanel";
 import styles from "./AdminHome.module.scss";
 
@@ -20,12 +21,6 @@ import {
     useGetLastMovements,
     useGetLastTicket,
 } from "@/api/hooks";
-
-/** Punto de la gráfica de rendimiento (antes en queries/getAdminHome.ts, eliminado como residual). */
-interface PerformancePoint {
-    label: string;
-    value: number;
-}
 
 const AdminHome: React.FC = () => {
     const [filter, setFilter] = useState<PrimaryFilter>("HOY");
@@ -64,7 +59,7 @@ const AdminHome: React.FC = () => {
         : [];
 
     // Transformar UserPerformance a datos para el gráfico
-    const dataByFilter: PerformancePoint[] = performanceData
+    const dataByFilter: BarChartDataPoint[] = performanceData
         ? performanceData.map(user => ({
             label: user.nombre || "Sin nombre",
             value: user.tickets_resueltos,

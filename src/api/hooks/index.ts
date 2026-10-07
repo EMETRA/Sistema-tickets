@@ -114,3 +114,6 @@ export { useGuardarNoticia } from './useGuardarNoticia';
 export { useArchivarNoticia } from './useArchivarNoticia';
 export { useRestaurarNoticia } from './useRestaurarNoticia';
 export { useGetPermisosNoticias } from './useGetPermisosNoticias';
+
+// Consulta Vehículos SAT - Apps hooks
+export { useConsultaVehiculoMuni } from './useConsultaVehiculoMuni';

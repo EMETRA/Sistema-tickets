@@ -32,7 +32,6 @@ export const SystemLayout = ({
     const user = useAuthStore((state) => state.user);
     const isHydrated = useAuthStore((state) => state.isHydrated);
     const token = useAuthStore((state) => state.token);
-    const departamento = useAuthStore((state) => state.user?.departamento ?? null);
     const { catalog, loading: catalogLoading } = useAppsCatalogContext();
 
     const currentRole = getRole();
@@ -52,10 +51,12 @@ export const SystemLayout = ({
             return;
         }
 
-        if (!canAccessAppPath(departamento, pathname, catalog)) {
+        if (appId && catalogLoading) return;
+
+        if (!canAccessAppPath(pathname, catalog)) {
             router.replace("/unauthorized");
         }
-    }, [isHydrated, token, currentRole, departamento, pathname, router, catalog]);
+    }, [isHydrated, token, currentRole, pathname, router, catalog, catalogLoading, appId]);
 
     const navItems =
         appId && catalog
@@ -97,9 +98,9 @@ export const SystemLayout = ({
     const hasAccess =
         Boolean(token) &&
         canAccessPath(currentRole, pathname ?? "/home") &&
-        canAccessAppPath(departamento, pathname ?? "/home", catalog);
+        (!appId || (!catalogLoading && canAccessAppPath(pathname ?? "/home", catalog)));
 
-    if (!isHydrated || (appId && catalogLoading && !catalog)) {
+    if (!isHydrated || (appId && catalogLoading)) {
         return null;
     }
 

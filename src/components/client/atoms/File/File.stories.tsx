@@ -24,3 +24,11 @@ export const Outlined: Story = {
         variant: "outlined",
     },
 };
+
+export const Download: Story = {
+    args: {
+        name: "document.pdf",
+        onClick: () => alert("File clicked!"),
+        download: true,
+    },
+};

@@ -4,7 +4,7 @@ import React from "react";
 import classNames from "classnames";
 import { Title } from "../../atoms/Title";
 import { Text } from "../../atoms/Text";
-import { Chip } from "../../atoms/Chip";
+import { TicketStateChip } from "../../atoms/TicketStateChip";
 import { TableHeader } from "../../molecules/TableHeader";
 import { TableRow } from "../../molecules/TableRow";
 import { AssignedChip } from "../../molecules/AssignedChip";
@@ -98,7 +98,7 @@ export const TicketsPanel: React.FC<TicketsPanelProps> = ({
                                     },
                                     {
                                         content: (
-                                            <Chip state={ticket.status} label={ticket.statusLabel} />
+                                            <TicketStateChip state={ticket.status} label={ticket.statusLabel} />
                                         ),
                                         align: "left",
                                     },
@@ -186,7 +186,7 @@ export const TicketsPanel: React.FC<TicketsPanelProps> = ({
                                 },
                                 {
                                     content: (
-                                        <Chip state={ticket.status} label={ticket.statusLabel} />
+                                        <TicketStateChip state={ticket.status} label={ticket.statusLabel} />
                                     ),
                                     align: "left",
                                 },

@@ -4,7 +4,7 @@ import classNames from "classnames";
 import { TableHeader } from "../../molecules/TableHeader";
 import { TableRow } from "../../molecules/TableRow";
 import { Text } from "../../atoms/Text";
-import { Chip } from "../../atoms/Chip";
+import { TicketStateChip } from "../../atoms/TicketStateChip";
 import { IconButton } from "../../atoms/IconButton";
 import { useState } from "react";
 import RolesForm from "../RolesForm/RolesForm";
@@ -107,7 +107,7 @@ const RolesTable: React.FC<RolesTableProps> = ({
                             { content: <Text>{rol.roleCode}</Text> },
                             {
                                 content: (
-                                    <Chip label={rol.status} state="ingresado" />
+                                    <TicketStateChip label={rol.status} state="ingresado" />
                                 ),
                                 align: "center"
                             },

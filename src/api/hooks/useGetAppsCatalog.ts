@@ -15,7 +15,7 @@ import type { AppsCatalog } from "@/config/apps-catalog";
 
 export function useGetAppsCatalog() {
     const [data, setData] = useState<AppsCatalog | null>(null);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
 
     async function refetch() {

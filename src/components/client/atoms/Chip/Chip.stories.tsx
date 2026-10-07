@@ -11,29 +11,17 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Ingressed: Story = {
-    args: { label: "Ingresado", state: "ingressed" },
+    args: { label: "Ingresado" },
 };
 
-export const Assigned: Story = {
-    args: { label: "Asignado", state: "assigned" },
+export const IngressedWithCustomColor: Story = {
+    args: { label: "Ingresado", color: "#80B918" },
 };
 
-export const Inwork: Story = {
-    args: { label: "En trabajo", state: "inwork" },
+export const Outlined: Story = {
+    args: { label: "Cancelado", variant: "outlined" },
 };
 
-export const Resolved: Story = {
-    args: { label: "Resuelto", state: "resolved" },
-};
-
-export const Canceled: Story = {
-    args: { label: "Cancelado", state: "canceled" },
-};
-
-export const FilterOption: Story = {
-    args: { label: "Cancelado", variant: "outlined", state: "canceled" },
-};
-
-export const FilterSelected: Story = {
-    args: { label: "En trabajo", variant: "outlined", state: "inwork" },
+export const OutlinedWithCustomColor: Story = {
+    args: { label: "Cancelado", variant: "outlined", color: "#E63946" },
 };

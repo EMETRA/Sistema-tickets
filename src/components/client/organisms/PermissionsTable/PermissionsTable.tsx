@@ -4,7 +4,7 @@ import classNames from "classnames";
 import { TableHeader } from "../../molecules/TableHeader";
 import { TableRow } from "../../molecules/TableRow";
 import { Text } from "../../atoms/Text";
-import { Chip } from "../../atoms/Chip";
+import { TicketStateChip } from "../../atoms/TicketStateChip";
 import { IconButton } from "../../atoms/IconButton";
 import { useState } from "react";
 import { PermissionsForm } from "../PermissionsForm";
@@ -101,7 +101,7 @@ const PermissionsTable: React.FC<PermissionsTableProps> = ({
                             { content: <Text>{perm.name}</Text> },
                             {
                                 content: (
-                                    <Chip label={perm.status} state="asignado" />
+                                    <TicketStateChip label={perm.status} state="asignado" />
                                 ),
                                 align: "center"
                             },

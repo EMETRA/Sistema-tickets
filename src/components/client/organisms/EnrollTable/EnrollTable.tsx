@@ -6,7 +6,7 @@ import { useState } from "react";
 import { TableRow } from "../../molecules/TableRow";
 import { Avatar } from "../../atoms/Avatar";
 import { Text } from "../../atoms/Text";
-import { Chip } from "../../atoms/Chip";
+import { TicketStateChip } from "../../atoms/TicketStateChip";
 import { IconButton } from "../../atoms/IconButton";
 import { Button } from "../../atoms/Button";
 
@@ -101,7 +101,7 @@ const EnrollTable: React.FC<EnrollTableProps> = ({
                             { content: <Text>{en.permission}</Text> },
                             { 
                                 content: (
-                                    <Chip label={en.status} state="ingresado" />
+                                    <TicketStateChip label={en.status} state="ingresado" />
                                 ),
                                 align: "center"
                             },

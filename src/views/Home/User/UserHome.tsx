@@ -22,10 +22,11 @@ const UserHome: React.FC = () => {
     const { catalog, loading: catalogLoading, error: catalogError } =
         useAppsCatalogContext();
     const { data: userData, loading: loadingUser, refetch: refetchUser } = useGetUser();
-    const { data: statsData, loading: loadingStats, refetch: refetchMyStats } = useGetMyStats();
+    const { data: statsData, loading: loadingStats, error: statsError, refetch: refetchMyStats } = useGetMyStats();
     const {
         data: myActivityData,
         loading: loadingMyActivity,
+        error: activityError,
         refetch: refetchMyActivity,
     } = useGetMyActivity({ limit: 10 });
 
@@ -36,7 +37,6 @@ const UserHome: React.FC = () => {
             hasRunOnce.current = true;
             refetchUser();
             refetchMyStats();
-            refetchMyActivity();
         }
     }, [refetchMyActivity, refetchMyStats, refetchUser]);
 
@@ -107,17 +107,23 @@ const UserHome: React.FC = () => {
                     />
                 </div>
                 <div className={styles.eventsAndPerformanceContainer}>
-                    <InfoPanel
+                    {activityError ? <div role="alert" className={styles.errorPanel}>
+                        <p>No se pudo cargar la actividad reciente.</p>
+                        <button type="button" onClick={() => void refetchMyActivity()}>Reintentar actividad</button>
+                    </div> : <InfoPanel
                         type="my-activity"
                         items={eventItems}
                         className={styles.infoPanel}
-                    />
-                    <ReportTable
+                    />}
+                    {statsError ? <div role="alert" className={styles.errorPanel}>
+                        <p>No se pudo cargar el reporte de tickets.</p>
+                        <button type="button" onClick={() => void refetchMyStats()}>Reintentar reporte</button>
+                    </div> : <ReportTable
                         title="Reporte durante el año"
                         iconName="chart-simple-solid"
                         data={reportData}
                         className={styles.reportGraph}
-                    />
+                    />}
                 </div>
             </div>
         </div>

@@ -11,23 +11,8 @@ import { Text } from '../../components/client/atoms/Text';
 import { JUZ01Schema } from './JUZ01.schema';
 
 import styles from './JUZ01.module.scss';
-
-/**
- * DUMMY - BORRAAAAAAR
- */
-const consultarCaso = async (caseNumber: string) => {
-    await new Promise((resolve) => {
-        setTimeout(resolve, 1000);
-    });
-
-    if (Math.random() > 0.7) {
-        throw new Error('No se pudo consultar el caso');
-    } else if (Math.random() > 0.5) {
-        return undefined;
-    }
-
-    return { caseNumber };
-};
+import { consultarCasoJuzgado, mensajeJuzgado } from '@/api/graphql/juzgado';
+import { useRef } from 'react';
 
 const JUZ01: React.FC = () => {
     const router = useRouter();
@@ -35,12 +20,13 @@ const JUZ01: React.FC = () => {
     const [caseNumber, setCaseNumber] = useState('');
     const [fieldError, setFieldError] = useState<string | null>(null);
     const [message, setMessage] = useState<string | null>(null);
-    // MOCK - BORRAAAAAAR
+    const enCurso = useRef(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<{ message: string } | null>(null);
 
     const handleExecute = async () => {
-        setError(null);
+        if (enCurso.current) return;
+        setError(null); setMessage(null);
 
         const parsed = JUZ01Schema.safeParse({ caseNumber });
         if (!parsed.success) {
@@ -52,21 +38,21 @@ const JUZ01: React.FC = () => {
 
         setFieldError(null);
         setCaseNumber(parsed.data.caseNumber);
-        setLoading(true);
+        setLoading(true); enCurso.current = true;
 
         try {
-            const result = await consultarCaso(parsed.data.caseNumber);
+            const result = await consultarCasoJuzgado(parsed.data.caseNumber);
             if (!result) {
                 setMessage('Sin resultados');
                 return;
             }
-            router.push(`${pathname}/detail?caseNumber=${encodeURIComponent(result.caseNumber)}`);
+            router.push(`${pathname}/detail?caseNumber=${encodeURIComponent(result.codigoCaso)}`);
         } catch (err) {
             setError({
-                message: err instanceof Error ? err.message : 'No se pudo consultar el caso',
+                message: mensajeJuzgado(err),
             });
         } finally {
-            setLoading(false);
+            setLoading(false); enCurso.current = false;
         }
     };
 

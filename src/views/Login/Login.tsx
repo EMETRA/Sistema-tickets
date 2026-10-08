@@ -42,8 +42,11 @@ const Login: React.FC = () => {
                 token
             );
             return response.usuario || null;
-        } catch {
-            return null;
+        } catch (error) {
+            const e = error as { statusCode?: number; body?: { referencia?: string } };
+            const message = e.statusCode === 401 ? 'La sesión no fue validada. Vuelve a iniciar sesión.' : e.statusCode === 403 ? 'Tu cuenta no tiene permiso para consultar el perfil.' : 'Se obtuvo la respuesta de acceso, pero no se pudo cargar tu perfil. Intenta nuevamente.';
+            const referencia = e.body?.referencia;
+            throw new Error(message + (referencia && /^[a-f0-9-]{36}$/.test(referencia) ? ` Referencia: ${referencia}` : ''));
         }
     };
 
@@ -63,7 +66,6 @@ const Login: React.FC = () => {
             const response = await login(email, clave);
 
             if (!response) {
-                setError("Ocurrió un error. Intenta nuevamente.");
                 setClave("");
                 return;
             }
@@ -71,7 +73,7 @@ const Login: React.FC = () => {
             const userInfo = await fetchUserInfo(response.token);
 
             if (!userInfo) {
-                setError("Ocurrió un error. Intenta nuevamente.");
+                setError("No se recibió un perfil válido. Intenta nuevamente.");
                 setClave("");
                 return;
             }
@@ -86,7 +88,7 @@ const Login: React.FC = () => {
             
             router.push("/home");
         } catch (err) {
-            setError("Error al iniciar sesión. Verifica tus credenciales.");
+            setError(err instanceof Error ? err.message : "No se pudo completar el inicio de sesión.");
             setClave("");
             // setCaptchaToken(null);
         } finally {

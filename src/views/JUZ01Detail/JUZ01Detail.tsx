@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import classNames from 'classnames';
 import { Icon } from "@/components/client/atoms/Icon";
 import { Title } from "@/components/client/atoms/Title";
@@ -19,522 +19,24 @@ import styles from './JUZ01Detail.module.scss';
 import { JUZ01DetailProps } from './types';
 import { useRouter } from 'next/navigation';
 import { TextArea } from '@/components/client/atoms/TextArea';
+import { Select } from '@/components/client/atoms/Select';
+import { Input } from '@/components/client/atoms/Input';
+import { useAuthStore } from '@/store/useAuthStore';
+import { consultarCasoJuzgado, consultarSedesJuzgado, recibirCasoJuzgado, resolverCasoJuzgado, registrarGestionJuzgado, generarDocumentoJuzgado, descargarArchivoJuzgado, idSolicitudJuzgado, mensajeJuzgado, type DetalleJuzgado, type SedeJuzgado, type RecepcionInput, type ResolucionInput, type GestionInput } from '@/api/graphql/juzgado';
+import { mapearCasoJuzgado } from '@/api/graphql/juzgado-vista';
 
 
-/**
- * DUMMY - BORRAAAAAAR
- */
-type CaseStatus = "CREADO" | "EN_JUZGADO" | "ACOGIDO" | "NO_ACOGIDA";
-
-type File = {
-    id: string,
-    name: string,
-    sourceUrl: string,
-    size: string
-}
-
-type Log = {
-    userName: string,
-    email: string,
-    action: string,
-    date: string,
-    note: string
-}
-
-type Tag = {
-    id: string;
-    nombre: string;
-    color?: string;
-}
-
-type Case = {
-    caseNumber: string,
-    tags: Tag[],
-    caseDate: string,
-    place: string,
-    title: string,
-    status: CaseStatus,
-    placa: string,
-    denuncia: {
-        descripción: string,
-        evidencias: File[]
-    },
-    // defensa: {
-    //     nombre: string,
-    //     dpi: string,
-    //     correo: string,
-    //     telefono: string,
-    //     argumentos: string,
-    //     anexos: File[]
-    // }
-    logs: Log[],
-    resolucion?: {
-        id: string,
-        fecha: string,
-        comentario: string,
-        file: File
-    },
-    multa?: {
-        ciudad: string,
-        serie: string,
-        numero: string,
-        monto: number,
-        placa: string,
-        datosPago: {
-            estado: string,
-            monto: string,
-            referencia: string,
-        }
-    }
-}
-
-const cases: Case[] = [
-    // Caso recien creado
-    {
-        caseNumber: "1",
-        tags: [
-            {
-                id: "1",
-                nombre: "Registrado en Web",
-                color: "#000000",
-            },
-            {
-                id: "2",
-                nombre: "Pendiente de recepción",
-            },
-        ],
-        caseDate: "2026-01-01",
-        place: "Ciudad de Guatemala",
-        title: "Caso de prueba",
-        status: "CREADO",
-        placa: "P123DFB",
-        denuncia: {
-            descripción: "Descripción de la denuncia",
-            evidencias: [
-                {
-                    id: "1",
-                    name: "Evidencia 1",
-                    sourceUrl: "/images/no-user.png",
-                    size: "100KB",
-                },
-                {
-                    id: "2",
-                    name: "Evidencia 2",
-                    sourceUrl: "/images/city.png",
-                    size: "100KB",
-                },
-                {
-                    id: "3",
-                    name: "Evidencia 3",
-                    sourceUrl: "/images/image.png",
-                    size: "100KB",
-                },
-            ],
-        },
-        // defensa: {
-        //     nombre: "Nombre de la defensa",
-        //     dpi: "1234567890",
-        //     correo: "defensa@gmail.com",
-        //     telefono: "1234567890",
-        //     argumentos: "Argumentos de la defensa",
-        //     anexos: [
-        //         {
-        //             id: "1",
-        //             name: "Anexo 1",
-        //             sourceUrl: "/images/no-user.png",
-        //             size: "100KB",
-        //         },
-        //         {
-        //             id: "2",
-        //             name: "Anexo 2",
-        //             sourceUrl: "/images/login-info.png",
-        //             size: "100KB",
-        //         },
-        //     ],
-        // },
-        logs: [
-            {
-                userName: "Juan Perez",
-                email: "juan.perez@gmail.com",
-                action: "Registrado en Web",
-                date: "2026-01-01",
-                note: "Caso de prueba",
-            },
-        ],
-    },
-    // Caso recibido en juzgado
-    {
-        caseNumber: "2",
-        tags: [
-            {
-                id: "1",
-                nombre: "Registrado en Web",
-                color: "#000000",
-            },
-            {
-                id: "2",
-                nombre: "Recibido en juzgado",
-            },
-            {
-                id: "3",
-                nombre: "En revisión",
-                color: "#F59E0B",
-            }
-        ],
-        caseDate: "2026-01-01",
-        place: "Ciudad de Guatemala. 2da Calle 23-45 Zona 10",
-        title: "Caso de prueba",
-        status: "EN_JUZGADO",
-        placa: "P123DFB",
-        denuncia: {
-            descripción: "El vehículo se estacionó en la acera de la calle 123, y el conductor no se detuvo. La placa del vehículo es P123DFB. Se adjunta una imagen de la placa del vehículo. Y una imagen de la escena del accidente.. Además, se adjunta una imagen de la escena del accidente. Cabe destacar que el conductor no se detuvo y continuó conduciendo. La imagen de la placa del vehículo es P123DFB. La imagen de la escena del accidente es la siguiente: ...",
-            evidencias: [
-                {
-                    id: "1",
-                    name: "Evidencia 1",
-                    sourceUrl: "/images/no-user.png",
-                    size: "100KB",
-                },
-                {
-                    id: "2",
-                    name: "Evidencia 2",
-                    sourceUrl: "/images/city.png",
-                    size: "100KB",
-                },
-                {
-                    id: "3",
-                    name: "Evidencia 3",
-                    sourceUrl: "/images/image.png",
-                    size: "100KB",
-                },
-                {
-                    id: "4",
-                    name: "Evidencia 4.pdf",
-                    sourceUrl: "/images/image.png",
-                    size: "100KB",
-                },
-                {
-                    id: "5",
-                    name: "Evidencia 4.docx",
-                    sourceUrl: "/images/image.png",
-                    size: "100KB",
-                },
-            ],
-        },
-        // defensa: {
-        //     nombre: "Nombre de la defensa",
-        //     dpi: "1234567890",
-        //     correo: "defensa@gmail.com",
-        //     telefono: "1234567890",
-        //     argumentos: "El vehículo se estacionó en la acera de la calle 123, y el conductor no se detuvo. La placa del vehículo es P123DFB. Se adjunta una imagen de la placa del vehículo. Y una imagen de la escena del accidente.. Además, se adjunta una imagen de la escena del accidente. Cabe destacar que el conductor no se detuvo y continuó conduciendo. La imagen de la placa del vehículo es P123DFB. La imagen de la escena del accidente es la siguiente: ...",
-        //     anexos: [
-        //         {
-        //             id: "1",
-        //             name: "Anexo 1",
-        //             sourceUrl: "/images/no-user.png",
-        //             size: "100KB",
-        //         },
-        //         {
-        //             id: "2",
-        //             name: "Anexo 2",
-        //             sourceUrl: "/images/login-info.png",
-        //             size: "100KB",
-        //         },
-        //     ],
-        // },
-        logs: [
-            {
-                userName: "Juan Perez",
-                email: "juan.perez@gmail.com",
-                action: "Registrado en Web",
-                date: "2026-01-01",
-                note: "Caso de prueba",
-            },
-            {
-                userName: "Maria Gomez",
-                email: "maria.gomez@gmail.com",
-                action: "Recibido en juzgado",
-                date: "2026-01-01 10:00:00",
-                note: "Caso recibido en juzgado",
-            },
-            {
-                userName: "Jorge Juan",
-                email: "jorge.juarez@gmail.com",
-                action: "Registró su defensa",
-                date: "2026-01-02 10:00:00",
-                note: "Caso registró su defensa",
-            }
-        ],
-    },
-    // Caso acogido
-    {
-        caseNumber: "3",
-        tags: [
-            {
-                id: "1",
-                nombre: "Acogido",
-                color: "#80B918",
-            },
-            {
-                id: "2",
-                nombre: "Archivado",
-            },
-        ],
-        caseDate: "2026-01-01",
-        place: "2da Calle 23-45 Zona 10",
-        title: "Caso de prueba",
-        status: "ACOGIDO",
-        placa: "P123DFB",
-        denuncia: {
-            descripción: "El vehículo se estacionó en la acera de la calle 123, y el conductor no se detuvo. La placa del vehículo es P123DFB. Se adjunta una imagen de la placa del vehículo. Y una imagen de la escena del accidente.. Además, se adjunta una imagen de la escena del accidente. Cabe destacar que el conductor no se detuvo y continuó conduciendo. La imagen de la placa del vehículo es P123DFB. La imagen de la escena del accidente es la siguiente: ...",
-            evidencias: [
-                {
-                    id: "1",
-                    name: "Evidencia 1",
-                    sourceUrl: "/images/no-user.png",
-                    size: "100KB",
-                },
-                {
-                    id: "2",
-                    name: "Evidencia 2",
-                    sourceUrl: "/images/city.png",
-                    size: "100KB",
-                },
-                {
-                    id: "3",
-                    name: "Evidencia 3",
-                    sourceUrl: "/images/image.png",
-                    size: "100KB",
-                },
-            ],
-        },
-        // defensa: {
-        //     nombre: "Nombre de la defensa",
-        //     dpi: "1234567890",
-        //     correo: "defensa@gmail.com",
-        //     telefono: "1234567890",
-        //     argumentos: "El vehículo se estacionó en la acera de la calle 123, y el conductor no se detuvo. La placa del vehículo es P123DFB. Se adjunta una imagen de la placa del vehículo. Y una imagen de la escena del accidente.. Además, se adjunta una imagen de la escena del accidente. Cabe destacar que el conductor no se detuvo y continuó conduciendo. La imagen de la placa del vehículo es P123DFB. La imagen de la escena del accidente es la siguiente: ...",
-        //     anexos: [
-        //         {
-        //             id: "1",
-        //             name: "Anexo 1",
-        //             sourceUrl: "/images/no-user.png",
-        //             size: "100KB",
-        //         },
-        //         {
-        //             id: "2",
-        //             name: "Anexo 2",
-        //             sourceUrl: "/images/login-info.png",
-        //             size: "100KB",
-        //         },
-        //     ],
-        // },
-        logs: [
-            {
-                userName: "Juan Perez",
-                email: "juan.perez@gmail.com",
-                action: "Registrado en Web",
-                date: "2026-01-01",
-                note: "Caso de prueba",
-            },
-            {
-                userName: "Maria Gomez",
-                email: "maria.gomez@gmail.com",
-                action: "Recibido en juzgado",
-                date: "2026-01-01 10:00:00",
-                note: "Caso recibido en juzgado",
-            },
-            {
-                userName: "Jorge Juan",
-                email: "jorge.juarez@gmail.com",
-                action: "Registró su defensa",
-                date: "2026-01-02 10:00:00",
-                note: "Caso registró su defensa",
-            },
-            {
-                userName: "Margia Gomez",
-                email: "margia.gomez@gmail.com",
-                action: "Acogido",
-                date: "2026-01-03 10:00:00",
-                note: "Caso acogido y archivado",
-            }
-        ],
-        resolucion: {
-            id: "1",
-            fecha: "2026-01-04",
-            comentario: "Analizando la denuncia y la defensa determiné que el conductor no se detuvo y continuó conduciendo. La imagen de la placa del vehículo es P123DFB. La imagen de la escena del accidente es la siguiente: ...",
-            file: {
-                id: "1",
-                name: "Resolución.pdf",
-                sourceUrl: "/images/no-user.png",
-                size: "100KB",
-            }
-        }
-    },
-    // Caso acogido
-    {
-        caseNumber: "4",
-        tags: [
-            {
-                id: "1",
-                nombre: "No acogido",
-                color: "#EF4444",
-            },
-            {
-                id: "2",
-                nombre: "Remisión emitida",
-            },
-        ],
-        caseDate: "2026-01-01",
-        place: "2da Calle 23-45 Zona 10",
-        title: "Caso de prueba",
-        status: "NO_ACOGIDA",
-        placa: "P123DFB",
-        denuncia: {
-            descripción: "El vehículo se estacionó en la acera de la calle 123, y el conductor no se detuvo. La placa del vehículo es P123DFB. Se adjunta una imagen de la placa del vehículo. Y una imagen de la escena del accidente.. Además, se adjunta una imagen de la escena del accidente. Cabe destacar que el conductor no se detuvo y continuó conduciendo. La imagen de la placa del vehículo es P123DFB. La imagen de la escena del accidente es la siguiente: ...",
-            evidencias: [
-                {
-                    id: "1",
-                    name: "Evidencia 1",
-                    sourceUrl: "/images/no-user.png",
-                    size: "100KB",
-                },
-                {
-                    id: "2",
-                    name: "Evidencia 2",
-                    sourceUrl: "/images/city.png",
-                    size: "100KB",
-                },
-                {
-                    id: "3",
-                    name: "Evidencia 3",
-                    sourceUrl: "/images/image.png",
-                    size: "100KB",
-                },
-            ],
-        },
-        // defensa: {
-        //     nombre: "Nombre de la defensa",
-        //     dpi: "1234567890",
-        //     correo: "defensa@gmail.com",
-        //     telefono: "1234567890",
-        //     argumentos: "El vehículo se estacionó en la acera de la calle 123, y el conductor no se detuvo. La placa del vehículo es P123DFB. Se adjunta una imagen de la placa del vehículo. Y una imagen de la escena del accidente.. Además, se adjunta una imagen de la escena del accidente. Cabe destacar que el conductor no se detuvo y continuó conduciendo. La imagen de la placa del vehículo es P123DFB. La imagen de la escena del accidente es la siguiente: ...",
-        //     anexos: [
-        //         {
-        //             id: "1",
-        //             name: "Anexo 1",
-        //             sourceUrl: "/images/no-user.png",
-        //             size: "100KB",
-        //         },
-        //         {
-        //             id: "2",
-        //             name: "Anexo 2",
-        //             sourceUrl: "/images/login-info.png",
-        //             size: "100KB",
-        //         },
-        //     ],
-        // },
-        logs: [
-            {
-                userName: "Juan Perez",
-                email: "juan.perez@gmail.com",
-                action: "Registrado en Web",
-                date: "2026-01-01",
-                note: "Caso de prueba",
-            },
-            {
-                userName: "Maria Gomez",
-                email: "maria.gomez@gmail.com",
-                action: "Recibido en juzgado",
-                date: "2026-01-01 10:00:00",
-                note: "Caso recibido en juzgado",
-            },
-            {
-                userName: "Jorge Juan",
-                email: "jorge.juarez@gmail.com",
-                action: "Registró su defensa",
-                date: "2026-01-02 10:00:00",
-                note: "Caso registró su defensa",
-            },
-            {
-                userName: "Margia Gomez",
-                email: "margia.gomez@gmail.com",
-                action: "Acogido",
-                date: "2026-01-03 10:00:00",
-                note: "Caso acogido y archivado",
-            }
-        ],
-        resolucion: {
-            id: "1",
-            fecha: "2026-01-04",
-            comentario: "Analizando la denuncia y la defensa determiné que el conductor no se detuvo y continuó conduciendo. La imagen de la placa del vehículo es P123DFB. La imagen de la escena del accidente es la siguiente: ...",
-            file: {
-                id: "1",
-                name: "Resolución.pdf",
-                sourceUrl: "/images/no-user.png",
-                size: "100KB",
-            }
-        },
-        multa: {
-            ciudad: "Ciudad de Guatemala",
-            serie: "1234567890",
-            numero: "1234567890",
-            placa: "P123DFB",
-            monto: 100,
-            datosPago: {
-                estado: "Pendiente",
-                monto: "100",
-                referencia: "1234567890",
-            }
-        }
-    },
-]
-/////////////////////////////
-
-const IMAGE_EXTENSIONS = ["jpg", "jpeg", "png", "gif", "webp", "svg"];
-const VIDEO_EXTENSIONS = ["mp4", "webm", "ogg", "mov"];
-
-const getExtension = (value: string) => {
-    const filename = value.split("?")[0].split("/").pop() ?? value;
-    const ext = filename.includes(".") ? filename.split(".").pop() : "";
-    return ext?.toLowerCase() ?? "";
-};
-
-const toMediaGridItem = (file: File): MediaGridItem => {
-    const ext = getExtension(file.name) || getExtension(file.sourceUrl);
-
-    if (IMAGE_EXTENSIONS.includes(ext)) {
-        return {
-            type: "image",
-            src: file.sourceUrl,
-            alt: file.name,
-            width: 320,
-            height: 180,
-        };
-    }
-
-    if (VIDEO_EXTENSIONS.includes(ext)) {
-        return {
-            type: "video",
-            src: file.sourceUrl,
-        };
-    }
-
-    return {
-        type: "file",
-        id: file.id,
-        name: file.name,
-        download: true,
-        onClick: () => {
-            alert(`Descargar archivo id: ${file.id}`);
-        },
-    };
-};
+type Case = ReturnType<typeof mapearCasoJuzgado>;
+type EvidenceFile = Case['denuncia']['evidencias'][number];
+const toMediaGridItem = (file: EvidenceFile, onError: (error: unknown) => void): MediaGridItem => ({
+    type: 'file', id: file.id, name: file.name, download: true,
+    onClick: () => { void descargarArchivoJuzgado('evidencias', file.id, `evidencia-${file.id}.${file.mime.startsWith('video/') ? 'mp4' : file.mime === 'image/png' ? 'png' : 'jpg'}`).catch(onError); },
+});
 
 const LOG_GRID = "minmax(0,0.5fr) minmax(0,0.3fr) minmax(0,1fr) minmax(0,0.2fr) minmax(0,1fr)";
 
 const LOG_HEADER: TableCellConfig[] = [
-    { label: "Nombre", icon: "user-solid" },
+    { label: "Actor", icon: "user-solid" },
     { label: "Correo", icon: "mail-solid" },
     { label: "Acción", icon: "ticket" },
     { label: "Fecha", icon: "calendar-regular" },
@@ -555,61 +57,73 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
     const [fundament, setFundament] = useState("");
     const [isSendingResolution, setIsSendingResolution] = useState(false);
 
-    useMemo(() => {
-        setIsLoading(true);
-        setError(null);
-        
-        setTimeout(() => {
-            const caseData = cases.find(c => c.caseNumber === caseNumber);
+    const permisos = useAuthStore(state => state.user)?.permisos || [];
+    const [detalle, setDetalle] = useState<DetalleJuzgado | null>(null);
+    const [sedes, setSedes] = useState<SedeJuzgado[]>([]);
+    const [sede, setSede] = useState('');
+    const [numeroInterno, setNumeroInterno] = useState('');
+    const [observacion, setObservacion] = useState('');
+    const [gestionTipo, setGestionTipo] = useState('REVISION');
+    const [gestionNota, setGestionNota] = useState('');
+    const [busy, setBusy] = useState(false);
+    const [aviso, setAviso] = useState<string | null>(null);
+    const [consultaVersion, setConsultaVersion] = useState(0);
+    const enCurso = useRef(false);
+    const recepcionPendiente = useRef<RecepcionInput | null>(null);
+    const resolucionPendiente = useRef<{ decision: 'ACOGIDA' | 'NO_ACOGIDA'; input: ResolucionInput } | null>(null);
+    const gestionPendiente = useRef<GestionInput | null>(null);
+    const puedeConsultar = permisos.includes('VIVI_JUZGADO_CONSULTAR');
+    const puedeRecibir = !!detalle && !detalle.expediente && ['REGISTRADA', 'PENDIENTE_CORREO', 'NOTIFICADA', 'DEFENSA_WEB'].includes(detalle.estadoCaso) && permisos.includes('VIVI_JUZGADO_RECIBIR');
+    const puedeResolver = detalle?.estadoCaso === 'EN_JUZGADO' && !!detalle.expediente && ['RECIBIDO', 'EN_REVISION'].includes(detalle.expediente.estado) && permisos.includes('VIVI_JUZGADO_RESOLVER');
 
-            // if (Math.random() > 0.7) {
-            //     setError({ message: "Error al cargar el caso" });
-            //     setIsLoading(false);
-            //     return;
-            // }
+    async function recargar() {
+        const data = await consultarCasoJuzgado(caseNumber);
+        setDetalle(data); setCurrentCase(mapearCasoJuzgado(data));
+    }
+    useEffect(() => {
+        let activo = true;
+        setIsLoading(true); setError(null); setCurrentCase(null); setDetalle(null);
+        recepcionPendiente.current = null; resolucionPendiente.current = null; gestionPendiente.current = null;
+        void (async () => {
+            if (!puedeConsultar) throw new Error('Sin permiso');
+            const data = await consultarCasoJuzgado(caseNumber);
+            const disponibles = await consultarSedesJuzgado();
+            if (activo) { setDetalle(data); setCurrentCase(mapearCasoJuzgado(data)); setSedes(disponibles); }
+        })().catch(e => { if (activo) setError({ message: puedeConsultar ? mensajeJuzgado(e) : 'Tu cuenta no tiene permiso para consultar casos del juzgado.' }); }).finally(() => { if (activo) setIsLoading(false); });
+        return () => { activo = false; };
+    }, [caseNumber, puedeConsultar, consultaVersion]);
 
-            if (caseData) {
-                setCurrentCase(caseData);
-            }
-            setIsLoading(false);
-        }, 1000);
-
-    }, [caseNumber]);
-
+    const falloArchivo = (e: unknown) => setAviso(mensajeJuzgado(e));
+    async function ejecutar(accion: () => Promise<unknown>, confirmar?: () => void) {
+        if (enCurso.current) return;
+        enCurso.current = true; setBusy(true); setAviso(null); setErrorSendResolution(null);
+        try {
+            await accion(); confirmar?.();
+            try { await recargar(); } catch { setAviso('La operación fue confirmada, pero no se pudo actualizar la vista. Consulta el estado actual del caso.'); }
+        } catch (e) { setAviso(mensajeJuzgado(e)); }
+        finally { enCurso.current = false; setBusy(false); setIsSendingResolution(false); }
+    }
     const handleConfirmReceipt = () => {
-        console.log("Confirmar recepción de papelería");
+        if (!puedeRecibir || !sede) { setAviso('Selecciona un juzgado activo para confirmar la recepción.'); return; }
         setShowConfirmReceiptModal(false);
-        router.replace(`/home/juridico/juz01/juz01/detail?caseNumber=2`);
-    }
-
+        recepcionPendiente.current ||= { codigoCaso: caseNumber, codigoJuzgado: sede, requestId: idSolicitudJuzgado(), numeroInterno: numeroInterno.trim() || undefined, observacion: observacion.trim() || undefined };
+        void ejecutar(() => recibirCasoJuzgado(recepcionPendiente.current!));
+    };
     const handleSendResolution = () => {
-        setErrorSendResolution(null);
-        if (fundament.trim() === "") {
-            alert("El fundamento es requerido para enviar la resolución");
-            setShowSendResolutionModal(false);
-            return;
-        }
-
-        setShowSendResolutionModal(false);
-        setIsSendingResolution(true);
-        if (Math.random() > 0.5) {
-            setErrorSendResolution({ message: "Error al enviar la resolución" });
-            setIsSendingResolution(false);
-            return;
-        }
-        setTimeout(() => {
-            setIsSendingResolution(false);
-        }, 5000);
-        console.log("Resolucion enviada con:");
-        console.log(resolveCaseValue);
-        console.log(fundament);
-
-        if (resolveCaseValue === "acogido") {
-            router.replace(`/home/juridico/juz01/juz01/detail?caseNumber=3`);
-        } else {
-            router.replace(`/home/juridico/juz01/juz01/detail?caseNumber=4`);
-        }
-    }
+        if (!puedeResolver || !detalle?.expediente || !fundament.trim()) { setAviso('El fundamento es requerido para emitir la resolución.'); setShowSendResolutionModal(false); return; }
+        setShowSendResolutionModal(false); setIsSendingResolution(true);
+        resolucionPendiente.current ||= { decision: resolveCaseValue === 'acogido' ? 'ACOGIDA' : 'NO_ACOGIDA', input: { idExpediente: detalle.expediente.id, fundamento: fundament.trim(), requestId: idSolicitudJuzgado(), claveIdempotencia: idSolicitudJuzgado(), versionExpediente: detalle.expediente.version || undefined } };
+        const pendiente = resolucionPendiente.current;
+        void ejecutar(async () => {
+            const resultado = await resolverCasoJuzgado(pendiente.decision, pendiente.input);
+            if (resultado.estadoDocumento === 'ERROR_REINTENTABLE') setAviso('La resolución fue confirmada. El PDF está pendiente por un error recuperable; reintenta solo el documento.');
+        }, () => setShowResolveDefense(false));
+    };
+    const handleGestion = () => {
+        if (!puedeResolver || !detalle?.expediente || !gestionNota.trim()) { setAviso('Escribe una observación para registrar la actuación.'); return; }
+        gestionPendiente.current ||= { idExpediente: detalle.expediente.id, tipoGestion: gestionTipo, observacion: gestionNota.trim(), requestId: idSolicitudJuzgado() };
+        void ejecutar(() => registrarGestionJuzgado(gestionPendiente.current!), () => { gestionPendiente.current = null; setGestionNota(''); });
+    };
 
     if (isLoading) {
         return (
@@ -623,6 +137,7 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
         return (
             <div className={classNames(styles.mainContainer, styles.error)}>
                 <Text variant="body">{error.message}</Text>
+                {puedeConsultar && <Button onClick={() => setConsultaVersion(v => v + 1)}>Reintentar consulta</Button>}
                 <Button variant="contained" onClick={() => router.back()}>Volver</Button>
             </div>
         );
@@ -649,16 +164,21 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
             <Title variant="large">{currentCase.title} - {currentCase.placa}</Title>
             <div className={styles.tags}>
                 {currentCase.tags.map((tag) => (
-                    <Chip key={tag.id} label={tag.nombre} color={tag.color} />
+                    <Chip key={tag.id} label={tag.nombre} />
                 ))}
             </div>
-            {currentCase.status === "CREADO" || currentCase.status === "EN_JUZGADO" && !showResolveDefense ? (
+            {(puedeRecibir || puedeResolver) && !showResolveDefense ? (
                 <div className={styles.actions}>
                     <Title variant="mid" className={styles.title}>Acciones disponibles</Title>
-                    {currentCase.status === "CREADO" ? (
-                        <Button variant="contained" onClick={() => setShowConfirmReceiptModal(true)}>Confirmar recepción de papelería</Button>
-                    ) : currentCase.status === "EN_JUZGADO" ? (
-                        <Button variant="contained" onClick={() => setShowResolveDefense(true)}>Resolver defensa</Button>
+                    {puedeRecibir ? (
+                        <div className={styles.resolveCaseForm}>
+                            <FormField label="Juzgado receptor" htmlFor="juzgado" required><Select id="juzgado" options={sedes.map(s => ({ value: s.codigo, label: s.nombre }))} placeholder="Selecciona un juzgado" value={sede} onChange={e => setSede(e.target.value)} disabled={busy || !!recepcionPendiente.current} /></FormField>
+                            <FormField label="Número interno (opcional)" htmlFor="numeroInterno"><Input id="numeroInterno" value={numeroInterno} onChange={e => setNumeroInterno(e.target.value)} maxLength={80} disabled={busy || !!recepcionPendiente.current} /></FormField>
+                            <FormField label="Observación (opcional)" htmlFor="observacion"><TextArea id="observacion" value={observacion} onChange={e => setObservacion(e.target.value)} maxLength={2000} disabled={busy || !!recepcionPendiente.current} /></FormField>
+                            <Button variant="contained" state={busy ? "disabled" : "default"} onClick={() => setShowConfirmReceiptModal(true)}>Confirmar recepción de papelería</Button>
+                        </div>
+                    ) : puedeResolver ? (
+                        <Button variant="contained" state={busy ? "disabled" : "default"} onClick={() => setShowResolveDefense(true)}>Resolver defensa</Button>
                     ) : <Text variant="body">No hay acciones disponibles</Text>}
                 </div>
             ) : !showResolveDefense && (
@@ -668,12 +188,11 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
                             <Title variant="mid">Resolución - {currentCase.resolucion?.id}</Title>
                             <Text variant="caption">{currentCase.resolucion?.fecha}</Text>
                             <Text variant="body">{currentCase.resolucion?.comentario}</Text>
-                            <File
-                                id={currentCase.resolucion?.file.id}
-                                name={currentCase.resolucion?.file.name}
-                                onClick={() => alert(`Descargar archivo id: ${currentCase.resolucion?.file.id}`)}
-                                download
-                            />
+                            <Text variant="caption">Plantilla: {currentCase.resolucion.plantilla} (borrador técnico)</Text>
+                            {currentCase.resolucion.file ? <File id={currentCase.resolucion.file.id} name={currentCase.resolucion.file.name} onClick={() => { void descargarArchivoJuzgado('documentos', currentCase.resolucion!.file!.id, currentCase.resolucion!.file!.name).catch(falloArchivo); }} download /> : <>
+                                <Text variant="body">El documento de resolución no está disponible.</Text>
+                                {permisos.includes('VIVI_JUZGADO_RESOLVER') && <Button state={busy ? 'disabled' : 'default'} onClick={() => { void ejecutar(() => generarDocumentoJuzgado(currentCase.resolucion!.id)); }}>Reintentar PDF de resolución</Button>}
+                            </>}
                         </>
                     ) : (
                         <Text variant="body">La resolución aún no está disponible</Text>
@@ -698,26 +217,8 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
                                     <Text variant="body"><strong>Placa</strong></Text>
                                     <Text variant="body">{currentCase.multa.placa}</Text>
                                 </div>
-                                <div className={styles.remissionDataItem}>
-                                    <Text variant="body"><strong>Monto (Q)</strong></Text>
-                                    <Text variant="body">{currentCase.multa.monto}</Text>
-                                </div>
                             </div>
-                            <Title variant="mid" className={styles.title}>Datos de pago</Title>
-                            <div className={styles.remissionData}>
-                                <div className={styles.remissionDataItem}>
-                                    <Text variant="body"><strong>Estado</strong></Text>
-                                    <Text variant="body">{currentCase.multa.datosPago.estado}</Text>
-                                </div>
-                                <div className={styles.remissionDataItem}>
-                                    <Text variant="body"><strong>Monto (Q)</strong></Text>
-                                    <Text variant="body">{currentCase.multa.datosPago.monto}</Text>
-                                </div>
-                                <div className={styles.remissionDataItem}>
-                                    <Text variant="body"><strong>Referencia</strong></Text>
-                                    <Text variant="body">{currentCase.multa.datosPago.referencia}</Text>
-                                </div>
-                            </div>
+                            <Text variant="body">El importe y la disponibilidad de pago se consultan en el sistema institucional.</Text>
                         </div>
                     )}
                     <Title variant="mid">Caso</Title>
@@ -728,45 +229,29 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
             <Title variant="mid" className={styles.title}>Evidencias</Title>
             <MediaGrid
                 columns={3}
-                items={currentCase.denuncia.evidencias.map(toMediaGridItem)}
+                items={currentCase.denuncia.evidencias.map(file => toMediaGridItem(file, falloArchivo))}
             />
-            {/* <Title variant="mid">Defensa</Title>
-            <div className={styles.defensePersonalData}>
-                <div className={styles.defensePersonalDataItem}>
-                    <Text variant="body"><strong>Nombre</strong></Text>
-                    <Text variant="body">{currentCase.defensa.nombre}</Text>
-                </div>
-                <div className={styles.defensePersonalDataItem}>
-                    <Text variant="body"><strong>DPI</strong></Text>
-                    <Text variant="body">{currentCase.defensa.dpi}</Text>
-                </div>
-                <div className={styles.defensePersonalDataItem}>
-                    <Text variant="body"><strong>Correo</strong></Text>
-                    <Text variant="body">{currentCase.defensa.correo}</Text>
-                </div>
-                <div className={styles.defensePersonalDataItem}>
-                    <Text variant="body"><strong>Teléfono</strong></Text>
-                    <Text variant="body">{currentCase.defensa.telefono}</Text>
-                </div>
-            </div>
-            <Title variant="mid" className={styles.title}>Argumentos</Title>
-            <Text variant="body">{currentCase.defensa.argumentos}</Text>
-            <Title variant="mid" className={styles.title}>Anexos</Title>
-            <MediaGrid
-                columns={3}
-                items={currentCase.defensa.anexos.map(toMediaGridItem)}
-            /> */}
-            {showResolveDefense && currentCase.status === "EN_JUZGADO" && (
+            {currentCase.defensa && <><Title variant="mid">Defensa histórica</Title><Text variant="body">{currentCase.defensa.nombreDeclarado}</Text><Text variant="body">{currentCase.defensa.argumentos}</Text><MediaGrid columns={3} items={currentCase.defensa.evidencias.map(file => toMediaGridItem(file, falloArchivo))} /></>}
+            {puedeResolver && <div className={styles.resolveCaseForm}>
+                <Title variant="mid">Registrar actuación</Title>
+                <Select options={[{ value: 'REVISION', label: 'Revisión' }, { value: 'ENTREGA_DOCUMENTOS', label: 'Entrega de documentos' }, { value: 'INCIDENCIA', label: 'Incidencia' }]} value={gestionTipo} onChange={e => setGestionTipo(e.target.value)} disabled={busy || !!gestionPendiente.current} aria-label="Tipo de actuación" />
+                <TextArea value={gestionNota} onChange={e => setGestionNota(e.target.value)} maxLength={2000} disabled={busy || !!gestionPendiente.current} aria-label="Observación de la actuación" />
+                <Button onClick={handleGestion} state={busy ? 'disabled' : 'default'}>Registrar actuación</Button>
+            </div>}
+            {showResolveDefense && puedeResolver && (
                 <>
                     <Title variant="large">Resolver</Title>
                     <div className={styles.resolveCaseForm}>
                         <ButtonTab options={[
                             { label: "Acogido", value: "acogido" },
                             { label: "No acogido", value: "no_acogido" },
-                        ]} value={resolveCaseValue} onChange={setResolveCaseValue} />
+                        ]} value={resolveCaseValue} onChange={value => { if (!resolucionPendiente.current && !busy) setResolveCaseValue(value); }} />
                         <FormField label="Fundamento" htmlFor="fundament" required className={styles.fundamentFormField}>
                             <TextArea
                                 id="fundament"
+                                value={fundament}
+                                maxLength={12000}
+                                disabled={busy || !!resolucionPendiente.current}
                                 onInput={(e) => {
                                     const el = e.currentTarget;
                                     el.style.height = "auto";
@@ -781,13 +266,15 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
                             color="default"
                             onClick={() => setShowSendResolutionModal(true)}
                             className={styles.executeButton}
-                            state={isSendingResolution ? "disabled" : "default"}
+                            state={busy || isSendingResolution ? "disabled" : "default"}
                         >
                             {isSendingResolution ? 'Enviando resolución...' : 'Enviar resolución'}
                         </Button>
                     </div>
                 </>
             )}
+            {aviso && <div role="alert"><Text variant="body">{aviso}</Text></div>}
+            <Button state={busy ? 'disabled' : 'default'} onClick={() => { void recargar().then(() => { recepcionPendiente.current = null; resolucionPendiente.current = null; gestionPendiente.current = null; }).catch(falloArchivo); }}>Consultar estado actual</Button>
             <Title variant="mid" className={styles.title}>Bitácora de cambios</Title>
             <div className={styles.tableContainer}>
                 <TableRow isHeader gridTemplate={LOG_GRID} cells={LOG_HEADER} />
@@ -811,7 +298,7 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
                 isOpen={showConfirmReceiptModal}
                 onClose={() => setShowConfirmReceiptModal(false)}
                 title="Confirmar recepción de denuncia"
-                description={`Al presionar el botón Confirmar indicará que la papelería fue recibida por parte de usted, Juez.\nUna vez recibida la papelería, deberá de analizar la defensa del caso y emitir una resolución.`}
+                description={`Confirma que recibiste físicamente la papelería de este caso. La recepción abre el expediente para su revisión y posterior resolución por la autoridad autorizada.`}
                 actions={[
                     {
                         text: "Confirmar",

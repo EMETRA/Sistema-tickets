@@ -36,3 +36,15 @@
 .reportGraph {
   width: 100%;
 }
+
+.errorPanel {
+  background: white;
+  border: 1px solid #dce1ea;
+  border-radius: 12px;
+  padding: 20px;
+
+  button {
+    padding: 8px 12px;
+    cursor: pointer;
+  }
+}

@@ -4,6 +4,7 @@ import {
     GET_MY_ACTIVITY_QUERY,
     type GetMyActivityResponse,
 } from "@/api/graphql/technician";
+import { falloInicio, headersInicio } from '@/api/graphql/home/server-response';
 
 /**
  * GET /api/my-activity
@@ -17,26 +18,20 @@ import {
  *
  * Requiere: Authorization header con JWT token
  */
-export async function GET(_request: NextRequest) {
+export async function GET(request: NextRequest) {
+    const rawLimit = request.nextUrl.searchParams.get('limit');
+    const limit = rawLimit === null ? 10 : Number(rawLimit);
+    if (!Number.isInteger(limit) || limit < 1 || limit > 100) {
+        return NextResponse.json({ error: 'limit debe ser un entero entre 1 y 100' },
+            { status: 400, headers: headersInicio });
+    }
     try {
-        const result = await graphqlRequest<Record<string, unknown>>(
-            GET_MY_ACTIVITY_QUERY
+        const result = await graphqlRequest<GetMyActivityResponse>(
+            GET_MY_ACTIVITY_QUERY, { variables: { limit } }
         );
-
-        const typedResult = result as unknown as GetMyActivityResponse;
-
-        return NextResponse.json(typedResult);
+        if (!Array.isArray(result?.myActivity)) throw new Error('RESPUESTA_INICIO_INCOMPLETA');
+        return NextResponse.json(result, { headers: headersInicio });
     } catch (error) {
-        const message = error instanceof Error ? error.message : "Error desconocido";
-        const statusCode =
-            error instanceof Error && error.message.includes("401") ? 401 : 500;
-
-        return NextResponse.json(
-            {
-                error: message,
-                timestamp: new Date().toISOString(),
-            },
-            { status: statusCode }
-        );
+        return falloInicio(error, 'myActivity');
     }
 }

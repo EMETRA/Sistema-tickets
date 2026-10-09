@@ -1,5 +1,6 @@
 import 'server-only';
 import { NextRequest, NextResponse } from 'next/server';
+import { getGraphqlEndpoint } from '@/api/config/env';
 
 export class CmsHttpError extends Error {
     constructor(public readonly status: number, public readonly payload: Record<string, unknown>) {
@@ -8,10 +9,15 @@ export class CmsHttpError extends Error {
 }
 export const privateCmsHeaders = { 'Cache-Control': 'private, no-store' };
 export function cmsBaseUrl(): string {
-    const base = process.env.API_PORTAL_URL?.trim();
-    if (!base) throw new CmsHttpError(503, { message: 'Configurar API_PORTAL_URL en el servidor del Panel' });
-    if (!['http:', 'https:'].includes(new URL(base).protocol)) throw new CmsHttpError(503, { message: 'API_PORTAL_URL debe usar HTTP o HTTPS' });
-    return base.replace(/\/+$/, '');
+    try {
+        const url = new URL(getGraphqlEndpoint());
+        if (!/\/graphql\/?$/.test(url.pathname) || url.username || url.password) throw new Error('Endpoint inválido');
+        url.pathname = url.pathname.replace(/\/graphql\/?$/, '');
+        url.search = ''; url.hash = '';
+        return url.toString().replace(/\/+$/, '');
+    } catch {
+        throw new CmsHttpError(503, { message: 'Configurar GRAPHQL_ENDPOINT de api-tickets en el servidor del Panel' });
+    }
 }
 /** Las lecturas y recursos usan el Bearer del usuario. El Panel no utiliza la clave interna. */
 export async function cmsFetch(request: NextRequest, path: string, method = 'GET'): Promise<Response> {
@@ -33,7 +39,7 @@ export async function cmsJson<T>(request: NextRequest, path: string, method = 'G
 }
 export function cmsFailure(error: unknown): NextResponse {
     const status = error instanceof CmsHttpError ? error.status : 502;
-    const payload = error instanceof CmsHttpError ? error.payload : { message: 'No se pudo contactar api-portal' };
+    const payload = error instanceof CmsHttpError ? error.payload : { message: 'No se pudo contactar api-tickets' };
     return NextResponse.json(status === 500 ? { message: 'No se pudo completar la operación de noticias' } : payload, { status, headers: privateCmsHeaders });
 }
 export function noticiaId(id: string): string {

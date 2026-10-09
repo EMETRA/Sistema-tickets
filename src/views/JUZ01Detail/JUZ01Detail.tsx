@@ -61,6 +61,9 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
     const [detalle, setDetalle] = useState<DetalleJuzgado | null>(null);
     const [sedes, setSedes] = useState<SedeJuzgado[]>([]);
     const [sede, setSede] = useState('');
+    const [errorSedes, setErrorSedes] = useState<string | null>(null);
+    const [cargandoSedes, setCargandoSedes] = useState(false);
+    const [catalogoVersion, setCatalogoVersion] = useState(0);
     const [numeroInterno, setNumeroInterno] = useState('');
     const [observacion, setObservacion] = useState('');
     const [gestionTipo, setGestionTipo] = useState('REVISION');
@@ -87,11 +90,23 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
         void (async () => {
             if (!puedeConsultar) throw new Error('Sin permiso');
             const data = await consultarCasoJuzgado(caseNumber);
-            const disponibles = await consultarSedesJuzgado();
-            if (activo) { setDetalle(data); setCurrentCase(mapearCasoJuzgado(data)); setSedes(disponibles); }
+            if (activo) { setDetalle(data); setCurrentCase(mapearCasoJuzgado(data)); }
         })().catch(e => { if (activo) setError({ message: puedeConsultar ? mensajeJuzgado(e) : 'Tu cuenta no tiene permiso para consultar casos del juzgado.' }); }).finally(() => { if (activo) setIsLoading(false); });
         return () => { activo = false; };
     }, [caseNumber, puedeConsultar, consultaVersion]);
+
+    useEffect(() => {
+        let activo = true;
+        setSedes([]); setSede(''); setErrorSedes(null);
+        if (!puedeRecibir) { setCargandoSedes(false); return; }
+        setCargandoSedes(true);
+        void consultarSedesJuzgado().then(disponibles => {
+            if (activo) setSedes(disponibles);
+        }).catch(e => { if (activo) setErrorSedes(mensajeJuzgado(e)); })
+          .finally(() => { if (activo) setCargandoSedes(false); });
+        return () => { activo = false; };
+    }, [puedeRecibir, caseNumber, catalogoVersion]);
+    const sedeElegida = sedes.find(item => item.codigo === sede);
 
     const falloArchivo = (e: unknown) => setAviso(mensajeJuzgado(e));
     async function ejecutar(accion: () => Promise<unknown>, confirmar?: () => void) {
@@ -104,7 +119,7 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
         finally { enCurso.current = false; setBusy(false); setIsSendingResolution(false); }
     }
     const handleConfirmReceipt = () => {
-        if (!puedeRecibir || !sede) { setAviso('Selecciona un juzgado activo para confirmar la recepción.'); return; }
+        if (!puedeRecibir || !sede || cargandoSedes || errorSedes || !sedeElegida) { setAviso('Selecciona un juzgado activo para confirmar la recepción.'); return; }
         setShowConfirmReceiptModal(false);
         recepcionPendiente.current ||= { codigoCaso: caseNumber, codigoJuzgado: sede, requestId: idSolicitudJuzgado(), numeroInterno: numeroInterno.trim() || undefined, observacion: observacion.trim() || undefined };
         void ejecutar(() => recibirCasoJuzgado(recepcionPendiente.current!));
@@ -167,15 +182,26 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
                     <Chip key={tag.id} label={tag.nombre} />
                 ))}
             </div>
+            {detalle?.expediente && <section className={styles.juzgadoInfo} aria-label="Datos del juzgado">
+                <Title variant="mid">Juzgado receptor</Title>
+                <Text variant="body">{detalle.expediente.nombreJuzgado} · {detalle.expediente.codigoJuzgado}</Text>
+                <Text variant="body"><strong>Dirección:</strong> {detalle.expediente.direccionJuzgado || 'No registrada'}</Text>
+                <Text variant="body"><strong>Horario:</strong> {detalle.expediente.horarioJuzgado || 'No registrado'}</Text>
+                <Text variant="body"><strong>Referencia interna del expediente:</strong> {detalle.expediente.numeroInterno || 'Sin asignar'}</Text>
+                <Text variant="caption">Recepción: {new Date(detalle.expediente.recibidaEn).toLocaleString('es-GT', { timeZone: 'America/Guatemala' })} · Estado: {detalle.expediente.estado}</Text>
+            </section>}
             {(puedeRecibir || puedeResolver) && !showResolveDefense ? (
                 <div className={styles.actions}>
                     <Title variant="mid" className={styles.title}>Acciones disponibles</Title>
                     {puedeRecibir ? (
                         <div className={styles.resolveCaseForm}>
-                            <FormField label="Juzgado receptor" htmlFor="juzgado" required><Select id="juzgado" options={sedes.map(s => ({ value: s.codigo, label: s.nombre }))} placeholder="Selecciona un juzgado" value={sede} onChange={e => setSede(e.target.value)} disabled={busy || !!recepcionPendiente.current} /></FormField>
-                            <FormField label="Número interno (opcional)" htmlFor="numeroInterno"><Input id="numeroInterno" value={numeroInterno} onChange={e => setNumeroInterno(e.target.value)} maxLength={80} disabled={busy || !!recepcionPendiente.current} /></FormField>
+                            <FormField label="Juzgado receptor" htmlFor="juzgado" required><Select id="juzgado" options={sedes.map(s => ({ value: s.codigo, label: s.nombre }))} placeholder="Selecciona un juzgado" value={sede} onChange={e => setSede(e.target.value)} disabled={busy || cargandoSedes || !!errorSedes || !sedes.length || !!recepcionPendiente.current} /></FormField>
+                            {cargandoSedes ? <Text variant="body">Cargando juzgados...</Text> : errorSedes ? <div role="alert"><Text variant="body">No se pudo cargar el catálogo de juzgados. {errorSedes}</Text><Button onClick={() => setCatalogoVersion(v => v + 1)}>Reintentar juzgados</Button></div> : !sedes.length ? <div role="status"><Text variant="body">No hay juzgados activos configurados. Solicita que se complete el catálogo de juzgados para registrar la recepción.</Text><Button onClick={() => setCatalogoVersion(v => v + 1)}>Actualizar juzgados</Button></div> : null}
+                            {sedeElegida && <div className={styles.juzgadoInfo}><Text variant="body"><strong>Dirección:</strong> {sedeElegida.direccion || 'No registrada'}</Text><Text variant="body"><strong>Horario:</strong> {sedeElegida.horario || 'No registrado'}</Text></div>}
+                            <FormField label="Referencia interna del expediente (opcional)" htmlFor="numeroInterno"><Input id="numeroInterno" aria-describedby="numeroInternoAyuda" placeholder="Referencia asignada por el juzgado" value={numeroInterno} onChange={e => setNumeroInterno(e.target.value)} maxLength={80} disabled={busy || !!recepcionPendiente.current} /></FormField>
+                            <p id="numeroInternoAyuda" className={styles.ayuda}>Número o referencia que el juzgado asigna al expediente físico. Puedes dejarlo vacío si aún no se ha asignado.</p>
                             <FormField label="Observación (opcional)" htmlFor="observacion"><TextArea id="observacion" value={observacion} onChange={e => setObservacion(e.target.value)} maxLength={2000} disabled={busy || !!recepcionPendiente.current} /></FormField>
-                            <Button variant="contained" state={busy ? "disabled" : "default"} onClick={() => setShowConfirmReceiptModal(true)}>Confirmar recepción de papelería</Button>
+                            <Button variant="contained" state={busy || cargandoSedes || !!errorSedes || !sedeElegida ? "disabled" : "default"} onClick={() => setShowConfirmReceiptModal(true)}>Confirmar recepción de papelería</Button>
                         </div>
                     ) : puedeResolver ? (
                         <Button variant="contained" state={busy ? "disabled" : "default"} onClick={() => setShowResolveDefense(true)}>Resolver defensa</Button>

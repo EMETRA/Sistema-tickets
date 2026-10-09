@@ -6,7 +6,7 @@ export type SedeJuzgado = { codigo: string; nombre: string; direccion: string | 
 export type DetalleJuzgado = {
   codigoCaso: string; estadoCaso: string;
   caso: { id: string; codigoCaso: string; usoPlaca: string; placa: string; regla: string; observaciones: string | null; estado: string; registradaEn: string; evidenciasDenuncia: EvidenciaJuzgado[]; defensa: { id: string; nombreDeclarado: string; argumentos: string; evidencias: EvidenciaJuzgado[] } | null };
-  expediente: { id: string; version: string | null; codigoJuzgado: string; nombreJuzgado: string; estado: string; idActorReceptor: string; recibidaEn: string; numeroInterno: string | null; observacion: string | null; gestiones: { id: string; idActor: string; tipoGestion: string; ocurridaEn: string; observacion: string | null }[]; resolucion: { id: string; decision: string; fundamento: string; autoridadSnapshot: string; versionPlantilla: string; resueltaEn: string; idActorJuez: string } | null; remision: { ciudad: string; serie: string; numero: string } | null; documentos: DocumentoJuzgado[] } | null;
+  expediente: { id: string; version: string | null; codigoJuzgado: string; nombreJuzgado: string; direccionJuzgado: string | null; horarioJuzgado: string | null; estado: string; idActorReceptor: string; recibidaEn: string; numeroInterno: string | null; observacion: string | null; gestiones: { id: string; idActor: string; tipoGestion: string; ocurridaEn: string; observacion: string | null }[]; resolucion: { id: string; decision: string; fundamento: string; autoridadSnapshot: string; versionPlantilla: string; resueltaEn: string; idActorJuez: string } | null; remision: { ciudad: string; serie: string; numero: string } | null; documentos: DocumentoJuzgado[] } | null;
 };
 export type RecepcionInput = { codigoCaso: string; codigoJuzgado: string; requestId: string; numeroInterno?: string; observacion?: string };
 export type ResolucionInput = { idExpediente: string; fundamento: string; requestId: string; claveIdempotencia: string; versionExpediente?: string };
@@ -19,7 +19,7 @@ export const DETALLE_JUZGADO = `query ViviJuzgadoDetalle($codigoCaso: String!) {
    evidenciasDenuncia { id origen mime tamanoBytes estado }
    defensa { id nombreDeclarado argumentos evidencias { id origen mime tamanoBytes estado } }
   }
-  expediente { id version codigoJuzgado nombreJuzgado estado idActorReceptor recibidaEn numeroInterno observacion
+  expediente { id version codigoJuzgado nombreJuzgado direccionJuzgado horarioJuzgado estado idActorReceptor recibidaEn numeroInterno observacion
    gestiones { id idActor tipoGestion ocurridaEn observacion }
    resolucion { id decision fundamento autoridadSnapshot versionPlantilla resueltaEn idActorJuez }
    remision { ciudad serie numero }

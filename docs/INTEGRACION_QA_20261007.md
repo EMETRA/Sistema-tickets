@@ -2,12 +2,13 @@
 
 Rama **Dev** (mayúscula). El login y las mutaciones llaman `/api/graphql` en
 el mismo origen del Panel. Las lecturas y subidas de noticias llaman
-`/api/COM03/*`. El servidor reenvía el Bearer a Tickets o Portal según la ruta.
+`/api/COM03/*`. El servidor reenvía el Bearer a Tickets. Tickets contacta el CMS de Portal para
+lecturas, fotos y creación, conservando el almacenamiento existente.
 No configurar el navegador para llamar directamente al dominio del backend.
 
 ## Preparación y arranque
 
-1. Obtener `api-tickets/QA`, incluido el PR #11, y levantar su servicio `api`.
+1. Obtener `api-tickets/QA`, con el proxy CMS de octubre 9, y levantar su servicio `api`.
    Mantener `API_PORTAL_URL` y `API_PORTAL_INTERNAL_KEY` de Tickets: la clave
    coincide con la configurada en Portal y nunca se introduce en el frontend.
 2. Mantener las APIs en la red `vivi-qa-cierre`, con los alias

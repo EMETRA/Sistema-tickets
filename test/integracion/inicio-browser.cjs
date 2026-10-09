@@ -6,7 +6,7 @@ const {once} = require('node:events');
 const {chromium} = require('playwright');
 
 async function run() {
-  const user = {id_usuario: '12', nombre: 'Usuario QA controlado', email: 'qa@example.invalid', rol: 'USUARIO', permisos: [], departamento: 'Prueba'};
+  const user = {id_usuario: '12', nombre: 'Usuario QA controlado', email: 'qa@example.invalid', rol: 'JUZGADO', permisos: [], departamento: 'Prueba'};
   const calls = {myActivity: 0, myStats: 0};
   let fails = true;
   const backend = http.createServer(async (req, res) => {
@@ -43,6 +43,9 @@ async function run() {
     await page.goto('http://127.0.0.1:3841/home');
     await page.getByRole('button', {name: 'Reintentar actividad'}).waitFor();
     await page.getByRole('button', {name: 'Reintentar reporte'}).waitFor();
+    await page.getByText('JUZGADO', {exact: true}).waitFor();
+    assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem('auth-storage')).state.user.rol), 'JUZGADO');
+    assert.equal((await context.cookies()).find(cookie => cookie.name === 'auth_role').value, 'USUARIO');
     assert.equal(await page.getByText('Reporte durante el año', {exact: true}).count(), 0);
     assert(!(await page.locator('body').innerText()).includes('ORA-'));
     assert.deepEqual(calls, {myActivity: 1, myStats: 1});

@@ -6,14 +6,18 @@ const {once} = require('node:events');
 const {chromium} = require('playwright');
 
 async function run() {
-  const user = {id_usuario: '12', nombre: 'Usuario QA controlado', email: 'qa@example.invalid', rol: 'JUZGADO', permisos: [], departamento: 'Prueba'};
+  const user = {id_usuario: '1', nombre: 'Usuario QA controlado', email: 'qa@example.invalid', rol: 'USER_ADMIN', perfil: {id: 1, nombre: 'USER_ADMIN', descripcion: 'Perfil QA'}, roles: [{id: 1, nombre: 'VIVI_NOTICIAS', descripcion: null}], permisos: ['VIVI_NOTICIAS_EDITAR', 'VIVI_NOTICIAS_PUBLICAR', 'VIVI_NOTICIAS_LEER'], departamento: 'Prueba'};
   const calls = {myActivity: 0, myStats: 0};
   let fails = true;
   const backend = http.createServer(async (req, res) => {
     let body = ''; for await (const chunk of req) body += chunk;
     const {query = ''} = JSON.parse(body || '{}');
     const json = value => {res.writeHead(200, {'Content-Type': 'application/json'}); res.end(JSON.stringify(value));};
-    if (query.includes('query GetUser')) return json({data: {usuario: user}});
+    if (query.includes('query GetUser')) {
+      assert(query.includes('perfil { id nombre descripcion }'));
+      assert(query.includes('roles { id nombre descripcion }'));
+      return json({data: {usuario: user}});
+    }
     const operation = query.includes('query GetMyActivity') ? 'myActivity' : query.includes('query GetMyStats') ? 'myStats' : null;
     if (!operation) return json({data: {}});
     calls[operation]++;
@@ -43,8 +47,11 @@ async function run() {
     await page.goto('http://127.0.0.1:3841/home');
     await page.getByRole('button', {name: 'Reintentar actividad'}).waitFor();
     await page.getByRole('button', {name: 'Reintentar reporte'}).waitFor();
-    await page.getByText('JUZGADO', {exact: true}).waitFor();
-    assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem('auth-storage')).state.user.rol), 'JUZGADO');
+    await page.getByText('USER_ADMIN', {exact: true}).waitFor();
+    assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem('auth-storage')).state.user.rol), 'USER_ADMIN');
+    assert.deepEqual(await page.evaluate(() => JSON.parse(localStorage.getItem('auth-storage')).state.user.roles), user.roles);
+    assert.deepEqual(await page.evaluate(() => JSON.parse(localStorage.getItem('auth-storage')).state.user.perfil), user.perfil);
+    assert.deepEqual(await page.evaluate(() => JSON.parse(localStorage.getItem('auth-storage')).state.user.permisos), user.permisos);
     assert.equal((await context.cookies()).find(cookie => cookie.name === 'auth_role').value, 'USUARIO');
     assert.equal(await page.getByText('Reporte durante el año', {exact: true}).count(), 0);
     assert(!(await page.locator('body').innerText()).includes('ORA-'));

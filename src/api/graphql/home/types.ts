@@ -9,7 +9,9 @@ export interface UsuarioPerfil {
   id_usuario: string;
   nombre: string;
   email: string;
-  rol?: string;
+  rol?: string | null;
+  perfil?: { id: number; nombre: string; descripcion?: string | null } | null;
+  roles?: { id: number; nombre: string; descripcion?: string | null }[];
   departamento?: string;
   direccion?: string | null;
   puesto?: string | null;

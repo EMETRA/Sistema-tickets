@@ -49,7 +49,7 @@ export const useAuthStore = create<AuthState>()(
                 const role = normalizeRole(user.rol);
                 set({
                     token,
-                    user: { ...user, rol: role },
+                    user: { ...user },
                     userId: user.id_usuario,
                 });
 

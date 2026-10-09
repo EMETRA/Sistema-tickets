@@ -125,6 +125,7 @@ export const SystemLayout = ({
                         iconName={activePage.iconName}
                         userName={user?.nombre || "Usuario"}
                         userRole={
+                            user?.rol?.trim() ||
                             currentRole.charAt(0).toUpperCase() +
                             currentRole.slice(1).toLowerCase()
                         }

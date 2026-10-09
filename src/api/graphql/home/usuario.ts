@@ -11,6 +11,8 @@ export const GET_USER_QUERY = `
       nombre
       email
       rol
+      perfil { id nombre descripcion }
+      roles { id nombre descripcion }
       departamento
       direccion
       puesto

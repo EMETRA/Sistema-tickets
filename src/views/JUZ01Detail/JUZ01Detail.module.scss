@@ -94,3 +94,15 @@
 .tableContainer { 
     width: 100%;
 }
+
+.juzgadoInfo {
+    padding: 1rem;
+    border: 1px solid #dbe2ee;
+    border-radius: 12px;
+    background: #f7f9fc;
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    overflow-wrap: anywhere;
+}
+.ayuda { color: #62748b; font-size: .875rem; line-height: 1.5; margin: 0; }

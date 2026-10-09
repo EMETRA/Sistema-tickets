@@ -31,7 +31,7 @@ const JUZ01: React.FC = () => {
         const parsed = JUZ01Schema.safeParse({ caseNumber });
         if (!parsed.success) {
             const message = z.flattenError(parsed.error).fieldErrors.caseNumber?.[0]
-                ?? 'El número de caso es requerido';
+                ?? 'El código de caso es requerido';
             setFieldError(message);
             return;
         }
@@ -62,7 +62,7 @@ const JUZ01: React.FC = () => {
                 <Title variant="mid" tag="h3" className={styles.title}>Parámetros de consulta</Title>
 
                 {/* Numero de caso */}
-                <FormField label="Número de caso" htmlFor="caseNumber" required className={styles.fieldCaseNumber}>
+                <FormField label="Código de caso" htmlFor="caseNumber" required className={styles.fieldCaseNumber}>
                     <Input
                         id="caseNumber"
                         type="text"
@@ -71,12 +71,15 @@ const JUZ01: React.FC = () => {
                             setCaseNumber(e.target.value);
                             if (fieldError) setFieldError(null);
                         }}
-                        placeholder="Ingresa el número de caso"
+                        placeholder="Ejemplo: QA-E0910D-PDF_P"
                         state={loading ? "disabled" : fieldError ? "error" : "default"}
                         errorMessage={fieldError ?? undefined}
+                        aria-describedby="codigoCasoAyuda"
                         required
                     />
                 </FormField>
+
+                <p id="codigoCasoAyuda">Usa el código de denuncia que aparece en el correo o en el PDF del trámite.</p>
 
                 <Button
                     variant="contained"

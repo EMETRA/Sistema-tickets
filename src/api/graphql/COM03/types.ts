@@ -327,7 +327,7 @@ export type CodigoErrorNoticiaCms =
   | 'NEWS_NOT_FOUND';
 
 // ============================================
-// LECTURAS DEL EDITOR (api-portal REST, README de backend)
+// LECTURAS DEL EDITOR (REST de api-tickets hacia el CMS existente de api-portal)
 // TODO [COM03-BACKEND]: sin conectar. Falta confirmar cómo las llama Sistema-tickets
 // (URL base y autenticación). Hoy los Route Handlers devuelven datos dummy.
 // ============================================

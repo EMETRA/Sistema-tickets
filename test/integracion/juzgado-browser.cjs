@@ -11,9 +11,9 @@ async function run() {
   const permisos = ['VIVI_JUZGADO_CONSULTAR', 'VIVI_JUZGADO_RECIBIR', 'VIVI_JUZGADO_RESOLVER'];
   const user = { id_usuario: '12', nombre: 'Usuario QA controlado', email: 'qa@example.invalid', rol: 'USUARIO', permisos, departamento: 'Prueba' };
   const llamadas = [];
-  let perfilFalla = true, recepcionFalla = true, recibida = false, resuelta = false, pdf = false;
+  let sedesFalla = true, sedesVacias = false, perfilFalla = true, recepcionFalla = true, recibida = false, resuelta = false, pdf = false;
   const documento = { id: '80', tipoDocumento: 'RESOLUCION', numeroVersion: '1', versionPlantilla: 'DEN09-BORRADOR-1', mime: 'application/pdf', tamanoBytes: '40', generadoEn: '2026-10-08T20:00:00Z' };
-  const detalle = () => ({ codigoCaso: codigo, estadoCaso: resuelta ? 'REMISION_EMITIDA' : recibida ? 'EN_JUZGADO' : 'NOTIFICADA', caso: { id: '8003', codigoCaso: codigo, usoPlaca: 'P', placa: '113BBB', regla: '39', observaciones: 'Observación QA', estado: 'NOTIFICADA', registradaEn: '2026-10-08T17:00:00Z', evidenciasDenuncia: [], defensa: null }, expediente: recibida ? { id: '77', version: '2', codigoJuzgado: 'JUZ_QA', nombreJuzgado: 'Sede QA controlada', estado: resuelta ? 'RESUELTO' : 'RECIBIDO', idActorReceptor: '12', recibidaEn: '2026-10-08T18:00:00Z', numeroInterno: null, observacion: null, gestiones: [], resolucion: resuelta ? { id: '79', decision: 'NO_ACOGIDA', fundamento: 'Fundamento QA controlado', autoridadSnapshot: user.nombre, versionPlantilla: 'DEN09-BORRADOR-1', resueltaEn: '2026-10-08T19:00:00Z', idActorJuez: '12' } : null, remision: resuelta ? { ciudad: '1', serie: 'V', numero: '8003' } : null, documentos: pdf ? [documento] : [] } : null });
+  const detalle = () => ({ codigoCaso: codigo, estadoCaso: resuelta ? 'REMISION_EMITIDA' : recibida ? 'EN_JUZGADO' : 'NOTIFICADA', caso: { id: '8003', codigoCaso: codigo, usoPlaca: 'P', placa: '113BBB', regla: '39', observaciones: 'Observación QA', estado: 'NOTIFICADA', registradaEn: '2026-10-08T17:00:00Z', evidenciasDenuncia: [], defensa: null }, expediente: recibida ? { id: '77', version: '2', codigoJuzgado: 'JUZ_QA', nombreJuzgado: 'Sede QA controlada', direccionJuzgado: 'Dirección QA controlada', horarioJuzgado: 'Horario QA controlado', estado: resuelta ? 'RESUELTO' : 'RECIBIDO', idActorReceptor: '12', recibidaEn: '2026-10-08T18:00:00Z', numeroInterno: 'EXP-QA-77', observacion: null, gestiones: [], resolucion: resuelta ? { id: '79', decision: 'NO_ACOGIDA', fundamento: 'Fundamento QA controlado', autoridadSnapshot: user.nombre, versionPlantilla: 'DEN09-BORRADOR-1', resueltaEn: '2026-10-08T19:00:00Z', idActorJuez: '12' } : null, remision: resuelta ? { ciudad: '1', serie: 'V', numero: '8003' } : null, documentos: pdf ? [documento] : [] } : null });
   const backend = http.createServer(async (req, res) => {
     let body = ''; for await (const chunk of req) body += chunk;
     const datos = body ? JSON.parse(body) : {};
@@ -25,7 +25,7 @@ async function run() {
     if (q.includes('mutation Login')) return json({ data: { login: { token: 'qa-token-controlado', refresh_token: 'qa-refresh-controlado', expires_in: 3600 } } });
     if (q.includes('query GetUser')) return perfilFalla ? json({ errors: [{ message: 'ORA-00942 consulta privada', extensions: { code: 'INTERNAL_SERVER_ERROR' } }] }) : json({ data: { usuario: user } });
     if (q.includes('viviJuzgadoDetalle')) return json({ data: { viviJuzgadoDetalle: detalle() } });
-    if (q.includes('viviJuzgadoSedes')) return json({ data: { viviJuzgadoSedes: [{ codigo: 'JUZ_QA', nombre: 'Sede QA controlada', direccion: null, horario: null }] } });
+    if (q.includes('viviJuzgadoSedes')) return sedesFalla ? json({ errors: [{ message: 'Temporal', extensions: { originalError: { statusCode: 503 } } }] }) : json({ data: { viviJuzgadoSedes: sedesVacias ? [] : [{ codigo: 'JUZ_QA', nombre: 'Sede QA controlada', direccion: 'Dirección QA controlada', horario: 'Horario QA controlado' }] } });
     if (q.includes('viviJuzgadoRegistrarRecepcion')) {
       if (recepcionFalla) return json({ errors: [{ message: 'Temporal', extensions: { originalError: { statusCode: 503 } } }] });
       recibida = true; return json({ data: { viviJuzgadoRegistrarRecepcion: { idExpediente: '77', codigoCaso: codigo, estado: 'RECIBIDO', estadoCaso: 'EN_JUZGADO', reutilizada: false } } });
@@ -34,7 +34,7 @@ async function run() {
     return json({ data: {} });
   });
   backend.listen(3742, '127.0.0.1'); await once(backend, 'listening');
-  const next = spawn(process.execPath, ['node_modules/next/dist/bin/next', 'start', '-p', '3741', '-H', '127.0.0.1'], { env: { ...process.env, GRAPHQL_ENDPOINT: 'http://127.0.0.1:3742/graphql', API_PORTAL_URL: 'http://127.0.0.1:3742', NEXT_TELEMETRY_DISABLED: '1' }, stdio: ['ignore', 'pipe', 'pipe'] });
+  const next = spawn(process.execPath, ['node_modules/next/dist/bin/next', 'start', '-p', '3741', '-H', '127.0.0.1'], { env: { ...process.env, GRAPHQL_ENDPOINT: 'http://127.0.0.1:3742/graphql', NEXT_TELEMETRY_DISABLED: '1' }, stdio: ['ignore', 'pipe', 'pipe'] });
   let salida = ''; next.stdout.on('data', b => salida += b); next.stderr.on('data', b => salida += b);
   let browser, page;
   try {
@@ -58,11 +58,25 @@ async function run() {
     await page.evaluate(({ user }) => localStorage.setItem('auth-storage', JSON.stringify({ state: { token: 'qa-token-controlado', user, userId: user.id_usuario }, version: 0 })), { user });
     const url = `http://127.0.0.1:3741/home/juridico/juz01/juz01/detail?caseNumber=${codigo}`;
     await page.goto(url);
-    await page.getByRole('button', { name: 'Confirmar recepción de papelería' }).waitFor();
+    await page.getByRole('button', { name: 'Reintentar juzgados' }).waitFor();
+    assert.ok((await page.locator('body').innerText()).includes(codigo));
+    assert.equal(await page.getByRole('button', { name: 'Confirmar recepción de papelería' }).isDisabled(), true);
+    sedesFalla = false; sedesVacias = true;
+    await page.getByRole('button', { name: 'Reintentar juzgados' }).click();
+    await page.getByText('No hay juzgados activos configurados.', { exact: false }).waitFor();
+    assert.equal(await page.locator('#juzgado option').count(), 1);
+    assert.equal(await page.getByRole('button', { name: 'Confirmar recepción de papelería' }).isDisabled(), true);
+    sedesVacias = false;
+    await page.getByRole('button', { name: 'Actualizar juzgados' }).click();
+    await page.locator('#juzgado option[value=JUZ_QA]').waitFor({ state: 'attached' });
     assert.equal(llamadas.filter(l => l.query.startsWith('mutation') && !l.query.includes('Login')).length, 0);
     const out = process.env.QA_SCREENSHOT_DIR || path.resolve(__dirname, '../../../../capturas'); await fs.mkdir(out, { recursive: true });
     await page.screenshot({ path: path.join(out, 'panel-juzgado.png'), fullPage: true });
     await page.locator('#juzgado').selectOption('JUZ_QA');
+    await page.getByText('Dirección QA controlada', { exact: false }).waitFor();
+    await page.getByText('Horario QA controlado', { exact: false }).waitFor();
+    await page.locator('#numeroInterno').fill('EXP-QA-77');
+    assert.ok((await page.locator('#numeroInternoAyuda').innerText()).includes('expediente físico'));
     await page.getByRole('button', { name: 'Confirmar recepción de papelería' }).click();
     await page.getByRole('button', { name: 'Confirmar', exact: true }).dblclick();
     await page.getByRole('alert').filter({ hasText: 'reintentar' }).waitFor();
@@ -72,9 +86,11 @@ async function run() {
     await page.getByRole('button', { name: 'Confirmar recepción de papelería' }).click();
     await page.getByRole('button', { name: 'Confirmar', exact: true }).click();
     await page.getByRole('button', { name: 'Resolver defensa', exact: true }).waitFor();
+    await page.getByText('EXP-QA-77', { exact: false }).waitFor();
     const recepciones = llamadas.filter(l => l.query.includes('viviJuzgadoRegistrarRecepcion'));
     assert.deepEqual(recepciones[0].variables, recepciones[1].variables);
     assert.equal(recepciones[0].variables.input.idActor, undefined);
+    assert.equal(recepciones[0].variables.input.numeroInterno, 'EXP-QA-77');
     await page.getByRole('button', { name: 'Resolver defensa', exact: true }).click();
     await page.getByText('No acogido', { exact: true }).click(); await page.locator('#fundament').fill('Fundamento QA controlado');
     await page.getByRole('button', { name: 'Enviar resolución', exact: true }).click();
@@ -92,7 +108,7 @@ async function run() {
     const antes = llamadas.length;
     await page.reload(); await page.getByText('Tu cuenta no tiene permiso para consultar casos del juzgado.').waitFor();
     assert.equal(llamadas.slice(antes).filter(l => l.query.includes('viviJuzgado')).length, 0);
-    console.log('OK | Perfil 502 sin sesión parcial ni ORA público; JUZ01 consulta, recepción 503/reintento, doble clic, NO_ACOGIDA, PDF independiente, Bearer y permisos reales. Backend controlado.');
+    console.log('OK | Perfil 502 sin sesión parcial ni ORA público; JUZ01 conserva el caso ante fallo de sedes, muestra catálogo vacío/dirección/horario/referencia, recepción 503/reintento, doble clic, NO_ACOGIDA, PDF independiente, Bearer y permisos reales. Backend controlado.');
   } catch (error) { console.error('Diagnóstico QA:', JSON.stringify({ rutas: llamadas.map(l => ({ ruta: l.ruta, operacion: l.query.split('{')[0] })), texto: page ? await page.locator('body').innerText() : salida })); throw error; }
   finally { if (browser) await browser.close(); next.kill('SIGTERM'); backend.close(); }
 }

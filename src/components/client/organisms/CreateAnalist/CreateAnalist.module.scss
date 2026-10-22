@@ -1,0 +1,29 @@
+.mainContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 50px 0 0 20px;
+}
+
+.formContainer {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+}
+
+.fileInputContainer {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 50px;
+}
+
+.filesSection {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.submitButton {
+    width: fit-content;
+    align-self: center;
+}

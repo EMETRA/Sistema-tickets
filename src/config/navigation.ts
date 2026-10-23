@@ -21,6 +21,7 @@ export const PAGES_CONFIG: Record<string, PageMetadata> = {
     reportes: { path: "/reportes", label: "REPORTES", title: "Módulo de Reportes", iconName: "chart-pie-solid" },
     estadistica: { path: "/statistics", label: "ESTADISTICA", title: "Estadísticas", iconName: "chart-bar-regular" },
     crear_ticket: { path: "/tickets-creation", label: "CREAR TICKET", title: "Nuevo Ticket", iconName: "file-circle-plus-solid" },
+    gestionAnalistas: { path: "/gestion-analistas", label: "GESTION ANALISTAS", title: "Gestión de Analistas", iconName: "user-add" },
 };
 
 export const ROLE_LAYOUTS: Record<UserRole, string[]> = {
@@ -31,6 +32,7 @@ export const ROLE_LAYOUTS: Record<UserRole, string[]> = {
         "tickets",
         "config",
         "crear_ticket",
+        "gestionAnalistas",
         // "historial",
         // "planifica",
         // "reportes",
@@ -40,6 +42,7 @@ export const ROLE_LAYOUTS: Record<UserRole, string[]> = {
         "home",
         "tickets",
         "crear_ticket",
+        "gestionAnalistas",
         // "planifica",
         "usuarios",
         "equipo",
@@ -57,6 +60,7 @@ export const ROLE_LAYOUTS: Record<UserRole, string[]> = {
         "home",
         "tickets",
         "crear_ticket",
+        "gestionAnalistas",
         // "planifica",
         "usuarios",
         "equipo",

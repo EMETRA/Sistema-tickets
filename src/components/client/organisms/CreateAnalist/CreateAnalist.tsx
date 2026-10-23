@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { z } from "zod";
+import { TableHeader } from '@/components/client/molecules/TableHeader';
 import { FormField } from '@/components/client/molecules/FormField';
 import { Input } from '@/components/client/atoms/Input';
 import { Button } from '@/components/client/atoms/Button';
@@ -91,6 +92,7 @@ const CreateAnalist: React.FC = () => {
     
     return (
         <div className={styles.mainContainer}>
+            <TableHeader iconName="user-add" label="Crear analista" />
             <div className={styles.formContainer}>
                 {/* Nombre */}
                 <FormField label="Nombre" htmlFor="name" required className={styles.fieldName}>

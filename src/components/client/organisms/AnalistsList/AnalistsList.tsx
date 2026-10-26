@@ -44,11 +44,13 @@ const initialAnalistas: analista[] = [
 	}
 ]
 
-const GRID = "minmax(0, 1.6fr) minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 0.8fr) minmax(0, 0.7fr) minmax(0, 0.8fr) minmax(0, 1fr)";
+// const GRID = "minmax(0, 1.6fr) minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 0.8fr) minmax(0, 0.7fr) minmax(0, 0.8fr) minmax(0, 1fr)";
+const GRID = "minmax(0, 1.6fr) minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 0.8fr) minmax(0, 1fr)";
 
 const AnalistsList: React.FC = () => {
 
     const [analistas, setAnalistas] = useState<analista[]>([]);
+    const [analistaEdit, setAnalistaEdit] = useState<analista | null>(null);
 
     useEffect(() => {
         setAnalistas(initialAnalistas);
@@ -69,7 +71,7 @@ const AnalistsList: React.FC = () => {
     };
 
     const handleEdit = (id: string) => {
-        console.log(id);
+        setAnalistaEdit(analistas.find(a => a.id === id) || null);
     };
 
     const handleToggleStatus = (id: string) => {
@@ -83,72 +85,79 @@ const AnalistsList: React.FC = () => {
                 label="Analistas"
             />
 
-            <div className={styles.table}>
+            {!analistaEdit ? (
 
-                <TableRow 
-                    isHeader
-                    selectable
-                    isSelected={isAllSelected}
-                    onSelect={handleSelectAll}
-                    gridTemplate={GRID}
-                    cells={[
-                        { icon: "user-regular", label: "Nombre y apellido"},
-                        { icon: "envelope-regular", label: "Correo"},
-                        { icon: "file-lines-regular", label: "DPI"},
-                        { icon: "briefcase-solid", label: "NIT"},
-                        { icon: "phone-solid", label: "Teléfono"},
-                        { icon: "spinner-solid", label: "Estado"},
-                        { icon: "gears-solid", label: "", align: "center" }
-                    ]}
-                />
+                <div className={styles.table}>
 
-                {analistas.map((analista) => (
                     <TableRow 
-                        key={analista.id}
-                        id={analista.id}
+                        isHeader
                         selectable
-                        isSelected={selected.includes(analista.id)}
-                        onSelect={(checked) => handleSelectRow(analista.id, checked)}
+                        isSelected={isAllSelected}
+                        onSelect={handleSelectAll}
                         gridTemplate={GRID}
-                        scale={0.9}
                         cells={[
-                            {
-                                content: (
-                                    <UserChip userName={`${analista.names} ${analista.lastNames}`} avatarProps={{ initials: analista.names[0] }} />
-                                )
-                            },
-                            { content: <Text >{analista.email}</Text>},
-                            { content: <Text>{analista.dpi}</Text>},
-                            { content: <Text>{analista.nit}</Text>},
-                            { content: <Text>{analista.phone}</Text>},
-                            {
-                                content: (
-                                    <Chip label={analista.status} variant="outlined" color={analista.status === "active" ? "#008000" : "#FF0000"} />
-                                ),
-                                align: "center"
-                            },
-                            { 
-                                content: (
-                                    <div className={styles.actions}>
-                                        <IconButton 
-                                            icon="pen-to-square-regular"
-                                            iconColor="#8A8A8A"
-                                            onClick={() => handleEdit(analista.id)}  
-                                        />
-                                        <IconButton 
-                                            icon={analista.status === "active" ? "lock-solid" : "unlock-solid"}
-                                            iconColor="#8A8A8A"
-                                            onClick={() => handleToggleStatus(analista.id)}  
-                                        />
-                                    </div>
-                                ),
-                                align: "center"
-                            }
+                            { icon: "user-regular", label: "Nombre y apellido"},
+                            { icon: "envelope-regular", label: "Correo"},
+                            { icon: "file-lines-regular", label: "DPI"},
+                            { icon: "briefcase-solid", label: "NIT"},
+                            { icon: "phone-solid", label: "Teléfono"},
+                            // { icon: "spinner-solid", label: "Estado"},
+                            // { icon: "gears-solid", label: "", align: "center" }
                         ]}
                     />
-                ))}
 
-            </div>
+                    {analistas.map((analista) => (
+                        <TableRow 
+                            key={analista.id}
+                            id={analista.id}
+                            selectable
+                            isSelected={selected.includes(analista.id)}
+                            onSelect={(checked) => handleSelectRow(analista.id, checked)}
+                            gridTemplate={GRID}
+                            scale={0.9}
+                            cells={[
+                                {
+                                    content: (
+                                        <UserChip userName={`${analista.names} ${analista.lastNames}`} avatarProps={{ initials: analista.names[0] }} />
+                                    )
+                                },
+                                { content: <Text >{analista.email}</Text>},
+                                { content: <Text>{analista.dpi}</Text>},
+                                { content: <Text>{analista.nit}</Text>},
+                                { content: <Text>{analista.phone}</Text>},
+                                // {
+                                //     content: (
+                                //         <Chip label={analista.status} variant="outlined" color={analista.status === "active" ? "#008000" : "#FF0000"} />
+                                //     ),
+                                //     align: "center"
+                                // },
+                                // { 
+                                //     content: (
+                                //         <div className={styles.actions}>
+                                //             <IconButton 
+                                //                 icon="pen-to-square-regular"
+                                //                 iconColor="#8A8A8A"
+                                //                 onClick={() => handleEdit(analista.id)}  
+                                //             />
+                                //             <IconButton 
+                                //                 icon={analista.status === "active" ? "lock-solid" : "unlock-solid"}
+                                //                 iconColor="#8A8A8A"
+                                //                 onClick={() => handleToggleStatus(analista.id)}  
+                                //             />
+                                //         </div>
+                                //     ),
+                                //     align: "center"
+                                // }
+                            ]}
+                        />
+                    ))}
+
+                </div>
+            ) : (
+                <div className={styles.analistMainContainer}>
+                    
+                </div>
+            )}
 
         </div>
     );

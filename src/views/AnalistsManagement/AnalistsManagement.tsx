@@ -35,12 +35,12 @@ const AnalistsManagement: React.FC = () => {
                     onClick={() => setView("createAnalist")}
                 />
 
-                <SettingsNavItem 
+                {/* <SettingsNavItem 
                     label="Analistas"
                     iconName="user-group-solid"
                     active={view === "analists"}
                     onClick={() => setView("analists")}
-                />
+                /> */}
 
             </div>
             <div className={styles.content}>

@@ -4,6 +4,32 @@ import type { AppsCatalog } from "@/config/apps-catalog";
  * Catálogo dummy - CAMBIAAAAAAR
  */
 export const APPS_CATALOG_DUMMY: AppsCatalog = {
+    casillero: {
+        meta: {
+            id: "casillero",
+            label: "CASILLERO",
+            title: "Casillero",
+            iconName: "envelope-regular",
+        },
+        sections: {
+            userRequests: {
+                meta: {
+                    id: "userRequests",
+                    label: "NUEVOS USUARIOS CASILLERO",
+                    title: "Nuevos usuarios casillero",
+                    iconName: "envelope-regular",
+                },
+                modules: [
+                    {
+                        id: "casillero-user-requests",
+                        label: "SOLICITUDES DE CREACIÓN DE USUARIO",
+                        title: "Solicitudes de creación de usuario",
+                        iconName: "envelope-regular",
+                    },
+                ],
+            },
+        },
+    },
     informatica: {
         meta: {
             id: "informatica",

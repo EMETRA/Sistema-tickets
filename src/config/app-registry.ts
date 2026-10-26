@@ -15,6 +15,7 @@ import SaveMOD01 from "@/views/SaveMOD01/ExportMOD01";
 import MOD13 from "@/views/MOD13";
 import COM03 from "@/views/COM03";
 import JUZ01 from "@/views/JUZ01";
+import CasilleroUserRequests from "@/views/CasilleroUserRequests";
 
 /**
  * Registro de vistas de módulos (hojas del árbol de apps).
@@ -38,6 +39,7 @@ export const APP_REGISTRY: Record<string, ComponentType> = {
     "save-mod01": SaveMOD01,
     "consulta-vehiculos": ConsultaVehiculos,
     juz01: JUZ01,
+    "casillero-user-requests": CasilleroUserRequests,
 };
 
 export function getAppComponent(moduleId: string): ComponentType | null {

@@ -1,0 +1,134 @@
+.mainContainer {
+    display: flex;
+    flex-direction: column;
+    padding: 50px 20px 0 20px;
+    width: 100%;
+    height: 100%;
+    gap: 24px;
+}
+
+.filtersContainer {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.detailContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.backButton {
+    width: fit-content;
+}
+
+.header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.actions {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+.resumeContainer {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 80%;
+    gap: 24px;
+}
+
+.userAvatar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+}
+
+.userAvatarContent {
+    display: flex;
+    flex-direction: column;
+}
+
+.infoItem {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.infoItemContent {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.content {
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+    gap: 24px;
+}
+
+.userInfoContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    border: 1px solid #E0E0E0;
+    border-radius: 10px;
+    padding: 10px;
+    width: 100%;
+    height: fit-content;
+}
+
+.userInfoContent {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+}
+
+.userInfoItem {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+}
+
+.link {
+    color: #4361EE;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.userDocumentsContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    border: 1px solid #E0E0E0;
+    border-radius: 10px;
+    padding: 10px;
+    width: 100%;
+}
+
+.dpiImage {
+    width: 100%;
+    height: auto;
+    max-height: 300px;
+    object-fit: contain;
+    border-radius: 10px;
+}

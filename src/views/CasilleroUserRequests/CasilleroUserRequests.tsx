@@ -104,7 +104,7 @@ const initialIndividualsUsers: individualUser[] = [
         dpiFile: "https://i.pravatar.cc/300?img=68",
     },
     {
-        id: "2",
+        id: "3",
         userType: "individual",
         firstName: "Maria",
         secondName: "Juana",
@@ -135,7 +135,7 @@ const initialJuridicUsers: juridicUser[] = [
         phone: "50212345678",
     },
     {
-        id: "2",
+        id: "4",
         userType: "juridico",
         dpi: "1234567891234",
         nit: "1234567890",

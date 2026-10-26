@@ -17,6 +17,7 @@ export const ICON_FILES = [
     "angle-right-solid",
     "archivo",
     "arrow-down-wide-short-gray",
+    "arrow-left-solid",
     "arrow-right-solid",
     "arrows-rotate-solid-full",
     "bank-solid",

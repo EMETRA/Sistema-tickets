@@ -2,12 +2,11 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import classNames from 'classnames';
-import { Icon } from "@/components/client/atoms/Icon";
+import { AnalisisEvidencias } from './AnalisisEvidencias';
+import { EvidenciasCaso } from './EvidenciasCaso';
 import { Title } from "@/components/client/atoms/Title";
 import { Text } from "@/components/client/atoms/Text";
 import { Button } from "@/components/client/atoms/Button";
-import { Chip } from "@/components/client/atoms/Chip";
-import { MediaGrid, type MediaGridItem } from "@/components/client/molecules/MediaGrid";
 import { File } from "@/components/client/atoms/File";
 import { ButtonTab } from "@/components/client/atoms/ButtonTab";
 import { FormField } from '@/components/client/molecules/FormField';
@@ -27,12 +26,6 @@ import { mapearCasoJuzgado } from '@/api/graphql/juzgado-vista';
 
 
 type Case = ReturnType<typeof mapearCasoJuzgado>;
-type EvidenceFile = Case['denuncia']['evidencias'][number];
-const toMediaGridItem = (file: EvidenceFile, onError: (error: unknown) => void): MediaGridItem => ({
-    type: 'file', id: file.id, name: file.name, download: true,
-    onClick: () => { void descargarArchivoJuzgado('evidencias', file.id, `evidencia-${file.id}.${file.mime.startsWith('video/') ? 'mp4' : file.mime === 'image/png' ? 'png' : 'jpg'}`).catch(onError); },
-});
-
 const LOG_GRID = "minmax(0,0.5fr) minmax(0,0.3fr) minmax(0,1fr) minmax(0,0.2fr) minmax(0,1fr)";
 
 const LOG_HEADER: TableCellConfig[] = [
@@ -169,19 +162,12 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
 
     return (
         <div className={styles.mainContainer}>
-            <div className={styles.header}>
-                <div className={styles.headerInfo}>
-                    <Icon name="file" variant="status" color="#7F8D9F" />
-                    <Title variant="mid" className={styles.title}>Caso #{currentCase.caseNumber}</Title>
-                </div>
-                <Title variant="mid" className={styles.title}>{currentCase.caseDate} - {currentCase.place}</Title>
-            </div>
-            <Title variant="large">{currentCase.title} - {currentCase.placa}</Title>
-            <div className={styles.tags}>
-                {currentCase.tags.map((tag) => (
-                    <Chip key={tag.id} label={tag.nombre} />
-                ))}
-            </div>
+            <header className={styles.caseHero}>
+                <div className={styles.heroTop}><button type="button" onClick={()=>router.back()} className={styles.backLink}>← Volver a casos</button><span>Juzgado de tránsito · Avísame</span></div>
+                <div className={styles.heroTitle}><div><p className={styles.eyebrow}>Consulta del caso</p><h1>{currentCase.placa}</h1><p>{currentCase.title}</p></div><div className={styles.statusPill}>{({REGISTRADA:'Registrada',PENDIENTE_CORREO:'Pendiente de correo',NOTIFICADA:'Notificada',DEFENSA_WEB:'Defensa presentada',EN_JUZGADO:'En juzgado',REMISION_EMITIDA:'Remisión emitida',ARCHIVADA:'Archivada'} as Record<string,string>)[currentCase.status] || currentCase.status}</div></div>
+                <dl className={styles.caseMeta}><div><dt>Código de caso</dt><dd>{currentCase.caseNumber}</dd></div><div><dt>Registrado</dt><dd>{currentCase.caseDate}</dd></div><div><dt>Juzgado receptor</dt><dd>{currentCase.place}</dd></div></dl>
+            </header>
+            <nav className={styles.caseNav} aria-label="Secciones del caso"><a href="#denuncia">Denuncia y evidencias</a><a href="#analisis-ia">Análisis IA</a><a href="#defensa">Defensa</a><a href="#actuaciones">Actuaciones</a></nav>
             {detalle?.expediente && <section className={styles.juzgadoInfo} aria-label="Datos del juzgado">
                 <Title variant="mid">Juzgado receptor</Title>
                 <Text variant="body">{detalle.expediente.nombreJuzgado} · {detalle.expediente.codigoJuzgado}</Text>
@@ -190,8 +176,11 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
                 <Text variant="body"><strong>Referencia interna del expediente:</strong> {detalle.expediente.numeroInterno || 'Sin asignar'}</Text>
                 <Text variant="caption">Recepción: {new Date(detalle.expediente.recibidaEn).toLocaleString('es-GT', { timeZone: 'America/Guatemala' })} · Estado: {detalle.expediente.estado}</Text>
             </section>}
+            <section id="denuncia" className={styles.sectionCard} aria-labelledby="titulo-denuncia"><div className={styles.sectionHeading}><div><span className={styles.eyebrow}>Hecho reportado</span><h2 id="titulo-denuncia">Denuncia y evidencias originales</h2></div><span className={styles.countBadge}>{currentCase.denuncia.evidencias.length} archivos</span></div><p className={styles.description}>{currentCase.denuncia.descripción}</p><EvidenciasCaso archivos={currentCase.denuncia.evidencias}/></section>
+            <AnalisisEvidencias analisis={detalle?.caso.analisisEvidencias}/>
+            <section id="defensa" className={styles.sectionCard} aria-labelledby="titulo-defensa"><div className={styles.sectionHeading}><div><span className={styles.eyebrow}>Versión de la persona notificada</span><h2 id="titulo-defensa">Defensa presentada</h2></div></div>{currentCase.defensa ? <><p className={styles.defenseAuthor}>{currentCase.defensa.nombreDeclarado}</p><p className={styles.description}>{currentCase.defensa.argumentos}</p><EvidenciasCaso archivos={currentCase.defensa.evidencias}/></>:<p className={styles.emptyState}>No hay una defensa web registrada. La recepción de papelería física se consulta en el expediente.</p>}</section>
             {(puedeRecibir || puedeResolver) && !showResolveDefense ? (
-                <div className={styles.actions}>
+                <section className={classNames(styles.sectionCard,styles.actions)} aria-label="Acciones del expediente">
                     <Title variant="mid" className={styles.title}>Acciones disponibles</Title>
                     {puedeRecibir ? (
                         <div className={styles.resolveCaseForm}>
@@ -206,9 +195,9 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
                     ) : puedeResolver ? (
                         <Button variant="contained" state={busy ? "disabled" : "default"} onClick={() => setShowResolveDefense(true)}>Resolver defensa</Button>
                     ) : <Text variant="body">No hay acciones disponibles</Text>}
-                </div>
+                </section>
             ) : !showResolveDefense && (
-                <div className={styles.resolution}>
+                <section className={classNames(styles.sectionCard,styles.resolution)} aria-label="Resolución del caso">
                     {currentCase.resolucion ? (
                         <>
                             <Title variant="mid">Resolución - {currentCase.resolucion?.id}</Title>
@@ -247,18 +236,9 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
                             <Text variant="body">El importe y la disponibilidad de pago se consultan en el sistema institucional.</Text>
                         </div>
                     )}
-                    <Title variant="mid">Caso</Title>
-                </div>
+                </section>
             )}
-            <Title variant="mid" className={styles.title}>Descripción</Title>
-            <Text variant="body">{currentCase.denuncia.descripción}</Text>
-            <Title variant="mid" className={styles.title}>Evidencias</Title>
-            <MediaGrid
-                columns={3}
-                items={currentCase.denuncia.evidencias.map(file => toMediaGridItem(file, falloArchivo))}
-            />
-            {currentCase.defensa && <><Title variant="mid">Defensa histórica</Title><Text variant="body">{currentCase.defensa.nombreDeclarado}</Text><Text variant="body">{currentCase.defensa.argumentos}</Text><MediaGrid columns={3} items={currentCase.defensa.evidencias.map(file => toMediaGridItem(file, falloArchivo))} /></>}
-            {puedeResolver && <div className={styles.resolveCaseForm}>
+            {puedeResolver && <div className={classNames(styles.sectionCard,styles.resolveCaseForm)}>
                 <Title variant="mid">Registrar actuación</Title>
                 <Select options={[{ value: 'REVISION', label: 'Revisión' }, { value: 'ENTREGA_DOCUMENTOS', label: 'Entrega de documentos' }, { value: 'INCIDENCIA', label: 'Incidencia' }]} value={gestionTipo} onChange={e => setGestionTipo(e.target.value)} disabled={busy || !!gestionPendiente.current} aria-label="Tipo de actuación" />
                 <TextArea value={gestionNota} onChange={e => setGestionNota(e.target.value)} maxLength={2000} disabled={busy || !!gestionPendiente.current} aria-label="Observación de la actuación" />
@@ -301,7 +281,8 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
             )}
             {aviso && <div role="alert"><Text variant="body">{aviso}</Text></div>}
             <Button state={busy ? 'disabled' : 'default'} onClick={() => { void recargar().then(() => { recepcionPendiente.current = null; resolucionPendiente.current = null; gestionPendiente.current = null; }).catch(falloArchivo); }}>Consultar estado actual</Button>
-            <Title variant="mid" className={styles.title}>Bitácora de cambios</Title>
+            <section id="actuaciones" className={styles.sectionCard} aria-labelledby="titulo-actuaciones"><div className={styles.sectionHeading}><div><span className={styles.eyebrow}>Seguimiento del expediente</span><h2 id="titulo-actuaciones">Bitácora de actuaciones</h2></div><span className={styles.countBadge}>{currentCase.logs.length} registros</span></div>
+            {!currentCase.logs.length && <p className={styles.emptyState}>Todavía no hay actuaciones registradas.</p>}
             <div className={styles.tableContainer}>
                 <TableRow isHeader gridTemplate={LOG_GRID} cells={LOG_HEADER} />
                 {currentCase.logs.map((log, i) => (
@@ -319,7 +300,7 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
                     />
                 ))}
             </div>
-            
+            </section>
             <PopUp
                 isOpen={showConfirmReceiptModal}
                 onClose={() => setShowConfirmReceiptModal(false)}

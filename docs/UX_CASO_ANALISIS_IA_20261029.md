@@ -17,20 +17,42 @@ La defensa y la denuncia siguen visibles si el análisis devuelve error de consu
 
 ## Despliegue
 
-Primero actualizar api-vivi_v2, permisos de consulta y api-tickets según
-`docs/ANALISIS_IA_JUZGADO_20261029.md` de api-tickets. Después, desde la carpeta
-desplegada del Panel:
+Primero actualizar api-vivi_v2, permisos de consulta y api-tickets en el servidor
+del backend. El servidor del front no necesita una copia de esos repositorios.
+El actualizador se incluye en este repositorio, en
+`scripts/actualizar-servicio-preservando.py`, y solo usa la biblioteca estándar
+de Python 3.6 o posterior y Docker Compose v2 instalados en el servidor del front.
+
+Desde la carpeta desplegada de **Sistema-tickets en el servidor del front**:
 
 ```bash
 git pull --ff-only origin Dev
-python3 /root/api-vivi_v2/scripts/actualizar-servicio-preservando.py sistema-tickets-web --comprobar
-python3 /root/api-vivi_v2/scripts/actualizar-servicio-preservando.py sistema-tickets-web
+python3 scripts/actualizar-servicio-preservando.py sistema-tickets-web --comprobar
 ```
 
+Si devuelve `CONFIGURACION_Y_MONTAJES_OK`, reconstruir y levantar el servicio:
+
+```bash
+python3 scripts/actualizar-servicio-preservando.py sistema-tickets-web
+```
+
+La confirmación final es `SERVICIO_ACTUALIZADO; montajes y redes conservados`.
 La rama de integración de este repositorio es **Dev**; las APIs usan **QA**.
 Usar el nombre real del contenedor si el despliegue lo cambió. El actualizador
 conserva el proyecto, archivos Compose, montajes y redes/alias actuales. No usar
 `down` ni eliminar volúmenes.
+
+El script obtiene el proyecto, el servicio y todos los archivos Compose de las
+etiquetas del contenedor existente; no necesita conocer las rutas del backend.
+Si las rutas de los montajes resueltas por Compose difieren de las actuales,
+se detiene antes de reconstruir o recrear. Corregir la configuración indicada
+antes de volver a ejecutar. No cambiar al Compose base para evitar ese control.
+
+Pruebas del actualizador, con Docker simulado y sin desplegar contenedores:
+
+```bash
+PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s test/despliegue -p '*_test.py' -v
+```
 
 ## Comprobaciones
 

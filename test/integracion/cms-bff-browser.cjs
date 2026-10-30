@@ -15,7 +15,10 @@ async function run() {
     calls.push({ path: req.url, auth: req.headers.authorization, type: req.headers['content-type'], body: Buffer.concat(chunks) });
     if (req.url === '/uploads/noticias/qa.png') { res.writeHead(200, { 'content-type': 'image/png' }); return res.end(image); }
     let body;
-    if (req.url.startsWith('/news?')) body = { items: [news], total: 1 };
+    if(req.url.includes('q=respuesta-html')){res.writeHead(200,{'content-type':'text/html'});return res.end('<html>contenido privado de prueba</html>');}
+    if(req.url.includes('q=respuesta-incompleta'))body={total:0};
+    else if(req.url.includes('q=lista-vacia'))body={items:[],total:0};
+    else if (req.url.startsWith('/news?')) body = { items: [news], total: 1 };
     else if (req.url === '/news/21') body = news;
     else if (req.url === '/taxonomy/categories') body = [{ id: 2, nombre: 'Categoría QA', slug: 'qa', padre: null }];
     else if (req.url === '/taxonomy/tags') body = [{ id: 3, nombre: 'Etiqueta QA', slug: 'qa' }];
@@ -54,6 +57,12 @@ async function run() {
     assert.match(uploaded.type, /multipart\/form-data; boundary=/);
     const video = await fetch(base + '/recursos/externos', { method: 'POST', headers: { ...headers, 'content-type': 'application/json' }, body: JSON.stringify({ url: 'https://example.invalid/video' }) });
     assert.equal(video.status, 200); assert.equal((await video.json()).id, 8);
+    for(const busqueda of ['respuesta-html','respuesta-incompleta']){
+      const r=await fetch(base+'/noticias?busqueda='+busqueda,{headers});assert.equal(r.status,502);
+      const payload=await r.json();assert.equal(payload.codigo,'CMS_RESPUESTA_INVALIDA');assert.match(payload.referencia,/^[0-9a-f-]{36}$/);
+      assert.ok(!JSON.stringify(payload).includes('contenido privado'));
+    }
+    const empty=await get('/noticias?busqueda=lista-vacia');assert.deepEqual(empty.data,[]);assert.equal(empty.total,0);
     const before = calls.length;
     assert.equal((await fetch(base + '/noticias')).status, 401); assert.equal(calls.length, before);
     assert.ok(calls.filter(c => !c.path.startsWith('/uploads/')).every(c => c.auth === headers.authorization));

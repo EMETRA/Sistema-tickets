@@ -1,38 +1,56 @@
-
 .mainContainer {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 50px 0 0 20px;
+  gap: 24px;
+  padding: clamp(16px, 2.5vw, 32px);
+  background: #f4f6fa;
+  min-height: 100%;
+  container: home / inline-size;
 }
-
 .dashboardContainer {
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  padding: 0 50px 20px 0;
-  gap: 10px;
-}
-
-.myPerformanceContainer {
-  width: 100%;
+  min-width: 0;
   display: grid;
-  grid-template-columns: minmax(500px, 1.5fr) minmax(auto, 0.5fr);
-  gap: 10px;
-
+  gap: 20px;
+}
+.dashboardContainer > *,
+.metricsContainer > * {
+  min-width: 0;
+  box-sizing: border-box;
 }
 
-.performanceChart {
-  width: 100%;
-}
-
+.myPerformanceContainer,
 .eventsAndTicketsContainer {
-  width: 100%;
   display: grid;
-  grid-template-columns: minmax(400px, 0.5fr) minmax(500px, 1.5fr);
-  gap: 10px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+  > * {
+    min-width: 0;
+    box-sizing: border-box;
+  }
 }
-
+.performanceChart,
 .infoPanel {
   width: 100%;
+  min-width: 0;
+}
+@container home (min-width:1000px) {
+  .myPerformanceContainer {
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  }
+  .eventsAndTicketsContainer {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr);
+  }
+}
+.myPerformanceContainer.myPerformanceContainer > *,
+.eventsAndTicketsContainer.eventsAndTicketsContainer > * {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: auto;
 }

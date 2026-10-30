@@ -4,6 +4,7 @@ import {
   obtenerArchivoJuzgado,
 } from "@/api/graphql/juzgado";
 import styles from "./JUZ01Detail.module.scss";
+import { ArchivoJuzgadoError } from "@/api/graphql/juzgado-archivo";
 type Archivo = { id: string; name: string; size: string; mime: string };
 export function EvidenciasCaso({ archivos }: { archivos: Archivo[] }) {
   const [seleccion, setSeleccion] = useState<{
@@ -50,10 +51,12 @@ export function EvidenciasCaso({ archivos }: { archivos: Archivo[] }) {
         mime: a.mime,
         nombre: `Evidencia ${a.id}`,
       });
-    } catch {
+    } catch (error) {
       if (!controller.signal.aborted)
         setError(
-          "No se pudo abrir la evidencia. Puedes reintentar o descargarla.",
+          error instanceof ArchivoJuzgadoError
+            ? error.message
+            : "No se pudo abrir la evidencia. Puedes reintentar o descargarla.",
         );
     } finally {
       if (!controller.signal.aborted) setCargando(null);
@@ -108,9 +111,11 @@ export function EvidenciasCaso({ archivos }: { archivos: Archivo[] }) {
                       "evidencias",
                       a.id,
                       `evidencia-${a.id}.${a.mime.startsWith("video/") ? "mp4" : a.mime === "image/png" ? "png" : a.mime === "application/pdf" ? "pdf" : "jpg"}`,
-                    ).catch(() =>
+                    ).catch((error) =>
                       setError(
-                        "No se pudo descargar la evidencia. Intenta nuevamente.",
+                        error instanceof ArchivoJuzgadoError
+                          ? error.message
+                          : "No se pudo descargar la evidencia. Intenta nuevamente.",
                       ),
                     );
                   }}

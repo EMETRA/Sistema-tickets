@@ -21,6 +21,12 @@ const etiquetas: Record<string, string> = {
   NO_VISIBLE: "No visible",
   COMPATIBLE: "Compatible",
   INCOMPATIBLE: "Incompatibilidad evidente",
+  BANQUETA: "Banqueta",
+  CALZADA: "Calzada",
+  ACERA: "Acera",
+  IDENTIFICABLE: "Identificable",
+  NO_IDENTIFICABLE: "No identificable",
+  NO_APLICA: "No aplica",
 };
 const motivos: Record<string, string> = {
   RELACIONADA: "Evidencia relacionada.",
@@ -68,7 +74,9 @@ export function AnalisisEvidencias({
         </div>
         {analisis?.disponible && (
           <span className={styles.analysisStatus} data-state={analisis.estado}>
-            {etiqueta(analisis.estado)}
+            {analisis.continuoConObservaciones
+              ? "Aviso continuado · análisis inconcluso"
+              : etiqueta(analisis.estado)}
           </span>
         )}
       </div>
@@ -84,6 +92,14 @@ export function AnalisisEvidencias({
         </p>
       ) : (
         <>
+          {analisis.continuoConObservaciones && (
+            <p className={styles.historyNotice}>
+              El aviso continuó con las observaciones de la IA, sin aprobación
+              automática de las evidencias. La incertidumbre no acredita una
+              infracción. El caso llega a valoración judicial si el propietario
+              presenta defensa.
+            </p>
+          )}
           {analisis.modo === "OBSERVAR" && (
             <p className={styles.historyNotice}>
               Este análisis se ejecutó en modo de observación: su resultado no
@@ -156,6 +172,7 @@ export function AnalisisEvidencias({
                     ["Comparación de placa", a.comparacionPlaca],
                     ["Compatibilidad del vehículo", a.compatibilidad],
                     ["Comparación de marca", a.marca],
+                    ["Ubicación estimada por IA", a.ubicacionVehiculo],
                   ].map(([nombre, valor]) => (
                     <div key={nombre}>
                       <dt>{nombre}</dt>
@@ -165,7 +182,7 @@ export function AnalisisEvidencias({
                         }
                       >
                         {nombre === "Comparación de marca"
-                          ? marca(valor, a.indicioMarca)
+                          ? marca(valor ?? null, a.indicioMarca)
                           : etiqueta(valor)}
                       </dd>
                     </div>
@@ -203,6 +220,50 @@ export function AnalisisEvidencias({
                     </dd>
                   </div>
                 </dl>
+                {a.verificacionBanqueta ? (
+                  <>
+                    <h4>Apoyos observados por IA</h4>
+                    <dl className={styles.criteriaGrid}>
+                      {[
+                        [
+                          "Límite entre acera y calzada",
+                          a.verificacionBanqueta.limiteAcera,
+                        ],
+                        [
+                          "Apoyo de rueda delantera",
+                          a.verificacionBanqueta.ruedaDelantera,
+                        ],
+                        [
+                          "Apoyo de rueda trasera",
+                          a.verificacionBanqueta.ruedaTrasera,
+                        ],
+                        [
+                          "Estructura sobre la acera",
+                          a.verificacionBanqueta.estructuraSobreAcera,
+                        ],
+                        [
+                          "Ubicación en la primera lectura",
+                          a.verificacionBanqueta.ubicacionInicial,
+                        ],
+                      ].map(([nombre, valor]) => (
+                        <div key={nombre}>
+                          <dt>{nombre}</dt>
+                          <dd>{etiqueta(valor)}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                    <p className={styles.fileHint}>
+                      Son estimaciones visuales que pueden contener errores.
+                      Versión:{" "}
+                      {a.verificacionBanqueta.version || "No registrada"}.
+                    </p>
+                  </>
+                ) : analisis.criterioMotivo === "SOBRE_BANQUETA" ? (
+                  <p className={styles.fileHint}>
+                    No consta una comprobación adicional de apoyos en este
+                    archivo. Esto no acredita que el vehículo ocupe la banqueta.
+                  </p>
+                ) : null}
                 {(analisis.esPoliticaConjunto ||
                   (a.marca === "COINCIDE" && !a.indicioMarca)) && (
                   <p className={styles.fileHint}>
@@ -213,8 +274,10 @@ export function AnalisisEvidencias({
                       " La IA registró una coincidencia en el análisis anterior, sin detallar el indicio visual. Se conserva el resultado original para su revisión."}
                   </p>
                 )}
-                {!analisis.esPoliticaConjunto && a.motivo && (
+                {a.motivo && (
                   <p className={styles.fileHint}>
+                    {analisis.esPoliticaConjunto &&
+                      "Resultado de este archivo: "}
                     {motivos[a.motivo] ||
                       "Consulta las evidencias y el resultado general."}
                   </p>

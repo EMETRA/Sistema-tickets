@@ -4,8 +4,9 @@ import { ArchivoJuzgadoError } from './juzgado-archivo';
 export type EvidenciaJuzgado = { id: string; origen: string; mime: string; tamanoBytes: string; estado: string };
 export type DocumentoJuzgado = { id: string; tipoDocumento: string; numeroVersion: string; versionPlantilla: string; mime: string; tamanoBytes: string; generadoEn: string };
 export type SedeJuzgado = { codigo: string; nombre: string; direccion: string | null; horario: string | null };
-export type AnalisisArchivo = { idEvidencia:string|null; decision:string|null; motivo:string|null; hecho:string|null; placa:string|null; comparacionPlaca:string|null; compatibilidad:string|null; marca:string|null; indicioMarca?:string|null; contenidoSensible:boolean|null; posiblePantalla:boolean|null; analizadoEn:string|null; fotogramas:number|null };
-export type AnalisisEvidencias = { modo?:string|null; disponible:boolean; estado:string; modelo:string|null; versionPolitica:string|null; creadoEn:string|null; terminadoEn:string|null; referenciaEstado:string|null; referenciaFuente:string|null; errorReferencia:string|null; codigoError:string|null; esPoliticaConjunto:boolean; archivos:AnalisisArchivo[] };
+export type VerificacionBanqueta = { version:string|null; ubicacionInicial:string|null; limiteAcera:string|null; ruedaDelantera:string|null; ruedaTrasera:string|null; estructuraSobreAcera:string|null };
+export type AnalisisArchivo = { idEvidencia:string|null; decision:string|null; motivo:string|null; hecho:string|null; placa:string|null; comparacionPlaca:string|null; compatibilidad:string|null; marca:string|null; indicioMarca?:string|null; ubicacionVehiculo?:string|null; verificacionBanqueta?:VerificacionBanqueta|null; contenidoSensible:boolean|null; posiblePantalla:boolean|null; analizadoEn:string|null; fotogramas:number|null };
+export type AnalisisEvidencias = { modo?:string|null; disponible:boolean; estado:string; modelo:string|null; versionPolitica:string|null; creadoEn:string|null; terminadoEn:string|null; referenciaEstado:string|null; referenciaFuente:string|null; errorReferencia:string|null; codigoError:string|null; esPoliticaConjunto:boolean; continuoConObservaciones?:boolean|null; criterioMotivo?:string|null; verificacionMotivo?:string|null; archivos:AnalisisArchivo[] };
 export type DetalleJuzgado = {
   codigoCaso: string; estadoCaso: string;
   caso: { id: string; codigoCaso: string; usoPlaca: string; placa: string; regla: string; observaciones: string | null; estado: string; registradaEn: string; evidenciasDenuncia: EvidenciaJuzgado[]; analisisEvidencias?:AnalisisEvidencias|null; defensa: { id: string; nombreDeclarado: string; argumentos: string; evidencias: EvidenciaJuzgado[] } | null };
@@ -33,8 +34,30 @@ export const DETALLE_JUZGADO = `query ViviJuzgadoDetalle($codigoCaso: String!) {
   }
  }
 }`;
+// Contrato ampliado con una unica lectura de compatibilidad si el API aun
+// no se ha actualizado. No repetir mutaciones ni ocultar otros errores.
+export const DETALLE_JUZGADO_ANALISIS = DETALLE_JUZGADO
+  .replace('esPoliticaConjunto', 'esPoliticaConjunto continuoConObservaciones criterioMotivo verificacionMotivo')
+  .replace('indicioMarca', 'indicioMarca ubicacionVehiculo verificacionBanqueta { version ubicacionInicial limiteAcera ruedaDelantera ruedaTrasera estructuraSobreAcera }');
+
+function contratoAnalisisAnterior(error: unknown): boolean {
+  const errors = (error as { graphQLErrors?: { message?:string; extensions?:{code?:string} }[] })?.graphQLErrors;
+  return Array.isArray(errors) && errors.length > 0 && errors.every(e =>
+    e.extensions?.code === 'GRAPHQL_VALIDATION_FAILED' && (
+      /^Cannot query field "(continuoConObservaciones|criterioMotivo|verificacionMotivo)" on type "ViviJuzgadoAnalisis"\./.test(e.message || '') ||
+      /^Cannot query field "(ubicacionVehiculo|verificacionBanqueta)" on type "ViviJuzgadoAnalisisArchivo"\./.test(e.message || '')
+    )
+  );
+}
 export async function consultarCasoJuzgado(codigoCaso: string): Promise<DetalleJuzgado> {
-  const data = await graphqlRequestClient<{ viviJuzgadoDetalle: DetalleJuzgado }>(DETALLE_JUZGADO, { variables: { codigoCaso } });
+  const options = { variables: { codigoCaso } };
+  let data: { viviJuzgadoDetalle: DetalleJuzgado };
+  try {
+    data = await graphqlRequestClient<{ viviJuzgadoDetalle: DetalleJuzgado }>(DETALLE_JUZGADO_ANALISIS, options);
+  } catch (error) {
+    if (!contratoAnalisisAnterior(error)) throw error;
+    data = await graphqlRequestClient<{ viviJuzgadoDetalle: DetalleJuzgado }>(DETALLE_JUZGADO, options);
+  }
   if (data?.viviJuzgadoDetalle?.codigoCaso !== codigoCaso) throw new Error('No se recibió el caso solicitado');
   return data.viviJuzgadoDetalle;
 }

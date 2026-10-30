@@ -3,7 +3,7 @@ import { graphqlRequestClient, apiFetch } from './client';
 export type EvidenciaJuzgado = { id: string; origen: string; mime: string; tamanoBytes: string; estado: string };
 export type DocumentoJuzgado = { id: string; tipoDocumento: string; numeroVersion: string; versionPlantilla: string; mime: string; tamanoBytes: string; generadoEn: string };
 export type SedeJuzgado = { codigo: string; nombre: string; direccion: string | null; horario: string | null };
-export type AnalisisArchivo = { idEvidencia:string|null; decision:string|null; motivo:string|null; hecho:string|null; placa:string|null; comparacionPlaca:string|null; compatibilidad:string|null; marca:string|null; contenidoSensible:boolean|null; posiblePantalla:boolean|null; analizadoEn:string|null; fotogramas:number|null };
+export type AnalisisArchivo = { idEvidencia:string|null; decision:string|null; motivo:string|null; hecho:string|null; placa:string|null; comparacionPlaca:string|null; compatibilidad:string|null; marca:string|null; indicioMarca?:string|null; contenidoSensible:boolean|null; posiblePantalla:boolean|null; analizadoEn:string|null; fotogramas:number|null };
 export type AnalisisEvidencias = { modo?:string|null; disponible:boolean; estado:string; modelo:string|null; versionPolitica:string|null; creadoEn:string|null; terminadoEn:string|null; referenciaEstado:string|null; referenciaFuente:string|null; errorReferencia:string|null; codigoError:string|null; esPoliticaConjunto:boolean; archivos:AnalisisArchivo[] };
 export type DetalleJuzgado = {
   codigoCaso: string; estadoCaso: string;
@@ -19,7 +19,7 @@ export const DETALLE_JUZGADO = `query ViviJuzgadoDetalle($codigoCaso: String!) {
  viviJuzgadoDetalle(codigoCaso: $codigoCaso) { codigoCaso estadoCaso
   caso { id codigoCaso usoPlaca placa regla observaciones estado registradaEn
    analisisEvidencias { disponible estado modo modelo versionPolitica creadoEn terminadoEn referenciaEstado referenciaFuente errorReferencia codigoError esPoliticaConjunto
-    archivos { idEvidencia decision motivo hecho placa comparacionPlaca compatibilidad marca contenidoSensible posiblePantalla analizadoEn fotogramas }
+    archivos { idEvidencia decision motivo hecho placa comparacionPlaca compatibilidad marca indicioMarca contenidoSensible posiblePantalla analizadoEn fotogramas }
    }
    evidenciasDenuncia { id origen mime tamanoBytes estado }
    defensa { id nombreDeclarado argumentos evidencias { id origen mime tamanoBytes estado } }

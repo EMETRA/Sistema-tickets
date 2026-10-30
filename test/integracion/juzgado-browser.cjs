@@ -13,7 +13,7 @@ async function run() {
   const llamadas = [];
   let sedesFalla = true, sedesVacias = false, perfilFalla = true, recepcionFalla = true, recibida = false, resuelta = false, pdf = false;
   const documento = { id: '80', tipoDocumento: 'RESOLUCION', numeroVersion: '1', versionPlantilla: 'DEN09-BORRADOR-1', mime: 'application/pdf', tamanoBytes: '40', generadoEn: '2026-10-08T20:00:00Z' };
-  const detalle = () => ({ codigoCaso: codigo, estadoCaso: resuelta ? 'REMISION_EMITIDA' : recibida ? 'EN_JUZGADO' : 'NOTIFICADA', caso: { id: '8003', codigoCaso: codigo, usoPlaca: 'P', placa: '113BBB', regla: '39', observaciones: 'Observación QA', estado: 'NOTIFICADA', registradaEn: '2026-10-08T17:00:00Z', evidenciasDenuncia: [{id:'81',origen:'DENUNCIA',mime:'image/png',tamanoBytes:'68',estado:'DISPONIBLE'},{id:'82',origen:'DENUNCIA',mime:'image/png',tamanoBytes:'68',estado:'DISPONIBLE'}], analisisEvidencias: {disponible:true,estado:'ACEPTADA',modelo:'modelo-qa',versionPolitica:'EVIDENCIA_V5_CONJUNTO',creadoEn:'2026-10-29T17:00:00Z',terminadoEn:'2026-10-29T17:01:00Z',referenciaEstado:'SIN_DATOS',referenciaFuente:'SAT_MUNI',errorReferencia:'SAT_TRANSPORTE',codigoError:null,esPoliticaConjunto:true,archivos:[{idEvidencia:'81',decision:'REVISION',motivo:'INSUFICIENTE',hecho:'RELACIONADO',placa:'NO_VISIBLE',comparacionPlaca:'NO_DETERMINABLE',compatibilidad:'COMPATIBLE',marca:'SIN_REFERENCIA',contenidoSensible:false,posiblePantalla:false,analizadoEn:'2026-10-29T17:01:00Z',fotogramas:1},{idEvidencia:'82',decision:'REVISION',motivo:'INSUFICIENTE',hecho:'AJENO',placa:'PARCIAL',comparacionPlaca:'NO_DETERMINABLE',compatibilidad:'NO_DETERMINABLE',marca:'SIN_REFERENCIA',contenidoSensible:false,posiblePantalla:false,analizadoEn:'2026-10-29T17:01:00Z',fotogramas:1}]}, defensa: null }, expediente: recibida ? { id: '77', version: '2', codigoJuzgado: 'JUZ_QA', nombreJuzgado: 'Sede QA controlada', direccionJuzgado: 'Dirección QA controlada', horarioJuzgado: 'Horario QA controlado', estado: resuelta ? 'RESUELTO' : 'RECIBIDO', idActorReceptor: '12', recibidaEn: '2026-10-08T18:00:00Z', numeroInterno: 'EXP-QA-77', observacion: null, gestiones: [], resolucion: resuelta ? { id: '79', decision: 'NO_ACOGIDA', fundamento: 'Fundamento QA controlado', autoridadSnapshot: user.nombre, versionPlantilla: 'DEN09-BORRADOR-1', resueltaEn: '2026-10-08T19:00:00Z', idActorJuez: '12' } : null, remision: resuelta ? { ciudad: '1', serie: 'V', numero: '8003' } : null, documentos: pdf ? [documento] : [] } : null });
+  const detalle = () => ({ codigoCaso: codigo, estadoCaso: resuelta ? 'REMISION_EMITIDA' : recibida ? 'EN_JUZGADO' : 'NOTIFICADA', caso: { id: '8003', codigoCaso: codigo, usoPlaca: 'P', placa: '113BBB', regla: '39', observaciones: 'Observación QA', estado: 'NOTIFICADA', registradaEn: '2026-10-08T17:00:00Z', evidenciasDenuncia: [{id:'81',origen:'DENUNCIA',mime:'image/png',tamanoBytes:'68',estado:'DISPONIBLE'},{id:'82',origen:'DENUNCIA',mime:'image/png',tamanoBytes:'68',estado:'DISPONIBLE'}], analisisEvidencias: {disponible:true,estado:'ACEPTADA',modelo:'modelo-qa',versionPolitica:'EVIDENCIA_V5_CONJUNTO',creadoEn:'2026-10-29T17:00:00Z',terminadoEn:'2026-10-29T17:01:00Z',referenciaEstado:'DISPONIBLE',referenciaFuente:'SAT_MUNI',errorReferencia:null,codigoError:null,esPoliticaConjunto:true,archivos:[{idEvidencia:'81',decision:'REVISION',motivo:'INSUFICIENTE',hecho:'RELACIONADO',placa:'NO_VISIBLE',comparacionPlaca:'NO_DETERMINABLE',compatibilidad:'COMPATIBLE',marca:'NO_DETERMINABLE',indicioMarca:'NO_RECONOCIBLE',contenidoSensible:false,posiblePantalla:false,analizadoEn:'2026-10-29T17:01:00Z',fotogramas:1},{idEvidencia:'82',decision:'REVISION',motivo:'INSUFICIENTE',hecho:'AJENO',placa:'PARCIAL',comparacionPlaca:'NO_DETERMINABLE',compatibilidad:'NO_DETERMINABLE',marca:'COINCIDE',indicioMarca:null,contenidoSensible:false,posiblePantalla:false,analizadoEn:'2026-10-29T17:01:00Z',fotogramas:1}]}, defensa: null }, expediente: recibida ? { id: '77', version: '2', codigoJuzgado: 'JUZ_QA', nombreJuzgado: 'Sede QA controlada', direccionJuzgado: 'Dirección QA controlada', horarioJuzgado: 'Horario QA controlado', estado: resuelta ? 'RESUELTO' : 'RECIBIDO', idActorReceptor: '12', recibidaEn: '2026-10-08T18:00:00Z', numeroInterno: 'EXP-QA-77', observacion: null, gestiones: [], resolucion: resuelta ? { id: '79', decision: 'NO_ACOGIDA', fundamento: 'Fundamento QA controlado', autoridadSnapshot: user.nombre, versionPlantilla: 'DEN09-BORRADOR-1', resueltaEn: '2026-10-08T19:00:00Z', idActorJuez: '12' } : null, remision: resuelta ? { ciudad: '1', serie: 'V', numero: '8003' } : null, documentos: pdf ? [documento] : [] } : null });
   const backend = http.createServer(async (req, res) => {
     let body = ''; for await (const chunk of req) body += chunk;
     const datos = body ? JSON.parse(body) : {};
@@ -66,7 +66,12 @@ async function run() {
     assert.equal(await page.getByText('Visible parcialmente',{exact:true}).count(),1);
     assert.equal(await page.getByText('No evaluado',{exact:true}).count(),0);
     assert.ok(llamadas.some(l=>l.query.includes('analisisEvidencias')));
+    await page.getByText('No reconocible en este archivo',{exact:true}).waitFor();
+    await page.getByText('Sin indicio visual registrado',{exact:true}).waitFor();
+    assert.equal(await page.getByText('Coincide',{exact:true}).count(),0);
     await page.getByRole('button',{name:'Ver evidencia',exact:true}).first().click();
+    await page.getByRole('figure', {name:'Vista de Evidencia 81'}).locator('img').waitFor();
+    await page.getByRole('button', {name:'Ampliar',exact:true}).first().click();
     await page.getByRole('dialog').waitFor();
     await page.getByRole('dialog').locator('img').waitFor();
     await page.getByRole('button',{name:'Cerrar',exact:true}).click();
@@ -85,6 +90,32 @@ async function run() {
     await page.screenshot({ path: path.join(out, 'panel-juzgado.png'), fullPage: true });
     await page.locator('#analisis-ia').scrollIntoViewIfNeeded();
     await page.screenshot({path:path.join(out,'panel-analisis-ia.png'),fullPage:true});
+    // En escritorio y tablet la evidencia y la IA deben poder compararse en paralelo.
+    for (const width of [1920,1440,1180]) {
+      await page.setViewportSize({width,height:1100});
+      const boxes = await page.evaluate(() => {
+        const rect = id => {const r=document.getElementById(id).getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,right:r.right};};
+        return {denuncia:rect('denuncia'),ia:rect('analisis-ia'),defensa:rect('defensa'),page:document.documentElement.scrollWidth,viewport:innerWidth};
+      });
+      assert.ok(boxes.ia.x > boxes.denuncia.x + boxes.denuncia.width, `Dos columnas a ${width}px`);
+      assert.ok(Math.abs(boxes.denuncia.y-boxes.ia.y)<2, 'Evidencia y analisis alineados');
+      assert.ok(boxes.page<=boxes.viewport, `Sin desbordamiento a ${width}px`);
+      assert.equal(await page.getByRole('figure',{name:'Vista de Evidencia 81'}).count(),1,'Cerrar ampliacion conserva la vista junto a la IA');
+    }
+    await page.setViewportSize({width:1024,height:768});
+    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Tablet sin desbordamiento');
+    await page.locator('main').evaluate(el=>{el.scrollTop=0});
+    await page.screenshot({path:path.join(out,'panel-juzgado-tablet.png'),fullPage:true});
+    await page.setViewportSize({width:1920,height:1300});
+    await page.getByRole('button',{name:'Ocultar vista',exact:true}).click();
+    await page.locator('main').evaluate(el=>{el.scrollTop=0});
+    await page.screenshot({path:path.join(out,'panel-juzgado-escritorio.png'),fullPage:true});
+    await page.setViewportSize({width:768,height:1024});
+    assert.ok(await page.evaluate(()=>{
+      const d=document.getElementById('denuncia').getBoundingClientRect();
+      const a=document.getElementById('analisis-ia').getBoundingClientRect();
+      return Math.abs(d.x-a.x)<2 && a.y>d.y && document.documentElement.scrollWidth<=innerWidth;
+    }),'Tablet vertical apila las secciones sin desbordamiento');
     await page.setViewportSize({width:390,height:844});
     assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth),'Sin desbordamiento horizontal');
     await page.locator('#analisis-ia').scrollIntoViewIfNeeded();

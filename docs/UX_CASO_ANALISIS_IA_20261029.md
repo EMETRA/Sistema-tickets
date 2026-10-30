@@ -5,8 +5,8 @@ denuncia, análisis, defensa y actuaciones; tarjetas diferenciadas y presentaci�
 adaptable. Las acciones de recepción/resolución quedan después de las evidencias
 y la defensa. Se conservan permisos, idempotencia y confirmación de resoluciones.
 
-Las fotografías y videos se abren en un diálogo mediante la ruta autenticada
-existente. No hay URL pública ni JWT en parámetros. Se revocan URL blob al cerrar,
+Las fotografías y videos se previsualizan y pueden ampliarse en un diálogo
+mediante la ruta autenticada existente. No hay URL pública ni JWT en parámetros. Se revocan URL blob al ocultar o sustituir la vista,
 se cancelan peticiones al desmontar y solo se previsualizan PNG/JPEG/MP4 con MIME
 coincidente. También se permite descargar.
 
@@ -60,3 +60,24 @@ Prueba en navegador con backend controlado: análisis V5 complementario, fotogra
 privada, Bearer, permisos, recepción con error/reintento, resolución y PDF
 independientes, escritorio y móvil. Typecheck, compilación Next e integración.
 No se usó una cuenta real ni se modificó un expediente de eme02.
+
+## Ajustes para escritorio y tablet
+
+La consulta utiliza el ancho disponible, sin el límite anterior de 1440 px.
+A partir de 780 px de contenido real, denuncia/defensa y análisis se muestran en
+columnas; en espacios menores se apilan. La grilla responde al contenedor,
+incluyendo el espacio ocupado por la navegación lateral. Las acciones y datos
+del expediente comparten una segunda grilla. Las pruebas de navegador cubren
+1920, 1440, 1180, 1024, 768 y 390 px sin desbordamiento de la página.
+
+«Ver evidencia» abre una vista dentro de la denuncia o defensa, para comparar
+la imagen con el análisis. «Ampliar» utiliza el mismo archivo ya autorizado;
+cerrar la ampliación conserva la vista. Se mantienen las descargas con Bearer,
+la cancelación de peticiones y la liberación de URL de objetos.
+
+La comparación de marca no se deduce del estado aprobado. Un resultado nuevo
+sin indicio reconocible se presenta como «No se pudo determinar». Si una
+coincidencia histórica no guardó un indicio, se presenta «Sin indicio visual
+registrado» y se explica lo que informó la IA. No se corrigen ni reanalizan
+silenciosamente los resultados anteriores. Esto requiere primero actualizar
+api-tickets, que añade el campo GraphQL nullable `indicioMarca`.

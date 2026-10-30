@@ -1,359 +1,874 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from 'react';
-import classNames from 'classnames';
-import { AnalisisEvidencias } from './AnalisisEvidencias';
-import { EvidenciasCaso } from './EvidenciasCaso';
+import React, { useState, useEffect, useRef } from "react";
+import classNames from "classnames";
+import { AnalisisEvidencias } from "./AnalisisEvidencias";
+import { EvidenciasCaso } from "./EvidenciasCaso";
 import { Title } from "@/components/client/atoms/Title";
 import { Text } from "@/components/client/atoms/Text";
 import { Button } from "@/components/client/atoms/Button";
 import { File } from "@/components/client/atoms/File";
 import { ButtonTab } from "@/components/client/atoms/ButtonTab";
-import { FormField } from '@/components/client/molecules/FormField';
+import { FormField } from "@/components/client/molecules/FormField";
 import { TableRow } from "@/components/client/molecules/TableRow";
 import type { TableCellConfig } from "@/components/client/molecules/TableRow/types";
-import { PopUp } from '@/components/client/molecules/PopUp';
+import { PopUp } from "@/components/client/molecules/PopUp";
 
-import styles from './JUZ01Detail.module.scss';
-import { JUZ01DetailProps } from './types';
-import { useRouter } from 'next/navigation';
-import { TextArea } from '@/components/client/atoms/TextArea';
-import { Select } from '@/components/client/atoms/Select';
-import { Input } from '@/components/client/atoms/Input';
-import { useAuthStore } from '@/store/useAuthStore';
-import { consultarCasoJuzgado, consultarSedesJuzgado, recibirCasoJuzgado, resolverCasoJuzgado, registrarGestionJuzgado, generarDocumentoJuzgado, descargarArchivoJuzgado, idSolicitudJuzgado, mensajeJuzgado, type DetalleJuzgado, type SedeJuzgado, type RecepcionInput, type ResolucionInput, type GestionInput } from '@/api/graphql/juzgado';
-import { mapearCasoJuzgado } from '@/api/graphql/juzgado-vista';
-
+import styles from "./JUZ01Detail.module.scss";
+import { JUZ01DetailProps } from "./types";
+import { useRouter } from "next/navigation";
+import { TextArea } from "@/components/client/atoms/TextArea";
+import { Select } from "@/components/client/atoms/Select";
+import { Input } from "@/components/client/atoms/Input";
+import { useAuthStore } from "@/store/useAuthStore";
+import {
+  consultarCasoJuzgado,
+  consultarSedesJuzgado,
+  recibirCasoJuzgado,
+  resolverCasoJuzgado,
+  registrarGestionJuzgado,
+  generarDocumentoJuzgado,
+  descargarArchivoJuzgado,
+  idSolicitudJuzgado,
+  mensajeJuzgado,
+  type DetalleJuzgado,
+  type SedeJuzgado,
+  type RecepcionInput,
+  type ResolucionInput,
+  type GestionInput,
+} from "@/api/graphql/juzgado";
+import { mapearCasoJuzgado } from "@/api/graphql/juzgado-vista";
 
 type Case = ReturnType<typeof mapearCasoJuzgado>;
-const LOG_GRID = "minmax(0,0.5fr) minmax(0,0.3fr) minmax(0,1fr) minmax(0,0.2fr) minmax(0,1fr)";
+const LOG_GRID =
+  "minmax(0,0.5fr) minmax(0,0.3fr) minmax(0,1fr) minmax(0,0.2fr) minmax(0,1fr)";
 
 const LOG_HEADER: TableCellConfig[] = [
-    { label: "Actor", icon: "user-solid" },
-    { label: "Correo", icon: "mail-solid" },
-    { label: "Acción", icon: "ticket" },
-    { label: "Fecha", icon: "calendar-regular" },
-    { label: "Nota", icon: "briefcase-solid" },
+  { label: "Actor", icon: "user-solid" },
+  { label: "Correo", icon: "mail-solid" },
+  { label: "Acción", icon: "ticket" },
+  { label: "Fecha", icon: "calendar-regular" },
+  { label: "Nota", icon: "briefcase-solid" },
 ];
 const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
+  const [currentCase, setCurrentCase] = useState<Case | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<{ message: string } | null>(null); // Error al cargar el caso
+  const [errorSendResolution, setErrorSendResolution] = useState<{
+    message: string;
+  } | null>(null); // Error al enviar la resolución
+  const router = useRouter();
 
-    const [currentCase, setCurrentCase] = useState<Case | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<{ message: string } | null>(null); // Error al cargar el caso
-    const [errorSendResolution, setErrorSendResolution] = useState<{ message: string } | null>(null); // Error al enviar la resolución
-    const router = useRouter();
+  const [showConfirmReceiptModal, setShowConfirmReceiptModal] = useState(false);
+  const [showSendResolutionModal, setShowSendResolutionModal] = useState(false);
+  const [showResolveDefense, setShowResolveDefense] = useState(false);
+  const [resolveCaseValue, setResolveCaseValue] = useState("acogido");
+  const [fundament, setFundament] = useState("");
+  const [isSendingResolution, setIsSendingResolution] = useState(false);
 
-    const [showConfirmReceiptModal, setShowConfirmReceiptModal] = useState(false);
-    const [showSendResolutionModal, setShowSendResolutionModal] = useState(false);
-    const [showResolveDefense, setShowResolveDefense] = useState(false);
-    const [resolveCaseValue, setResolveCaseValue] = useState("acogido");
-    const [fundament, setFundament] = useState("");
-    const [isSendingResolution, setIsSendingResolution] = useState(false);
+  const permisos = useAuthStore((state) => state.user)?.permisos || [];
+  const [detalle, setDetalle] = useState<DetalleJuzgado | null>(null);
+  const [sedes, setSedes] = useState<SedeJuzgado[]>([]);
+  const [sede, setSede] = useState("");
+  const [errorSedes, setErrorSedes] = useState<string | null>(null);
+  const [cargandoSedes, setCargandoSedes] = useState(false);
+  const [catalogoVersion, setCatalogoVersion] = useState(0);
+  const [numeroInterno, setNumeroInterno] = useState("");
+  const [observacion, setObservacion] = useState("");
+  const [gestionTipo, setGestionTipo] = useState("REVISION");
+  const [gestionNota, setGestionNota] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [aviso, setAviso] = useState<string | null>(null);
+  const [consultaVersion, setConsultaVersion] = useState(0);
+  const enCurso = useRef(false);
+  const recepcionPendiente = useRef<RecepcionInput | null>(null);
+  const resolucionPendiente = useRef<{
+    decision: "ACOGIDA" | "NO_ACOGIDA";
+    input: ResolucionInput;
+  } | null>(null);
+  const gestionPendiente = useRef<GestionInput | null>(null);
+  const puedeConsultar = permisos.includes("VIVI_JUZGADO_CONSULTAR");
+  const puedeRecibir =
+    !!detalle &&
+    !detalle.expediente &&
+    ["REGISTRADA", "PENDIENTE_CORREO", "NOTIFICADA", "DEFENSA_WEB"].includes(
+      detalle.estadoCaso,
+    ) &&
+    permisos.includes("VIVI_JUZGADO_RECIBIR");
+  const puedeResolver =
+    detalle?.estadoCaso === "EN_JUZGADO" &&
+    !!detalle.expediente &&
+    ["RECIBIDO", "EN_REVISION"].includes(detalle.expediente.estado) &&
+    permisos.includes("VIVI_JUZGADO_RESOLVER");
 
-    const permisos = useAuthStore(state => state.user)?.permisos || [];
-    const [detalle, setDetalle] = useState<DetalleJuzgado | null>(null);
-    const [sedes, setSedes] = useState<SedeJuzgado[]>([]);
-    const [sede, setSede] = useState('');
-    const [errorSedes, setErrorSedes] = useState<string | null>(null);
-    const [cargandoSedes, setCargandoSedes] = useState(false);
-    const [catalogoVersion, setCatalogoVersion] = useState(0);
-    const [numeroInterno, setNumeroInterno] = useState('');
-    const [observacion, setObservacion] = useState('');
-    const [gestionTipo, setGestionTipo] = useState('REVISION');
-    const [gestionNota, setGestionNota] = useState('');
-    const [busy, setBusy] = useState(false);
-    const [aviso, setAviso] = useState<string | null>(null);
-    const [consultaVersion, setConsultaVersion] = useState(0);
-    const enCurso = useRef(false);
-    const recepcionPendiente = useRef<RecepcionInput | null>(null);
-    const resolucionPendiente = useRef<{ decision: 'ACOGIDA' | 'NO_ACOGIDA'; input: ResolucionInput } | null>(null);
-    const gestionPendiente = useRef<GestionInput | null>(null);
-    const puedeConsultar = permisos.includes('VIVI_JUZGADO_CONSULTAR');
-    const puedeRecibir = !!detalle && !detalle.expediente && ['REGISTRADA', 'PENDIENTE_CORREO', 'NOTIFICADA', 'DEFENSA_WEB'].includes(detalle.estadoCaso) && permisos.includes('VIVI_JUZGADO_RECIBIR');
-    const puedeResolver = detalle?.estadoCaso === 'EN_JUZGADO' && !!detalle.expediente && ['RECIBIDO', 'EN_REVISION'].includes(detalle.expediente.estado) && permisos.includes('VIVI_JUZGADO_RESOLVER');
-
-    async function recargar() {
-        const data = await consultarCasoJuzgado(caseNumber);
-        setDetalle(data); setCurrentCase(mapearCasoJuzgado(data));
-    }
-    useEffect(() => {
-        let activo = true;
-        setIsLoading(true); setError(null); setCurrentCase(null); setDetalle(null);
-        recepcionPendiente.current = null; resolucionPendiente.current = null; gestionPendiente.current = null;
-        void (async () => {
-            if (!puedeConsultar) throw new Error('Sin permiso');
-            const data = await consultarCasoJuzgado(caseNumber);
-            if (activo) { setDetalle(data); setCurrentCase(mapearCasoJuzgado(data)); }
-        })().catch(e => { if (activo) setError({ message: puedeConsultar ? mensajeJuzgado(e) : 'Tu cuenta no tiene permiso para consultar casos del juzgado.' }); }).finally(() => { if (activo) setIsLoading(false); });
-        return () => { activo = false; };
-    }, [caseNumber, puedeConsultar, consultaVersion]);
-
-    useEffect(() => {
-        let activo = true;
-        setSedes([]); setSede(''); setErrorSedes(null);
-        if (!puedeRecibir) { setCargandoSedes(false); return; }
-        setCargandoSedes(true);
-        void consultarSedesJuzgado().then(disponibles => {
-            if (activo) setSedes(disponibles);
-        }).catch(e => { if (activo) setErrorSedes(mensajeJuzgado(e)); })
-          .finally(() => { if (activo) setCargandoSedes(false); });
-        return () => { activo = false; };
-    }, [puedeRecibir, caseNumber, catalogoVersion]);
-    const sedeElegida = sedes.find(item => item.codigo === sede);
-
-    const falloArchivo = (e: unknown) => setAviso(mensajeJuzgado(e));
-    async function ejecutar(accion: () => Promise<unknown>, confirmar?: () => void) {
-        if (enCurso.current) return;
-        enCurso.current = true; setBusy(true); setAviso(null); setErrorSendResolution(null);
-        try {
-            await accion(); confirmar?.();
-            try { await recargar(); } catch { setAviso('La operación fue confirmada, pero no se pudo actualizar la vista. Consulta el estado actual del caso.'); }
-        } catch (e) { setAviso(mensajeJuzgado(e)); }
-        finally { enCurso.current = false; setBusy(false); setIsSendingResolution(false); }
-    }
-    const handleConfirmReceipt = () => {
-        if (!puedeRecibir || !sede || cargandoSedes || errorSedes || !sedeElegida) { setAviso('Selecciona un juzgado activo para confirmar la recepción.'); return; }
-        setShowConfirmReceiptModal(false);
-        recepcionPendiente.current ||= { codigoCaso: caseNumber, codigoJuzgado: sede, requestId: idSolicitudJuzgado(), numeroInterno: numeroInterno.trim() || undefined, observacion: observacion.trim() || undefined };
-        void ejecutar(() => recibirCasoJuzgado(recepcionPendiente.current!));
+  async function recargar() {
+    const data = await consultarCasoJuzgado(caseNumber);
+    setDetalle(data);
+    setCurrentCase(mapearCasoJuzgado(data));
+  }
+  useEffect(() => {
+    let activo = true;
+    setIsLoading(true);
+    setError(null);
+    setCurrentCase(null);
+    setDetalle(null);
+    recepcionPendiente.current = null;
+    resolucionPendiente.current = null;
+    gestionPendiente.current = null;
+    void (async () => {
+      if (!puedeConsultar) throw new Error("Sin permiso");
+      const data = await consultarCasoJuzgado(caseNumber);
+      if (activo) {
+        setDetalle(data);
+        setCurrentCase(mapearCasoJuzgado(data));
+      }
+    })()
+      .catch((e) => {
+        if (activo)
+          setError({
+            message: puedeConsultar
+              ? mensajeJuzgado(e)
+              : "Tu cuenta no tiene permiso para consultar casos del juzgado.",
+          });
+      })
+      .finally(() => {
+        if (activo) setIsLoading(false);
+      });
+    return () => {
+      activo = false;
     };
-    const handleSendResolution = () => {
-        if (!puedeResolver || !detalle?.expediente || !fundament.trim()) { setAviso('El fundamento es requerido para emitir la resolución.'); setShowSendResolutionModal(false); return; }
-        setShowSendResolutionModal(false); setIsSendingResolution(true);
-        resolucionPendiente.current ||= { decision: resolveCaseValue === 'acogido' ? 'ACOGIDA' : 'NO_ACOGIDA', input: { idExpediente: detalle.expediente.id, fundamento: fundament.trim(), requestId: idSolicitudJuzgado(), claveIdempotencia: idSolicitudJuzgado(), versionExpediente: detalle.expediente.version || undefined } };
-        const pendiente = resolucionPendiente.current;
-        void ejecutar(async () => {
-            const resultado = await resolverCasoJuzgado(pendiente.decision, pendiente.input);
-            if (resultado.estadoDocumento === 'ERROR_REINTENTABLE') setAviso('La resolución fue confirmada. El PDF está pendiente por un error recuperable; reintenta solo el documento.');
-        }, () => setShowResolveDefense(false));
+  }, [caseNumber, puedeConsultar, consultaVersion]);
+
+  useEffect(() => {
+    let activo = true;
+    setSedes([]);
+    setSede("");
+    setErrorSedes(null);
+    if (!puedeRecibir) {
+      setCargandoSedes(false);
+      return;
+    }
+    setCargandoSedes(true);
+    void consultarSedesJuzgado()
+      .then((disponibles) => {
+        if (activo) setSedes(disponibles);
+      })
+      .catch((e) => {
+        if (activo) setErrorSedes(mensajeJuzgado(e));
+      })
+      .finally(() => {
+        if (activo) setCargandoSedes(false);
+      });
+    return () => {
+      activo = false;
     };
-    const handleGestion = () => {
-        if (!puedeResolver || !detalle?.expediente || !gestionNota.trim()) { setAviso('Escribe una observación para registrar la actuación.'); return; }
-        gestionPendiente.current ||= { idExpediente: detalle.expediente.id, tipoGestion: gestionTipo, observacion: gestionNota.trim(), requestId: idSolicitudJuzgado() };
-        void ejecutar(() => registrarGestionJuzgado(gestionPendiente.current!), () => { gestionPendiente.current = null; setGestionNota(''); });
+  }, [puedeRecibir, caseNumber, catalogoVersion]);
+  const sedeElegida = sedes.find((item) => item.codigo === sede);
+
+  const falloArchivo = (e: unknown) => setAviso(mensajeJuzgado(e));
+  async function ejecutar(
+    accion: () => Promise<unknown>,
+    confirmar?: () => void,
+  ) {
+    if (enCurso.current) return;
+    enCurso.current = true;
+    setBusy(true);
+    setAviso(null);
+    setErrorSendResolution(null);
+    try {
+      await accion();
+      confirmar?.();
+      try {
+        await recargar();
+      } catch {
+        setAviso(
+          "La operación fue confirmada, pero no se pudo actualizar la vista. Consulta el estado actual del caso.",
+        );
+      }
+    } catch (e) {
+      setAviso(mensajeJuzgado(e));
+    } finally {
+      enCurso.current = false;
+      setBusy(false);
+      setIsSendingResolution(false);
+    }
+  }
+  const handleConfirmReceipt = () => {
+    if (!puedeRecibir || !sede || cargandoSedes || errorSedes || !sedeElegida) {
+      setAviso("Selecciona un juzgado activo para confirmar la recepción.");
+      return;
+    }
+    setShowConfirmReceiptModal(false);
+    recepcionPendiente.current ||= {
+      codigoCaso: caseNumber,
+      codigoJuzgado: sede,
+      requestId: idSolicitudJuzgado(),
+      numeroInterno: numeroInterno.trim() || undefined,
+      observacion: observacion.trim() || undefined,
     };
-
-    if (isLoading) {
-        return (
-            <div className={classNames(styles.mainContainer, styles.loading)}>
-                <Text variant="body">Cargando caso...</Text>
-            </div>
-        );
+    void ejecutar(() => recibirCasoJuzgado(recepcionPendiente.current!));
+  };
+  const handleSendResolution = () => {
+    if (!puedeResolver || !detalle?.expediente || !fundament.trim()) {
+      setAviso("El fundamento es requerido para emitir la resolución.");
+      setShowSendResolutionModal(false);
+      return;
     }
-
-    if (error) {
-        return (
-            <div className={classNames(styles.mainContainer, styles.error)}>
-                <Text variant="body">{error.message}</Text>
-                {puedeConsultar && <Button onClick={() => setConsultaVersion(v => v + 1)}>Reintentar consulta</Button>}
-                <Button variant="contained" onClick={() => router.back()}>Volver</Button>
-            </div>
+    setShowSendResolutionModal(false);
+    setIsSendingResolution(true);
+    resolucionPendiente.current ||= {
+      decision: resolveCaseValue === "acogido" ? "ACOGIDA" : "NO_ACOGIDA",
+      input: {
+        idExpediente: detalle.expediente.id,
+        fundamento: fundament.trim(),
+        requestId: idSolicitudJuzgado(),
+        claveIdempotencia: idSolicitudJuzgado(),
+        versionExpediente: detalle.expediente.version || undefined,
+      },
+    };
+    const pendiente = resolucionPendiente.current;
+    void ejecutar(
+      async () => {
+        const resultado = await resolverCasoJuzgado(
+          pendiente.decision,
+          pendiente.input,
         );
-    }
-
-    if (!currentCase) {
-        return (
-            <div className={classNames(styles.mainContainer, styles.notFound)}>
-                <Text variant="body">No se encontró el caso</Text>
-                <Button variant="contained" onClick={() => router.back()}>Volver</Button>
-            </div>
-        );
-    }
-
-    return (
-        <div className={styles.mainContainer}>
-            <header className={styles.caseHero}>
-                <div className={styles.heroTop}><button type="button" onClick={()=>router.back()} className={styles.backLink}>← Volver a casos</button><span>Juzgado de tránsito · Avísame</span></div>
-                <div className={styles.heroTitle}><div><p className={styles.eyebrow}>Consulta del caso</p><h1>{currentCase.placa}</h1><p>{currentCase.title}</p></div><div className={styles.statusPill}>{({REGISTRADA:'Registrada',PENDIENTE_CORREO:'Pendiente de correo',NOTIFICADA:'Notificada',DEFENSA_WEB:'Defensa presentada',EN_JUZGADO:'En juzgado',REMISION_EMITIDA:'Remisión emitida',ARCHIVADA:'Archivada'} as Record<string,string>)[currentCase.status] || currentCase.status}</div></div>
-                <dl className={styles.caseMeta}><div><dt>Código de caso</dt><dd>{currentCase.caseNumber}</dd></div><div><dt>Registrado</dt><dd>{currentCase.caseDate}</dd></div><div><dt>Juzgado receptor</dt><dd>{currentCase.place}</dd></div></dl>
-            </header>
-            <nav className={styles.caseNav} aria-label="Secciones del caso"><a href="#denuncia">Denuncia y evidencias</a><a href="#analisis-ia">Análisis IA</a><a href="#defensa">Defensa</a><a href="#actuaciones">Actuaciones</a></nav>
-            {detalle?.expediente && <section className={styles.juzgadoInfo} aria-label="Datos del juzgado">
-                <Title variant="mid">Juzgado receptor</Title>
-                <Text variant="body">{detalle.expediente.nombreJuzgado} · {detalle.expediente.codigoJuzgado}</Text>
-                <Text variant="body"><strong>Dirección:</strong> {detalle.expediente.direccionJuzgado || 'No registrada'}</Text>
-                <Text variant="body"><strong>Horario:</strong> {detalle.expediente.horarioJuzgado || 'No registrado'}</Text>
-                <Text variant="body"><strong>Referencia interna del expediente:</strong> {detalle.expediente.numeroInterno || 'Sin asignar'}</Text>
-                <Text variant="caption">Recepción: {new Date(detalle.expediente.recibidaEn).toLocaleString('es-GT', { timeZone: 'America/Guatemala' })} · Estado: {detalle.expediente.estado}</Text>
-            </section>}
-            <section id="denuncia" className={styles.sectionCard} aria-labelledby="titulo-denuncia"><div className={styles.sectionHeading}><div><span className={styles.eyebrow}>Hecho reportado</span><h2 id="titulo-denuncia">Denuncia y evidencias originales</h2></div><span className={styles.countBadge}>{currentCase.denuncia.evidencias.length} archivos</span></div><p className={styles.description}>{currentCase.denuncia.descripción}</p><EvidenciasCaso archivos={currentCase.denuncia.evidencias}/></section>
-            <AnalisisEvidencias analisis={detalle?.caso.analisisEvidencias}/>
-            <section id="defensa" className={styles.sectionCard} aria-labelledby="titulo-defensa"><div className={styles.sectionHeading}><div><span className={styles.eyebrow}>Versión de la persona notificada</span><h2 id="titulo-defensa">Defensa presentada</h2></div></div>{currentCase.defensa ? <><p className={styles.defenseAuthor}>{currentCase.defensa.nombreDeclarado}</p><p className={styles.description}>{currentCase.defensa.argumentos}</p><EvidenciasCaso archivos={currentCase.defensa.evidencias}/></>:<p className={styles.emptyState}>No hay una defensa web registrada. La recepción de papelería física se consulta en el expediente.</p>}</section>
-            {(puedeRecibir || puedeResolver) && !showResolveDefense ? (
-                <section className={classNames(styles.sectionCard,styles.actions)} aria-label="Acciones del expediente">
-                    <Title variant="mid" className={styles.title}>Acciones disponibles</Title>
-                    {puedeRecibir ? (
-                        <div className={styles.resolveCaseForm}>
-                            <FormField label="Juzgado receptor" htmlFor="juzgado" required><Select id="juzgado" options={sedes.map(s => ({ value: s.codigo, label: s.nombre }))} placeholder="Selecciona un juzgado" value={sede} onChange={e => setSede(e.target.value)} disabled={busy || cargandoSedes || !!errorSedes || !sedes.length || !!recepcionPendiente.current} /></FormField>
-                            {cargandoSedes ? <Text variant="body">Cargando juzgados...</Text> : errorSedes ? <div role="alert"><Text variant="body">No se pudo cargar el catálogo de juzgados. {errorSedes}</Text><Button onClick={() => setCatalogoVersion(v => v + 1)}>Reintentar juzgados</Button></div> : !sedes.length ? <div role="status"><Text variant="body">No hay juzgados activos configurados. Solicita que se complete el catálogo de juzgados para registrar la recepción.</Text><Button onClick={() => setCatalogoVersion(v => v + 1)}>Actualizar juzgados</Button></div> : null}
-                            {sedeElegida && <div className={styles.juzgadoInfo}><Text variant="body"><strong>Dirección:</strong> {sedeElegida.direccion || 'No registrada'}</Text><Text variant="body"><strong>Horario:</strong> {sedeElegida.horario || 'No registrado'}</Text></div>}
-                            <FormField label="Referencia interna del expediente (opcional)" htmlFor="numeroInterno"><Input id="numeroInterno" aria-describedby="numeroInternoAyuda" placeholder="Referencia asignada por el juzgado" value={numeroInterno} onChange={e => setNumeroInterno(e.target.value)} maxLength={80} disabled={busy || !!recepcionPendiente.current} /></FormField>
-                            <p id="numeroInternoAyuda" className={styles.ayuda}>Número o referencia que el juzgado asigna al expediente físico. Puedes dejarlo vacío si aún no se ha asignado.</p>
-                            <FormField label="Observación (opcional)" htmlFor="observacion"><TextArea id="observacion" value={observacion} onChange={e => setObservacion(e.target.value)} maxLength={2000} disabled={busy || !!recepcionPendiente.current} /></FormField>
-                            <Button variant="contained" state={busy || cargandoSedes || !!errorSedes || !sedeElegida ? "disabled" : "default"} onClick={() => setShowConfirmReceiptModal(true)}>Confirmar recepción de papelería</Button>
-                        </div>
-                    ) : puedeResolver ? (
-                        <Button variant="contained" state={busy ? "disabled" : "default"} onClick={() => setShowResolveDefense(true)}>Resolver defensa</Button>
-                    ) : <Text variant="body">No hay acciones disponibles</Text>}
-                </section>
-            ) : !showResolveDefense && (
-                <section className={classNames(styles.sectionCard,styles.resolution)} aria-label="Resolución del caso">
-                    {currentCase.resolucion ? (
-                        <>
-                            <Title variant="mid">Resolución - {currentCase.resolucion?.id}</Title>
-                            <Text variant="caption">{currentCase.resolucion?.fecha}</Text>
-                            <Text variant="body">{currentCase.resolucion?.comentario}</Text>
-                            <Text variant="caption">Plantilla: {currentCase.resolucion.plantilla} (borrador técnico)</Text>
-                            {currentCase.resolucion.file ? <File id={currentCase.resolucion.file.id} name={currentCase.resolucion.file.name} onClick={() => { void descargarArchivoJuzgado('documentos', currentCase.resolucion!.file!.id, currentCase.resolucion!.file!.name).catch(falloArchivo); }} download /> : <>
-                                <Text variant="body">El documento de resolución no está disponible.</Text>
-                                {permisos.includes('VIVI_JUZGADO_RESOLVER') && <Button state={busy ? 'disabled' : 'default'} onClick={() => { void ejecutar(() => generarDocumentoJuzgado(currentCase.resolucion!.id)); }}>Reintentar PDF de resolución</Button>}
-                            </>}
-                        </>
-                    ) : (
-                        <Text variant="body">La resolución aún no está disponible</Text>
-                    )}
-                    {currentCase.multa && (
-                        <div className={styles.remissionContainer}>
-                            <Title variant="mid" className={styles.title}>Remisión</Title>
-                            <div className={styles.remissionData}>
-                                <div className={styles.remissionDataItem}>
-                                    <Text variant="body"><strong>Ciudad</strong></Text>
-                                    <Text variant="body">{currentCase.multa.ciudad}</Text>
-                                </div>
-                                <div className={styles.remissionDataItem}>
-                                    <Text variant="body"><strong>Serie</strong></Text>
-                                    <Text variant="body">{currentCase.multa.serie}</Text>
-                                </div>
-                                <div className={styles.remissionDataItem}>
-                                    <Text variant="body"><strong>Número</strong></Text>
-                                    <Text variant="body">{currentCase.multa.numero}</Text>
-                                </div>
-                                <div className={styles.remissionDataItem}>
-                                    <Text variant="body"><strong>Placa</strong></Text>
-                                    <Text variant="body">{currentCase.multa.placa}</Text>
-                                </div>
-                            </div>
-                            <Text variant="body">El importe y la disponibilidad de pago se consultan en el sistema institucional.</Text>
-                        </div>
-                    )}
-                </section>
-            )}
-            {puedeResolver && <div className={classNames(styles.sectionCard,styles.resolveCaseForm)}>
-                <Title variant="mid">Registrar actuación</Title>
-                <Select options={[{ value: 'REVISION', label: 'Revisión' }, { value: 'ENTREGA_DOCUMENTOS', label: 'Entrega de documentos' }, { value: 'INCIDENCIA', label: 'Incidencia' }]} value={gestionTipo} onChange={e => setGestionTipo(e.target.value)} disabled={busy || !!gestionPendiente.current} aria-label="Tipo de actuación" />
-                <TextArea value={gestionNota} onChange={e => setGestionNota(e.target.value)} maxLength={2000} disabled={busy || !!gestionPendiente.current} aria-label="Observación de la actuación" />
-                <Button onClick={handleGestion} state={busy ? 'disabled' : 'default'}>Registrar actuación</Button>
-            </div>}
-            {showResolveDefense && puedeResolver && (
-                <>
-                    <Title variant="large">Resolver</Title>
-                    <div className={styles.resolveCaseForm}>
-                        <ButtonTab options={[
-                            { label: "Acogido", value: "acogido" },
-                            { label: "No acogido", value: "no_acogido" },
-                        ]} value={resolveCaseValue} onChange={value => { if (!resolucionPendiente.current && !busy) setResolveCaseValue(value); }} />
-                        <FormField label="Fundamento" htmlFor="fundament" required className={styles.fundamentFormField}>
-                            <TextArea
-                                id="fundament"
-                                value={fundament}
-                                maxLength={12000}
-                                disabled={busy || !!resolucionPendiente.current}
-                                onInput={(e) => {
-                                    const el = e.currentTarget;
-                                    el.style.height = "auto";
-                                    el.style.height = `${el.scrollHeight}px`;
-                                }}
-                                className={styles.fundamentTextArea}
-                                onChange={(e) => setFundament(e.target.value)}
-                            />
-                        </FormField>
-                        <Button
-                            variant="contained"
-                            color="default"
-                            onClick={() => setShowSendResolutionModal(true)}
-                            className={styles.executeButton}
-                            state={busy || isSendingResolution ? "disabled" : "default"}
-                        >
-                            {isSendingResolution ? 'Enviando resolución...' : 'Enviar resolución'}
-                        </Button>
-                    </div>
-                </>
-            )}
-            {aviso && <div role="alert"><Text variant="body">{aviso}</Text></div>}
-            <Button state={busy ? 'disabled' : 'default'} onClick={() => { void recargar().then(() => { recepcionPendiente.current = null; resolucionPendiente.current = null; gestionPendiente.current = null; }).catch(falloArchivo); }}>Consultar estado actual</Button>
-            <section id="actuaciones" className={styles.sectionCard} aria-labelledby="titulo-actuaciones"><div className={styles.sectionHeading}><div><span className={styles.eyebrow}>Seguimiento del expediente</span><h2 id="titulo-actuaciones">Bitácora de actuaciones</h2></div><span className={styles.countBadge}>{currentCase.logs.length} registros</span></div>
-            {!currentCase.logs.length && <p className={styles.emptyState}>Todavía no hay actuaciones registradas.</p>}
-            <div className={styles.tableContainer}>
-                <TableRow isHeader gridTemplate={LOG_GRID} cells={LOG_HEADER} />
-                {currentCase.logs.map((log, i) => (
-                    <TableRow
-                        key={i}
-                        gridTemplate={LOG_GRID}
-                        scale={0.8}
-                        cells={[
-                            { content: <Text variant="muted">{log.userName}</Text> },
-                            { content: <Text variant="muted">{log.email}</Text> },
-                            { content: <Text variant="muted">{log.action}</Text> },
-                            { content: <Text variant="muted">{log.date}</Text> },
-                            { content: <Text variant="muted">{log.note}</Text> },
-                        ] as TableCellConfig[]}
-                    />
-                ))}
-            </div>
-            </section>
-            <PopUp
-                isOpen={showConfirmReceiptModal}
-                onClose={() => setShowConfirmReceiptModal(false)}
-                title="Confirmar recepción de denuncia"
-                description={`Confirma que recibiste físicamente la papelería de este caso. La recepción abre el expediente para su revisión y posterior resolución por la autoridad autorizada.`}
-                actions={[
-                    {
-                        text: "Confirmar",
-                        color: "success",
-                        onClick: () => handleConfirmReceipt(),
-                    },
-                    {
-                        text: "Cancelar",
-                        color: "danger",
-                        onClick: () => setShowConfirmReceiptModal(false),
-                    }
-                ]}
-            />
-
-            <PopUp
-                isOpen={showSendResolutionModal}
-                onClose={() => setShowSendResolutionModal(false)}
-                title={resolveCaseValue === "acogido" ? "Seguro que desea Acoger la defensa" : "Seguro que desea No Acoger la defensa"}
-                description={resolveCaseValue === "acogido" ? `Esta acción hará que el denunciado sea exonerado de la denuncia.\n\nNota: El caso pasará a Archivado` : `Esta acción hará que al denunciado se le coloque la Multa correspondiente.`}
-                actions={[
-                    {
-                        text: "Confirmar",
-                        color: "success",
-                        onClick: () => handleSendResolution(),
-                    },
-                    {
-                        text: "Cancelar",
-                        color: "danger",
-                        onClick: () => setShowSendResolutionModal(false),
-                    }
-                ]}
-            />
-
-            <PopUp
-                isOpen={!!errorSendResolution}
-                onClose={() => setErrorSendResolution(null)}
-                title="Error al enviar la resolución"
-                description={errorSendResolution?.message ?? "Ocurrió un error al enviar la resolución. Por favor, inténtelo nuevamente."}
-                actions={[
-                    {
-                        text: "Reintentar",
-                        color: "success",
-                        onClick: () => handleSendResolution(),
-                    },
-                ]}
-            />
-        </div>
+        if (resultado.estadoDocumento === "ERROR_REINTENTABLE")
+          setAviso(
+            "La resolución fue confirmada. El PDF está pendiente por un error recuperable; reintenta solo el documento.",
+          );
+      },
+      () => setShowResolveDefense(false),
     );
+  };
+  const handleGestion = () => {
+    if (!puedeResolver || !detalle?.expediente || !gestionNota.trim()) {
+      setAviso("Escribe una observación para registrar la actuación.");
+      return;
+    }
+    gestionPendiente.current ||= {
+      idExpediente: detalle.expediente.id,
+      tipoGestion: gestionTipo,
+      observacion: gestionNota.trim(),
+      requestId: idSolicitudJuzgado(),
+    };
+    void ejecutar(
+      () => registrarGestionJuzgado(gestionPendiente.current!),
+      () => {
+        gestionPendiente.current = null;
+        setGestionNota("");
+      },
+    );
+  };
+
+  if (isLoading) {
+    return (
+      <div className={classNames(styles.mainContainer, styles.loading)}>
+        <Text variant="body">Cargando caso...</Text>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className={classNames(styles.mainContainer, styles.error)}>
+        <Text variant="body">{error.message}</Text>
+        {puedeConsultar && (
+          <Button onClick={() => setConsultaVersion((v) => v + 1)}>
+            Reintentar consulta
+          </Button>
+        )}
+        <Button variant="contained" onClick={() => router.back()}>
+          Volver
+        </Button>
+      </div>
+    );
+  }
+
+  if (!currentCase) {
+    return (
+      <div className={classNames(styles.mainContainer, styles.notFound)}>
+        <Text variant="body">No se encontró el caso</Text>
+        <Button variant="contained" onClick={() => router.back()}>
+          Volver
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className={styles.mainContainer}>
+      <header className={styles.caseHero}>
+        <div className={styles.heroTop}>
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className={styles.backLink}
+          >
+            ← Volver a casos
+          </button>
+          <span>Juzgado de tránsito · Avísame</span>
+        </div>
+        <div className={styles.heroTitle}>
+          <div>
+            <p className={styles.eyebrow}>Consulta del caso</p>
+            <h1>{currentCase.placa}</h1>
+            <p>{currentCase.title}</p>
+          </div>
+          <div className={styles.statusPill}>
+            {(
+              {
+                REGISTRADA: "Registrada",
+                PENDIENTE_CORREO: "Pendiente de correo",
+                NOTIFICADA: "Notificada",
+                DEFENSA_WEB: "Defensa presentada",
+                EN_JUZGADO: "En juzgado",
+                REMISION_EMITIDA: "Remisión emitida",
+                ARCHIVADA: "Archivada",
+              } as Record<string, string>
+            )[currentCase.status] || currentCase.status}
+          </div>
+        </div>
+        <dl className={styles.caseMeta}>
+          <div>
+            <dt>Código de caso</dt>
+            <dd>{currentCase.caseNumber}</dd>
+          </div>
+          <div>
+            <dt>Registrado</dt>
+            <dd>{currentCase.caseDate}</dd>
+          </div>
+          <div>
+            <dt>Juzgado receptor</dt>
+            <dd>{currentCase.place}</dd>
+          </div>
+        </dl>
+      </header>
+      <nav className={styles.caseNav} aria-label="Secciones del caso">
+        <a href="#denuncia">Denuncia y evidencias</a>
+        <a href="#analisis-ia">Análisis IA</a>
+        <a href="#defensa">Defensa</a>
+        <a href="#actuaciones">Actuaciones</a>
+      </nav>
+
+      <div className={styles.reviewGrid}>
+        <div className={styles.evidenceColumn}>
+          <section
+            id="denuncia"
+            className={styles.sectionCard}
+            aria-labelledby="titulo-denuncia"
+          >
+            <div className={styles.sectionHeading}>
+              <div>
+                <span className={styles.eyebrow}>Hecho reportado</span>
+                <h2 id="titulo-denuncia">Denuncia y evidencias originales</h2>
+              </div>
+              <span className={styles.countBadge}>
+                {currentCase.denuncia.evidencias.length} archivos
+              </span>
+            </div>
+            <p className={styles.description}>
+              {currentCase.denuncia.descripción}
+            </p>
+            <EvidenciasCaso archivos={currentCase.denuncia.evidencias} />
+          </section>
+          <section
+            id="defensa"
+            className={styles.sectionCard}
+            aria-labelledby="titulo-defensa"
+          >
+            <div className={styles.sectionHeading}>
+              <div>
+                <span className={styles.eyebrow}>
+                  Versión de la persona notificada
+                </span>
+                <h2 id="titulo-defensa">Defensa presentada</h2>
+              </div>
+            </div>
+            {currentCase.defensa ? (
+              <>
+                <p className={styles.defenseAuthor}>
+                  {currentCase.defensa.nombreDeclarado}
+                </p>
+                <p className={styles.description}>
+                  {currentCase.defensa.argumentos}
+                </p>
+                <EvidenciasCaso archivos={currentCase.defensa.evidencias} />
+              </>
+            ) : (
+              <p className={styles.emptyState}>
+                No hay una defensa web registrada. La recepción de papelería
+                física se consulta en el expediente.
+              </p>
+            )}
+          </section>
+        </div>
+        <div className={styles.analysisColumn}>
+          <AnalisisEvidencias analisis={detalle?.caso.analisisEvidencias} />
+        </div>
+      </div>
+      <div className={styles.workflowGrid}>
+        {detalle?.expediente && (
+          <section
+            className={styles.juzgadoInfo}
+            aria-label="Datos del juzgado"
+          >
+            <Title variant="mid">Juzgado receptor</Title>
+            <Text variant="body">
+              {detalle.expediente.nombreJuzgado} ·{" "}
+              {detalle.expediente.codigoJuzgado}
+            </Text>
+            <Text variant="body">
+              <strong>Dirección:</strong>{" "}
+              {detalle.expediente.direccionJuzgado || "No registrada"}
+            </Text>
+            <Text variant="body">
+              <strong>Horario:</strong>{" "}
+              {detalle.expediente.horarioJuzgado || "No registrado"}
+            </Text>
+            <Text variant="body">
+              <strong>Referencia interna del expediente:</strong>{" "}
+              {detalle.expediente.numeroInterno || "Sin asignar"}
+            </Text>
+            <Text variant="caption">
+              Recepción:{" "}
+              {new Date(detalle.expediente.recibidaEn).toLocaleString("es-GT", {
+                timeZone: "America/Guatemala",
+              })}{" "}
+              · Estado: {detalle.expediente.estado}
+            </Text>
+          </section>
+        )}
+        {(puedeRecibir || puedeResolver) && !showResolveDefense ? (
+          <section
+            className={classNames(styles.sectionCard, styles.actions)}
+            aria-label="Acciones del expediente"
+          >
+            <Title variant="mid" className={styles.title}>
+              Acciones disponibles
+            </Title>
+            {puedeRecibir ? (
+              <div
+                className={classNames(
+                  styles.resolveCaseForm,
+                  styles.receiptForm,
+                )}
+              >
+                <FormField label="Juzgado receptor" htmlFor="juzgado" required>
+                  <Select
+                    id="juzgado"
+                    options={sedes.map((s) => ({
+                      value: s.codigo,
+                      label: s.nombre,
+                    }))}
+                    placeholder="Selecciona un juzgado"
+                    value={sede}
+                    onChange={(e) => setSede(e.target.value)}
+                    disabled={
+                      busy ||
+                      cargandoSedes ||
+                      !!errorSedes ||
+                      !sedes.length ||
+                      !!recepcionPendiente.current
+                    }
+                  />
+                </FormField>
+                {cargandoSedes ? (
+                  <Text variant="body">Cargando juzgados...</Text>
+                ) : errorSedes ? (
+                  <div role="alert" className={styles.formWide}>
+                    <Text variant="body">
+                      No se pudo cargar el catálogo de juzgados. {errorSedes}
+                    </Text>
+                    <Button onClick={() => setCatalogoVersion((v) => v + 1)}>
+                      Reintentar juzgados
+                    </Button>
+                  </div>
+                ) : !sedes.length ? (
+                  <div role="status" className={styles.formWide}>
+                    <Text variant="body">
+                      No hay juzgados activos configurados. Solicita que se
+                      complete el catálogo de juzgados para registrar la
+                      recepción.
+                    </Text>
+                    <Button onClick={() => setCatalogoVersion((v) => v + 1)}>
+                      Actualizar juzgados
+                    </Button>
+                  </div>
+                ) : null}
+                {sedeElegida && (
+                  <div className={styles.juzgadoInfo}>
+                    <Text variant="body">
+                      <strong>Dirección:</strong>{" "}
+                      {sedeElegida.direccion || "No registrada"}
+                    </Text>
+                    <Text variant="body">
+                      <strong>Horario:</strong>{" "}
+                      {sedeElegida.horario || "No registrado"}
+                    </Text>
+                  </div>
+                )}
+                <FormField
+                  label="Referencia interna del expediente (opcional)"
+                  htmlFor="numeroInterno"
+                >
+                  <Input
+                    id="numeroInterno"
+                    aria-describedby="numeroInternoAyuda"
+                    placeholder="Referencia asignada por el juzgado"
+                    value={numeroInterno}
+                    onChange={(e) => setNumeroInterno(e.target.value)}
+                    maxLength={80}
+                    disabled={busy || !!recepcionPendiente.current}
+                  />
+                </FormField>
+                <p
+                  id="numeroInternoAyuda"
+                  className={classNames(styles.ayuda, styles.formWide)}
+                >
+                  Número o referencia que el juzgado asigna al expediente
+                  físico. Puedes dejarlo vacío si aún no se ha asignado.
+                </p>
+                <FormField
+                  className={styles.formWide}
+                  label="Observación (opcional)"
+                  htmlFor="observacion"
+                >
+                  <TextArea
+                    id="observacion"
+                    value={observacion}
+                    onChange={(e) => setObservacion(e.target.value)}
+                    maxLength={2000}
+                    disabled={busy || !!recepcionPendiente.current}
+                  />
+                </FormField>
+                <Button
+                  variant="contained"
+                  state={
+                    busy || cargandoSedes || !!errorSedes || !sedeElegida
+                      ? "disabled"
+                      : "default"
+                  }
+                  onClick={() => setShowConfirmReceiptModal(true)}
+                >
+                  Confirmar recepción de papelería
+                </Button>
+              </div>
+            ) : puedeResolver ? (
+              <Button
+                variant="contained"
+                state={busy ? "disabled" : "default"}
+                onClick={() => setShowResolveDefense(true)}
+              >
+                Resolver defensa
+              </Button>
+            ) : (
+              <Text variant="body">No hay acciones disponibles</Text>
+            )}
+          </section>
+        ) : (
+          !showResolveDefense && (
+            <section
+              className={classNames(styles.sectionCard, styles.resolution)}
+              aria-label="Resolución del caso"
+            >
+              {currentCase.resolucion ? (
+                <>
+                  <Title variant="mid">
+                    Resolución - {currentCase.resolucion?.id}
+                  </Title>
+                  <Text variant="caption">{currentCase.resolucion?.fecha}</Text>
+                  <Text variant="body">
+                    {currentCase.resolucion?.comentario}
+                  </Text>
+                  <Text variant="caption">
+                    Plantilla: {currentCase.resolucion.plantilla} (borrador
+                    técnico)
+                  </Text>
+                  {currentCase.resolucion.file ? (
+                    <File
+                      id={currentCase.resolucion.file.id}
+                      name={currentCase.resolucion.file.name}
+                      onClick={() => {
+                        void descargarArchivoJuzgado(
+                          "documentos",
+                          currentCase.resolucion!.file!.id,
+                          currentCase.resolucion!.file!.name,
+                        ).catch(falloArchivo);
+                      }}
+                      download
+                    />
+                  ) : (
+                    <>
+                      <Text variant="body">
+                        El documento de resolución no está disponible.
+                      </Text>
+                      {permisos.includes("VIVI_JUZGADO_RESOLVER") && (
+                        <Button
+                          state={busy ? "disabled" : "default"}
+                          onClick={() => {
+                            void ejecutar(() =>
+                              generarDocumentoJuzgado(
+                                currentCase.resolucion!.id,
+                              ),
+                            );
+                          }}
+                        >
+                          Reintentar PDF de resolución
+                        </Button>
+                      )}
+                    </>
+                  )}
+                </>
+              ) : (
+                <Text variant="body">La resolución aún no está disponible</Text>
+              )}
+              {currentCase.multa && (
+                <div className={styles.remissionContainer}>
+                  <Title variant="mid" className={styles.title}>
+                    Remisión
+                  </Title>
+                  <div className={styles.remissionData}>
+                    <div className={styles.remissionDataItem}>
+                      <Text variant="body">
+                        <strong>Ciudad</strong>
+                      </Text>
+                      <Text variant="body">{currentCase.multa.ciudad}</Text>
+                    </div>
+                    <div className={styles.remissionDataItem}>
+                      <Text variant="body">
+                        <strong>Serie</strong>
+                      </Text>
+                      <Text variant="body">{currentCase.multa.serie}</Text>
+                    </div>
+                    <div className={styles.remissionDataItem}>
+                      <Text variant="body">
+                        <strong>Número</strong>
+                      </Text>
+                      <Text variant="body">{currentCase.multa.numero}</Text>
+                    </div>
+                    <div className={styles.remissionDataItem}>
+                      <Text variant="body">
+                        <strong>Placa</strong>
+                      </Text>
+                      <Text variant="body">{currentCase.multa.placa}</Text>
+                    </div>
+                  </div>
+                  <Text variant="body">
+                    El importe y la disponibilidad de pago se consultan en el
+                    sistema institucional.
+                  </Text>
+                </div>
+              )}
+            </section>
+          )
+        )}
+        {puedeResolver && (
+          <div
+            className={classNames(styles.sectionCard, styles.resolveCaseForm)}
+          >
+            <Title variant="mid">Registrar actuación</Title>
+            <Select
+              options={[
+                { value: "REVISION", label: "Revisión" },
+                { value: "ENTREGA_DOCUMENTOS", label: "Entrega de documentos" },
+                { value: "INCIDENCIA", label: "Incidencia" },
+              ]}
+              value={gestionTipo}
+              onChange={(e) => setGestionTipo(e.target.value)}
+              disabled={busy || !!gestionPendiente.current}
+              aria-label="Tipo de actuación"
+            />
+            <TextArea
+              value={gestionNota}
+              onChange={(e) => setGestionNota(e.target.value)}
+              maxLength={2000}
+              disabled={busy || !!gestionPendiente.current}
+              aria-label="Observación de la actuación"
+            />
+            <Button
+              onClick={handleGestion}
+              state={busy ? "disabled" : "default"}
+            >
+              Registrar actuación
+            </Button>
+          </div>
+        )}
+        {showResolveDefense && puedeResolver && (
+          <section
+            className={classNames(styles.sectionCard, styles.resolutionEditor)}
+            aria-label="Resolver defensa"
+          >
+            <Title variant="large">Resolver</Title>
+            <div className={styles.resolveCaseForm}>
+              <ButtonTab
+                options={[
+                  { label: "Acogido", value: "acogido" },
+                  { label: "No acogido", value: "no_acogido" },
+                ]}
+                value={resolveCaseValue}
+                onChange={(value) => {
+                  if (!resolucionPendiente.current && !busy)
+                    setResolveCaseValue(value);
+                }}
+              />
+              <FormField
+                label="Fundamento"
+                htmlFor="fundament"
+                required
+                className={styles.fundamentFormField}
+              >
+                <TextArea
+                  id="fundament"
+                  value={fundament}
+                  maxLength={12000}
+                  disabled={busy || !!resolucionPendiente.current}
+                  onInput={(e) => {
+                    const el = e.currentTarget;
+                    el.style.height = "auto";
+                    el.style.height = `${el.scrollHeight}px`;
+                  }}
+                  className={styles.fundamentTextArea}
+                  onChange={(e) => setFundament(e.target.value)}
+                />
+              </FormField>
+              <Button
+                variant="contained"
+                color="default"
+                onClick={() => setShowSendResolutionModal(true)}
+                className={styles.executeButton}
+                state={busy || isSendingResolution ? "disabled" : "default"}
+              >
+                {isSendingResolution
+                  ? "Enviando resolución..."
+                  : "Enviar resolución"}
+              </Button>
+            </div>
+          </section>
+        )}
+      </div>
+      {aviso && (
+        <div role="alert">
+          <Text variant="body">{aviso}</Text>
+        </div>
+      )}
+      <Button
+        state={busy ? "disabled" : "default"}
+        onClick={() => {
+          void recargar()
+            .then(() => {
+              recepcionPendiente.current = null;
+              resolucionPendiente.current = null;
+              gestionPendiente.current = null;
+            })
+            .catch(falloArchivo);
+        }}
+      >
+        Consultar estado actual
+      </Button>
+      <section
+        id="actuaciones"
+        className={styles.sectionCard}
+        aria-labelledby="titulo-actuaciones"
+      >
+        <div className={styles.sectionHeading}>
+          <div>
+            <span className={styles.eyebrow}>Seguimiento del expediente</span>
+            <h2 id="titulo-actuaciones">Bitácora de actuaciones</h2>
+          </div>
+          <span className={styles.countBadge}>
+            {currentCase.logs.length} registros
+          </span>
+        </div>
+        {!currentCase.logs.length && (
+          <p className={styles.emptyState}>
+            Todavía no hay actuaciones registradas.
+          </p>
+        )}
+        <div className={styles.tableContainer}>
+          <TableRow isHeader gridTemplate={LOG_GRID} cells={LOG_HEADER} />
+          {currentCase.logs.map((log, i) => (
+            <TableRow
+              key={i}
+              gridTemplate={LOG_GRID}
+              scale={0.8}
+              cells={
+                [
+                  { content: <Text variant="muted">{log.userName}</Text> },
+                  { content: <Text variant="muted">{log.email}</Text> },
+                  { content: <Text variant="muted">{log.action}</Text> },
+                  { content: <Text variant="muted">{log.date}</Text> },
+                  { content: <Text variant="muted">{log.note}</Text> },
+                ] as TableCellConfig[]
+              }
+            />
+          ))}
+        </div>
+      </section>
+      <PopUp
+        isOpen={showConfirmReceiptModal}
+        onClose={() => setShowConfirmReceiptModal(false)}
+        title="Confirmar recepción de denuncia"
+        description={`Confirma que recibiste físicamente la papelería de este caso. La recepción abre el expediente para su revisión y posterior resolución por la autoridad autorizada.`}
+        actions={[
+          {
+            text: "Confirmar",
+            color: "success",
+            onClick: () => handleConfirmReceipt(),
+          },
+          {
+            text: "Cancelar",
+            color: "danger",
+            onClick: () => setShowConfirmReceiptModal(false),
+          },
+        ]}
+      />
+
+      <PopUp
+        isOpen={showSendResolutionModal}
+        onClose={() => setShowSendResolutionModal(false)}
+        title={
+          resolveCaseValue === "acogido"
+            ? "Seguro que desea Acoger la defensa"
+            : "Seguro que desea No Acoger la defensa"
+        }
+        description={
+          resolveCaseValue === "acogido"
+            ? `Esta acción hará que el denunciado sea exonerado de la denuncia.\n\nNota: El caso pasará a Archivado`
+            : `Esta acción hará que al denunciado se le coloque la Multa correspondiente.`
+        }
+        actions={[
+          {
+            text: "Confirmar",
+            color: "success",
+            onClick: () => handleSendResolution(),
+          },
+          {
+            text: "Cancelar",
+            color: "danger",
+            onClick: () => setShowSendResolutionModal(false),
+          },
+        ]}
+      />
+
+      <PopUp
+        isOpen={!!errorSendResolution}
+        onClose={() => setErrorSendResolution(null)}
+        title="Error al enviar la resolución"
+        description={
+          errorSendResolution?.message ??
+          "Ocurrió un error al enviar la resolución. Por favor, inténtelo nuevamente."
+        }
+        actions={[
+          {
+            text: "Reintentar",
+            color: "success",
+            onClick: () => handleSendResolution(),
+          },
+        ]}
+      />
+    </div>
+  );
 };
 
 export default JUZ01Detail;

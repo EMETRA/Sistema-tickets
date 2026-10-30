@@ -37,6 +37,15 @@ const motivos: Record<string, string> = {
 };
 const etiqueta = (v: string | null | undefined) =>
   v ? etiquetas[v] || "No disponible" : "No evaluado";
+const marca = (valor: string | null, indicio?: string | null) => {
+  if (indicio === "NO_RECONOCIBLE" && valor !== "SIN_REFERENCIA")
+    return "No se pudo determinar";
+  if (valor === "COINCIDE")
+    return indicio
+      ? "Coincidencia visual estimada"
+      : "Sin indicio visual registrado";
+  return etiqueta(valor);
+};
 const fecha = (v: string | null) =>
   v && Number.isFinite(Date.parse(v))
     ? new Date(v).toLocaleString("es-GT", { timeZone: "America/Guatemala" })
@@ -155,10 +164,24 @@ export function AnalisisEvidencias({
                           valor === "DIFIERE" || valor === "INCOMPATIBLE"
                         }
                       >
-                        {etiqueta(valor)}
+                        {nombre === "Comparación de marca"
+                          ? marca(valor, a.indicioMarca)
+                          : etiqueta(valor)}
                       </dd>
                     </div>
                   ))}
+                  <div>
+                    <dt>Indicio visual de marca</dt>
+                    <dd>
+                      {a.indicioMarca === "EMBLEMA_EN_VEHICULO"
+                        ? "Emblema en el vehículo"
+                        : a.indicioMarca === "NOMBRE_EN_VEHICULO"
+                          ? "Nombre del fabricante en el vehículo"
+                          : a.indicioMarca === "NO_RECONOCIBLE"
+                            ? "No reconocible en este archivo"
+                            : "No registrado en este análisis"}
+                    </dd>
+                  </div>
                   <div>
                     <dt>Contenido sensible</dt>
                     <dd>
@@ -180,6 +203,16 @@ export function AnalisisEvidencias({
                     </dd>
                   </div>
                 </dl>
+                {(analisis.esPoliticaConjunto ||
+                  (a.marca === "COINCIDE" && !a.indicioMarca)) && (
+                  <p className={styles.fileHint}>
+                    {analisis.esPoliticaConjunto &&
+                      "Una marca no reconocible permite continuar; no acredita coincidencia."}
+                    {a.marca === "COINCIDE" &&
+                      !a.indicioMarca &&
+                      " La IA registró una coincidencia en el análisis anterior, sin detallar el indicio visual. Se conserva el resultado original para su revisión."}
+                  </p>
+                )}
                 {!analisis.esPoliticaConjunto && a.motivo && (
                   <p className={styles.fileHint}>
                     {motivos[a.motivo] ||

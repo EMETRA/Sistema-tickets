@@ -13,8 +13,10 @@ export function EvidenciasCaso({ archivos }: { archivos: Archivo[] }) {
   } | null>(null);
   const [cargando, setCargando] = useState<string | null>(null),
     [error, setError] = useState<string | null>(null);
+  const [ampliada, setAmpliada] = useState(false);
   const dialogo = useRef<HTMLDialogElement>(null),
     peticion = useRef<AbortController | null>(null);
+  const previewVideo = useRef<HTMLVideoElement>(null);
   useEffect(
     () => () => {
       peticion.current?.abort();
@@ -23,9 +25,11 @@ export function EvidenciasCaso({ archivos }: { archivos: Archivo[] }) {
   );
   useEffect(() => {
     if (!seleccion) return;
-    dialogo.current?.showModal();
     return () => URL.revokeObjectURL(seleccion.url);
   }, [seleccion]);
+  useEffect(() => {
+    if (ampliada) dialogo.current?.showModal();
+  }, [ampliada]);
   async function abrir(a: Archivo) {
     peticion.current?.abort();
     const controller = new AbortController();
@@ -124,16 +128,50 @@ export function EvidenciasCaso({ archivos }: { archivos: Archivo[] }) {
         </p>
       )}
       {seleccion && (
+        <figure
+          className={styles.evidencePreview}
+          aria-label={`Vista de ${seleccion.nombre}`}
+        >
+          <figcaption className={styles.dialogHeading}>
+            <strong>{seleccion.nombre}</strong>
+            <div className={styles.fileActions}>
+              <button
+                type="button"
+                onClick={() => {
+                  previewVideo.current?.pause();
+                  setAmpliada(true);
+                }}
+              >
+                Ampliar
+              </button>
+              <button type="button" onClick={() => setSeleccion(null)}>
+                Ocultar vista
+              </button>
+            </div>
+          </figcaption>
+          {seleccion.mime.startsWith("video/") ? (
+            <video
+              ref={previewVideo}
+              controls
+              autoPlay={false}
+              src={seleccion.url}
+            />
+          ) : (
+            <img src={seleccion.url} alt={seleccion.nombre} />
+          )}
+        </figure>
+      )}
+      {seleccion && ampliada && (
         <dialog
           ref={dialogo}
           className={styles.evidenceDialog}
-          onCancel={() => setSeleccion(null)}
-          onClose={() => setSeleccion(null)}
+          onCancel={() => setAmpliada(false)}
+          onClose={() => setAmpliada(false)}
           aria-label={seleccion.nombre}
         >
           <div className={styles.dialogHeading}>
             <h2>{seleccion.nombre}</h2>
-            <button type="button" onClick={() => setSeleccion(null)}>
+            <button type="button" onClick={() => setAmpliada(false)}>
               Cerrar
             </button>
           </div>

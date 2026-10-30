@@ -26,7 +26,17 @@ async function run() {
     if (req.url.includes('/documentos/')) { res.writeHead(200, { 'Content-Type': 'application/pdf', 'Content-Disposition': 'attachment; filename="resolucion.pdf"' }); return res.end('%PDF-1.4\nQA\n%%EOF'); }
     if (q.includes('mutation Login')) return json({ data: { login: { token: 'qa-token-controlado', refresh_token: 'qa-refresh-controlado', expires_in: 3600 } } });
     if (q.includes('query GetUser')) return perfilFalla ? json({ errors: [{ message: 'ORA-00942 consulta privada', extensions: { code: 'INTERNAL_SERVER_ERROR' } }] }) : json({ data: { usuario: user } });
-    if (q.includes('viviJuzgadoDetalle')) return json({ data: { viviJuzgadoDetalle: detalle() } });
+    if (q.includes('viviJuzgadoDetalle')) {
+      const caso = detalle();
+      const analisis = caso.caso.analisisEvidencias;
+      Object.assign(analisis, { estado: 'REVISION', modo: 'EXIGIR', continuoConObservaciones: true, criterioMotivo: 'SOBRE_BANQUETA', verificacionMotivo: 'BANQUETA_APOYO_V3' });
+      Object.assign(analisis.archivos[0], {
+        hecho: 'NO_DETERMINABLE', ubicacionVehiculo: 'NO_DETERMINABLE',
+        verificacionBanqueta: { version: 'BANQUETA_APOYO_V3', ubicacionInicial: 'BANQUETA', limiteAcera: 'NO_IDENTIFICABLE', ruedaDelantera: 'NO_VISIBLE', ruedaTrasera: 'INDETERMINADA', estructuraSobreAcera: 'INDETERMINADA' },
+      });
+      analisis.archivos[1].ubicacionVehiculo = 'NO_APLICA';
+      return json({ data: { viviJuzgadoDetalle: caso } });
+    }
     if (q.includes('viviJuzgadoSedes')) return sedesFalla ? json({ errors: [{ message: 'Temporal', extensions: { originalError: { statusCode: 503 } } }] }) : json({ data: { viviJuzgadoSedes: sedesVacias ? [] : [{ codigo: 'JUZ_QA', nombre: 'Sede QA controlada', direccion: 'Dirección QA controlada', horario: 'Horario QA controlado' }] } });
     if (q.includes('viviJuzgadoRegistrarRecepcion')) {
       if (recepcionFalla) return json({ errors: [{ message: 'Temporal', extensions: { originalError: { statusCode: 503 } } }] });
@@ -63,7 +73,10 @@ async function run() {
     await page.getByRole('button', { name: 'Reintentar juzgados' }).waitFor();
     assert.ok((await page.locator('body').innerText()).includes(codigo));
     await page.getByRole('heading',{name:'Análisis automático de evidencias'}).waitFor();
-    await page.getByText('Superó la validación',{exact:true}).waitFor();
+    await page.getByText('Aviso continuado · análisis inconcluso',{exact:true}).waitFor();
+    await page.getByRole('heading', { name: 'Apoyos observados por IA' }).waitFor();
+    await page.getByText('Apoyo de rueda delantera', {exact:true}).waitFor();
+    assert.equal(await page.getByText('Superó la validación', {exact:true}).count(), 0);
     assert.equal(await page.getByText('Visible parcialmente',{exact:true}).count(),1);
     assert.equal(await page.getByText('No evaluado',{exact:true}).count(),0);
     assert.ok(llamadas.some(l=>l.query.includes('analisisEvidencias')));

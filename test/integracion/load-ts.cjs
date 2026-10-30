@@ -12,7 +12,7 @@ module.exports = function loader(root, mocks = {}) {
     if (cache.has(file)) return cache.get(file).exports;
     const module = { exports: {} }; cache.set(file, module);
     const code = ts.transpileModule(fs.readFileSync(file, 'utf8'), {
-      compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020, esModuleInterop: true }, fileName: file,
+      compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020, esModuleInterop: true, jsx: ts.JsxEmit.ReactJSX }, fileName: file,
     }).outputText;
     function localRequire(name) {
       if (!name.startsWith('.') && !name.startsWith('@/')) return createRequire(file)(name);

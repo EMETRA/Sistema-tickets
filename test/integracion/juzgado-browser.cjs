@@ -11,6 +11,7 @@ async function run() {
   const permisos = ['VIVI_JUZGADO_CONSULTAR', 'VIVI_JUZGADO_RECIBIR', 'VIVI_JUZGADO_RESOLVER'];
   const user = { id_usuario: '12', nombre: 'Usuario QA controlado', email: 'qa@example.invalid', rol: 'USUARIO', permisos, departamento: 'Prueba' };
   const llamadas = [];
+  let archivoHttp=503;
   let sedesFalla = true, sedesVacias = false, perfilFalla = true, recepcionFalla = true, recibida = false, resuelta = false, pdf = false;
   const documento = { id: '80', tipoDocumento: 'RESOLUCION', numeroVersion: '1', versionPlantilla: 'DEN09-BORRADOR-1', mime: 'application/pdf', tamanoBytes: '40', generadoEn: '2026-10-08T20:00:00Z' };
   const detalle = () => ({ codigoCaso: codigo, estadoCaso: resuelta ? 'REMISION_EMITIDA' : recibida ? 'EN_JUZGADO' : 'NOTIFICADA', caso: { id: '8003', codigoCaso: codigo, usoPlaca: 'P', placa: '113BBB', regla: '39', observaciones: 'Observación QA', estado: 'NOTIFICADA', registradaEn: '2026-10-08T17:00:00Z', evidenciasDenuncia: [{id:'81',origen:'DENUNCIA',mime:'image/png',tamanoBytes:'68',estado:'DISPONIBLE'},{id:'82',origen:'DENUNCIA',mime:'image/png',tamanoBytes:'68',estado:'DISPONIBLE'}], analisisEvidencias: {disponible:true,estado:'ACEPTADA',modelo:'modelo-qa',versionPolitica:'EVIDENCIA_V5_CONJUNTO',creadoEn:'2026-10-29T17:00:00Z',terminadoEn:'2026-10-29T17:01:00Z',referenciaEstado:'DISPONIBLE',referenciaFuente:'SAT_MUNI',errorReferencia:null,codigoError:null,esPoliticaConjunto:true,archivos:[{idEvidencia:'81',decision:'REVISION',motivo:'INSUFICIENTE',hecho:'RELACIONADO',placa:'NO_VISIBLE',comparacionPlaca:'NO_DETERMINABLE',compatibilidad:'COMPATIBLE',marca:'NO_DETERMINABLE',indicioMarca:'NO_RECONOCIBLE',contenidoSensible:false,posiblePantalla:false,analizadoEn:'2026-10-29T17:01:00Z',fotogramas:1},{idEvidencia:'82',decision:'REVISION',motivo:'INSUFICIENTE',hecho:'AJENO',placa:'PARCIAL',comparacionPlaca:'NO_DETERMINABLE',compatibilidad:'NO_DETERMINABLE',marca:'COINCIDE',indicioMarca:null,contenidoSensible:false,posiblePantalla:false,analizadoEn:'2026-10-29T17:01:00Z',fotogramas:1}]}, defensa: null }, expediente: recibida ? { id: '77', version: '2', codigoJuzgado: 'JUZ_QA', nombreJuzgado: 'Sede QA controlada', direccionJuzgado: 'Dirección QA controlada', horarioJuzgado: 'Horario QA controlado', estado: resuelta ? 'RESUELTO' : 'RECIBIDO', idActorReceptor: '12', recibidaEn: '2026-10-08T18:00:00Z', numeroInterno: 'EXP-QA-77', observacion: null, gestiones: [], resolucion: resuelta ? { id: '79', decision: 'NO_ACOGIDA', fundamento: 'Fundamento QA controlado', autoridadSnapshot: user.nombre, versionPlantilla: 'DEN09-BORRADOR-1', resueltaEn: '2026-10-08T19:00:00Z', idActorJuez: '12' } : null, remision: resuelta ? { ciudad: '1', serie: 'V', numero: '8003' } : null, documentos: pdf ? [documento] : [] } : null });
@@ -20,7 +21,7 @@ async function run() {
     const json = (data, status = 200) => { res.writeHead(status, { 'Content-Type': 'application/json' }); res.end(JSON.stringify(data)); };
     llamadas.push({ ruta: req.url, query: datos.query || '', variables: datos.variables, auth: req.headers.authorization });
     const q = datos.query || '';
-    if(req.url.includes('/evidencias/')){res.writeHead(200,{'Content-Type':'image/png'});return res.end(Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=','base64'));}
+    if(req.url.includes('/evidencias/')){if(archivoHttp!==200)return json({codigo:'ARCHIVO_NO_DISPONIBLE',mensaje:'ruta privada no debe exponerse'},archivoHttp);res.writeHead(200,{'Content-Type':'image/png'});return res.end(Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=','base64'));}
     if (req.url.includes('/documento/generar')) { pdf = true; return json(documento); }
     if (req.url.includes('/documentos/')) { res.writeHead(200, { 'Content-Type': 'application/pdf', 'Content-Disposition': 'attachment; filename="resolucion.pdf"' }); return res.end('%PDF-1.4\nQA\n%%EOF'); }
     if (q.includes('mutation Login')) return json({ data: { login: { token: 'qa-token-controlado', refresh_token: 'qa-refresh-controlado', expires_in: 3600 } } });
@@ -69,6 +70,13 @@ async function run() {
     await page.getByText('No reconocible en este archivo',{exact:true}).waitFor();
     await page.getByText('Sin indicio visual registrado',{exact:true}).waitFor();
     assert.equal(await page.getByText('Coincide',{exact:true}).count(),0);
+    await page.getByRole('button',{name:'Descargar',exact:true}).first().click();
+    await page.locator('#denuncia').getByRole('alert').filter({hasText:'almacenamiento del servicio'}).waitFor();
+    assert.ok(!(await page.locator('body').innerText()).includes('ruta privada'));
+    archivoHttp=403;
+    await page.getByRole('button',{name:'Ver evidencia',exact:true}).first().click();
+    await page.locator('#denuncia').getByRole('alert').filter({hasText:'no tiene permiso'}).waitFor();
+    archivoHttp=200;
     await page.getByRole('button',{name:'Ver evidencia',exact:true}).first().click();
     await page.getByRole('figure', {name:'Vista de Evidencia 81'}).locator('img').waitFor();
     await page.getByRole('button', {name:'Ampliar',exact:true}).first().click();

@@ -1,4 +1,5 @@
 import { graphqlRequestClient, apiFetch } from './client';
+import { ArchivoJuzgadoError } from './juzgado-archivo';
 
 export type EvidenciaJuzgado = { id: string; origen: string; mime: string; tamanoBytes: string; estado: string };
 export type DocumentoJuzgado = { id: string; tipoDocumento: string; numeroVersion: string; versionPlantilla: string; mime: string; tamanoBytes: string; generadoEn: string };
@@ -60,7 +61,14 @@ export async function obtenerArchivoJuzgado(tipo: 'evidencias' | 'documentos', i
   const { useAuthStore } = await import('@/store/useAuthStore');
   const token = useAuthStore.getState().token;
   const response = await fetch(`/api/JUZ01/${tipo}/${encodeURIComponent(id)}`, { headers: token ? { Authorization: `Bearer ${token}` } : {}, cache: 'no-store', signal });
-  if (!response.ok) throw new Error('No se pudo descargar el archivo privado. Intenta de nuevo.');
+  if (!response.ok) {
+    const body = await response.json().catch(() => ({}));
+    throw new ArchivoJuzgadoError(response.status, body.codigo);
+  }
+  if (!/^(image\/(jpeg|png)|video\/mp4|application\/(pdf|octet-stream))(;|$)/i.test(response.headers.get('content-type') || '')) {
+    await response.body?.cancel();
+    throw new ArchivoJuzgadoError(502);
+  }
   return response.blob();
 }
 export async function descargarArchivoJuzgado(tipo: 'evidencias' | 'documentos', id: string, nombre: string) {

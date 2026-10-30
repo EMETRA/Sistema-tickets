@@ -1,34 +1,56 @@
-
 .mainContainer {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 50px 0 0 20px;
+  gap: 24px;
+  padding: clamp(16px, 2.5vw, 32px);
+  background: #f4f6fa;
+  min-height: 100%;
+  container: home / inline-size;
+}
+.dashboardContainer {
+  width: 100%;
+  min-width: 0;
+  display: grid;
+  gap: 20px;
+}
+.dashboardContainer > *,
+.metricsContainer > * {
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .metricsContainer {
-  width: 90%;
-  padding: 0 20px;
-}
-
-.dashboardContainer {
+  min-width: 0;
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  padding: 0 50px 20px 0;
-  gap: 10px;
 }
-
-.teamPerformanceContainer {
-  width: 100%;
-  display: grid;
-  grid-template-columns: minmax(500px, 1.5fr) minmax(auto, 0.5fr);
-  gap: 10px;
-}
-
+.teamPerformanceContainer,
 .ticketsPerformanceContainer {
-  width: 100%;
   display: grid;
-  grid-template-columns: 0.5fr 1.5fr;
-  gap: 10px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+  > * {
+    min-width: 0;
+    box-sizing: border-box;
+  }
+}
+@container home (min-width:1000px) {
+  .teamPerformanceContainer {
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  }
+  .ticketsPerformanceContainer {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr);
+  }
+}
+.teamPerformanceContainer.teamPerformanceContainer > *,
+.ticketsPerformanceContainer.ticketsPerformanceContainer > *,
+.metricsContainer.metricsContainer > * {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: auto;
 }

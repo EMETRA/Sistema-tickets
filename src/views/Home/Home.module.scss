@@ -1,0 +1,66 @@
+.heading {
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 24px 28px;
+  border: 1px solid #dfe6f2;
+  border-radius: 16px;
+  background: #fff;
+  border-left: 4px solid #4361ee;
+  h1 {
+    margin: 6px 0;
+    font-size: clamp(24px, 2.2vw, 32px);
+    color: #243953;
+  }
+  p {
+    margin: 0;
+    color: #61718a;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+}
+.eyebrow {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #596c90;
+  font-weight: 700;
+}
+.date {
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: #f2f5fc;
+  font-size: 12px;
+  color: #40597f;
+}
+.state {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  border: 1px solid #dfe6f2;
+  border-radius: 14px;
+  padding: 24px;
+  background: #fff;
+  color: #61718a;
+  p {
+    margin: 0 0 12px;
+    line-height: 1.6;
+  }
+  button {
+    border: 1px solid #cdd8ef;
+    border-radius: 8px;
+    padding: 9px 14px;
+    background: #fff;
+    color: #3656af;
+    cursor: pointer;
+    font: inherit;
+  }
+  button:focus-visible {
+    outline: 3px solid #92a2fa;
+    outline-offset: 3px;
+  }
+}

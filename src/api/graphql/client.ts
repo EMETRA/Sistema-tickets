@@ -1,3 +1,9 @@
+import {
+    graphqlProof,
+    legacyProof,
+    completeLegacy,
+} from "@/platform/legacy-proof";
+import { getPlatformRuntime } from "@/platform/runtime";
 import { GraphQLClient } from "graphql-request";
 import { ErrorHandler } from "./errors";
 import { getEnvConfig, getGraphqlEndpoint } from "@/api/config/env";
@@ -55,8 +61,8 @@ export function getGraphQLClient(): GraphQLClient {
  * Error de GraphQL tal como lo devuelve el servidor (`errors[]` de la respuesta).
  */
 export interface GraphQLResponseError {
-  message: string;
-  extensions?: Record<string, unknown>;
+    message: string;
+    extensions?: Record<string, unknown>;
 }
 
 /**
@@ -66,7 +72,7 @@ export interface GraphQLResponseError {
  * `extensions.originalError`). Quien no lo usa no nota ningún cambio.
  */
 export type GraphQLClientError = Error & {
-  graphQLErrors: GraphQLResponseError[];
+    graphQLErrors: GraphQLResponseError[];
 };
 
 function toGraphQLClientError(
@@ -81,10 +87,10 @@ function toGraphQLClientError(
  * Interfaz de opciones para graphqlRequest
  */
 export interface GraphQLRequestOptions {
-  variables?: Record<string, unknown>;
-  files?: File[];
-  fileMap?: Record<string, string[]>;
-  onProgress?: (percent: number) => void;
+    variables?: Record<string, unknown>;
+    files?: File[];
+    fileMap?: Record<string, string[]>;
+    onProgress?: (percent: number) => void;
 }
 
 /**
@@ -127,6 +133,11 @@ export async function graphqlRequest<TData = Record<string, unknown>>(
             headers: {
                 "Content-Type": "application/json",
                 ...(authorization && { Authorization: authorization }),
+                ...Object.fromEntries(
+                    ["x-ticket-request-id", "x-ticket-confirmation"]
+                        .map((name) => [name, headersList.get(name)])
+                        .filter(([, value]) => value),
+                ),
             },
         });
 
@@ -148,7 +159,7 @@ export async function graphqlRequest<TData = Record<string, unknown>>(
             clearTimeout(timeoutId);
         }
     } catch (error: unknown) {
-    // Loguear error
+        // Loguear error
         ErrorHandler.log(error, "graphqlRequest");
         throw error;
     }
@@ -173,7 +184,7 @@ export async function graphqlRequest<TData = Record<string, unknown>>(
  */
 
 export async function graphqlRequestClient<
-  TData extends Record<string, unknown> = Record<string, unknown>,
+    TData extends Record<string, unknown> = Record<string, unknown>,
 >(query: string, options?: GraphQLRequestOptions): Promise<TData> {
     try {
         const graphqlEndpoint = "/api/graphql";
@@ -185,7 +196,13 @@ export async function graphqlRequestClient<
         const files = options?.files ?? [];
         const variables = options?.variables ?? {};
 
-        await confirmAdministrativeChange(describeGraphqlChange(query, variables));
+        const change = describeGraphqlChange(query, variables);
+        const proofHeaders = await graphqlProof(
+            query,
+            variables,
+            change?.label || "Aplicar cambios",
+        );
+        if (!getPlatformRuntime()) await confirmAdministrativeChange(change);
 
         if (files.length > 0) {
             // Use XHR for real upload progress
@@ -215,12 +232,17 @@ export async function graphqlRequestClient<
                 const xhr = new XMLHttpRequest();
                 xhr.open("POST", graphqlEndpoint);
 
-                if (token) xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+                if (token)
+                    xhr.setRequestHeader("Authorization", `Bearer ${token}`);
                 xhr.setRequestHeader("apollo-require-preflight", "true");
+                for (const [name, value] of Object.entries(proofHeaders))
+                    xhr.setRequestHeader(name, value);
 
                 xhr.upload.onprogress = (event) => {
                     if (event.lengthComputable) {
-                        const percent = Math.round((event.loaded / event.total) * 100);
+                        const percent = Math.round(
+                            (event.loaded / event.total) * 100,
+                        );
                         options?.onProgress?.(percent);
                     }
                 };
@@ -240,6 +262,7 @@ export async function graphqlRequestClient<
                             }
                             reject(toGraphQLClientError(json.errors));
                         } else {
+                            completeLegacy(proofHeaders);
                             resolve(json.data as TData);
                         }
                     } catch {
@@ -269,6 +292,7 @@ export async function graphqlRequestClient<
                 headers: {
                     "Content-Type": "application/json",
                     ...(token && { Authorization: `Bearer ${token}` }),
+                    ...proofHeaders,
                 },
                 body: JSON.stringify({ query, variables }),
                 signal: controller.signal,
@@ -292,6 +316,7 @@ export async function graphqlRequestClient<
             throw toGraphQLClientError(json.errors);
         }
 
+        completeLegacy(proofHeaders);
         return json.data as TData;
     } catch (error: unknown) {
         if (!(error instanceof AdministrativeChangeCancelled))
@@ -328,10 +353,37 @@ export async function apiFetch<TData = Record<string, unknown>>(
         const { useAuthStore } = await import("@/store/useAuthStore");
         const token = sentToken || useAuthStore.getState().token;
 
-        await confirmAdministrativeChange(describeRestChange(url, options));
+        const restChange = describeRestChange(url, options);
+        let proofHeaders: Record<string, string> = {};
+        if (
+            restChange &&
+            getPlatformRuntime() &&
+            url.startsWith("/api/JUZ01/") &&
+            (options?.method || "GET").toUpperCase() === "POST"
+        )
+            proofHeaders = await legacyProof(
+                "/legacy/vivi/juzgado/" + url.slice("/api/JUZ01/".length),
+                {},
+                restChange.label,
+            );
+        else if (
+            restChange &&
+            getPlatformRuntime() &&
+            url === "/api/graphql" &&
+            typeof options?.body === "string"
+        ) {
+            const request = JSON.parse(options.body);
+            proofHeaders = await graphqlProof(
+                request.query,
+                request.variables || {},
+                restChange.label,
+            );
+        } else await confirmAdministrativeChange(restChange);
 
         // Preparar headers con token si está disponible
         const headers = new Headers(options?.headers || {});
+        for (const [name, value] of Object.entries(proofHeaders))
+            headers.set(name, value);
 
         if (token) {
             headers.set("Authorization", `Bearer ${token}`);
@@ -339,8 +391,8 @@ export async function apiFetch<TData = Record<string, unknown>>(
 
         if (
             !headers.has("Content-Type") &&
-      options?.body &&
-      !(options.body instanceof FormData)
+            options?.body &&
+            !(options.body instanceof FormData)
         ) {
             headers.set("Content-Type", "application/json");
         }
@@ -366,9 +418,9 @@ export async function apiFetch<TData = Record<string, unknown>>(
 
             if (!response.ok) {
                 const body = (await response.json().catch(() => ({}))) as {
-          message?: string | string[];
-          error?: string;
-        };
+                    message?: string | string[];
+                    error?: string;
+                };
                 const messages = Array.isArray(body.message)
                     ? body.message
                     : [body.message || body.error || `HTTP ${response.status}`];
@@ -379,13 +431,14 @@ export async function apiFetch<TData = Record<string, unknown>>(
             }
 
             const data = (await response.json()) as TData;
+            completeLegacy(proofHeaders);
             return data;
         } catch (error) {
             clearTimeout(timeoutId);
             throw error;
         }
     } catch (error: unknown) {
-    // Loguear error
+        // Loguear error
         if (!(error instanceof AdministrativeChangeCancelled))
             ErrorHandler.log(error, "apiFetch");
         throw error;

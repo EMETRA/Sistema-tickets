@@ -1,5 +1,7 @@
 "use client";
 
+import { usePlatform } from "@/platform/context";
+import { platformSections, PLATFORM_SECTIONS } from "@/platform/navigation";
 import { usePathname, useRouter } from "next/navigation";
 import { SideBarNavigation } from "../../organisms/SideBarNavigation";
 import { TopBar } from "../../organisms/TopBar";
@@ -26,8 +28,8 @@ export const SystemLayout = ({
     children,
     className,
 }: {
-  children: React.ReactNode;
-  className?: string;
+    children: React.ReactNode;
+    className?: string;
 }) => {
     const pathname = usePathname();
     const router = useRouter();
@@ -79,13 +81,27 @@ export const SystemLayout = ({
         appId,
     ]);
 
+    const platform = usePlatform();
     const navItems = getMenuByRole(currentRole)
-        .filter((page) => page.path !== "/tickets-creation")
+        .filter(
+            (page) =>
+                page.path !== "/tickets-creation" &&
+                (!platform.data ||
+                    !["/tickets", "/config", "/usuarios"].includes(page.path)),
+        )
         .map((page) => ({
             path: page.path,
             label: page.label,
             iconName: page.iconName,
         }));
+    if (platform.data)
+        navItems.push(
+            ...platformSections(platform.data).map((s) => ({
+                path: "/espacio/" + s.id,
+                label: s.label,
+                iconName: s.iconName,
+            })),
+        );
     const sections = appId && catalog ? getSections(appId, catalog) : [];
     const sectionItems = sections.map((section) => ({
         path: buildSectionPath(appId!, section.id),
@@ -102,6 +118,11 @@ export const SystemLayout = ({
 
     const activePage = (() => {
         if (!pathname) return PAGES_CONFIG.home;
+        const workspace = PLATFORM_SECTIONS.find(
+            (s) => pathname === "/espacio/" + s.id,
+        );
+        if (workspace)
+            return { title: workspace.label, iconName: workspace.iconName };
 
         if (catalog) {
             const appMeta = getAppPathMeta(pathname, catalog);
@@ -113,7 +134,9 @@ export const SystemLayout = ({
             }
         }
 
-        const exact = Object.values(PAGES_CONFIG).find((p) => p.path === pathname);
+        const exact = Object.values(PAGES_CONFIG).find(
+            (p) => p.path === pathname,
+        );
         if (exact) return exact;
 
         const prefixMatch = Object.values(PAGES_CONFIG).find(
@@ -125,10 +148,11 @@ export const SystemLayout = ({
     })();
 
     const hasAccess =
-    Boolean(token) &&
-    canAccessPath(currentRole, pathname ?? "/home") &&
-    (!appId ||
-      (!catalogLoading && canAccessAppPath(pathname ?? "/home", catalog)));
+        Boolean(token) &&
+        canAccessPath(currentRole, pathname ?? "/home") &&
+        (!appId ||
+            (!catalogLoading &&
+                canAccessAppPath(pathname ?? "/home", catalog)));
 
     if (!isHydrated || (appId && catalogLoading)) {
         return (
@@ -153,7 +177,9 @@ export const SystemLayout = ({
                     items={navItems}
                     sectionItems={sectionItems}
                     applicationLabel={
-                        appId && catalog ? catalog[appId]?.meta.label : undefined
+                        appId && catalog
+                            ? catalog[appId]?.meta.label
+                            : undefined
                     }
                     open={menuOpen}
                     onClose={() => setMenuOpen(false)}
@@ -178,7 +204,13 @@ export const SystemLayout = ({
                                 : undefined
                         }
                         settingsPath={
-                            canAccessPath(currentRole, "/config") ? "/config" : undefined
+                            platform.data
+                                ? platform.data.actor.admin
+                                    ? "/espacio/accesos"
+                                    : undefined
+                                : canAccessPath(currentRole, "/config")
+                                    ? "/config"
+                                    : undefined
                         }
                         unit={user?.departamento || undefined}
                         menuOpen={menuOpen}
@@ -188,14 +220,18 @@ export const SystemLayout = ({
                         userName={user?.nombre || "Usuario"}
                         userRole={
                             user?.rol?.trim() ||
-              currentRole.charAt(0).toUpperCase() +
-                currentRole.slice(1).toLowerCase()
+                            currentRole.charAt(0).toUpperCase() +
+                                currentRole.slice(1).toLowerCase()
                         }
                         userAvatarUrl={user?.avatar}
                         userStatus="online"
                     />
 
-                    <main id="main-content" tabIndex={-1} className={styles.main}>
+                    <main
+                        id="main-content"
+                        tabIndex={-1}
+                        className={styles.main}
+                    >
                         {appContext && catalog && (
                             <nav
                                 aria-label="Ruta de navegación"
@@ -216,9 +252,10 @@ export const SystemLayout = ({
                                             )}
                                         >
                                             {
-                                                catalog[appContext.appId]?.sections[
-                                                    appContext.sectionId
-                                                ]?.meta.label
+                                                catalog[appContext.appId]
+                                                    ?.sections[
+                                                        appContext.sectionId
+                                                    ]?.meta.label
                                             }
                                         </Link>
                                     </>
@@ -226,14 +263,17 @@ export const SystemLayout = ({
                                 {appContext.moduleId && (
                                     <>
                                         <span aria-hidden="true">/</span>
-                                        <span aria-current="page">{activePage.title}</span>
+                                        <span aria-current="page">
+                                            {activePage.title}
+                                        </span>
                                     </>
                                 )}
                             </nav>
                         )}
                         <div
                             className={classNames(styles.pageContent, {
-                                [styles.standardPage]: !appContext && pathname !== "/home",
+                                [styles.standardPage]:
+                                    !appContext && pathname !== "/home",
                             })}
                         >
                             {!appContext && pathname !== "/home" && (

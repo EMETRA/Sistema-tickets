@@ -1,0 +1,912 @@
+{
+  "equipos": {
+    "table": "TB_TK_EQUIPOS",
+    "title": "Equipos de trabajo",
+    "singular": "Equipo",
+    "group": "organizacion",
+    "permission": "TICKETS_EQUIPOS",
+    "fields": [
+      {
+        "key": "unidadRh",
+        "label": "Unidad institucional",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "informatica",
+        "label": "Equipo de Informática",
+        "type": "boolean",
+        "required": false
+      },
+      {
+        "key": "minutosAlerta",
+        "label": "Minutos sin primera atención",
+        "type": "number",
+        "required": true,
+        "min": 1,
+        "max": 43200
+      }
+    ],
+    "adminOnly": true
+  },
+  "miembros": {
+    "table": "TB_TK_MIEMBROS",
+    "title": "Miembros y responsabilidades",
+    "singular": "Miembro",
+    "group": "organizacion",
+    "permission": "TICKETS_MIEMBROS",
+    "fields": [
+      {
+        "key": "usuarioId",
+        "label": "Colaborador",
+        "type": "user",
+        "required": true
+      },
+      {
+        "key": "funcion",
+        "label": "Responsabilidad",
+        "type": "select",
+        "required": true,
+        "options": [
+          "MIEMBRO",
+          "JEFATURA",
+          "ASIGNADOR",
+          "TECNICO",
+          "DESARROLLADOR",
+          "DEVOPS"
+        ]
+      }
+    ],
+    "adminOnly": true
+  },
+  "actividades": {
+    "table": "TB_TK_ACTIVIDADES",
+    "title": "Calendario",
+    "singular": "Actividad",
+    "group": "calendario",
+    "permission": "TICKETS_ACTIVIDADES",
+    "fields": [
+      {
+        "key": "inicio",
+        "label": "Inicio",
+        "type": "datetime",
+        "required": true
+      },
+      {
+        "key": "fin",
+        "label": "Finalización",
+        "type": "datetime",
+        "required": true
+      },
+      {
+        "key": "lugar",
+        "label": "Lugar o enlace",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "descripcion",
+        "label": "Descripción",
+        "type": "textarea",
+        "required": false
+      },
+      {
+        "key": "participantes",
+        "label": "Participantes",
+        "type": "list",
+        "required": false
+      }
+    ],
+    "audience": "everyone"
+  },
+  "instalaciones": {
+    "table": "TB_TK_INSTALACIONES",
+    "title": "Instalaciones a cargo",
+    "singular": "Instalación",
+    "group": "inventario",
+    "permission": "TICKETS_INSTALACIONES",
+    "fields": [
+      {
+        "key": "direccion",
+        "label": "Dirección",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "key": "responsableId",
+        "label": "Técnico responsable",
+        "type": "user",
+        "required": true
+      },
+      {
+        "key": "nivel",
+        "label": "Nivel",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "plano",
+        "label": "Plano o documento autorizado",
+        "type": "url",
+        "required": false
+      }
+    ]
+  },
+  "activos": {
+    "table": "TB_TK_ACTIVOS",
+    "title": "Equipos de Informática",
+    "singular": "Equipo de cómputo",
+    "group": "inventario",
+    "permission": "TICKETS_ACTIVOS",
+    "fields": [
+      {
+        "key": "numeroInventario",
+        "label": "Número de inventario institucional",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "clase",
+        "label": "Tipo de equipo",
+        "type": "select",
+        "required": true,
+        "options": [
+          "COMPUTADORA",
+          "PORTATIL",
+          "IMPRESORA",
+          "SERVIDOR",
+          "OTRO"
+        ]
+      },
+      {
+        "key": "marca",
+        "label": "Marca",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "modelo",
+        "label": "Modelo",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "serie",
+        "label": "Serie",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "instalacionId",
+        "label": "Instalación",
+        "type": "ref",
+        "required": true,
+        "resource": "instalaciones"
+      },
+      {
+        "key": "responsableId",
+        "label": "Responsable",
+        "type": "user",
+        "required": true
+      },
+      {
+        "key": "detalle",
+        "label": "Características",
+        "type": "textarea",
+        "required": false
+      }
+    ]
+  },
+  "intervenciones": {
+    "table": "TB_TK_INTERVENCIONES",
+    "title": "Mantenimientos y visitas",
+    "singular": "Intervención",
+    "group": "inventario",
+    "permission": "TICKETS_INTERVENCIONES",
+    "fields": [
+      {
+        "key": "tipo",
+        "label": "Tipo",
+        "type": "select",
+        "required": true,
+        "options": [
+          "PREVENTIVO",
+          "CORRECTIVO",
+          "VISITA_TECNICA"
+        ]
+      },
+      {
+        "key": "activoId",
+        "label": "Equipo",
+        "type": "ref",
+        "required": false,
+        "resource": "activos"
+      },
+      {
+        "key": "instalacionId",
+        "label": "Instalación",
+        "type": "ref",
+        "required": true,
+        "resource": "instalaciones"
+      },
+      {
+        "key": "fecha",
+        "label": "Fecha",
+        "type": "datetime",
+        "required": true
+      },
+      {
+        "key": "responsableId",
+        "label": "Técnico",
+        "type": "user",
+        "required": true
+      },
+      {
+        "key": "detalle",
+        "label": "Trabajo realizado",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "key": "proximaRevision",
+        "label": "Próxima revisión",
+        "type": "date",
+        "required": false
+      }
+    ],
+    "immutable": true
+  },
+  "movimientos-activos": {
+    "table": "TB_TK_MOV_ACTIVOS",
+    "title": "Bajas y salidas de equipo",
+    "singular": "Movimiento",
+    "group": "inventario",
+    "permission": "TICKETS_MOVIMIENTOS_ACTIVOS",
+    "fields": [
+      {
+        "key": "tipo",
+        "label": "Tipo",
+        "type": "select",
+        "required": true,
+        "options": [
+          "BAJA",
+          "SALIDA",
+          "RETORNO"
+        ]
+      },
+      {
+        "key": "activoId",
+        "label": "Equipo",
+        "type": "ref",
+        "required": true,
+        "resource": "activos"
+      },
+      {
+        "key": "fecha",
+        "label": "Fecha",
+        "type": "datetime",
+        "required": true
+      },
+      {
+        "key": "destino",
+        "label": "Destino",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "motivo",
+        "label": "Motivo y autorización",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "key": "referencia",
+        "label": "Número de documento de autorización",
+        "type": "text",
+        "required": true
+      }
+    ],
+    "immutable": true
+  },
+  "dispositivos": {
+    "table": "TB_TK_RED_DISPOSITIVOS",
+    "title": "Dispositivos de red",
+    "singular": "Dispositivo",
+    "group": "red",
+    "permission": "TICKETS_DISPOSITIVOS",
+    "fields": [
+      {
+        "key": "planoX",
+        "label": "Posición en plano X",
+        "type": "number",
+        "min": 0,
+        "max": 4000
+      },
+      {
+        "key": "planoY",
+        "label": "Posición en plano Y",
+        "type": "number",
+        "min": 0,
+        "max": 4000
+      },
+      {
+        "key": "clase",
+        "label": "Tipo",
+        "type": "select",
+        "required": true,
+        "options": [
+          "SWITCH",
+          "ROUTER",
+          "ACCESS_POINT",
+          "PANEL",
+          "EQUIPO"
+        ]
+      },
+      {
+        "key": "numeroInventario",
+        "label": "Número de inventario",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "instalacionId",
+        "label": "Instalación",
+        "type": "ref",
+        "required": true,
+        "resource": "instalaciones"
+      },
+      {
+        "key": "puertos",
+        "label": "Cantidad de puertos",
+        "type": "number",
+        "required": true,
+        "min": 1,
+        "max": 1024
+      },
+      {
+        "key": "direccion",
+        "label": "Dirección de administración",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "x",
+        "label": "Posición horizontal",
+        "type": "number",
+        "required": true,
+        "min": 0,
+        "max": 4000
+      },
+      {
+        "key": "y",
+        "label": "Posición vertical",
+        "type": "number",
+        "required": true,
+        "min": 0,
+        "max": 4000
+      },
+      {
+        "key": "ultimaRevision",
+        "label": "Última revisión",
+        "type": "date",
+        "required": false
+      },
+      {
+        "key": "mantenimiento",
+        "label": "Mantenimiento",
+        "type": "textarea",
+        "required": false
+      }
+    ]
+  },
+  "conexiones": {
+    "table": "TB_TK_RED_ENLACES",
+    "title": "Conexiones por puerto",
+    "singular": "Conexión",
+    "group": "red",
+    "permission": "TICKETS_CONEXIONES",
+    "fields": [
+      {
+        "key": "origenId",
+        "label": "Dispositivo de origen",
+        "type": "ref",
+        "required": true,
+        "resource": "dispositivos"
+      },
+      {
+        "key": "puertoOrigen",
+        "label": "Puerto de origen",
+        "type": "number",
+        "required": true,
+        "min": 1,
+        "max": 1024
+      },
+      {
+        "key": "destinoId",
+        "label": "Dispositivo de destino",
+        "type": "ref",
+        "required": true,
+        "resource": "dispositivos"
+      },
+      {
+        "key": "puertoDestino",
+        "label": "Puerto de destino",
+        "type": "number",
+        "required": true,
+        "min": 1,
+        "max": 1024
+      },
+      {
+        "key": "medio",
+        "label": "Medio",
+        "type": "select",
+        "required": true,
+        "options": [
+          "UTP",
+          "FIBRA",
+          "INALAMBRICO",
+          "OTRO"
+        ]
+      },
+      {
+        "key": "detalle",
+        "label": "Notas",
+        "type": "textarea",
+        "required": false
+      }
+    ]
+  },
+  "aplicaciones": {
+    "table": "TB_TK_APLICACIONES",
+    "title": "Sistemas a cargo",
+    "singular": "Aplicación",
+    "group": "sistemas",
+    "permission": "TICKETS_APLICACIONES",
+    "fields": [
+      {
+        "key": "operacionesMetricas",
+        "label": "Operaciones de negocio admitidas (separadas por coma)",
+        "type": "text"
+      },
+      {
+        "key": "codigo",
+        "label": "Código de aplicación",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "responsableId",
+        "label": "Responsable",
+        "type": "user",
+        "required": true
+      },
+      {
+        "key": "frontUrl",
+        "label": "URL del front",
+        "type": "url",
+        "required": false
+      },
+      {
+        "key": "backUrl",
+        "label": "URL del back",
+        "type": "url",
+        "required": false
+      },
+      {
+        "key": "servidorId",
+        "label": "Servidor",
+        "type": "ref",
+        "required": false,
+        "resource": "servidores"
+      },
+      {
+        "key": "descripcion",
+        "label": "Descripción",
+        "type": "textarea",
+        "required": false
+      }
+    ]
+  },
+  "repositorios": {
+    "table": "TB_TK_REPOSITORIOS",
+    "title": "Repositorios vinculados",
+    "singular": "Repositorio",
+    "group": "sistemas",
+    "permission": "TICKETS_REPOSITORIOS",
+    "fields": [
+      {
+        "key": "aplicacionId",
+        "label": "Aplicación",
+        "type": "ref",
+        "required": true,
+        "resource": "aplicaciones"
+      },
+      {
+        "key": "url",
+        "label": "Repositorio",
+        "type": "url",
+        "required": true
+      },
+      {
+        "key": "rama",
+        "label": "Rama de despliegue",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "componente",
+        "label": "Componente",
+        "type": "select",
+        "required": true,
+        "options": [
+          "FRONT",
+          "BACK",
+          "MOVIL",
+          "OTRO"
+        ]
+      }
+    ]
+  },
+  "despliegues": {
+    "table": "TB_TK_DESPLIEGUES",
+    "title": "Versiones y despliegues",
+    "singular": "Despliegue",
+    "group": "sistemas",
+    "permission": "TICKETS_DESPLIEGUES",
+    "fields": [
+      {
+        "key": "aplicacionId",
+        "label": "Aplicación",
+        "type": "ref",
+        "required": true,
+        "resource": "aplicaciones"
+      },
+      {
+        "key": "repositorioId",
+        "label": "Repositorio",
+        "type": "ref",
+        "required": true,
+        "resource": "repositorios"
+      },
+      {
+        "key": "revision",
+        "label": "Commit o versión",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "entorno",
+        "label": "Entorno",
+        "type": "select",
+        "required": true,
+        "options": [
+          "DESARROLLO",
+          "QA",
+          "PRODUCCION"
+        ]
+      },
+      {
+        "key": "fecha",
+        "label": "Fecha",
+        "type": "datetime",
+        "required": true
+      },
+      {
+        "key": "resultado",
+        "label": "Resultado",
+        "type": "select",
+        "required": true,
+        "options": [
+          "CORRECTO",
+          "FALLIDO",
+          "REVERTIDO"
+        ]
+      },
+      {
+        "key": "detalle",
+        "label": "Detalle",
+        "type": "textarea",
+        "required": false
+      }
+    ],
+    "immutable": true
+  },
+  "incidencias": {
+    "table": "TB_TK_INCIDENCIAS",
+    "title": "Incidentes de aplicaciones",
+    "singular": "Incidente",
+    "group": "sistemas",
+    "permission": "TICKETS_INCIDENCIAS",
+    "fields": [
+      {
+        "key": "aplicacionId",
+        "label": "Aplicación",
+        "type": "ref",
+        "required": true,
+        "resource": "aplicaciones"
+      },
+      {
+        "key": "severidad",
+        "label": "Severidad",
+        "type": "select",
+        "required": true,
+        "options": [
+          "BAJA",
+          "MEDIA",
+          "ALTA",
+          "CRITICA"
+        ]
+      },
+      {
+        "key": "detalle",
+        "label": "Contexto del incidente",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "key": "ticketId",
+        "label": "Ticket relacionado",
+        "type": "number",
+        "required": false,
+        "min": 1
+      },
+      {
+        "key": "referencia",
+        "label": "Referencia del error",
+        "type": "text",
+        "required": false
+      }
+    ]
+  },
+  "servidores": {
+    "table": "TB_TK_SERVIDORES",
+    "title": "Servidores",
+    "singular": "Servidor",
+    "group": "infraestructura",
+    "permission": "TICKETS_SERVIDORES",
+    "fields": [
+      {
+        "key": "identificador",
+        "label": "Identificador del observador",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "direccion",
+        "label": "Dirección o referencia",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "entorno",
+        "label": "Entorno",
+        "type": "select",
+        "required": true,
+        "options": [
+          "DESARROLLO",
+          "QA",
+          "PRODUCCION"
+        ]
+      },
+      {
+        "key": "responsableId",
+        "label": "Responsable",
+        "type": "user",
+        "required": true
+      },
+      {
+        "key": "descripcion",
+        "label": "Descripción",
+        "type": "textarea",
+        "required": false
+      }
+    ],
+    "adminOnly": true
+  },
+  "contenedores": {
+    "table": "TB_TK_CONTENEDORES",
+    "title": "Contenedores",
+    "singular": "Contenedor",
+    "group": "infraestructura",
+    "permission": "TICKETS_CONTENEDORES",
+    "fields": [
+      {
+        "key": "servidorId",
+        "label": "Servidor",
+        "type": "ref",
+        "required": true,
+        "resource": "servidores"
+      },
+      {
+        "key": "aplicacionId",
+        "label": "Aplicación",
+        "type": "ref",
+        "required": false,
+        "resource": "aplicaciones"
+      },
+      {
+        "key": "identificador",
+        "label": "Nombre del contenedor",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "descripcion",
+        "label": "Descripción",
+        "type": "textarea",
+        "required": false
+      }
+    ]
+  },
+  "esquemas": {
+    "table": "TB_TK_ESQUEMAS",
+    "title": "Esquemas y objetos Oracle",
+    "singular": "Esquema",
+    "group": "sistemas",
+    "permission": "TICKETS_ESQUEMAS",
+    "fields": [
+      {
+        "key": "aplicacionId",
+        "label": "Aplicación",
+        "type": "ref",
+        "required": true,
+        "resource": "aplicaciones"
+      },
+      {
+        "key": "owner",
+        "label": "Esquema Oracle",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "descripcion",
+        "label": "Descripción",
+        "type": "textarea",
+        "required": false
+      }
+    ],
+    "adminOnly": true
+  },
+  "solicitudes": {
+    "immutable": true,
+    "table": "TB_TK_SOL_ACCESO",
+    "title": "Solicitudes de usuarios y accesos",
+    "singular": "Solicitud",
+    "group": "accesos",
+    "permission": "TICKETS_SOLICITUDES",
+    "fields": [
+      {
+        "key": "tipo",
+        "label": "Solicitud",
+        "type": "select",
+        "required": true,
+        "options": [
+          "USUARIO_NUEVO",
+          "ACCESO",
+          "PERFIL",
+          "COPIA"
+        ]
+      },
+      {
+        "key": "usuarioDestinoId",
+        "label": "Usuario existente",
+        "type": "user",
+        "required": false
+      },
+      {
+        "key": "correo",
+        "label": "Correo institucional",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "dpi",
+        "label": "DPI del empleado",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "perfilId",
+        "label": "Perfil solicitado",
+        "type": "number",
+        "required": false,
+        "min": 1
+      },
+      {
+        "key": "copiarUsuarioId",
+        "label": "Copiar acceso de usuario",
+        "type": "user",
+        "required": false
+      },
+      {
+        "key": "roles",
+        "label": "Roles adicionales",
+        "type": "list",
+        "required": false
+      },
+      {
+        "key": "permisos",
+        "label": "Permisos adicionales",
+        "type": "list",
+        "required": false
+      },
+      {
+        "key": "justificacion",
+        "label": "Justificación",
+        "type": "textarea",
+        "required": true
+      }
+    ],
+    "audience": "everyone"
+  },
+  "modulos": {
+    "table": "TB_TK_MODULOS",
+    "title": "Aplicaciones y módulos autorizados",
+    "singular": "Módulo",
+    "group": "accesos",
+    "permission": "TICKETS_MODULOS",
+    "fields": [
+      {
+        "key": "appId",
+        "label": "Código de aplicación",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "appNombre",
+        "label": "Nombre de aplicación",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "seccionId",
+        "label": "Código de sección",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "seccionNombre",
+        "label": "Nombre de sección",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "moduloId",
+        "label": "Código de módulo",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "icono",
+        "label": "Icono registrado",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "leer",
+        "label": "Permiso LEER",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "insertar",
+        "label": "Permiso INSERTAR",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "editar",
+        "label": "Permiso EDITAR",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "eliminar",
+        "label": "Permiso ELIMINAR",
+        "type": "text",
+        "required": false
+      }
+    ],
+    "adminOnly": true
+  }
+}

@@ -1,13 +1,12 @@
 {
   "reference": "Presentación Sistema Tickets R3; inventario de 120 vistas/estados",
   "branch": "feat/redisenar_sistema_tickets",
-  "status": "ENTREGA_UI_EXISTENTE; FUNCIONES_NUEVAS_PENDIENTES",
+  "status": "AMPLIACION_UI_API_SQL_PREPARADA; INSTALACION_ORACLE_Y_CONEXIONES_PENDIENTES",
   "counts": {
-    "UI_EXISTENTE_ADAPTADA": 49,
+    "UI_EXISTENTE_ADAPTADA": 41,
     "CONFIGURACION_PENDIENTE": 1,
-    "BASE_EXISTENTE_PARCIAL": 5,
-    "API_DATOS_PENDIENTES": 53,
-    "DEMO_HEREDADA": 12
+    "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION": 77,
+    "DEMO_HEREDADA": 1
   },
   "runtimeRoutes": {
     "modules": 16,
@@ -131,7 +130,54 @@
         "/equipo"
       ]
     },
-    "catalogStatus": "MANIFIESTO_ESTATICO_LEGADO; NO ES AUTORIZACION"
+    "catalogStatus": "CATALOGO_REAL_DEL_API_CON_FLAG; MANIFIESTO_ESTATICO_SOLO_EN_MODO_LEGADO",
+    "platform": [
+      {
+        "section": "busqueda",
+        "path": "/espacio/busqueda"
+      },
+      {
+        "section": "asignacion",
+        "path": "/espacio/asignacion"
+      },
+      {
+        "section": "calendario",
+        "path": "/espacio/calendario"
+      },
+      {
+        "section": "metricas",
+        "path": "/espacio/metricas"
+      },
+      {
+        "section": "inventario",
+        "path": "/espacio/inventario"
+      },
+      {
+        "section": "red",
+        "path": "/espacio/red"
+      },
+      {
+        "section": "sistemas",
+        "path": "/espacio/sistemas"
+      },
+      {
+        "section": "infraestructura",
+        "path": "/espacio/infraestructura"
+      },
+      {
+        "section": "solicitudes",
+        "path": "/espacio/solicitudes"
+      },
+      {
+        "section": "accesos",
+        "path": "/espacio/accesos"
+      },
+      {
+        "section": "auditoria",
+        "path": "/espacio/auditoria"
+      }
+    ],
+    "recordDetail": "/espacio/registro/[type]/[id]"
   },
   "screens": [
     {
@@ -156,31 +202,34 @@
       "title": "Recuperación de contraseña",
       "referenceSource": "src/views/ForgotPassword/ForgotPassword.tsx",
       "status": "CONFIGURACION_PENDIENTE",
-      "note": "Flujo real preparado; habilitar AUTH_RECOVERY_BASE_URL y validar contra autenticación."
+      "note": "Flujo preparado para Auth existente. Configurar AUTH_RECOVERY_BASE_URL y validar envío/código real."
     },
     {
       "id": "P04",
       "chapter": "Inicio y navegación",
       "title": "Inicio del usuario: acciones recientes y accesos",
       "referenceSource": "src/views/Home/User/UserHome.tsx",
-      "status": "BASE_EXISTENTE_PARCIAL",
-      "note": "Métricas de tickets y actividad existentes. Métricas de operaciones de otras apps pendientes."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Inicio por responsabilidades/permisos actuales, métricas reales, aplicaciones autorizadas, próximos eventos y acciones recientes.",
+      "implementedPath": "/home"
     },
     {
       "id": "P05",
       "chapter": "Inicio y navegación",
       "title": "Inicio: Admin · Informática",
       "referenceSource": "src/views/Home/Admin/AdminHome.tsx",
-      "status": "BASE_EXISTENTE_PARCIAL",
-      "note": "Conserva el inicio real de administrador. Nuevas bandejas y monitoreo pendientes."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Inicio por responsabilidades/permisos actuales, métricas reales, aplicaciones autorizadas, próximos eventos y acciones recientes.",
+      "implementedPath": "/home"
     },
     {
       "id": "P06",
       "chapter": "Inicio y navegación",
       "title": "Inicio: Técnico · Informática",
       "referenceSource": "src/views/Home/Tech/TechHome.tsx",
-      "status": "BASE_EXISTENTE_PARCIAL",
-      "note": "Conserva estadísticas, eventos y tickets asignados del API actual."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Inicio por responsabilidades/permisos actuales, métricas reales, aplicaciones autorizadas, próximos eventos y acciones recientes.",
+      "implementedPath": "/home"
     },
     {
       "id": "P07",
@@ -203,16 +252,18 @@
       "chapter": "Tickets",
       "title": "Tickets",
       "referenceSource": "src/views/Tickets/Tickets.tsx",
-      "status": "UI_EXISTENTE_ADAPTADA",
-      "note": "Vista/estado existente conservado e integrado al diseño y navegación compartidos."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Bandejas con alcance del servidor, asignación por permisos/membresía, primera atención, cancelación e historial conservado.",
+      "implementedPath": "/espacio/asignacion"
     },
     {
       "id": "P10",
       "chapter": "Tickets",
       "title": "Mis tickets",
       "referenceSource": "src/app/(dashboard)/mis-tickets/page.tsx",
-      "status": "UI_EXISTENTE_ADAPTADA",
-      "note": "Vista/estado existente conservado e integrado al diseño y navegación compartidos."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Bandejas con alcance del servidor, asignación por permisos/membresía, primera atención, cancelación e historial conservado.",
+      "implementedPath": "/espacio/asignacion"
     },
     {
       "id": "P11",
@@ -227,32 +278,35 @@
       "chapter": "Tickets",
       "title": "Detalle del ticket: conversación",
       "referenceSource": "src/components/client/organisms/TicketDetail/TicketDetail.tsx",
-      "status": "UI_EXISTENTE_ADAPTADA",
-      "note": "Vista/estado existente conservado e integrado al diseño y navegación compartidos."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Bandejas con alcance del servidor, asignación por permisos/membresía, primera atención, cancelación e historial conservado.",
+      "implementedPath": "/espacio/asignacion"
     },
     {
       "id": "P13",
       "chapter": "Tickets",
       "title": "Historial del ticket",
       "referenceSource": "src/components/client/organisms/TicketHistory/TicketHistory.tsx",
-      "status": "UI_EXISTENTE_ADAPTADA",
-      "note": "Vista/estado existente conservado e integrado al diseño y navegación compartidos."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Bandejas con alcance del servidor, asignación por permisos/membresía, primera atención, cancelación e historial conservado.",
+      "implementedPath": "/espacio/asignacion"
     },
     {
       "id": "P14",
       "chapter": "Tickets",
       "title": "Admin: revisar el cambio · Paso 1 de 2",
       "referenceSource": "src/components/client/organisms/TicketsTablePanel/TicketsTablePanel.tsx",
-      "status": "UI_EXISTENTE_ADAPTADA",
-      "note": "Dos confirmaciones centrales antes de enviar la mutación. No equivalen a auditoría persistida."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Dos etapas del mismo administrador vinculadas y comprobadas por el API; auditoría persistida. No requiere otro aprobador."
     },
     {
       "id": "P15",
       "chapter": "Tickets",
       "title": "Admin: eliminación con historial conservado",
       "referenceSource": "src/components/client/organisms/TicketsTablePanel/TicketsTablePanel.tsx",
-      "status": "UI_EXISTENTE_ADAPTADA",
-      "note": "Cancelar usa updateTicket con estado 4; no ejecuta deleteTicket ni elimina el historial."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Bandejas con alcance del servidor, asignación por permisos/membresía, primera atención, cancelación e historial conservado.",
+      "implementedPath": "/espacio/asignacion"
     },
     {
       "id": "P16",
@@ -275,88 +329,98 @@
       "chapter": "Personas",
       "title": "Perfil del colaborador",
       "referenceSource": "src/views/Profile/Profile.tsx",
-      "status": "BASE_EXISTENTE_PARCIAL",
-      "note": "Perfil real y conteo de tickets creados. Inventario y rendimiento no se simulan."
+      "status": "UI_EXISTENTE_ADAPTADA",
+      "note": "Flujo heredado conservado; la ampliación opera mediante las rutas /espacio con servicios reales."
     },
     {
       "id": "P19",
       "chapter": "Personas",
       "title": "Perfil: mantenimiento y equipo",
       "referenceSource": "src/views/Profile/Profile.tsx",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Sin fuente real de inventario/mantenimiento en el perfil; se indica la dependencia."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Registros técnicos, instalaciones, responsables, documentos, mantenimiento/visitas y baja/salida. Inventario patrimonial pendiente de vista oficial.",
+      "implementedPath": "/espacio/inventario"
     },
     {
       "id": "P20",
       "chapter": "Reportes y configuración",
       "title": "Admin: métricas globales de tickets de Informática",
       "referenceSource": "src/views/Statistics/Statistics.tsx",
-      "status": "DEMO_HEREDADA",
-      "note": "Estadísticas heredadas de demostración, identificadas. El inicio admin usa su API existente."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Agregados de tickets y eventos de negocio con detalle. Las aplicaciones deben conectar su emisor; no se simulan operaciones.",
+      "implementedPath": "/espacio/metricas"
     },
     {
       "id": "P21",
       "chapter": "Configuración",
       "title": "Informática: revisar solicitudes de acceso",
       "referenceSource": "src/views/Configuration/Configuration.tsx",
-      "status": "DEMO_HEREDADA",
-      "note": "Datos heredados de demostración; configuración solo de lectura, sin mutaciones."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Solicitud privada/de equipo de jefatura, vista de impacto, aprobación que aplica accesos; provisión por RRHH e invitación separada.",
+      "implementedPath": "/espacio/solicitudes"
     },
     {
       "id": "P22",
       "chapter": "Configuración",
       "title": "Módulos",
       "referenceSource": "src/views/Configuration/Configuration.tsx",
-      "status": "DEMO_HEREDADA",
-      "note": "Datos heredados de demostración; configuración solo de lectura, sin mutaciones."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Catálogo real de Auth, perfil/roles/permisos, excepciones por usuario, copia independiente, versiones y doble confirmación persistida.",
+      "implementedPath": "/espacio/accesos"
     },
     {
       "id": "P23",
       "chapter": "Configuración",
       "title": "Permisos: INSERTAR, LEER, EDITAR y ELIMINAR",
       "referenceSource": "src/views/Configuration/Configuration.tsx",
-      "status": "DEMO_HEREDADA",
-      "note": "Datos heredados de demostración; configuración solo de lectura, sin mutaciones."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Catálogo real de Auth, perfil/roles/permisos, excepciones por usuario, copia independiente, versiones y doble confirmación persistida.",
+      "implementedPath": "/espacio/accesos"
     },
     {
       "id": "P24",
       "chapter": "Configuración",
       "title": "Rol: módulos y permisos de operación",
       "referenceSource": "src/views/Configuration/Configuration.tsx",
-      "status": "DEMO_HEREDADA",
-      "note": "Datos heredados de demostración; configuración solo de lectura, sin mutaciones."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Catálogo real de Auth, perfil/roles/permisos, excepciones por usuario, copia independiente, versiones y doble confirmación persistida.",
+      "implementedPath": "/espacio/accesos"
     },
     {
       "id": "P25",
       "chapter": "Configuración",
       "title": "Asignación de perfiles y excepciones",
       "referenceSource": "src/views/Configuration/Configuration.tsx",
-      "status": "DEMO_HEREDADA",
-      "note": "Datos heredados de demostración; configuración solo de lectura, sin mutaciones."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Catálogo real de Auth, perfil/roles/permisos, excepciones por usuario, copia independiente, versiones y doble confirmación persistida.",
+      "implementedPath": "/espacio/accesos"
     },
     {
       "id": "P26",
       "chapter": "Configuración",
       "title": "Crear módulo",
       "referenceSource": "src/components/client/organisms/ConfigurationManagement",
-      "status": "DEMO_HEREDADA",
-      "note": "Vista de demostración deshabilitada hasta conectar un catálogo autorizado real."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Catálogo real de Auth, perfil/roles/permisos, excepciones por usuario, copia independiente, versiones y doble confirmación persistida.",
+      "implementedPath": "/espacio/accesos"
     },
     {
       "id": "P27",
       "chapter": "Configuración",
       "title": "Asignar operaciones al módulo",
       "referenceSource": "src/components/client/organisms/ConfigurationManagement",
-      "status": "DEMO_HEREDADA",
-      "note": "Vista de demostración deshabilitada hasta conectar un catálogo autorizado real."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Catálogo real de Auth, perfil/roles/permisos, excepciones por usuario, copia independiente, versiones y doble confirmación persistida.",
+      "implementedPath": "/espacio/accesos"
     },
     {
       "id": "P28",
       "chapter": "Configuración",
       "title": "Crear o editar rol",
       "referenceSource": "src/components/client/organisms/ConfigurationManagement",
-      "status": "DEMO_HEREDADA",
-      "note": "Vista de demostración deshabilitada hasta conectar un catálogo autorizado real."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Catálogo real de Auth, perfil/roles/permisos, excepciones por usuario, copia independiente, versiones y doble confirmación persistida.",
+      "implementedPath": "/espacio/accesos"
     },
     {
       "id": "P29A",
@@ -403,16 +467,18 @@
       "chapter": "Módulos administrativos",
       "title": "Dashboard de proyectos",
       "referenceSource": "src/views/DashboardProjects/DashboardProjects.tsx",
-      "status": "DEMO_HEREDADA",
-      "note": "Dashboard heredado con datos de demostración, ahora identificado."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Agregados de tickets y eventos de negocio con detalle. Las aplicaciones deben conectar su emisor; no se simulan operaciones.",
+      "implementedPath": "/espacio/metricas"
     },
     {
       "id": "P33",
       "chapter": "Módulos administrativos",
       "title": "Dashboard de colaboradores",
       "referenceSource": "src/views/DashboardCollaborators/DashboardCollaborators.tsx",
-      "status": "DEMO_HEREDADA",
-      "note": "Dashboard heredado con datos de demostración, ahora identificado."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Agregados de tickets y eventos de negocio con detalle. Las aplicaciones deben conectar su emisor; no se simulan operaciones.",
+      "implementedPath": "/espacio/metricas"
     },
     {
       "id": "P34",
@@ -476,7 +542,7 @@
       "title": "Búsqueda EMETRA",
       "referenceSource": "src/views/MOD13/MOD13.tsx",
       "status": "DEMO_HEREDADA",
-      "note": "Consulta heredada con datos de demostración, ahora identificada."
+      "note": "MOD13 conserva la consulta ilustrativa de remisiones por nombre. No se cambió su significado ni se inventó una fuente de remisiones. La nueva búsqueda interna de registros autorizados está en /espacio/busqueda."
     },
     {
       "id": "P42",
@@ -651,448 +717,503 @@
       "chapter": "Inicio y navegación",
       "title": "Inicio: Jefatura de unidad",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Inicio por responsabilidades/permisos actuales, métricas reales, aplicaciones autorizadas, próximos eventos y acciones recientes.",
+      "implementedPath": "/home"
     },
     {
       "id": "P64",
       "chapter": "Inicio y navegación",
       "title": "Inicio: Desarrollador",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "BASE_EXISTENTE_PARCIAL",
-      "note": "Desarrollador conserva inicio técnico del rol DESARROLLADOR. Sistemas a cargo pendientes."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Inicio por responsabilidades/permisos actuales, métricas reales, aplicaciones autorizadas, próximos eventos y acciones recientes.",
+      "implementedPath": "/home"
     },
     {
       "id": "P65",
       "chapter": "Inicio y navegación",
       "title": "Inicio: Asignación · Informática",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Inicio por responsabilidades/permisos actuales, métricas reales, aplicaciones autorizadas, próximos eventos y acciones recientes.",
+      "implementedPath": "/home"
     },
     {
       "id": "P66",
       "chapter": "Tickets",
       "title": "Bandeja de asignación",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Bandejas con alcance del servidor, asignación por permisos/membresía, primera atención, cancelación e historial conservado.",
+      "implementedPath": "/espacio/asignacion"
     },
     {
       "id": "P67",
       "chapter": "Tickets",
       "title": "Asignados sin primera atención",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Bandejas con alcance del servidor, asignación por permisos/membresía, primera atención, cancelación e historial conservado.",
+      "implementedPath": "/espacio/asignacion"
     },
     {
       "id": "P68",
       "chapter": "Tickets",
       "title": "Asignar desde la bandeja de la secretaria",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Bandejas con alcance del servidor, asignación por permisos/membresía, primera atención, cancelación e historial conservado.",
+      "implementedPath": "/espacio/asignacion"
     },
     {
       "id": "P69",
       "chapter": "Tickets",
       "title": "Admin: confirmar el cambio · Paso 2 de 2",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "UI_EXISTENTE_ADAPTADA",
-      "note": "Segundo paso central con casilla explícita y cancelación sin petición."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Dos etapas del mismo administrador vinculadas y comprobadas por el API; auditoría persistida. No requiere otro aprobador."
     },
     {
       "id": "P70",
       "chapter": "Tickets",
       "title": "Admin: autoasignación de un ticket propio",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "UI_EXISTENTE_ADAPTADA",
-      "note": "Solo ADMINISTRADOR autoasigna los tickets que crea con su propio ID."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "El API solo permite autoasignación al administrador que crea su propio ticket. Los demás ingresan sin asignación.",
+      "implementedPath": "/tickets-creation"
     },
     {
       "id": "P71",
       "chapter": "Calendario",
       "title": "Calendario: vista de todos los usuarios",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "API real de actividades, participantes y visibilidad privada/equipo/empresa. Hora de Guatemala.",
+      "implementedPath": "/espacio/calendario"
     },
     {
       "id": "P72",
       "chapter": "Calendario",
       "title": "Calendario: gestión de una jefatura",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "API real de actividades, participantes y visibilidad privada/equipo/empresa. Hora de Guatemala.",
+      "implementedPath": "/espacio/calendario"
     },
     {
       "id": "P73",
       "chapter": "Calendario",
       "title": "Crear actividad de equipo",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "API real de actividades, participantes y visibilidad privada/equipo/empresa. Hora de Guatemala.",
+      "implementedPath": "/espacio/calendario"
     },
     {
       "id": "P74",
       "chapter": "Personas y accesos",
       "title": "Solicitudes de mi equipo",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Solicitud privada/de equipo de jefatura, vista de impacto, aprobación que aplica accesos; provisión por RRHH e invitación separada.",
+      "implementedPath": "/espacio/solicitudes"
     },
     {
       "id": "P75",
       "chapter": "Personas y accesos",
       "title": "Jefatura: solicitar usuario nuevo",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Solicitud privada/de equipo de jefatura, vista de impacto, aprobación que aplica accesos; provisión por RRHH e invitación separada.",
+      "implementedPath": "/espacio/solicitudes"
     },
     {
       "id": "P76",
       "chapter": "Personas y accesos",
       "title": "Informática: resolver una solicitud de acceso",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Solicitud privada/de equipo de jefatura, vista de impacto, aprobación que aplica accesos; provisión por RRHH e invitación separada.",
+      "implementedPath": "/espacio/solicitudes"
     },
     {
       "id": "P77",
       "chapter": "Personas y accesos",
       "title": "Perfiles de trabajo",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Catálogo real de Auth, perfil/roles/permisos, excepciones por usuario, copia independiente, versiones y doble confirmación persistida.",
+      "implementedPath": "/espacio/accesos"
     },
     {
       "id": "P78",
       "chapter": "Personas y accesos",
       "title": "Perfil: roles incluidos y acceso resultante",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Catálogo real de Auth, perfil/roles/permisos, excepciones por usuario, copia independiente, versiones y doble confirmación persistida.",
+      "implementedPath": "/espacio/accesos"
     },
     {
       "id": "P79",
       "chapter": "Personas y accesos",
       "title": "Alta de usuario: elegir una base de permisos",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Solicitud privada/de equipo de jefatura, vista de impacto, aprobación que aplica accesos; provisión por RRHH e invitación separada.",
+      "implementedPath": "/espacio/solicitudes"
     },
     {
       "id": "P80",
       "chapter": "Personas y accesos",
       "title": "Copiar accesos: revisar antes de aplicar",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Catálogo real de Auth, perfil/roles/permisos, excepciones por usuario, copia independiente, versiones y doble confirmación persistida.",
+      "implementedPath": "/espacio/accesos"
     },
     {
       "id": "P81",
       "chapter": "Personas y accesos",
       "title": "Usuario: perfil base y excepciones individuales",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Catálogo real de Auth, perfil/roles/permisos, excepciones por usuario, copia independiente, versiones y doble confirmación persistida.",
+      "implementedPath": "/espacio/accesos"
     },
     {
       "id": "P82",
       "chapter": "Personas y accesos",
       "title": "Permisos: revisar impacto antes de confirmar",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Catálogo real de Auth, perfil/roles/permisos, excepciones por usuario, copia independiente, versiones y doble confirmación persistida.",
+      "implementedPath": "/espacio/accesos"
     },
     {
       "id": "P83",
       "chapter": "Trazabilidad",
       "title": "Trazabilidad de movimientos",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Consulta inmutable de actor, fecha, antes/después, resultado y ambas confirmaciones. Requiere SQL y permiso.",
+      "implementedPath": "/espacio/auditoria"
     },
     {
       "id": "P84",
       "chapter": "Trazabilidad",
       "title": "Movimiento: antes, después y confirmaciones",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Consulta inmutable de actor, fecha, antes/después, resultado y ambas confirmaciones. Requiere SQL y permiso.",
+      "implementedPath": "/espacio/auditoria"
     },
     {
       "id": "P85",
       "chapter": "Operación técnica",
       "title": "Equipos de Informática",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Registros técnicos, instalaciones, responsables, documentos, mantenimiento/visitas y baja/salida. Inventario patrimonial pendiente de vista oficial.",
+      "implementedPath": "/espacio/inventario"
     },
     {
       "id": "P86",
       "chapter": "Operación técnica",
       "title": "Registrar o actualizar equipo",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Registros técnicos, instalaciones, responsables, documentos, mantenimiento/visitas y baja/salida. Inventario patrimonial pendiente de vista oficial.",
+      "implementedPath": "/espacio/inventario"
     },
     {
       "id": "P87",
       "chapter": "Operación técnica",
       "title": "Registrar mantenimiento o visita técnica",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Registros técnicos, instalaciones, responsables, documentos, mantenimiento/visitas y baja/salida. Inventario patrimonial pendiente de vista oficial.",
+      "implementedPath": "/espacio/inventario"
     },
     {
       "id": "P88",
       "chapter": "Operación técnica",
       "title": "Generar baja o salida de equipo",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Registros técnicos, instalaciones, responsables, documentos, mantenimiento/visitas y baja/salida. Inventario patrimonial pendiente de vista oficial.",
+      "implementedPath": "/espacio/inventario"
     },
     {
       "id": "P89",
       "chapter": "Operación técnica",
       "title": "Instalaciones a mi cargo",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Registros técnicos, instalaciones, responsables, documentos, mantenimiento/visitas y baja/salida. Inventario patrimonial pendiente de vista oficial.",
+      "implementedPath": "/espacio/inventario"
     },
     {
       "id": "P90",
       "chapter": "Operación técnica",
       "title": "Topología: switch, router y conexiones",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Topología lógica/plano, dispositivos, puertos y conexiones persistidas; posiciones con versión y dos confirmaciones de administrador.",
+      "implementedPath": "/espacio/red"
     },
     {
       "id": "P91",
       "chapter": "Operación técnica",
       "title": "Registrar o actualizar punto de red",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Topología lógica/plano, dispositivos, puertos y conexiones persistidas; posiciones con versión y dos confirmaciones de administrador.",
+      "implementedPath": "/espacio/red"
     },
     {
       "id": "P92",
       "chapter": "Operación de desarrollo",
       "title": "Sistemas a mi cargo",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Aplicaciones, repositorios, despliegues, incidentes y objetos Oracle autorizados. Fuentes externas requieren configurar su emisor y grants.",
+      "implementedPath": "/espacio/sistemas"
     },
     {
       "id": "P93",
       "chapter": "Operación de desarrollo",
       "title": "Sistema: front, back y servidor",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Aplicaciones, repositorios, despliegues, incidentes y objetos Oracle autorizados. Fuentes externas requieren configurar su emisor y grants.",
+      "implementedPath": "/espacio/sistemas"
     },
     {
       "id": "P94",
       "chapter": "Operación de desarrollo",
       "title": "Repositorios y despliegues vinculados",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Aplicaciones, repositorios, despliegues, incidentes y objetos Oracle autorizados. Fuentes externas requieren configurar su emisor y grants.",
+      "implementedPath": "/espacio/sistemas"
     },
     {
       "id": "P95",
       "chapter": "Operación de desarrollo",
       "title": "Incidentes de aplicaciones",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Aplicaciones, repositorios, despliegues, incidentes y objetos Oracle autorizados. Fuentes externas requieren configurar su emisor y grants.",
+      "implementedPath": "/espacio/sistemas"
     },
     {
       "id": "P96",
       "chapter": "Operación de desarrollo",
       "title": "Estado de esquema y objetos",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Aplicaciones, repositorios, despliegues, incidentes y objetos Oracle autorizados. Fuentes externas requieren configurar su emisor y grants.",
+      "implementedPath": "/espacio/sistemas"
     },
     {
       "id": "P97",
       "chapter": "Métricas",
       "title": "Mis métricas de atención",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Agregados de tickets y eventos de negocio con detalle. Las aplicaciones deben conectar su emisor; no se simulan operaciones.",
+      "implementedPath": "/espacio/metricas"
     },
     {
       "id": "P98",
       "chapter": "Métricas",
       "title": "Jefatura: métricas de sus equipos",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Agregados de tickets y eventos de negocio con detalle. Las aplicaciones deben conectar su emisor; no se simulan operaciones.",
+      "implementedPath": "/espacio/metricas"
     },
     {
       "id": "P99",
       "chapter": "Métricas",
       "title": "Mis métricas: tickets y actividad de aplicaciones",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Agregados de tickets y eventos de negocio con detalle. Las aplicaciones deben conectar su emisor; no se simulan operaciones.",
+      "implementedPath": "/espacio/metricas"
     },
     {
       "id": "P100",
       "chapter": "Personas y accesos",
       "title": "Permisos: confirmar y aplicar · Paso 2 de 2",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Catálogo real de Auth, perfil/roles/permisos, excepciones por usuario, copia independiente, versiones y doble confirmación persistida.",
+      "implementedPath": "/espacio/accesos"
     },
     {
       "id": "P101",
       "chapter": "Tickets",
       "title": "Resolver un ticket asignado",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "UI_EXISTENTE_ADAPTADA",
-      "note": "Flujo existente en detalle del ticket para pasar a trabajo y completar; backend conserva su validación."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Bandejas con alcance del servidor, asignación por permisos/membresía, primera atención, cancelación e historial conservado.",
+      "implementedPath": "/espacio/asignacion"
     },
     {
       "id": "P102",
       "chapter": "Operación de desarrollo",
       "title": "Incidente: contexto y relación con un ticket",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Aplicaciones, repositorios, despliegues, incidentes y objetos Oracle autorizados. Fuentes externas requieren configurar su emisor y grants.",
+      "implementedPath": "/espacio/sistemas"
     },
     {
       "id": "P103",
       "chapter": "Personas y accesos",
       "title": "Solicitar acceso para un miembro",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Solicitud privada/de equipo de jefatura, vista de impacto, aprobación que aplica accesos; provisión por RRHH e invitación separada.",
+      "implementedPath": "/espacio/solicitudes"
     },
     {
       "id": "P104",
       "chapter": "Métricas",
       "title": "Mi actividad en aplicaciones",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Agregados de tickets y eventos de negocio con detalle. Las aplicaciones deben conectar su emisor; no se simulan operaciones.",
+      "implementedPath": "/espacio/metricas"
     },
     {
       "id": "P105",
       "chapter": "Métricas",
       "title": "Jefatura: actividad de aplicaciones de su equipo",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Agregados de tickets y eventos de negocio con detalle. Las aplicaciones deben conectar su emisor; no se simulan operaciones.",
+      "implementedPath": "/espacio/metricas"
     },
     {
       "id": "P106",
       "chapter": "Métricas",
       "title": "Registros que forman un indicador",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Agregados de tickets y eventos de negocio con detalle. Las aplicaciones deben conectar su emisor; no se simulan operaciones.",
+      "implementedPath": "/espacio/metricas"
     },
     {
       "id": "P107",
       "chapter": "Operación técnica",
       "title": "Switch: puertos y equipos conectados",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Topología lógica/plano, dispositivos, puertos y conexiones persistidas; posiciones con versión y dos confirmaciones de administrador.",
+      "implementedPath": "/espacio/red"
     },
     {
       "id": "P108",
       "chapter": "Operación técnica",
       "title": "Agregar o editar un dispositivo de red",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Topología lógica/plano, dispositivos, puertos y conexiones persistidas; posiciones con versión y dos confirmaciones de administrador.",
+      "implementedPath": "/espacio/red"
     },
     {
       "id": "P109",
       "chapter": "Operación técnica",
       "title": "Conectar dispositivos por sus puertos",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Topología lógica/plano, dispositivos, puertos y conexiones persistidas; posiciones con versión y dos confirmaciones de administrador.",
+      "implementedPath": "/espacio/red"
     },
     {
       "id": "P110",
       "chapter": "Operación técnica",
       "title": "Dispositivo: ficha, revisión y mantenimiento",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Topología lógica/plano, dispositivos, puertos y conexiones persistidas; posiciones con versión y dos confirmaciones de administrador.",
+      "implementedPath": "/espacio/red"
     },
     {
       "id": "P118",
       "chapter": "Operación técnica",
       "title": "Plano físico: ubicación de los puntos",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Topología lógica/plano, dispositivos, puertos y conexiones persistidas; posiciones con versión y dos confirmaciones de administrador.",
+      "implementedPath": "/espacio/red"
     },
     {
       "id": "P111",
       "chapter": "Infraestructura",
       "title": "Servidores: vista de DevOps",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Observador de lectura, recursos, contenedores y logs autorizados. running no equivale a healthy; sin fuente/vencida se declara expresamente.",
+      "implementedPath": "/espacio/infraestructura"
     },
     {
       "id": "P112",
       "chapter": "Infraestructura",
       "title": "Servidor: recursos y contenedores",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Observador de lectura, recursos, contenedores y logs autorizados. running no equivale a healthy; sin fuente/vencida se declara expresamente.",
+      "implementedPath": "/espacio/infraestructura"
     },
     {
       "id": "P113",
       "chapter": "Infraestructura",
       "title": "Contenedor: estado, versión y logs",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Observador de lectura, recursos, contenedores y logs autorizados. running no equivale a healthy; sin fuente/vencida se declara expresamente.",
+      "implementedPath": "/espacio/infraestructura"
     },
     {
       "id": "P114",
       "chapter": "Infraestructura",
       "title": "Logs: consulta filtrada del recurso",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Observador de lectura, recursos, contenedores y logs autorizados. running no equivale a healthy; sin fuente/vencida se declara expresamente.",
+      "implementedPath": "/espacio/infraestructura"
     },
     {
       "id": "P115",
       "chapter": "Infraestructura",
       "title": "Jefatura: servidores y contenedores autorizados",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Observador de lectura, recursos, contenedores y logs autorizados. running no equivale a healthy; sin fuente/vencida se declara expresamente.",
+      "implementedPath": "/espacio/infraestructura"
     },
     {
       "id": "P116",
       "chapter": "Infraestructura",
       "title": "Monitoreo: lectura antigua o fuente no disponible",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Observador de lectura, recursos, contenedores y logs autorizados. running no equivale a healthy; sin fuente/vencida se declara expresamente.",
+      "implementedPath": "/espacio/infraestructura"
     },
     {
       "id": "P117",
       "chapter": "Infraestructura",
       "title": "Logs: acceso de lectura no otorgado",
       "referenceSource": "Definición funcional del usuario · 31/10/2026",
-      "status": "API_DATOS_PENDIENTES",
-      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+      "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
+      "note": "Observador de lectura, recursos, contenedores y logs autorizados. running no equivale a healthy; sin fuente/vencida se declara expresamente.",
+      "implementedPath": "/espacio/infraestructura"
     }
   ]
 }

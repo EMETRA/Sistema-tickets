@@ -1,10 +1,10 @@
 {
-  "status": "PASS",
+  "status": "PASS_LOCAL_REQUIERE_INSTALACION_ORACLE",
   "branch": "feat/redisenar_sistema_tickets",
   "typecheck": "PASS",
-  "lintChangedTypeScriptFiles": "PASS",
+  "lintChangedTypeScriptFiles": "PASS; 42 archivos de producción modificados/nuevos",
   "productionBuild": "next build --webpack; PASS",
-  "nodeIntegrationTestFiles": 6,
+  "nodeIntegrationTestFiles": 7,
   "registeredModules": 16,
   "authenticatedRoles": [
     "ADMINISTRADOR",
@@ -66,13 +66,54 @@
     "errors": []
   },
   "regressions": {
-    "inicio-browser.cjs": "PASS",
-    "panel-ux-browser.cjs": "PASS",
-    "juzgado-browser.cjs": "PASS"
+    "redisenio-browser.cjs": "PASS; 16 módulos e inicios de los cuatro roles heredados",
+    "panel-ux-browser.cjs": "PASS; Inicio y Noticias, imágenes de secciones, errores y reintentos",
+    "juzgado-browser.cjs": "PASS; defensa, permisos, PDF independiente y fallos de sesión"
   },
   "limits": [
-    "Backend HTTP controlado, sin Oracle ni envíos reales",
-    "Recorridos de módulos verifican navegación y espacio; no prueban todos sus procesos de negocio",
-    "Recuperación requiere configurar AUTH_RECOVERY_BASE_URL y validarla contra el servicio real"
-  ]
+    "Backend HTTP controlado, sin Oracle, despliegues ni envíos reales",
+    "Los recorridos de módulos conservan navegación y espacio; no certifican todos sus procesos de negocio",
+    "Se requieren el nuevo esquema ADMEMETRAINFORMATICA, SQL, grants y activación coordinada en los tres servicios",
+    "La tabla/columna del inventario oficial queda pendiente de configuración; se permite registro técnico manual identificado como no verificado",
+    "Observadores, eventos de negocio e incidentes requieren conectar sus fuentes reales",
+    "Recuperación requiere configurar AUTH_RECOVERY_BASE_URL; invitaciones y SMTP se prueban después de la instalación"
+  ],
+  "date": "2026-11-01",
+  "platformSections": 12,
+  "oracleExecuted": false,
+  "liveMailSent": false,
+  "deployed": false,
+  "platformBrowser": {
+    "estado": "PASS",
+    "backend": "HTTP controlado; Next real",
+    "recorridos": [
+      "inicio administrativo con datos reales del contrato",
+      "crear instalación y dos confirmaciones ligadas al servidor",
+      "calendario y actividad de equipo",
+      "mapa de red, selección de puertos y guardar posiciones",
+      "perfiles/roles/permisos y copia de accesos",
+      "monitoreo con healthcheck y logs autorizados",
+      "objetos Oracle mediante contrato HTTP",
+      "auditoría con antes/después",
+      "tableta y alcance del usuario sin privilegios"
+    ],
+    "capturas": "/workspace/artifacts/tickets-plataforma",
+    "erroresReact": []
+  },
+  "backendVerification": {
+    "api-tickets": {
+      "build": "PASS",
+      "suites": 27,
+      "tests": 281,
+      "result": "PASS",
+      "persistence": "dobles de Oracle; contratos SQL y HTTP local"
+    },
+    "api-autenticacion": {
+      "build": "PASS",
+      "focusedSuites": 2,
+      "focusedTests": 15,
+      "result": "PASS en flujo nuevo y regresión UserService",
+      "fullSuite": "9 fallos anteriores, reproducidos en origin/QA sin los cambios"
+    }
+  }
 }

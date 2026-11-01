@@ -1,183 +1,173 @@
-# Rediseño de Sistema Tickets: cobertura y revisión
+# Rediseño y ampliación de Sistema Tickets
 
-La rama `feat/redisenar_sistema_tickets` adapta las pantallas existentes a la línea aprobada y conserva sus rutas. Esta entrega no implementa todavía toda la ampliación funcional de la presentación. Las 120 referencias representan vistas, estados y capacidades; no son 120 rutas ya conectadas a servicios.
+La rama `feat/redisenar_sistema_tickets` incorpora la línea visual aprobada y sus funciones nuevas, en coordinación con api-tickets y api-autenticacion. Conserva Atomic Design, Noticias, Juzgado y las rutas de los 16 módulos actuales.
 
-## Alcance que se puede revisar
+El espacio nuevo agrega inicio por responsabilidad, bandejas de asignación/atención, calendario, métricas, solicitudes/aprobaciones, perfiles/roles/permisos reales, inventario técnico, mantenimientos/visitas, bajas/salidas, cableado/puertos/planos, aplicaciones/repositorios/despliegues/incidentes, servidores/contenedores/logs y trazabilidad. Las vistas leen y escriben servicios; no muestran métricas inventadas ni consideran exitosa una fuente sin conectar.
 
-- Acceso, recuperación, menú global, buscador de aplicaciones, secciones, breadcrumbs y menú móvil.
-- Inicio según los cuatro roles actuales, actividad reciente y métricas de tickets que entrega el API.
-- Tickets creados frente a tickets asignados, creación, adjuntos, detalle e historial. Solo el administrador autoasigna sus propios tickets.
-- Dos confirmaciones de administrador en las escrituras que pasan por el cliente común, antes de enviar HTTP. Cancelar no escribe. Es un control de interacción; no sustituye permisos ni auditoría del servidor.
-- Cancelación de tickets mediante cambio al estado 4. Se conserva el expediente y no se llama a la eliminación física.
-- Los 16 módulos registrados mantienen sus páginas y operaciones existentes. Formularios, tablas, Noticias y Juzgado usan el espacio disponible sin centrar formularios en áreas vacías.
-- Componentes reutilizables: tokens CSS; átomos de controles; moléculas `PageHeading`, `MetricCard`, `ApplicationSwitcher` y `DemoNotice`; organismo `AdministrativeConfirmation`; plantillas `AccessLayout` y `ModuleWorkspace`.
+## Instalación
 
-## Límites de la integración existente
+La ampliación se activa después de aplicar los SQL y configurar los tres servicios. La guía completa, DDL, grants, datos iniciales, verificación y emisores están en [api-tickets, rama de la ampliación](https://github.com/EMETRA/api-tickets/tree/feat/redisenar_sistema_tickets/docs/plataforma). **No ejecutar tablas nuevas en usuarios personales.** Se propone un solo esquema adicional, ADMEMETRAINFORMATICA; los accesos nuevos van en ADMEMETRAIDENTIDAD y la auditoría en ADMEMETRAAUDITORIA. Auth y tickets existentes continúan en sus propietarios actuales.
 
-El catálogo de aplicaciones viene de `APPS_CATALOG_DUMMY`; es un manifiesto estático de navegación y no la autorización de cada usuario. El rediseño no concede permisos por mostrar un enlace. El servidor debe validar cada operación. Se conserva el contrato actual y no se inventan jefaturas, secretaría o DevOps como roles de autenticación nuevos.
+En el servidor Next, `TICKETS_PLATFORM_ENABLED=true` habilita el espacio y el catálogo autorizado del API. Mantener GRAPHQL_ENDPOINT y los montajes del despliegue. El navegador utiliza el BFF de origen fijo `/api/platform`; no recibe claves de observadores, Oracle ni SMTP. Los tres servicios deben usar el mismo modo antes de reanudar escrituras. Las sesiones abiertas deben recargar la nueva versión del Panel.
 
-Configuración de accesos, dashboards de proyectos/colaboradores, Estadísticas y búsqueda MOD13 ya utilizaban datos de demostración. Ahora se identifican. Configuración queda solo de lectura y no conecta IDs de demostración con mutaciones reales; perfiles, roles y permisos efectivos necesitan conectarse al servicio autorizado. La ficha de perfil deja de mostrar inventario y métricas inventados. Se normalizan además las respuestas de perfil/solicitudes para coincidir con sus campos GraphQL reales y se toma el ID de la ruta, conservando el error de sesión.
+El repositorio incluye `scripts/actualizar-servicio-preservando.py` para el servidor del Front. Primero ejecutar con `CONTENEDOR_REAL --comprobar`, desde la carpeta Compose desplegada; luego sin ese argumento. Detecta overlays, verifica los montajes y conserva redes. No hace `down` ni borra volúmenes.
 
-La recuperación se conecta opcionalmente al servicio de autenticación existente. Configurar `AUTH_RECOVERY_BASE_URL` en el servidor de Sistema Tickets con la base real que expone `send-recovery-email` y `recover-password` (por ejemplo, la base interna terminada en `/auth/`). No usa `NEXT_PUBLIC_`, no incluye claves y no modifica montajes. Si falta la base, muestra indisponibilidad; no simula que envió correo. Las pruebas de esta rama usan un servidor local controlado.
+## Componentes y navegación
 
-## Verificación
+- Átomos existentes de botones, texto, iconos y formularios; conserva colores y tipografía institucionales.
+- Moléculas PageHeading, MetricCard, ApplicationSwitcher y PlatformField.
+- Organismos ResourceWorkspace, RecordEditor, RecordDetail, RecordFiles y AdministrativeConfirmation.
+- Plantillas SystemLayout, AccessLayout, ModuleWorkspace y PlatformPage.
+- Los formularios utilizan metadatos tipados del API; permisos y visibilidad se verifican de nuevo en el servidor. Ocultar un botón no concede ni sustituye autorización.
+- El inicio adapta prioridades a administrador, jefatura, asignación, técnico, desarrollo, DevOps y usuario. Son responsabilidades/permisos, sin inventar roles de autenticación por el cargo mostrado.
+- Las fichas tienen URL propia `/espacio/registro/[type]/[id]`, documentos e historial. La búsqueda interna devuelve únicamente registros autorizados.
+
+## Configuraciones pendientes, sin simular resultados
+
+- Inventario oficial: el catálogo está en ADMEMETRA y falta su tabla/columna. El registro técnico manual muestra **Inventario oficial pendiente de verificar**. Se conectará mediante vista en ADMEMETRAINTEGRACION, conservando la futura migración.
+- Observadores de servidores y emisores de actividad/errores de aplicaciones: los adaptadores y contratos están implementados en el API; deben conectarse a sus fuentes reales. Sin emisor, se muestran ausencia de mediciones/eventos y lecturas vencidas.
+- Objetos Oracle: solo se muestran ALL_OBJECTS/ALL_CONSTRAINTS visibles para la cuenta del API. No se conceden permisos SYS o ANY DICTIONARY.
+- Recuperación e invitaciones: configurar Auth/SMTP y validar con una cuenta controlada. Crear cuenta, aceptar correo en SMTP y leer el correo son resultados distintos.
+- MOD13 conserva su búsqueda heredada de remisiones ilustrativa, identificada como tal. No se repurposó su enlace como otro trámite. La búsqueda nueva del espacio técnico es independiente.
+
+## Cobertura y verificación
+
+`cobertura.json` relaciona las 120 referencias de la presentación con rutas y estados. Son vistas, variantes y capacidades, **no 120 rutas distintas**. `UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION` indica que el código y contrato están preparados y que faltan SQL/configuración/validación con datos reales. La matriz no presenta esas conexiones como ya verificadas.
 
 ```bash
 pnpm typecheck
 pnpm test:integracion
 node scripts/verificar-cobertura-redisenio.cjs
 pnpm exec next build --webpack
+node test/integracion/plataforma-browser.cjs
 node test/integracion/redisenio-browser.cjs
 node test/integracion/panel-ux-browser.cjs
 node test/integracion/juzgado-browser.cjs
 ```
 
-`verificacion.json` registra el resultado local: tipos, lint, compilación, seis archivos de pruebas de lógica y los recorridos de navegador completados.
+Las pruebas de navegador ejecutan Next con límites HTTP sustituidos, en escritorio y tablet. No consultan Oracle ni envían correos, publican noticias o modifican servidores reales. Las pruebas del API cubren alcance, privacidad, permisos, confirmaciones, versiones, idempotencia, puertos, logs y contrato SQL. La guía del API incluye el recorrido de validación posterior en Oracle.
 
-El recorrido de rediseño verifica login con error/éxito, recuperación, cuatro roles, filtros por usuario, las dos confirmaciones, cancelación sin eliminación física, configuración demo sin escrituras, rutas registradas y anchos 1920/1440/1180/1024/768/390. Noticias y Juzgado tienen recorridos separados de sus operaciones. Los límites HTTP se sustituyen: no se consulta Oracle, no se publican noticias y no se envían correos reales. Visitar una ruta no valida todos los procesos de negocio de ese módulo.
+## Matriz de referencias
 
-## Datos y tablas
-
-Para el diseño de las pantallas existentes no hay DDL que ejecutar. No se cambiaron api-tickets ni api-autenticacion en esta entrega.
-
-Las funciones nuevas sí necesitan contratos y revisar qué datos existen antes de crear tablas:
-
-| Capacidad | Datos y reglas pendientes |
-| --- | --- |
-| Secretaría y jefaturas | Equipos, responsables, suplencias, asignación y tiempo sin primera atención configurable. |
-| Calendario | Actividades, participantes, unidad y visibilidad de empresa/equipo, con autorización del servidor. |
-| Accesos efectivos | Perfil → roles → módulos → operaciones, excepciones por usuario, copia independiente, solicitudes y aprobaciones. Integración con autenticación. |
-| Auditoría transversal | Actor, fecha, recurso, antes/después, resultado, correlación y ambas confirmaciones persistidas. El cliente no puede acreditar esto por sí solo. |
-| Inventario técnico | Referencia al número de inventario institucional, equipo, instalación, responsable, mantenimientos, visitas, bajas y salidas. |
-| Cableado y topología | Ubicaciones/niveles/planos, dispositivos, puertos, conexiones e historial de cambios. |
-| Desarrollo e infraestructura | Aplicaciones, repositorios, despliegues, recursos autorizados, observaciones con fecha, objetos Oracle, incidencias y acceso de lectura a logs. Requiere fuentes de monitoreo, no solo tablas. |
-| Métricas de aplicaciones | Eventos de negocio como revisar/grabar recibos, autor, resultado, unidad, agregados y detalle verificable. No inferir trabajo realizado contando visitas a pantallas. |
-
-Antes del SQL se debe acordar el esquema propietario dentro de `ADMEMETRA…`, las integraciones existentes y los privilegios mínimos. No se deben ejecutar tablas provisionales en usuarios personales. El diseño compartido permite incorporar esas capacidades sin rehacer la navegación.
-
-## Matriz completa de referencias
-
-`cobertura.json` conserva las 120 referencias y las 16 rutas verificadas. Estados: `UI_EXISTENTE_ADAPTADA` conserva un flujo existente; `BASE_EXISTENTE_PARCIAL` necesita ampliar sus datos; `DEMO_HEREDADA` no es operativa; `CONFIGURACION_PENDIENTE` requiere conectar el servicio; `API_DATOS_PENDIENTES` representa capacidad nueva no implementada.
-
-| Referencia | Vista o estado | Cobertura de esta entrega |
+| Referencia | Vista o estado | Ruta/cobertura |
 | --- | --- | --- |
-| P01 | Inicio de sesión | UI_EXISTENTE_ADAPTADA · Vista/estado existente conservado e integrado al diseño y navegación compartidos. |
-| P02 | Error de acceso o carga de perfil | UI_EXISTENTE_ADAPTADA · Vista/estado existente conservado e integrado al diseño y navegación compartidos. |
-| P03 | Recuperación de contraseña | CONFIGURACION_PENDIENTE · Flujo real preparado; habilitar AUTH_RECOVERY_BASE_URL y validar contra autenticación. |
-| P04 | Inicio del usuario: acciones recientes y accesos | BASE_EXISTENTE_PARCIAL · Métricas de tickets y actividad existentes. Métricas de operaciones de otras apps pendientes. |
-| P05 | Inicio: Admin · Informática | BASE_EXISTENTE_PARCIAL · Conserva el inicio real de administrador. Nuevas bandejas y monitoreo pendientes. |
-| P06 | Inicio: Técnico · Informática | BASE_EXISTENTE_PARCIAL · Conserva estadísticas, eventos y tickets asignados del API actual. |
-| P07 | Aplicaciones y secciones | UI_EXISTENTE_ADAPTADA · Vista/estado existente conservado e integrado al diseño y navegación compartidos. |
-| P08 | Módulos de una sección | UI_EXISTENTE_ADAPTADA · Vista/estado existente conservado e integrado al diseño y navegación compartidos. |
-| P09 | Tickets | UI_EXISTENTE_ADAPTADA · Vista/estado existente conservado e integrado al diseño y navegación compartidos. |
-| P10 | Mis tickets | UI_EXISTENTE_ADAPTADA · Vista/estado existente conservado e integrado al diseño y navegación compartidos. |
-| P11 | Crear ticket | UI_EXISTENTE_ADAPTADA · Vista/estado existente conservado e integrado al diseño y navegación compartidos. |
-| P12 | Detalle del ticket: conversación | UI_EXISTENTE_ADAPTADA · Vista/estado existente conservado e integrado al diseño y navegación compartidos. |
-| P13 | Historial del ticket | UI_EXISTENTE_ADAPTADA · Vista/estado existente conservado e integrado al diseño y navegación compartidos. |
-| P14 | Admin: revisar el cambio · Paso 1 de 2 | UI_EXISTENTE_ADAPTADA · Dos confirmaciones centrales antes de enviar la mutación. No equivalen a auditoría persistida. |
-| P15 | Admin: eliminación con historial conservado | UI_EXISTENTE_ADAPTADA · Cancelar usa updateTicket con estado 4; no ejecuta deleteTicket ni elimina el historial. |
-| P16 | Equipo | UI_EXISTENTE_ADAPTADA · Vista/estado existente conservado e integrado al diseño y navegación compartidos. |
-| P17 | Usuarios | UI_EXISTENTE_ADAPTADA · Vista/estado existente conservado e integrado al diseño y navegación compartidos. |
-| P18 | Perfil del colaborador | BASE_EXISTENTE_PARCIAL · Perfil real y conteo de tickets creados. Inventario y rendimiento no se simulan. |
-| P19 | Perfil: mantenimiento y equipo | API_DATOS_PENDIENTES · Sin fuente real de inventario/mantenimiento en el perfil; se indica la dependencia. |
-| P20 | Admin: métricas globales de tickets de Informática | DEMO_HEREDADA · Estadísticas heredadas de demostración, identificadas. El inicio admin usa su API existente. |
-| P21 | Informática: revisar solicitudes de acceso | DEMO_HEREDADA · Datos heredados de demostración; configuración solo de lectura, sin mutaciones. |
-| P22 | Módulos | DEMO_HEREDADA · Datos heredados de demostración; configuración solo de lectura, sin mutaciones. |
-| P23 | Permisos: INSERTAR, LEER, EDITAR y ELIMINAR | DEMO_HEREDADA · Datos heredados de demostración; configuración solo de lectura, sin mutaciones. |
-| P24 | Rol: módulos y permisos de operación | DEMO_HEREDADA · Datos heredados de demostración; configuración solo de lectura, sin mutaciones. |
-| P25 | Asignación de perfiles y excepciones | DEMO_HEREDADA · Datos heredados de demostración; configuración solo de lectura, sin mutaciones. |
-| P26 | Crear módulo | DEMO_HEREDADA · Vista de demostración deshabilitada hasta conectar un catálogo autorizado real. |
-| P27 | Asignar operaciones al módulo | DEMO_HEREDADA · Vista de demostración deshabilitada hasta conectar un catálogo autorizado real. |
-| P28 | Crear o editar rol | DEMO_HEREDADA · Vista de demostración deshabilitada hasta conectar un catálogo autorizado real. |
-| P29A | Reporte semanal · Información general | UI_EXISTENTE_ADAPTADA · Vista/estado existente conservado e integrado al diseño y navegación compartidos. |
-| P29B | Reporte semanal · Indicadores y tareas | UI_EXISTENTE_ADAPTADA · Vista/estado existente conservado e integrado al diseño y navegación compartidos. |
-| P29C | Reporte semanal · Riesgos y próxima semana | UI_EXISTENTE_ADAPTADA · Vista/estado existente conservado e integrado al diseño y navegación compartidos. |
-| P30 | Reporte semanal guardado | UI_EXISTENTE_ADAPTADA · Vista/estado existente conservado e integrado al diseño y navegación compartidos. |
-| P31 | Exportar reportes semanales | UI_EXISTENTE_ADAPTADA · Vista/estado existente conservado e integrado al diseño y navegación compartidos. |
-| P32 | Dashboard de proyectos | DEMO_HEREDADA · Dashboard heredado con datos de demostración, ahora identificado. |
-| P33 | Dashboard de colaboradores | DEMO_HEREDADA · Dashboard heredado con datos de demostración, ahora identificado. |
-| P34 | Visa de nómina | UI_EXISTENTE_ADAPTADA · Vista/estado existente conservado e integrado al diseño y navegación compartidos. |
-| P35 | Reporte de Recursos Humanos | UI_EXISTENTE_ADAPTADA · Vista/estado existente conservado e integrado al diseño y navegación compartidos. |
-| P36 | Permisos por aplicación | UI_EXISTENTE_ADAPTADA · Vista/estado existente conservado e integrado al diseño y navegación compartidos. |
-| P37 | Manuales y visor PDF | UI_EXISTENTE_ADAPTADA · Vista/estado existente conservado e integrado al diseño y navegación compartidos. |
-| P38 | Reporte de anulados | UI_EXISTENTE_ADAPTADA · Vista/estado existente conservado e integrado al diseño y navegación compartidos. |
-| P39 | Notificar documento | UI_EXISTENTE_ADAPTADA · Vista/estado existente conservado e integrado al diseño y navegación compartidos. |
-| P40 | Confirmar notificación | UI_EXISTENTE_ADAPTADA · Vista/estado existente conservado e integrado al diseño y navegación compartidos. |
-| P41 | Búsqueda EMETRA | DEMO_HEREDADA · Consulta heredada con datos de demostración, ahora identificada. |
-| P42 | Consulta de vehículos | UI_EXISTENTE_ADAPTADA · Vista/estado existente conservado e integrado al diseño y navegación compartidos. |
-| P43 | Ejecutar proceso | UI_EXISTENTE_ADAPTADA · Vista/estado existente conservado e integrado al diseño y navegación compartidos. |
-| P44 | Resultado de un proceso | UI_EXISTENTE_ADAPTADA · Vista/estado existente conservado e integrado al diseño y navegación compartidos. |
-| P45 | Noticias | UI_EXISTENTE_ADAPTADA · Se conserva el flujo COM03 existente: lista, edición, recursos, vista previa y publicación con sus permisos. |
-| P46 | Crear y editar noticia | UI_EXISTENTE_ADAPTADA · Se conserva el flujo COM03 existente: lista, edición, recursos, vista previa y publicación con sus permisos. |
-| P47 | Editar una sección de noticia | UI_EXISTENTE_ADAPTADA · Se conserva el flujo COM03 existente: lista, edición, recursos, vista previa y publicación con sus permisos. |
-| P48 | Vista previa de noticia | UI_EXISTENTE_ADAPTADA · Se conserva el flujo COM03 existente: lista, edición, recursos, vista previa y publicación con sus permisos. |
-| P49 | Confirmar publicación | UI_EXISTENTE_ADAPTADA · Se conserva el flujo COM03 existente: lista, edición, recursos, vista previa y publicación con sus permisos. |
-| P50 | Resultado de publicación | UI_EXISTENTE_ADAPTADA · Se conserva el flujo COM03 existente: lista, edición, recursos, vista previa y publicación con sus permisos. |
-| P51 | Consultar caso | UI_EXISTENTE_ADAPTADA · Se conserva JUZ01 existente, evidencias privadas, defensa, actuaciones, resolución y PDF con permisos. |
-| P52 | Caso: evidencia, análisis y defensa | UI_EXISTENTE_ADAPTADA · Se conserva JUZ01 existente, evidencias privadas, defensa, actuaciones, resolución y PDF con permisos. |
-| P53 | Caso: adaptación a tablet | UI_EXISTENTE_ADAPTADA · Se conserva JUZ01 existente, evidencias privadas, defensa, actuaciones, resolución y PDF con permisos. |
-| P54 | Evidencia ampliada | UI_EXISTENTE_ADAPTADA · Se conserva JUZ01 existente, evidencias privadas, defensa, actuaciones, resolución y PDF con permisos. |
-| P55 | Recibir defensa en el juzgado | UI_EXISTENTE_ADAPTADA · Se conserva JUZ01 existente, evidencias privadas, defensa, actuaciones, resolución y PDF con permisos. |
-| P56 | Registrar una actuación | UI_EXISTENTE_ADAPTADA · Se conserva JUZ01 existente, evidencias privadas, defensa, actuaciones, resolución y PDF con permisos. |
-| P57 | Resolver defensa | UI_EXISTENTE_ADAPTADA · Se conserva JUZ01 existente, evidencias privadas, defensa, actuaciones, resolución y PDF con permisos. |
-| P58 | Confirmar resolución | UI_EXISTENTE_ADAPTADA · Se conserva JUZ01 existente, evidencias privadas, defensa, actuaciones, resolución y PDF con permisos. |
-| P59 | Resolución y documento PDF | UI_EXISTENTE_ADAPTADA · Se conserva JUZ01 existente, evidencias privadas, defensa, actuaciones, resolución y PDF con permisos. |
-| P60 | Sin permiso de acceso | UI_EXISTENTE_ADAPTADA · Vista/estado existente conservado e integrado al diseño y navegación compartidos. |
-| P61 | Página no encontrada | UI_EXISTENTE_ADAPTADA · Vista/estado existente conservado e integrado al diseño y navegación compartidos. |
-| P62 | No se pudo cargar la información | UI_EXISTENTE_ADAPTADA · Vista/estado existente conservado e integrado al diseño y navegación compartidos. |
-| P63 | Inicio: Jefatura de unidad | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P64 | Inicio: Desarrollador | BASE_EXISTENTE_PARCIAL · Desarrollador conserva inicio técnico del rol DESARROLLADOR. Sistemas a cargo pendientes. |
-| P65 | Inicio: Asignación · Informática | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P66 | Bandeja de asignación | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P67 | Asignados sin primera atención | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P68 | Asignar desde la bandeja de la secretaria | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P69 | Admin: confirmar el cambio · Paso 2 de 2 | UI_EXISTENTE_ADAPTADA · Segundo paso central con casilla explícita y cancelación sin petición. |
-| P70 | Admin: autoasignación de un ticket propio | UI_EXISTENTE_ADAPTADA · Solo ADMINISTRADOR autoasigna los tickets que crea con su propio ID. |
-| P71 | Calendario: vista de todos los usuarios | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P72 | Calendario: gestión de una jefatura | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P73 | Crear actividad de equipo | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P74 | Solicitudes de mi equipo | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P75 | Jefatura: solicitar usuario nuevo | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P76 | Informática: resolver una solicitud de acceso | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P77 | Perfiles de trabajo | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P78 | Perfil: roles incluidos y acceso resultante | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P79 | Alta de usuario: elegir una base de permisos | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P80 | Copiar accesos: revisar antes de aplicar | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P81 | Usuario: perfil base y excepciones individuales | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P82 | Permisos: revisar impacto antes de confirmar | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P83 | Trazabilidad de movimientos | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P84 | Movimiento: antes, después y confirmaciones | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P85 | Equipos de Informática | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P86 | Registrar o actualizar equipo | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P87 | Registrar mantenimiento o visita técnica | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P88 | Generar baja o salida de equipo | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P89 | Instalaciones a mi cargo | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P90 | Topología: switch, router y conexiones | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P91 | Registrar o actualizar punto de red | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P92 | Sistemas a mi cargo | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P93 | Sistema: front, back y servidor | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P94 | Repositorios y despliegues vinculados | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P95 | Incidentes de aplicaciones | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P96 | Estado de esquema y objetos | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P97 | Mis métricas de atención | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P98 | Jefatura: métricas de sus equipos | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P99 | Mis métricas: tickets y actividad de aplicaciones | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P100 | Permisos: confirmar y aplicar · Paso 2 de 2 | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P101 | Resolver un ticket asignado | UI_EXISTENTE_ADAPTADA · Flujo existente en detalle del ticket para pasar a trabajo y completar; backend conserva su validación. |
-| P102 | Incidente: contexto y relación con un ticket | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P103 | Solicitar acceso para un miembro | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P104 | Mi actividad en aplicaciones | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P105 | Jefatura: actividad de aplicaciones de su equipo | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P106 | Registros que forman un indicador | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P107 | Switch: puertos y equipos conectados | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P108 | Agregar o editar un dispositivo de red | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P109 | Conectar dispositivos por sus puertos | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P110 | Dispositivo: ficha, revisión y mantenimiento | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P118 | Plano físico: ubicación de los puntos | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P111 | Servidores: vista de DevOps | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P112 | Servidor: recursos y contenedores | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P113 | Contenedor: estado, versión y logs | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P114 | Logs: consulta filtrada del recurso | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P115 | Jefatura: servidores y contenedores autorizados | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P116 | Monitoreo: lectura antigua o fuente no disponible | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
-| P117 | Logs: acceso de lectura no otorgado | API_DATOS_PENDIENTES · Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función. |
+| P01 | Inicio de sesión | UI_EXISTENTE_ADAPTADA |
+| P02 | Error de acceso o carga de perfil | UI_EXISTENTE_ADAPTADA |
+| P03 | Recuperación de contraseña | CONFIGURACION_PENDIENTE |
+| P04 | Inicio del usuario: acciones recientes y accesos | /home |
+| P05 | Inicio: Admin · Informática | /home |
+| P06 | Inicio: Técnico · Informática | /home |
+| P07 | Aplicaciones y secciones | UI_EXISTENTE_ADAPTADA |
+| P08 | Módulos de una sección | UI_EXISTENTE_ADAPTADA |
+| P09 | Tickets | /espacio/asignacion |
+| P10 | Mis tickets | /espacio/asignacion |
+| P11 | Crear ticket | UI_EXISTENTE_ADAPTADA |
+| P12 | Detalle del ticket: conversación | /espacio/asignacion |
+| P13 | Historial del ticket | /espacio/asignacion |
+| P14 | Admin: revisar el cambio · Paso 1 de 2 | UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION |
+| P15 | Admin: eliminación con historial conservado | /espacio/asignacion |
+| P16 | Equipo | UI_EXISTENTE_ADAPTADA |
+| P17 | Usuarios | UI_EXISTENTE_ADAPTADA |
+| P18 | Perfil del colaborador | UI_EXISTENTE_ADAPTADA |
+| P19 | Perfil: mantenimiento y equipo | /espacio/inventario |
+| P20 | Admin: métricas globales de tickets de Informática | /espacio/metricas |
+| P21 | Informática: revisar solicitudes de acceso | /espacio/solicitudes |
+| P22 | Módulos | /espacio/accesos |
+| P23 | Permisos: INSERTAR, LEER, EDITAR y ELIMINAR | /espacio/accesos |
+| P24 | Rol: módulos y permisos de operación | /espacio/accesos |
+| P25 | Asignación de perfiles y excepciones | /espacio/accesos |
+| P26 | Crear módulo | /espacio/accesos |
+| P27 | Asignar operaciones al módulo | /espacio/accesos |
+| P28 | Crear o editar rol | /espacio/accesos |
+| P29A | Reporte semanal · Información general | UI_EXISTENTE_ADAPTADA |
+| P29B | Reporte semanal · Indicadores y tareas | UI_EXISTENTE_ADAPTADA |
+| P29C | Reporte semanal · Riesgos y próxima semana | UI_EXISTENTE_ADAPTADA |
+| P30 | Reporte semanal guardado | UI_EXISTENTE_ADAPTADA |
+| P31 | Exportar reportes semanales | UI_EXISTENTE_ADAPTADA |
+| P32 | Dashboard de proyectos | /espacio/metricas |
+| P33 | Dashboard de colaboradores | /espacio/metricas |
+| P34 | Visa de nómina | UI_EXISTENTE_ADAPTADA |
+| P35 | Reporte de Recursos Humanos | UI_EXISTENTE_ADAPTADA |
+| P36 | Permisos por aplicación | UI_EXISTENTE_ADAPTADA |
+| P37 | Manuales y visor PDF | UI_EXISTENTE_ADAPTADA |
+| P38 | Reporte de anulados | UI_EXISTENTE_ADAPTADA |
+| P39 | Notificar documento | UI_EXISTENTE_ADAPTADA |
+| P40 | Confirmar notificación | UI_EXISTENTE_ADAPTADA |
+| P41 | Búsqueda EMETRA | DEMO_HEREDADA |
+| P42 | Consulta de vehículos | UI_EXISTENTE_ADAPTADA |
+| P43 | Ejecutar proceso | UI_EXISTENTE_ADAPTADA |
+| P44 | Resultado de un proceso | UI_EXISTENTE_ADAPTADA |
+| P45 | Noticias | UI_EXISTENTE_ADAPTADA |
+| P46 | Crear y editar noticia | UI_EXISTENTE_ADAPTADA |
+| P47 | Editar una sección de noticia | UI_EXISTENTE_ADAPTADA |
+| P48 | Vista previa de noticia | UI_EXISTENTE_ADAPTADA |
+| P49 | Confirmar publicación | UI_EXISTENTE_ADAPTADA |
+| P50 | Resultado de publicación | UI_EXISTENTE_ADAPTADA |
+| P51 | Consultar caso | UI_EXISTENTE_ADAPTADA |
+| P52 | Caso: evidencia, análisis y defensa | UI_EXISTENTE_ADAPTADA |
+| P53 | Caso: adaptación a tablet | UI_EXISTENTE_ADAPTADA |
+| P54 | Evidencia ampliada | UI_EXISTENTE_ADAPTADA |
+| P55 | Recibir defensa en el juzgado | UI_EXISTENTE_ADAPTADA |
+| P56 | Registrar una actuación | UI_EXISTENTE_ADAPTADA |
+| P57 | Resolver defensa | UI_EXISTENTE_ADAPTADA |
+| P58 | Confirmar resolución | UI_EXISTENTE_ADAPTADA |
+| P59 | Resolución y documento PDF | UI_EXISTENTE_ADAPTADA |
+| P60 | Sin permiso de acceso | UI_EXISTENTE_ADAPTADA |
+| P61 | Página no encontrada | UI_EXISTENTE_ADAPTADA |
+| P62 | No se pudo cargar la información | UI_EXISTENTE_ADAPTADA |
+| P63 | Inicio: Jefatura de unidad | /home |
+| P64 | Inicio: Desarrollador | /home |
+| P65 | Inicio: Asignación · Informática | /home |
+| P66 | Bandeja de asignación | /espacio/asignacion |
+| P67 | Asignados sin primera atención | /espacio/asignacion |
+| P68 | Asignar desde la bandeja de la secretaria | /espacio/asignacion |
+| P69 | Admin: confirmar el cambio · Paso 2 de 2 | UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION |
+| P70 | Admin: autoasignación de un ticket propio | /tickets-creation |
+| P71 | Calendario: vista de todos los usuarios | /espacio/calendario |
+| P72 | Calendario: gestión de una jefatura | /espacio/calendario |
+| P73 | Crear actividad de equipo | /espacio/calendario |
+| P74 | Solicitudes de mi equipo | /espacio/solicitudes |
+| P75 | Jefatura: solicitar usuario nuevo | /espacio/solicitudes |
+| P76 | Informática: resolver una solicitud de acceso | /espacio/solicitudes |
+| P77 | Perfiles de trabajo | /espacio/accesos |
+| P78 | Perfil: roles incluidos y acceso resultante | /espacio/accesos |
+| P79 | Alta de usuario: elegir una base de permisos | /espacio/solicitudes |
+| P80 | Copiar accesos: revisar antes de aplicar | /espacio/accesos |
+| P81 | Usuario: perfil base y excepciones individuales | /espacio/accesos |
+| P82 | Permisos: revisar impacto antes de confirmar | /espacio/accesos |
+| P83 | Trazabilidad de movimientos | /espacio/auditoria |
+| P84 | Movimiento: antes, después y confirmaciones | /espacio/auditoria |
+| P85 | Equipos de Informática | /espacio/inventario |
+| P86 | Registrar o actualizar equipo | /espacio/inventario |
+| P87 | Registrar mantenimiento o visita técnica | /espacio/inventario |
+| P88 | Generar baja o salida de equipo | /espacio/inventario |
+| P89 | Instalaciones a mi cargo | /espacio/inventario |
+| P90 | Topología: switch, router y conexiones | /espacio/red |
+| P91 | Registrar o actualizar punto de red | /espacio/red |
+| P92 | Sistemas a mi cargo | /espacio/sistemas |
+| P93 | Sistema: front, back y servidor | /espacio/sistemas |
+| P94 | Repositorios y despliegues vinculados | /espacio/sistemas |
+| P95 | Incidentes de aplicaciones | /espacio/sistemas |
+| P96 | Estado de esquema y objetos | /espacio/sistemas |
+| P97 | Mis métricas de atención | /espacio/metricas |
+| P98 | Jefatura: métricas de sus equipos | /espacio/metricas |
+| P99 | Mis métricas: tickets y actividad de aplicaciones | /espacio/metricas |
+| P100 | Permisos: confirmar y aplicar · Paso 2 de 2 | /espacio/accesos |
+| P101 | Resolver un ticket asignado | /espacio/asignacion |
+| P102 | Incidente: contexto y relación con un ticket | /espacio/sistemas |
+| P103 | Solicitar acceso para un miembro | /espacio/solicitudes |
+| P104 | Mi actividad en aplicaciones | /espacio/metricas |
+| P105 | Jefatura: actividad de aplicaciones de su equipo | /espacio/metricas |
+| P106 | Registros que forman un indicador | /espacio/metricas |
+| P107 | Switch: puertos y equipos conectados | /espacio/red |
+| P108 | Agregar o editar un dispositivo de red | /espacio/red |
+| P109 | Conectar dispositivos por sus puertos | /espacio/red |
+| P110 | Dispositivo: ficha, revisión y mantenimiento | /espacio/red |
+| P118 | Plano físico: ubicación de los puntos | /espacio/red |
+| P111 | Servidores: vista de DevOps | /espacio/infraestructura |
+| P112 | Servidor: recursos y contenedores | /espacio/infraestructura |
+| P113 | Contenedor: estado, versión y logs | /espacio/infraestructura |
+| P114 | Logs: consulta filtrada del recurso | /espacio/infraestructura |
+| P115 | Jefatura: servidores y contenedores autorizados | /espacio/infraestructura |
+| P116 | Monitoreo: lectura antigua o fuente no disponible | /espacio/infraestructura |
+| P117 | Logs: acceso de lectura no otorgado | /espacio/infraestructura |

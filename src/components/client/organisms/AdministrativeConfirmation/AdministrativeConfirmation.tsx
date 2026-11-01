@@ -9,8 +9,8 @@ import { Button } from "../../atoms/Button";
 import styles from "./AdministrativeConfirmation.module.scss";
 
 type Pending = {
-  change: AdministrativeChange;
-  resolve: (confirmed: boolean) => void;
+    change: AdministrativeChange;
+    resolve: (confirmed: boolean) => void;
 };
 export function AdministrativeConfirmation() {
     const dialog = useRef<HTMLDialogElement>(null);
@@ -19,6 +19,8 @@ export function AdministrativeConfirmation() {
     const [pending, setPending] = useState<Pending | null>(null);
     const [step, setStep] = useState(1);
     const [checked, setChecked] = useState(false);
+    const [busy, setBusy] = useState(false);
+    const [error, setError] = useState("");
     const userName = useAuthStore(
         (state) => state.user?.nombre || "Administrador",
     );
@@ -61,6 +63,29 @@ export function AdministrativeConfirmation() {
         setPending(next);
         setStep(1);
         setChecked(false);
+        setError("");
+    };
+    const advance = async () => {
+        if (busy || !pending || (step === 2 && !checked)) return;
+        setBusy(true);
+        setError("");
+        try {
+            if (step === 1) {
+                await pending.change.onReview?.();
+                setStep(2);
+            } else {
+                await pending.change.onConfirm?.();
+                finish(true);
+            }
+        } catch (e) {
+            setError(
+                e instanceof Error
+                    ? e.message
+                    : "No se pudo confirmar. Intenta nuevamente.",
+            );
+        } finally {
+            setBusy(false);
+        }
     };
     return (
         <dialog
@@ -70,10 +95,13 @@ export function AdministrativeConfirmation() {
             aria-describedby="admin-confirm-description"
             onCancel={(event) => {
                 event.preventDefault();
-                finish(false);
+                if (!busy) finish(false);
             }}
         >
-            <div className={styles.progress} aria-label={`Confirmación ${step} de 2`}>
+            <div
+                className={styles.progress}
+                aria-label={`Confirmación ${step} de 2`}
+            >
                 <span className={styles.current}>1 · Revisar</span>
                 <span className={step === 2 ? styles.current : undefined}>
                     2 · Confirmar
@@ -102,21 +130,31 @@ export function AdministrativeConfirmation() {
                     He revisado la acción y quiero aplicarla.
                 </label>
             )}
+            {error && <p role="alert">{error}</p>}
             <div className={styles.actions}>
-                <Button type="button" variant="outlined" onClick={() => finish(false)}>
+                <Button
+                    type="button"
+                    variant="outlined"
+                    onClick={() => finish(false)}
+                    state={busy ? "disabled" : "default"}
+                >
                     Cancelar
                 </Button>
                 {step === 1 ? (
-                    <Button type="button" onClick={() => setStep(2)}>
+                    <Button
+                        type="button"
+                        onClick={() => void advance()}
+                        state={busy ? "loading" : "default"}
+                    >
                         Confirmar revisión · 1 de 2
                     </Button>
                 ) : (
                     <Button
                         type="button"
-                        state={checked ? "default" : "disabled"}
-                        onClick={() => {
-                            if (checked) finish(true);
-                        }}
+                        state={
+                            busy ? "loading" : checked ? "default" : "disabled"
+                        }
+                        onClick={() => void advance()}
                     >
                         Confirmar y aplicar · 2 de 2
                     </Button>

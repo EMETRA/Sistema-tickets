@@ -21,20 +21,27 @@ import { MarkdownViewer } from "../../atoms/MarkdownViewer";
 import { useAuthStore } from "@/store/useAuthStore";
 
 // Constantes
-const ADMIN_GRID = "minmax(0, 1.8fr) minmax(0, 1fr) minmax(0, 1.4fr) minmax(0, 0.6fr) minmax(0, 0.9fr) minmax(0, 1.2fr) minmax(0, 1fr)";
-const TECH_DEV_GRID = "minmax(0, 1.8fr) minmax(0, 1fr) minmax(0, 1.4fr) minmax(0, 0.6fr) minmax(0, 0.9fr) minmax(0, 1fr)";
-const USER_GRID = "minmax(0, 1.8fr) minmax(0, 1fr) minmax(0, 1.4fr) minmax(0, 0.6fr) minmax(0, 0.9fr) minmax(0, 1fr)";
+const ADMIN_GRID =
+  "minmax(0, 1.8fr) minmax(0, 1fr) minmax(0, 1.4fr) minmax(0, 0.6fr) minmax(0, 0.9fr) minmax(0, 1.2fr) minmax(0, 1fr)";
+const TECH_DEV_GRID =
+  "minmax(0, 1.8fr) minmax(0, 1fr) minmax(0, 1.4fr) minmax(0, 0.6fr) minmax(0, 0.9fr) minmax(0, 1fr)";
+const USER_GRID =
+  "minmax(0, 1.8fr) minmax(0, 1fr) minmax(0, 1.4fr) minmax(0, 0.6fr) minmax(0, 0.9fr) minmax(0, 1fr)";
 
 const COMMON_GRID = {
-    "ADMINISTRADOR": ADMIN_GRID,
-    "TECNICO": TECH_DEV_GRID,
-    "DESARROLLADOR": TECH_DEV_GRID,
-    "USUARIO": USER_GRID,
-}
+    ADMINISTRADOR: ADMIN_GRID,
+    TECNICO: TECH_DEV_GRID,
+    DESARROLLADOR: TECH_DEV_GRID,
+    USUARIO: USER_GRID,
+};
 
 const FILTER_OPTIONS = [
     { label: "Asignados", value: "asignado", icon: "user-tag-solid" as const },
-    { label: "Sin asignar", value: "sin_asignar", icon: "user-clock-solid" as const },
+    {
+        label: "Sin asignar",
+        value: "sin_asignar",
+        icon: "user-clock-solid" as const,
+    },
     { label: "Completados", value: "completado", icon: "check-solid" as const },
     { label: "Cancelados", value: "cancelado", icon: "xmark-solid" as const },
 ];
@@ -57,8 +64,13 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
     const [selectedFilter, setSelectedFilter] = useState<string>("all");
     const [ticketToDelete, setTicketToDelete] = useState<string | null>(null);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-    const [hiddenTicketIds, setHiddenTicketIds] = useState<Array<string | number>>([]);
-    const [pendingCancellation, setPendingCancellation] = useState<{ id: string; title: string } | null>(null);
+    const [hiddenTicketIds, setHiddenTicketIds] = useState<
+    Array<string | number>
+  >([]);
+    const [pendingCancellation, setPendingCancellation] = useState<{
+    id: string;
+    title: string;
+  } | null>(null);
     const [openAssignedChipModal, setOpenAssignedChipModal] = useState(false);
     const [ticketToAssign, setTicketToAssign] = useState<string | null>(null);
     const [isAssigning, setIsAssigning] = useState(false);
@@ -67,9 +79,10 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
 
     const { getRole } = useAuthStore();
 
-    const visibleTickets = useMemo(() => (
-        tickets.filter((ticket) => !hiddenTicketIds.includes(ticket.id))
-    ), [tickets, hiddenTicketIds]);
+    const visibleTickets = useMemo(
+        () => tickets.filter((ticket) => !hiddenTicketIds.includes(ticket.id)),
+        [tickets, hiddenTicketIds],
+    );
 
     // Filtrar tickets según el filtro seleccionado y el miembro seleccionado
     const filteredTickets = useMemo(() => {
@@ -77,13 +90,23 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
 
         // Filtrar por tipo (Asignados/Sin Asignar/Finalizados/Cancelados)
         if (selectedFilter === "asignado") {
-            filtered = filtered.filter(ticket => ticket.assignedTo !== null && ticket.assignedTo !== undefined);
+            filtered = filtered.filter(
+                (ticket) =>
+                    ticket.assignedTo !== null && ticket.assignedTo !== undefined,
+            );
         } else if (selectedFilter === "sin_asignar") {
-            filtered = filtered.filter(ticket => ticket.assignedTo === null || ticket.assignedTo === undefined);
+            filtered = filtered.filter(
+                (ticket) =>
+                    ticket.assignedTo === null || ticket.assignedTo === undefined,
+            );
         } else if (selectedFilter === "completado") {
-            filtered = filtered.filter(ticket => ticket.status.state === "completado");
+            filtered = filtered.filter(
+                (ticket) => ticket.status.state === "completado",
+            );
         } else if (selectedFilter === "cancelado") {
-            filtered = filtered.filter(ticket => ticket.status.state === "cancelado");
+            filtered = filtered.filter(
+                (ticket) => ticket.status.state === "cancelado",
+            );
         }
 
         return filtered;
@@ -102,8 +125,12 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
     // Confirmar cancelación y mostrar ventana para revertir
     const handleConfirmDelete = () => {
         if (ticketToDelete !== null) {
-            const selectedTicket = tickets.find((ticket) => ticket.id === ticketToDelete);
-            setHiddenTicketIds((prev) => (prev.includes(ticketToDelete) ? prev : [...prev, ticketToDelete]));
+            const selectedTicket = tickets.find(
+                (ticket) => ticket.id === ticketToDelete,
+            );
+            setHiddenTicketIds((prev) =>
+                prev.includes(ticketToDelete) ? prev : [...prev, ticketToDelete],
+            );
             setPendingCancellation({
                 id: ticketToDelete,
                 title: selectedTicket?.title || "Ticket",
@@ -124,7 +151,9 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
             return;
         }
 
-        setHiddenTicketIds((prev) => prev.filter((id) => id !== pendingCancellation.id));
+        setHiddenTicketIds((prev) =>
+            prev.filter((id) => id !== pendingCancellation.id),
+        );
         setPendingCancellation(null);
     };
 
@@ -207,7 +236,12 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
             { content: <MarkdownViewer content={ticket.description} color="#666" /> },
             { content: <Text variant="muted">{ticket.date}</Text> },
             {
-                content: <TicketStateChip label={ticket.status.label} state={ticket.status.state} />,
+                content: (
+                    <TicketStateChip
+                        label={ticket.status.label}
+                        state={ticket.status.state}
+                    />
+                ),
                 align: "center",
             },
             {
@@ -216,16 +250,18 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
                         {!ticket.assignedTo && (
                             <IconButton
                                 icon="trash-solid"
+                                aria-label={`Cancelar ticket ${ticket.title}`}
                                 size={24}
-                                iconColor="#BDBDBD"
+                                iconColor="#61728b"
                                 disabled={!!pendingCancellation || isAssigning}
                                 onClick={() => handleDeleteClick(ticket.id)}
                             />
                         )}
                         <IconButton
                             icon="eye"
+                            aria-label={`Ver detalle de ${ticket.title}`}
                             size={24}
-                            iconColor="#BDBDBD"
+                            iconColor="#61728b"
                             disabled={!!pendingCancellation || isAssigning}
                             onClick={() => setSelectedTicketId(ticket.id)}
                         />
@@ -259,7 +295,12 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
             { content: <MarkdownViewer content={ticket.description} color="#666" /> },
             { content: <Text variant="muted">{ticket.date}</Text> },
             {
-                content: <TicketStateChip label={ticket.status.label} state={ticket.status.state} />,
+                content: (
+                    <TicketStateChip
+                        label={ticket.status.label}
+                        state={ticket.status.state}
+                    />
+                ),
                 align: "center",
             },
             {
@@ -267,8 +308,9 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
                     <div className={styles.actions}>
                         <IconButton
                             icon="eye"
+                            aria-label={`Ver detalle de ${ticket.title}`}
                             size={24}
-                            iconColor="#BDBDBD"
+                            iconColor="#61728b"
                             disabled={!!pendingCancellation || isAssigning}
                             onClick={() => setSelectedTicketId(ticket.id)}
                         />
@@ -302,7 +344,12 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
             { content: <MarkdownViewer content={ticket.description} color="#666" /> },
             { content: <Text variant="muted">{ticket.date}</Text> },
             {
-                content: <TicketStateChip label={ticket.status.label} state={ticket.status.state} />,
+                content: (
+                    <TicketStateChip
+                        label={ticket.status.label}
+                        state={ticket.status.state}
+                    />
+                ),
                 align: "center",
             },
             {
@@ -326,15 +373,17 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
                     <div className={styles.actions}>
                         <IconButton
                             icon="trash-solid"
+                            aria-label={`Cancelar ticket ${ticket.title}`}
                             size={24}
-                            iconColor="#BDBDBD"
+                            iconColor="#61728b"
                             disabled={!!pendingCancellation || isAssigning}
                             onClick={() => handleDeleteClick(ticket.id)}
                         />
                         <IconButton
                             icon="eye"
+                            aria-label={`Ver detalle de ${ticket.title}`}
                             size={24}
-                            iconColor="#BDBDBD"
+                            iconColor="#61728b"
                             disabled={!!pendingCancellation || isAssigning}
                             onClick={() => setSelectedTicketId(ticket.id)}
                         />
@@ -344,7 +393,12 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
             },
         ] as TableCellConfig[];
 
-        const cells = getRole() === "ADMINISTRADOR" ? adminCells : getRole() === "TECNICO" || getRole() === "DESARROLLADOR" ? techDevCells : userCells;
+        const cells =
+      getRole() === "ADMINISTRADOR"
+          ? adminCells
+          : getRole() === "TECNICO" || getRole() === "DESARROLLADOR"
+              ? techDevCells
+              : userCells;
 
         return (
             <TableRow
@@ -390,7 +444,7 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
             { icon: "magnifying-glass-solid", label: "Status Actual" },
             { icon: "hand-regular", label: "Acciones" },
         ],
-    }
+    };
 
     return (
         <div className={classNames(styles.TicketsTablePanel, className)}>
@@ -400,7 +454,12 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
                 selectedFilter={selectedFilter}
                 onFilterChange={setSelectedFilter}
                 onExport={onExport || (() => {})}
-                disabled={loading || !!pendingCancellation || isAssigning || tickets.length === 0}
+                disabled={
+                    loading ||
+          !!pendingCancellation ||
+          isAssigning ||
+          tickets.length === 0
+                }
             />
 
             {/* Tabla de tickets */}

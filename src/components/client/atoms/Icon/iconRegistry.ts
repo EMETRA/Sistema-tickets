@@ -10,6 +10,10 @@
 
 /** Nombres de archivo en public/svgs (sin .svg) */
 export const ICON_FILES = [
+    "bars-solid",
+    "plus-solid",
+    "table-cells-large-solid",
+    "right-from-bracket-solid",
     "adress-book-regular",
     "adress-card-solid",
     "angle-down-solid",
@@ -150,7 +154,7 @@ export function resolveIconFile(name: string): SvgFileName {
 
     if (process.env.NODE_ENV === "development") {
         console.warn(
-            `[Icon] Ícono desconocido "${name}". Usando fallback "${DEFAULT_ICON_FILE}".`
+            `[Icon] Ícono desconocido "${name}". Usando fallback "${DEFAULT_ICON_FILE}".`,
         );
     }
 

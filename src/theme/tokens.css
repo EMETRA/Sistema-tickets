@@ -1,0 +1,20 @@
+:root {
+  --tickets-primary: #4361ee;
+  --tickets-primary-hover: #3654db;
+  --tickets-primary-soft: #edf1ff;
+  --tickets-surface: #ffffff;
+  --tickets-background: #f4f6fb;
+  --tickets-text: #263b58;
+  --tickets-text-secondary: #61728b;
+  --tickets-text-muted: #7b8ba2;
+  --tickets-border: #dfe5f2;
+  --tickets-success: #177849;
+  --tickets-danger: #ba3544;
+  --tickets-warning: #80540d;
+  --tickets-radius: 14px;
+  --tickets-control-radius: 9px;
+  --tickets-shadow: 0 2px 8px #20396308;
+  --tickets-focus: 0 0 0 3px #4361ee25;
+  --tickets-sidebar: 228px;
+  --tickets-page-padding: clamp(18px, 2.2vw, 32px);
+}

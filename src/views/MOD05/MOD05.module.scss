@@ -1,51 +1,69 @@
 .mainContainer {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .formContainer {
-    width: 90%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
-    padding: 20px 40px;
-    border-radius: 8px;
-    border: 1px solid #e0e0e0;
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 20px 40px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
 }
 
 .title {
-    width: 100%;
-    text-align: start;
+  width: 100%;
+  text-align: start;
 }
 
 .completedTasksFilters {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    gap: 40px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  gap: 40px;
 }
 
 .fieldsSelection {
-    width: 100%;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
 }
 
-.fieldStatus, .fieldStartDate, .fieldEndDate {
-    width: 100%;
+.fieldStatus,
+.fieldStartDate,
+.fieldEndDate {
+  width: 100%;
 }
 
 .executeButton {
-    align-self: flex-end;
+  align-self: flex-end;
 }
 
 .errorText {
-    margin-top: 10px;
-    color: red;
+  margin-top: 10px;
+  color: red;
 }
+
+.formContainer {
+  width: min(100%, 1120px);
+  max-width: 100%;
+  align-self: flex-start;
+  align-items: stretch;
+  padding: clamp(18px, 2.3vw, 30px);
+  border: 1px solid var(--tickets-border);
+  border-radius: var(--tickets-radius);
+  background: var(--tickets-surface);
+  box-shadow: var(--tickets-shadow);
+}
+
+.completedTasksFilters { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)); gap: 20px; min-width: 0; > * { min-width: 0; } }
+
+.errorText { overflow-wrap: anywhere; }

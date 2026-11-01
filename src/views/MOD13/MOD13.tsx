@@ -1,4 +1,5 @@
 "use client";
+import { DemoNotice } from "@/components/client/molecules/DemoNotice/DemoNotice";
 
 import { useState } from "react";
 import styles from "./MOD13.module.scss";
@@ -55,8 +56,8 @@ export default function MOD13() {
 
     return (
         <div className={styles.content}>
+            <DemoNotice />
             <div className={styles.wrapper}>
-
                 {/* Search */}
                 <p className={styles.searchLabel}>Búsqueda EMETRA</p>
                 <div className={styles.searchBox}>
@@ -78,9 +79,26 @@ export default function MOD13() {
                         {loading ? (
                             <span className={styles.spinner} />
                         ) : (
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                                <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" />
-                                <path d="M16.5 16.5L21 21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                            <svg
+                                width="16"
+                                height="16"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                aria-hidden="true"
+                            >
+                                <circle
+                                    cx="11"
+                                    cy="11"
+                                    r="7"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                />
+                                <path
+                                    d="M16.5 16.5L21 21"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                />
                             </svg>
                         )}
                     </button>
@@ -94,7 +112,9 @@ export default function MOD13() {
                                 <h2 className={styles.sectionTitle}>Errores</h2>
                                 <div className={styles.errorBox}>
                                     {result.errors.map((err, i) => (
-                                        <p key={i} className={styles.errorLine}>{err}</p>
+                                        <p key={i} className={styles.errorLine}>
+                                            {err}
+                                        </p>
                                     ))}
                                 </div>
                             </section>
@@ -106,7 +126,9 @@ export default function MOD13() {
                                 <h2 className={styles.sectionTitle}>Depuración</h2>
                                 <div className={styles.debugBox}>
                                     {result.debugLines.map((line, i) => (
-                                        <p key={i} className={styles.debugLine}>{line}</p>
+                                        <p key={i} className={styles.debugLine}>
+                                            {line}
+                                        </p>
                                     ))}
                                 </div>
                             </section>

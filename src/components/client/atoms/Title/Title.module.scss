@@ -1,19 +1,18 @@
-.title { 
-    font-family: var(--font-montserrat), sans-serif;
-    font-weight: 700; 
-    color: #1a1a1a; 
-    margin: 0; 
+.title {
+  font-family: var(--font-montserrat), sans-serif;
+  font-weight: 700;
+  color: var(--tickets-text, #263b58);
+  margin: 0;
 }
-.xlarge { 
-    font-family: 'Montserrat', 
-    sans-serif;
-    font-size: 3.5rem;
+.xlarge {
+  font-family: "Montserrat", sans-serif;
+  font-size: clamp(28px, 3vw, 40px);
 }
 .large {
-    font-family: var(--font-montserrat), sans-serif;
-    font-size: 2rem; 
+  font-family: var(--font-montserrat), sans-serif;
+  font-size: 28px;
 }
-.mid { 
-    font-family: var(--font-montserrat), sans-serif;
-    font-size: 1.5rem; 
+.mid {
+  font-family: var(--font-montserrat), sans-serif;
+  font-size: 20px;
 }

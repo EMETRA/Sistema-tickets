@@ -79,3 +79,14 @@
     grid-template-columns: repeat(6, minmax(0, 1fr));
   }
 }
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+@media (max-width: 650px) {
+  .metrics {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

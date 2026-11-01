@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * Hook useGetTicketsByUserId
@@ -12,9 +12,9 @@
  * 4. Hook retorna { data, loading, error, refetch }
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect } from "react";
 import { apiFetch } from "@/api/graphql/client";
-import { type Ticket } from '@/api/graphql/tickets';
+import { type Ticket } from "@/api/graphql/tickets";
 
 /**
  * Hook para obtener tickets desde el servidor
@@ -33,9 +33,10 @@ export function useGetTicketsByUserId(userId: string) {
     const [error, setError] = useState<Error | null>(null);
 
     /**
-     * Ejecuta fetch a /api/tickets con filtros
-     */
+   * Ejecuta fetch a /api/tickets con filtros
+   */
     const refetch = useCallback(async () => {
+        if (!Number.isSafeInteger(Number(userId)) || Number(userId) <= 0) return;
         setLoading(true);
         setError(null);
 

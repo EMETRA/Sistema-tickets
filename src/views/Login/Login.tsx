@@ -8,7 +8,7 @@ import { FormActions } from "@/components/client/molecules/FormActions";
 import { Input } from "@/components/client/atoms/Input";
 import { Button } from "@/components/client/atoms/Button";
 import { Link } from "@/components/client/atoms/Link";
-import { Image } from "@/components/client/atoms/Image";
+import { AccessLayout } from "@/components/client/templates/AccessLayout/AccessLayout";
 // TODO: Turnstile desactivado en el login (indicación de Elías y Feyser, 2026-10-07). Para
 // reactivarlo, descomentar el import, el estado captchaToken, la validación y el widget de abajo.
 // import { Turnstile } from "@/components/client/atoms/Turnstile/Turnstile";
@@ -32,21 +32,36 @@ const Login: React.FC = () => {
     // const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
     /**
-     * Obtener información del usuario desde el backend
-     * El token se envía automáticamente via apiFetch
-     */
-    const fetchUserInfo = async (token: string): Promise<UsuarioPerfil | null> => {
+   * Obtener información del usuario desde el backend
+   * El token se envía automáticamente via apiFetch
+   */
+    const fetchUserInfo = async (
+        token: string,
+    ): Promise<UsuarioPerfil | null> => {
         try {
             const response = await apiFetch<{ usuario: UsuarioPerfil }>(
                 "/api/usuario",
-                token
+                token,
             );
             return response.usuario || null;
         } catch (error) {
-            const e = error as { statusCode?: number; body?: { referencia?: string } };
-            const message = e.statusCode === 401 ? 'La sesión no fue validada. Vuelve a iniciar sesión.' : e.statusCode === 403 ? 'Tu cuenta no tiene permiso para consultar el perfil.' : 'Se obtuvo la respuesta de acceso, pero no se pudo cargar tu perfil. Intenta nuevamente.';
+            const e = error as {
+        statusCode?: number;
+        body?: { referencia?: string };
+      };
+            const message =
+        e.statusCode === 401
+            ? "La sesión no fue validada. Vuelve a iniciar sesión."
+            : e.statusCode === 403
+                ? "Tu cuenta no tiene permiso para consultar el perfil."
+                : "Se obtuvo la respuesta de acceso, pero no se pudo cargar tu perfil. Intenta nuevamente.";
             const referencia = e.body?.referencia;
-            throw new Error(message + (referencia && /^[a-f0-9-]{36}$/.test(referencia) ? ` Referencia: ${referencia}` : ''));
+            throw new Error(
+                message +
+          (referencia && /^[a-f0-9-]{36}$/.test(referencia)
+              ? ` Referencia: ${referencia}`
+              : ""),
+            );
         }
     };
 
@@ -85,10 +100,14 @@ const Login: React.FC = () => {
             };
 
             setAuth(response.token, normalizedUser);
-            
+
             router.push("/home");
         } catch (err) {
-            setError(err instanceof Error ? err.message : "No se pudo completar el inicio de sesión.");
+            setError(
+                err instanceof Error
+                    ? err.message
+                    : "No se pudo completar el inicio de sesión.",
+            );
             setClave("");
             // setCaptchaToken(null);
         } finally {
@@ -97,43 +116,47 @@ const Login: React.FC = () => {
         }
     };
 
-    return(
-        <div className={styles.mainContainer}>
-            <Title variant="xlarge" className={styles.title}>EMETRA</Title>
-            <div className={styles.contentContainer}>
-                <div className={styles.formContainer}>
-                    <form onSubmit={handleSubmit}>
-                        <div className={styles.headerContainer}>
-                            <Title variant="large">Iniciar Sesión</Title>
-                            <Text variant="caption" className={styles.headerText}>Bienvenido ingresa tus credenciales para acceder</Text>
-                        </div>
-                        <div className={styles.formFieldsContainer}>
-                            <FormField htmlFor="email" label="Usuario" required>
-                                <Input 
-                                    id="email"
-                                    placeholder="email@ejemplo.com"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    disabled={busy}
-                                    required
-                                />
-                            </FormField>
-                            <FormField htmlFor="clave" label="Contraseña" required>
-                                <Input 
-                                    id="clave" 
-                                    type="password" 
-                                    placeholder="Contraseña"
-                                    value={clave}
-                                    onChange={(e) => setClave(e.target.value)}
-                                    disabled={busy}
-                                    required
-                                    iconcolor="#000000"
-                                />
-                            </FormField>
-                            <Link href="/forgot-password" className={styles.forgotPasswordLink}>
-                                ¿Olvidaste tu contraseña?
-                            </Link>
-                            {/* <div className={styles.captchaContainer}>
+    return (
+        <AccessLayout>
+            <div className={styles.formContainer}>
+                <form onSubmit={handleSubmit}>
+                    <div className={styles.headerContainer}>
+                        <Title variant="large">Iniciar Sesión</Title>
+                        <Text variant="caption" className={styles.headerText}>
+                            Tu perfil y tus permisos se cargan después de validar tu cuenta.
+                        </Text>
+                    </div>
+                    <div className={styles.formFieldsContainer}>
+                        <FormField htmlFor="email" label="Usuario" required>
+                            <Input
+                                id="email"
+                                autoComplete="username"
+                                name="username"
+                                placeholder="email@ejemplo.com"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                disabled={busy}
+                                required
+                            />
+                        </FormField>
+                        <FormField htmlFor="clave" label="Contraseña" required>
+                            <Input
+                                id="clave"
+                                autoComplete="current-password"
+                                name="password"
+                                type="password"
+                                placeholder="Contraseña"
+                                value={clave}
+                                onChange={(e) => setClave(e.target.value)}
+                                disabled={busy}
+                                required
+                                iconcolor="#000000"
+                            />
+                        </FormField>
+                        <Link href="/forgot-password" className={styles.forgotPasswordLink}>
+                            ¿Olvidaste tu contraseña?
+                        </Link>
+                        {/* <div className={styles.captchaContainer}>
                                 <Turnstile
                                     onSuccess={(token) => setCaptchaToken(token)}
                                     onError={(message) => {
@@ -144,33 +167,29 @@ const Login: React.FC = () => {
                                     disabled={loading}
                                 />
                             </div> */}
-                            {(loginError || error) && (
-                                <Text variant="caption" className={styles.errorText}>
-                                    {error || loginError}
-                                </Text>
-                            )}
-                        </div>
-                        <FormActions className={styles.loginButton}>
-                            <Button 
-                                color="cancel" 
-                                fullWidth 
-                                type="submit"
-                                state={busy ? "loading" : "default"}
-                            >
-                                {busy ? "Iniciando..." : "Iniciar Sesión"}
-                            </Button>
-                        </FormActions>
-                    </form>
-                </div>
-                <div className={styles.infoContainer}>
-                    <Title variant="xlarge">Sistema de tickets EMETRA</Title>
-                    <Text variant="caption" className={styles.infoText}>
-                        Un sistema diseñado especialmente para ti para facilitarte el control de tus procesos de la mejor manera.
-                    </Text>
-                    <Image src="/images/login-info.png" alt="Información del sistema" width={1041} height={586} rounded={false} />
-                </div>
+                        {(loginError || error) && (
+                            <Text variant="caption" className={styles.errorText}>
+                                {error || loginError}
+                            </Text>
+                        )}
+                    </div>
+                    <FormActions className={styles.loginButton}>
+                        <Button
+                            color="default"
+                            fullWidth
+                            type="submit"
+                            state={busy ? "loading" : "default"}
+                        >
+                            {busy ? "Iniciando..." : "Iniciar Sesión"}
+                        </Button>
+                    </FormActions>
+                </form>
             </div>
-        </div>
+            <p className={styles.accessNote}>
+                El acceso a cada aplicación depende de los permisos otorgados por
+                Informática.
+            </p>
+        </AccessLayout>
     );
 };
 

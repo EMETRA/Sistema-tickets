@@ -1,0 +1,27 @@
+.heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  flex-wrap: wrap;
+  min-width: 0;
+  margin-bottom: 26px;
+  h1 {
+    color: var(--tickets-text);
+    font-size: clamp(23px, 2vw, 28px);
+    line-height: 1.3;
+    letter-spacing: -0.4px;
+  }
+  p {
+    color: var(--tickets-text-secondary);
+    font-size: 12px;
+    line-height: 1.8;
+    margin-top: 8px;
+    max-width: 800px;
+  }
+}
+.actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}

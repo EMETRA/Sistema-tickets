@@ -1,48 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
+import { ErrorHandler } from "@/api/graphql/errors";
 import { graphqlRequest } from "@/api/graphql/client";
-import { GET_USER_BY_ID_QUERY } from "@/api/graphql/home";
+import { GET_USER_BY_ID_QUERY, type UsuarioPerfil } from "@/api/graphql/home";
 
-/**
- * GET /api/usuario/[userId]
- *
- * Obtiene el perfil de un usuario específico por su ID
- */
-export async function GET(_request: NextRequest) {
+export async function GET(_request: NextRequest, context: { params: Promise<{ userId: string }> }) {
+    const { userId: raw } = await context.params;
+    const userId = Number(raw);
+    if (!/^\d+$/.test(raw) || !Number.isSafeInteger(userId) || userId <= 0) {
+        return NextResponse.json({ error: "El usuario no es válido." }, { status: 400 });
+    }
     try {
-        const url = new URL(_request.url);
-        const userIdParam = url.pathname.split("/").pop();
-
-        if (!userIdParam) {
-            return NextResponse.json(
-                { error: "Falta el parámetro userId", timestamp: new Date().toISOString() },
-                { status: 400 }
-            );
-        }
-
-        const userId = parseInt(userIdParam, 10);
-        if (isNaN(userId)) {
-            return NextResponse.json(
-                { error: "El parámetro userId debe ser un número", timestamp: new Date().toISOString() },
-                { status: 400 }
-            );
-        }
-
-        const result = await graphqlRequest(GET_USER_BY_ID_QUERY, {
-            variables: { idUsuario: userId },
-        });
-
-        return NextResponse.json(result);
+        const result = await graphqlRequest<{ usuarioById: UsuarioPerfil | null }>(GET_USER_BY_ID_QUERY, { variables: { idUsuario: userId } });
+        if (!result.usuarioById) return NextResponse.json({ error: "No se encontró el perfil." }, { status: 404 });
+        return NextResponse.json({ usuario: result.usuarioById }, { headers: { "Cache-Control": "no-store" } });
     } catch (error) {
-        const message = error instanceof Error ? error.message : "Error desconocido";
-        const statusCode =
-            error instanceof Error && error.message.includes("401") ? 401 : 500;
-
-        return NextResponse.json(
-            {
-                error: message,
-                timestamp: new Date().toISOString(),
-            },
-            { status: statusCode }
-        );
+        return NextResponse.json({ error: "No se pudo cargar el perfil." }, { status: ErrorHandler.isAuthError(error) ? 401 : 503 });
     }
 }

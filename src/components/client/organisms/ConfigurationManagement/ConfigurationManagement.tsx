@@ -10,7 +10,7 @@ import { ModulesTable } from "../ModulesTable";
 import { PermissionsTable } from "../PermissionsTable";
 import { EnrollTable } from "../EnrollTable";
 
-const   ConfigurationManagement: React.FC<ConfigurationManagementProps> = ({
+const ConfigurationManagement: React.FC<ConfigurationManagementProps> = ({
     requests,
     onRequestApproveAll,
     onRequestApprove,
@@ -31,108 +31,106 @@ const   ConfigurationManagement: React.FC<ConfigurationManagementProps> = ({
     onEnrollApprove,
     className,
     activeView,
-    onViewChange
+    onViewChange,
+    readOnly = false,
 }) => {
-
-    const view = activeView; 
+    const view = activeView;
     const setView = onViewChange;
     const renderView = () => {
         switch (view) {
         case "requests":
             return (
-                <RequestTable 
-                    requests={requests} 
-                    onApproveAll={onRequestApproveAll} 
-                    onApprove={onRequestApprove} 
+                <RequestTable
+                    requests={requests}
+                    onApproveAll={onRequestApproveAll}
+                    onApprove={onRequestApprove}
                 />
-            )
+            );
         case "modules":
             return (
-                <ModulesTable 
-                    modules={modules} 
-                    onSubmit={onModulesSubmit} 
-                    onEdit={onModulesEdit} 
+                <ModulesTable
+                    modules={modules}
+                    onSubmit={onModulesSubmit}
+                    onEdit={onModulesEdit}
                     onDelete={onModulesDelete}
                 />
-            )
+            );
         case "permissions":
             return (
-                <PermissionsTable 
+                <PermissionsTable
                     permissions={permissions}
                     modules={modules}
                     onSubmit={onPermissionsSubmit}
                     onEdit={onPermissionsEdit}
                     onDelete={onPermissionsDelete}
                 />
-            )
+            );
         case "roles":
             return (
-                <RolesTable 
-                    roles={roles} 
+                <RolesTable
+                    roles={roles}
                     permissions={permissions}
                     onSubmit={onRolesSubmit}
                     onEdit={onRolesEdit}
                     onDelete={onRolesDelete}
                 />
-            )
+            );
         case "enroll":
             return (
-                <EnrollTable 
-                    enroll={enrolls} 
+                <EnrollTable
+                    enroll={enrolls}
                     onApproveAll={onEnrollApproveAll}
                     onApprove={onEnrollApprove}
                 />
-            )
-            
+            );
         }
     };
 
     return (
         <div className={classNames(styles.ConfigurationManagement, className)}>
             <div className={styles.sidebar}>
-
-                <SettingsNavItem 
+                <SettingsNavItem
                     label="Aprobar solicitudes"
                     iconName="user-clock-solid"
                     active={view === "requests"}
                     onClick={() => setView("requests")}
                 />
 
-                <SettingsNavItem 
+                <SettingsNavItem
                     label="Módulos del sistema"
                     iconName="layer-group-solid"
                     active={view === "modules"}
                     onClick={() => setView("modules")}
                 />
 
-                <SettingsNavItem 
+                <SettingsNavItem
                     label="Permisos del sistema"
                     iconName="user-lock-solid"
                     active={view === "permissions"}
                     onClick={() => setView("permissions")}
                 />
 
-                <SettingsNavItem 
+                <SettingsNavItem
                     label="Roles del sistema"
                     iconName="user-group-solid"
                     active={view === "roles"}
                     onClick={() => setView("roles")}
                 />
 
-                <SettingsNavItem 
+                <SettingsNavItem
                     label="Asignar permisos"
                     iconName="id-badge-solid"
-                    active={view === "enroll"}                
+                    active={view === "enroll"}
                     onClick={() => setView("enroll")}
                 />
-
             </div>
             <div className={styles.content}>
-                {renderView()}
+                <fieldset disabled={readOnly} className={styles.readOnlyContent}>
+                    {renderView()}
+                </fieldset>
             </div>
         </div>
     );
-
 };
 
 export default ConfigurationManagement;

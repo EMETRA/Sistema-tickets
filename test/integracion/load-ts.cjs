@@ -15,6 +15,7 @@ module.exports = function loader(root, mocks = {}) {
       compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020, esModuleInterop: true, jsx: ts.JsxEmit.ReactJSX }, fileName: file,
     }).outputText;
     function localRequire(name) {
+      if (Object.hasOwn(mocks, name)) return mocks[name];
       if (!name.startsWith('.') && !name.startsWith('@/')) return createRequire(file)(name);
       const base = name.startsWith('@/') ? path.join(root, 'src', name.slice(2)) : path.resolve(path.dirname(file), name);
       const resolved = ['', '.ts', '.tsx', '/index.ts', '/index.tsx'].map(ext => base + ext).find(f => fs.existsSync(f) && fs.statSync(f).isFile());

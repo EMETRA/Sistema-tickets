@@ -1,0 +1,1098 @@
+{
+  "reference": "Presentación Sistema Tickets R3; inventario de 120 vistas/estados",
+  "branch": "feat/redisenar_sistema_tickets",
+  "status": "ENTREGA_UI_EXISTENTE; FUNCIONES_NUEVAS_PENDIENTES",
+  "counts": {
+    "UI_EXISTENTE_ADAPTADA": 49,
+    "CONFIGURACION_PENDIENTE": 1,
+    "BASE_EXISTENTE_PARCIAL": 5,
+    "API_DATOS_PENDIENTES": 53,
+    "DEMO_HEREDADA": 12
+  },
+  "runtimeRoutes": {
+    "modules": 16,
+    "moduleRoutes": [
+      {
+        "module": "mod01",
+        "title": "Reporte semanal informática",
+        "path": "/home/informatica/reportes/mod01"
+      },
+      {
+        "module": "exportmod01",
+        "title": "Exportar reporte semanal informática",
+        "path": "/home/informatica/reportes/exportmod01"
+      },
+      {
+        "module": "save-mod01",
+        "title": "Reporte Guardado",
+        "path": "/home/informatica/reportes/save-mod01"
+      },
+      {
+        "module": "dashboard-proyectos",
+        "title": "Dashboard de indicadores - Informática",
+        "path": "/home/informatica/reportes/dashboard-proyectos"
+      },
+      {
+        "module": "dashboard-colaboradores",
+        "title": "Dashboard por colaborador - Informática",
+        "path": "/home/informatica/reportes/dashboard-colaboradores"
+      },
+      {
+        "module": "mod06",
+        "title": "Asignación de permisos por usuario",
+        "path": "/home/informatica/permisos/mod06"
+      },
+      {
+        "module": "mod07",
+        "title": "Visor de manuales de usuario | EMETRA",
+        "path": "/home/informatica/manuales/mod07"
+      },
+      {
+        "module": "mod04",
+        "title": "Formulario reporte de visa nóminas",
+        "path": "/home/rrhh/formularios/mod04"
+      },
+      {
+        "module": "mod05",
+        "title": "Reporte general RRHH - EMETRA",
+        "path": "/home/rrhh/formularios/mod05"
+      },
+      {
+        "module": "proc01",
+        "title": "Proceso de grabación unificada de remisiones de cámara LPR",
+        "path": "/home/recaudacion/procesos/proc01"
+      },
+      {
+        "module": "mod13",
+        "title": "Consulta de remisiones pendientes por nombre",
+        "path": "/home/recaudacion/proyectos/mod13"
+      },
+      {
+        "module": "consulta-vehiculos",
+        "title": "Consulta de vehículos SAT",
+        "path": "/home/recaudacion/consultas/consulta-vehiculos"
+      },
+      {
+        "module": "mod08",
+        "title": "Generador de Reportes Sistema Financiero - Recibos/Tickets anulados",
+        "path": "/home/financiero/formularios/mod08"
+      },
+      {
+        "module": "mod10",
+        "title": "Formulario reporte de visa nóminas",
+        "path": "/home/juridico/reportes/mod10"
+      },
+      {
+        "module": "juz01",
+        "title": "Consultar caso",
+        "path": "/home/juridico/juz01/juz01"
+      },
+      {
+        "module": "noticias",
+        "title": "Noticias",
+        "path": "/home/comunicacion/contenido/noticias"
+      }
+    ],
+    "roleMenus": {
+      "ADMINISTRADOR": [
+        "/home",
+        "/mis-tickets",
+        "/aplicaciones",
+        "/usuarios",
+        "/equipo",
+        "/tickets",
+        "/config",
+        "/tickets-creation"
+      ],
+      "TECNICO": [
+        "/home",
+        "/mis-tickets",
+        "/aplicaciones",
+        "/tickets",
+        "/tickets-creation",
+        "/usuarios",
+        "/equipo"
+      ],
+      "USUARIO": [
+        "/home",
+        "/mis-tickets",
+        "/aplicaciones",
+        "/tickets-creation",
+        "/tickets",
+        "/equipo"
+      ],
+      "DESARROLLADOR": [
+        "/home",
+        "/mis-tickets",
+        "/aplicaciones",
+        "/tickets",
+        "/tickets-creation",
+        "/usuarios",
+        "/equipo"
+      ]
+    },
+    "catalogStatus": "MANIFIESTO_ESTATICO_LEGADO; NO ES AUTORIZACION"
+  },
+  "screens": [
+    {
+      "id": "P01",
+      "chapter": "Acceso",
+      "title": "Inicio de sesión",
+      "referenceSource": "src/views/Login/Login.tsx",
+      "status": "UI_EXISTENTE_ADAPTADA",
+      "note": "Vista/estado existente conservado e integrado al diseño y navegación compartidos."
+    },
+    {
+      "id": "P02",
+      "chapter": "Acceso",
+      "title": "Error de acceso o carga de perfil",
+      "referenceSource": "src/views/Login/Login.tsx",
+      "status": "UI_EXISTENTE_ADAPTADA",
+      "note": "Vista/estado existente conservado e integrado al diseño y navegación compartidos."
+    },
+    {
+      "id": "P03",
+      "chapter": "Acceso",
+      "title": "Recuperación de contraseña",
+      "referenceSource": "src/views/ForgotPassword/ForgotPassword.tsx",
+      "status": "CONFIGURACION_PENDIENTE",
+      "note": "Flujo real preparado; habilitar AUTH_RECOVERY_BASE_URL y validar contra autenticación."
+    },
+    {
+      "id": "P04",
+      "chapter": "Inicio y navegación",
+      "title": "Inicio del usuario: acciones recientes y accesos",
+      "referenceSource": "src/views/Home/User/UserHome.tsx",
+      "status": "BASE_EXISTENTE_PARCIAL",
+      "note": "Métricas de tickets y actividad existentes. Métricas de operaciones de otras apps pendientes."
+    },
+    {
+      "id": "P05",
+      "chapter": "Inicio y navegación",
+      "title": "Inicio: Admin · Informática",
+      "referenceSource": "src/views/Home/Admin/AdminHome.tsx",
+      "status": "BASE_EXISTENTE_PARCIAL",
+      "note": "Conserva el inicio real de administrador. Nuevas bandejas y monitoreo pendientes."
+    },
+    {
+      "id": "P06",
+      "chapter": "Inicio y navegación",
+      "title": "Inicio: Técnico · Informática",
+      "referenceSource": "src/views/Home/Tech/TechHome.tsx",
+      "status": "BASE_EXISTENTE_PARCIAL",
+      "note": "Conserva estadísticas, eventos y tickets asignados del API actual."
+    },
+    {
+      "id": "P07",
+      "chapter": "Inicio y navegación",
+      "title": "Aplicaciones y secciones",
+      "referenceSource": "src/app/(dashboard)/home/[appId]/page.tsx",
+      "status": "UI_EXISTENTE_ADAPTADA",
+      "note": "Vista/estado existente conservado e integrado al diseño y navegación compartidos."
+    },
+    {
+      "id": "P08",
+      "chapter": "Inicio y navegación",
+      "title": "Módulos de una sección",
+      "referenceSource": "src/app/(dashboard)/home/[appId]/[sectionId]/page.tsx",
+      "status": "UI_EXISTENTE_ADAPTADA",
+      "note": "Vista/estado existente conservado e integrado al diseño y navegación compartidos."
+    },
+    {
+      "id": "P09",
+      "chapter": "Tickets",
+      "title": "Tickets",
+      "referenceSource": "src/views/Tickets/Tickets.tsx",
+      "status": "UI_EXISTENTE_ADAPTADA",
+      "note": "Vista/estado existente conservado e integrado al diseño y navegación compartidos."
+    },
+    {
+      "id": "P10",
+      "chapter": "Tickets",
+      "title": "Mis tickets",
+      "referenceSource": "src/app/(dashboard)/mis-tickets/page.tsx",
+      "status": "UI_EXISTENTE_ADAPTADA",
+      "note": "Vista/estado existente conservado e integrado al diseño y navegación compartidos."
+    },
+    {
+      "id": "P11",
+      "chapter": "Tickets",
+      "title": "Crear ticket",
+      "referenceSource": "src/views/TicketsCreation/TicketsCreation.tsx",
+      "status": "UI_EXISTENTE_ADAPTADA",
+      "note": "Vista/estado existente conservado e integrado al diseño y navegación compartidos."
+    },
+    {
+      "id": "P12",
+      "chapter": "Tickets",
+      "title": "Detalle del ticket: conversación",
+      "referenceSource": "src/components/client/organisms/TicketDetail/TicketDetail.tsx",
+      "status": "UI_EXISTENTE_ADAPTADA",
+      "note": "Vista/estado existente conservado e integrado al diseño y navegación compartidos."
+    },
+    {
+      "id": "P13",
+      "chapter": "Tickets",
+      "title": "Historial del ticket",
+      "referenceSource": "src/components/client/organisms/TicketHistory/TicketHistory.tsx",
+      "status": "UI_EXISTENTE_ADAPTADA",
+      "note": "Vista/estado existente conservado e integrado al diseño y navegación compartidos."
+    },
+    {
+      "id": "P14",
+      "chapter": "Tickets",
+      "title": "Admin: revisar el cambio · Paso 1 de 2",
+      "referenceSource": "src/components/client/organisms/TicketsTablePanel/TicketsTablePanel.tsx",
+      "status": "UI_EXISTENTE_ADAPTADA",
+      "note": "Dos confirmaciones centrales antes de enviar la mutación. No equivalen a auditoría persistida."
+    },
+    {
+      "id": "P15",
+      "chapter": "Tickets",
+      "title": "Admin: eliminación con historial conservado",
+      "referenceSource": "src/components/client/organisms/TicketsTablePanel/TicketsTablePanel.tsx",
+      "status": "UI_EXISTENTE_ADAPTADA",
+      "note": "Cancelar usa updateTicket con estado 4; no ejecuta deleteTicket ni elimina el historial."
+    },
+    {
+      "id": "P16",
+      "chapter": "Personas",
+      "title": "Equipo",
+      "referenceSource": "src/views/Team/Team.tsx",
+      "status": "UI_EXISTENTE_ADAPTADA",
+      "note": "Vista/estado existente conservado e integrado al diseño y navegación compartidos."
+    },
+    {
+      "id": "P17",
+      "chapter": "Personas",
+      "title": "Usuarios",
+      "referenceSource": "src/views/Users/Users.tsx",
+      "status": "UI_EXISTENTE_ADAPTADA",
+      "note": "Vista/estado existente conservado e integrado al diseño y navegación compartidos."
+    },
+    {
+      "id": "P18",
+      "chapter": "Personas",
+      "title": "Perfil del colaborador",
+      "referenceSource": "src/views/Profile/Profile.tsx",
+      "status": "BASE_EXISTENTE_PARCIAL",
+      "note": "Perfil real y conteo de tickets creados. Inventario y rendimiento no se simulan."
+    },
+    {
+      "id": "P19",
+      "chapter": "Personas",
+      "title": "Perfil: mantenimiento y equipo",
+      "referenceSource": "src/views/Profile/Profile.tsx",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Sin fuente real de inventario/mantenimiento en el perfil; se indica la dependencia."
+    },
+    {
+      "id": "P20",
+      "chapter": "Reportes y configuración",
+      "title": "Admin: métricas globales de tickets de Informática",
+      "referenceSource": "src/views/Statistics/Statistics.tsx",
+      "status": "DEMO_HEREDADA",
+      "note": "Estadísticas heredadas de demostración, identificadas. El inicio admin usa su API existente."
+    },
+    {
+      "id": "P21",
+      "chapter": "Configuración",
+      "title": "Informática: revisar solicitudes de acceso",
+      "referenceSource": "src/views/Configuration/Configuration.tsx",
+      "status": "DEMO_HEREDADA",
+      "note": "Datos heredados de demostración; configuración solo de lectura, sin mutaciones."
+    },
+    {
+      "id": "P22",
+      "chapter": "Configuración",
+      "title": "Módulos",
+      "referenceSource": "src/views/Configuration/Configuration.tsx",
+      "status": "DEMO_HEREDADA",
+      "note": "Datos heredados de demostración; configuración solo de lectura, sin mutaciones."
+    },
+    {
+      "id": "P23",
+      "chapter": "Configuración",
+      "title": "Permisos: INSERTAR, LEER, EDITAR y ELIMINAR",
+      "referenceSource": "src/views/Configuration/Configuration.tsx",
+      "status": "DEMO_HEREDADA",
+      "note": "Datos heredados de demostración; configuración solo de lectura, sin mutaciones."
+    },
+    {
+      "id": "P24",
+      "chapter": "Configuración",
+      "title": "Rol: módulos y permisos de operación",
+      "referenceSource": "src/views/Configuration/Configuration.tsx",
+      "status": "DEMO_HEREDADA",
+      "note": "Datos heredados de demostración; configuración solo de lectura, sin mutaciones."
+    },
+    {
+      "id": "P25",
+      "chapter": "Configuración",
+      "title": "Asignación de perfiles y excepciones",
+      "referenceSource": "src/views/Configuration/Configuration.tsx",
+      "status": "DEMO_HEREDADA",
+      "note": "Datos heredados de demostración; configuración solo de lectura, sin mutaciones."
+    },
+    {
+      "id": "P26",
+      "chapter": "Configuración",
+      "title": "Crear módulo",
+      "referenceSource": "src/components/client/organisms/ConfigurationManagement",
+      "status": "DEMO_HEREDADA",
+      "note": "Vista de demostración deshabilitada hasta conectar un catálogo autorizado real."
+    },
+    {
+      "id": "P27",
+      "chapter": "Configuración",
+      "title": "Asignar operaciones al módulo",
+      "referenceSource": "src/components/client/organisms/ConfigurationManagement",
+      "status": "DEMO_HEREDADA",
+      "note": "Vista de demostración deshabilitada hasta conectar un catálogo autorizado real."
+    },
+    {
+      "id": "P28",
+      "chapter": "Configuración",
+      "title": "Crear o editar rol",
+      "referenceSource": "src/components/client/organisms/ConfigurationManagement",
+      "status": "DEMO_HEREDADA",
+      "note": "Vista de demostración deshabilitada hasta conectar un catálogo autorizado real."
+    },
+    {
+      "id": "P29A",
+      "chapter": "Módulos administrativos",
+      "title": "Reporte semanal · Información general",
+      "referenceSource": "src/views/MOD01/MOD01.tsx",
+      "status": "UI_EXISTENTE_ADAPTADA",
+      "note": "Vista/estado existente conservado e integrado al diseño y navegación compartidos."
+    },
+    {
+      "id": "P29B",
+      "chapter": "Módulos administrativos",
+      "title": "Reporte semanal · Indicadores y tareas",
+      "referenceSource": "src/views/MOD01/MOD01.tsx",
+      "status": "UI_EXISTENTE_ADAPTADA",
+      "note": "Vista/estado existente conservado e integrado al diseño y navegación compartidos."
+    },
+    {
+      "id": "P29C",
+      "chapter": "Módulos administrativos",
+      "title": "Reporte semanal · Riesgos y próxima semana",
+      "referenceSource": "src/views/MOD01/MOD01.tsx",
+      "status": "UI_EXISTENTE_ADAPTADA",
+      "note": "Vista/estado existente conservado e integrado al diseño y navegación compartidos."
+    },
+    {
+      "id": "P30",
+      "chapter": "Módulos administrativos",
+      "title": "Reporte semanal guardado",
+      "referenceSource": "src/views/SaveMOD01/ExportMOD01/SaveMOD01.tsx",
+      "status": "UI_EXISTENTE_ADAPTADA",
+      "note": "Vista/estado existente conservado e integrado al diseño y navegación compartidos."
+    },
+    {
+      "id": "P31",
+      "chapter": "Módulos administrativos",
+      "title": "Exportar reportes semanales",
+      "referenceSource": "src/views/ExportMOD01/ExportMOD01.tsx",
+      "status": "UI_EXISTENTE_ADAPTADA",
+      "note": "Vista/estado existente conservado e integrado al diseño y navegación compartidos."
+    },
+    {
+      "id": "P32",
+      "chapter": "Módulos administrativos",
+      "title": "Dashboard de proyectos",
+      "referenceSource": "src/views/DashboardProjects/DashboardProjects.tsx",
+      "status": "DEMO_HEREDADA",
+      "note": "Dashboard heredado con datos de demostración, ahora identificado."
+    },
+    {
+      "id": "P33",
+      "chapter": "Módulos administrativos",
+      "title": "Dashboard de colaboradores",
+      "referenceSource": "src/views/DashboardCollaborators/DashboardCollaborators.tsx",
+      "status": "DEMO_HEREDADA",
+      "note": "Dashboard heredado con datos de demostración, ahora identificado."
+    },
+    {
+      "id": "P34",
+      "chapter": "Módulos administrativos",
+      "title": "Visa de nómina",
+      "referenceSource": "src/views/MOD04/MOD04.tsx",
+      "status": "UI_EXISTENTE_ADAPTADA",
+      "note": "Vista/estado existente conservado e integrado al diseño y navegación compartidos."
+    },
+    {
+      "id": "P35",
+      "chapter": "Módulos administrativos",
+      "title": "Reporte de Recursos Humanos",
+      "referenceSource": "src/views/MOD05/MOD05.tsx",
+      "status": "UI_EXISTENTE_ADAPTADA",
+      "note": "Vista/estado existente conservado e integrado al diseño y navegación compartidos."
+    },
+    {
+      "id": "P36",
+      "chapter": "Módulos administrativos",
+      "title": "Permisos por aplicación",
+      "referenceSource": "src/views/MOD06/MOD06.tsx",
+      "status": "UI_EXISTENTE_ADAPTADA",
+      "note": "Vista/estado existente conservado e integrado al diseño y navegación compartidos."
+    },
+    {
+      "id": "P37",
+      "chapter": "Módulos administrativos",
+      "title": "Manuales y visor PDF",
+      "referenceSource": "src/views/MOD07/MOD07.tsx",
+      "status": "UI_EXISTENTE_ADAPTADA",
+      "note": "Vista/estado existente conservado e integrado al diseño y navegación compartidos."
+    },
+    {
+      "id": "P38",
+      "chapter": "Módulos administrativos",
+      "title": "Reporte de anulados",
+      "referenceSource": "src/views/MOD08/MOD08.tsx",
+      "status": "UI_EXISTENTE_ADAPTADA",
+      "note": "Vista/estado existente conservado e integrado al diseño y navegación compartidos."
+    },
+    {
+      "id": "P39",
+      "chapter": "Módulos administrativos",
+      "title": "Notificar documento",
+      "referenceSource": "src/views/MOD10/MOD10.tsx",
+      "status": "UI_EXISTENTE_ADAPTADA",
+      "note": "Vista/estado existente conservado e integrado al diseño y navegación compartidos."
+    },
+    {
+      "id": "P40",
+      "chapter": "Módulos administrativos",
+      "title": "Confirmar notificación",
+      "referenceSource": "src/components/client/organisms/MOD10Modal",
+      "status": "UI_EXISTENTE_ADAPTADA",
+      "note": "Vista/estado existente conservado e integrado al diseño y navegación compartidos."
+    },
+    {
+      "id": "P41",
+      "chapter": "Módulos administrativos",
+      "title": "Búsqueda EMETRA",
+      "referenceSource": "src/views/MOD13/MOD13.tsx",
+      "status": "DEMO_HEREDADA",
+      "note": "Consulta heredada con datos de demostración, ahora identificada."
+    },
+    {
+      "id": "P42",
+      "chapter": "Módulos administrativos",
+      "title": "Consulta de vehículos",
+      "referenceSource": "src/views/ConsultaVehiculos/ConsultaVehiculos.tsx",
+      "status": "UI_EXISTENTE_ADAPTADA",
+      "note": "Vista/estado existente conservado e integrado al diseño y navegación compartidos."
+    },
+    {
+      "id": "P43",
+      "chapter": "Módulos administrativos",
+      "title": "Ejecutar proceso",
+      "referenceSource": "src/views/PROC01/PROC01.tsx",
+      "status": "UI_EXISTENTE_ADAPTADA",
+      "note": "Vista/estado existente conservado e integrado al diseño y navegación compartidos."
+    },
+    {
+      "id": "P44",
+      "chapter": "Módulos administrativos",
+      "title": "Resultado de un proceso",
+      "referenceSource": "src/views/PROC01/PROC01.tsx",
+      "status": "UI_EXISTENTE_ADAPTADA",
+      "note": "Vista/estado existente conservado e integrado al diseño y navegación compartidos."
+    },
+    {
+      "id": "P45",
+      "chapter": "Comunicación",
+      "title": "Noticias",
+      "referenceSource": "src/views/COM03/NewsListView/NewsListView.tsx",
+      "status": "UI_EXISTENTE_ADAPTADA",
+      "note": "Se conserva el flujo COM03 existente: lista, edición, recursos, vista previa y publicación con sus permisos."
+    },
+    {
+      "id": "P46",
+      "chapter": "Comunicación",
+      "title": "Crear y editar noticia",
+      "referenceSource": "src/views/COM03/NewsFormView/NewsFormView.tsx",
+      "status": "UI_EXISTENTE_ADAPTADA",
+      "note": "Se conserva el flujo COM03 existente: lista, edición, recursos, vista previa y publicación con sus permisos."
+    },
+    {
+      "id": "P47",
+      "chapter": "Comunicación",
+      "title": "Editar una sección de noticia",
+      "referenceSource": "src/views/COM03/NewsFormView/NewsFormView.tsx",
+      "status": "UI_EXISTENTE_ADAPTADA",
+      "note": "Se conserva el flujo COM03 existente: lista, edición, recursos, vista previa y publicación con sus permisos."
+    },
+    {
+      "id": "P48",
+      "chapter": "Comunicación",
+      "title": "Vista previa de noticia",
+      "referenceSource": "src/views/COM03/NewsFormView/NewsFormView.tsx",
+      "status": "UI_EXISTENTE_ADAPTADA",
+      "note": "Se conserva el flujo COM03 existente: lista, edición, recursos, vista previa y publicación con sus permisos."
+    },
+    {
+      "id": "P49",
+      "chapter": "Comunicación",
+      "title": "Confirmar publicación",
+      "referenceSource": "src/views/COM03/NewsFormView/NewsFormView.tsx",
+      "status": "UI_EXISTENTE_ADAPTADA",
+      "note": "Se conserva el flujo COM03 existente: lista, edición, recursos, vista previa y publicación con sus permisos."
+    },
+    {
+      "id": "P50",
+      "chapter": "Comunicación",
+      "title": "Resultado de publicación",
+      "referenceSource": "src/views/COM03/NewsFormView/NewsFormView.tsx",
+      "status": "UI_EXISTENTE_ADAPTADA",
+      "note": "Se conserva el flujo COM03 existente: lista, edición, recursos, vista previa y publicación con sus permisos."
+    },
+    {
+      "id": "P51",
+      "chapter": "Juzgado",
+      "title": "Consultar caso",
+      "referenceSource": "src/views/JUZ01/JUZ01.tsx",
+      "status": "UI_EXISTENTE_ADAPTADA",
+      "note": "Se conserva JUZ01 existente, evidencias privadas, defensa, actuaciones, resolución y PDF con permisos."
+    },
+    {
+      "id": "P52",
+      "chapter": "Juzgado",
+      "title": "Caso: evidencia, análisis y defensa",
+      "referenceSource": "src/views/JUZ01Detail/JUZ01Detail.tsx",
+      "status": "UI_EXISTENTE_ADAPTADA",
+      "note": "Se conserva JUZ01 existente, evidencias privadas, defensa, actuaciones, resolución y PDF con permisos."
+    },
+    {
+      "id": "P53",
+      "chapter": "Juzgado",
+      "title": "Caso: adaptación a tablet",
+      "referenceSource": "src/views/JUZ01Detail/JUZ01Detail.tsx",
+      "status": "UI_EXISTENTE_ADAPTADA",
+      "note": "Se conserva JUZ01 existente, evidencias privadas, defensa, actuaciones, resolución y PDF con permisos."
+    },
+    {
+      "id": "P54",
+      "chapter": "Juzgado",
+      "title": "Evidencia ampliada",
+      "referenceSource": "src/views/JUZ01Detail/EvidenciasCaso.tsx",
+      "status": "UI_EXISTENTE_ADAPTADA",
+      "note": "Se conserva JUZ01 existente, evidencias privadas, defensa, actuaciones, resolución y PDF con permisos."
+    },
+    {
+      "id": "P55",
+      "chapter": "Juzgado",
+      "title": "Recibir defensa en el juzgado",
+      "referenceSource": "src/views/JUZ01Detail/JUZ01Detail.tsx",
+      "status": "UI_EXISTENTE_ADAPTADA",
+      "note": "Se conserva JUZ01 existente, evidencias privadas, defensa, actuaciones, resolución y PDF con permisos."
+    },
+    {
+      "id": "P56",
+      "chapter": "Juzgado",
+      "title": "Registrar una actuación",
+      "referenceSource": "src/views/JUZ01Detail/JUZ01Detail.tsx",
+      "status": "UI_EXISTENTE_ADAPTADA",
+      "note": "Se conserva JUZ01 existente, evidencias privadas, defensa, actuaciones, resolución y PDF con permisos."
+    },
+    {
+      "id": "P57",
+      "chapter": "Juzgado",
+      "title": "Resolver defensa",
+      "referenceSource": "src/views/JUZ01Detail/JUZ01Detail.tsx",
+      "status": "UI_EXISTENTE_ADAPTADA",
+      "note": "Se conserva JUZ01 existente, evidencias privadas, defensa, actuaciones, resolución y PDF con permisos."
+    },
+    {
+      "id": "P58",
+      "chapter": "Juzgado",
+      "title": "Confirmar resolución",
+      "referenceSource": "src/views/JUZ01Detail/JUZ01Detail.tsx",
+      "status": "UI_EXISTENTE_ADAPTADA",
+      "note": "Se conserva JUZ01 existente, evidencias privadas, defensa, actuaciones, resolución y PDF con permisos."
+    },
+    {
+      "id": "P59",
+      "chapter": "Juzgado",
+      "title": "Resolución y documento PDF",
+      "referenceSource": "src/views/JUZ01Detail/JUZ01Detail.tsx",
+      "status": "UI_EXISTENTE_ADAPTADA",
+      "note": "Se conserva JUZ01 existente, evidencias privadas, defensa, actuaciones, resolución y PDF con permisos."
+    },
+    {
+      "id": "P60",
+      "chapter": "Estados compartidos",
+      "title": "Sin permiso de acceso",
+      "referenceSource": "src/app/unauthorized/page.tsx",
+      "status": "UI_EXISTENTE_ADAPTADA",
+      "note": "Vista/estado existente conservado e integrado al diseño y navegación compartidos."
+    },
+    {
+      "id": "P61",
+      "chapter": "Estados compartidos",
+      "title": "Página no encontrada",
+      "referenceSource": "src/app/not-found.tsx",
+      "status": "UI_EXISTENTE_ADAPTADA",
+      "note": "Vista/estado existente conservado e integrado al diseño y navegación compartidos."
+    },
+    {
+      "id": "P62",
+      "chapter": "Estados compartidos",
+      "title": "No se pudo cargar la información",
+      "referenceSource": "src/api/graphql/client.ts · estados compartidos",
+      "status": "UI_EXISTENTE_ADAPTADA",
+      "note": "Vista/estado existente conservado e integrado al diseño y navegación compartidos."
+    },
+    {
+      "id": "P63",
+      "chapter": "Inicio y navegación",
+      "title": "Inicio: Jefatura de unidad",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P64",
+      "chapter": "Inicio y navegación",
+      "title": "Inicio: Desarrollador",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "BASE_EXISTENTE_PARCIAL",
+      "note": "Desarrollador conserva inicio técnico del rol DESARROLLADOR. Sistemas a cargo pendientes."
+    },
+    {
+      "id": "P65",
+      "chapter": "Inicio y navegación",
+      "title": "Inicio: Asignación · Informática",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P66",
+      "chapter": "Tickets",
+      "title": "Bandeja de asignación",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P67",
+      "chapter": "Tickets",
+      "title": "Asignados sin primera atención",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P68",
+      "chapter": "Tickets",
+      "title": "Asignar desde la bandeja de la secretaria",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P69",
+      "chapter": "Tickets",
+      "title": "Admin: confirmar el cambio · Paso 2 de 2",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "UI_EXISTENTE_ADAPTADA",
+      "note": "Segundo paso central con casilla explícita y cancelación sin petición."
+    },
+    {
+      "id": "P70",
+      "chapter": "Tickets",
+      "title": "Admin: autoasignación de un ticket propio",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "UI_EXISTENTE_ADAPTADA",
+      "note": "Solo ADMINISTRADOR autoasigna los tickets que crea con su propio ID."
+    },
+    {
+      "id": "P71",
+      "chapter": "Calendario",
+      "title": "Calendario: vista de todos los usuarios",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P72",
+      "chapter": "Calendario",
+      "title": "Calendario: gestión de una jefatura",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P73",
+      "chapter": "Calendario",
+      "title": "Crear actividad de equipo",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P74",
+      "chapter": "Personas y accesos",
+      "title": "Solicitudes de mi equipo",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P75",
+      "chapter": "Personas y accesos",
+      "title": "Jefatura: solicitar usuario nuevo",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P76",
+      "chapter": "Personas y accesos",
+      "title": "Informática: resolver una solicitud de acceso",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P77",
+      "chapter": "Personas y accesos",
+      "title": "Perfiles de trabajo",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P78",
+      "chapter": "Personas y accesos",
+      "title": "Perfil: roles incluidos y acceso resultante",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P79",
+      "chapter": "Personas y accesos",
+      "title": "Alta de usuario: elegir una base de permisos",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P80",
+      "chapter": "Personas y accesos",
+      "title": "Copiar accesos: revisar antes de aplicar",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P81",
+      "chapter": "Personas y accesos",
+      "title": "Usuario: perfil base y excepciones individuales",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P82",
+      "chapter": "Personas y accesos",
+      "title": "Permisos: revisar impacto antes de confirmar",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P83",
+      "chapter": "Trazabilidad",
+      "title": "Trazabilidad de movimientos",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P84",
+      "chapter": "Trazabilidad",
+      "title": "Movimiento: antes, después y confirmaciones",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P85",
+      "chapter": "Operación técnica",
+      "title": "Equipos de Informática",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P86",
+      "chapter": "Operación técnica",
+      "title": "Registrar o actualizar equipo",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P87",
+      "chapter": "Operación técnica",
+      "title": "Registrar mantenimiento o visita técnica",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P88",
+      "chapter": "Operación técnica",
+      "title": "Generar baja o salida de equipo",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P89",
+      "chapter": "Operación técnica",
+      "title": "Instalaciones a mi cargo",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P90",
+      "chapter": "Operación técnica",
+      "title": "Topología: switch, router y conexiones",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P91",
+      "chapter": "Operación técnica",
+      "title": "Registrar o actualizar punto de red",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P92",
+      "chapter": "Operación de desarrollo",
+      "title": "Sistemas a mi cargo",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P93",
+      "chapter": "Operación de desarrollo",
+      "title": "Sistema: front, back y servidor",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P94",
+      "chapter": "Operación de desarrollo",
+      "title": "Repositorios y despliegues vinculados",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P95",
+      "chapter": "Operación de desarrollo",
+      "title": "Incidentes de aplicaciones",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P96",
+      "chapter": "Operación de desarrollo",
+      "title": "Estado de esquema y objetos",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P97",
+      "chapter": "Métricas",
+      "title": "Mis métricas de atención",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P98",
+      "chapter": "Métricas",
+      "title": "Jefatura: métricas de sus equipos",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P99",
+      "chapter": "Métricas",
+      "title": "Mis métricas: tickets y actividad de aplicaciones",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P100",
+      "chapter": "Personas y accesos",
+      "title": "Permisos: confirmar y aplicar · Paso 2 de 2",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P101",
+      "chapter": "Tickets",
+      "title": "Resolver un ticket asignado",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "UI_EXISTENTE_ADAPTADA",
+      "note": "Flujo existente en detalle del ticket para pasar a trabajo y completar; backend conserva su validación."
+    },
+    {
+      "id": "P102",
+      "chapter": "Operación de desarrollo",
+      "title": "Incidente: contexto y relación con un ticket",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P103",
+      "chapter": "Personas y accesos",
+      "title": "Solicitar acceso para un miembro",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P104",
+      "chapter": "Métricas",
+      "title": "Mi actividad en aplicaciones",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P105",
+      "chapter": "Métricas",
+      "title": "Jefatura: actividad de aplicaciones de su equipo",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P106",
+      "chapter": "Métricas",
+      "title": "Registros que forman un indicador",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P107",
+      "chapter": "Operación técnica",
+      "title": "Switch: puertos y equipos conectados",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P108",
+      "chapter": "Operación técnica",
+      "title": "Agregar o editar un dispositivo de red",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P109",
+      "chapter": "Operación técnica",
+      "title": "Conectar dispositivos por sus puertos",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P110",
+      "chapter": "Operación técnica",
+      "title": "Dispositivo: ficha, revisión y mantenimiento",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P118",
+      "chapter": "Operación técnica",
+      "title": "Plano físico: ubicación de los puntos",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P111",
+      "chapter": "Infraestructura",
+      "title": "Servidores: vista de DevOps",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P112",
+      "chapter": "Infraestructura",
+      "title": "Servidor: recursos y contenedores",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P113",
+      "chapter": "Infraestructura",
+      "title": "Contenedor: estado, versión y logs",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P114",
+      "chapter": "Infraestructura",
+      "title": "Logs: consulta filtrada del recurso",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P115",
+      "chapter": "Infraestructura",
+      "title": "Jefatura: servidores y contenedores autorizados",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P116",
+      "chapter": "Infraestructura",
+      "title": "Monitoreo: lectura antigua o fuente no disponible",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    },
+    {
+      "id": "P117",
+      "chapter": "Infraestructura",
+      "title": "Logs: acceso de lectura no otorgado",
+      "referenceSource": "Definición funcional del usuario · 31/10/2026",
+      "status": "API_DATOS_PENDIENTES",
+      "note": "Definir API, alcance de permisos, modelo persistente y auditoría antes de ofrecer la función."
+    }
+  ]
+}

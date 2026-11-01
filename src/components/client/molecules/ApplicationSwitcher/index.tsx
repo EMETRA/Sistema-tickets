@@ -1,0 +1,1 @@
+export { ApplicationSwitcher } from "./ApplicationSwitcher";

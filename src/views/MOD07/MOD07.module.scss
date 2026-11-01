@@ -8,7 +8,8 @@
 .panelLayout {
     display: grid;
     grid-template-columns: 280px 1fr;
-    height: 100%;
+    height: max(560px, calc(100dvh - 260px));
+    min-width: 0;
     border: 2px solid #e5e5e5;
     border-radius: 12px;
     overflow: hidden;
@@ -144,6 +145,7 @@
     justify-content: center;
     background: #d4d4d4;
     height: 100%;
+    min-width: 0;
 }
 
 .pdfViewer {
@@ -168,4 +170,13 @@
 .emptySubtitle {
     font-size: 13px;
     color: #666;
+}
+
+@media (max-width: 950px) {
+    .panelLayout { grid-template-columns: 230px minmax(0, 1fr); }
+}
+@media (max-width: 650px) {
+    .panelLayout { grid-template-columns: minmax(0, 1fr); height: auto; }
+    .leftPanel { max-height: 360px; border-right: none; border-bottom: 1px solid #e5e5e5; }
+    .rightPanel { height: 65dvh; min-height: 440px; }
 }

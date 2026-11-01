@@ -19,7 +19,7 @@ export default function HomePage() {
     };
 
     if (platform.data) return <HomeWorkspace />;
-    if (platform.loading)
+    if (platform.loading || (!platform.disabled && !platform.error))
         return <p role="status">Cargando tu espacio de trabajo…</p>;
     if (platform.error) return <p role="alert">{platform.error}</p>;
     return views[role] ?? <UserHome />;

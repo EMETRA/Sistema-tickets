@@ -246,6 +246,18 @@ export function AssignmentsWorkspace() {
                                             {row.codigo || "#" + row.id} ·{" "}
                                             {row.titulo}
                                         </button>
+                                        <p className={styles.muted}>
+                                            {(
+                                                {
+                                                    1: "Sin asignar",
+                                                    2: "Asignado",
+                                                    3: "En atención",
+                                                    4: "Cancelado",
+                                                    5: "Resuelto",
+                                                } as Record<number, string>
+                                            )[row.estado] ||
+                                                "Estado registrado"}
+                                        </p>
                                     </td>
                                     <td>{row.creador}</td>
                                     <td>{row.asignado || "Sin asignar"}</td>

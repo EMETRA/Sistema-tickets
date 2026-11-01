@@ -4,7 +4,7 @@
   "typecheck": "PASS",
   "lintChangedTypeScriptFiles": "PASS; 42 archivos de producción modificados/nuevos",
   "productionBuild": "next build --webpack; PASS",
-  "nodeIntegrationTestFiles": 7,
+  "nodeIntegrationTestFiles": 8,
   "registeredModules": 16,
   "authenticatedRoles": [
     "ADMINISTRADOR",
@@ -115,5 +115,22 @@
       "result": "PASS en flujo nuevo y regresión UserService",
       "fullSuite": "9 fallos anteriores, reproducidos en origin/QA sin los cambios"
     }
+  },
+  "localLaboratory": {
+    "status": "PASS_LOCAL",
+    "command": "pnpm laboratorio",
+    "profiles": 7,
+    "persistence": ".laboratorio/estado.json; datos ficticios; excluido de Git",
+    "mockContractTests": 10,
+    "allPanelIntegrationTests": 47,
+    "browser": "PASS; crear/asignar/iniciar/resolver entre perfiles; 12 secciones; ambas confirmaciones; privacidad; sin solicitudes externas",
+    "productionBuild": "PASS; next build --webpack",
+    "typecheck": "PASS",
+    "legacyNavigationBrowser": "PASS; 16 módulos",
+    "limits": [
+      "No verifica Oracle, grants, transacciones del API real, Auth/JWT, SMTP ni servicios institucionales",
+      "El API local es una aproximación de contratos; las cuentas y mediciones son ficticias",
+      "Los módulos externos y los adjuntos del ticket heredado quedan fuera de cobertura"
+    ]
   }
 }

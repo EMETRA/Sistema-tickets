@@ -47,3 +47,4 @@ next-env.d.ts
 storybook-static
 
 .tool-versions
+/.next-oracle/

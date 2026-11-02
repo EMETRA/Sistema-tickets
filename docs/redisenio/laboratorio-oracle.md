@@ -1,6 +1,6 @@
 # Pruebas del Panel con Oracle real
 
-La rama `feat/laboratorio_oracle_tickets` añade una alternativa al laboratorio con mocks. Requiere las ramas del mismo nombre en api-tickets y api-autenticacion, como carpetas hermanas.
+La rama `feat/laboratorio_oracle_tickets` añade una alternativa al laboratorio con mocks. Requiere las ramas del mismo nombre en api-tickets y api-autenticacion. La herramienta admite los APIs en `work/apis/` y este frontend en `work/web/Sistema-tickets`, además de carpetas hermanas. Para otra ubicación, define `TICKETS_ORACLE_PANEL_DIR` con la ruta del frontend antes de iniciar desde api-tickets.
 
 La guía de instalación, cuentas y comandos está en [api-tickets/laboratorio/oracle/README.md](https://github.com/EMETRA/api-tickets/blob/feat/laboratorio_oracle_tickets/laboratorio/oracle/README.md).
 

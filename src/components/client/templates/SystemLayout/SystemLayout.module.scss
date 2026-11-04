@@ -1,45 +1,79 @@
 .layout {
-    display: flex;
-    width: 100%;
-    height: 100vh;
-    background-color: #F8F9FA; 
-    overflow: hidden;
+  display: flex;
+  width: 100%;
+  height: 100dvh;
+  background: var(--tickets-background);
+  overflow: hidden;
+  color: var(--tickets-text);
 }
-
 .sidebar {
-    flex-shrink: 0;
+  flex-shrink: 0;
 }
-
 .container {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
-
 .main {
-    flex: 1;
-    display: flex;
-    overflow-y: auto;
-    padding: 0;
-    background-color: #FDFDFD;
-    
-    &::-webkit-scrollbar {
-        width: 8px;
-    }
-    &::-webkit-scrollbar-track {
-        background: transparent;
-    }
-    &::-webkit-scrollbar-thumb {
-        background: #4361EE;
-        border-radius: 10px;
-    }
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  background: var(--tickets-background);
+  scrollbar-color: #b7c5eb transparent;
+}
+.pageContent {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  max-width: 1920px;
+  margin: 0 auto;
+}
+.breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 9px;
+  padding: 20px var(--tickets-page-padding) 0;
+  font-size: 11px;
+  color: var(--tickets-text-secondary);
+  a:hover {
+    color: var(--tickets-primary);
+    text-decoration: underline;
+  }
+  [aria-current] {
+    color: var(--tickets-text);
+  }
+}
+.skipLink {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  padding: 12px 18px;
+  color: #fff;
+  background: #263b58;
+  border-radius: 8px;
+  z-index: 3000;
+  transform: translateY(-180%);
+  &:focus {
+    transform: translateY(0);
+  }
+}
+.loading {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  color: #61728b;
+  background: #f4f6fb;
 }
 
-.pageContent {
-    flex: 1;
-    width: 100%;
-    margin: 0 auto;
-    padding: 0;
-    // background-color: #950606;
+.standardPage {
+  padding: var(--tickets-page-padding);
+}
+.standardContent.standardContent > * {
+  width: 100%;
+  min-width: 0;
+  padding: 0;
 }

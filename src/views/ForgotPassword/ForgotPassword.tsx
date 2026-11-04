@@ -1,87 +1,189 @@
 "use client";
-
-import { useState } from "react";
-import { Title } from "@/components/client/atoms/Title";
-import { Text } from "@/components/client/atoms/Text";
+import { useRef, useState } from "react";
+import Link from "next/link";
+import { AccessLayout } from "@/components/client/templates/AccessLayout/AccessLayout";
 import { FormField } from "@/components/client/molecules/FormField";
-import { FormActions } from "@/components/client/molecules/FormActions";
 import { Input } from "@/components/client/atoms/Input";
 import { Button } from "@/components/client/atoms/Button";
-import { Link } from "@/components/client/atoms/Link";
-import { Image } from "@/components/client/atoms/Image";
 import styles from "./ForgotPassword.module.scss";
 
-const ForgotPassword: React.FC = () => {
+export default function ForgotPassword() {
     const [email, setEmail] = useState("");
-    const [isLoading, setIsLoading] = useState(false);
-
-    const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        setIsLoading(true);
-
+    const [otp, setOtp] = useState("");
+    const [password, setPassword] = useState("");
+    const [repeatPassword, setRepeatPassword] = useState("");
+    const [step, setStep] = useState<"email" | "code" | "done">("email");
+    const [busy, setBusy] = useState(false);
+    const [error, setError] = useState("");
+    const [message, setMessage] = useState("");
+    const submitting = useRef(false);
+    const submit = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        if (submitting.current) return;
+        setError("");
+        if (step === "code" && password !== repeatPassword) {
+            setError("Las contraseñas no coinciden.");
+            return;
+        }
+        submitting.current = true;
+        setBusy(true);
         try {
-            // TODO: Implementar llamada a API para recuperar contraseña
-            await new Promise(resolve => setTimeout(resolve, 1000));
-      
-            console.log("Se ha enviado un correo con instrucciones para restablecer tu contraseña.");
-            setEmail("");
-        } catch (err) {
-            console.error("Error al enviar correo:", err);
-            console.log("Error al enviar el correo. Por favor intenta nuevamente.");
+            const response = await fetch("/api/auth/recovery", {
+                method: step === "email" ? "POST" : "PUT",
+                headers: { "Content-Type": "application/json" },
+                signal: AbortSignal.timeout(20000),
+                body: JSON.stringify(
+                    step === "email"
+                        ? { correo: email.trim() }
+                        : { OTP: otp, clave: password },
+                ),
+            });
+            const data = (await response.json()) as { message?: string };
+            if (!response.ok)
+                throw new Error(
+                    data.message || "No se pudo completar la recuperación.",
+                );
+            setMessage(data.message || "Solicitud procesada.");
+            setStep(step === "email" ? "code" : "done");
+            setPassword("");
+            setRepeatPassword("");
+        } catch (error) {
+            setError(
+                error instanceof Error
+                    ? error.message
+                    : "No se pudo completar la recuperación.",
+            );
         } finally {
-            setIsLoading(false);
+            submitting.current = false;
+            setBusy(false);
         }
     };
-
-    return(
-        <div className={styles.mainContainer}>
-            <Title variant="xlarge" className={styles.title}>EMETRA</Title>
-            <div className={styles.contentContainer}>
-                <div className={styles.formContainer}>
-                    <form onSubmit={handleSubmit}>
-                        <div className={styles.headerContainer}>
-                            <Title variant="large">Recuperar Contraseña</Title>
-                            <Text variant="caption" className={styles.headerText}>
-                                Ingresa tu correo electrónico y te enviaremos instrucciones para restablecer tu contraseña
-                            </Text>
-                        </div>
-                        <div className={styles.formFieldsContainer}>
-                            <FormField htmlFor="email" label="Correo Electrónico" required>
-                                <Input 
-                                    id="email"
-                                    placeholder="tu-correo@ejemplo.com"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    disabled={isLoading}
+    return (
+        <AccessLayout>
+            <div className={styles.header}>
+                <span>Acceso institucional</span>
+                <h2>
+                    {step === "done" ? "Acceso recuperado" : "Recuperar contraseña"}
+                </h2>
+                <p>
+                    {step === "email"
+                        ? "Solicita un código para restablecer tu acceso con tu correo institucional."
+                        : step === "code"
+                            ? "Escribe el código recibido y una nueva contraseña."
+                            : "Regresa al inicio de sesión para ingresar con tu nueva contraseña."}
+                </p>
+            </div>
+            {message && (
+                <p className={styles.message} role="status">
+                    {message}
+                </p>
+            )}
+            {step !== "done" && (
+                <form onSubmit={submit} className={styles.form}>
+                    {step === "email" ? (
+                        <FormField
+                            label="Correo institucional"
+                            htmlFor="recovery-email"
+                            required
+                        >
+                            <Input
+                                id="recovery-email"
+                                type="email"
+                                autoComplete="email"
+                                value={email}
+                                onChange={(event) => setEmail(event.target.value)}
+                                required
+                                disabled={busy}
+                            />
+                        </FormField>
+                    ) : (
+                        <>
+                            <FormField
+                                label="Código de recuperación"
+                                htmlFor="recovery-code"
+                                required
+                            >
+                                <Input
+                                    id="recovery-code"
+                                    value={otp}
+                                    inputMode="numeric"
+                                    pattern="[0-9]{6}"
+                                    maxLength={6}
+                                    autoComplete="one-time-code"
+                                    onChange={(event) => setOtp(event.target.value)}
                                     required
+                                    disabled={busy}
                                 />
                             </FormField>
-                            <Link href="/login" className={styles.backToLoginLink}>
-                                Volver a iniciar sesión
-                            </Link>
-                        </div>
-                        <FormActions className={styles.submitButton}>
-                            <Button 
-                                color="cancel" 
-                                fullWidth 
-                                type="submit"
-                                state={isLoading ? "loading" : "default"}
+                            <FormField
+                                label="Nueva contraseña"
+                                htmlFor="recovery-password"
+                                required
                             >
-                                {isLoading ? "Enviando..." : "Enviar"}
-                            </Button>
-                        </FormActions>
-                    </form>
-                </div>
-                <div className={styles.infoContainer}>
-                    <Title variant="xlarge">Sistema de tickets EMETRA</Title>
-                    <Text variant="caption" className={styles.infoText}>
-                        Un sistema diseñado especialmente para ti para facilitarte el control de tus procesos de la mejor manera.
-                    </Text>
-                    <Image src="/images/login-info.png" alt="Información del sistema" width={1041} height={586} rounded={false} />
-                </div>
-            </div>
-        </div>
+                                <Input
+                                    id="recovery-password"
+                                    type="password"
+                                    autoComplete="new-password"
+                                    minLength={8}
+                                    maxLength={128}
+                                    value={password}
+                                    onChange={(event) => setPassword(event.target.value)}
+                                    required
+                                    disabled={busy}
+                                />
+                            </FormField>
+                            <p className={styles.hint}>
+                                Usa al menos 8 caracteres, mayúsculas, minúsculas, un número y
+                                un símbolo (@$!%*?&amp;ñáéíóú).
+                            </p>
+                            <FormField
+                                label="Repetir contraseña"
+                                htmlFor="recovery-repeat"
+                                required
+                            >
+                                <Input
+                                    id="recovery-repeat"
+                                    type="password"
+                                    autoComplete="new-password"
+                                    value={repeatPassword}
+                                    onChange={(event) => setRepeatPassword(event.target.value)}
+                                    required
+                                    disabled={busy}
+                                />
+                            </FormField>
+                        </>
+                    )}
+                    {error && (
+                        <p role="alert" className={styles.error}>
+                            {error}
+                        </p>
+                    )}
+                    <Button fullWidth type="submit" state={busy ? "loading" : "default"}>
+                        {step === "email"
+                            ? "Solicitar recuperación"
+                            : "Actualizar contraseña"}
+                    </Button>
+                    {step === "code" && (
+                        <button
+                            type="button"
+                            className={styles.retry}
+                            disabled={busy}
+                            onClick={() => {
+                                setStep("email");
+                                setMessage("");
+                                setOtp("");
+                                setPassword("");
+                                setRepeatPassword("");
+                            }}
+                        >
+                            Solicitar otro código
+                        </button>
+                    )}
+                </form>
+            )}
+            <Link href="/login" className={styles.back}>
+                Volver a iniciar sesión
+            </Link>
+        </AccessLayout>
     );
-};
-
-export default ForgotPassword;
+}

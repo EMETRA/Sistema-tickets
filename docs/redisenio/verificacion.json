@@ -1,0 +1,136 @@
+{
+  "status": "PASS_LOCAL_REQUIERE_INSTALACION_ORACLE",
+  "branch": "feat/redisenar_sistema_tickets",
+  "typecheck": "PASS",
+  "lintChangedTypeScriptFiles": "PASS; 42 archivos de producción modificados/nuevos",
+  "productionBuild": "next build --webpack; PASS",
+  "nodeIntegrationTestFiles": 8,
+  "registeredModules": 16,
+  "authenticatedRoles": [
+    "ADMINISTRADOR",
+    "TECNICO",
+    "DESARROLLADOR",
+    "USUARIO"
+  ],
+  "homeWidths": [
+    1920,
+    1440,
+    1180,
+    1024,
+    768,
+    390
+  ],
+  "moduleWidths": [
+    1600,
+    1024,
+    768
+  ],
+  "browser": {
+    "estado": "OK",
+    "modulos": 16,
+    "recorridos": [
+      "login con error y éxito",
+      "buscador y secciones",
+      "mis tickets creados",
+      "inicios 4 roles",
+      "cancelación administrativa sin envío",
+      "dos confirmaciones y una sola escritura",
+      "técnico sin autoasignación",
+      "cancelar conserva historial sin deleteTicket",
+      "configuración demo sin escrituras",
+      "usuarios, equipo, perfil y aplicaciones",
+      "manual con visor utilizable",
+      "módulos a 1024 y 768",
+      "menú móvil",
+      "denegación de ruta",
+      "recuperación y nueva contraseña"
+    ],
+    "visited": [
+      "/home/informatica/reportes/mod01",
+      "/home/informatica/reportes/exportmod01",
+      "/home/informatica/reportes/save-mod01",
+      "/home/informatica/reportes/dashboard-proyectos",
+      "/home/informatica/reportes/dashboard-colaboradores",
+      "/home/informatica/permisos/mod06",
+      "/home/informatica/manuales/mod07",
+      "/home/rrhh/formularios/mod04",
+      "/home/rrhh/formularios/mod05",
+      "/home/recaudacion/procesos/proc01",
+      "/home/recaudacion/proyectos/mod13",
+      "/home/recaudacion/consultas/consulta-vehiculos",
+      "/home/financiero/formularios/mod08",
+      "/home/juridico/reportes/mod10",
+      "/home/juridico/juz01/juz01",
+      "/home/comunicacion/contenido/noticias"
+    ],
+    "errors": []
+  },
+  "regressions": {
+    "redisenio-browser.cjs": "PASS; 16 módulos e inicios de los cuatro roles heredados",
+    "panel-ux-browser.cjs": "PASS; Inicio y Noticias, imágenes de secciones, errores y reintentos",
+    "juzgado-browser.cjs": "PASS; defensa, permisos, PDF independiente y fallos de sesión"
+  },
+  "limits": [
+    "Backend HTTP controlado, sin Oracle, despliegues ni envíos reales",
+    "Los recorridos de módulos conservan navegación y espacio; no certifican todos sus procesos de negocio",
+    "Se requieren el nuevo esquema ADMEMETRAIT, SQL, grants y activación coordinada en los tres servicios",
+    "La tabla/columna del inventario oficial queda pendiente de configuración; se permite registro técnico manual identificado como no verificado",
+    "Observadores, eventos de negocio e incidentes requieren conectar sus fuentes reales",
+    "Recuperación requiere configurar AUTH_RECOVERY_BASE_URL; invitaciones y SMTP se prueban después de la instalación"
+  ],
+  "date": "2026-11-01",
+  "platformSections": 12,
+  "oracleExecuted": false,
+  "liveMailSent": false,
+  "deployed": false,
+  "platformBrowser": {
+    "estado": "PASS",
+    "backend": "HTTP controlado; Next real",
+    "recorridos": [
+      "inicio administrativo con datos reales del contrato",
+      "crear instalación y dos confirmaciones ligadas al servidor",
+      "calendario y actividad de equipo",
+      "mapa de red, selección de puertos y guardar posiciones",
+      "perfiles/roles/permisos y copia de accesos",
+      "monitoreo con healthcheck y logs autorizados",
+      "objetos Oracle mediante contrato HTTP",
+      "auditoría con antes/después",
+      "tableta y alcance del usuario sin privilegios"
+    ],
+    "capturas": "/workspace/artifacts/tickets-plataforma",
+    "erroresReact": []
+  },
+  "backendVerification": {
+    "api-tickets": {
+      "build": "PASS",
+      "suites": 27,
+      "tests": 281,
+      "result": "PASS",
+      "persistence": "dobles de Oracle; contratos SQL y HTTP local"
+    },
+    "api-autenticacion": {
+      "build": "PASS",
+      "focusedSuites": 2,
+      "focusedTests": 15,
+      "result": "PASS en flujo nuevo y regresión UserService",
+      "fullSuite": "9 fallos anteriores, reproducidos en origin/QA sin los cambios"
+    }
+  },
+  "localLaboratory": {
+    "status": "PASS_LOCAL",
+    "command": "pnpm laboratorio",
+    "profiles": 7,
+    "persistence": ".laboratorio/estado.json; datos ficticios; excluido de Git",
+    "mockContractTests": 10,
+    "allPanelIntegrationTests": 47,
+    "browser": "PASS; crear/asignar/iniciar/resolver entre perfiles; 12 secciones; ambas confirmaciones; privacidad; sin solicitudes externas",
+    "productionBuild": "PASS; next build --webpack",
+    "typecheck": "PASS",
+    "legacyNavigationBrowser": "PASS; 16 módulos",
+    "limits": [
+      "No verifica Oracle, grants, transacciones del API real, Auth/JWT, SMTP ni servicios institucionales",
+      "El API local es una aproximación de contratos; las cuentas y mediciones son ficticias",
+      "Los módulos externos y los adjuntos del ticket heredado quedan fuera de cobertura"
+    ]
+  }
+}

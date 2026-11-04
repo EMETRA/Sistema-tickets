@@ -1,3 +1,4 @@
+import Link from "next/link";
 import React, { useState, useRef, useEffect } from "react";
 import { UserMenuProps } from "./types";
 import { Avatar } from "../../atoms/Avatar";
@@ -12,7 +13,8 @@ export const UserMenu = ({
     role,
     avatarUrl,
     status,
-    className
+    className,
+    profilePath,
 }: UserMenuProps) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const logout = useAuthStore((state) => state.logout);
@@ -31,41 +33,62 @@ export const UserMenu = ({
 
     return (
         <div className={classNames(styles.userMenu, className)} ref={menuRef}>
-            <Avatar 
-                src={avatarUrl} 
+            <Avatar
+                src={avatarUrl}
                 initials={name.charAt(0)}
                 status={status}
                 ringed={status ? true : false}
                 size="sm"
             />
-            
+
             <div className={styles.info}>
-                <Text variant="body" className={styles.name}>{name}</Text>
-                <Text variant="caption" className={styles.role}>{role}</Text>
+                <Text variant="body" className={styles.name}>
+                    {name}
+                </Text>
+                <Text variant="caption" className={styles.role}>
+                    {role}
+                </Text>
             </div>
 
             <div className={styles.menuWrapper}>
-                <IconButton 
+                <IconButton
                     icon="angle-down-solid"
-                    borderless 
+                    borderless
                     onClick={() => {
-                        console.log("clicked, isMenuOpen:", isMenuOpen);
                         setIsMenuOpen((prev) => !prev);
                     }}
+                    aria-label="Menú de usuario"
+                    aria-expanded={isMenuOpen}
                     size={20}
                     iconColor="#000000"
-                    className={classNames(styles.chevron, { [styles.chevronOpen]: isMenuOpen })}
+                    className={classNames(styles.chevron, {
+                        [styles.chevronOpen]: isMenuOpen,
+                    })}
                 />
                 {isMenuOpen && (
                     <ul className={styles.menu}>
-                        <li 
-                            className={styles.menuItem} 
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                logout();
-                            }}
-                        >
-                            <Text>Cerrar sesión</Text>
+                        {profilePath && (
+                            <li>
+                                <Link
+                                    href={profilePath}
+                                    className={styles.menuItem}
+                                    onClick={() => setIsMenuOpen(false)}
+                                >
+                                    Mi perfil
+                                </Link>
+                            </li>
+                        )}
+                        <li>
+                            <button
+                                type="button"
+                                className={styles.menuItem}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    logout();
+                                }}
+                            >
+                                <Text>Cerrar sesión</Text>
+                            </button>
                         </li>
                     </ul>
                 )}

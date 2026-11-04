@@ -3,14 +3,17 @@ import { notFound, redirect } from "next/navigation";
 import { getModule } from "@/config/apps-catalog";
 import { getAppComponent } from "@/config/app-registry";
 import { requireAppCatalog } from "@/config/require-app-catalog";
+import { ModuleWorkspace } from "@/components/client/templates/ModuleWorkspace/ModuleWorkspace";
 
 type PageProps = {
-    params: Promise<{ appId: string; sectionId: string; moduleId: string }>;
+  params: Promise<{ appId: string; sectionId: string; moduleId: string }>;
 };
 
 export default async function ModuleAppPage({ params }: PageProps) {
     const { appId, sectionId, moduleId } = await params;
-    const catalog = await requireAppCatalog(`/home/${appId}/${sectionId}/${moduleId}`);
+    const catalog = await requireAppCatalog(
+        `/home/${appId}/${sectionId}/${moduleId}`,
+    );
 
     const moduleMeta = getModule(appId, sectionId, moduleId, catalog);
     if (!moduleMeta) redirect("/unauthorized");
@@ -18,5 +21,12 @@ export default async function ModuleAppPage({ params }: PageProps) {
     const appComponent = getAppComponent(moduleId);
     if (!appComponent) return notFound();
 
-    return createElement(appComponent);
+    return (
+        <ModuleWorkspace
+            title={moduleMeta.title}
+            showHeading={moduleId !== "noticias"}
+        >
+            {createElement(appComponent)}
+        </ModuleWorkspace>
+    );
 }

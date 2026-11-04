@@ -1,12 +1,12 @@
 @use "../../../../theme/colors.scss" as *;
 
 .AppCard {
-  border: 1px solid #D5D5D5;
+  border: 1px solid #d5d5d5;
   border-radius: 10px;
-  padding: 16px 5px 0 5px;
+  padding: 20px 5px 0 5px;
   display: flex;
   flex-direction: column;
-  background-color: #FFFFFF;
+  background-color: #ffffff;
   position: relative;
 
   width: 280px;
@@ -29,9 +29,9 @@
 
 .bookmarkButton {
   // Color por defecto será manejado por el Icon
-  
+
   &.bookmarked {
-    --icon-color: #FFB703;
+    --icon-color: #ffb703;
   }
 }
 
@@ -52,7 +52,7 @@
 .divider {
   width: 100%;
   height: 1px;
-  background-color: #D5D5D5;
+  background-color: #d5d5d5;
   margin-top: auto;
 }
 
@@ -62,5 +62,12 @@
 }
 
 .button {
-  color: #8D8DA8;
+  color: var(--tickets-primary);
+}
+.AppCard {
+  border-color: var(--tickets-border);
+  border-radius: var(--tickets-radius);
+  box-shadow: var(--tickets-shadow);
+  min-width: 0;
+  background: var(--tickets-surface);
 }

@@ -28,7 +28,11 @@ export const ModalContent = ({
     if (variant === "compact") {
         return (
             <PopOver isOpen={isOpen} onClose={handleClose} position="center">
-                <div className={classNames(styles.compactCard, { [styles.alignLeft]: align === "left" })}>
+                <div
+                    className={classNames(styles.compactCard, {
+                        [styles.alignLeft]: align === "left",
+                    })}
+                >
                     <div className={styles.compactText}>
                         <Text variant="body" className={styles.compactTitle}>
                             {title}
@@ -64,7 +68,7 @@ export const ModalContent = ({
     }
 
     return (
-        <PopOver isOpen={isOpen} onClose={onClose} position="center">
+        <PopOver isOpen={isOpen} onClose={handleClose} position="center">
             <div className={styles.modalCard}>
                 <div className={styles.iconWrapper}>
                     <Icon name={iconName} size={64} className={styles.mainIcon} />
@@ -80,18 +84,19 @@ export const ModalContent = ({
                 </div>
 
                 <div className={styles.actions}>
-                    <Button 
-                        variant="contained" 
+                    <Button
+                        variant="contained"
                         color="danger"
                         onClick={onConfirm}
                         state={loading ? "loading" : "default"}
                     >
                         {confirmLabel}
                     </Button>
-                    <Button 
-                        variant="outlined" 
-                        color="cancel" 
-                        onClick={onClose}
+                    <Button
+                        variant="outlined"
+                        color="cancel"
+                        onClick={handleClose}
+                        state={loading ? "disabled" : "default"}
                     >
                         {cancelLabel}
                     </Button>

@@ -20,7 +20,10 @@ export const RichTextField: React.FC<RichTextFieldProps> = ({
     value, 
     onChange, 
     className,
-    placeholder 
+    placeholder,
+    id,
+    label,
+    readOnly = false
 }) => {
     const editor = useEditor({
         extensions: [
@@ -35,10 +38,13 @@ export const RichTextField: React.FC<RichTextFieldProps> = ({
             }),
         ],
         content: value,
+        editable: !readOnly,
         immediatelyRender: false,
         editorProps: {
             attributes: {
                 class: styles.editorContent,
+                ...(id ? { id } : {}),
+                "aria-label": label || "Descripción del problema",
             },
         },
         onUpdate: ({ editor }) => {
@@ -47,6 +53,10 @@ export const RichTextField: React.FC<RichTextFieldProps> = ({
             onChange(markdown);
         },
     });
+
+    useEffect(() => {
+        editor?.setEditable(!readOnly, false);
+    }, [editor, readOnly]);
 
     // Sincronización robusta con el estado externo
     useEffect(() => {
@@ -64,7 +74,9 @@ export const RichTextField: React.FC<RichTextFieldProps> = ({
 
     return (
         <div className={classNames(styles.RichTextField, className)}>
-            <RichTextToolbar editor={editor} />
+            <fieldset disabled={readOnly} className={styles.toolbarControls}>
+                <RichTextToolbar editor={editor} />
+            </fieldset>
             <div className={styles.editorContainer}>
                 <EditorContent editor={editor} placeholder={placeholder} />
             </div>

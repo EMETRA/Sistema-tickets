@@ -1,4 +1,5 @@
 "use client";
+import { DemoNotice } from "@/components/client/molecules/DemoNotice/DemoNotice";
 
 import React, { useState } from "react";
 import { Input } from "@/components/client/atoms/Input";
@@ -14,23 +15,24 @@ import StatusChip from "@/components/client/atoms/StatusChip";
 // DUMMY DATA - REPLACE WITH REAL QUERY
 
 interface ProjectRow {
-    colaborador: string;
-    proyecto: string;
-    fechaInicio: string;
-    fechaFin: string;
-    avancePlan: string;
-    avanceReal: string;
-    desvAvance: string;
-    cumplTareas: string;
-    cumplFechas: string;
-    desvHoras: string;
-    prod: number;
-    bloqueos: number;
-    estado: "verde" | "amarillo" | "rojo";
-    situacion: string;
+  colaborador: string;
+  proyecto: string;
+  fechaInicio: string;
+  fechaFin: string;
+  avancePlan: string;
+  avanceReal: string;
+  desvAvance: string;
+  cumplTareas: string;
+  cumplFechas: string;
+  desvHoras: string;
+  prod: number;
+  bloqueos: number;
+  estado: "verde" | "amarillo" | "rojo";
+  situacion: string;
 }
 
-const GRID = "minmax(0,1fr) minmax(0,1.5fr) minmax(0,0.8fr) minmax(0,0.8fr) minmax(0,0.7fr) minmax(0,0.7fr) minmax(0,0.7fr) minmax(0,0.7fr) minmax(0,0.7fr) minmax(0,0.7fr) minmax(0,0.5fr) minmax(0,0.6fr) minmax(0,0.8fr) minmax(0,2fr)";
+const GRID =
+  "minmax(0,1fr) minmax(0,1.5fr) minmax(0,0.8fr) minmax(0,0.8fr) minmax(0,0.7fr) minmax(0,0.7fr) minmax(0,0.7fr) minmax(0,0.7fr) minmax(0,0.7fr) minmax(0,0.7fr) minmax(0,0.5fr) minmax(0,0.6fr) minmax(0,0.8fr) minmax(0,2fr)";
 
 const DUMMY_DATA: ProjectRow[] = [
     {
@@ -47,7 +49,8 @@ const DUMMY_DATA: ProjectRow[] = [
         prod: 92,
         bloqueos: 1,
         estado: "amarillo",
-        situacion: "El proyecto presenta avance parcial con desviaciones moderadas.",
+        situacion:
+      "El proyecto presenta avance parcial con desviaciones moderadas.",
     },
     {
         colaborador: "Erick Guerra",
@@ -63,7 +66,8 @@ const DUMMY_DATA: ProjectRow[] = [
         prod: 70,
         bloqueos: 0,
         estado: "rojo",
-        situacion: "El proyecto presenta atrasos relevantes respecto a lo planificado.",
+        situacion:
+      "El proyecto presenta atrasos relevantes respecto a lo planificado.",
     },
     {
         colaborador: "Daniel Morales",
@@ -120,11 +124,12 @@ const DashboardProjects: React.FC = () => {
 
     const handleConsultar = () => {
         console.log({ desde, hasta });
-        // TODO: refetch query with date range
+    // TODO: refetch query with date range
     };
 
     return (
         <div className={styles.mainContainer}>
+            <DemoNotice />
 
             {/* Filter bar */}
             <div className={styles.filterBar}>
@@ -172,39 +177,36 @@ const DashboardProjects: React.FC = () => {
             {/* Projects table */}
             <div className={styles.tableContainer}>
                 <Text className={styles.chartTitle}>Resumen por proyecto</Text>
-                <TableRow
-                    isHeader
-                    gridTemplate={GRID}
-                    cells={headers}
-                />
+                <TableRow isHeader gridTemplate={GRID} cells={headers} />
                 {DUMMY_DATA.map((row, i) => (
                     <TableRow
                         key={i}
                         gridTemplate={GRID}
                         scale={0.8}
-                        cells={[
-                            { content: <Text variant="muted">{row.colaborador}</Text> },
-                            { content: <Text variant="muted">{row.proyecto}</Text> },
-                            { content: <Text variant="muted">{row.fechaInicio}</Text> },
-                            { content: <Text variant="muted">{row.fechaFin}</Text> },
-                            { content: <Text variant="muted">{row.avancePlan}</Text> },
-                            { content: <Text variant="muted">{row.avanceReal}</Text> },
-                            { content: <Text variant="muted">{row.desvAvance}</Text> },
-                            { content: <Text variant="muted">{row.cumplTareas}</Text> },
-                            { content: <Text variant="muted">{row.cumplFechas}</Text> },
-                            { content: <Text variant="muted">{row.desvHoras}</Text> },
-                            { content: <Text variant="muted">{row.prod}</Text> },
-                            { content: <Text variant="muted">{row.bloqueos}</Text> },
-                            {
-                                content: <StatusChip variant={row.estado} />,
-                                align: "center",
-                            },
-                            { content: <Text variant="muted">{row.situacion}</Text> },
-                        ] as TableCellConfig[]}
+                        cells={
+              [
+                  { content: <Text variant="muted">{row.colaborador}</Text> },
+                  { content: <Text variant="muted">{row.proyecto}</Text> },
+                  { content: <Text variant="muted">{row.fechaInicio}</Text> },
+                  { content: <Text variant="muted">{row.fechaFin}</Text> },
+                  { content: <Text variant="muted">{row.avancePlan}</Text> },
+                  { content: <Text variant="muted">{row.avanceReal}</Text> },
+                  { content: <Text variant="muted">{row.desvAvance}</Text> },
+                  { content: <Text variant="muted">{row.cumplTareas}</Text> },
+                  { content: <Text variant="muted">{row.cumplFechas}</Text> },
+                  { content: <Text variant="muted">{row.desvHoras}</Text> },
+                  { content: <Text variant="muted">{row.prod}</Text> },
+                  { content: <Text variant="muted">{row.bloqueos}</Text> },
+                  {
+                      content: <StatusChip variant={row.estado} />,
+                      align: "center",
+                  },
+                  { content: <Text variant="muted">{row.situacion}</Text> },
+              ] as TableCellConfig[]
+                        }
                     />
                 ))}
             </div>
-
         </div>
     );
 };

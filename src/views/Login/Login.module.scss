@@ -1,87 +1,57 @@
-@use "../../theme/colors.scss" as *;
-
-.mainContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: start;
-  padding: 20px 20px 0 20px;
-  height: 100vh;
-}
-
-.title {
-  width: 100%;
-}
-
-.contentContainer {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  width: 100%;
-  height: 100%;
-}
-
 .formContainer form {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 20px;
-  padding: 100px 0 0 0;
+  gap: 28px;
+  width: 100%;
 }
-
-.errorText {
-  color: red;
-}
-
 .headerContainer {
-  width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 5px;
+  gap: 14px;
+  h2 {
+    font-size: 30px;
+    color: var(--tickets-text);
+  }
 }
-
 .headerText {
-  margin: 0;
-}
-
-.formFieldsContainer {
-  width: 70%;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.captchaContainer {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  padding: 20px 0;
-}
-
-.forgotPasswordLink {
-  align-self: flex-end;
-  text-decoration: none;
-  color: $gris-4;
+  color: var(--tickets-text-secondary);
+  line-height: 1.8;
   font-size: 12px;
 }
-
+.formFieldsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 19px;
+}
+.forgotPasswordLink {
+  color: var(--tickets-primary);
+  text-align: center;
+  font-size: 12px;
+  &:hover {
+    text-decoration: underline;
+  }
+}
 .loginButton {
-  width: 70%;
+  width: 100%;
+  margin: 0;
+}
+.errorText {
+  color: var(--tickets-danger);
+  background: #fcecee;
+  border: 1px solid #f0cdd3;
+  border-radius: 9px;
+  padding: 12px 14px;
+  line-height: 1.7;
+}
+.accessNote {
+  color: var(--tickets-text-muted);
+  font-size: 11px;
+  line-height: 1.8;
+  margin-top: 34px;
+  padding-top: 20px;
+  border-top: 1px solid var(--tickets-border);
+}
+.captchaContainer {
   display: flex;
   justify-content: center;
-}
-
-.infoContainer {
-  position: relative;
-  padding: 50px;
-  overflow: hidden;
-  height: 100%;
-  background-color: #F9F9FB;
-  border-radius: 5%;
-
-  :last-child {
-    position: absolute;
-    bottom: -50px;
-    right: -100px;
-  }
 }

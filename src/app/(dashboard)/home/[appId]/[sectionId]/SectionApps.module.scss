@@ -1,4 +1,9 @@
 .container {
-    width: 100%;
-    padding: 50px 0 0 20px;
+  width: 100%;
+  padding: 50px 0 0 20px;
+}
+
+.container {
+  padding: var(--tickets-page-padding);
+  min-width: 0;
 }

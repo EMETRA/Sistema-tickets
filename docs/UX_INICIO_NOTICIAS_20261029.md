@@ -1,7 +1,7 @@
 # Inicio, Noticias y recuperación de archivos
 
 Inicio utiliza el ancho disponible con aplicaciones en una grilla adaptable y
-actividad/reporte en columnas. Se conserva el catálogo real y sus permisos.
+actividad/reporte en columnas. Se conserva el manifiesto de rutas existente; la autorización de cada operación corresponde al servidor.
 El saludo se integra al encabezado; se retira la tarjeta ilustrada que imponía
 un ancho fijo. Se corrigen también las grillas de administrador y técnico,
 con estados recuperables y protección ante estadísticas de cero tickets.

@@ -1,5 +1,5 @@
-
 "use client";
+import { DemoNotice } from "@/components/client/molecules/DemoNotice/DemoNotice";
 
 import { useEffect, useState } from "react";
 import classNames from "classnames";
@@ -17,9 +17,15 @@ import {
 import styles from "./Statistics.module.scss";
 
 export const Statistics = () => {
-    const [systems, setSystems] = useState<Array<{ label: string; value: string }>>([]);
-    const [selectedSystem, setSelectedSystem] = useState({ label: "", value: "" });
-    const [filterConfig, setFilterConfig] = useState<SecondaryFilterConfig | null>(null);
+    const [systems, setSystems] = useState<
+    Array<{ label: string; value: string }>
+  >([]);
+    const [selectedSystem, setSelectedSystem] = useState({
+        label: "",
+        value: "",
+    });
+    const [filterConfig, setFilterConfig] =
+    useState<SecondaryFilterConfig | null>(null);
     const [selectedParentFilter, setSelectedParentFilter] = useState("");
     const [selectedChildFilter, setSelectedChildFilter] = useState("");
     const [data, setData] = useState<BarChartDataPoint[]>([]);
@@ -35,7 +41,8 @@ export const Statistics = () => {
                 const systemsData = await getSystemsDummy();
                 const config = await getStatisticsFilterConfigDummy();
                 const defaultParent = config.parentOptions[0]?.value || "";
-                const defaultChild = config.childOptionsByParent[defaultParent]?.[0]?.value || "";
+                const defaultChild =
+          config.childOptionsByParent[defaultParent]?.[0]?.value || "";
 
                 setSystems(systemsData);
                 setSelectedSystem(systemsData[0] || { label: "", value: "" });
@@ -61,7 +68,10 @@ export const Statistics = () => {
             try {
                 setIsLoading(true);
                 setError("");
-                const response = await getStatisticsPerformanceDummy(selectedParentFilter, selectedChildFilter);
+                const response = await getStatisticsPerformanceDummy(
+                    selectedParentFilter,
+                    selectedChildFilter,
+                );
                 setData(response);
             } catch (fetchError) {
                 console.error("Error cargando estadisticas:", fetchError);
@@ -76,12 +86,14 @@ export const Statistics = () => {
 
     const handleParentFilterChange = (value: string) => {
         setSelectedParentFilter(value);
-        const nextChild = filterConfig?.childOptionsByParent[value]?.[0]?.value || "";
+        const nextChild =
+      filterConfig?.childOptionsByParent[value]?.[0]?.value || "";
         setSelectedChildFilter(nextChild);
     };
 
     return (
         <div className={classNames(styles.Statistics)}>
+            <DemoNotice />
             <div className={styles.header}>
                 <div className={styles.titleContainer}>
                     <DropdownMenu
@@ -90,9 +102,13 @@ export const Statistics = () => {
                         className={styles.systemDropdown}
                     />
                     <Text variant="caption">Reporte del:</Text>
-                    <Text variant="body">{selectedSystem.label || "Seleccione un sistema"}</Text>
+                    <Text variant="body">
+                        {selectedSystem.label || "Seleccione un sistema"}
+                    </Text>
                 </div>
-                <Button variant="contained" icon="print-solid" left>Imprimir</Button>
+                <Button variant="contained" icon="print-solid" left>
+                    Imprimir
+                </Button>
             </div>
             <div className={styles.content}>
                 {isLoading ? (
@@ -103,7 +119,9 @@ export const Statistics = () => {
                     <PerformanceChartPanel
                         variant="secondary"
                         data={data}
-                        filterConfig={filterConfig || { parentOptions: [], childOptionsByParent: {} }}
+                        filterConfig={
+                            filterConfig || { parentOptions: [], childOptionsByParent: {} }
+                        }
                         selectedParentFilter={selectedParentFilter}
                         selectedChildFilter={selectedChildFilter}
                         onParentFilterChange={handleParentFilterChange}
@@ -112,7 +130,7 @@ export const Statistics = () => {
                 )}
             </div>
         </div>
-    )
-}
+    );
+};
 
 export default Statistics;

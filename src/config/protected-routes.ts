@@ -1,4 +1,6 @@
 export const protectedRoutes = [
+    "/aplicaciones",
+    "/espacio",
     "/home",
     "/tickets",
     "/tickets-creation",

@@ -1,0 +1,1 @@
+export { AdministrativeConfirmation } from "./AdministrativeConfirmation";

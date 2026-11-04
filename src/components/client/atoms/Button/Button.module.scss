@@ -1,4 +1,4 @@
-@use  "../../../../../src/theme/colors.scss" as *;
+@use "../../../../../src/theme/colors.scss" as *;
 @use "sass:color";
 
 // Estilos base del botón
@@ -6,9 +6,10 @@
   box-sizing: border-box;
   outline: none;
   border: none;
-  padding: 10px 24px;
-  font-weight: 500;
-  font-size: 14px;
+  min-height: 42px;
+  padding: 10px 18px;
+  font-weight: 600;
+  font-size: 13px;
   cursor: pointer;
   transition: all 0.2s ease;
   display: inline-flex;
@@ -30,7 +31,7 @@
 
   // Contained (con relleno)
   &--contained {
-    border-radius: 5px;
+    border-radius: var(--tickets-control-radius, 9px);
     color: #ffffff;
 
     // Colores para contained
@@ -95,24 +96,24 @@
     }
 
     &.Button--neutral-light {
-      background-color: #D3D3D366;
+      background-color: #d3d3d366;
       color: $negro-1;
 
       &:hover:not(.Button--disabled):not(.Button--loading) {
-        background-color: #D3D3D388;
+        background-color: #d3d3d388;
       }
 
       &:active:not(.Button--disabled):not(.Button--loading) {
-        background-color: #D3D3D3AA;
+        background-color: #d3d3d3aa;
       }
     }
   }
 
   // Outlined (con borde)
   &--outlined {
-    border-radius: 5px;
+    border-radius: var(--tickets-control-radius, 9px);
     background-color: transparent;
-    border: 1px solid $gris-2;
+    border: 1px solid var(--tickets-border, #dfe5f2);
     color: $negro-1;
 
     &:hover:not(.Button--disabled):not(.Button--loading) {
@@ -174,7 +175,7 @@
     border: none;
     padding: 8px 12px;
     color: $negro-2;
-    border-radius: 5px;
+    border-radius: var(--tickets-control-radius, 9px);
 
     &:hover:not(.Button--disabled):not(.Button--loading) {
       background-color: rgba($negro-2, 0.08);

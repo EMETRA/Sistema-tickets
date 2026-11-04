@@ -1,6 +1,8 @@
+@import "../theme/tokens.css";
+
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: var(--tickets-text);
 }
 
 /* @media (prefers-color-scheme: dark) {
@@ -35,8 +37,35 @@ a {
   text-decoration: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: white dark;
+html {
+  color-scheme: light;
+}
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+button,
+a,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+:focus-visible {
+  outline: 2px solid var(--tickets-primary);
+  outline-offset: 3px;
+}
+button:disabled {
+  cursor: not-allowed;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
   }
 }

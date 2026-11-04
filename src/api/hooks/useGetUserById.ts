@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * Hook useGetUserById
@@ -27,15 +27,14 @@ export function useGetUserById(userId: number) {
     const [error, setError] = useState<Error | null>(null);
 
     const refetch = useCallback(async () => {
+        if (!Number.isSafeInteger(userId) || userId <= 0) return;
         setLoading(true);
         setError(null);
 
         try {
             const response = await apiFetch<{ usuario: UsuarioPerfil }>(
-                `/api/usuario/${userId}`
+                `/api/usuario/${userId}`,
             );
-
-            console.log("Response from /api/usuario/[userId]:", response);
 
             setData(response.usuario || null);
         } catch (err) {

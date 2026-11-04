@@ -73,7 +73,7 @@
   "limits": [
     "Backend HTTP controlado, sin Oracle, despliegues ni envíos reales",
     "Los recorridos de módulos conservan navegación y espacio; no certifican todos sus procesos de negocio",
-    "Se requieren el nuevo esquema ADMEMETRAINFORMATICA, SQL, grants y activación coordinada en los tres servicios",
+    "Se requieren el nuevo esquema ADMEMETRAIT, SQL, grants y activación coordinada en los tres servicios",
     "La tabla/columna del inventario oficial queda pendiente de configuración; se permite registro técnico manual identificado como no verificado",
     "Observadores, eventos de negocio e incidentes requieren conectar sus fuentes reales",
     "Recuperación requiere configurar AUTH_RECOVERY_BASE_URL; invitaciones y SMTP se prueban después de la instalación"

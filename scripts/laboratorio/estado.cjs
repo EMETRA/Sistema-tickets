@@ -241,7 +241,7 @@ function seed() {
     componente: "BACK",
   });
   rec("esquemas", ids.esquema, "Esquema ficticio", {
-    owner: "ADMEMETRAINFORMATICA",
+    owner: "ADMEMETRAIT",
     aplicacionId: ids.app,
   });
   rec("contenedores", randomUUID(), "Contenedor ficticio", {

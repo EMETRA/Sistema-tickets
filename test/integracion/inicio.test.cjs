@@ -31,11 +31,40 @@ test('ORA-00942 mantiene el fallo sin exponer query, variables, JWT ni detalles 
       assert.match(body.referencia, /^[0-9a-f-]{36}$/);
       assert(!JSON.stringify(body).match(/ORA-|SELECT|ESQUEMA_PRIVADO|JWT-PRUEBA|variables/));
       const log = logs.find(item => item.operacion === operation);
+      assert.equal(log.tipoFallo, 'ORACLE');
+      assert.equal(log.httpOrigen, 200);
       assert.deepEqual(log.codigosOracle, ['ORA-00942']);
       assert.equal(log.referencia, body.referencia);
     }
     assert(!JSON.stringify(logs).match(/SELECT|ESQUEMA_PRIVADO|JWT-PRUEBA|variables/));
   } finally { console.error = previous; }
+});
+
+test('el diagnóstico distingue red, plazo, contrato y respuesta incompleta sin registrar mensajes privados', () => {
+  const { diagnosticoErrorGraphql } = loader(root)('src/api/graphql/server-error.ts');
+  const secret = 'Bearer JWT-PRIVADO SELECT * FROM TABLA_INTERNA';
+  const cases = [
+    [Object.assign(new TypeError(secret), {cause: {code: 'ENOTFOUND'}}), 'DNS', null, ['ENOTFOUND']],
+    [Object.assign(new TypeError(secret), {cause: {code: 'ECONNREFUSED'}}), 'CONEXION', null, ['ECONNREFUSED']],
+    [Object.assign(new TypeError(secret), {cause: {code: 'UNABLE_TO_VERIFY_LEAF_SIGNATURE'}}), 'TLS', null, ['UNABLE_TO_VERIFY_LEAF_SIGNATURE']],
+    [Object.assign(new Error(secret), {name: 'AbortError'}), 'TIEMPO_AGOTADO', null, []],
+    [Object.assign(new TypeError(secret), {cause: {code: 'UND_ERR_CONNECT_TIMEOUT'}}), 'TIEMPO_AGOTADO', null, ['UND_ERR_CONNECT_TIMEOUT']],
+    [Object.assign(new Error(secret), {response: {status: 400, errors: [{message: secret, extensions: {code: 'GRAPHQL_VALIDATION_FAILED'}}]}}), 'CONTRATO_GRAPHQL', 400, []],
+    [Object.assign(new Error(secret), {response: {status: 502}}), 'HTTP', 502, []],
+    [new SyntaxError(secret), 'RESPUESTA_NO_JSON', null, []],
+    [new Error('RESPUESTA_INICIO_INCOMPLETA'), 'RESPUESTA_INCOMPLETA', null, []],
+  ];
+  for (const [error, tipoFallo, httpOrigen, codigosTransporte] of cases) {
+    const result = diagnosticoErrorGraphql(error);
+    assert.equal(result.tipoFallo, tipoFallo);
+    assert.equal(result.httpOrigen, httpOrigen);
+    assert.deepEqual(result.codigosTransporte, codigosTransporte);
+    assert(!JSON.stringify(result).includes(secret));
+  }
+  const untrusted = Object.assign(new Error(secret), {code: secret, cause: {code: secret},
+    response: {status: secret, errors: [{message: 'ORA-01031 '+secret, extensions: {code: secret}}]}});
+  assert.deepEqual(diagnosticoErrorGraphql(untrusted), {tipoFallo:'ORACLE',httpOrigen:null,
+    codigosGraphql:[],codigosTransporte:[],codigosOracle:['ORA-01031']});
 });
 
 test('errores de sesión y permiso dentro de GraphQL200 conservan 401 y 403', async () => {

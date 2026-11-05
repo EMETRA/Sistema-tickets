@@ -6,7 +6,7 @@ El fallo al abrir `/home/comunicacion` se producía porque la lectura del catál
 
 **Infraestructura** consulta las observaciones recibidas de cada servidor y refresca la vista cada minuto mientras esté abierta y visible. El Panel no ejecuta comandos de Docker ni SSH. **Sistemas → Estado de repositorios** consulta rama, commit, comprobaciones y PR abiertos hacia la rama del vínculo seleccionado. Un commit de GitHub no certifica la versión desplegada en un servidor.
 
-Para habilitar las fuentes reales, integrar primero el cambio de **api-tickets** con `GET /platform/repositories/:id`, registrar servidores/aplicaciones/repositorios y seguir [la guía de instalación de las fuentes](https://github.com/EMETRA/api-tickets/blob/feat/observadores_y_repositorios/docs/plataforma/FUENTES_REALES.md). Requiere:
+Para habilitar las fuentes reales, integrar primero el cambio de **api-tickets** con `GET /platform/repositories/:id`, registrar servidores/aplicaciones/repositorios y seguir [la guía de instalación de las fuentes](https://github.com/EMETRA/api-tickets/blob/QA/docs/plataforma/FUENTES_REALES.md). Requiere:
 
 - Observador local configurado/programado por separado en consultan y eme02, UUID del servidor, clave exclusiva y base HTTPS del API accesible desde ambas máquinas.
 - Credencial GitHub de solo lectura configurada únicamente en api-tickets para los repositorios necesarios. El Panel recibe metadatos autorizados, nunca esa credencial.

@@ -2,6 +2,8 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/client/atoms/Button";
+import { Icon } from "@/components/client/atoms/Icon";
+import homeStyles from "./HomeWorkspace.module.scss";
 import { MetricCard } from "@/components/client/molecules/MetricCard";
 import { TicketDetail } from "@/components/client/organisms/TicketDetail";
 import { usePlatform } from "@/platform/context";
@@ -113,11 +115,165 @@ export function HomeWorkspace() {
     const links = platformSections(data!)
         .filter((s) => priorities.includes(s.id))
         .sort((a, b) => priorities.indexOf(a.id) - priorities.indexOf(b.id));
+    const ticketsPanel = (
+        <section className={`${styles.card} ${homeStyles.tickets}`} aria-labelledby="inicio-tickets">
+            <div className={styles.toolbar}>
+                <h2 id="inicio-tickets">
+                    {scope === "cola"
+                        ? "Bandeja de Informática"
+                        : scope === "asignados"
+                          ? "Tickets asignados a mí"
+                          : scope === "equipo"
+                            ? "Tickets de mi equipo"
+                            : "Mis solicitudes"}
+                </h2>
+                <Link
+                    className={styles.link}
+                    href="/espacio/asignacion"
+                >
+                    Abrir bandeja
+                </Link>
+            </div>
+            <ul className={`${styles.timeline} ${homeStyles.ticketList}`}>
+                {tickets?.items.map((t) => (
+                    <li key={t.id}>
+                        <button
+                            className={homeStyles.recordLink}
+                            onClick={() => setTicket(t.id)}
+                        >
+                            {t.codigo || "#" + t.id} · {t.titulo}
+                        </button>
+                        <p className={homeStyles.state} data-state={t.estado}>
+                            {(
+                                {
+                                    1: "Sin asignar",
+                                    2: "Asignado",
+                                    3: "En atención",
+                                    4: "Cancelado",
+                                    5: "Resuelto",
+                                } as Record<number, string>
+                            )[t.estado] || "Estado registrado"}
+                        </p>
+                        {t.alerta && (
+                            <p className={styles.error}>
+                                Asignado sin primera atención: superó el
+                                umbral del equipo.
+                            </p>
+                        )}
+                    </li>
+                ))}
+            </ul>
+            {tickets && !tickets.items.length && (
+                <p className={styles.muted}>
+                    No hay tickets en esta bandeja.
+                </p>
+            )}
+            {tickets && (
+                <p className={styles.muted}>
+                    {tickets.total} tickets en tu alcance. Se muestran
+                    hasta cinco.
+                </p>
+            )}
+        </section>
+    );
+    const calendarPanel = (
+        <aside className={`${styles.card} ${homeStyles.calendar}`} aria-labelledby="inicio-calendario">
+            <h2 id="inicio-calendario">Próximas actividades</h2>
+            <p className={styles.muted}>
+                Esta semana · Hora de Guatemala
+            </p>
+            <ul className={styles.timeline}>
+                {activities.map((a) => (
+                    <li key={a.id}>
+                        <Link
+                            className={homeStyles.recordLink}
+                            href={
+                                "/espacio/registro/actividades/" + a.id
+                            }
+                        >
+                            {a.nombre}
+                        </Link>
+                        <p className={styles.muted}>
+                            {displayDate(a.datos.inicio)} ·{" "}
+                            {a.visibilidad === "EMPRESA"
+                                ? "General de la empresa"
+                                : a.visibilidad === "PRIVADA"
+                                  ? "Privada"
+                                  : "De equipo"}
+                        </p>
+                    </li>
+                ))}
+            </ul>
+            {summary && !activities.length && (
+                <p className={styles.muted}>
+                    No hay actividades visibles programadas para estos
+                    días.
+                </p>
+            )}
+            <Link className={styles.link} href="/espacio/calendario">
+                Abrir calendario
+            </Link>
+        </aside>
+    );
+    const activityPanel = (
+        <section className={`${styles.card} ${homeStyles.activity}`} aria-labelledby="inicio-actividad">
+            <h2 id="inicio-actividad">Acciones recientes en aplicaciones</h2>
+            <ul className={styles.timeline}>
+                {summary?.registros.slice(0, 8).map((a) => (
+                    <li key={a.id}>
+                        <strong>
+                            {a.operacion.replaceAll("_", " ")}
+                        </strong>
+                        <p>
+                            {a.recurso} · {a.cantidad}
+                        </p>
+                        <p className={styles.muted}>
+                            {displayDate(a.fecha)}
+                        </p>
+                    </li>
+                ))}
+            </ul>
+            {summary && !summary.registros.length && (
+                <p className={styles.muted}>
+                    Aún no hay operaciones confirmadas por tus
+                    aplicaciones. Aquí aparecerán cuando sus servicios
+                    registren los eventos.
+                </p>
+            )}
+            <Link className={styles.link} href="/espacio/metricas">
+                Consultar registros e indicadores
+            </Link>
+        </section>
+    );
+    const applicationsPanel = (
+        <section className={`${styles.card} ${homeStyles.applications}`} aria-labelledby="inicio-aplicaciones">
+            <h2 id="inicio-aplicaciones">Aplicaciones autorizadas</h2>
+            <ul className={styles.timeline}>
+                {catalog &&
+                    Object.values(catalog).map((app) => (
+                        <li key={app.meta.id}>
+                            <Link
+                                className={styles.link}
+                                href={"/home/" + app.meta.id}
+                            >
+                                {app.meta.title}
+                            </Link>
+                        </li>
+                    ))}
+            </ul>
+            {catalog && !Object.keys(catalog).length && (
+                <p className={styles.muted}>
+                    Tu perfil aún no tiene módulos de aplicaciones
+                    asignados.
+                </p>
+            )}
+        </section>
+    );
     return (
         <section className={`${styles.page} ${styles.homePage}`}>
-            <div className={styles.toolbar}>
+            <div className={homeStyles.hero}>
                 <div>
-                    <p className={styles.muted}>
+                    <p className={homeStyles.eyebrow}>
                         {modeLabels[data!.actor.mode] ||
                             "Mi espacio de trabajo"}
                     </p>
@@ -150,7 +306,7 @@ export function HomeWorkspace() {
                 </p>
             )}
             {summary ? (
-                <div className={styles.metrics}>
+                <div className={styles.metrics} role="group" aria-label="Indicadores de tickets">
                     <MetricCard
                         label="Tickets del periodo"
                         value={summary.tickets.total}
@@ -171,170 +327,21 @@ export function HomeWorkspace() {
             ) : (
                 !error && <p role="status">Consultando indicadores…</p>
             )}
-            <div className={styles.grid}>
+            <div className={homeStyles.content} data-mode={data!.actor.mode}>
+                {data!.actor.mode === "USUARIO" ? activityPanel : ticketsPanel}
+                {calendarPanel}
+                {data!.actor.mode === "USUARIO" ? ticketsPanel : activityPanel}
+                {applicationsPanel}
+            </div>
+            <nav className={homeStyles.shortcuts} aria-label="Accesos de mi espacio">
                 {links.map((s) => (
-                    <Link
-                        className={styles.card}
-                        key={s.id}
-                        href={"/espacio/" + s.id}
-                    >
+                    <Link className={`${styles.card} ${homeStyles.shortcut}`} key={s.id} href={"/espacio/" + s.id}>
+                        <span className={homeStyles.shortcutIcon}><Icon name={s.iconName} size={24} color="var(--tickets-primary)" /></span>
                         <h3>{s.label}</h3>
-                        <span className={styles.muted}>
-                            Abrir mi espacio autorizado →
-                        </span>
+                        <span className={homeStyles.shortcutAction}>Ingresar <span aria-hidden="true">→</span></span>
                     </Link>
                 ))}
-            </div>
-            <div className={styles.split}>
-                <section className={styles.card}>
-                    <div className={styles.toolbar}>
-                        <h2>
-                            {scope === "cola"
-                                ? "Bandeja de Informática"
-                                : scope === "asignados"
-                                  ? "Tickets asignados a mí"
-                                  : scope === "equipo"
-                                    ? "Tickets de mi equipo"
-                                    : "Mis solicitudes"}
-                        </h2>
-                        <Link
-                            className={styles.link}
-                            href="/espacio/asignacion"
-                        >
-                            Abrir bandeja
-                        </Link>
-                    </div>
-                    <ul className={styles.timeline}>
-                        {tickets?.items.map((t) => (
-                            <li key={t.id}>
-                                <button
-                                    className={styles.link}
-                                    onClick={() => setTicket(t.id)}
-                                >
-                                    {t.codigo || "#" + t.id} · {t.titulo}
-                                </button>
-                                <p className={styles.muted}>
-                                    {(
-                                        {
-                                            1: "Sin asignar",
-                                            2: "Asignado",
-                                            3: "En atención",
-                                            4: "Cancelado",
-                                            5: "Resuelto",
-                                        } as Record<number, string>
-                                    )[t.estado] || "Estado registrado"}
-                                </p>
-                                {t.alerta && (
-                                    <p className={styles.error}>
-                                        Asignado sin primera atención: superó el
-                                        umbral del equipo.
-                                    </p>
-                                )}
-                            </li>
-                        ))}
-                    </ul>
-                    {tickets && !tickets.items.length && (
-                        <p className={styles.muted}>
-                            No hay tickets en esta bandeja.
-                        </p>
-                    )}
-                    {tickets && (
-                        <p className={styles.muted}>
-                            {tickets.total} tickets en tu alcance. Se muestran
-                            hasta cinco.
-                        </p>
-                    )}
-                </section>
-                <aside className={styles.card}>
-                    <h2>Próximas actividades</h2>
-                    <p className={styles.muted}>
-                        Esta semana · Hora de Guatemala
-                    </p>
-                    <ul className={styles.timeline}>
-                        {activities.map((a) => (
-                            <li key={a.id}>
-                                <Link
-                                    className={styles.link}
-                                    href={
-                                        "/espacio/registro/actividades/" + a.id
-                                    }
-                                >
-                                    {a.nombre}
-                                </Link>
-                                <p className={styles.muted}>
-                                    {displayDate(a.datos.inicio)} ·{" "}
-                                    {a.visibilidad === "EMPRESA"
-                                        ? "General de la empresa"
-                                        : a.visibilidad === "PRIVADA"
-                                          ? "Privada"
-                                          : "De equipo"}
-                                </p>
-                            </li>
-                        ))}
-                    </ul>
-                    {summary && !activities.length && (
-                        <p className={styles.muted}>
-                            No hay actividades visibles programadas para estos
-                            días.
-                        </p>
-                    )}
-                    <Link className={styles.link} href="/espacio/calendario">
-                        Abrir calendario
-                    </Link>
-                </aside>
-            </div>
-            <div className={styles.grid}>
-                <section className={styles.card}>
-                    <h2>Acciones recientes en aplicaciones</h2>
-                    <ul className={styles.timeline}>
-                        {summary?.registros.slice(0, 8).map((a) => (
-                            <li key={a.id}>
-                                <strong>
-                                    {a.operacion.replaceAll("_", " ")}
-                                </strong>
-                                <p>
-                                    {a.recurso} · {a.cantidad}
-                                </p>
-                                <p className={styles.muted}>
-                                    {displayDate(a.fecha)}
-                                </p>
-                            </li>
-                        ))}
-                    </ul>
-                    {summary && !summary.registros.length && (
-                        <p className={styles.muted}>
-                            Aún no hay operaciones confirmadas por tus
-                            aplicaciones. Aquí aparecerán cuando sus servicios
-                            registren los eventos.
-                        </p>
-                    )}
-                    <Link className={styles.link} href="/espacio/metricas">
-                        Consultar registros e indicadores
-                    </Link>
-                </section>
-                <section className={styles.card}>
-                    <h2>Aplicaciones autorizadas</h2>
-                    <ul className={styles.timeline}>
-                        {catalog &&
-                            Object.values(catalog).map((app) => (
-                                <li key={app.meta.id}>
-                                    <Link
-                                        className={styles.link}
-                                        href={"/home/" + app.meta.id}
-                                    >
-                                        {app.meta.title}
-                                    </Link>
-                                </li>
-                            ))}
-                    </ul>
-                    {catalog && !Object.keys(catalog).length && (
-                        <p className={styles.muted}>
-                            Tu perfil aún no tiene módulos de aplicaciones
-                            asignados.
-                        </p>
-                    )}
-                </section>
-            </div>
+            </nav>
             <TicketDetail
                 isOpen={ticketId !== null}
                 ticketId={String(ticketId || "")}

@@ -71,7 +71,10 @@ async function run(){
   await page.getByRole('navigation',{name:'Menú principal'}).getByRole('link',{name:'Mis tickets',exact:true}).click();await page.waitForURL('**/mis-tickets');await page.getByText(ticket.titulo,{exact:true}).waitFor();
   assert.ok(calls.some(c=>c.query.includes('query Tickets')&&c.variables?.filters?.usuarioCreadorId===12));
   const session=async(nextRole)=>{role=nextRole;await context.addCookies([{name:'auth_token',value:'qa-token-controlado',url:base},{name:'auth_role',value:role,url:base}]);await page.evaluate(user=>localStorage.setItem('auth-storage',JSON.stringify({state:{token:'qa-token-controlado',user,userId:user.id_usuario},version:0})),user());};
-  for(const current of ['TECNICO','DESARROLLADOR','ADMINISTRADOR']){await session(current);await page.goto(base+'/home');await page.getByRole('heading',{name:'Hola, Usuario'}).waitFor();await page.waitForLoadState('networkidle');await fits();await page.mouse.move(0,0);await page.screenshot({path:path.join(out,'inicio-'+current.toLowerCase()+'.png')});}
+  for(const current of ['TECNICO','DESARROLLADOR','ADMINISTRADOR']){await session(current);await page.goto(base+'/home');await page.getByRole('heading',{name:'Hola, Usuario'}).waitFor();await page.waitForLoadState('networkidle');await fits();if(current==='TECNICO'){
+    const performance=page.getByRole('heading',{name:'Mi Rendimiento',exact:true}).locator('../..');
+    assert.equal(await performance.evaluate(el=>getComputedStyle(el).backgroundColor),'rgb(255, 255, 255)','El panel de rendimiento conserva la superficie blanca');
+  }await page.mouse.move(0,0);await page.screenshot({path:path.join(out,'inicio-'+current.toLowerCase()+'.png')});}
   await session('ADMINISTRADOR');await page.goto(base+'/tickets-creation');await page.locator('#subject').fill('Guardar requiere dos confirmaciones');await page.locator('#department').selectOption('1');await page.locator('[contenteditable=true]').fill('Descripción controlada');
   await page.getByRole('complementary',{name:'Resumen de la solicitud'}).getByText('Guardar requiere dos confirmaciones',{exact:true}).waitFor();await page.screenshot({path:path.join(out,'crear-ticket.png')});
   const writes=()=>calls.filter(c=>c.query.includes('mutation CreateTicket')).length;const before=writes();await page.getByRole('button',{name:'Crear ticket',exact:true}).click();

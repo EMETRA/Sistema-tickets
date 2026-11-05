@@ -1,6 +1,6 @@
-.body { font-family: var(--font-montserrat), sans-serif; font-size: 1rem; color: #333; }
-.muted { font-family: var(--font-montserrat), sans-serif; color: #666; }
-.caption { font-family: var(--font-montserrat), sans-serif; font-size: 0.875rem; color: #888; } // Datos de tablas
+.body { font-family: var(--font-montserrat), sans-serif; font-size: 1rem; color: var(--tickets-text); }
+.muted { font-family: var(--font-montserrat), sans-serif; color: var(--tickets-text-secondary); }
+.caption { font-family: var(--font-montserrat), sans-serif; font-size: 0.875rem; color: var(--tickets-text-secondary); } // Datos de tablas
 .overline { font-family: var(--font-montserrat), sans-serif; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; } // Sidebar
 .navLabel {
     color: #FFFFFF;

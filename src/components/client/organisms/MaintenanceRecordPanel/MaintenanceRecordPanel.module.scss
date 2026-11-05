@@ -1,3 +1,4 @@
+@use "../../../../theme/surfaces.scss" as surfaces;
 .card {
     background-color: #FFFFFF;
     border: 1px solid #E0E0E0;
@@ -10,7 +11,7 @@
 .title {
     font-size: 18px;
     font-weight: 700;
-    color: #333333;
+    color: var(--tickets-text);
 }
 
 .records {
@@ -31,7 +32,7 @@
 
 .label {
     font-weight: 500;
-    color: #333333;
+    color: var(--tickets-text);
     // margin: 0;
     padding: 0;
     line-height: 2;
@@ -50,7 +51,7 @@
 .observationsSection {
     .obsLabel {
         font-weight: 600;
-        color: #333333;
+        color: var(--tickets-text);
 
         line-height: 2;
     }
@@ -59,4 +60,7 @@
         line-height: 1.5;
         font-size: 14px;
     }
+}
+.card {
+  @include surfaces.panel;
 }

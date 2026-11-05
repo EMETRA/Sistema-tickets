@@ -121,120 +121,122 @@ export function ResourceWorkspace({
                     {message}
                 </p>
             )}
-            {def.actions.LEER && (
-                <label className={styles.search}>
-                    <span className={styles.muted}>Buscar por nombre</span>
-                    <input
-                        className={styles.control}
-                        value={query}
-                        onChange={(e) => {
-                            setQuery(e.target.value);
-                            setOffset(0);
-                        }}
-                    />
-                </label>
-            )}
-            {error ? (
-                <div role="alert" className={styles.error}>
-                    {error}{" "}
-                    <button className={styles.link} onClick={refresh}>
-                        Reintentar
-                    </button>
-                </div>
-            ) : loading ? (
-                <p role="status" className={styles.muted}>
-                    Cargando registros…
-                </p>
-            ) : def.actions.LEER ? (
-                <>
-                    <div className={styles.tableRegion}>
-                        <table className={styles.table}>
-                            <thead>
-                                <tr>
-                                    <th>Nombre</th>
-                                    <th>Estado</th>
-                                    <th>Equipo</th>
-                                    <th>Actualizado</th>
-                                    <th>Acción</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {result.items.map((row) => (
-                                    <tr key={row.id}>
-                                        <td>
-                                            <button
-                                                className={styles.link}
-                                                onClick={() => setSelected(row)}
-                                            >
-                                                {row.nombre}
-                                            </button>
-                                        </td>
-                                        <td>
-                                            <span className={styles.chip}>
-                                                {row.estado.replaceAll(
-                                                    "_",
-                                                    " ",
-                                                )}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            {data!.teams.find(
-                                                (t) => t.id === row.equipoId,
-                                            )?.nombre ||
-                                                "Administración institucional"}
-                                        </td>
-                                        <td>
-                                            {displayDate(row.actualizadoEn)}
-                                        </td>
-                                        <td>
-                                            <button
-                                                className={styles.link}
-                                                onClick={() => setSelected(row)}
-                                            >
-                                                Ver ficha
-                                            </button>
-                                        </td>
+            <div className={styles.listPanel}>
+                {def.actions.LEER && (
+                    <label className={styles.search}>
+                        <span className={styles.muted}>Buscar por nombre</span>
+                        <input
+                            className={styles.control}
+                            value={query}
+                            onChange={(e) => {
+                                setQuery(e.target.value);
+                                setOffset(0);
+                            }}
+                        />
+                    </label>
+                )}
+                {error ? (
+                    <div role="alert" className={styles.error}>
+                        {error}{" "}
+                        <button className={styles.link} onClick={refresh}>
+                            Reintentar
+                        </button>
+                    </div>
+                ) : loading ? (
+                    <p role="status" className={styles.muted}>
+                        Cargando registros…
+                    </p>
+                ) : def.actions.LEER ? (
+                    <>
+                        <div className={styles.tableRegion}>
+                            <table className={styles.table}>
+                                <thead>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Estado</th>
+                                        <th>Equipo</th>
+                                        <th>Actualizado</th>
+                                        <th>Acción</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                        {!result.items.length && (
-                            <p className={styles.card}>
-                                No hay registros para esta consulta.
-                            </p>
-                        )}
-                    </div>
-                    <div className={styles.toolbar}>
-                        <p className={styles.muted}>{result.total} registros</p>
-                        <div className={styles.actions}>
-                            <Button
-                                variant="outlined"
-                                state={offset ? "default" : "disabled"}
-                                onClick={() =>
-                                    setOffset(Math.max(0, offset - 25))
-                                }
-                            >
-                                Anterior
-                            </Button>
-                            <Button
-                                variant="outlined"
-                                state={
-                                    offset + 25 < result.total
-                                        ? "default"
-                                        : "disabled"
-                                }
-                                onClick={() => setOffset(offset + 25)}
-                            >
-                                Siguiente
-                            </Button>
+                                </thead>
+                                <tbody>
+                                    {result.items.map((row) => (
+                                        <tr key={row.id}>
+                                            <td>
+                                                <button
+                                                    className={styles.link}
+                                                    onClick={() => setSelected(row)}
+                                                >
+                                                    {row.nombre}
+                                                </button>
+                                            </td>
+                                            <td>
+                                                <span className={styles.chip}>
+                                                    {row.estado.replaceAll(
+                                                        "_",
+                                                        " ",
+                                                    )}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                {data!.teams.find(
+                                                    (t) => t.id === row.equipoId,
+                                                )?.nombre ||
+                                                    "Administración institucional"}
+                                            </td>
+                                            <td>
+                                                {displayDate(row.actualizadoEn)}
+                                            </td>
+                                            <td>
+                                                <button
+                                                    className={styles.link}
+                                                    onClick={() => setSelected(row)}
+                                                >
+                                                    Ver ficha
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                            {!result.items.length && (
+                                <p className={styles.card}>
+                                    No hay registros para esta consulta.
+                                </p>
+                            )}
                         </div>
-                    </div>
-                </>
-            ) : (
-                <p className={styles.muted}>
-                    Puedes registrar información en este módulo.
-                </p>
-            )}
+                        <div className={styles.toolbar}>
+                            <p className={styles.muted}>{result.total} registros</p>
+                            <div className={styles.actions}>
+                                <Button
+                                    variant="outlined"
+                                    state={offset ? "default" : "disabled"}
+                                    onClick={() =>
+                                        setOffset(Math.max(0, offset - 25))
+                                    }
+                                >
+                                    Anterior
+                                </Button>
+                                <Button
+                                    variant="outlined"
+                                    state={
+                                        offset + 25 < result.total
+                                            ? "default"
+                                            : "disabled"
+                                    }
+                                    onClick={() => setOffset(offset + 25)}
+                                >
+                                    Siguiente
+                                </Button>
+                            </div>
+                        </div>
+                    </>
+                ) : (
+                    <p className={styles.muted}>
+                        Puedes registrar información en este módulo.
+                    </p>
+                )}
+            </div>
             {editing !== undefined && (
                 <RecordEditor
                     key={editing?.id || "new-" + type}

@@ -1,3 +1,4 @@
+@use "../../../../theme/surfaces.scss" as surfaces;
 .UserCard {
   display: flex;
   flex-direction: column;
@@ -168,4 +169,7 @@
     &:active {
         transform: scale(0.95);
     }
+}
+.UserCard {
+  @include surfaces.panel;
 }

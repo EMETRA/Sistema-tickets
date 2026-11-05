@@ -14,6 +14,7 @@ export interface TopBarProps {
   applications?: import("../../molecules/ApplicationSwitcher/ApplicationSwitcher").ApplicationLink[];
   createTicketPath?: string;
   settingsPath?: string;
+  notificationsPath?: string;
   onMenuClick?: () => void;
   menuOpen?: boolean;
   unit?: string;

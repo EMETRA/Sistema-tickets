@@ -7,12 +7,12 @@
 
   .icon {
     flex-shrink: 0;
-    color: #262626;
+    color: var(--tickets-text);
   }
 
   .title {
     margin: 0;
     font-weight: 700;
-    color: #262626;
+    color: var(--tickets-text);
   }
 }

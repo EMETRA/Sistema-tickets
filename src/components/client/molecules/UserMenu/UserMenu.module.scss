@@ -77,12 +77,12 @@
 .chevronOpen {
   transform: rotate(180deg);
 }
-.name {
+.info .name {
   font-size: 11px;
   color: var(--tickets-text);
   max-width: 180px;
 }
-.role {
+.info .role {
   font-size: 10px;
   color: #536ca1;
   background: #edf1ff;

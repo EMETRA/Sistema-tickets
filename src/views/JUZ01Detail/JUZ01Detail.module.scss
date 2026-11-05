@@ -7,7 +7,7 @@
   align-items: flex-start;
   gap: 24px;
   padding: clamp(16px, 3vw, 36px);
-  background: #f4f6fa;
+  background: var(--tickets-background);
   color: #24344c;
   box-sizing: border-box;
   container: caso / inline-size;

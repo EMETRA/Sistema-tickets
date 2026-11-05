@@ -119,249 +119,251 @@ export function AssignmentsWorkspace() {
                     Actualizar
                 </Button>
             </div>
-            <nav className={styles.tabs} aria-label="Bandejas de tickets">
-                {data!.capabilities.assign && (
+            <div className={styles.listPanel}>
+                <nav className={styles.tabs} aria-label="Bandejas de tickets">
+                    {data!.capabilities.assign && (
+                        <button
+                            aria-current={scope === "cola" ? "page" : undefined}
+                            onClick={() => {
+                                setScope("cola");
+                                setOffset(0);
+                            }}
+                        >
+                            Bandeja de asignación
+                        </button>
+                    )}
+                    {data!.capabilities.attend && (
+                        <button
+                            aria-current={
+                                scope === "asignados" ? "page" : undefined
+                            }
+                            onClick={() => {
+                                setScope("asignados");
+                                setOffset(0);
+                            }}
+                        >
+                            Mis asignados
+                        </button>
+                    )}
                     <button
-                        aria-current={scope === "cola" ? "page" : undefined}
+                        aria-current={scope === "creados" ? "page" : undefined}
                         onClick={() => {
-                            setScope("cola");
+                            setScope("creados");
                             setOffset(0);
                         }}
                     >
-                        Bandeja de asignación
+                        Mis solicitudes
                     </button>
+                </nav>
+                {scope === "cola" && (
+                    <label className={styles.field}>
+                        Mostrar
+                        <select
+                            className={styles.control}
+                            value={filter}
+                            onChange={(e) => {
+                                setFilter(e.target.value);
+                                setOffset(0);
+                            }}
+                        >
+                            <option value="sin-asignar">Sin asignar</option>
+                            <option value="sin-atencion">
+                                Asignados sin primera atención
+                            </option>
+                            <option value="todos">Todos</option>
+                        </select>
+                    </label>
                 )}
-                {data!.capabilities.attend && (
-                    <button
-                        aria-current={
-                            scope === "asignados" ? "page" : undefined
-                        }
-                        onClick={() => {
-                            setScope("asignados");
-                            setOffset(0);
-                        }}
-                    >
-                        Mis asignados
-                    </button>
+                {message && (
+                    <p role="status" className={styles.success}>
+                        {message}
+                    </p>
                 )}
-                <button
-                    aria-current={scope === "creados" ? "page" : undefined}
-                    onClick={() => {
-                        setScope("creados");
-                        setOffset(0);
-                    }}
-                >
-                    Mis solicitudes
-                </button>
-            </nav>
-            {scope === "cola" && (
-                <label className={styles.field}>
-                    Mostrar
-                    <select
-                        className={styles.control}
-                        value={filter}
-                        onChange={(e) => {
-                            setFilter(e.target.value);
-                            setOffset(0);
-                        }}
-                    >
-                        <option value="sin-asignar">Sin asignar</option>
-                        <option value="sin-atencion">
-                            Asignados sin primera atención
-                        </option>
-                        <option value="todos">Todos</option>
-                    </select>
-                </label>
-            )}
-            {message && (
-                <p role="status" className={styles.success}>
-                    {message}
-                </p>
-            )}
-            {error && (
-                <p role="alert" className={styles.error}>
-                    {error}
-                </p>
-            )}
-            {assigning && (
-                <section className={styles.card}>
-                    <h3>Asignar {assigning.codigo}</h3>
-                    <p>{assigning.titulo}</p>
-                    <PlatformField
-                        field={{
-                            key: "usuarioId",
-                            label: "Responsable",
-                            lookupPath:
-                                "/tickets/" + assigning.id + "/assignees",
-                            type: "user",
-                            required: true,
-                        }}
-                        value={user}
-                        onChange={setUser}
-                        disabled={busy}
-                    />
+                {error && (
+                    <p role="alert" className={styles.error}>
+                        {error}
+                    </p>
+                )}
+                {assigning && (
+                    <section className={styles.card}>
+                        <h3>Asignar {assigning.codigo}</h3>
+                        <p>{assigning.titulo}</p>
+                        <PlatformField
+                            field={{
+                                key: "usuarioId",
+                                label: "Responsable",
+                                lookupPath:
+                                    "/tickets/" + assigning.id + "/assignees",
+                                type: "user",
+                                required: true,
+                            }}
+                            value={user}
+                            onChange={setUser}
+                            disabled={busy}
+                        />
+                        <div className={styles.actions}>
+                            <Button
+                                variant="outlined"
+                                onClick={() => setAssigning(null)}
+                                state={busy ? "disabled" : "default"}
+                            >
+                                Cancelar
+                            </Button>
+                            <Button
+                                onClick={() => void act(assigning, "assign")}
+                                state={
+                                    busy ? "loading" : user ? "default" : "disabled"
+                                }
+                            >
+                                Asignar ticket
+                            </Button>
+                        </div>
+                    </section>
+                )}
+                {loading ? (
+                    <p role="status" className={styles.muted}>
+                        Consultando la bandeja…
+                    </p>
+                ) : (
+                    <div className={styles.tableRegion}>
+                        <table className={styles.table}>
+                            <thead>
+                                <tr>
+                                    <th>Ticket</th>
+                                    <th>Solicitante</th>
+                                    <th>Responsable</th>
+                                    <th>Seguimiento</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {result.items.map((row) => (
+                                    <tr key={row.id}>
+                                        <td>
+                                            <button
+                                                className={styles.link}
+                                                onClick={() => setDetail(row)}
+                                            >
+                                                {row.codigo || "#" + row.id} ·{" "}
+                                                {row.titulo}
+                                            </button>
+                                            <p className={styles.muted}>
+                                                {(
+                                                    {
+                                                        1: "Sin asignar",
+                                                        2: "Asignado",
+                                                        3: "En atención",
+                                                        4: "Cancelado",
+                                                        5: "Resuelto",
+                                                    } as Record<number, string>
+                                                )[row.estado] ||
+                                                    "Estado registrado"}
+                                            </p>
+                                        </td>
+                                        <td>{row.creador}</td>
+                                        <td>{row.asignado || "Sin asignar"}</td>
+                                        <td>
+                                            {row.alerta ? (
+                                                <span className={styles.error}>
+                                                    Sin primera atención · Umbral{" "}
+                                                    {row.minutosAlerta} min
+                                                </span>
+                                            ) : row.atendidoEn ? (
+                                                "Atendido: " +
+                                                displayDate(row.atendidoEn)
+                                            ) : row.asignadoEn ? (
+                                                "Asignado: " +
+                                                displayDate(row.asignadoEn)
+                                            ) : row.asignado ? (
+                                                "Asignación histórica sin fecha confirmada"
+                                            ) : (
+                                                "Pendiente de asignación"
+                                            )}
+                                        </td>
+                                        <td>
+                                            <div className={styles.actions}>
+                                                {scope === "cola" &&
+                                                    ![4, 5].includes(
+                                                        row.estado,
+                                                    ) && (
+                                                        <button
+                                                            className={styles.link}
+                                                            onClick={() => {
+                                                                setAssigning(row);
+                                                                setUser(
+                                                                    row.asignadoId ||
+                                                                        "",
+                                                                );
+                                                            }}
+                                                        >
+                                                            Asignar
+                                                        </button>
+                                                    )}
+                                                {row.asignadoId ===
+                                                    data!.actor.id &&
+                                                    row.estado === 2 && (
+                                                        <button
+                                                            className={styles.link}
+                                                            disabled={busy}
+                                                            onClick={() =>
+                                                                void act(
+                                                                    row,
+                                                                    "start",
+                                                                )
+                                                            }
+                                                        >
+                                                            Iniciar atención
+                                                        </button>
+                                                    )}
+                                                {row.asignadoId ===
+                                                    data!.actor.id &&
+                                                    row.estado === 3 && (
+                                                        <button
+                                                            className={styles.link}
+                                                            disabled={busy}
+                                                            onClick={() =>
+                                                                void act(
+                                                                    row,
+                                                                    "resolve",
+                                                                )
+                                                            }
+                                                        >
+                                                            Resolver
+                                                        </button>
+                                                    )}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                        {!result.items.length && (
+                            <p className={styles.card}>
+                                No hay tickets en esta bandeja.
+                            </p>
+                        )}
+                    </div>
+                )}
+                <div className={styles.toolbar}>
+                    <p className={styles.muted}>{result.total} tickets</p>
                     <div className={styles.actions}>
                         <Button
                             variant="outlined"
-                            onClick={() => setAssigning(null)}
-                            state={busy ? "disabled" : "default"}
+                            state={offset ? "default" : "disabled"}
+                            onClick={() => setOffset(Math.max(0, offset - 50))}
                         >
-                            Cancelar
+                            Anterior
                         </Button>
                         <Button
-                            onClick={() => void act(assigning, "assign")}
+                            variant="outlined"
                             state={
-                                busy ? "loading" : user ? "default" : "disabled"
+                                offset + 50 < result.total ? "default" : "disabled"
                             }
+                            onClick={() => setOffset(offset + 50)}
                         >
-                            Asignar ticket
+                            Siguiente
                         </Button>
                     </div>
-                </section>
-            )}
-            {loading ? (
-                <p role="status" className={styles.muted}>
-                    Consultando la bandeja…
-                </p>
-            ) : (
-                <div className={styles.tableRegion}>
-                    <table className={styles.table}>
-                        <thead>
-                            <tr>
-                                <th>Ticket</th>
-                                <th>Solicitante</th>
-                                <th>Responsable</th>
-                                <th>Seguimiento</th>
-                                <th>Acción</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {result.items.map((row) => (
-                                <tr key={row.id}>
-                                    <td>
-                                        <button
-                                            className={styles.link}
-                                            onClick={() => setDetail(row)}
-                                        >
-                                            {row.codigo || "#" + row.id} ·{" "}
-                                            {row.titulo}
-                                        </button>
-                                        <p className={styles.muted}>
-                                            {(
-                                                {
-                                                    1: "Sin asignar",
-                                                    2: "Asignado",
-                                                    3: "En atención",
-                                                    4: "Cancelado",
-                                                    5: "Resuelto",
-                                                } as Record<number, string>
-                                            )[row.estado] ||
-                                                "Estado registrado"}
-                                        </p>
-                                    </td>
-                                    <td>{row.creador}</td>
-                                    <td>{row.asignado || "Sin asignar"}</td>
-                                    <td>
-                                        {row.alerta ? (
-                                            <span className={styles.error}>
-                                                Sin primera atención · Umbral{" "}
-                                                {row.minutosAlerta} min
-                                            </span>
-                                        ) : row.atendidoEn ? (
-                                            "Atendido: " +
-                                            displayDate(row.atendidoEn)
-                                        ) : row.asignadoEn ? (
-                                            "Asignado: " +
-                                            displayDate(row.asignadoEn)
-                                        ) : row.asignado ? (
-                                            "Asignación histórica sin fecha confirmada"
-                                        ) : (
-                                            "Pendiente de asignación"
-                                        )}
-                                    </td>
-                                    <td>
-                                        <div className={styles.actions}>
-                                            {scope === "cola" &&
-                                                ![4, 5].includes(
-                                                    row.estado,
-                                                ) && (
-                                                    <button
-                                                        className={styles.link}
-                                                        onClick={() => {
-                                                            setAssigning(row);
-                                                            setUser(
-                                                                row.asignadoId ||
-                                                                    "",
-                                                            );
-                                                        }}
-                                                    >
-                                                        Asignar
-                                                    </button>
-                                                )}
-                                            {row.asignadoId ===
-                                                data!.actor.id &&
-                                                row.estado === 2 && (
-                                                    <button
-                                                        className={styles.link}
-                                                        disabled={busy}
-                                                        onClick={() =>
-                                                            void act(
-                                                                row,
-                                                                "start",
-                                                            )
-                                                        }
-                                                    >
-                                                        Iniciar atención
-                                                    </button>
-                                                )}
-                                            {row.asignadoId ===
-                                                data!.actor.id &&
-                                                row.estado === 3 && (
-                                                    <button
-                                                        className={styles.link}
-                                                        disabled={busy}
-                                                        onClick={() =>
-                                                            void act(
-                                                                row,
-                                                                "resolve",
-                                                            )
-                                                        }
-                                                    >
-                                                        Resolver
-                                                    </button>
-                                                )}
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                    {!result.items.length && (
-                        <p className={styles.card}>
-                            No hay tickets en esta bandeja.
-                        </p>
-                    )}
-                </div>
-            )}
-            <div className={styles.toolbar}>
-                <p className={styles.muted}>{result.total} tickets</p>
-                <div className={styles.actions}>
-                    <Button
-                        variant="outlined"
-                        state={offset ? "default" : "disabled"}
-                        onClick={() => setOffset(Math.max(0, offset - 50))}
-                    >
-                        Anterior
-                    </Button>
-                    <Button
-                        variant="outlined"
-                        state={
-                            offset + 50 < result.total ? "default" : "disabled"
-                        }
-                        onClick={() => setOffset(offset + 50)}
-                    >
-                        Siguiente
-                    </Button>
                 </div>
             </div>
             <TicketDetail

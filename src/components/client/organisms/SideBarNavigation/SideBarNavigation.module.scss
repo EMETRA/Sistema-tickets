@@ -1,4 +1,8 @@
 .sidebar {
+  // Capa estable junto al contenido con scroll: evita perder el pintado inicial.
+  position: relative;
+  isolation: isolate;
+  transform: translateZ(0);
   width: var(--tickets-sidebar, 228px);
   height: 100dvh;
   display: flex;
@@ -46,7 +50,7 @@
 .footer {
   border-top: 1px solid var(--tickets-border, #dfe5f2);
   padding: 12px 14px;
-  button {
+  button, a {
     display: flex;
     align-items: center;
     gap: 11px;
@@ -94,7 +98,7 @@
   }
   .footer {
     padding: 6px;
-    button {
+    button, a {
       flex-direction: column;
       gap: 5px;
       font-size: 9px;
@@ -128,5 +132,17 @@
 @media (max-width: 767px) {
   .sidebar:not(.open) {
     visibility: hidden;
+  }
+}
+
+.more { margin-top:18px; }
+.moreToggle { padding:10px; font:inherit; font-size:11px; color:var(--tickets-text-secondary); cursor:pointer; border:0; background:transparent; text-align:left; width:100%; &[aria-expanded="true"] { margin-bottom:8px; } }
+.navItemsGroup[hidden] { display:none; }
+@media (min-width: 768px) and (max-width: 1199px) {
+  .moreToggle {
+    padding: 10px 2px;
+    font-size: 9px;
+    text-align: center;
+    overflow-wrap: anywhere;
   }
 }

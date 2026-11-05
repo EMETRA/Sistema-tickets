@@ -103,3 +103,5 @@
     display: none;
   }
 }
+
+.notification { display:flex; padding:8px; border-radius:8px; color:var(--tickets-text-secondary); &:hover { background:var(--tickets-primary-soft); } }

@@ -5,9 +5,9 @@
 .Dropzone {
     width: 100%;
     padding: 32px 24px;
-    border: 3px dashed $primary-blue;
+    border: 1px dashed #aabaff;
     border-radius: 10px;
-    background-color: rgba($primary-blue, 0.1);
+    background-color: var(--tickets-surface-subtle);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -15,12 +15,14 @@
     transition: all 0.2s ease;
 
     &:hover {
-        background-color: rgba($azul-9, 0.3);
+        background-color: var(--tickets-primary-soft);
+        border-color: var(--tickets-primary);
     }
 }
 
 .dragging {
-    background-color: rgba($azul-9, 0.3);
+    background-color: var(--tickets-primary-soft);
+    border-color: var(--tickets-primary);
 }
 
 .input {
@@ -28,25 +30,28 @@
 }
 
 .content {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
     align-items: center;
-    gap: 6px;
-    text-align: center;
+    gap: 6px 16px;
+    text-align: left;
+    min-width: 0;
 }
 
 .icon {
     pointer-events: none;
+    grid-row: 1 / span 2;
 }
 
 .title {
-    font-size: 18px;
+    font-size: 14px;
     font-weight: bold;
+    color: var(--tickets-primary);
 }
 
 .subtitle {
-    font-size: 14px;
-    color: $secondary-text;
+    font-size: 12px;
+    color: var(--tickets-text-secondary);
 }
 // ============================================
 // VARIANTE COMPACT
@@ -60,6 +65,7 @@
 
     .content {
         gap: 0.25rem;
+        grid-template-columns: minmax(0, 1fr);
     }
 
     .title {
@@ -88,6 +94,7 @@
 }
 
 .rejected {
+    grid-column: 1 / -1;
     color: #E63946;
     font-size: 0.8rem;
     margin-top: 0.5rem;

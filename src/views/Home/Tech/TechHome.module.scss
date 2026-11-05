@@ -6,7 +6,7 @@
   flex-direction: column;
   gap: 24px;
   padding: clamp(16px, 2.5vw, 32px);
-  background: #f4f6fa;
+  background: var(--tickets-background);
   min-height: 100%;
   container: home / inline-size;
 }

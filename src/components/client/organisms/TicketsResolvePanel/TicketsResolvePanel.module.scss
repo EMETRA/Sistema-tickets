@@ -1,3 +1,4 @@
+@use "../../../../theme/surfaces.scss" as surfaces;
 @use "../../../../theme/colors.scss" as *;
 
 .TicketsResolvePanel {
@@ -24,4 +25,8 @@
   align-items: center;
   width: 100%;
   padding: 16px 0;
+}
+
+.TicketsResolvePanel {
+  @include surfaces.panel;
 }

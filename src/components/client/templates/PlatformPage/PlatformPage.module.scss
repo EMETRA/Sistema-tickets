@@ -8,6 +8,25 @@
 .homePage {
   padding: var(--tickets-page-padding);
 }
+.listPanel {
+  background: var(--tickets-surface);
+  border: 1px solid var(--tickets-border);
+  border-radius: var(--tickets-radius);
+  box-shadow: var(--tickets-shadow);
+  padding: var(--tickets-panel-padding);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+  > .tableRegion {
+    border: 0;
+    border-radius: 0;
+    > p {
+      border: 0;
+      box-shadow: none;
+    }
+  }
+}
 .toolbar {
   display: flex;
   align-items: center;

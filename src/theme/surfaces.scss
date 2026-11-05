@@ -1,0 +1,8 @@
+// Shared by existing organisms as well as the new workspace templates.
+@mixin panel {
+  background: var(--tickets-surface, #fff);
+  color: var(--tickets-text, #263b58);
+  border: 1px solid var(--tickets-border, #dfe5f2);
+  border-radius: var(--tickets-radius, 14px);
+  box-shadow: var(--tickets-shadow, 0 2px 8px #20396308);
+}

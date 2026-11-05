@@ -204,7 +204,7 @@ export function MetricsWorkspace() {
                         )}
                     </section>
                     <section>
-                        <h3>Registros que forman los indicadores</h3>
+                        <h3 id="actividad">Registros que forman los indicadores</h3>
                         <div className={styles.tableRegion}>
                             <table className={styles.table}>
                                 <thead>

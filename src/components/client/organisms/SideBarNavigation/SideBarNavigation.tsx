@@ -1,14 +1,16 @@
 import Link from "next/link";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SideBarNavigationProps } from "./types";
 import { NavItem } from "../../molecules/NavItem";
-import { Icon } from "../../atoms/Icon";
+import { WorkspaceIcon } from "../../atoms/WorkspaceIcon/WorkspaceIcon";
 import styles from "./SideBarNavigation.module.scss";
 import classNames from "classnames";
 
 export const SideBarNavigation = ({
     items,
     sectionItems = [],
+    secondaryItems = [],
+    helpPath,
     applicationLabel,
     activePath,
     className,
@@ -17,6 +19,7 @@ export const SideBarNavigation = ({
     onLogout,
 }: SideBarNavigationProps) => {
     const sidebarRef = useRef<HTMLElement>(null);
+    const [moreOpen, setMoreOpen] = useState<boolean | null>(null);
     useEffect(() => {
         if (!open) return;
         const opener = document.activeElement as HTMLElement | null;
@@ -24,9 +27,9 @@ export const SideBarNavigation = ({
         const controls = () =>
             Array.from(
                 sidebarRef.current?.querySelectorAll<HTMLElement>(
-                    "a[href],button:not(:disabled)",
+                    "a[href],button:not(:disabled),summary",
                 ) || [],
-            );
+            ).filter(el=>el.getClientRects().length > 0);
         if (mobile.matches) controls()[0]?.focus();
         const trap = (event: KeyboardEvent) => {
             if (
@@ -52,7 +55,7 @@ export const SideBarNavigation = ({
             if (mobile.matches && opener?.isConnected) opener.focus();
         };
     }, [open]);
-    const all = [...items, ...sectionItems];
+    const all = [...items, ...sectionItems, ...secondaryItems];
     const active = all
         .filter(
             (item) =>
@@ -60,6 +63,7 @@ export const SideBarNavigation = ({
         (item.path !== "/home" && activePath.startsWith(`${item.path}/`)),
         )
         .sort((a, b) => b.path.length - a.path.length)[0]?.path;
+    const moreExpanded = moreOpen ?? secondaryItems.some(item => active === item.path);
     const renderItem = (item: SideBarNavigationProps["items"][number]) => (
         <NavItem
             key={item.path}
@@ -67,7 +71,7 @@ export const SideBarNavigation = ({
             label={item.label}
             href={item.path}
             active={active === item.path}
-            onClick={onClose}
+            onClick={() => {setMoreOpen(null);onClose?.();}}
         />
     );
     return (
@@ -97,6 +101,14 @@ export const SideBarNavigation = ({
                 <nav className={styles.navContainer} aria-label="Menú principal">
                     <span className={styles.groupLabel}>Mi espacio de trabajo</span>
                     <div className={styles.navItemsGroup}>{items.map(renderItem)}</div>
+                    {secondaryItems.length > 0 && (
+                        <div className={styles.more}>
+                            <button type="button" className={styles.moreToggle} aria-expanded={moreExpanded} aria-controls="system-secondary-navigation" onClick={() => setMoreOpen(!moreExpanded)}>
+                                <span aria-hidden="true">{moreExpanded ? "▾" : "▸"}</span> Más herramientas
+                            </button>
+                            <div id="system-secondary-navigation" hidden={!moreExpanded} className={styles.navItemsGroup}>{secondaryItems.map(renderItem)}</div>
+                        </div>
+                    )}
                     {sectionItems.length > 0 && (
                         <>
                             <span className={styles.groupLabel}>
@@ -110,6 +122,7 @@ export const SideBarNavigation = ({
                 </nav>
                 {onLogout && (
                     <div className={styles.footer}>
+                        {helpPath && <Link href={helpPath} onClick={onClose}><WorkspaceIcon name="help" size={20}/><span>Ayuda</span></Link>}
                         <button
                             type="button"
                             onClick={() => {
@@ -117,7 +130,7 @@ export const SideBarNavigation = ({
                                 onLogout();
                             }}
                         >
-                            <Icon name="right-from-bracket-solid" color="#536ca1" size={20} />
+                            <WorkspaceIcon name="right-from-bracket-solid" size={20} />
                             <span>Cerrar sesión</span>
                         </button>
                     </div>

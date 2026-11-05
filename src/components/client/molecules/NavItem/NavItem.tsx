@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { NavItemProps } from "./types";
-import { Icon } from "../../atoms/Icon";
+import { WorkspaceIcon } from "../../atoms/WorkspaceIcon/WorkspaceIcon";
 import styles from "./NavItem.module.scss";
 import classNames from "classnames";
 
@@ -14,7 +14,7 @@ export const NavItem = ({
 }: NavItemProps) => {
     const content = (
         <>
-            <Icon name={iconName} size={20} color={active ? "#fff" : "#536ca1"} />
+            <WorkspaceIcon name={iconName} size={20} />
             <span className={styles.label}>{label}</span>
         </>
     );

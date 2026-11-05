@@ -34,7 +34,7 @@ async function run() {
   const enter = async (name) => {
     await visit("/__laboratorio");
     await page.getByRole("link", { name }).click();
-    await page.getByRole("heading", { name: /Hola,/ }).waitFor();
+    await page.getByRole("heading", { name: "Tus solicitudes y aplicaciones" }).waitFor();
     await page.waitForLoadState("networkidle");
   };
   const confirm = async () => {

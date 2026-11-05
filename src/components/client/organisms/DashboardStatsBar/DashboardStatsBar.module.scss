@@ -1,3 +1,4 @@
+@use "../../../../theme/surfaces.scss" as surfaces;
 @use "../../../../theme/colors.scss" as *;
 
 .DashboardStatsBar {
@@ -26,4 +27,7 @@
 
 .NoStatsText {
   text-align: center;
+}
+.DashboardStatsBar {
+  @include surfaces.panel;
 }

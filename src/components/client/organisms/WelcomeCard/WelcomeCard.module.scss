@@ -1,3 +1,4 @@
+@use "../../../../theme/surfaces.scss" as surfaces;
 .welcomeCard {
     background-color: #FFFFFF;
     border: 1px solid #F0F0F0;
@@ -28,4 +29,7 @@
 .illustration {
     object-fit: contain;
     display: block;
+}
+.welcomeCard {
+  @include surfaces.panel;
 }

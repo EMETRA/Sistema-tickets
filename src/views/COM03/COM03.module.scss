@@ -26,6 +26,6 @@
   min-height: 100%;
   padding: clamp(16px, 2.5vw, 32px);
   gap: 20px;
-  background: #f4f6fa;
+  background: var(--tickets-background);
   container: news / inline-size;
 }

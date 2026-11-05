@@ -11,13 +11,14 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid $gris-1;
-  padding: 8px;
-  border-radius: 50%;
+  background: var(--tickets-primary-soft);
+  color: var(--tickets-primary);
+  padding: 12px;
+  border-radius: 12px;
 }
 
 .label {
-  color: #8D8DA8;
+  color: var(--tickets-text-secondary);
   font-weight: 600;
   font-size: 14px;
   text-align: start;

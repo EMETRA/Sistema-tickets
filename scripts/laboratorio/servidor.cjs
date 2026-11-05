@@ -475,11 +475,15 @@ async function createLab(file) {
           resueltos: ts.filter((t) => t.estadoId === 5).length,
           enTrabajo: ts.filter((t) => t.estadoId === 3).length,
           asignados: ts.filter((t) => t.estadoId === 2).length,
+          pendientesRespuesta: ts.filter((t) => [1,2].includes(t.estadoId) && !t.atendidoEn).length,
+          sinAsignar: ts.filter((t) => t.estadoId === 1 && !t.usuarioAsignadoId).length,
+          sinPrimeraAtencion: ts.filter((t) => t.estadoId === 2 && !t.atendidoEn).length,
         },
         aplicaciones: Object.values(groups),
         registros: page(events, q).items,
         totalRegistros: events.length,
         limiteDetalle: 100,
+        actividadTickets: q.get("inicio") === "true" && !team ? s.tickets.filter(t=>t.usuarioCreadorId===a.id).sort((a,b)=>+new Date(b.fechaCreacion)-+new Date(a.fechaCreacion)).slice(0,3).map(t=>({id:String(t.id),codigo:t.codigo,fecha:t.fechaCreacion})) : [],
       };
     }
     if (parts[0] === "search")

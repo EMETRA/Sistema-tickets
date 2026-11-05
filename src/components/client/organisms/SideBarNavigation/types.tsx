@@ -14,6 +14,8 @@ export interface SideBarNavigationProps {
   logoIcon?: IconNameInput;
   className?: string;
   sectionItems?: NavConfigItem[];
+  secondaryItems?: NavConfigItem[];
+  helpPath?: string;
   applicationLabel?: string;
   open?: boolean;
   onClose?: () => void;

@@ -1,0 +1,120 @@
+@use "@/theme/surfaces";
+.card {
+  @include surfaces.panel;
+  padding: 22px;
+  min-width: 0;
+  header {
+    margin-bottom: 17px;
+    h2 {
+      font-size: 16px;
+      line-height: 1.4;
+      margin: 0;
+    }
+    p {
+      margin-top: 4px;
+      font-size: 11px;
+      color: var(--tickets-text-secondary);
+      line-height: 1.5;
+    }
+  }
+  footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding-top: 17px;
+    font-size: 11px;
+    > span {
+      color: var(--tickets-text-secondary);
+    }
+    a {
+      font-weight: 600;
+      color: var(--tickets-primary);
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+  }
+}
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 17px 0;
+    min-width: 0;
+  }
+  time {
+    margin-left: auto;
+    flex-shrink: 0;
+    font-size: 10px;
+    color: var(--tickets-text-muted);
+    line-height: 1.6;
+  }
+}
+.icon {
+  color: #536ca1;
+  padding-top: 2px;
+  flex-shrink: 0;
+}
+.body {
+  min-width: 0;
+  flex: 1;
+  overflow-wrap: anywhere;
+  strong {
+    font-size: 12px;
+    line-height: 1.6;
+  }
+  p {
+    color: var(--tickets-text-secondary);
+    font-size: 10px;
+    margin: 4px 0 0;
+    line-height: 1.7;
+  }
+}
+.action {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+  line-height: 1.6;
+  &:hover {
+    color: var(--tickets-primary);
+    text-decoration: underline;
+  }
+}
+.message {
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--tickets-text-secondary);
+  padding: 16px 0;
+  button {
+    font: inherit;
+    background: none;
+    border: 0;
+    text-decoration: underline;
+    color: var(--tickets-primary);
+    cursor: pointer;
+  }
+}
+@media (max-width: 599px) {
+  .list {
+    li {
+      flex-wrap: wrap;
+    }
+    time {
+      margin-left: 35px;
+    }
+  }
+}

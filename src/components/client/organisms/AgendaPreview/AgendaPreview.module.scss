@@ -1,0 +1,82 @@
+@use "@/theme/surfaces";
+.card {
+  @include surfaces.panel;
+  padding: 22px;
+  min-width: 0;
+  header {
+    margin-bottom: 17px;
+    h2 {
+      font-size: 16px;
+      line-height: 1.4;
+      margin: 0;
+    }
+    p {
+      font-size: 11px;
+      margin-top: 4px;
+      color: var(--tickets-text-secondary);
+      line-height: 1.5;
+    }
+  }
+  ul {
+    display: flex;
+    flex-direction: column;
+    list-style: none;
+    gap: 16px;
+    margin: 18px 0 0;
+    padding: 0;
+  }
+  li {
+    border: 1px solid var(--tickets-border);
+    background: var(--tickets-surface-subtle);
+    border-radius: 10px;
+    a {
+      display: block;
+      padding: 16px;
+      overflow-wrap: anywhere;
+      &:hover strong {
+        color: var(--tickets-primary);
+        text-decoration: underline;
+      }
+    }
+    strong {
+      font-size: 12px;
+      line-height: 1.6;
+    }
+    p {
+      margin-top: 6px;
+      font-size: 11px;
+      line-height: 1.6;
+      color: var(--tickets-text-secondary);
+    }
+  }
+}
+.date {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 11px;
+  a {
+    background: var(--tickets-primary-soft);
+    color: #3656b4;
+    border-radius: 6px;
+    padding: 5px 8px;
+    font-size: 10px;
+    font-weight: 600;
+  }
+}
+.message {
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--tickets-text-secondary);
+  padding: 16px 0;
+  button {
+    font: inherit;
+    background: none;
+    border: 0;
+    text-decoration: underline;
+    color: var(--tickets-primary);
+    cursor: pointer;
+  }
+}

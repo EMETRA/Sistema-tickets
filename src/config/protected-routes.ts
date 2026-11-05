@@ -1,5 +1,6 @@
 export const protectedRoutes = [
     "/aplicaciones",
+    "/ayuda",
     "/espacio",
     "/home",
     "/tickets",

@@ -41,6 +41,7 @@ const ConsultaVehiculos: React.FC = () => {
     const [hasSearched, setHasSearched] = useState(false);
 
     const handleConsultar = async () => {
+        if (loading) return;
         const normalizedPlaca = placa.trim().toUpperCase();
 
         const nextUsoError = uso ? '' : 'Seleccione el tipo de uso de la placa.';
@@ -62,8 +63,8 @@ const ConsultaVehiculos: React.FC = () => {
                 placa: normalizedPlaca,
             });
             setResult(vehiculo);
-        } catch (err) {
-            console.error('Error consultando vehículo en SAT:', err);
+        } catch {
+            // El hook presenta el error; no registrar datos del vehículo en consola.
         }
     };
 

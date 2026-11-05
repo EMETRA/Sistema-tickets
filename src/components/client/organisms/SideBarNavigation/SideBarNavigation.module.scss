@@ -46,7 +46,7 @@
 .footer {
   border-top: 1px solid var(--tickets-border, #dfe5f2);
   padding: 12px 14px;
-  button {
+  button, a {
     display: flex;
     align-items: center;
     gap: 11px;
@@ -94,7 +94,7 @@
   }
   .footer {
     padding: 6px;
-    button {
+    button, a {
       flex-direction: column;
       gap: 5px;
       font-size: 9px;
@@ -128,5 +128,15 @@
 @media (max-width: 767px) {
   .sidebar:not(.open) {
     visibility: hidden;
+  }
+}
+
+.more { margin-top:18px; summary { padding:10px; font-size:11px; color:var(--tickets-text-secondary); cursor:pointer; } &[open] summary { margin-bottom:8px; } }
+@media (min-width: 768px) and (max-width: 1199px) {
+  .more summary {
+    padding: 10px 2px;
+    font-size: 9px;
+    text-align: center;
+    overflow-wrap: anywhere;
   }
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { usePlatform } from "@/platform/context";
-import { platformSections, PLATFORM_SECTIONS } from "@/platform/navigation";
+import { homeNavigation, PLATFORM_SECTIONS } from "@/platform/navigation";
 import { usePathname, useRouter } from "next/navigation";
 import { SideBarNavigation } from "../../organisms/SideBarNavigation";
 import { TopBar } from "../../organisms/TopBar";
@@ -94,14 +94,12 @@ export const SystemLayout = ({
             label: page.label,
             iconName: page.iconName,
         }));
-    if (platform.data)
-        navItems.push(
-            ...platformSections(platform.data).map((s) => ({
-                path: "/espacio/" + s.id,
-                label: s.label,
-                iconName: s.iconName,
-            })),
-        );
+    const workspaceNavigation = platform.data ? homeNavigation(platform.data) : null;
+    const secondaryItems = workspaceNavigation ? [
+        ...workspaceNavigation.secondary,
+        ...navItems.filter(item=>!workspaceNavigation.primary.some(p=>p.path===item.path)
+            && !workspaceNavigation.secondary.some(p=>p.path===item.path)),
+    ] : [];
     const sections = appId && catalog ? getSections(appId, catalog) : [];
     const sectionItems = sections.map((section) => ({
         path: buildSectionPath(appId!, section.id),
@@ -174,7 +172,9 @@ export const SystemLayout = ({
                     Ir al contenido
                 </a>
                 <SideBarNavigation
-                    items={navItems}
+                    items={workspaceNavigation?.primary || navItems}
+                    secondaryItems={secondaryItems}
+                    helpPath="/ayuda"
                     sectionItems={sectionItems}
                     applicationLabel={
                         appId && catalog
@@ -203,6 +203,7 @@ export const SystemLayout = ({
                                 ? "/tickets-creation"
                                 : undefined
                         }
+                        notificationsPath="/mis-tickets"
                         settingsPath={
                             platform.data
                                 ? platform.data.actor.admin

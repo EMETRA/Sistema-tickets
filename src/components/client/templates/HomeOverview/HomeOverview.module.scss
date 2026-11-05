@@ -1,0 +1,130 @@
+@use "@/theme/surfaces";
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 23px;
+  padding: 27px 30px;
+  min-width: 0;
+  color: var(--tickets-text);
+}
+.hero {
+  background: var(--tickets-surface);
+  border: 1px solid var(--tickets-border);
+  border-left: 4px solid var(--tickets-primary);
+  border-radius: 13px;
+  padding: 25px 28px;
+  h1 {
+    font-size: 27px;
+    font-weight: 700;
+    line-height: 1.4;
+    margin: 10px 0 7px;
+    letter-spacing: -0.35px;
+  }
+}
+.eyebrow {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.25px;
+  text-transform: uppercase;
+}
+.description {
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--tickets-text-secondary);
+}
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 15px;
+  > article {
+    min-height: 130px;
+    padding: 18px;
+    gap: 8px;
+    border-radius: 12px;
+    box-shadow: none;
+  }
+}
+.content {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(300px, 1fr);
+  gap: 20px;
+  align-items: start;
+  min-width: 0;
+}
+.shortcuts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+.shortcut {
+  @include surfaces.panel;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 20px;
+  min-width: 0;
+  min-height: 170px;
+  border-radius: 12px;
+  h2 {
+    font-size: 15px;
+    line-height: 1.5;
+    margin: 16px 0 15px;
+  }
+  &:hover {
+    border-color: var(--tickets-primary);
+    box-shadow: 0 4px 12px #20396312;
+  }
+}
+.shortcutIcon {
+  display: inline-flex;
+  padding: 8px;
+  border-radius: 9px;
+  background: var(--tickets-primary-soft);
+  color: var(--tickets-primary);
+}
+.shortcutAction {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid var(--tickets-divider);
+  color: var(--tickets-primary);
+  font-size: 12px;
+  font-weight: 600;
+}
+@media (min-width: 768px) and (max-width: 1199px) {
+  .page {
+    padding: 22px;
+  }
+  .content {
+    grid-template-columns: minmax(0, 1.1fr) minmax(280px, 1fr);
+  }
+}
+@media (max-width: 900px) {
+  .content {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 599px) {
+  .page {
+    padding: 18px 14px;
+    gap: 18px;
+  }
+  .hero {
+    padding: 20px;
+    h1 {
+      font-size: 23px;
+    }
+  }
+  .shortcuts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .shortcut {
+    min-height: 150px;
+  }
+}

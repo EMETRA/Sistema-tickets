@@ -11,6 +11,7 @@ export interface PageMetadata {
 
 // Metadata única de cada página del menú de sistema
 export const PAGES_CONFIG: Record<string, PageMetadata> = {
+    ayuda: {path:"/ayuda",label:"Ayuda",title:"Ayuda",iconName:"circle-exclamation-solid"},
     aplicaciones: {
         path: "/aplicaciones",
         label: "Aplicaciones",

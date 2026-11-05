@@ -4,6 +4,7 @@ import { TopBarProps } from "./types";
 import { UserMenu } from "../../molecules/UserMenu";
 import { ApplicationSwitcher } from "../../molecules/ApplicationSwitcher/ApplicationSwitcher";
 import { Icon } from "../../atoms/Icon";
+import { WorkspaceIcon } from "../../atoms/WorkspaceIcon/WorkspaceIcon";
 import { IconButton } from "../../atoms/IconButton";
 import styles from "./TopBar.module.scss";
 import classNames from "classnames";
@@ -21,6 +22,7 @@ export const TopBar = ({
     applications = [],
     createTicketPath,
     settingsPath,
+    notificationsPath,
     onMenuClick,
     menuOpen,
     unit,
@@ -71,7 +73,8 @@ export const TopBar = ({
                     />
                 )
             )}
-            {onNotificationsClick && (
+            {notificationsPath && <Link href={notificationsPath} className={styles.notification} aria-label="Seguimiento de mis tickets" title="Respuestas y actualizaciones de mis tickets"><WorkspaceIcon name="bell-regular" size={21}/></Link>}
+            {!notificationsPath && onNotificationsClick && (
                 <IconButton
                     icon="bell-regular"
                     onClick={onNotificationsClick}

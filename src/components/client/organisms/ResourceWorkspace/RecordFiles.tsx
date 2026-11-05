@@ -20,9 +20,11 @@ type FileInfo = {
 export function RecordFiles({
     type,
     record,
+    readOnly = false,
 }: {
     type: string;
     record: PlatformRecord;
+    readOnly?: boolean;
 }) {
     const { data } = usePlatform(),
         def = data!.definitions[type],
@@ -114,29 +116,30 @@ export function RecordFiles({
         <section className={styles.card}>
             <div className={styles.toolbar}>
                 <h3>Documentos y planos</h3>
-                {(def.actions.EDITAR ||
-                    (def.immutable && def.actions.INSERTAR)) && (
-                    <>
-                        <Button
-                            type="button"
-                            variant="outlined"
-                            state={loading ? "loading" : "default"}
-                            onClick={() => input.current?.click()}
-                        >
-                            Adjuntar archivo
-                        </Button>
-                        <input
-                            ref={input}
-                            type="file"
-                            accept="image/jpeg,image/png,application/pdf"
-                            hidden
-                            onChange={(e) => {
-                                if (e.target.files?.[0])
-                                    void upload(e.target.files[0]);
-                            }}
-                        />
-                    </>
-                )}
+                {!readOnly &&
+                    (def.actions.EDITAR ||
+                        (def.immutable && def.actions.INSERTAR)) && (
+                        <>
+                            <Button
+                                type="button"
+                                variant="outlined"
+                                state={loading ? "loading" : "default"}
+                                onClick={() => input.current?.click()}
+                            >
+                                Adjuntar archivo
+                            </Button>
+                            <input
+                                ref={input}
+                                type="file"
+                                accept="image/jpeg,image/png,application/pdf"
+                                hidden
+                                onChange={(e) => {
+                                    if (e.target.files?.[0])
+                                        void upload(e.target.files[0]);
+                                }}
+                            />
+                        </>
+                    )}
             </div>
             <p className={styles.muted}>
                 PDF, JPEG o PNG · Hasta 20 MB por archivo. El acceso conserva

@@ -16,6 +16,8 @@ El repositorio incluye `scripts/actualizar-servicio-preservando.py` para el serv
 
 ## Componentes y navegación
 
+El [calendario semanal y la navegación de Personas y accesos](CALENDARIO_Y_ACCESOS.md) detallan las vistas, las relaciones y la preparación del permiso administrativo inicial.
+
 - Átomos existentes de botones, texto, iconos y formularios; conserva colores y tipografía institucionales.
 - Moléculas PageHeading, MetricCard, ApplicationSwitcher y PlatformField.
 - Organismos ResourceWorkspace, RecordEditor, RecordDetail, RecordFiles y AdministrativeConfirmation.

@@ -1,5 +1,13 @@
 "use client";
 import { startTransition, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { AccessNavigation } from "@/components/client/molecules/AccessNavigation/AccessNavigation";
+import { AccessChoices as Multi } from "@/components/client/molecules/AccessChoices/AccessChoices";
+import {
+    ACCESS_TABS,
+    accessTab,
+    type AccessTab,
+} from "@/platform/access-navigation";
 import { Button } from "@/components/client/atoms/Button";
 import { usePlatform } from "@/platform/context";
 import { platformCommand, platformFetch } from "@/platform/client";
@@ -27,63 +35,14 @@ type Effective = {
     permisosAdicionales: number[];
     permisos: Named[];
 };
-function Multi({
-    label,
-    options,
-    value,
-    onChange,
-}: {
-    label: string;
-    options: Named[];
-    value: number[];
-    onChange: (v: number[]) => void;
-}) {
-    const [q, setQuery] = useState("");
-    return (
-        <label className={styles.field}>
-            {label}
-            <input
-                className={styles.control}
-                placeholder="Filtrar opciones…"
-                value={q}
-                onChange={(e) => setQuery(e.target.value)}
-            />
-            <select
-                className={styles.control}
-                multiple
-                size={8}
-                value={value.map(String)}
-                onChange={(e) =>
-                    onChange(
-                        Array.from(e.target.selectedOptions, (o) =>
-                            Number(o.value),
-                        ),
-                    )
-                }
-            >
-                {options
-                    .filter(
-                        (o) =>
-                            value.includes(o.id) ||
-                            o.nombre.toLowerCase().includes(q.toLowerCase()),
-                    )
-                    .map((o) => (
-                        <option key={o.id} value={o.id}>
-                            {o.nombre}
-                        </option>
-                    ))}
-            </select>
-            <small className={styles.muted}>
-                Ctrl/Cmd para seleccionar varias opciones. {value.length}{" "}
-                seleccionadas.
-            </small>
-        </label>
-    );
-}
 export function AccessWorkspace() {
+    const params = useSearchParams();
+    const tab = accessTab(params.get("tab"));
+    return <AccessCatalog key={tab} tab={tab} />;
+}
+function AccessCatalog({ tab }: { tab: AccessTab }) {
     const { data: context, refresh } = usePlatform(),
         [catalog, setCatalog] = useState<Catalog | null>(null),
-        [tab, setTab] = useState("users"),
         [query, setQuery] = useState(""),
         [error, setError] = useState(""),
         [message, setMessage] = useState(""),
@@ -108,7 +67,12 @@ export function AccessWorkspace() {
     useEffect(() => {
         const c = new AbortController();
         platformFetch<Catalog>("/rbac", { signal: c.signal })
-            .then(setCatalog)
+            .then((result) => {
+                if (!c.signal.aborted) {
+                    setCatalog(result);
+                    setError("");
+                }
+            })
             .catch((e) => {
                 if (!c.signal.aborted) setError(e.message);
             });
@@ -209,18 +173,21 @@ export function AccessWorkspace() {
     }
     if (!catalog)
         return (
-            <div className={styles.card}>
-                {error ? (
-                    <p className={styles.error}>
-                        {error}
-                        <button onClick={() => setRevision((n) => n + 1)}>
-                            Reintentar
-                        </button>
-                    </p>
-                ) : (
-                    <p role="status">Consultando el catálogo de accesos…</p>
-                )}
-            </div>
+            <section className={styles.page}>
+                <AccessNavigation active={tab} admin={!!context?.actor.admin} />
+                <div className={styles.card}>
+                    {error ? (
+                        <p role="alert" className={styles.error}>
+                            {error}
+                            <button onClick={() => setRevision((n) => n + 1)}>
+                                Reintentar
+                            </button>
+                        </p>
+                    ) : (
+                        <p role="status">Consultando el catálogo de accesos…</p>
+                    )}
+                </div>
+            </section>
         );
     const named =
         tab === "profiles"
@@ -228,28 +195,30 @@ export function AccessWorkspace() {
             : tab === "roles"
               ? catalog.roles
               : catalog.permissions;
+    const filtered = named.filter((row) =>
+        (row.nombre + " " + (row.descripcion || ""))
+            .toLocaleLowerCase("es-GT")
+            .includes(query.trim().toLocaleLowerCase("es-GT")),
+    );
     return (
         <section className={styles.page}>
-            <nav className={styles.tabs} aria-label="Administración de accesos">
-                {[
-                    ["users", "Usuarios"],
-                    ["profiles", "Perfiles"],
-                    ["roles", "Roles"],
-                    ["permissions", "Permisos"],
-                    ["modules", "Módulos de aplicaciones"],
-                ].map(([id, label]) => (
-                    <button
-                        key={id}
-                        aria-current={tab === id ? "page" : undefined}
-                        onClick={() => {
-                            setTab(id);
-                            setQuery("");
-                        }}
-                    >
-                        {label}
-                    </button>
-                ))}
-            </nav>
+            <AccessNavigation active={tab} admin={!!context?.actor.admin} />
+            <div className={styles.toolbar}>
+                <div>
+                    <h2>
+                        {ACCESS_TABS.find((item) => item.id === tab)?.label}
+                    </h2>
+                    <p className={styles.muted}>
+                        {
+                            ACCESS_TABS.find((item) => item.id === tab)
+                                ?.description
+                        }
+                    </p>
+                </div>
+                <span className={styles.chip}>
+                    Perfil → Roles → Permisos de módulos
+                </span>
+            </div>
             {error && (
                 <p role="alert" className={styles.error}>
                     {error}
@@ -426,26 +395,29 @@ export function AccessWorkspace() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {named
-                                    .filter((o) =>
-                                        o.nombre
-                                            .toLowerCase()
-                                            .includes(query.toLowerCase()),
-                                    )
-                                    .map((o) => (
-                                        <tr key={o.id}>
-                                            <td>{o.nombre}</td>
-                                            <td>{o.descripcion}</td>
-                                            <td>
-                                                <button
-                                                    className={styles.link}
-                                                    onClick={() => edit(o)}
-                                                >
-                                                    Editar y ver relaciones
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
+                                {filtered.map((o) => (
+                                    <tr key={o.id}>
+                                        <td>{o.nombre}</td>
+                                        <td>{o.descripcion}</td>
+                                        <td>
+                                            <button
+                                                className={styles.link}
+                                                onClick={() => edit(o)}
+                                            >
+                                                Editar y ver relaciones
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                                {!filtered.length && (
+                                    <tr>
+                                        <td colSpan={3}>
+                                            {query
+                                                ? "No hay resultados para esta búsqueda."
+                                                : "Este catálogo todavía no tiene registros."}
+                                        </td>
+                                    </tr>
+                                )}
                             </tbody>
                         </table>
                     </div>
@@ -500,6 +472,11 @@ export function AccessWorkspace() {
                                 <input
                                     className={styles.control}
                                     value={nombre}
+                                    disabled={
+                                        !!editing &&
+                                        tab === "permissions" &&
+                                        /^(TICKETS_|VIVI_)/.test(editing.nombre)
+                                    }
                                     onChange={(e) => setNombre(e.target.value)}
                                     maxLength={100}
                                     required
@@ -524,6 +501,16 @@ export function AccessWorkspace() {
                                 Guardar datos
                             </Button>
                         </form>
+                        {!editing && tab !== "permissions" && (
+                            <p className={styles.muted}>
+                                Guarda primero los datos. Luego abre «Editar y
+                                ver relaciones» para asignar{" "}
+                                {tab === "profiles"
+                                    ? "los roles del perfil"
+                                    : "los permisos del rol"}
+                                .
+                            </p>
+                        )}
                         {editing && tab !== "permissions" && (
                             <>
                                 <Multi
@@ -585,8 +572,8 @@ export function AccessWorkspace() {
                 </dialog>
             )}
             <p className={styles.muted}>
-                La administración se valida con permisos actuales del servidor.
-                Sesión: {context!.actor.nombre}.
+                Los cambios de acceso quedan en el historial y requieren doble
+                confirmación.
             </p>
         </section>
     );

@@ -61,6 +61,14 @@ export function MonitoringWorkspace() {
             });
         return () => c.abort();
     }, [server, logs, revision]);
+    useEffect(() => {
+        if (!server || tab !== "salud") return;
+        const timer = setInterval(() => {
+            if (document.visibilityState === "visible")
+                setRevision((n) => n + 1);
+        }, 60000);
+        return () => clearInterval(timer);
+    }, [server, tab]);
     return (
         <section className={styles.page}>
             <nav className={styles.tabs}>
@@ -101,6 +109,12 @@ export function MonitoringWorkspace() {
                             Actualizar mediciones
                         </Button>
                     </div>
+                    {!!server && (
+                        <p className={styles.muted}>
+                            Actualización automática cada minuto mientras esta
+                            vista esté abierta.
+                        </p>
+                    )}
                     {error && (
                         <p role="alert" className={styles.error}>
                             {error}

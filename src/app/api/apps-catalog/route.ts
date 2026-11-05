@@ -1,29 +1,38 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getAppsCatalog } from "@/api/graphql/home/getAppsCatalog";
+import { NextResponse } from "next/server";
+import { randomUUID } from "node:crypto";
+import {
+    AppsCatalogError,
+    getAppsCatalog,
+} from "@/api/graphql/home/getAppsCatalog";
+export const dynamic = "force-dynamic";
 
-/**
- * GET /api/apps-catalog
- *
- * Árbol de aplicaciones del usuario autenticado.
- * El route handler resuelve la data en servidor (dummy hoy / GraphQL después).
- * Requiere: Authorization header con JWT (vía apiFetch desde el cliente).
- */
-export async function GET(_request: NextRequest) {
+export async function GET() {
+    const headers = { "Cache-Control": "private, no-store" };
     try {
-        const appsCatalog = await getAppsCatalog();
-
-        return NextResponse.json({ appsCatalog });
+        return NextResponse.json(
+            { appsCatalog: await getAppsCatalog() },
+            { headers },
+        );
     } catch (error) {
-        const message = error instanceof Error ? error.message : "Error desconocido";
-        const statusCode =
-            error instanceof Error && error.message.includes("401") ? 401 : 500;
-
+        const status = error instanceof AppsCatalogError ? error.status : 503;
+        const referencia = randomUUID();
+        console.warn(
+            JSON.stringify({
+                codigo: "CATALOGO_APLICACIONES_FALLIDO",
+                referencia,
+                status,
+            }),
+        );
         return NextResponse.json(
             {
-                error: message,
-                timestamp: new Date().toISOString(),
+                codigo: "CATALOGO_APLICACIONES_FALLIDO",
+                referencia,
+                message:
+                    status === 401
+                        ? "Inicia sesión para consultar tus aplicaciones."
+                        : "No se pudo cargar el catálogo de aplicaciones. Intenta nuevamente.",
             },
-            { status: statusCode }
+            { status, headers },
         );
     }
 }

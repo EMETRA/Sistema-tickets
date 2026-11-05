@@ -28,6 +28,8 @@ El [calendario semanal y la navegación de Personas y accesos](CALENDARIO_Y_ACCE
 
 ## Configuraciones pendientes, sin simular resultados
 
+La [guía de aplicaciones y fuentes reales](FUENTES_REALES.md) describe la conexión del observador de servidores y GitHub, y la recuperación de errores al navegar entre aplicaciones.
+
 - Inventario oficial: el catálogo está en ADMEMETRA y falta su tabla/columna. El registro técnico manual muestra **Inventario oficial pendiente de verificar**. Se conectará mediante vista en ADMEMETRAINTEGRACION, conservando la futura migración.
 - Observadores de servidores y emisores de actividad/errores de aplicaciones: los adaptadores y contratos están implementados en el API; deben conectarse a sus fuentes reales. Sin emisor, se muestran ausencia de mediciones/eventos y lecturas vencidas.
 - Objetos Oracle: solo se muestran ALL_OBJECTS/ALL_CONSTRAINTS visibles para la cuenta del API. No se conceden permisos SYS o ANY DICTIONARY.

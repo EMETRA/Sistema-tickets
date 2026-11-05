@@ -37,7 +37,12 @@ async function run() {
         const left=await primary.boundingBox(),right=await calendar.boundingBox();assert.ok(left.x<right.x && Math.abs(left.y-right.y)<2,'Actividad y calendario en una fila');
         const bottom=await page.getByRole('navigation',{name:'Accesos de mi espacio'}).boundingBox();assert.ok(bottom.y>=Math.max(left.y+left.height,right.y+right.height));
       }
-      await page.screenshot({path:path.join(out,'inicio-'+index+'.png'),fullPage:true});
+      const painted = await page.screenshot({path:path.join(out,'inicio-'+index+'.png'),fullPage:true});
+      const active = await page.getByRole('navigation',{name:'Menú principal',exact:true}).getByRole('link',{name:'Inicio',exact:true}).boundingBox();
+      const pixel = await page.evaluate(({png,x,y})=>new Promise((resolve,reject)=>{
+        const img=new Image();img.onload=()=>{const c=document.createElement('canvas');c.width=img.width;c.height=img.height;const ctx=c.getContext('2d');ctx.drawImage(img,0,0);resolve(Array.from(ctx.getImageData(x,y,1,1).data));};img.onerror=reject;img.src='data:image/png;base64,'+png;
+      }),{png:painted.toString('base64'),x:Math.floor(active.x+active.width-12),y:Math.floor(active.y+active.height/2)});
+      assert.deepEqual(pixel,[67,97,238,255],'Inicio debe estar pintado en la captura inicial, sin redimensionar');
     }
     for(const width of [1920,1440,1024,768,390]) {
       await page.setViewportSize({width,height:1100});await visit('/home');await fits();

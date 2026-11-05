@@ -66,7 +66,8 @@ TICKETS_LAB_TEST_URL=http://127.0.0.1:3030 node test/integracion/fidelidad-brows
 
 Ese recorrido comprueba siete perfiles, superficies calculadas por el navegador,
 composición P04 (títulos, orden, cuatro métricas, dos paneles y tres accesos),
-menú de cinco entradas, enlaces de accesos/ayuda/seguimiento y un fallo parcial
+menú de cinco entradas, pintado inicial de su entrada activa en la captura (sin
+redimensionar), enlaces de accesos/ayuda/seguimiento y un fallo parcial
 que no oculta el calendario ni fabrica ceros. También comprueba ausencia de
 desbordamiento a 1920, 1440, 1024, 768 y 390 píxeles y adjuntos por teclado. Las capturas se guardan en
 `QA_SCREENSHOT_DIR`, o `/tmp/tickets-fidelidad` por defecto. Usa datos ficticios

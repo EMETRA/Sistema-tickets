@@ -1,4 +1,8 @@
 .sidebar {
+  // Capa estable junto al contenido con scroll: evita perder el pintado inicial.
+  position: relative;
+  isolation: isolate;
+  transform: translateZ(0);
   width: var(--tickets-sidebar, 228px);
   height: 100dvh;
   display: flex;

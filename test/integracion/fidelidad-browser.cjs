@@ -44,7 +44,7 @@ async function run() {
       await page.screenshot({path:path.join(out,'inicio-'+width+'.png'),fullPage:true});
     }
     await page.setViewportSize({width:1440,height:1100});
-    await visit('/home');await page.getByRole('button',{name:/Registraste el ticket/}).click();await page.getByRole('dialog').waitFor();await page.getByRole('dialog').getByText('LAB-0001',{exact:false}).first().waitFor();await page.keyboard.press('Escape');assert.equal(await page.getByRole('dialog').count(),0);
+    await visit('/home');await page.getByRole('button',{name:/Registraste el ticket/}).click();await page.getByRole('dialog').waitFor();await page.getByRole('dialog').getByRole('heading',{name:'Impresora de prueba sin conexión',exact:true}).waitFor();await page.keyboard.press('Escape');assert.equal(await page.getByRole('dialog').count(),0);
     for(const [label,href,title] of [['Aplicaciones autorizadas','/aplicaciones','Aplicaciones del panel'],['Crear ticket','/tickets-creation','Nuevo ticket'],['Mis métricas','/espacio/metricas','Métricas de atención y actividad']]) {
       await visit('/home');const link=page.getByRole('navigation',{name:'Accesos de mi espacio'}).getByRole('link',{name:new RegExp(label)});
       assert.equal(await link.getAttribute('href'),href);await link.click();await page.getByRole('heading',{name:new RegExp(title,'i')}).waitFor();await fits();

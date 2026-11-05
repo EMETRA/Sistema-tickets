@@ -18,7 +18,7 @@ async function run() {
   const white=async locator=>assert.equal(await locator.evaluate(el=>getComputedStyle(el).backgroundColor),'rgb(255, 255, 255)');
   const roles=[[/Administración ficticia/,'Control de Informática'],[/Secretaría ficticia/,'Primero, los tickets por asignar'],[/Jefatura ficticia/,'Tu unidad, en un solo lugar'],[/Técnico ficticio/,'Tu atención y tus instalaciones'],[/Desarrolladora ficticia/,'Tus sistemas y tus pendientes'],[/Operación ficticia/,'Tus servicios y tus pendientes'],[/Analista ficticio/,'Tus solicitudes y aplicaciones']];
   try {
-    for(const [index,[role,title]] of roles.entries()) {
+    for(const [index,[role,title]] of [...Array.from(roles.entries()).slice(6),...Array.from(roles.entries()).slice(0,6)]) {
       await visit('/__laboratorio');await page.getByRole('link',{name:role}).click();
       const heading=page.getByRole('heading',{name:title,exact:true});await heading.waitFor();await page.waitForLoadState('networkidle');await fits();
       const primary=page.getByRole('region',{name:index===6?'Acciones recientes':index===2?'Tickets de mi equipo':index<=1?'Tickets recientes':'Mis tickets asignados',exact:true});
@@ -40,10 +40,12 @@ async function run() {
       const painted = await page.screenshot({path:path.join(out,'inicio-'+index+'.png'),fullPage:true});
       const active = await page.getByRole('navigation',{name:'Menú principal',exact:true}).getByRole('link',{name:'Inicio',exact:true}).boundingBox();
       const pixel = await page.evaluate(({png,x,y})=>new Promise((resolve,reject)=>{
-        const img=new Image();img.onload=()=>{const c=document.createElement('canvas');c.width=img.width;c.height=img.height;const ctx=c.getContext('2d');ctx.drawImage(img,0,0);resolve(Array.from(ctx.getImageData(x,y,1,1).data));};img.onerror=reject;img.src='data:image/png;base64,'+png;
+        const img=new Image();img.onload=()=>{const c=document.createElement('canvas');c.width=img.width;c.height=img.height;const ctx=c.getContext('2d');ctx.drawImage(img,0,0);const brand=ctx.getImageData(12,32,180,46).data;let brandInk=0;for(let i=0;i<brand.length;i+=4)if(brand[i]<100&&brand[i+1]<130&&brand[i+2]<180)brandInk++;resolve({color:Array.from(ctx.getImageData(x,y,1,1).data),brandInk});};img.onerror=reject;img.src='data:image/png;base64,'+png;
       }),{png:painted.toString('base64'),x:Math.floor(active.x+active.width-12),y:Math.floor(active.y+active.height/2)});
-      assert.deepEqual(pixel,[67,97,238,255],'Inicio debe estar pintado en la captura inicial, sin redimensionar');
+      assert.deepEqual(pixel.color,[67,97,238,255],'Inicio debe estar pintado en la captura inicial, sin redimensionar');assert.ok(pixel.brandInk>50,'La marca debe estar pintada en la captura inicial');
     }
+    await visit('/__laboratorio');await page.getByRole('link',{name:/Analista ficticio/}).click();await page.getByRole('heading',{name:'Tus solicitudes y aplicaciones',exact:true}).waitFor();await page.waitForLoadState('networkidle');
+    const more=page.getByRole('button',{name:'Más herramientas',exact:true});await more.click();assert.equal(await more.getAttribute('aria-expanded'),'true');await page.getByRole('link',{name:'Buscar registros',exact:true}).waitFor();await more.click();assert.equal(await more.getAttribute('aria-expanded'),'false');
     for(const width of [1920,1440,1024,768,390]) {
       await page.setViewportSize({width,height:1100});await visit('/home');await fits();
       await page.screenshot({path:path.join(out,'inicio-'+width+'.png'),fullPage:true});

@@ -135,9 +135,11 @@
   }
 }
 
-.more { margin-top:18px; summary { padding:10px; font-size:11px; color:var(--tickets-text-secondary); cursor:pointer; } &[open] summary { margin-bottom:8px; } }
+.more { margin-top:18px; }
+.moreToggle { padding:10px; font:inherit; font-size:11px; color:var(--tickets-text-secondary); cursor:pointer; border:0; background:transparent; text-align:left; width:100%; &[aria-expanded="true"] { margin-bottom:8px; } }
+.navItemsGroup[hidden] { display:none; }
 @media (min-width: 768px) and (max-width: 1199px) {
-  .more summary {
+  .moreToggle {
     padding: 10px 2px;
     font-size: 9px;
     text-align: center;

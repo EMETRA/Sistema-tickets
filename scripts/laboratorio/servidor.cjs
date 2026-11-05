@@ -372,7 +372,7 @@ async function createLab(file) {
       parts = p.split("/").filter(Boolean),
       q = url.searchParams;
     if (p === "/bootstrap") return bootstrap(s, a);
-    if (p === "/catalog") return {}; // Los trámites externos se validan con sus suites dedicadas, no se simulan como exitosos.
+    if (p === "/catalog") return s.applicationCatalog || {}; // Catálogo ficticio explícito de los recorridos; sin trámites externos.
     if (p === "/people")
       return s.users
         .filter(

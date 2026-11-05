@@ -21,6 +21,7 @@ import Link from "next/link";
 import { RoleProvider } from "@/context/RoleContext";
 import { useAppsCatalogContext } from "@/context/AppsCatalogContext";
 import { useAuthStore } from "@/store/useAuthStore";
+import { ApplicationLoadError } from "../../organisms/ApplicationLoadError/ApplicationLoadError";
 import { PageHeading } from "../../molecules/PageHeading/PageHeading";
 import { AdministrativeConfirmation } from "../../organisms/AdministrativeConfirmation/AdministrativeConfirmation";
 
@@ -46,7 +47,7 @@ export const SystemLayout = ({
         window.addEventListener("keydown", close);
         return () => window.removeEventListener("keydown", close);
     }, []);
-    const { catalog, loading: catalogLoading } = useAppsCatalogContext();
+    const { catalog, loading: catalogLoading, error: catalogError } = useAppsCatalogContext();
 
     const currentRole = getRole();
     const appContext = pathname ? resolveAppPath(pathname) : null;
@@ -65,7 +66,7 @@ export const SystemLayout = ({
             return;
         }
 
-        if (appId && catalogLoading) return;
+        if (appId && (catalogLoading || catalogError)) return;
 
         if (!canAccessAppPath(pathname, catalog)) {
             router.replace("/unauthorized");
@@ -78,6 +79,7 @@ export const SystemLayout = ({
         router,
         catalog,
         catalogLoading,
+        catalogError,
         appId,
     ]);
 
@@ -158,6 +160,10 @@ export const SystemLayout = ({
                 Cargando tu espacio de trabajo…
             </div>
         );
+    }
+
+    if (token && appId && catalogError && canAccessPath(currentRole, pathname ?? "/home")) {
+        return <div className={styles.loading}><ApplicationLoadError onRetry={() => window.location.reload()} /></div>;
     }
 
     if (!hasAccess) {

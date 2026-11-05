@@ -1,6 +1,8 @@
 "use client";
 import { startTransition, useEffect, useState } from "react";
 import { Button } from "@/components/client/atoms/Button";
+import { RepositoryStatus } from "@/components/client/organisms/RepositoryStatus/RepositoryStatus";
+import { usePlatform } from "@/platform/context";
 import { PlatformField } from "@/components/client/molecules/PlatformField/PlatformField";
 import { ResourceWorkspace } from "@/components/client/organisms/ResourceWorkspace/ResourceWorkspace";
 import { platformFetch } from "@/platform/client";
@@ -26,6 +28,7 @@ type Objects = {
     }[];
 };
 export function SystemsWorkspace() {
+    const { data } = usePlatform();
     const [tab, setTab] = useState("catalogo"),
         [schema, setSchema] = useState<unknown>(""),
         [result, setResult] = useState<Objects | null>(null),
@@ -57,6 +60,16 @@ export function SystemsWorkspace() {
                 >
                     Aplicaciones y seguimiento
                 </button>
+                {!!data?.definitions.repositorios?.actions.LEER && (
+                    <button
+                        aria-current={
+                            tab === "repositorios" ? "page" : undefined
+                        }
+                        onClick={() => setTab("repositorios")}
+                    >
+                        Estado de repositorios
+                    </button>
+                )}
                 <button
                     aria-current={tab === "oracle" ? "page" : undefined}
                     onClick={() => setTab("oracle")}
@@ -66,6 +79,8 @@ export function SystemsWorkspace() {
             </nav>
             {tab === "catalogo" ? (
                 <ResourceWorkspace group="sistemas" />
+            ) : tab === "repositorios" ? (
+                <RepositoryStatus />
             ) : (
                 <>
                     <div className={styles.toolbar}>

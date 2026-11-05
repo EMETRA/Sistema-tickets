@@ -1,4 +1,5 @@
 "use client";
+import { Suspense } from "react";
 import { Button } from "@/components/client/atoms/Button";
 import { usePlatform } from "@/platform/context";
 import { platformSections } from "@/platform/navigation";
@@ -12,6 +13,7 @@ import { AccessWorkspace } from "./AccessWorkspace";
 import { SystemsWorkspace } from "./SystemsWorkspace";
 import { MonitoringWorkspace } from "./MonitoringWorkspace";
 import { AuditWorkspace } from "./AuditWorkspace";
+import { AccessNavigation } from "@/components/client/molecules/AccessNavigation/AccessNavigation";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
 export function PlatformRoute({ section }: { section: string }) {
     const { data, loading, error, disabled, refresh } = usePlatform();
@@ -59,7 +61,17 @@ export function PlatformRoute({ section }: { section: string }) {
         case "red":
             return <NetworkWorkspace />;
         case "accesos":
-            return <AccessWorkspace />;
+            return (
+                <Suspense
+                    fallback={
+                        <p role="status" className={styles.card}>
+                            Consultando los accesos…
+                        </p>
+                    }
+                >
+                    <AccessWorkspace />
+                </Suspense>
+            );
         case "sistemas":
             return <SystemsWorkspace />;
         case "infraestructura":
@@ -68,7 +80,23 @@ export function PlatformRoute({ section }: { section: string }) {
             return <AuditWorkspace />;
         case "solicitudes":
             return (
-                <ResourceWorkspace group="accesos" types={["solicitudes"]} />
+                <section className={styles.page}>
+                    <AccessNavigation
+                        active="requests"
+                        admin={data.actor.admin}
+                    />
+                    {data.actor.admin && (
+                        <p className={styles.muted}>
+                            Revisa las solicitudes aquí o utiliza las pestañas
+                            para administrar usuarios, perfiles, roles, módulos
+                            y permisos.
+                        </p>
+                    )}
+                    <ResourceWorkspace
+                        group="accesos"
+                        types={["solicitudes"]}
+                    />
+                </section>
             );
         default:
             return <ResourceWorkspace group={section} />;

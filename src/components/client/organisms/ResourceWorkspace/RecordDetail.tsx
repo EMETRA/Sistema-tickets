@@ -75,6 +75,10 @@ export function RecordDetail({
         [busy, setBusy] = useState(false),
         [decision, setDecision] = useState("APROBAR"),
         [observacion, setObservacion] = useState("");
+    const readOnly =
+        type === "actividades" &&
+        current.visibilidad === "EMPRESA" &&
+        !data!.actor.admin;
     useEffect(() => {
         dialog.current?.showModal();
         const controller = new AbortController();
@@ -225,7 +229,7 @@ export function RecordDetail({
                         {current.estado.replaceAll("_", " ")}
                     </span>
                     <div className={styles.actions}>
-                        {def.actions.EDITAR && (
+                        {!readOnly && def.actions.EDITAR && (
                             <Button
                                 variant="outlined"
                                 onClick={() => onEdit(current)}
@@ -233,7 +237,7 @@ export function RecordDetail({
                                 Editar
                             </Button>
                         )}
-                        {def.actions.ELIMINAR && (
+                        {!readOnly && def.actions.ELIMINAR && (
                             <Button
                                 variant="outlined"
                                 onClick={() => void remove()}
@@ -244,6 +248,11 @@ export function RecordDetail({
                         )}
                     </div>
                 </div>
+                {readOnly && (
+                    <p className={styles.muted}>
+                        Este registro está disponible solo para consulta.
+                    </p>
+                )}
                 <nav className={styles.tabs} aria-label="Detalle del registro">
                     {[
                         ["info", "Información"],
@@ -265,7 +274,11 @@ export function RecordDetail({
                     </p>
                 )}
                 {tab === "files" ? (
-                    <RecordFiles type={type} record={current} />
+                    <RecordFiles
+                        type={type}
+                        record={current}
+                        readOnly={readOnly}
+                    />
                 ) : tab === "history" ? (
                     <section className={styles.card}>
                         <h3>Historial de cambios</h3>

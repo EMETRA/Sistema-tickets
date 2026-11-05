@@ -28,7 +28,7 @@ export const PLATFORM_SECTIONS = [
     },
     {
         id: "accesos",
-        label: "Perfiles y permisos",
+        label: "Personas y accesos",
         iconName: "user-lock-solid",
     },
     {

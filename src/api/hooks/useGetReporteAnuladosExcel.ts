@@ -26,9 +26,10 @@
 
 'use client';
 
+import { apiFetch } from '@/api/graphql/client';
 import { useCallback, useState } from 'react';
 import { downloadBase64File } from '@/helpers/downloadBase64File';
-import type { ReporteAnuladosInput } from '@/api/graphql/MOD08';
+import type { ReporteAnuladosInput, ReporteAnuladosExcelExport } from '@/api/graphql/MOD08';
 
 interface UseGetReporteAnuladosExcelReturn {
   exportar: (input: ReporteAnuladosInput) => Promise<boolean>;
@@ -51,16 +52,7 @@ export function useGetReporteAnuladosExcel(): UseGetReporteAnuladosExcelReturn {
                 params.set('fechaFin', input.fechaFin);
                 params.set('tipoReporte', input.tipoReporte);
 
-                const response = await fetch(`/api/MOD08/reporteAnuladosExcel?${params.toString()}`, {
-                    method: 'GET',
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || `Error ${response.status}`);
-                }
-
-                const result = await response.json();
+                const result = await apiFetch<{ data: ReporteAnuladosExcelExport }>(`/api/MOD08/reporteAnuladosExcel?${params.toString()}`);
                 const exportData = result.data;
 
                 if (!exportData?.contentBase64 || !exportData?.filename || !exportData?.mimeType) {

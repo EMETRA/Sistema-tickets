@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { apiFetch } from '@/api/graphql/client';
-import type { FuncionesPorUsuarioAplicacion, GetFuncionesPorUsuarioAplicacionesResponse } from '@/api/graphql/MOD06';
+import type { FuncionesPorUsuarioAplicacion } from '@/api/graphql/MOD06';
 
 export const useGetFuncionesPorUsuarioAplicaciones = () => {
     const [data, setData] = useState<FuncionesPorUsuarioAplicacion[]>([]);
@@ -11,8 +11,8 @@ export const useGetFuncionesPorUsuarioAplicaciones = () => {
         setLoading(true);
         setError(null);
         try {
-            const res = await apiFetch<{ data: GetFuncionesPorUsuarioAplicacionesResponse }>('/api/MOD06/aplicaciones');
-            setData(res.data?.funcionesPorUsuarioAplicaciones ?? []);
+            const res = await apiFetch<{ data: FuncionesPorUsuarioAplicacion[] }>('/api/MOD06/aplicaciones');
+            setData(res.data ?? []);
         } catch (err) {
             setError(err instanceof Error ? err : new Error(String(err)));
             setData([]);

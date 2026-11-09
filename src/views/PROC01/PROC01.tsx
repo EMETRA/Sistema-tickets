@@ -21,7 +21,7 @@ const PROCESS_CONFIG: Record<string, ProcessConfig> = {
 };
 
 const PROC01: React.FC = () => {
-    const { executeLprRemission, loading} = useExecuteLprRemission();
+    const { executeLprRemission, loading, error} = useExecuteLprRemission();
 
     const [processResult, setProcessResult] = useState({
         totalProcesados: "—",
@@ -29,6 +29,7 @@ const PROC01: React.FC = () => {
         totalFallidos: "—",
     });
 
+    const [validation, setValidation] = useState('');
     const [selectedProcess, setSelectedProcess] = useState<string>('');
     const [usuario, setUsuario] = useState<string>('');
     const [correlativo, setCorrelativo] = useState<string>('');
@@ -36,14 +37,16 @@ const PROC01: React.FC = () => {
     const currentProcess = selectedProcess ? PROCESS_CONFIG[selectedProcess] : null;
 
     const handleExecute = async () => {
-        if (!selectedProcess) return;
+        if (loading) return;
+        setValidation('');
+        if (!selectedProcess) { setValidation('Selecciona el proceso que deseas ejecutar.'); return; }
 
         if (currentProcess?.requiresUser && !usuario) {
-            alert('Por favor, ingrese el usuario requerido para este proceso.');
+            setValidation('Por favor, ingrese el usuario requerido para este proceso.');
             return;
         }
         if (currentProcess?.requiresCorrelative && !correlativo) {
-            alert('Por favor, ingrese el correlativo requerido para este proceso.');
+            setValidation('Por favor, ingrese el correlativo requerido para este proceso.');
             return;
         }
 
@@ -67,6 +70,8 @@ const PROC01: React.FC = () => {
         <div className={styles.mainContainer}>
             <div className={styles.formContainer}>
                 <Title variant="mid" tag="h3" className={styles.title}>Escoger Proceso</Title>
+                {validation && <p role="alert">{validation}</p>}
+                {error && <p role="alert">No se pudo completar el proceso. Conservamos los parámetros para que reintentes.</p>}
                 
                 <FormField label="Proceso" htmlFor="proceso" required>
                     <Select

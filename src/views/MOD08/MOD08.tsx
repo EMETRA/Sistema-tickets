@@ -26,15 +26,19 @@ const MOD08: React.FC = () => {
     const [endDate, setEndDate] = useState<string>('');
     const [selectedReportType, setSelectedReportType] = useState<TipoReporteAnulado | ''>('');
 
+    const [validation, setValidation] = useState('');
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const { exportar, loading, error } = useGetReporteAnuladosExcel();
 
     const handleExecute = async () => {
+        if (loading) return;
+        setValidation('');
         if (startDate === '' || endDate === '' || selectedReportType === '') {
-            alert('Por favor, complete todos los campos antes de ejecutar el proceso.');
+            setValidation('Por favor, complete todos los campos antes de ejecutar el proceso.');
             return;
         }
 
+        if (startDate > endDate) { setValidation('La fecha de inicio no puede ser posterior a la fecha de fin.'); return; }
         const success = await exportar({
             fechaInicio: startDate,
             fechaFin: endDate,
@@ -49,7 +53,8 @@ const MOD08: React.FC = () => {
     return (
         <div className={styles.mainContainer}>
             <div className={styles.formContainer}>
-                <Title variant="mid" tag="h3" className={styles.title}>Exportar Reporte</Title>
+                <Title variant="mid" tag="h3" className={styles.title}>Parámetros de exportación</Title>
+                {validation && <p role="alert">{validation}</p>}
 
                 {/* Fecha de inicio */}
                 <FormField label="Fecha de inicio" htmlFor="startDate" required className={styles.fieldStartDate}>

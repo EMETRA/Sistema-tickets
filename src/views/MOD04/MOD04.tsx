@@ -22,15 +22,17 @@ const MOD04: React.FC = () => {
     const [paymentType, setPaymentType] = useState<string>('');
     const [budgetUnit, setBudgetUnit] = useState<string>('');
 
+    const [validation, setValidation] = useState('');
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
     const handleExecute = async () => {
-        if (company === '' || paystubType === '' || playrollManager === '' || paymentType === '' || budgetUnit === '') {
-            alert('Por favor, complete todos los campos antes de ejecutar el proceso.');
+        if (exportLoading) return;
+        setValidation('');
+        if (company.trim() === '' || paystubType === '' || playrollManager === '' || paymentType === '' || budgetUnit === '') {
+            setValidation('Completa todos los parámetros de la consulta.');
             return;
         }
 
-        alert(`Ejecutando proceso con:\nEmpresa: ${company}\nTipo de Recibo: ${paystubType}\nGerente de Nómina: ${playrollManager}\nTipo de Pago: ${paymentType}\nUnidad de Presupuesto: ${budgetUnit}`);
         
         const result = await exportar({
             empresa: company,
@@ -42,8 +44,6 @@ const MOD04: React.FC = () => {
 
         if (result) {
             setIsModalOpen(true);
-        } else {
-            alert(`Proceso finalizado. Resultado: ${result ? 'Éxito' : 'Error'}`);
         }
     };
 
@@ -51,6 +51,7 @@ const MOD04: React.FC = () => {
         <div className={styles.mainContainer}>
             <div className={styles.formContainer}>
                 <Title variant="mid" tag="h3" className={styles.title}>Parámetros de consulta</Title>
+                {validation && <p role="alert">{validation}</p>}
 
                 {/* Empresa */}
                 <FormField label="Empresa" htmlFor="company" required className={styles.fieldCompany}>
@@ -122,14 +123,13 @@ const MOD04: React.FC = () => {
                     color="default"
                     onClick={handleExecute}
                     className={styles.executeButton}
+                    state={exportLoading ? "loading" : "default"}
                 >
                     {exportLoading ? 'Generando Excel...' : 'Generar Reporte en Excel'}
                 </Button>
 
                 {exportError && (
-                    <Text variant="caption" className={styles.errorText}>
-                        Error: {exportError.message}
-                    </Text>
+                    <p role="alert" className={styles.errorText}>{exportError.message}</p>
                 )}
 
                 <Text variant="caption" className={styles.footerText}>

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { apiFetch } from '@/api/graphql/client';
-import type { FuncionesPorUsuarioConsulta, FuncionesPorUsuarioConsultaInput, GetFuncionesPorUsuarioPermisosResponse } from '@/api/graphql/MOD06';
+import type { FuncionesPorUsuarioConsulta, FuncionesPorUsuarioConsultaInput } from '@/api/graphql/MOD06';
 
 export const useGetFuncionesPorUsuarioPermisos = () => {
     const [data, setData] = useState<FuncionesPorUsuarioConsulta | null>(null);
@@ -11,9 +11,9 @@ export const useGetFuncionesPorUsuarioPermisos = () => {
         setLoading(true);
         setError(null);
         try {
-            const response = await apiFetch<{ data: GetFuncionesPorUsuarioPermisosResponse }>('/api/MOD06/permisos', undefined, { method: 'POST', body: JSON.stringify(payload) });
-            setData(response.data?.funcionesPorUsuarioPermisos ?? null);
-            return response.data?.funcionesPorUsuarioPermisos ?? null;
+            const response = await apiFetch<{ data: FuncionesPorUsuarioConsulta }>('/api/MOD06/permisos', undefined, { method: 'POST', body: JSON.stringify(payload) });
+            setData(response.data ?? null);
+            return response.data ?? null;
         } catch (err) {
             setError(err instanceof Error ? err : new Error(String(err)));
             setData(null);

@@ -65,3 +65,7 @@
 .userPermissionsContainer { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)); gap: 20px; min-width: 0; > * { min-width: 0; } }
 
 .errorText { overflow-wrap: anywhere; }
+.generalInfomationContainer, .userPermissionsContainer { padding: 0; border: 0; }
+.formContainer { font-size: 12px; line-height: 1.8; p { color: var(--tickets-text-secondary); } [role="alert"] { color: var(--tickets-danger); } [role="status"] { color: var(--tickets-success); } h2 { font-size: 18px; } }
+.permissionList { border: 1px solid var(--tickets-border); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; background: var(--tickets-surface-subtle); label { display: flex; align-items: center; gap: 10px; } }
+.consent { display: flex; align-items: flex-start; gap: 10px; }

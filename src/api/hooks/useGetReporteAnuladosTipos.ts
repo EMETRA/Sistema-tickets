@@ -15,6 +15,7 @@
 
 'use client';
 
+import { apiFetch } from '@/api/graphql/client';
 import { useEffect, useState, useCallback } from 'react';
 import type { ReporteAnuladoTipoInfo } from '@/api/graphql/MOD08';
 
@@ -35,16 +36,7 @@ export function useGetReporteAnuladosTipos(): UseGetReporteAnuladosTiposReturn {
         setError(null);
 
         try {
-            const response = await fetch('/api/MOD08/reporteAnuladosTipos', {
-                method: 'GET',
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || `Error ${response.status}`);
-            }
-
-            const result = await response.json();
+            const result = await apiFetch<{ data: ReporteAnuladoTipoInfo[] }>('/api/MOD08/reporteAnuladosTipos');
             setData(result.data);
         } catch (err) {
             const error = err instanceof Error ? err : new Error('Error desconocido');

@@ -31,3 +31,6 @@
     display: flex;
     gap: 1rem;
 }
+.tableRegion { overflow: auto; margin-top: 28px; table { width: 100%; border-collapse: collapse; min-width: 560px; font-size: 12px; th, td { padding: 14px; text-align: left; border-bottom: 1px solid var(--tickets-border); } th { background: var(--tickets-surface-subtle); } } }
+.card { min-width: 0; border-color: var(--tickets-border); p { font-size: 12px; line-height: 1.8; margin: 14px 0; color: var(--tickets-text-secondary); } [role="alert"] { color: var(--tickets-danger); } }
+@media (max-width: 650px) { .fieldsGridTwo { grid-template-columns: minmax(0, 1fr); } .card { padding: 18px; } }

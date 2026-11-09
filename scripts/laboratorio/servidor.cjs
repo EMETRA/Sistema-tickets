@@ -293,7 +293,7 @@ function requestPlan(s, r) {
     copiaIndependiente: !!d.copiarUsuarioId,
   };
 }
-async function createLab(file) {
+async function createLab(file, options = {}) {
   const state = await new State(file).open(),
     sessions = new Map(),
     failures = [];
@@ -1067,6 +1067,10 @@ async function createLab(file) {
     );
   }
   function graphql(s, a, req, raw) {
+    // Límite de servicios sustituible para recorridos de contratos de módulos.
+    // Solo existe en este laboratorio de loopback; no forma parte del Panel.
+    const custom = options.graphql?.({ state: s, actor: a, request: req, ...raw });
+    if (custom !== undefined) return custom;
     const op = getOperationAST(parse(raw.query || ""));
     if (!op) fail(400, "Consulta inválida.");
     const fields = op.selectionSet.selections;

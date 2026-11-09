@@ -9,7 +9,7 @@ import { MOD10ModalProps } from "./types";
 import styles from "./MOD10Modal.module.scss";
 
 
-const MOD10Modal: React.FC<MOD10ModalProps> = ({ isOpen, onClose, onSubmit, ...formData }) => {
+const MOD10Modal: React.FC<MOD10ModalProps> = ({ isOpen, onClose, onSubmit, loading = false, error, ...formData }) => {
 
     const renderField = (label: string, value: string | number) => (
         <div className={styles.field}>
@@ -64,11 +64,12 @@ const MOD10Modal: React.FC<MOD10ModalProps> = ({ isOpen, onClose, onSubmit, ...f
                         </div>
                     </div>
                 </div>
+                {error && <p role="alert">{error}</p>}
                 <div className={styles.footer}>
                     <Button variant="contained" color="neutral-light" onClick={onClose}>
                         Cancelar
                     </Button>
-                    <Button variant="contained" onClick={() => onSubmit(formData)}>
+                    <Button variant="contained" state={loading ? "loading" : "default"} onClick={() => onSubmit(formData)}>
                         Enviar
                     </Button>
                 </div>

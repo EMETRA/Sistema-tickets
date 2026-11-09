@@ -23,8 +23,10 @@ const destinyAreas = [
 
 export const MOD10: React.FC = () => {
     // Mutations
-    const { sendNotification } = useSendEmailNotification();
+    const { sendNotification, loading } = useSendEmailNotification();
 
+    const [feedback, setFeedback] = useState("");
+    const [sendError, setSendError] = useState("");
     // Estados del formulario
     const [destinyArea, setDestinyArea] = useState<string>('');
     const [documentDate, setDocumentDate] = useState<string>('');
@@ -85,14 +87,15 @@ export const MOD10: React.FC = () => {
     // Manejar envío del formulario
     const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
+        setFeedback(""); setSendError("");
 
         if (!uploadedFile) {
-            alert("Por favor, sube un archivo PDF antes de enviar el formulario.");
+            setFeedback("Por favor, sube un archivo PDF antes de enviar el formulario.");
             return;
         }
 
-        if (destinyArea==='' || documentDate==='' || issuedBy==='' || caseNumber==='' || pageNumbers===undefined || name==='' || reference==='') {
-            alert("Por favor, completa todos los campos obligatorios antes de enviar el formulario.");
+        if (destinyArea==='' || documentDate==='' || issuedBy==='' || caseNumber==='' || (!pageNumbers || pageNumbers < 1) || name==='' || reference==='') {
+            setFeedback("Por favor, completa todos los campos obligatorios antes de enviar el formulario.");
             return;
         }
 
@@ -113,6 +116,8 @@ export const MOD10: React.FC = () => {
     };
 
     const handleModalSubmit = async (data: casesNotificationFormData) => {
+        if (loading) return;
+        setSendError("");
         try {
             const result = await sendNotification(
                 {
@@ -126,17 +131,19 @@ export const MOD10: React.FC = () => {
                 },
                 data.file.file
             );
-            console.log("Success:", result);
+            if (!result?.success) throw new Error("ENVIO_NO_CONFIRMADO");
+            setFeedback("Notificación enviada correctamente.");
             setIsModalOpen(false);
             setPendingFormData(null);
-        } catch (err) {
-            console.error("Error sending notification:", err);
+        } catch {
+            setSendError("No se pudo enviar la notificación. Los datos y el PDF se conservaron para reintentar.");
         }
     };
 
     return (
         <div className={styles.mainContainer}>
             <form onSubmit={handleSubmit} className={styles.form}>
+                {feedback && <p role="status">{feedback}</p>}
                 <div className={styles.fieldsRow}>
                     <div className={styles.fieldsColumn}>
                         {/* Área destino */}
@@ -264,6 +271,8 @@ export const MOD10: React.FC = () => {
             {/* Modal de vista previa */}
             {pendingFormData && (
                 <MOD10Modal
+                    loading={loading}
+                    error={sendError}
                     isOpen={isModalOpen}
                     onClose={() => {
                         setIsModalOpen(false);

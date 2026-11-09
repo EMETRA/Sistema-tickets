@@ -1,3 +1,4 @@
+import { falloModulo } from "@/api/graphql/module-response";
 /**
  * Route Handler: GET /api/MOD07/manual
  *
@@ -47,7 +48,7 @@ export async function GET(request: NextRequest) {
             );
         }
 
-        const response = await graphqlRequest<{ data: GetManualResponse }>(
+        const response = await graphqlRequest<GetManualResponse>(
             GET_MANUAL_QUERY,
             {
                 variables: {
@@ -58,32 +59,9 @@ export async function GET(request: NextRequest) {
 
         return NextResponse.json(
             {
-                data: response.data.manual,
+                data: response.manual,
             },
             { status: 200 },
         );
-    } catch (error) {
-        const message = error instanceof Error ? error.message : 'Error desconocido';
-        const timestamp = new Date().toISOString();
-
-        if (message.includes('401') || message.includes('Unauthorized')) {
-            return NextResponse.json(
-                {
-                    error: 'No autorizado',
-                    message: 'Sesión expirada o credenciales inválidas',
-                    timestamp,
-                },
-                { status: 401 },
-            );
-        }
-
-        return NextResponse.json(
-            {
-                error: 'Error al obtener manual',
-                message,
-                timestamp,
-            },
-            { status: 500 },
-        );
-    }
+    } catch (error) { return falloModulo(error, "MOD07/manual"); }
 }

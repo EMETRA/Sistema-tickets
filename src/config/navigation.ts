@@ -15,7 +15,7 @@ export const PAGES_CONFIG: Record<string, PageMetadata> = {
     aplicaciones: {
         path: "/aplicaciones",
         label: "Aplicaciones",
-        title: "Aplicaciones",
+        title: "Aplicaciones y secciones",
         iconName: "table-cells-large-solid",
     },
     home: {
@@ -75,7 +75,7 @@ export const PAGES_CONFIG: Record<string, PageMetadata> = {
     mis_tickets: {
         path: "/mis-tickets",
         label: "Mis tickets",
-        title: "Mis tickets creados",
+        title: "Mis tickets",
         iconName: "ticket-solid",
     },
     crear_ticket: {

@@ -5,6 +5,7 @@ export interface AppCardProps {
   iconLabel: string;
   iconColor?: string;
   title: string;
+  description?: string;
   // bookmarked?: boolean;
   // onBookmarkClick?: () => void;
   onButtonClick?: () => void;

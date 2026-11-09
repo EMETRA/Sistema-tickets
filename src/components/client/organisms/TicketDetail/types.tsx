@@ -13,4 +13,6 @@ export interface TicketDetailProps {
   isOpen: boolean;
   onClose: () => void;
   onTicketUpdated?: () => void;
+  presentation?: "dialog" | "page";
+  returnHref?: string;
 }

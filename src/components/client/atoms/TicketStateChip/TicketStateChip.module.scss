@@ -1,59 +1,8 @@
-.chip {
-  font-family: var(--font-montserrat), sans-serif;
-  display: inline-flex;
-  align-items: center; // Centra el círculo y el texto verticalmente
-  justify-content: center;
-  padding: 6px 12px; // Un poco más de padding vertical
-  border-radius: 16px;
-  font-size: 0.75rem;
-  font-weight: 700; // Un poco más grueso para que se lea bien
-  white-space: nowrap;
-  gap: 8px; // Espacio entre el círculo y el texto
-}
-
-// Estilos del círculo indicador
-.dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: currentColor; 
-  flex-shrink: 0;
-}
-  
-.ingresado { 
-  background-color: #80B91866; 
-  color: #80B918           
-}
-
-.asignado { 
-  background-color: #FB850066; 
-  color: #FB8500;           
-}
-
-.en_trabajo { 
-  background-color: #FFB70366; 
-  color: #FFB703;           
-}
-
-.completado { 
-  background-color: #0318ff66; 
-  color: #0320ff; 
-}
-
-.cancelado { 
-  background-color: #E6394666; 
-  color: #E63946;
-}
-
-.outlined {
-  background-color: transparent;
-  color: #666;
-  padding: 5px 11px; // Ajuste por el borde
-  
-  // Cuando un filtro está seleccionado
-  &.active {
-    background-color: #4361EE; // Fondo azul muy claro
-    color: #E3F2FD;           // Azul EMETRA
-    border-color: #4361EE;
-  }
-}
+.chip { font-family: var(--font-montserrat), sans-serif; display: inline-flex; align-items: center; justify-content: center; padding: 5px 10px; border-radius: 7px; font-size: 11px; font-weight: 600; white-space: nowrap; gap: 7px; }
+.dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+.ingresado, .creado, .sin_asignar { background: #edf1f7; color: #61728b; }
+.asignado { background: #fff1d1; color: #80540d; }
+.en_trabajo, .en_atencion { background: #edf1ff; color: #3453b7; }
+.completado, .resuelto { background: #e5f5eb; color: #176b43; }
+.cancelado { background: #fff0f2; color: #a33146; }
+.outlined { background: transparent; color: #61728b; border: 1px solid var(--tickets-border); &.active { background: var(--tickets-primary); color: #fff; border-color: var(--tickets-primary); } }

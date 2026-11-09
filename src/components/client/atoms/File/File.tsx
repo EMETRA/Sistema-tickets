@@ -36,13 +36,13 @@ const File: React.FC<FileProps> = ({ id, name, onClick, variant = "contained", d
     const { icon, color } = getFileIcon(name);
 
     return (
-        <div className={classNames(styles.File, { [styles.outlined]: variant === "outlined" }, className)} onClick={() => onClick(id)}>
+        <button type="button" aria-label={name} className={classNames(styles.File, { [styles.outlined]: variant === "outlined" }, className)} onClick={() => onClick(id)}>
             <Icon name={icon} color={color} raw />
             <Text variant="body">{name}</Text>
             {download && (
                 <Icon name="download-solid" color="#000000" size={24} raw />
             )}
-        </div>
+        </button>
     );
 };
 

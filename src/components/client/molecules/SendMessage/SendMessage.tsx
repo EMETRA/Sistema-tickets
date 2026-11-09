@@ -1,123 +1,130 @@
-import { useState, useRef, type KeyboardEvent, type ChangeEvent } from "react";
+"use client";
+import {
+    useId,
+    useRef,
+    useState,
+    type ChangeEvent,
+    type KeyboardEvent,
+} from "react";
 import classNames from "classnames";
-import { Icon } from "@/components/client/atoms/Icon";
-import type { SendMessageProps } from "./types";
+import { Icon } from "../../atoms/Icon";
+import { SendMessageProps } from "./types";
 import styles from "./SendMessage.module.scss";
 
 export const SendMessage = ({
     onSend,
-    placeholder = "Escribe aquí",
+    placeholder = "Escribe una respuesta…",
     disabled = false,
     className,
 }: SendMessageProps) => {
     const [message, setMessage] = useState("");
     const [files, setFiles] = useState<File[]>([]);
     const [isSending, setIsSending] = useState(false);
+    const [error, setError] = useState("");
     const fileInputRef = useRef<HTMLInputElement>(null);
-
-    const hasContent = message.trim().length > 0 || files.length > 0;
-
+    const id = useId();
+    const isDisabled = disabled || isSending;
     const handleSend = async () => {
-        if (!hasContent || isSending) return;
+        if (!message.trim() || isDisabled) return;
         setIsSending(true);
+        setError("");
         try {
             await onSend(message.trim(), files);
             setMessage("");
             setFiles([]);
+        } catch {
+            setError(
+                "No se pudo enviar el comentario. Conservamos el texto y los archivos para que reintentes.",
+            );
         } finally {
             setIsSending(false);
         }
     };
-
-    const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault();
-            handleSend();
+    const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
+        if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) {
+            event.preventDefault();
+            void handleSend();
         }
     };
-
-    const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-        if (!e.target.files || e.target.files.length === 0) return;
-        const incoming = Array.from(e.target.files);
-        setFiles((prev) => [...prev, ...incoming]);
-        e.target.value = "";
+    const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files?.length)
+            setFiles((current) => [
+                ...current,
+                ...Array.from(event.target.files!),
+            ]);
+        event.target.value = "";
     };
-
-    const handleRemoveFile = (index: number) => {
-        setFiles((prev) => prev.filter((_, i) => i !== index));
-    };
-
-    const isDisabled = disabled || isSending;
-
     return (
-        <div className={classNames(styles.wrapper, { [styles.disabled]: isDisabled }, className)}>
-
-            {/* File preview chips — above the input */}
+        <div className={classNames(styles.wrapper, className)}>
+            <label htmlFor={id} className={styles.label}>
+                Comentario
+            </label>
+            <textarea
+                id={id}
+                rows={3}
+                className={styles.input}
+                placeholder={placeholder}
+                value={message}
+                onChange={(event) => setMessage(event.target.value)}
+                onKeyDown={handleKeyDown}
+                disabled={isDisabled}
+            />
             {files.length > 0 && (
                 <div className={styles.filePreview}>
                     {files.map((file, index) => (
                         <span key={index} className={styles.fileChip}>
-                            <span className={styles.fileName}>{file.name}</span>
+                            <span>{file.name}</span>
                             <button
                                 type="button"
-                                className={styles.fileRemove}
-                                onClick={() => handleRemoveFile(index)}
-                                aria-label={`Eliminar archivo ${file.name}`}
+                                disabled={isDisabled}
+                                aria-label={"Eliminar archivo " + file.name}
+                                onClick={() =>
+                                    setFiles((current) =>
+                                        current.filter((_, i) => i !== index),
+                                    )
+                                }
                             >
-                                x
+                                ×
                             </button>
                         </span>
                     ))}
                 </div>
             )}
-
-            <div className={styles.container}>
-                {/* Attach button */}
+            {error && (
+                <p role="alert" className={styles.error}>
+                    {error}
+                </p>
+            )}
+            <div className={styles.actions}>
                 <button
                     type="button"
-                    className={styles.iconButton}
+                    className={styles.attach}
+                    disabled={isDisabled}
                     onClick={() => fileInputRef.current?.click()}
-                    disabled={isDisabled}
-                    aria-label="Adjuntar archivo"
                 >
-                    <Icon name="paperclip" size={18} variant="action" />
+                    <Icon name="paperclip" size={17} />
+                    Adjuntar archivo
                 </button>
-
-                <input
-                    type="text"
-                    className={styles.input}
-                    placeholder={placeholder}
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    disabled={isDisabled}
-                    aria-label="Escribe un mensaje"
-                />
-
-                {/* Send button */}
                 <button
                     type="button"
-                    className={styles.iconButton}
-                    onClick={handleSend}
-                    disabled={isDisabled || !hasContent}
-                    aria-label="Enviar mensaje"
+                    className={styles.send}
+                    disabled={isDisabled || !message.trim()}
+                    onClick={() => void handleSend()}
                 >
-                    <Icon name="send" size={18} variant="action" />
+                    {isSending ? "Enviando…" : "Enviar comentario"}
                 </button>
-
-                {/* Hidden file input */}
-                <input
-                    ref={fileInputRef}
-                    type="file"
-                    multiple
-                    className={styles.fileInput}
-                    onChange={handleFileChange}
-                    aria-hidden="true"
-                    tabIndex={-1}
-                />
             </div>
+            <input
+                ref={fileInputRef}
+                type="file"
+                multiple
+                className={styles.fileInput}
+                onChange={handleFileChange}
+                aria-hidden="true"
+                tabIndex={-1}
+                disabled={isDisabled}
+            />
         </div>
     );
 };
-
 export default SendMessage;

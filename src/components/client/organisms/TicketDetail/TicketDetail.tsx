@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useId, useState } from "react";
+import Link from "next/link";
+import { TicketStateChip } from "../../atoms/TicketStateChip";
+import type { ChipState } from "../../atoms/TicketStateChip/types";
+import { displayDate } from "../ResourceWorkspace/RecordDetail";
 
 import { PopOver } from "@/components/client/atoms/PopOver";
-import { Icon } from "@/components/client/atoms/Icon";
-import { Title } from "@/components/client/atoms/Title";
-import { Text } from "@/components/client/atoms/Text";
 import { File } from "@/components/client/atoms/File";
 import { Button } from "@/components/client/atoms/Button";
 
@@ -40,13 +41,26 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
     isOpen,
     onClose,
     onTicketUpdated,
+    presentation = "dialog",
+    returnHref = "/mis-tickets",
 }) => {
+    const [tab, setTab] = useState("conversacion");
+    const [actionError, setActionError] = useState("");
+    const tabsId = useId();
     const role = useAuthStore((state) => state.getRole());
     const { updateTicket, loading: isUpdating } = useUpdateTicket();
-    const { data: ticketData, loading: isTicketLoading } =
-    useGetTicketById(ticketId);
-    const { data: ticketAttachments, loading: isTicketAttachmentsLoading } =
-    useGetTicketAttachments(ticketId);
+    const {
+        data: ticketData,
+        loading: isTicketLoading,
+        error: ticketError,
+        refetch: refetchTicket,
+    } = useGetTicketById(ticketId);
+    const {
+        data: ticketAttachments,
+        loading: isTicketAttachmentsLoading,
+        error: attachmentsError,
+        refetch: refetchAttachments,
+    } = useGetTicketAttachments(ticketId);
     const {
         data: ticketTags,
         refetch: refetchTags,
@@ -84,23 +98,32 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
             ]);
             await refetchTags();
         } catch (err) {
+            setActionError(
+                "No se pudieron actualizar las etiquetas. Reintenta la operación.",
+            );
             console.error("Error actualizando etiquetas:", err);
         }
     };
 
     const handleOnFileClick = (url_descarga: string) => {
-        window.open(url_descarga, "_blank");
+        if (url_descarga)
+            window.open(url_descarga, "_blank", "noopener,noreferrer");
     };
 
     const handleOnTicketCancel = async (
         e: React.MouseEvent<HTMLButtonElement>,
     ) => {
         e.preventDefault();
+        setActionError("");
         try {
-            await updateTicket(ticketId, { estadoId: 4 });
+            const updated = await updateTicket(ticketId, { estadoId: 4 });
+            if (!updated) throw new Error("ACTUALIZACION_NO_CONFIRMADA");
             onTicketUpdated?.();
             onClose();
         } catch (err) {
+            setActionError(
+                "No se pudo actualizar el ticket. Conservamos la información para que reintentes.",
+            );
             console.error("Error cancelando ticket:", err);
         }
     };
@@ -109,11 +132,16 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
         e: React.MouseEvent<HTMLButtonElement>,
     ) => {
         e.preventDefault();
+        setActionError("");
         try {
-            await updateTicket(ticketId, { estadoId: 3 }); // En trabajo
+            const updated = await updateTicket(ticketId, { estadoId: 3 });
+            if (!updated) throw new Error("ACTUALIZACION_NO_CONFIRMADA"); // En trabajo
             onTicketUpdated?.();
             onClose();
         } catch (err) {
+            setActionError(
+                "No se pudo actualizar el ticket. Conservamos la información para que reintentes.",
+            );
             console.error("Error poniendo ticket en proceso:", err);
         }
     };
@@ -122,142 +150,344 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
         e: React.MouseEvent<HTMLButtonElement>,
     ) => {
         e.preventDefault();
+        setActionError("");
         try {
-            await updateTicket(ticketId, { estadoId: 5 }); // Completado
+            const updated = await updateTicket(ticketId, { estadoId: 5 });
+            if (!updated) throw new Error("ACTUALIZACION_NO_CONFIRMADA"); // Completado
             onTicketUpdated?.();
             onClose();
         } catch (err) {
+            setActionError(
+                "No se pudo actualizar el ticket. Conservamos la información para que reintentes.",
+            );
             console.error("Error finalizando ticket:", err);
         }
     };
 
     const ticketState = ticketData?.estadoNombre.toLowerCase();
-    const canCancel = ticketState && !["asignado", "completado", "cancelado"].includes(ticketState);
-    const canStart = ticketState === "creado" || ticketState === "asignado";
+    const canCancel =
+        ticketState &&
+        !["asignado", "completado", "resuelto", "cancelado"].includes(ticketState);
+    const canStart = ["creado", "sin asignar", "asignado"].includes(ticketState || "");
 
-    return (
+    const state = ticketState?.replaceAll(" ", "_") as ChipState | undefined;
+    const tabs = [
+        { id: "conversacion", label: "Conversación" },
+        { id: "historial", label: "Historial" },
+        { id: "archivos", label: "Archivos" },
+    ];
+    const files = (
+        <>
+            {isTicketAttachmentsLoading ? (
+                <p role="status">Cargando archivos…</p>
+            ) : attachmentsError ? (
+                <div role="alert" className={styles.error}>
+                    No se pudieron cargar los archivos.{" "}
+                    <button onClick={() => void refetchAttachments()}>
+                        Reintentar archivos
+                    </button>
+                </div>
+            ) : ticketAttachments.length ? (
+                <div className={styles.files}>
+                    {ticketAttachments.map((file) => (
+                        <File
+                            key={file.id}
+                            id={file.id}
+                            name={file.nombreArchivo || "Archivo adjunto"}
+                            onClick={() =>
+                                handleOnFileClick(file.url_descarga || "")
+                            }
+                            variant="outlined"
+                        />
+                    ))}
+                </div>
+            ) : (
+                <p className={styles.muted}>No hay archivos adjuntos.</p>
+            )}
+        </>
+    );
+    const content = (
+        <div className={styles.ticketDetailContainer}>
+            {presentation === "page" && (
+                <nav className={styles.breadcrumb} aria-label="Ruta del ticket">
+                    <Link href={returnHref}>Tickets</Link>
+                    <span aria-hidden="true">/</span>
+                    <span>{ticketData?.codigo || "#" + ticketId}</span>
+                </nav>
+            )}
+            <header className={styles.header}>
+                <div className={styles.headerInfo}>
+                    {presentation === "page" ? (
+                        <h1>
+                            {ticketData
+                                ? `${ticketData.codigo} · ${ticketData.titulo}`
+                                : `Ticket #${ticketId}`}
+                        </h1>
+                    ) : (
+                        <h2>
+                            {ticketData
+                                ? `${ticketData.codigo} · ${ticketData.titulo}`
+                                : `Ticket #${ticketId}`}
+                        </h2>
+                    )}
+                    <p className={styles.muted}>
+                        {ticketData?.categoriaNombre ||
+                            "Detalle de la solicitud"}
+                    </p>
+                </div>
+                <div className={styles.headerActions}>
+                    {ticketData && (
+                        <TicketStateChip
+                            state={state}
+                            label={ticketData.estadoNombre}
+                        />
+                    )}
+                    <Button
+                        variant="outlined"
+                        onClick={onClose}
+                        aria-label={
+                            presentation === "page"
+                                ? "Volver al listado de tickets"
+                                : "Cerrar detalle del ticket"
+                        }
+                    >
+                        {presentation === "page"
+                            ? "Volver al listado"
+                            : "Cerrar"}
+                    </Button>
+                </div>
+            </header>
+            {actionError && (
+                <p className={styles.error} role="alert">
+                    {actionError}
+                </p>
+            )}
+            {isTicketLoading && !ticketData ? (
+                <div role="status" className={styles.card}>
+                    Cargando detalles del ticket…
+                </div>
+            ) : ticketError ? (
+                <div role="alert" className={styles.error}>
+                    No fue posible consultar este ticket.{" "}
+                    <button onClick={() => void refetchTicket()}>
+                        Reintentar ticket
+                    </button>
+                </div>
+            ) : !ticketData ? (
+                <div className={styles.card}>
+                    No se encontraron detalles para este ticket.
+                </div>
+            ) : (
+                <div className={styles.content}>
+                    <section
+                        className={styles.mainPanel}
+                        aria-label="Seguimiento del ticket"
+                    >
+                        <div
+                            className={styles.tabs}
+                            role="tablist"
+                            aria-label="Vistas del ticket"
+                        >
+                            {tabs.map((item, index) => (
+                                <button
+                                    key={item.id}
+                                    id={tabsId + "-" + item.id}
+                                    role="tab"
+                                    aria-selected={tab === item.id}
+                                    aria-controls={tabsId + "-panel-" + item.id}
+                                    tabIndex={tab === item.id ? 0 : -1}
+                                    onClick={() => setTab(item.id)}
+                                    onKeyDown={(event) => {
+                                        const next =
+                                            event.key === "ArrowRight"
+                                                ? (index + 1) % tabs.length
+                                                : event.key === "ArrowLeft"
+                                                    ? (index + tabs.length - 1) %
+                                                    tabs.length
+                                                    : event.key === "Home"
+                                                        ? 0
+                                                        : event.key === "End"
+                                                            ? tabs.length - 1
+                                                            : -1;
+                                        if (next < 0) return;
+                                        event.preventDefault();
+                                        setTab(tabs[next].id);
+                                        document
+                                            .getElementById(
+                                                tabsId + "-" + tabs[next].id,
+                                            )
+                                            ?.focus();
+                                    }}
+                                >
+                                    {item.label}
+                                </button>
+                            ))}
+                        </div>
+                        <div
+                            id={tabsId + "-panel-conversacion"}
+                            role="tabpanel"
+                            aria-labelledby={tabsId + "-conversacion"}
+                            hidden={tab !== "conversacion"}
+                        >
+                            <div className={styles.description}>
+                                <h3>Descripción de la solicitud</h3>
+                                <MarkdownViewer
+                                    content={ticketData.descripcion}
+                                />
+                            </div>
+                            <Chat ticketId={ticketId} classname={styles.chat} />
+                        </div>
+                        <div
+                            id={tabsId + "-panel-historial"}
+                            role="tabpanel"
+                            aria-labelledby={tabsId + "-historial"}
+                            hidden={tab !== "historial"}
+                        >
+                            <HistoryMessage
+                                ticketId={ticketId}
+                                variant="table"
+                                actorNames={{
+                                    [ticketData.usuarioCreadorId]:
+                                        ticketData.creador?.nombre ||
+                                        ticketData.usuarioCreadorNombre,
+                                    ...(ticketData.asignado && ticketData.usuarioAsignadoId
+                                        ? {
+                                            [ticketData.usuarioAsignadoId]:
+                                                  ticketData.asignado.nombre,
+                                        }
+                                        : {}),
+                                }}
+                            />
+                        </div>
+                        <div
+                            id={tabsId + "-panel-archivos"}
+                            role="tabpanel"
+                            aria-labelledby={tabsId + "-archivos"}
+                            hidden={tab !== "archivos"}
+                            className={styles.filesPanel}
+                        >
+                            <h3>Archivos del ticket</h3>
+                            {files}
+                        </div>
+                    </section>
+                    <aside
+                        className={styles.sidebar}
+                        aria-label="Información del ticket"
+                    >
+                        <section className={styles.card}>
+                            <h2>Información del ticket</h2>
+                            <dl className={styles.metadata}>
+                                <div>
+                                    <dt>Estado</dt>
+                                    <dd>{ticketData.estadoNombre}</dd>
+                                </div>
+                                <div>
+                                    <dt>Asignado a</dt>
+                                    <dd>
+                                        {ticketData.asignado?.nombre ||
+                                            ticketData.usuarioAsignadoNombre ||
+                                            "Sin asignar"}
+                                    </dd>
+                                </div>
+                                <div>
+                                    <dt>Creado por</dt>
+                                    <dd>
+                                        {ticketData.creador?.nombre ||
+                                            ticketData.usuarioCreadorNombre}
+                                    </dd>
+                                </div>
+                                <div>
+                                    <dt>Prioridad</dt>
+                                    <dd>{ticketData.prioridadNombre}</dd>
+                                </div>
+                            </dl>
+                            <p className={styles.created}>
+                                Creado: {displayDate(ticketData.fechaCreacion)}
+                            </p>
+                        </section>
+                        <section
+                            className={styles.card}
+                            aria-label="Adjuntos del ticket"
+                        >
+                            <h2>Archivos</h2>
+                            {files}
+                        </section>
+                        {role !== "USUARIO" && (
+                            <section className={styles.card}>
+                                <h2>Gestión del ticket</h2>
+                                {isTagsLoading ? (
+                                    <p role="status">Cargando etiquetas…</p>
+                                ) : (
+                                    <LabelChipGroup
+                                        role={role}
+                                        labels={labels}
+                                        availableOptions={availableOptions}
+                                        onChange={handleLabelsChange}
+                                    />
+                                )}
+                                <div className={styles.ticketActions}>
+                                    {canCancel && (
+                                        <Button
+                                            color="danger"
+                                            onClick={handleOnTicketCancel}
+                                            fullWidth
+                                            state={
+                                                isUpdating
+                                                    ? "loading"
+                                                    : "default"
+                                            }
+                                        >
+                                            Cancelar ticket
+                                        </Button>
+                                    )}
+                                    {canStart ? (
+                                        <Button
+                                            onClick={handleOnTicketProcess}
+                                            fullWidth
+                                            state={
+                                                isUpdating
+                                                    ? "loading"
+                                                    : "default"
+                                            }
+                                        >
+                                            Iniciar atención
+                                        </Button>
+                                    ) : ["en trabajo", "en atención"].includes(ticketState || "") ? (
+                                        <Button
+                                            onClick={handleOnTicketFinish}
+                                            fullWidth
+                                            state={
+                                                isUpdating
+                                                    ? "loading"
+                                                    : "default"
+                                            }
+                                        >
+                                            Resolver ticket
+                                        </Button>
+                                    ) : (
+                                        <p className={styles.muted}>
+                                            No hay acciones disponibles para
+                                            este estado.
+                                        </p>
+                                    )}
+                                </div>
+                            </section>
+                        )}
+                    </aside>
+                </div>
+            )}
+        </div>
+    );
+    return presentation === "page" ? (
+        content
+    ) : (
         <PopOver
             isOpen={isOpen}
             onClose={onClose}
             position="center"
             className={styles.popOver}
         >
-            <div className={styles.ticketDetailContainer}>
-                <div className={styles.header}>
-                    <div className={styles.headerInfo}>
-                        <Icon name="file" variant="status" color="#7F8D9F" />
-                        <Title variant="mid" className={styles.title}>
-                            Ticket #{ticketId}
-                        </Title>
-                    </div>
-                    <Button
-                        variant="outlined"
-                        color="neutral-light"
-                        className={styles.closeButton}
-                        onClick={onClose}
-                    >
-                        X
-                    </Button>
-                </div>
-                <div
-                    className={
-                        role === "USUARIO" ? styles.contentFullWidth : styles.content
-                    }
-                >
-                    <div className={styles.ticketDetails}>
-                        {isTicketLoading ? (
-                            <div>Cargando detalles del ticket...</div>
-                        ) : ticketData ? (
-                            <div className={styles.ticketInfo}>
-                                <div className={styles.ticketTitleInfo}>
-                                    <Text variant="muted">Asunto</Text>
-                                    <Title variant="large">{ticketData.titulo}</Title>
-                                </div>
-                                <div className={styles.ticketInfoDescription}>
-                                    <Text variant="muted">Descripción</Text>
-                                    <MarkdownViewer content={ticketData.descripcion} />
-                                </div>
-                                <div className={styles.ticketInfoFiles}>
-                                    {isTicketAttachmentsLoading ? (
-                                        <div>Cargando archivos adjuntos...</div>
-                                    ) : ticketAttachments.length === 0 ? (
-                                        <div>No hay archivos adjuntos.</div>
-                                    ) : (
-                                        ticketAttachments.map((file) => (
-                                            <File
-                                                key={file.id}
-                                                id={file.id}
-                                                name={file.nombreArchivo || "Archivo adjunto"}
-                                                onClick={() =>
-                                                    handleOnFileClick(file.url_descarga || "")
-                                                }
-                                                variant="outlined"
-                                            />
-                                        ))
-                                    )}
-                                </div>
-                            </div>
-                        ) : (
-                            <div>No se encontraron detalles para este ticket.</div>
-                        )}
-                        <Chat ticketId={ticketId} classname={styles.chat} />
-                    </div>
-                    {role !== "USUARIO" && ticketData && (
-                        <div className={styles.ticketHistory}>
-                            {isTagsLoading ? (
-                                <div>Cargando etiquetas...</div>
-                            ) : (
-                                <LabelChipGroup
-                                    role={role}
-                                    labels={labels}
-                                    availableOptions={availableOptions}
-                                    onChange={handleLabelsChange}
-                                />
-                            )}
-                            <HistoryMessage ticketId={ticketId} />
-                            <div className={styles.ticketActions}>
-                                {canCancel ? (
-                                    <Button
-                                        variant="contained"
-                                        color="danger"
-                                        onClick={handleOnTicketCancel}
-                                        fullWidth
-                                        state={isUpdating ? "loading" : "default"}
-                                    >
-                                        {isUpdating ? "Cancelando..." : "Cancelado"}
-                                    </Button>
-                                ) : null}
-
-                                {canStart ? (
-                                    <Button
-                                        variant="contained"
-                                        color="default"
-                                        onClick={handleOnTicketProcess}
-                                        fullWidth
-                                        state={isUpdating ? "loading" : "default"}
-                                    >
-                                        {isUpdating ? "Actualizando..." : "En Proceso"}
-                                    </Button>
-                                ) : ticketState === "en trabajo" ? (
-                                    <Button
-                                        variant="contained"
-                                        color="default"
-                                        onClick={handleOnTicketFinish}
-                                        fullWidth
-                                        state={isUpdating ? "loading" : "default"}
-                                    >
-                                        {isUpdating ? "Finalizando..." : "Finalizado"}
-                                    </Button>
-                                ) : (
-                                    <Text variant="body" className={styles.noActionsText}>
-                                        No hay acciones disponibles
-                                    </Text>
-                                )}
-                            </div>
-                        </div>
-                    )}
-                </div>
-            </div>
+            {content}
         </PopOver>
     );
 };

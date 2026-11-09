@@ -79,6 +79,7 @@ export function RecordDetail({
         type === "actividades" &&
         current.visibilidad === "EMPRESA" &&
         !data!.actor.admin;
+    const employment = current.datos._rrhh as { unidad?: string; puesto?: string } | undefined;
     useEffect(() => {
         dialog.current?.showModal();
         const controller = new AbortController();
@@ -237,7 +238,7 @@ export function RecordDetail({
                                 Editar
                             </Button>
                         )}
-                        {!readOnly && def.actions.ELIMINAR && (
+                        {!readOnly && def.actions.ELIMINAR && !current.datos._rrhh && (
                             <Button
                                 variant="outlined"
                                 onClick={() => void remove()}
@@ -326,6 +327,7 @@ export function RecordDetail({
                 ) : (
                     <>
                         <section className={styles.card}>
+                            {employment && <div className={styles.card}><h3>Datos de RRHH</h3><p className={styles.muted}>Unidad institucional: {type === "equipos" ? current.nombre : data!.teams.find(t => t.id === current.equipoId)?.nombre || "Consulta la ficha del equipo"}. El puesto se actualiza al generar equipos desde RRHH.</p>{employment.puesto && <p><strong>Puesto: </strong>{employment.puesto}</p>}</div>}
                             {["activos", "dispositivos"].includes(type) &&
                                 !data!.inventoryConnected && (
                                     <p className={styles.error}>

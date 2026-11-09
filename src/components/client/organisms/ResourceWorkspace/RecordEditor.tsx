@@ -58,6 +58,7 @@ export function RecordEditor({
     const fields = def.fields.filter(
         (f) => !["x", "y", "planoX", "planoY"].includes(f.key),
     );
+    const fromHr = ["equipos", "miembros"].includes(type) && !!record?.datos._rrhh;
     async function save(event: React.SubmitEvent<HTMLFormElement>) {
         event.preventDefault();
         if (busyRef.current) return;
@@ -144,7 +145,7 @@ export function RecordEditor({
                                             setEquipo(e.target.value)
                                         }
                                         required
-                                        disabled={busy}
+                                        disabled={busy || fromHr}
                                     >
                                         <option value="">Seleccionar…</option>
                                         {availableTeams.map((t) => (
@@ -162,6 +163,7 @@ export function RecordEditor({
                                     value={datos[field.key]}
                                     disabled={
                                         busy ||
+                                        (fromHr && field.key === "unidadRh") ||
                                         (type === "miembros" &&
                                             Boolean(record) &&
                                             field.key === "usuarioId")
@@ -230,6 +232,7 @@ export function RecordEditor({
                     </section>
                     <aside className={styles.card}>
                         <h3>Resumen</h3>
+                        {fromHr && <p className={styles.muted}>La unidad se actualiza desde RRHH. Puedes revisar las responsabilidades y los ajustes del equipo sin perder su origen institucional.</p>}
                         {["activos", "dispositivos"].includes(type) &&
                             !context!.inventoryConnected && (
                                 <p className={styles.error}>

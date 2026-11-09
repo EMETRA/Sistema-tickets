@@ -3,6 +3,7 @@ import Link from "next/link";
 import { TicketStateChip } from "../../atoms/TicketStateChip";
 import type { ChipState } from "../../atoms/TicketStateChip/types";
 import { displayDate } from "../ResourceWorkspace/RecordDetail";
+import { FileViewer, type ViewedFile } from "../FileViewer/FileViewer";
 
 import { PopOver } from "@/components/client/atoms/PopOver";
 import { File } from "@/components/client/atoms/File";
@@ -46,6 +47,7 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
 }) => {
     const [tab, setTab] = useState("conversacion");
     const [actionError, setActionError] = useState("");
+    const [viewedFile, setViewedFile] = useState<ViewedFile | null>(null);
     const tabsId = useId();
     const role = useAuthStore((state) => state.getRole());
     const { updateTicket, loading: isUpdating } = useUpdateTicket();
@@ -105,10 +107,6 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
         }
     };
 
-    const handleOnFileClick = (url_descarga: string) => {
-        if (url_descarga)
-            window.open(url_descarga, "_blank", "noopener,noreferrer");
-    };
 
     const handleOnTicketCancel = async (
         e: React.MouseEvent<HTMLButtonElement>,
@@ -195,7 +193,7 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
                             id={file.id}
                             name={file.nombreArchivo || "Archivo adjunto"}
                             onClick={() =>
-                                handleOnFileClick(file.url_descarga || "")
+                                setViewedFile({ id: file.id, name: file.nombreArchivo || "Archivo adjunto" })
                             }
                             variant="outlined"
                         />
@@ -257,6 +255,7 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
                     </Button>
                 </div>
             </header>
+            {viewedFile && <FileViewer key={viewedFile.id} ticketId={ticketId} file={viewedFile} onClose={() => setViewedFile(null)} />}
             {actionError && (
                 <p className={styles.error} role="alert">
                     {actionError}
@@ -335,7 +334,7 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
                                     content={ticketData.descripcion}
                                 />
                             </div>
-                            <Chat ticketId={ticketId} classname={styles.chat} />
+                            <Chat ticketId={ticketId} classname={styles.chat} onOpenFile={setViewedFile} />
                         </div>
                         <div
                             id={tabsId + "-panel-historial"}

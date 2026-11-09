@@ -1,6 +1,7 @@
 import {
     ProjectsBridge,
     CollaboratorsBridge,
+    PermissionsBridge,
 } from "@/views/Platform/LegacyModuleBridge";
 import MOD13 from "@/views/MOD13";
 import type { ComponentType } from "react";
@@ -10,7 +11,6 @@ import ExportMOD01 from "@/views/ExportMOD01";
 import MOD01 from "@/views/MOD01";
 import MOD04 from "@/views/MOD04";
 import MOD05 from "@/views/MOD05";
-import MOD06 from "@/views/MOD06";
 import MOD07 from "@/views/MOD07";
 import MOD08 from "@/views/MOD08";
 import MOD10 from "@/views/MOD10";
@@ -29,7 +29,7 @@ export const APP_REGISTRY: Record<string, ComponentType> = {
     mod01: MOD01,
     mod04: MOD04,
     mod05: MOD05,
-    mod06: MOD06,
+    mod06: PermissionsBridge,
     mod07: MOD07,
     mod08: MOD08,
     mod10: MOD10,

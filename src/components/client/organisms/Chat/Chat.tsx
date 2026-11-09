@@ -4,6 +4,8 @@ import React, { useEffect, useRef } from "react";
 
 import { MessageText } from "@/components/client/molecules/MessageText";
 import { SendMessage } from "@/components/client/molecules/SendMessage";
+import { FileViewer, type ViewedFile } from "../FileViewer/FileViewer";
+import { useState } from "react";
 
 import styles from "./Chat.module.scss";
 import { ChatProps } from "./types";
@@ -12,7 +14,8 @@ import { useGetTicketMessages } from "@/api/hooks";
 import { useSendTicketMessage } from "@/api/hooks";
 import { useAuthStore } from "@/store/useAuthStore";
 
-const Chat: React.FC<ChatProps> = ({ ticketId, classname }) => {
+const Chat: React.FC<ChatProps> = ({ ticketId, classname, onOpenFile }) => {
+    const [viewedFile, setViewedFile] = useState<ViewedFile | null>(null);
     const userId = useAuthStore((state) => state.getUserId());
     const messagesContainerRef = useRef<HTMLDivElement>(null);
     const { data: ticketMessages, loading: isTicketMessagesLoading, error: messagesError, refetch } = useGetTicketMessages(ticketId);
@@ -24,9 +27,6 @@ const Chat: React.FC<ChatProps> = ({ ticketId, classname }) => {
         }
     }, [ticketMessages]);
 
-    const onFileClick = (url_descarga: string) => {
-        if (url_descarga) window.open(url_descarga, "_blank", "noopener,noreferrer");
-    }
 
     const handleSendMessage = async (message: string, files: File[]) => {
         if (!message.trim()) return;
@@ -49,6 +49,7 @@ const Chat: React.FC<ChatProps> = ({ ticketId, classname }) => {
 
     return (
         <div className={`${styles.chatContainer} ${classname}`}>
+            {viewedFile && <FileViewer key={viewedFile.id} ticketId={ticketId} file={viewedFile} onClose={() => setViewedFile(null)} />}
             {messagesError && <p role="alert" className={styles.error}>No se pudo cargar la conversación. <button onClick={() => void refetch()}>Reintentar conversación</button></p>}
             <div className={styles.messagesContainer} ref={messagesContainerRef}>
                 {isTicketMessagesLoading ? (
@@ -64,7 +65,7 @@ const Chat: React.FC<ChatProps> = ({ ticketId, classname }) => {
                                 message.archivos.map((archivo) => ({
                                     id: archivo.id,
                                     name: archivo.nombreArchivo || "Archivo adjunto",
-                                    onClick: () => onFileClick(archivo.url_descarga || "")
+                                    onClick: () => (onOpenFile || setViewedFile)({ id: archivo.id, name: archivo.nombreArchivo || "Archivo adjunto" })
                                 }))
                             }
                             timestamp={message.fechaEnvio}

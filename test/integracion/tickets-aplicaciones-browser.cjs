@@ -5,6 +5,13 @@ const os = require('node:os');
 const path = require('node:path');
 const { chromium } = require('playwright');
 const { start } = require('../../scripts/laboratorio/iniciar.cjs');
+function samplePdf() {
+  const stream='BT /F1 22 Tf 60 720 Td (Documento ficticio de prueba) Tj ET';
+  const objects=['<</Type/Catalog/Pages 2 0 R>>','<</Type/Pages/Kids[3 0 R]/Count 1>>','<</Type/Page/Parent 2 0 R/MediaBox[0 0 612 792]/Resources<</Font<</F1 4 0 R>>>>/Contents 5 0 R>>','<</Type/Font/Subtype/Type1/BaseFont/Helvetica>>',`<</Length ${Buffer.byteLength(stream)}>>\nstream\n${stream}\nendstream`];
+  let pdf='%PDF-1.4\n';const offsets=[0];
+  for(const [i,obj]of objects.entries()){offsets.push(Buffer.byteLength(pdf));pdf+=`${i+1} 0 obj\n${obj}\nendobj\n`;}
+  const xref=Buffer.byteLength(pdf);pdf+=`xref\n0 6\n0000000000 65535 f \n${offsets.slice(1).map(x=>String(x).padStart(10,'0')+' 00000 n \n').join('')}trailer\n<</Size 6/Root 1 0 R>>\nstartxref\n${xref}\n%%EOF\n`;return Buffer.from(pdf);
+}
 async function run() {
   const temp = await fs.mkdtemp(path.join(os.tmpdir(), 'tickets-vistas-'));
   const out = process.env.QA_SCREENSHOT_DIR || path.join(temp, 'capturas');
@@ -30,13 +37,20 @@ async function run() {
     page.setDefaultTimeout(25000);
     const errors=[];page.on('pageerror', e=>errors.push(e.message));
     await page.route('**/*', route=>/^https?:/.test(route.request().url())&&new URL(route.request().url()).hostname!=='127.0.0.1'?route.abort():route.continue());
-    let failComment=false, failFiles=false;
+    let failComment=false, failFiles=false, failPreview=false; const previewCalls=[];
     await page.route('**/api/graphql', route=>{
       const raw=route.request().postData()||'';
       if(failComment && /sendTicketMessage/i.test(raw)) return route.fulfill({status:503,json:{errors:[{message:'Prueba de envío fallido'}]}});
       return route.continue();
     });
-    await page.route('**/api/ticket/1/attachments', route=>route.fulfill(failFiles?{status:503,json:{error:'Prueba de archivos no disponibles'}}:{json:{ticketAttachments:[{id:'archivo-1',ticketId:1,usuarioId:7,nombreArchivo:'captura-ejemplo.png',keyStorage:null,url_descarga:instance.base+'/archivo-de-prueba.png',fecha:new Date().toISOString()}]}}));
+    await page.route('**/api/ticket/1/attachments', route=>route.fulfill(failFiles?{status:503,json:{error:'Prueba de archivos no disponibles'}}:{json:{ticketAttachments:['captura-ejemplo.png','documento.pdf','nota.txt','planilla.xlsx'].map((name,i)=>({id:String(i+1),ticketId:1,usuarioId:7,nombreArchivo:name,keyStorage:null,url_descarga:null,fecha:new Date().toISOString()}))}}));
+    await page.route('**/api/platform/tickets/1/files/*', route=>{
+      const id=new URL(route.request().url()).pathname.split('/').pop();
+      assert.match(route.request().headers().authorization,/^Bearer laboratorio-/); previewCalls.push(id);
+      if(failPreview)return route.fulfill({status:503,json:{message:'Archivo no disponible de prueba'}});
+      const files={1:{contentType:'image/png',body:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y9ZlGIAAAAASUVORK5CYII=','base64')},2:{contentType:'application/pdf',body:samplePdf()},3:{contentType:'text/plain; charset=utf-8',body:'Texto de prueba <script>window.archivoEjecutado=true</script>'},4:{contentType:'application/octet-stream',body:Buffer.from('Archivo ficticio')}};
+      return route.fulfill(files[id]);
+    });
     for(let i=0;i<100;i++){try{if((await fetch(instance.base+'/home')).status<500)break;}catch{}await new Promise(r=>setTimeout(r,100));}
     const visit=async url=>{await page.goto(instance.base+url);await page.waitForLoadState('networkidle');};
     await visit('/__laboratorio/entrar?usuario=7');
@@ -45,6 +59,12 @@ async function run() {
     await page.getByRole('dialog').getByRole('heading',{name:'QA-001 · No carga un adjunto',exact:true}).waitFor();
     await page.getByRole('dialog').getByText('Estamos revisando la solicitud.',{exact:true}).waitFor();
     await page.screenshot({path:path.join(out,'ticket-vista-rapida.png'),fullPage:true});
+    await page.getByRole('dialog').getByRole('tab',{name:'Archivos',exact:true}).click();
+    await page.getByRole('dialog').getByRole('tabpanel').getByRole('button',{name:'captura-ejemplo.png',exact:true}).click();
+    await page.getByRole('dialog',{name:'captura-ejemplo.png',exact:true}).getByRole('img').waitFor();
+    await page.keyboard.press('Escape');
+    await page.getByRole('dialog',{name:'captura-ejemplo.png',exact:true}).waitFor({state:'hidden'});
+    await page.getByRole('dialog').getByRole('heading',{name:'QA-001 · No carga un adjunto',exact:true}).waitFor();
     await page.keyboard.press('Escape');
     await page.getByRole('dialog').waitFor({state:'hidden'});
     await visit('/mis-tickets');
@@ -94,10 +114,27 @@ async function run() {
     assert.equal(await comment.inputValue(),'');
     assert.equal(instance.lab.state.data.messages.filter(m=>m.textoMensaje==='Borrador que se conserva').length,1);
     await page.getByRole('tab',{name:'Archivos',exact:true}).click();
-    await page.evaluate(()=>{window.open=(...args)=>{window.__download=args;return null;};});
     await page.getByRole('tabpanel').getByRole('button',{name:'captura-ejemplo.png',exact:true}).focus();
     await page.keyboard.press('Enter');
-    assert.equal((await page.evaluate(()=>window.__download))[0],instance.base+'/archivo-de-prueba.png');
+    await page.getByRole('dialog',{name:'captura-ejemplo.png',exact:true}).getByRole('img',{name:'captura-ejemplo.png',exact:true}).waitFor();
+    await page.getByRole('button',{name:'Cerrar visor de archivos',exact:true}).click();
+    for(const [name,selector]of [['documento.pdf','iframe'],['nota.txt','pre'],['planilla.xlsx','h3']]){
+      await page.getByRole('tabpanel').getByRole('button',{name,exact:true}).click();
+      const viewer=page.getByRole('dialog',{name,exact:true});
+      await viewer.locator(selector).waitFor();
+      if(name==='nota.txt'){assert.match(await viewer.locator('pre').innerText(),/<script>/);assert.equal(await page.evaluate(()=>window.archivoEjecutado),undefined);}
+      if(name==='planilla.xlsx'){
+        const pending=page.waitForEvent('download');await viewer.getByRole('link',{name:'Descargar archivo',exact:true}).click();assert.equal((await pending).suggestedFilename(),name);
+      }
+      await page.screenshot({path:path.join(out,'visor-'+name.replaceAll('.','-')+'.png'),fullPage:true});
+      await viewer.getByRole('button',{name:'Cerrar visor de archivos',exact:true}).click();
+    }
+    failPreview=true;await page.getByRole('tabpanel').getByRole('button',{name:'nota.txt',exact:true}).click();
+    await page.getByRole('dialog',{name:'nota.txt',exact:true}).getByRole('alert').waitFor();
+    failPreview=false;await page.getByRole('button',{name:'Reintentar archivo',exact:true}).click();
+    await page.getByRole('dialog',{name:'nota.txt',exact:true}).locator('pre').waitFor();
+    await page.keyboard.press('Escape');
+    assert.ok(previewCalls.length>=7);
     await page.setViewportSize({width:1440,height:1100});
     await page.reload();
     await page.getByRole('heading',{name:'QA-001 · No carga un adjunto',exact:true}).waitFor();

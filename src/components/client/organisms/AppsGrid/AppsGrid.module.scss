@@ -1,24 +1,28 @@
 .container {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 
 .header {
-    // Quitamos fondos si TableHeader los trae, para que se vea limpio como el diseño
-    padding: 0 !important;
-    background-color: transparent !important;
+  // Quitamos fondos si TableHeader los trae, para que se vea limpio como el diseño
+  padding: 0 !important;
+  background-color: transparent !important;
 }
 
 .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 24px;
-    width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+  gap: 16px;
+  width: 100%;
 }
 
-.card {
-    // Aseguramos que la tarjeta ocupe el alto que necesite según el contenido
-    height: auto;
+.card.card {
+  // Aseguramos que la tarjeta ocupe el alto que necesite según el contenido
+  height: auto;
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+  box-sizing: border-box;
 }

@@ -2,7 +2,8 @@
 
 import React, { useEffect, useMemo, useRef } from "react";
 import { AppsGrid } from "@/components/client/organisms/AppsGrid";
-import { WelcomeCard } from "@/components/client/organisms/WelcomeCard";
+import { MetricCard } from "@/components/client/molecules/MetricCard/MetricCard";
+import { HomeHeading, HomeState } from "../HomeHeading";
 import { InfoPanel } from "@/components/client/organisms/InfoPanel";
 import { ReportTable } from "@/components/client/organisms/ReportTable";
 
@@ -18,11 +19,26 @@ import { useRouter } from "next/navigation";
 
 const UserHome: React.FC = () => {
     const router = useRouter();
-    const departamento = useAuthStore((state) => state.user?.departamento ?? null);
-    const { catalog, loading: catalogLoading, error: catalogError } =
-        useAppsCatalogContext();
-    const { data: userData, loading: loadingUser, refetch: refetchUser } = useGetUser();
-    const { data: statsData, loading: loadingStats, error: statsError, refetch: refetchMyStats } = useGetMyStats();
+    const departamento = useAuthStore(
+        (state) => state.user?.departamento ?? null,
+    );
+    const {
+        catalog,
+        loading: catalogLoading,
+        error: catalogError,
+        refetch: refetchCatalog,
+    } = useAppsCatalogContext();
+    const {
+        data: userData,
+        loading: loadingUser,
+        refetch: refetchUser,
+    } = useGetUser();
+    const {
+        data: statsData,
+        loading: loadingStats,
+        error: statsError,
+        refetch: refetchMyStats,
+    } = useGetMyStats();
     const {
         data: myActivityData,
         loading: loadingMyActivity,
@@ -40,8 +56,7 @@ const UserHome: React.FC = () => {
         }
     }, [refetchMyActivity, refetchMyStats, refetchUser]);
 
-    const isLoading =
-        loadingUser || loadingStats || loadingMyActivity || catalogLoading;
+    const isLoading = loadingUser || catalogLoading;
 
     const user = userData
         ? {
@@ -52,10 +67,10 @@ const UserHome: React.FC = () => {
         : { name: "", role: "", departamento: departamento };
 
     const reportData =
-        statsData?.grafico_mensual?.map((point) => ({
-            label: point.mes,
-            value: point.tickets,
-        })) || [];
+    statsData?.grafico_mensual?.map((point) => ({
+        label: point.mes,
+        value: point.tickets,
+    })) || [];
 
     const mainApps = useMemo(() => {
         if (!catalog) return [];
@@ -77,22 +92,87 @@ const UserHome: React.FC = () => {
     };
 
     if (isLoading) {
-        return <div className={styles.mainContainer}>Cargando información...</div>;
+        return (
+            <div className={styles.mainContainer}>
+                <HomeHeading description="Tus aplicaciones y actividad reciente." />
+                <HomeState loading message="Cargando información..." />
+            </div>
+        );
     }
 
     if (catalogError) {
         return (
             <div className={styles.mainContainer}>
-                No fue posible cargar las aplicaciones. Intenta nuevamente.
+                <HomeState
+                    message="No fue posible cargar las aplicaciones."
+                    onRetry={() => void refetchCatalog()}
+                    retryLabel="Reintentar aplicaciones"
+                />
             </div>
         );
     }
 
     return (
         <div className={styles.mainContainer}>
+            <HomeHeading description="Accede a tus aplicaciones y consulta tu actividad reciente." />
+            {statsData && (
+                <div className={styles.metrics}>
+                    <MetricCard
+                        label="Tickets creados"
+                        value={statsData.tickets.ingresados}
+                        caption="Registrados por tu usuario"
+                    />
+                    <MetricCard
+                        label="Resueltos"
+                        value={statsData.tickets.resueltos}
+                        caption="Resultado de atención"
+                    />
+                    <MetricCard
+                        label="Cerrados"
+                        value={statsData.tickets.cerrados}
+                        caption="Seguimiento finalizado"
+                    />
+                </div>
+            )}
             <div className={styles.dashboardContainer}>
+                <div className={styles.eventsAndPerformanceContainer}>
+                    {loadingMyActivity ? (
+                        <HomeState loading message="Cargando actividad reciente..." />
+                    ) : activityError ? (
+                        <div role="alert" className={styles.errorPanel}>
+                            <p>No se pudo cargar la actividad reciente.</p>
+                            <button type="button" onClick={() => void refetchMyActivity()}>
+                                Reintentar actividad
+                            </button>
+                        </div>
+                    ) : (
+                        <InfoPanel
+                            type="my-activity"
+                            items={eventItems}
+                            className={styles.infoPanel}
+                        />
+                    )}
+                    {loadingStats ? (
+                        <HomeState loading message="Cargando reporte de tickets..." />
+                    ) : statsError ? (
+                        <div role="alert" className={styles.errorPanel}>
+                            <p>No se pudo cargar el reporte de tickets.</p>
+                            <button type="button" onClick={() => void refetchMyStats()}>
+                                Reintentar reporte
+                            </button>
+                        </div>
+                    ) : (
+                        <ReportTable
+                            title="Reporte durante el año"
+                            iconName="chart-simple-solid"
+                            data={reportData}
+                            className={styles.reportGraph}
+                        />
+                    )}
+                </div>
                 <div className={styles.appsContainer}>
                     <AppsGrid
+                        className={styles.homeApps}
                         title="Mis Apps"
                         apps={mainApps.map((app) => ({
                             icon: app.iconName as IconName,
@@ -101,29 +181,6 @@ const UserHome: React.FC = () => {
                             onButtonClick: () => handleAppClick(app.id),
                         }))}
                     />
-                    <WelcomeCard
-                        userName={user.name.split(" ")[0] || "Usuario"}
-                        imageSrc="/images/image.png"
-                    />
-                </div>
-                <div className={styles.eventsAndPerformanceContainer}>
-                    {activityError ? <div role="alert" className={styles.errorPanel}>
-                        <p>No se pudo cargar la actividad reciente.</p>
-                        <button type="button" onClick={() => void refetchMyActivity()}>Reintentar actividad</button>
-                    </div> : <InfoPanel
-                        type="my-activity"
-                        items={eventItems}
-                        className={styles.infoPanel}
-                    />}
-                    {statsError ? <div role="alert" className={styles.errorPanel}>
-                        <p>No se pudo cargar el reporte de tickets.</p>
-                        <button type="button" onClick={() => void refetchMyStats()}>Reintentar reporte</button>
-                    </div> : <ReportTable
-                        title="Reporte durante el año"
-                        iconName="chart-simple-solid"
-                        data={reportData}
-                        className={styles.reportGraph}
-                    />}
                 </div>
             </div>
         </div>

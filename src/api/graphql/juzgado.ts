@@ -1,11 +1,15 @@
 import { graphqlRequestClient, apiFetch } from './client';
+import { ArchivoJuzgadoError } from './juzgado-archivo';
 
 export type EvidenciaJuzgado = { id: string; origen: string; mime: string; tamanoBytes: string; estado: string };
 export type DocumentoJuzgado = { id: string; tipoDocumento: string; numeroVersion: string; versionPlantilla: string; mime: string; tamanoBytes: string; generadoEn: string };
 export type SedeJuzgado = { codigo: string; nombre: string; direccion: string | null; horario: string | null };
+export type VerificacionBanqueta = { version:string|null; ubicacionInicial:string|null; limiteAcera:string|null; ruedaDelantera:string|null; ruedaTrasera:string|null; estructuraSobreAcera:string|null };
+export type AnalisisArchivo = { idEvidencia:string|null; decision:string|null; motivo:string|null; hecho:string|null; placa:string|null; comparacionPlaca:string|null; compatibilidad:string|null; marca:string|null; indicioMarca?:string|null; ubicacionVehiculo?:string|null; verificacionBanqueta?:VerificacionBanqueta|null; contenidoSensible:boolean|null; posiblePantalla:boolean|null; analizadoEn:string|null; fotogramas:number|null };
+export type AnalisisEvidencias = { modo?:string|null; disponible:boolean; estado:string; modelo:string|null; versionPolitica:string|null; creadoEn:string|null; terminadoEn:string|null; referenciaEstado:string|null; referenciaFuente:string|null; errorReferencia:string|null; codigoError:string|null; esPoliticaConjunto:boolean; continuoConObservaciones?:boolean|null; criterioMotivo?:string|null; verificacionMotivo?:string|null; archivos:AnalisisArchivo[] };
 export type DetalleJuzgado = {
   codigoCaso: string; estadoCaso: string;
-  caso: { id: string; codigoCaso: string; usoPlaca: string; placa: string; regla: string; observaciones: string | null; estado: string; registradaEn: string; evidenciasDenuncia: EvidenciaJuzgado[]; defensa: { id: string; nombreDeclarado: string; argumentos: string; evidencias: EvidenciaJuzgado[] } | null };
+  caso: { id: string; codigoCaso: string; usoPlaca: string; placa: string; regla: string; observaciones: string | null; estado: string; registradaEn: string; evidenciasDenuncia: EvidenciaJuzgado[]; analisisEvidencias?:AnalisisEvidencias|null; defensa: { id: string; nombreDeclarado: string; argumentos: string; evidencias: EvidenciaJuzgado[] } | null };
   expediente: { id: string; version: string | null; codigoJuzgado: string; nombreJuzgado: string; direccionJuzgado: string | null; horarioJuzgado: string | null; estado: string; idActorReceptor: string; recibidaEn: string; numeroInterno: string | null; observacion: string | null; gestiones: { id: string; idActor: string; tipoGestion: string; ocurridaEn: string; observacion: string | null }[]; resolucion: { id: string; decision: string; fundamento: string; autoridadSnapshot: string; versionPlantilla: string; resueltaEn: string; idActorJuez: string } | null; remision: { ciudad: string; serie: string; numero: string } | null; documentos: DocumentoJuzgado[] } | null;
 };
 export type RecepcionInput = { codigoCaso: string; codigoJuzgado: string; requestId: string; numeroInterno?: string; observacion?: string };
@@ -16,6 +20,9 @@ export type ResultadoJudicial = { idResolucion: string; codigoCaso: string; esta
 export const DETALLE_JUZGADO = `query ViviJuzgadoDetalle($codigoCaso: String!) {
  viviJuzgadoDetalle(codigoCaso: $codigoCaso) { codigoCaso estadoCaso
   caso { id codigoCaso usoPlaca placa regla observaciones estado registradaEn
+   analisisEvidencias { disponible estado modo modelo versionPolitica creadoEn terminadoEn referenciaEstado referenciaFuente errorReferencia codigoError esPoliticaConjunto
+    archivos { idEvidencia decision motivo hecho placa comparacionPlaca compatibilidad marca indicioMarca contenidoSensible posiblePantalla analizadoEn fotogramas }
+   }
    evidenciasDenuncia { id origen mime tamanoBytes estado }
    defensa { id nombreDeclarado argumentos evidencias { id origen mime tamanoBytes estado } }
   }
@@ -27,8 +34,30 @@ export const DETALLE_JUZGADO = `query ViviJuzgadoDetalle($codigoCaso: String!) {
   }
  }
 }`;
+// Contrato ampliado con una unica lectura de compatibilidad si el API aun
+// no se ha actualizado. No repetir mutaciones ni ocultar otros errores.
+export const DETALLE_JUZGADO_ANALISIS = DETALLE_JUZGADO
+  .replace('esPoliticaConjunto', 'esPoliticaConjunto continuoConObservaciones criterioMotivo verificacionMotivo')
+  .replace('indicioMarca', 'indicioMarca ubicacionVehiculo verificacionBanqueta { version ubicacionInicial limiteAcera ruedaDelantera ruedaTrasera estructuraSobreAcera }');
+
+function contratoAnalisisAnterior(error: unknown): boolean {
+  const errors = (error as { graphQLErrors?: { message?:string; extensions?:{code?:string} }[] })?.graphQLErrors;
+  return Array.isArray(errors) && errors.length > 0 && errors.every(e =>
+    e.extensions?.code === 'GRAPHQL_VALIDATION_FAILED' && (
+      /^Cannot query field "(continuoConObservaciones|criterioMotivo|verificacionMotivo)" on type "ViviJuzgadoAnalisis"\./.test(e.message || '') ||
+      /^Cannot query field "(ubicacionVehiculo|verificacionBanqueta)" on type "ViviJuzgadoAnalisisArchivo"\./.test(e.message || '')
+    )
+  );
+}
 export async function consultarCasoJuzgado(codigoCaso: string): Promise<DetalleJuzgado> {
-  const data = await graphqlRequestClient<{ viviJuzgadoDetalle: DetalleJuzgado }>(DETALLE_JUZGADO, { variables: { codigoCaso } });
+  const options = { variables: { codigoCaso } };
+  let data: { viviJuzgadoDetalle: DetalleJuzgado };
+  try {
+    data = await graphqlRequestClient<{ viviJuzgadoDetalle: DetalleJuzgado }>(DETALLE_JUZGADO_ANALISIS, options);
+  } catch (error) {
+    if (!contratoAnalisisAnterior(error)) throw error;
+    data = await graphqlRequestClient<{ viviJuzgadoDetalle: DetalleJuzgado }>(DETALLE_JUZGADO, options);
+  }
   if (data?.viviJuzgadoDetalle?.codigoCaso !== codigoCaso) throw new Error('No se recibió el caso solicitado');
   return data.viviJuzgadoDetalle;
 }
@@ -51,12 +80,22 @@ export async function resolverCasoJuzgado(decision: 'ACOGIDA' | 'NO_ACOGIDA', in
 export function generarDocumentoJuzgado(id: string) {
   return apiFetch<DocumentoJuzgado>(`/api/JUZ01/resoluciones/${encodeURIComponent(id)}/documento/generar`, undefined, { method: 'POST' });
 }
-export async function descargarArchivoJuzgado(tipo: 'evidencias' | 'documentos', id: string, nombre: string) {
+export async function obtenerArchivoJuzgado(tipo: 'evidencias' | 'documentos', id: string, signal?: AbortSignal) {
   const { useAuthStore } = await import('@/store/useAuthStore');
   const token = useAuthStore.getState().token;
-  const response = await fetch(`/api/JUZ01/${tipo}/${encodeURIComponent(id)}`, { headers: token ? { Authorization: `Bearer ${token}` } : {}, cache: 'no-store' });
-  if (!response.ok) throw new Error('No se pudo descargar el archivo privado. Intenta de nuevo.');
-  const blob = await response.blob();
+  const response = await fetch(`/api/JUZ01/${tipo}/${encodeURIComponent(id)}`, { headers: token ? { Authorization: `Bearer ${token}` } : {}, cache: 'no-store', signal });
+  if (!response.ok) {
+    const body = await response.json().catch(() => ({}));
+    throw new ArchivoJuzgadoError(response.status, body.codigo);
+  }
+  if (!/^(image\/(jpeg|png)|video\/mp4|application\/(pdf|octet-stream))(;|$)/i.test(response.headers.get('content-type') || '')) {
+    await response.body?.cancel();
+    throw new ArchivoJuzgadoError(502);
+  }
+  return response.blob();
+}
+export async function descargarArchivoJuzgado(tipo: 'evidencias' | 'documentos', id: string, nombre: string) {
+  const blob = await obtenerArchivoJuzgado(tipo,id);
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a'); link.href = url; link.download = nombre;
   document.body.appendChild(link); link.click(); link.remove();

@@ -4,12 +4,13 @@
   box-sizing: border-box;
   outline: none;
   background: #ffffff;
-  border: 1px solid #262626;
+  border: 1px solid var(--tickets-border, #dfe5f2);
   border-radius: 8px;
-  padding: 10px;
+  padding: 12px 13px;
   font-weight: 400;
   width: 100%;
-  color: #262626;
+  min-width: 0;
+  color: var(--tickets-text, #263b58);
   font-size: 14px;
   transition: border-color 0.2s ease;
 
@@ -18,20 +19,21 @@
   }
 
   &:focus {
-    border-color: #A9A9A9;
+    border-color: var(--tickets-primary, #4361ee);
+    box-shadow: var(--tickets-focus);
     outline: none;
   }
 
   &[disabled] {
     opacity: 0.5;
     cursor: not-allowed;
-    background: #f5f5f5;
+    background: var(--tickets-surface-disabled);
   }
 }
 
 // INPUT tipo date - estilos específicos para el selector de fecha
-:global(input[type="date"]::-webkit-calendar-picker-indicator) {
-    filter: invert(1);
+.Input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: none;
 }
 
 // Input tipo text con icono
@@ -81,7 +83,7 @@
   padding: 32px;
   border: 3px dashed #4361ee;
   border-radius: 14px;
-  background: #4361EE0F;
+  background: #4361ee0f;
   cursor: pointer;
   transition: all 0.2s ease;
   min-height: 200px;
@@ -124,7 +126,7 @@
 .FileMainText {
   margin: 0;
   font-size: 16px;
-  color: #262626;
+  color: var(--tickets-text, #263b58);
   font-weight: 400;
 }
 

@@ -1,94 +1,92 @@
 import React from "react";
 import classNames from "classnames";
-import { EstadoNoticia, EstadoNotificacion, type NoticiaListRow } from "@/api/graphql/COM03";
+import {
+  EstadoNoticia,
+  EstadoNotificacion,
+  type NoticiaListRow,
+} from "@/api/graphql/COM03";
 import { ToggleButton } from "../../atoms/ToggleButton";
 import type { ToggleButtonOption } from "../../atoms/ToggleButton";
 import { LabelChip } from "../../atoms/LabelChip";
 import { Button } from "../../atoms/Button";
 import { Icon } from "../../atoms/Icon";
-import { Text } from "../../atoms/Text";
 import { SearchField } from "../../molecules/SearchField";
-import { TableRow } from "../../molecules/TableRow";
-import type { TableCellConfig } from "../../molecules/TableRow/types";
 import type { NewsFilter, NewsTablePanelProps } from "./types";
 import styles from "./NewsTablePanel.module.scss";
 
-type ColumnKey = "titulo" | "estado" | "notificacion" | "autor" | "fecha" | "acciones";
+type ColumnKey =
+  | "titulo"
+  | "estado"
+  | "notificacion"
+  | "autor"
+  | "fecha"
+  | "acciones";
 
 /** Columnas de la tabla, en orden. Notificación y Acciones se pueden ocultar por props. */
-const COLUMNS: { key: ColumnKey; label: string; width: string }[] = [
-    { key: "titulo", label: "Título", width: "minmax(0, 2.2fr)" },
-    { key: "estado", label: "Estado", width: "minmax(0, 1.1fr)" },
-    { key: "notificacion", label: "Notificación", width: "minmax(0, 1.1fr)" },
-    { key: "autor", label: "Autor", width: "minmax(0, 1.5fr)" },
-    { key: "fecha", label: "Fecha", width: "minmax(0, 1fr)" },
-    { key: "acciones", label: "Acciones", width: "minmax(0, 1.8fr)" },
+const COLUMNS: { key: ColumnKey; label: string }[] = [
+  { key: "titulo", label: "Título" },
+  { key: "estado", label: "Estado" },
+  { key: "notificacion", label: "Notificación" },
+  { key: "autor", label: "Autor" },
+  { key: "fecha", label: "Fecha" },
+  { key: "acciones", label: "Acciones" },
 ];
-const LOADING_GRID = "minmax(0, 1.2fr) minmax(0, 1.6fr) minmax(0, 1.2fr) minmax(0, 1.2fr) minmax(0, 1fr)";
-const SKELETON_ROWS = 3;
-
 const FILTER_OPTIONS: ToggleButtonOption[] = [
-    { label: "Todas", value: "all" },
-    { label: "Publicadas", value: EstadoNoticia.PUBLICADA },
-    { label: "Borradores", value: EstadoNoticia.BORRADOR },
-    { label: "Programadas", value: EstadoNoticia.PROGRAMADA },
-    { label: "Archivadas", value: EstadoNoticia.ARCHIVADA },
-];
-
-const LOADING_HEADER_CELLS: TableCellConfig[] = [
-    { label: "Título" },
-    { label: "Estado" },
-    { label: "Autor" },
-    { label: "Fecha" },
-    { label: "Acción" },
+  { label: "Todas", value: "all" },
+  { label: "Publicadas", value: EstadoNoticia.PUBLICADA },
+  { label: "Borradores", value: EstadoNoticia.BORRADOR },
+  { label: "Programadas", value: EstadoNoticia.PROGRAMADA },
+  { label: "Archivadas", value: EstadoNoticia.ARCHIVADA },
 ];
 
 const ESTADO_NOTICIA_LABEL: Record<EstadoNoticia, string> = {
-    [EstadoNoticia.PROGRAMADA]: "Programada",
-    [EstadoNoticia.PUBLICADA]: "Publicada",
-    [EstadoNoticia.BORRADOR]: "Borrador",
-    [EstadoNoticia.ARCHIVADA]: "Archivada",
+  [EstadoNoticia.PROGRAMADA]: "Programada",
+  [EstadoNoticia.PUBLICADA]: "Publicada",
+  [EstadoNoticia.BORRADOR]: "Borrador",
+  [EstadoNoticia.ARCHIVADA]: "Archivada",
 };
 
 const ESTADO_NOTIFICACION_LABEL: Record<EstadoNotificacion, string> = {
-    [EstadoNotificacion.ENVIADO]: "Enviada al proveedor",
-    [EstadoNotificacion.PENDIENTE]: "Pendiente",
-    [EstadoNotificacion.ERROR]: "Error",
-    [EstadoNotificacion.PARCIAL]: "Envío parcial",
-    [EstadoNotificacion.INCIERTA]: "Envío incierto",
-    [EstadoNotificacion.SIN_DESTINATARIOS]: "Sin dispositivos",
-    [EstadoNotificacion.SIN_PUBLICACION]: "Sin publicación",
-    [EstadoNotificacion.NO_DISPONIBLE]: "Sin dato disponible",
+  [EstadoNotificacion.ENVIADO]: "Enviada al proveedor",
+  [EstadoNotificacion.PENDIENTE]: "Pendiente",
+  [EstadoNotificacion.ERROR]: "Error",
+  [EstadoNotificacion.PARCIAL]: "Envío parcial",
+  [EstadoNotificacion.INCIERTA]: "Envío incierto",
+  [EstadoNotificacion.SIN_DESTINATARIOS]: "Sin dispositivos",
+  [EstadoNotificacion.SIN_PUBLICACION]: "Sin publicación",
+  [EstadoNotificacion.NO_DISPONIBLE]: "Sin dato disponible",
 };
 
 const PILL_CLASS: Record<EstadoNoticia | EstadoNotificacion, string> = {
-    [EstadoNoticia.PROGRAMADA]: styles["pill--warning"],
-    [EstadoNoticia.PUBLICADA]: styles["pill--success"],
-    [EstadoNoticia.BORRADOR]: styles["pill--neutral"],
-    [EstadoNoticia.ARCHIVADA]: styles["pill--info"],
-    [EstadoNotificacion.ENVIADO]: styles["pill--success"],
-    [EstadoNotificacion.PENDIENTE]: styles["pill--warning"],
-    [EstadoNotificacion.ERROR]: styles["pill--danger"],
-    [EstadoNotificacion.PARCIAL]: styles["pill--warning"],
-    [EstadoNotificacion.INCIERTA]: styles["pill--warning"],
-    [EstadoNotificacion.SIN_DESTINATARIOS]: styles["pill--neutral"],
-    [EstadoNotificacion.SIN_PUBLICACION]: styles["pill--neutral"],
-    [EstadoNotificacion.NO_DISPONIBLE]: styles["pill--neutral"],
+  [EstadoNoticia.PROGRAMADA]: styles["pill--warning"],
+  [EstadoNoticia.PUBLICADA]: styles["pill--success"],
+  [EstadoNoticia.BORRADOR]: styles["pill--neutral"],
+  [EstadoNoticia.ARCHIVADA]: styles["pill--info"],
+  [EstadoNotificacion.ENVIADO]: styles["pill--success"],
+  [EstadoNotificacion.PENDIENTE]: styles["pill--warning"],
+  [EstadoNotificacion.ERROR]: styles["pill--danger"],
+  [EstadoNotificacion.PARCIAL]: styles["pill--warning"],
+  [EstadoNotificacion.INCIERTA]: styles["pill--warning"],
+  [EstadoNotificacion.SIN_DESTINATARIOS]: styles["pill--neutral"],
+  [EstadoNotificacion.SIN_PUBLICACION]: styles["pill--neutral"],
+  [EstadoNotificacion.NO_DISPONIBLE]: styles["pill--neutral"],
 };
 
 const EMPTY_VALUE = "—";
 
 const dateFormatter = new Intl.DateTimeFormat("es-GT", {
-    timeZone: "America/Guatemala",
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
+  timeZone: "America/Guatemala",
+  day: "2-digit",
+  month: "2-digit",
+  year: "numeric",
 });
 
 function formatFecha(fecha: string | null): string {
-    if (!fecha) return EMPTY_VALUE;
-    const date = new Date(fecha);
-    return Number.isNaN(date.getTime()) ? EMPTY_VALUE : dateFormatter.format(date);
+  if (!fecha) return EMPTY_VALUE;
+  const date = new Date(fecha);
+  return Number.isNaN(date.getTime())
+    ? EMPTY_VALUE
+    : dateFormatter.format(date);
 }
 
 /**
@@ -96,185 +94,220 @@ function formatFecha(fecha: string | null): string {
  * estado de carga (skeleton) y estado vacío.
  */
 const NewsTablePanel: React.FC<NewsTablePanelProps> = ({
-    noticias,
-    loading = false,
-    notificationsLoading = false,
-    isEmpty = false,
-    filter,
-    onFilterChange,
-    search,
-    onSearchChange,
-    onCreate,
-    onEdit,
-    onArchive,
-    onRestore,
-    showNotifications = true,
-    canEdit = true,
-    className,
+  noticias,
+  loading = false,
+  notificationsLoading = false,
+  isEmpty = false,
+  filter,
+  onFilterChange,
+  search,
+  onSearchChange,
+  onEdit,
+  onArchive,
+  onRestore,
+  showNotifications = true,
+  canEdit = true,
+  errorMessage,
+  onRetry,
+  className,
 }) => {
-    const renderNotification = (noticia: NoticiaListRow) => {
-        if (notificationsLoading) {
-            return <span className={classNames(styles.skeleton, styles["skeleton--short"])} aria-label="Cargando" />;
-        }
-        if (!noticia.estadoNotificacion) {
-            return <span className={styles.muted}>{EMPTY_VALUE}</span>;
-        }
-        return (
-            <LabelChip
-                label={ESTADO_NOTIFICACION_LABEL[noticia.estadoNotificacion]}
-                className={classNames(styles.pill, PILL_CLASS[noticia.estadoNotificacion])}
-            />
-        );
-    };
-
-    const renderActions = (noticia: NoticiaListRow) => {
-        if (noticia.estado === EstadoNoticia.ARCHIVADA) {
-            return (
-                <Button rounded color="success" className={styles.actionButton} onClick={() => onRestore?.(noticia.id)}>
-                    Restaurar
-                </Button>
-            );
-        }
-
-        // No hay borrado (README "Noticias CMS" sección 3): todas, incluidos los borradores, se archivan.
-        return (
-            <>
-                <Button
-                    rounded
-                    variant="outlined"
-                    color="neutral-light"
-                    className={styles.actionButton}
-                    onClick={() => onEdit?.(noticia.id)}
-                >
-                    Editar
-                </Button>
-                <Button rounded className={styles.actionButton} onClick={() => onArchive?.(noticia.id)}>
-                    Archivar
-                </Button>
-            </>
-        );
-    };
-
-    const visibleColumns = COLUMNS.filter((column) =>
-        (column.key !== "notificacion" || showNotifications) && (column.key !== "acciones" || canEdit)
-    );
-    const grid = visibleColumns.map((column) => column.width).join(" ");
-    const headerCells: TableCellConfig[] = visibleColumns.map((column) => ({ label: column.label }));
-
-    const renderCell = (key: ColumnKey, noticia: NoticiaListRow) => {
-        switch (key) {
-        case "titulo":
-            return <span className={styles.title}>{noticia.titulo}</span>;
-        case "estado":
-            return (
-                <LabelChip
-                    label={ESTADO_NOTICIA_LABEL[noticia.estado]}
-                    className={classNames(styles.pill, PILL_CLASS[noticia.estado])}
-                />
-            );
-        case "notificacion":
-            return renderNotification(noticia);
-        case "autor":
-            return <span className={styles.text}>{noticia.autor}</span>;
-        case "fecha":
-            return <span className={styles.text}>{formatFecha(noticia.fecha)}</span>;
-        case "acciones":
-            return <div className={styles.actions}>{renderActions(noticia)}</div>;
-        }
-    };
-
-    const buildRowCells = (noticia: NoticiaListRow): TableCellConfig[] =>
-        visibleColumns.map((column) => ({ content: renderCell(column.key, noticia) }));
-
-    const renderBody = () => {
-        if (loading) {
-            return (
-                <div className={styles.table}>
-                    <TableRow isHeader gridTemplate={LOADING_GRID} cells={LOADING_HEADER_CELLS} className={styles.headerRow} />
-                    {Array.from({ length: SKELETON_ROWS }, (_, index) => (
-                        <TableRow
-                            key={index}
-                            gridTemplate={LOADING_GRID}
-                            className={styles.row}
-                            cells={[
-                                { content: <span className={classNames(styles.skeleton, styles["skeleton--long"])} /> },
-                                { content: <span className={classNames(styles.skeleton, styles["skeleton--short"])} /> },
-                                { content: <span className={classNames(styles.skeleton, styles["skeleton--mid"])} /> },
-                                { content: <span className={classNames(styles.skeleton, styles["skeleton--long"])} /> },
-                                { content: <span className={classNames(styles.skeleton, styles["skeleton--action"])} /> },
-                            ]}
-                        />
-                    ))}
-                </div>
-            );
-        }
-
-        if (isEmpty) {
-            return (
-                <div className={styles.emptyState}>
-                    <Icon name="file-lines-regular" size={24} />
-                    <Text variant="body" className={styles.emptyTitle}>Aún no hay noticias</Text>
-                    {canEdit && (
-                        <>
-                            <Text variant="caption" className={styles.emptyDescription}>
-                                Crea la primera noticia para que aparezca en el Portal.
-                            </Text>
-                            <Button rounded onClick={onCreate}>
-                                Crear noticia
-                            </Button>
-                        </>
-                    )}
-                </div>
-            );
-        }
-
-        return (
-            <div className={styles.table}>
-                <TableRow isHeader gridTemplate={grid} cells={headerCells} className={styles.headerRow} />
-                {noticias.length === 0 ? (
-                    <div className={styles.noResults}>
-                        <Text variant="caption">No hay noticias que coincidan con el filtro.</Text>
-                    </div>
-                ) : (
-                    noticias.map((noticia) => (
-                        <TableRow
-                            key={noticia.id}
-                            id={noticia.id}
-                            gridTemplate={grid}
-                            cells={buildRowCells(noticia)}
-                            className={styles.row}
-                        />
-                    ))
-                )}
-            </div>
-        );
-    };
-
+  const renderNotification = (noticia: NoticiaListRow) => {
+    if (notificationsLoading) {
+      return (
+        <span
+          className={classNames(styles.skeleton, styles["skeleton--short"])}
+          aria-label="Cargando"
+        />
+      );
+    }
+    if (!noticia.estadoNotificacion) {
+      return <span className={styles.muted}>{EMPTY_VALUE}</span>;
+    }
     return (
-        <div className={classNames(styles.NewsTablePanel, className)}>
-            <div className={styles.toolbar}>
-                <ToggleButton
-                    variant="segmented"
-                    options={FILTER_OPTIONS}
-                    value={filter}
-                    onChange={(value) => onFilterChange(value as NewsFilter)}
-                    disabled={loading}
-                />
-
-                {!loading && !isEmpty && (
-                    <SearchField
-                        value={search}
-                        placeholder="Buscar noticia"
-                        onChange={onSearchChange}
-                        onSearch={() => onSearchChange(search)}
-                        className={styles.search}
-                    />
-                )}
-            </div>
-
-            {renderBody()}
-        </div>
+      <LabelChip
+        label={ESTADO_NOTIFICACION_LABEL[noticia.estadoNotificacion]}
+        className={classNames(
+          styles.pill,
+          PILL_CLASS[noticia.estadoNotificacion],
+        )}
+      />
     );
+  };
+
+  const renderActions = (noticia: NoticiaListRow) => {
+    if (noticia.estado === EstadoNoticia.ARCHIVADA) {
+      return (
+        <Button
+          rounded
+          color="success"
+          className={styles.actionButton}
+          onClick={() => onRestore?.(noticia.id)}
+        >
+          Restaurar
+        </Button>
+      );
+    }
+
+    // No hay borrado (README "Noticias CMS" sección 3): todas, incluidos los borradores, se archivan.
+    return (
+      <>
+        <Button
+          rounded
+          variant="outlined"
+          color="neutral-light"
+          className={styles.actionButton}
+          onClick={() => onEdit?.(noticia.id)}
+        >
+          Editar
+        </Button>
+        <Button
+          rounded
+          className={styles.actionButton}
+          onClick={() => onArchive?.(noticia.id)}
+        >
+          Archivar
+        </Button>
+      </>
+    );
+  };
+
+  const visibleColumns = COLUMNS.filter(
+    (column) =>
+      (column.key !== "notificacion" || showNotifications) &&
+      (column.key !== "acciones" || canEdit),
+  );
+
+  const renderCell = (key: ColumnKey, noticia: NoticiaListRow) => {
+    switch (key) {
+      case "titulo":
+        return <span className={styles.title}>{noticia.titulo}</span>;
+      case "estado":
+        return (
+          <LabelChip
+            label={ESTADO_NOTICIA_LABEL[noticia.estado]}
+            className={classNames(styles.pill, PILL_CLASS[noticia.estado])}
+          />
+        );
+      case "notificacion":
+        return renderNotification(noticia);
+      case "autor":
+        return <span className={styles.text}>{noticia.autor}</span>;
+      case "fecha":
+        return (
+          <span className={styles.text}>{formatFecha(noticia.fecha)}</span>
+        );
+      case "acciones":
+        return <div className={styles.actions}>{renderActions(noticia)}</div>;
+    }
+  };
+
+  const renderBody = () => {
+    if (errorMessage)
+      return (
+        <div className={styles.errorState} role="alert">
+          <h2>No fue posible cargar las noticias</h2>
+          <p>{errorMessage}</p>
+          <Button variant="outlined" onClick={onRetry}>
+            Reintentar noticias
+          </Button>
+        </div>
+      );
+    if (loading)
+      return (
+        <div
+          className={styles.loadingState}
+          role="status"
+          aria-label="Cargando noticias"
+        >
+          {[1, 2, 3].map((n) => (
+            <span key={n} className={styles.skeleton} />
+          ))}
+        </div>
+      );
+    if (!noticias.length)
+      return (
+        <div className={styles.emptyState}>
+          <Icon name="file-lines-regular" size={24} />
+          <h2>
+            {isEmpty
+              ? "Aún no hay noticias"
+              : "No hay noticias que coincidan con el filtro."}
+          </h2>
+          <p>
+            {isEmpty
+              ? "Las noticias que registres aparecerán en este listado."
+              : "Prueba con otro título o restablece los filtros."}
+          </p>
+          {!isEmpty && (
+            <Button
+              variant="outlined"
+              onClick={() => {
+                onFilterChange("all");
+                onSearchChange("");
+              }}
+            >
+              Limpiar filtros
+            </Button>
+          )}
+        </div>
+      );
+    return (
+      <div
+        className={styles.tableScroll}
+        role="region"
+        aria-label="Listado de noticias"
+        tabIndex={0}
+      >
+        <table className={styles.table}>
+          <caption>Noticias del filtro seleccionado</caption>
+          <thead>
+            <tr>
+              {visibleColumns.map((c) => (
+                <th key={c.key} scope="col">
+                  {c.label}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {noticias.map((n) => (
+              <tr key={n.id}>
+                {visibleColumns.map((c) => (
+                  <td key={c.key} data-column={c.key}>
+                    {renderCell(c.key, n)}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
+
+  return (
+    <div className={classNames(styles.NewsTablePanel, className)}>
+      <div className={styles.toolbar}>
+        <ToggleButton
+          variant="segmented"
+          options={FILTER_OPTIONS}
+          value={filter}
+          onChange={(value) => onFilterChange(value as NewsFilter)}
+          disabled={loading}
+        />
+
+        <SearchField
+          value={search}
+          placeholder="Buscar noticia"
+          onChange={onSearchChange}
+          onSearch={() => onSearchChange(search)}
+          className={styles.search}
+        />
+      </div>
+
+      {renderBody()}
+    </div>
+  );
 };
 
 export default NewsTablePanel;

@@ -1,3 +1,4 @@
+@use "../../../../theme/surfaces.scss" as surfaces;
 .reportCard {
     background-color: #FFFFFF;
     border: 1px solid #E0E0E0;
@@ -19,7 +20,7 @@
         align-self: flex-start;
         margin-bottom: 24px;
         font-size: 18px;
-        color: #333333;
+        color: var(--tickets-text);
     }
 
     .ringWrapper {
@@ -30,7 +31,7 @@
     }
 
     .statusText {
-        color: #666666;
+        color: var(--tickets-text-secondary);
     }
 }
 
@@ -48,4 +49,7 @@
     column-gap: 20px;
     row-gap: 12px;
     align-content: center;
+}
+.reportCard {
+  @include surfaces.panel;
 }

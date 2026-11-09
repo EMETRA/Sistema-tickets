@@ -1,5 +1,8 @@
+"use client";
+import { usePlatform } from "@/platform/context";
+import { PlatformRoute } from "@/views/Platform/PlatformRoute";
 import Configuration from "@/views/Configuration";
-
 export default function ConfigPage() {
-    return <Configuration />
-};
+    const { disabled } = usePlatform();
+    return disabled ? <Configuration /> : <PlatformRoute section="accesos" />;
+}

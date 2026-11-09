@@ -12,7 +12,14 @@ import { HistoryMessage } from "@/components/client/molecules/HistoryMessage";
 
 import { useAuthStore } from "@/store/useAuthStore";
 
-import { useAddTagToTicket, useGetTicketById, useGetTicketTagCatalog, useGetTicketTags, useRemoveTagFromTicket, useUpdateTicket } from "@/api/hooks";
+import {
+    useAddTagToTicket,
+    useGetTicketById,
+    useGetTicketTagCatalog,
+    useGetTicketTags,
+    useRemoveTagFromTicket,
+    useUpdateTicket,
+} from "@/api/hooks";
 import { useGetTicketAttachments } from "@/api/hooks";
 
 import styles from "./TicketDetail.module.scss";
@@ -28,43 +35,52 @@ const COLOR_MAP: Record<string, string> = {
     AMARILLO: "#FDD835",
 };
 
-const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, isOpen, onClose, onTicketUpdated }) => {
+const TicketDetailContent: React.FC<TicketDetailProps> = ({
+    ticketId,
+    isOpen,
+    onClose,
+    onTicketUpdated,
+}) => {
     const role = useAuthStore((state) => state.getRole());
     const { updateTicket, loading: isUpdating } = useUpdateTicket();
-    const { data: ticketData, loading: isTicketLoading } = useGetTicketById(ticketId);
-    const { data: ticketAttachments, loading: isTicketAttachmentsLoading } = useGetTicketAttachments(ticketId);
-    const { data: ticketTags, refetch: refetchTags, loading: isTagsLoading } = useGetTicketTags(ticketId);
+    const { data: ticketData, loading: isTicketLoading } =
+    useGetTicketById(ticketId);
+    const { data: ticketAttachments, loading: isTicketAttachmentsLoading } =
+    useGetTicketAttachments(ticketId);
+    const {
+        data: ticketTags,
+        refetch: refetchTags,
+        loading: isTagsLoading,
+    } = useGetTicketTags(ticketId);
     const { data: tagCatalog } = useGetTicketTagCatalog();
     const { addTag } = useAddTagToTicket();
     const { removeTag } = useRemoveTagFromTicket();
 
-    const labels: LabelOption[] = ticketTags.map(tag => ({
+    const labels: LabelOption[] = ticketTags.map((tag) => ({
         value: tag.id,
         label: tag.nombre,
         color: "#ffffff",
         backgroundColor: COLOR_MAP[tag.color ?? ""] ?? tag.color ?? undefined,
     }));
 
-
-    const availableOptions: LabelOption[] = tagCatalog.map(tag => ({
+    const availableOptions: LabelOption[] = tagCatalog.map((tag) => ({
         value: tag.id,
         label: tag.nombre,
         color: "#ffffff",
         backgroundColor: COLOR_MAP[tag.color ?? ""] ?? tag.color ?? undefined,
     }));
-
 
     const handleLabelsChange = async (newLabels: LabelOption[]) => {
-        const currentIds = ticketTags.map(t => t.id);
-        const newIds = newLabels.map(l => l.value);
+        const currentIds = ticketTags.map((t) => t.id);
+        const newIds = newLabels.map((l) => l.value);
 
-        const added = newIds.filter(id => !currentIds.includes(id));
-        const removed = currentIds.filter(id => !newIds.includes(id));
+        const added = newIds.filter((id) => !currentIds.includes(id));
+        const removed = currentIds.filter((id) => !newIds.includes(id));
 
         try {
             await Promise.all([
-                ...added.map(id => addTag(ticketId, parseInt(id, 10))),
-                ...removed.map(id => removeTag(ticketId, parseInt(id, 10))),
+                ...added.map((id) => addTag(ticketId, parseInt(id, 10))),
+                ...removed.map((id) => removeTag(ticketId, parseInt(id, 10))),
             ]);
             await refetchTags();
         } catch (err) {
@@ -74,9 +90,11 @@ const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, isOpen, onClose, 
 
     const handleOnFileClick = (url_descarga: string) => {
         window.open(url_descarga, "_blank");
-    }
+    };
 
-    const handleOnTicketCancel = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    const handleOnTicketCancel = async (
+        e: React.MouseEvent<HTMLButtonElement>,
+    ) => {
         e.preventDefault();
         try {
             await updateTicket(ticketId, { estadoId: 4 });
@@ -87,7 +105,9 @@ const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, isOpen, onClose, 
         }
     };
 
-    const handleOnTicketProcess = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    const handleOnTicketProcess = async (
+        e: React.MouseEvent<HTMLButtonElement>,
+    ) => {
         e.preventDefault();
         try {
             await updateTicket(ticketId, { estadoId: 3 }); // En trabajo
@@ -98,7 +118,9 @@ const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, isOpen, onClose, 
         }
     };
 
-    const handleOnTicketFinish = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    const handleOnTicketFinish = async (
+        e: React.MouseEvent<HTMLButtonElement>,
+    ) => {
         e.preventDefault();
         try {
             await updateTicket(ticketId, { estadoId: 5 }); // Completado
@@ -109,19 +131,39 @@ const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, isOpen, onClose, 
         }
     };
 
+    const ticketState = ticketData?.estadoNombre.toLowerCase();
+    const canCancel = ticketState && !["asignado", "completado", "cancelado"].includes(ticketState);
+    const canStart = ticketState === "creado" || ticketState === "asignado";
+
     return (
-        <PopOver isOpen={isOpen} onClose={onClose} position="center" className={styles.popOver}>
+        <PopOver
+            isOpen={isOpen}
+            onClose={onClose}
+            position="center"
+            className={styles.popOver}
+        >
             <div className={styles.ticketDetailContainer}>
                 <div className={styles.header}>
                     <div className={styles.headerInfo}>
                         <Icon name="file" variant="status" color="#7F8D9F" />
-                        <Title variant="mid" className={styles.title}>Ticket #{ticketId}</Title>
+                        <Title variant="mid" className={styles.title}>
+                            Ticket #{ticketId}
+                        </Title>
                     </div>
-                    <Button variant="outlined" color="neutral-light" className={styles.closeButton} onClick={onClose}>
+                    <Button
+                        variant="outlined"
+                        color="neutral-light"
+                        className={styles.closeButton}
+                        onClick={onClose}
+                    >
                         X
                     </Button>
                 </div>
-                <div className={role === "USUARIO" ? styles.contentFullWidth : styles.content}>
+                <div
+                    className={
+                        role === "USUARIO" ? styles.contentFullWidth : styles.content
+                    }
+                >
                     <div className={styles.ticketDetails}>
                         {isTicketLoading ? (
                             <div>Cargando detalles del ticket...</div>
@@ -146,10 +188,13 @@ const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, isOpen, onClose, 
                                                 key={file.id}
                                                 id={file.id}
                                                 name={file.nombreArchivo || "Archivo adjunto"}
-                                                onClick={() => handleOnFileClick(file.url_descarga || "")}
+                                                onClick={() =>
+                                                    handleOnFileClick(file.url_descarga || "")
+                                                }
                                                 variant="outlined"
                                             />
-                                        )))}
+                                        ))
+                                    )}
                                 </div>
                             </div>
                         ) : (
@@ -171,7 +216,7 @@ const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, isOpen, onClose, 
                             )}
                             <HistoryMessage ticketId={ticketId} />
                             <div className={styles.ticketActions}>
-                                {ticketData.estadoNombre.toLowerCase() !== "asignado" && ticketData.estadoNombre.toLowerCase() !== "completado" && ticketData.estadoNombre.toLowerCase() !== "cancelado" ? (
+                                {canCancel ? (
                                     <Button
                                         variant="contained"
                                         color="danger"
@@ -183,7 +228,7 @@ const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, isOpen, onClose, 
                                     </Button>
                                 ) : null}
 
-                                {ticketData.estadoNombre.toLowerCase() === "creado" || ticketData.estadoNombre.toLowerCase() === "asignado" ? (
+                                {canStart ? (
                                     <Button
                                         variant="contained"
                                         color="default"
@@ -193,7 +238,7 @@ const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, isOpen, onClose, 
                                     >
                                         {isUpdating ? "Actualizando..." : "En Proceso"}
                                     </Button>
-                                ) : ticketData.estadoNombre.toLowerCase() === "en trabajo" ? (
+                                ) : ticketState === "en trabajo" ? (
                                     <Button
                                         variant="contained"
                                         color="default"
@@ -216,5 +261,8 @@ const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, isOpen, onClose, 
         </PopOver>
     );
 };
+
+const TicketDetail: React.FC<TicketDetailProps> = (props) =>
+    props.isOpen && props.ticketId ? <TicketDetailContent {...props} /> : null;
 
 export default TicketDetail;

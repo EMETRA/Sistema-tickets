@@ -1,3 +1,4 @@
+@use "../../../../theme/surfaces.scss" as surfaces;
 @use "../../../../theme/colors.scss" as *;
 
 .TicketTable {
@@ -66,4 +67,8 @@
 
 .noTicketsText {
   text-align: center;
+}
+
+.TicketTable {
+  @include surfaces.panel;
 }

@@ -21,3 +21,10 @@ test('el adaptador conserva estados y remisión reales sin inventar importe, pag
 test('solo los permisos reales habilitan el contrato; el error de consulta no expone SQL',()=>{
  assert.match(api.mensajeJuzgado({graphQLErrors:[{extensions:{code:'FORBIDDEN'}}]}),/no tiene permiso/);assert.ok(!api.mensajeJuzgado(new Error('ORA-00942 SQL privado')).includes('ORA-'));
 });
+test('las descargas explican permiso y almacenamiento sin copiar mensajes internos',()=>{
+ const {ArchivoJuzgadoError}=load('src/api/graphql/juzgado-archivo.ts');
+ assert.match(new ArchivoJuzgadoError(403).message,/no tiene permiso/);
+ assert.match(new ArchivoJuzgadoError(503,'ARCHIVO_NO_DISPONIBLE').message,/almacenamiento/);
+ assert.match(new ArchivoJuzgadoError(404).message,/No se encontró/);
+ assert.ok(!new ArchivoJuzgadoError(503,'SQL privado').message.includes('SQL'));
+});

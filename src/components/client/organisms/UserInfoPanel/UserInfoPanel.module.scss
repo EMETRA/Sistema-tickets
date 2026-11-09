@@ -1,3 +1,4 @@
+@use "../../../../theme/surfaces.scss" as surfaces;
 .panelCard {
     background-color: #FFFFFF;
     border: 1px solid #E0E0E0;
@@ -52,13 +53,16 @@
 .daysHighlight {
     font-size: 50px; // Tamaño grande para el dato principal
     font-weight: 400;
-    color: #333333;
+    color: var(--tickets-text);
     margin: 0;
     line-height: 0.75;
 }
 
 .locationText {
-    color: #333333;
+    color: var(--tickets-text);
     font-weight: 500;
     margin: 0;
+}
+.panelCard {
+  @include surfaces.panel;
 }

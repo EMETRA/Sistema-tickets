@@ -1,18 +1,29 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { TicketsTablePanel } from "@/components/client/organisms/TicketsTablePanel";
 import { Ticket } from "@/components/client/organisms/TicketsTablePanel/types";
-import { useDeleteTicket, useTicketsByRole, useUpdateTicket } from "@/api/hooks";
+import {
+    useTicketsByRole,
+    useUpdateTicket,
+} from "@/api/hooks";
 import styles from "./Tickets.module.scss";
+
+import { ErrorHandler } from "@/api/graphql/errors";
 
 import type { ChipState } from "@/components/client/atoms/TicketStateChip/types";
 
-const Tickets: React.FC = () => {
+const Tickets = ({ scope = "role" }: { scope?: "role" | "created" }) => {
     // Hook que obtiene tickets filtrados automáticamente según el rol del usuario
-    const { data: ticketsData, loading: isLoading, error: loadError, refetch: refetchTickets } = useTicketsByRole();
-    const { deleteTicket, loading: isDeleting } = useDeleteTicket();
-    const { updateTicket, loading: isAssigning } = useUpdateTicket();
+    const {
+        data: ticketsData,
+        loading: isLoading,
+        error: loadError,
+        refetch: refetchTickets,
+    } = useTicketsByRole(undefined, scope);
+    const { updateTicket, loading: isUpdating } = useUpdateTicket();
+    const [actionMessage, setActionMessage] = useState("");
+    const [actionError, setActionError] = useState("");
 
     // Auto-ejecutar refetch al montar el componente (solo una vez)
 
@@ -23,90 +34,99 @@ const Tickets: React.FC = () => {
             hasRunOnce.current = true;
             refetchTickets();
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-    
 
-    const handleDeleteTicket = async (ticketId: string) => {
+    const handleCancelTicket = async (ticketId: string) => {
+        setActionMessage("");
+        setActionError("");
         try {
-            const success = await deleteTicket(ticketId);
-
-            if (success) {
-                alert("Ticket eliminado con éxito");
-                await refetchTickets?.();            } else {
-                alert("No se pudo eliminar el ticket.");
-            }
+            const updated = await updateTicket(ticketId, { estadoId: 4 });
+            if (!updated) throw new Error("No se pudo cancelar el ticket.");
+            setActionMessage("Ticket cancelado. Su historial se conserva.");
+            await refetchTickets();
         } catch (err) {
-            console.error("Error al eliminar ticket:", err);
-            alert("Ocurrió un error técnico al intentar eliminar el ticket.");
+            setActionError(ErrorHandler.getUserMessage(err));
         }
     };
 
-    const handleAssignTicket = async (ticketId: string, userId: string | number) => {
+    const handleAssignTicket = async (
+        ticketId: string,
+        userId: string | number,
+    ) => {
+        setActionMessage("");
+        setActionError("");
         try {
-        // 1. Normalizamos los IDs
+            // 1. Normalizamos los IDs
             const tId = ticketId.toString();
             // El backend espera un Int para el ID de usuario según el README
             const uId = typeof userId === "string" ? parseInt(userId, 10) : userId;
 
-            // 2. Llamamos a tu hook pasando el ID y el objeto 'input'
-            // Tu hook espera: updateTicket(id, input)
+            if (!Number.isSafeInteger(uId) || uId <= 0) {
+                setActionError("Selecciona un responsable válido.");
+                return;
+            }
             const response = await updateTicket(tId, {
                 usuarioAsignadoId: uId,
-            // Aquí podrías pasar también un estadoId si quisieras 
-            // cambiar el estado a "Asignado" (ej: estadoId: 2)
+                estadoId: 2,
             });
 
             if (response) {
-            // No usamos alert para no interrumpir, pero podrías si prefieres
-                console.log("Ticket asignado con éxito");
+                setActionMessage("Ticket asignado correctamente.");
                 await refetchTickets?.();
             }
         } catch (err) {
-            console.error("Error al asignar ticket:", err);
-            alert("No se pudo realizar la asignación.");
+            setActionError(ErrorHandler.getUserMessage(err));
         }
     };
 
     // Derivar estados
-    const error = loadError ? "No fue posible cargar los tickets. Intenta nuevamente." : "";
+    const error = loadError
+        ? "No fue posible cargar los tickets. Intenta nuevamente."
+        : "";
 
     // Función para formatear fecha
     // Si es hoy, retorna solo la hora; si no, retorna fecha y hora
-    const formatTicketDate = (dateString: string ): string => {
+    const formatTicketDate = (dateString: string): string => {
         const ticketDate = new Date(dateString);
         const today = new Date();
-        
-        const isToday = 
-            ticketDate.getDate() === today.getDate() &&
-            ticketDate.getMonth() === today.getMonth() &&
-            ticketDate.getFullYear() === today.getFullYear();
+
+        const isToday =
+      ticketDate.getDate() === today.getDate() &&
+      ticketDate.getMonth() === today.getMonth() &&
+      ticketDate.getFullYear() === today.getFullYear();
 
         if (isToday) {
             // Mostrar solo la hora
-            return ticketDate.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
+            return ticketDate.toLocaleTimeString("es-GT", {
+                hour: "2-digit",
+                minute: "2-digit",
+            });
         } else {
             // Mostrar fecha y hora
-            return ticketDate.toLocaleString('es-CO', { 
-                day: '2-digit', 
-                month: '2-digit', 
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
+            return ticketDate.toLocaleString("es-GT", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
             });
         }
     };
 
     // Mapear tickets del API al tipo esperado por TicketsTablePanel
-    const transformedTickets: Ticket[] = ticketsData?.map(ticket => {
+    const transformedTickets: Ticket[] =
+    ticketsData?.map((ticket) => {
         return {
             id: ticket.id,
             user: {
                 id: ticket.usuarioCreadorId,
                 name: ticket.creador.nombre,
-                email: "email@example.com",
+                email: "",
                 department: ticket.creador.department || "Sin departamento",
-                initials: ticket.creador.nombre.charAt(0) + (ticket.creador.nombre.split(" ")[1]?.charAt(0) || ""),
+                initials:
+            ticket.creador.nombre.charAt(0) +
+            (ticket.creador.nombre.split(" ")[1]?.charAt(0) || ""),
                 avatar: ticket.creador.avatar,
             },
             title: ticket.titulo,
@@ -114,14 +134,21 @@ const Tickets: React.FC = () => {
             date: formatTicketDate(ticket.fechaCreacion),
             status: {
                 label: ticket.estadoNombre,
-                state: ticket.estadoNombre.toLowerCase() === "en trabajo" ? "en_trabajo" as ChipState : ticket.estadoNombre.toLowerCase() as ChipState,
+                state:
+            ticket.estadoNombre.toLowerCase() === "en trabajo"
+                ? ("en_trabajo" as ChipState)
+                : (ticket.estadoNombre.toLowerCase() as ChipState),
             },
-            assignedTo: ticket.asignado ? {
-                id: ticket.asignado.id,
-                name: ticket.asignado.nombre,
-                initials: ticket.asignado.nombre.charAt(0) + (ticket.asignado.nombre.split(" ")[1]?.charAt(0) || ""),
-                avatarSrc: ticket.asignado.avatar || undefined,
-            } : null,
+            assignedTo: ticket.asignado
+                ? {
+                    id: ticket.asignado.id,
+                    name: ticket.asignado.nombre,
+                    initials:
+                ticket.asignado.nombre.charAt(0) +
+                (ticket.asignado.nombre.split(" ")[1]?.charAt(0) || ""),
+                    avatarSrc: ticket.asignado.avatar || undefined,
+                }
+                : null,
         };
     }) || [];
 
@@ -130,7 +157,7 @@ const Tickets: React.FC = () => {
     }
 
     if (error) {
-        return <div className={styles.mainContainer}>{error}</div>;
+        return <div className={styles.mainContainer}><p role="alert">{error}</p><button type="button" onClick={() => void refetchTickets()}>Reintentar</button></div>;
     }
 
     const handleExportTickets = () => {
@@ -147,13 +174,13 @@ const Tickets: React.FC = () => {
             "Asignado a",
         ];
 
-        const rows = transformedTickets.map(ticket => [
+        const rows = transformedTickets.map((ticket) => [
             ticket.id,
             ticket.user.name,
             ticket.user.department,
             ticket.title,
             // Strip markdown and wrap in quotes to handle commas/newlines
-            `"${ticket.description.replace(/"/g, '""').replace(/\n/g, ' ')}"`,
+            `"${ticket.description.replace(/"/g, '""').replace(/\n/g, " ")}"`,
             ticket.date,
             ticket.status.label,
             ticket.assignedTo?.name ?? "Sin asignar",
@@ -161,10 +188,12 @@ const Tickets: React.FC = () => {
 
         const csvContent = [
             headers.join(","),
-            ...rows.map(row => row.join(",")),
+            ...rows.map((row) => row.join(",")),
         ].join("\n");
 
-        const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" }); // \uFEFF = BOM for Excel UTF-8
+        const blob = new Blob(["\uFEFF" + csvContent], {
+            type: "text/csv;charset=utf-8;",
+        }); // \uFEFF = BOM for Excel UTF-8
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
@@ -175,11 +204,13 @@ const Tickets: React.FC = () => {
 
     return (
         <div className={styles.mainContainer}>
+            {actionMessage && <p role="status">{actionMessage}</p>}
+            {actionError && <p role="alert">{actionError}</p>}
             <TicketsTablePanel
                 tickets={transformedTickets}
-                loading={isLoading || isDeleting || isAssigning}
+                loading={isLoading || isUpdating}
                 onAssign={handleAssignTicket}
-                onDelete={handleDeleteTicket}
+                onDelete={handleCancelTicket}
                 onExport={handleExportTickets}
                 onTicketUpdated={refetchTickets}
             />

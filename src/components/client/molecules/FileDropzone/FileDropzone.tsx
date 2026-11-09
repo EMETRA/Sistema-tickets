@@ -66,6 +66,12 @@ const FileDropzone: React.FC<FileDropzoneProps> = ({
             onDragEnter={handleDragEnter}
             onDragLeave={handleDragLeave}
             onClick={handleClick}
+            onKeyDown={(event) => {
+                if (event.target === event.currentTarget && (event.key === "Enter" || event.key === " ")) {
+                    event.preventDefault();
+                    handleClick();
+                }
+            }}
             role="button"
             tabIndex={0}
         >
@@ -79,7 +85,7 @@ const FileDropzone: React.FC<FileDropzoneProps> = ({
             />
             <div className={styles.content}>
                 {!isCompact && (
-                    <Icon name="file-arrow-up-solid-full" size={75} color="#4361EE" />
+                    <Icon className={styles.icon} name="file-arrow-up-solid-full" size={32} color="var(--tickets-primary)" />
                 )}
 
                 <p className={styles.title}>

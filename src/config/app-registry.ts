@@ -1,7 +1,11 @@
+import {
+    ProjectsBridge,
+    CollaboratorsBridge,
+} from "@/views/Platform/LegacyModuleBridge";
+import MOD13 from "@/views/MOD13";
 import type { ComponentType } from "react";
 import ConsultaVehiculos from "@/views/ConsultaVehiculos";
-import DashboardCollaborators from "@/views/DashboardCollaborators/DashboardCollaborators";
-import DashboardProjects from "@/views/DashboardProjects";
+
 import ExportMOD01 from "@/views/ExportMOD01";
 import MOD01 from "@/views/MOD01";
 import MOD04 from "@/views/MOD04";
@@ -12,7 +16,7 @@ import MOD08 from "@/views/MOD08";
 import MOD10 from "@/views/MOD10";
 import PROC01 from "@/views/PROC01/PROC01";
 import SaveMOD01 from "@/views/SaveMOD01/ExportMOD01";
-import MOD13 from "@/views/MOD13";
+
 import COM03 from "@/views/COM03";
 import JUZ01 from "@/views/JUZ01";
 import CasilleroUserRequests from "@/views/CasilleroUserRequests";
@@ -33,8 +37,8 @@ export const APP_REGISTRY: Record<string, ComponentType> = {
     mod13: MOD13,
     // COM-03: la clave es el id del módulo en la ruta /home/comunicacion/contenido/noticias
     noticias: COM03,
-    "dashboard-proyectos": DashboardProjects,
-    "dashboard-colaboradores": DashboardCollaborators,
+    "dashboard-proyectos": ProjectsBridge,
+    "dashboard-colaboradores": CollaboratorsBridge,
     exportmod01: ExportMOD01,
     "save-mod01": SaveMOD01,
     "consulta-vehiculos": ConsultaVehiculos,

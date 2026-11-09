@@ -1,14 +1,4 @@
-.pageContainer {
-    display: flex;
-    justify-content: center;
-    padding: 24px;
-    width: 100%;
-}
-
-.formWrapper {
-    width: 100%;
-    max-width: 80%;
-    background-color: var(--white);
-    border-radius: 12px;
-    border: 1px solid #E0E0E0;
-}
+.pageContainer { display: flex; flex-direction: column; gap: 20px; width: 100%; min-width: 0; }
+.formWrapper { width: 100%; min-width: 0; max-width: none; }
+.successMessage { padding: 15px 18px; border-radius: 10px; color: #177849; border: 1px solid #b8dfca; background: #e5f5eb; font-size: 13px; }
+.errorMessage { padding: 15px 18px; border-radius: 10px; color: #a73740; border: 1px solid #e7b5bc; background: #fff1f3; font-size: 13px; }

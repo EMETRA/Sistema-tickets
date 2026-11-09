@@ -23,6 +23,11 @@ const eslintConfig = defineConfig([
             'react/jsx-indent': ['error', 4],
             'react/jsx-indent-props': ['error', 4],
         }
+    },
+    {
+        files: ['src/platform/**/*.{ts,tsx}', 'src/views/Platform/**/*.tsx', 'src/components/client/molecules/PlatformField/**/*.tsx', 'src/components/client/organisms/ResourceWorkspace/**/*.tsx'],
+        // Prettier formats these modules; the core and JSX indentation fixers disagree on nested JSX.
+        rules: {'indent':'off','react/jsx-indent':'off','react/jsx-indent-props':'off'}
     }
 ]);
 

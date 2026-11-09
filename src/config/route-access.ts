@@ -3,7 +3,7 @@ import { PAGES_CONFIG, ROLE_LAYOUTS } from "@/config/navigation";
 
 /**
  * Paths base permitidos por rol, derivados de ROLE_LAYOUTS + PAGES_CONFIG.
- * Cambiar el menú = cambiar el acceso.
+ * Las rutas del espacio requieren sesión; su alcance se verifica con permisos del API.
  */
 function getAllowedPathsForRole(role: UserRole): string[] {
     const layout = ROLE_LAYOUTS[role] ?? ROLE_LAYOUTS.USUARIO;
@@ -20,6 +20,7 @@ function getAllowedPathsForRole(role: UserRole): string[] {
  */
 export function canAccessPath(role: UserRole | null | undefined, pathname: string): boolean {
     if (!role) return false;
+    if(pathname.startsWith("/espacio/") || pathname === "/ayuda") return true;
 
     const allowedPaths = getAllowedPathsForRole(role);
 

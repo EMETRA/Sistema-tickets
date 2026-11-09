@@ -52,7 +52,7 @@ export const AppCard = ({
                     className={styles.button}
                     fullWidth
                 >
-                    Haga click aquí para ingresar
+                    Ingresar
                 </Button>
             </div>
         </div>

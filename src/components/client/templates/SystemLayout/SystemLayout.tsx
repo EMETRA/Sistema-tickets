@@ -1,5 +1,7 @@
 "use client";
 
+import { usePlatform } from "@/platform/context";
+import { homeNavigation, PLATFORM_SECTIONS } from "@/platform/navigation";
 import { usePathname, useRouter } from "next/navigation";
 import { SideBarNavigation } from "../../organisms/SideBarNavigation";
 import { TopBar } from "../../organisms/TopBar";
@@ -14,10 +16,14 @@ import {
 } from "@/config/apps-catalog";
 import styles from "./SystemLayout.module.scss";
 import classNames from "classnames";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import Link from "next/link";
 import { RoleProvider } from "@/context/RoleContext";
 import { useAppsCatalogContext } from "@/context/AppsCatalogContext";
 import { useAuthStore } from "@/store/useAuthStore";
+import { ApplicationLoadError } from "../../organisms/ApplicationLoadError/ApplicationLoadError";
+import { PageHeading } from "../../molecules/PageHeading/PageHeading";
+import { AdministrativeConfirmation } from "../../organisms/AdministrativeConfirmation/AdministrativeConfirmation";
 
 export const SystemLayout = ({
     children,
@@ -32,7 +38,16 @@ export const SystemLayout = ({
     const user = useAuthStore((state) => state.user);
     const isHydrated = useAuthStore((state) => state.isHydrated);
     const token = useAuthStore((state) => state.token);
-    const { catalog, loading: catalogLoading } = useAppsCatalogContext();
+    const logout = useAuthStore((state) => state.logout);
+    const [menuOpen, setMenuOpen] = useState(false);
+    useEffect(() => {
+        const close = (event: KeyboardEvent) => {
+            if (event.key === "Escape") setMenuOpen(false);
+        };
+        window.addEventListener("keydown", close);
+        return () => window.removeEventListener("keydown", close);
+    }, []);
+    const { catalog, loading: catalogLoading, error: catalogError } = useAppsCatalogContext();
 
     const currentRole = getRole();
     const appContext = pathname ? resolveAppPath(pathname) : null;
@@ -51,28 +66,63 @@ export const SystemLayout = ({
             return;
         }
 
-        if (appId && catalogLoading) return;
+        if (appId && (catalogLoading || catalogError)) return;
 
         if (!canAccessAppPath(pathname, catalog)) {
             router.replace("/unauthorized");
         }
-    }, [isHydrated, token, currentRole, pathname, router, catalog, catalogLoading, appId]);
+    }, [
+        isHydrated,
+        token,
+        currentRole,
+        pathname,
+        router,
+        catalog,
+        catalogLoading,
+        catalogError,
+        appId,
+    ]);
 
-    const navItems =
-        appId && catalog
-            ? getSections(appId, catalog).map((section) => ({
-                path: buildSectionPath(appId, section.id),
-                label: section.label,
-                iconName: section.iconName,
-            }))
-            : getMenuByRole(currentRole).map((page) => ({
-                path: page.path,
-                label: page.label,
-                iconName: page.iconName,
-            }));
+    const platform = usePlatform();
+    const navItems = getMenuByRole(currentRole)
+        .filter(
+            (page) =>
+                page.path !== "/tickets-creation" &&
+                (!platform.data ||
+                    !["/tickets", "/config", "/usuarios"].includes(page.path)),
+        )
+        .map((page) => ({
+            path: page.path,
+            label: page.label,
+            iconName: page.iconName,
+        }));
+    const workspaceNavigation = platform.data ? homeNavigation(platform.data) : null;
+    const secondaryItems = workspaceNavigation ? [
+        ...workspaceNavigation.secondary,
+        ...navItems.filter(item=>!workspaceNavigation.primary.some(p=>p.path===item.path)
+            && !workspaceNavigation.secondary.some(p=>p.path===item.path)),
+    ] : [];
+    const sections = appId && catalog ? getSections(appId, catalog) : [];
+    const sectionItems = sections.map((section) => ({
+        path: buildSectionPath(appId!, section.id),
+        label: section.label,
+        iconName: section.iconName,
+    }));
+    const applicationLinks = catalog
+        ? Object.values(catalog).map((app) => ({
+            id: app.meta.id,
+            title: app.meta.title,
+            href: `/home/${app.meta.id}`,
+        }))
+        : [];
 
     const activePage = (() => {
         if (!pathname) return PAGES_CONFIG.home;
+        const workspace = PLATFORM_SECTIONS.find(
+            (s) => pathname === "/espacio/" + s.id,
+        );
+        if (workspace)
+            return { title: workspace.label, iconName: workspace.iconName };
 
         if (catalog) {
             const appMeta = getAppPathMeta(pathname, catalog);
@@ -84,11 +134,13 @@ export const SystemLayout = ({
             }
         }
 
-        const exact = Object.values(PAGES_CONFIG).find((p) => p.path === pathname);
+        const exact = Object.values(PAGES_CONFIG).find(
+            (p) => p.path === pathname,
+        );
         if (exact) return exact;
 
         const prefixMatch = Object.values(PAGES_CONFIG).find(
-            (p) => pathname.startsWith(`${p.path}/`) && p.path !== "/home"
+            (p) => pathname.startsWith(`${p.path}/`) && p.path !== "/home",
         );
         if (prefixMatch) return prefixMatch;
 
@@ -98,10 +150,20 @@ export const SystemLayout = ({
     const hasAccess =
         Boolean(token) &&
         canAccessPath(currentRole, pathname ?? "/home") &&
-        (!appId || (!catalogLoading && canAccessAppPath(pathname ?? "/home", catalog)));
+        (!appId ||
+            (!catalogLoading &&
+                canAccessAppPath(pathname ?? "/home", catalog)));
 
     if (!isHydrated || (appId && catalogLoading)) {
-        return null;
+        return (
+            <div className={styles.loading} role="status">
+                Cargando tu espacio de trabajo…
+            </div>
+        );
+    }
+
+    if (token && appId && catalogError && canAccessPath(currentRole, pathname ?? "/home")) {
+        return <div className={styles.loading}><ApplicationLoadError onRetry={() => window.location.reload()} /></div>;
     }
 
     if (!hasAccess) {
@@ -110,9 +172,24 @@ export const SystemLayout = ({
 
     return (
         <RoleProvider role={currentRole}>
+            <AdministrativeConfirmation />
             <div className={classNames(styles.layout, className)}>
+                <a href="#main-content" className={styles.skipLink}>
+                    Ir al contenido
+                </a>
                 <SideBarNavigation
-                    items={navItems}
+                    items={workspaceNavigation?.primary || navItems}
+                    secondaryItems={secondaryItems}
+                    helpPath="/ayuda"
+                    sectionItems={sectionItems}
+                    applicationLabel={
+                        appId && catalog
+                            ? catalog[appId]?.meta.label
+                            : undefined
+                    }
+                    open={menuOpen}
+                    onClose={() => setMenuOpen(false)}
+                    onLogout={logout}
                     activePath={pathname ? pathname : "/home"}
                     onNavigate={(path) => router.push(path)}
                     logoIcon={appId ? "house-solid" : "ticket-solid"}
@@ -121,20 +198,104 @@ export const SystemLayout = ({
 
                 <div className={styles.container}>
                     <TopBar
+                        applications={applicationLinks}
+                        profilePath={
+                            user?.id_usuario
+                                ? `/equipo/${encodeURIComponent(user.id_usuario)}`
+                                : undefined
+                        }
+                        createTicketPath={
+                            canAccessPath(currentRole, "/tickets-creation")
+                                ? "/tickets-creation"
+                                : undefined
+                        }
+                        notificationsPath="/mis-tickets"
+                        settingsPath={
+                            platform.data
+                                ? platform.data.actor.admin
+                                    ? "/espacio/accesos"
+                                    : undefined
+                                : canAccessPath(currentRole, "/config")
+                                    ? "/config"
+                                    : undefined
+                        }
+                        unit={user?.departamento || undefined}
+                        menuOpen={menuOpen}
+                        onMenuClick={() => setMenuOpen((open) => !open)}
                         title={activePage.title}
                         iconName={activePage.iconName}
                         userName={user?.nombre || "Usuario"}
                         userRole={
                             user?.rol?.trim() ||
                             currentRole.charAt(0).toUpperCase() +
-                            currentRole.slice(1).toLowerCase()
+                                currentRole.slice(1).toLowerCase()
                         }
                         userAvatarUrl={user?.avatar}
                         userStatus="online"
                     />
 
-                    <main className={styles.main}>
-                        <div className={styles.pageContent}>{children}</div>
+                    <main
+                        id="main-content"
+                        tabIndex={-1}
+                        className={styles.main}
+                    >
+                        {appContext && catalog && (
+                            <nav
+                                aria-label="Ruta de navegación"
+                                className={styles.breadcrumb}
+                            >
+                                <Link href="/home">Inicio</Link>
+                                <span aria-hidden="true">/</span>
+                                <Link href={`/home/${appContext.appId}`}>
+                                    {catalog[appContext.appId]?.meta.label}
+                                </Link>
+                                {appContext.sectionId && (
+                                    <>
+                                        <span aria-hidden="true">/</span>
+                                        <Link
+                                            href={buildSectionPath(
+                                                appContext.appId,
+                                                appContext.sectionId,
+                                            )}
+                                        >
+                                            {
+                                                catalog[appContext.appId]
+                                                    ?.sections[
+                                                        appContext.sectionId
+                                                    ]?.meta.label
+                                            }
+                                        </Link>
+                                    </>
+                                )}
+                                {appContext.moduleId && (
+                                    <>
+                                        <span aria-hidden="true">/</span>
+                                        <span aria-current="page">
+                                            {activePage.title}
+                                        </span>
+                                    </>
+                                )}
+                            </nav>
+                        )}
+                        <div
+                            className={classNames(styles.pageContent, {
+                                [styles.standardPage]:
+                                    !appContext && pathname !== "/home",
+                            })}
+                        >
+                            {!appContext && pathname !== "/home" && (
+                                <PageHeading title={activePage.title} />
+                            )}
+                            <div
+                                className={
+                                    !appContext && pathname !== "/home"
+                                        ? styles.standardContent
+                                        : undefined
+                                }
+                            >
+                                {children}
+                            </div>
+                        </div>
                     </main>
                 </div>
             </div>

@@ -1,101 +1,103 @@
 "use client";
-
-import React, { useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 import { ProfileHeader } from "@/components/client/organisms/ProfileHeader";
-import { UserPerformance } from "@/components/client/organisms/UserPerformance";
-import { UserInfoPanel } from "@/components/client/organisms/UserInfoPanel";
-import { MaintenanceRecordPanel } from "@/components/client/organisms/MaintenanceRecordPanel";
-import { EquipmentReportPanel } from "@/components/client/organisms/EquipmentReportPanel";
-
+import { MetricCard } from "@/components/client/molecules/MetricCard/MetricCard";
+import { useGetUserById } from "@/api/hooks/useGetUserById";
+import { useGetTicketsByUserId } from "@/api/hooks/useGetTicketsByUserId";
+import { useAuthStore } from "@/store/useAuthStore";
+import { HomeState } from "../Home/HomeHeading";
 import styles from "./Profile.module.scss";
-import { useGetUserById } from "@/api/hooks";
 
-interface ProfileProps {
-    userId?: string; // 👈 ID opcional para ver otros perfiles
-}
-
-export default function Profile({ userId }: ProfileProps) {
-    console.log("Renderizando Profile con userId:", userId);
-    // Estado para controlar la conmutación de vistas
-    const [view, setView] = useState<"perfil" | "mantenimiento">("perfil");
-    const { data: userData } = useGetUserById(Number(userId));
-
-    // Lógica de carga (Placeholder para GraphQL)
-    useEffect(() => {
-        if (userId) {
-            console.log(`Cargando datos para el colaborador con ID: ${userId}`);
-            // Aquí llamarías a: const data = await getMemberById(userId);
-        } else {
-            console.log("Cargando perfil del usuario actual (Mi Perfil)");
-        }
-    }, [userId]);
-
-    // Datos mockeados (Fuente Única por ahora)
-    const mockData = {
-        user: {
-            name: userId ? `Colaborador ${userId}` : "Gildder Alberto Caceres Urizar",
-            initials: userId ? "C" : "G",
-            role: userId ? "Técnico" : "Administrador",
-            locations: ["Zona 5", "Zona 7", "Zona 6", "Zona 1"],
-            vacationDays: 15,
-            stats: { entered: 150, solved: 120, inProgress: 1 }
-        },
-        equipment: {
-            lastMaintenance: "24/11/2023",
-            nextMaintenance: "24/11/2024",
-            observations: "Ejemplo de una descripción de lo realizado al equipo.",
-            percentage: 85,
-            items: [
-                { iconName: "desktop-solid", title: "Monitor", description: "Dell 27 pulgadas", iconColor: "#6F87FB" },
-                { iconName: "keyboard-solid", title: "Teclado", description: "Microsoft e56a5", iconColor: "#99cc33" },
-                { iconName: "computer-solid", title: "CPU", description: "Dell icore 5", iconColor: "#FFB347" },
-                { iconName: "print-solid", title: "Impresora", description: "No asignada", iconColor: "#9C27B0" },
-                { iconName: "computer-mouse-solid", title: "Mouse", description: "Logitech 205", iconColor: "#D32F2F" },
-                { iconName: "fax-solid", title: "Fax", description: "No asignada", iconColor: "#2C3E50" },
-            ]
-        }
-    };
-
+export default function Profile({ userId }: { userId?: string }) {
+    const currentUserId = useAuthStore((state) => state.getUserId());
+    const id = userId || currentUserId || "";
+    const [view, setView] = useState("perfil");
+    const { data: user, loading, error, refetch } = useGetUserById(Number(id));
+    const tickets = useGetTicketsByUserId(id);
+    const stats = useMemo(
+        () => ({
+            total: tickets.data.length,
+            solved: tickets.data.filter((ticket) => Number(ticket.estadoId) === 5)
+                .length,
+            working: tickets.data.filter((ticket) => Number(ticket.estadoId) === 3)
+                .length,
+        }),
+        [tickets.data],
+    );
+    if (loading) return <HomeState loading message="Cargando el perfil…" />;
+    if (error || !user)
+        return (
+            <HomeState
+                message="No se pudo cargar el perfil."
+                onRetry={() => void refetch()}
+            />
+        );
     return (
         <div className={styles.container}>
-            <ProfileHeader 
+            <ProfileHeader
                 bannerSrc="/images/city.png"
-                initials={mockData.user.initials}
-                name={userData?.nombre || "Sin nombre"}
-                role={userData?.rol || "Sin rol"}
+                avatarSrc={user.avatar}
+                initials={user.nombre?.trim().charAt(0) || "U"}
+                name={user.nombre}
+                role={user.rol || "Usuario"}
                 switchOptions={[
-                    { label: 'Perfil', value: 'perfil' },
-                    { label: 'Mantenimiento', value: 'mantenimiento' }
+                    { label: "Perfil", value: "perfil" },
+                    { label: "Mantenimiento", value: "mantenimiento" },
                 ]}
                 switchValue={view}
-                onSwitchChange={(val) => setView(val as "perfil" | "mantenimiento")}
+                onSwitchChange={setView}
             />
-
-            <div className={styles.content}>
+            <div className={styles.viewLayout}>
                 {view === "perfil" ? (
-                    <div className={styles.viewLayout}>
-                        {/* <UserInfoPanel 
-                            locations={mockData.user.locations}
-                            vacationDays={mockData.user.vacationDays}
-                        /> */}
-                        <UserPerformance 
-                            enteredTickets={mockData.user.stats.entered}
-                            solvedTickets={mockData.user.stats.solved}
-                            inProgressTickets={mockData.user.stats.inProgress}
-                        />
-                    </div>
+                    <>
+                        <section className={styles.identity}>
+                            <h2>Información del colaborador</h2>
+                            <dl>
+                                <div>
+                                    <dt>Correo</dt>
+                                    <dd>{user.email || "No disponible"}</dd>
+                                </div>
+                                <div>
+                                    <dt>Departamento</dt>
+                                    <dd>{user.departamento || "No disponible"}</dd>
+                                </div>
+                                <div>
+                                    <dt>Perfil</dt>
+                                    <dd>{user.rol || "No disponible"}</dd>
+                                </div>
+                            </dl>
+                        </section>
+                        <section className={styles.identity}>
+                            <h2>Solicitudes registradas</h2>
+                            <p>Tickets creados por este colaborador.</p>
+                            {tickets.loading ? (
+                                <HomeState loading message="Consultando solicitudes…" />
+                            ) : tickets.error ? (
+                                <HomeState
+                                    message="No se pudo consultar el reporte de solicitudes."
+                                    onRetry={() => void tickets.refetch()}
+                                />
+                            ) : (
+                                <div className={styles.metrics}>
+                                    <MetricCard label="Tickets creados" value={stats.total} />
+                                    <MetricCard label="Resueltos" value={stats.solved} />
+                                    <MetricCard label="En atención" value={stats.working} />
+                                </div>
+                            )}
+                        </section>
+                    </>
                 ) : (
-                    <div className={styles.viewLayout}>
-                        <MaintenanceRecordPanel 
-                            lastMaintenance={mockData.equipment.lastMaintenance}
-                            nextMaintenance={mockData.equipment.nextMaintenance}
-                            observations={mockData.equipment.observations}
-                        />
-                        <EquipmentReportPanel 
-                            percentage={mockData.equipment.percentage}
-                            items={mockData.equipment.items}
-                        />
-                    </div>
+                    <section className={styles.identity}>
+                        <h2>Mantenimiento y equipo</h2>
+                        <p>
+                            El registro de mantenimiento y asignación de equipo se gestiona
+                            con Informática.
+                        </p>
+                        <p>
+                            Consulta con el técnico responsable si necesitas registrar una
+                            revisión o actualizar el equipo asignado.
+                        </p>
+                    </section>
                 )}
             </div>
         </div>

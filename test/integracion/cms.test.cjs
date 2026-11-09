@@ -50,3 +50,12 @@ test('permisos ausentes o no confirmados no habilitan editar o publicar',()=>{
 test('misma carga conserva la clave idempotente; un cambio recibe otra clave',()=>{
  const p=makeLoader(root)('src/views/COM03/utils/claveIdempotente.ts');const first=p.claveParaIntento(null,'contenido',()=> 'qa-primera');assert.equal(p.claveParaIntento(first,'contenido',()=>{throw Error('No debe crear clave');}),first);assert.equal(p.claveParaIntento(first,'cambio',()=> 'qa-nueva').clave,'qa-nueva');
 });
+
+test('un ID de imagen sin URL confirmada no se confunde con una subida completa',async()=>{
+ const s=setup(async()=>[{id:12}]);const values={...base(),secciones:[{id:'s',encabezado:'QA',contenido:'Texto',imagen:media(file('seccion.png'))}]};
+ await assert.rejects(()=>s.prepareGuardarNoticiaPayload(values,null,s.accion,s.crearCacheRecursos()),e=>e.statusCode===502&&/confirmó todas/.test(e.message));
+});
+test('un catálogo de autores mal formado es un fallo de servicio y no una ausencia de autores',async()=>{
+ const s=setup(async()=>({data:{}}));
+ await assert.rejects(()=>s.prepareGuardarNoticiaPayload(base(),null,s.accion,s.crearCacheRecursos()),e=>e.statusCode===502&&/catálogo/.test(e.message));
+});

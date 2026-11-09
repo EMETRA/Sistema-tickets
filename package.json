@@ -4,6 +4,7 @@
   "private": true,
   "packageManager": "pnpm@8.15.0",
   "scripts": {
+    "laboratorio": "node scripts/laboratorio/iniciar.cjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",

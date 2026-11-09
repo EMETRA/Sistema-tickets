@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
         return Response.json({ errors: [{ message: 'Content-Type no permitido' }] }, { status: 415, headers: privateHeaders });
     }
     const headers = new Headers({ 'Content-Type': type });
-    for (const name of ['authorization', 'apollo-require-preflight']) {
+    for (const name of ['authorization', 'apollo-require-preflight','x-ticket-request-id','x-ticket-confirmation']) {
         const value = request.headers.get(name);
         if (value) headers.set(name, value);
     }

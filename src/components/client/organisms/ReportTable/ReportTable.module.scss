@@ -1,3 +1,4 @@
+@use "../../../../theme/surfaces.scss" as surfaces;
 .ReportTable {
     background-color: #FFFFFF;
     border: 1px solid #F0F0F0;
@@ -25,4 +26,7 @@
     justify-content: center;
     overflow-x: auto; 
     &::-webkit-scrollbar { height: 4px; }
+}
+.ReportTable {
+  @include surfaces.panel;
 }

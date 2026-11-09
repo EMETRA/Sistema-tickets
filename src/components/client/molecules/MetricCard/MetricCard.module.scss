@@ -1,0 +1,26 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 130px;
+  gap: 12px;
+  padding: 20px;
+  background: var(--tickets-surface);
+  border: 1px solid var(--tickets-border);
+  border-radius: var(--tickets-radius);
+  box-shadow: var(--tickets-shadow);
+  strong {
+    font-size: 29px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: #2d4776;
+  }
+}
+.label {
+  font-size: 11px;
+  color: var(--tickets-text-secondary);
+}
+.caption {
+  font-size: 10px;
+  color: var(--tickets-text-muted);
+}

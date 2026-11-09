@@ -1,3 +1,4 @@
+@use "../../../../theme/surfaces.scss" as surfaces;
 @use "../../../../theme/colors.scss" as *;
 
 .MyStatisticsPanel {
@@ -34,4 +35,7 @@
     align-items: center;
     justify-content: center;
     gap: 20px;
+}
+.MyStatisticsPanel {
+  @include surfaces.panel;
 }

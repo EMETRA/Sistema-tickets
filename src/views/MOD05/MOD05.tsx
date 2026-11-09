@@ -106,7 +106,7 @@ const MOD05: React.FC = () => {
                     <FormField label="Estatus" htmlFor="status" required className={styles.fieldStatus}>
                         {errorEstatus && (
                             <Text variant="caption" className={styles.errorText}>
-                                {errorEstatus.message}
+                                No se pudo cargar el catálogo de estatus.
                             </Text>
                         )}
                         <Select
@@ -151,7 +151,7 @@ const MOD05: React.FC = () => {
                 <Title variant="mid" tag="h3" className={styles.title}>Seleccione los campos a mostrar</Title>
                 {errorCampos && (
                     <Text variant="caption" className={styles.errorText}>
-                        {errorCampos.message}
+                        No se pudo cargar el catálogo de campos.
                     </Text>
                 )}
                 {loadingCampos && <Text>Cargando campos disponibles...</Text>}
@@ -178,7 +178,7 @@ const MOD05: React.FC = () => {
 
                 {exportError && (
                     <Text variant="caption" className={styles.errorText}>
-                        Error: {exportError.message}
+                        No se pudo generar el reporte. Intenta nuevamente.
                     </Text>
                 )}
             </div>

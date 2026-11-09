@@ -71,6 +71,7 @@ export const ICON_FILES = [
     "fuente-cursiva",
     "gear-solid",
     "gears-solid",
+    "gavel-solid",
     "globe",
     "hand-regular",
     "hashtag-solid",

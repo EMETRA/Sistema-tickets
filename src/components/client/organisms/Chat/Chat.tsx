@@ -15,7 +15,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 const Chat: React.FC<ChatProps> = ({ ticketId, classname }) => {
     const userId = useAuthStore((state) => state.getUserId());
     const messagesContainerRef = useRef<HTMLDivElement>(null);
-    const { data: ticketMessages, loading: isTicketMessagesLoading, refetch } = useGetTicketMessages(ticketId);
+    const { data: ticketMessages, loading: isTicketMessagesLoading, error: messagesError, refetch } = useGetTicketMessages(ticketId);
     const { sendMessage, loading: isSending } = useSendTicketMessage();
 
     useEffect(() => {
@@ -25,7 +25,7 @@ const Chat: React.FC<ChatProps> = ({ ticketId, classname }) => {
     }, [ticketMessages]);
 
     const onFileClick = (url_descarga: string) => {
-        window.open(url_descarga, "_blank");
+        if (url_descarga) window.open(url_descarga, "_blank", "noopener,noreferrer");
     }
 
     const handleSendMessage = async (message: string, files: File[]) => {
@@ -43,16 +43,18 @@ const Chat: React.FC<ChatProps> = ({ ticketId, classname }) => {
             await refetch();
         } catch (err) {
             console.error("Error al enviar mensaje:", err);
+            throw err;
         }
     }
 
     return (
         <div className={`${styles.chatContainer} ${classname}`}>
+            {messagesError && <p role="alert" className={styles.error}>No se pudo cargar la conversación. <button onClick={() => void refetch()}>Reintentar conversación</button></p>}
             <div className={styles.messagesContainer} ref={messagesContainerRef}>
                 {isTicketMessagesLoading ? (
                     <p>Cargando mensajes...</p>
                 ) : ticketMessages.length === 0 ? (
-                    <p>No hay mensajes para mostrar.</p>
+                    !messagesError && <p className={styles.empty}>Todavía no hay comentarios en este ticket.</p>
                 ) : (
                     ticketMessages.map((message, index) => (
                         <MessageText

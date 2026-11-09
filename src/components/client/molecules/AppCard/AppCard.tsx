@@ -1,62 +1,39 @@
 "use client";
-
-import React from "react";
 import classNames from "classnames";
 import { AppCardProps } from "./types";
-import styles from "./AppCard.module.scss";
-import { AppIcon } from "../AppIcon";
-// import { IconButton } from "../../atoms/IconButton";
-import { Text } from "../../atoms/Text";
+import { WorkspaceIcon } from "../../atoms/WorkspaceIcon/WorkspaceIcon";
 import { Button } from "../../atoms/Button";
+import styles from "./AppCard.module.scss";
 
 export const AppCard = ({
     icon,
     iconLabel,
     title,
-    // bookmarked = false,
-    // onBookmarkClick,
+    description = "Acceso del catálogo de aplicaciones",
     onButtonClick,
-    iconColor,
     className,
-}: AppCardProps) => {
-    return (
-        <div className={classNames(styles.AppCard, className)}>
-            <div className={styles.header}>
-                {/* <IconButton
-                    icon={bookmarked ? 'bookmark-solid-full' : 'bookmark-regular'}
-                    size={20}
-                    onClick={onBookmarkClick}
-                    squared_borded
-                    className={classNames(styles.bookmarkButton, {
-                        [styles.bookmarked]: bookmarked,
-                    })}
-                    iconColor={bookmarked ? "#0070f3" : "#666666"}
-                /> */}
+}: AppCardProps) => (
+    <article className={classNames(styles.AppCard, className)}>
+        <div className={styles.content}>
+            <div className={styles.icon} aria-hidden="true">
+                <WorkspaceIcon name={icon} size={26} />
             </div>
-
-            <div className={styles.content}>
-                <AppIcon icon={icon} label={iconLabel} size={24} color={iconColor} />
-                <Text variant="body" className={styles.title}>
-                    {title}
-                </Text>
-            </div>
-
-            <div className={styles.divider} />
-
-            <div className={styles.footer}>
-                <Button
-                    variant="text"
-                    color="cancel"
-                    icon="arrow-right-solid"
-                    onClick={onButtonClick}
-                    className={styles.button}
-                    fullWidth
-                >
-                    Ingresar
-                </Button>
-            </div>
+            <h3 className={styles.title}>{title}</h3>
+            <p className={styles.description}>{description}</p>
         </div>
-    );
-};
-
+        <div className={styles.footer}>
+            <Button
+                variant="text"
+                color="cancel"
+                icon="arrow-right-solid"
+                onClick={onButtonClick}
+                aria-label={"Ingresar a " + (title || iconLabel)}
+                className={styles.button}
+                fullWidth
+            >
+                Ingresar
+            </Button>
+        </div>
+    </article>
+);
 export default AppCard;

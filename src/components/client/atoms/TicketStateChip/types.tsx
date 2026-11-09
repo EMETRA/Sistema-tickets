@@ -1,5 +1,5 @@
 export type ChipVariant = "default" | "outlined";
-export type ChipState = "ingresado" | "asignado" | "en_trabajo" | "completado" | "cancelado";
+export type ChipState = "ingresado" | "creado" | "sin_asignar" | "asignado" | "en_trabajo" | "en_atencion" | "completado" | "resuelto" | "cancelado";
 
 export interface TicketStateChipProps {
     label: string;

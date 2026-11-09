@@ -3,6 +3,7 @@
 import { usePlatform } from "@/platform/context";
 import { homeNavigation, PLATFORM_SECTIONS } from "@/platform/navigation";
 import { usePathname, useRouter } from "next/navigation";
+import { Button } from "../../atoms/Button";
 import { SideBarNavigation } from "../../organisms/SideBarNavigation";
 import { TopBar } from "../../organisms/TopBar";
 import { PAGES_CONFIG, getMenuByRole } from "@/config/navigation";
@@ -118,6 +119,8 @@ export const SystemLayout = ({
 
     const activePage = (() => {
         if (!pathname) return PAGES_CONFIG.home;
+        if (/^\/mis-tickets\/[^/]+$/.test(pathname))
+            return { title: "Detalle del ticket", iconName: "ticket-solid" };
         const workspace = PLATFORM_SECTIONS.find(
             (s) => pathname === "/espacio/" + s.id,
         );
@@ -283,8 +286,11 @@ export const SystemLayout = ({
                                     !appContext && pathname !== "/home",
                             })}
                         >
-                            {!appContext && pathname !== "/home" && (
-                                <PageHeading title={activePage.title} />
+                            {!appContext && pathname !== "/home" && !/^\/mis-tickets\/[^/]+$/.test(pathname || "") && (
+                                <PageHeading title={activePage.title}
+                                    description={pathname === "/mis-tickets" ? "Solicitudes relacionadas con tu cuenta." : pathname === "/tickets" ? "Consulta y organiza los tickets dentro de tu alcance." : pathname === "/aplicaciones" ? "Accesos disponibles según tu perfil." : undefined}
+                                    actions={["/mis-tickets", "/tickets"].includes(pathname || "") && canAccessPath(currentRole, "/tickets-creation") ? <Button onClick={() => router.push("/tickets-creation")}>+ Crear ticket</Button> : undefined}
+                                />
                             )}
                             <div
                                 className={

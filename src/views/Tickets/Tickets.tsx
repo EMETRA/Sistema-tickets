@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { TicketsTablePanel } from "@/components/client/organisms/TicketsTablePanel";
 import { Ticket } from "@/components/client/organisms/TicketsTablePanel/types";
 import {
@@ -14,6 +15,7 @@ import { ErrorHandler } from "@/api/graphql/errors";
 import type { ChipState } from "@/components/client/atoms/TicketStateChip/types";
 
 const Tickets = ({ scope = "role" }: { scope?: "role" | "created" }) => {
+    const router = useRouter();
     // Hook que obtiene tickets filtrados automáticamente según el rol del usuario
     const {
         data: ticketsData,
@@ -119,6 +121,7 @@ const Tickets = ({ scope = "role" }: { scope?: "role" | "created" }) => {
     ticketsData?.map((ticket) => {
         return {
             id: ticket.id,
+            code: ticket.codigo,
             user: {
                 id: ticket.usuarioCreadorId,
                 name: ticket.creador.nombre,
@@ -134,10 +137,7 @@ const Tickets = ({ scope = "role" }: { scope?: "role" | "created" }) => {
             date: formatTicketDate(ticket.fechaCreacion),
             status: {
                 label: ticket.estadoNombre,
-                state:
-            ticket.estadoNombre.toLowerCase() === "en trabajo"
-                ? ("en_trabajo" as ChipState)
-                : (ticket.estadoNombre.toLowerCase() as ChipState),
+                state: ticket.estadoNombre.toLowerCase().replaceAll(" ", "_") as ChipState,
             },
             assignedTo: ticket.asignado
                 ? {
@@ -151,14 +151,6 @@ const Tickets = ({ scope = "role" }: { scope?: "role" | "created" }) => {
                 : null,
         };
     }) || [];
-
-    if (isLoading) {
-        return <div className={styles.mainContainer}>Cargando tickets...</div>;
-    }
-
-    if (error) {
-        return <div className={styles.mainContainer}><p role="alert">{error}</p><button type="button" onClick={() => void refetchTickets()}>Reintentar</button></div>;
-    }
 
     const handleExportTickets = () => {
         if (!transformedTickets.length) return;
@@ -204,14 +196,17 @@ const Tickets = ({ scope = "role" }: { scope?: "role" | "created" }) => {
 
     return (
         <div className={styles.mainContainer}>
-            {actionMessage && <p role="status">{actionMessage}</p>}
-            {actionError && <p role="alert">{actionError}</p>}
+            {error && <p role="alert" className={styles.error}>{error}<button type="button" onClick={() => void refetchTickets()}>Reintentar</button></p>}
+            {actionMessage && <p role="status" className={styles.success}>{actionMessage}</p>}
+            {actionError && <p role="alert" className={styles.error}>{actionError}</p>}
             <TicketsTablePanel
                 tickets={transformedTickets}
                 loading={isLoading || isUpdating}
                 onAssign={handleAssignTicket}
                 onDelete={handleCancelTicket}
                 onExport={handleExportTickets}
+                onRefresh={() => void refetchTickets()}
+                onOpenTicket={id => router.push(`/mis-tickets/${encodeURIComponent(id)}${scope === "role" ? "?origen=tickets" : ""}`)}
                 onTicketUpdated={refetchTickets}
             />
         </div>

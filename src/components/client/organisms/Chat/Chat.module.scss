@@ -1,16 +1,5 @@
-
-.chatContainer {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    width: 100%;
-    gap: 20px;
-}
-
-.messagesContainer {
-    flex: 1;
-    overflow-y: auto;
-}
-
-.inputContainer {
-}
+.chatContainer { display: flex; flex-direction: column; min-width: 0; width: 100%; gap: 20px; }
+.messagesContainer { max-height: 420px; overflow-y: auto; min-width: 0; > div + div { border-top: 1px solid var(--tickets-divider); } }
+.inputContainer { border-top: 1px solid var(--tickets-divider); padding-top: 20px; }
+.empty { color: var(--tickets-text-secondary); font-size: 12px; padding: 8px 0 18px; line-height: 1.8; }
+.error { padding: 14px 16px; color: var(--tickets-danger); border-radius: 8px; background: #fff5f6; font-size: 12px; line-height: 1.8; button { border: 0; background: none; color: inherit; font: inherit; text-decoration: underline; cursor: pointer; } }

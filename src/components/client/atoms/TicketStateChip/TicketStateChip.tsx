@@ -9,8 +9,9 @@ export const TicketStateChip = ({
     state = "ingresado", 
     className 
 }: TicketStateChipProps) => {
+    const stateKey = state.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replaceAll(" ", "_");
     return (
-        <div className={classNames(styles.chip, styles[variant], styles[state], className)}>
+        <div className={classNames(styles.chip, styles[variant], styles[stateKey], className)}>
             {variant !== 'outlined' && <span className={styles.dot}></span>}
             <span className={styles.label}>{label}</span>
         </div>

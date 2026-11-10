@@ -166,6 +166,7 @@ export function PayrollWorkspace() {
             while (!stop.current) {
                 const r = await platformFetch<{
                     procesado: boolean;
+                    referencia?: string;
                     estado?: string;
                 }>("/boletas/jobs/" + job + "/send-next", {
                     method: "POST",
@@ -178,7 +179,10 @@ export function PayrollWorkspace() {
                 if (!r.procesado) break;
                 if (r.estado !== "ACEPTADO_SMTP") {
                     setError(
-                        "Se detuvo el proceso para revisar un resultado de envío. Los registros pendientes se conservaron.",
+                        "Se detuvo el proceso para revisar un resultado de envío. Los registros pendientes se conservaron." +
+                            (r.referencia
+                                ? " Referencia: " + r.referencia
+                                : ""),
                     );
                     break;
                 }

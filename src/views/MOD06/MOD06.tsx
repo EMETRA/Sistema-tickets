@@ -10,6 +10,7 @@ import { ErrorHandler } from "@/api/graphql/errors";
 import styles from "./MOD06.module.scss";
 
 import { useModuleActions } from "@/components/client/organisms/ModuleAccessGate/ModuleAccessGate";
+import { AccessChoices } from "@/components/client/molecules/AccessChoices/AccessChoices";
 
 export default function MOD06() {
     const canEdit = useModuleActions().EDITAR;
@@ -65,7 +66,7 @@ export default function MOD06() {
             </fieldset>
             {loaded === key && permissions.data && <section className={styles.permissionList} aria-label="Funciones de la aplicación">
                 <h3>Funciones autorizadas</h3>
-                {permissions.data.funciones.map(item => <label key={item.funcion}><input type="checkbox" disabled={!canEdit || busy} checked={selected.includes(item.funcion)} onChange={e => setSelected(current => e.target.checked ? [...current, item.funcion] : current.filter(id => id !== item.funcion))} />{item.nombre}</label>)}
+                <AccessChoices label="Funciones de la aplicación" options={permissions.data.funciones.map(item => ({id:item.funcion,nombre:item.nombre}))} value={selected} onChange={setSelected} disabled={busy} readOnly={!canEdit} />
                 {!permissions.data.funciones.length && <p>Esta aplicación no tiene funciones registradas.</p>}
                 {canEdit && <><p>Guardar reemplaza la selección de funciones de este usuario en la empresa y aplicación elegidas.</p>
                     <Button onClick={() => void write(false)} state={busy ? "loading" : "default"}>Guardar permisos</Button></>}

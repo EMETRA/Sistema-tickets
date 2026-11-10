@@ -6,20 +6,22 @@ export function AccessChoices({
     options,
     value,
     onChange,
+    disabled = false,
+    readOnly = false,
 }: {
     label: string;
     options: { id: number; nombre: string; descripcion?: string }[];
     value: number[];
     onChange: (value: number[]) => void;
+    disabled?: boolean;
+    readOnly?: boolean;
 }) {
     const [query, setQuery] = useState("");
     const countId = useId();
-    const visible = options.filter(
-        (option) =>
-            value.includes(option.id) ||
-            (option.nombre + " " + (option.descripcion || ""))
-                .toLocaleLowerCase("es-GT")
-                .includes(query.toLocaleLowerCase("es-GT")),
+    const visible = options.filter((option) =>
+        (option.nombre + " " + (option.descripcion || ""))
+            .toLocaleLowerCase("es-GT")
+            .includes(query.toLocaleLowerCase("es-GT")),
     );
     return (
         <fieldset className={styles.field} aria-describedby={countId}>
@@ -29,6 +31,7 @@ export function AccessChoices({
                 aria-label={"Filtrar " + label.toLocaleLowerCase("es-GT")}
                 placeholder="Buscar por nombre o descripción…"
                 value={query}
+                disabled={disabled}
                 onChange={(event) => setQuery(event.target.value)}
             />
             <div className={styles.choices}>
@@ -44,6 +47,7 @@ export function AccessChoices({
                         <input
                             type="checkbox"
                             checked={value.includes(option.id)}
+                            disabled={disabled || readOnly}
                             onChange={() =>
                                 onChange(
                                     value.includes(option.id)
@@ -65,7 +69,8 @@ export function AccessChoices({
                 )}
             </div>
             <small id={countId}>
-                {value.length} seleccionadas · {options.length} disponibles
+                {value.length} seleccionadas · {options.length} disponibles ·{" "}
+                {visible.length} mostradas
             </small>
         </fieldset>
     );

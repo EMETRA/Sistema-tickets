@@ -15,11 +15,8 @@ import { HistoryMessage } from "@/components/client/molecules/HistoryMessage";
 import { useAuthStore } from "@/store/useAuthStore";
 
 import {
-    useAddTagToTicket,
     useGetTicketById,
     useGetTicketTagCatalog,
-    useGetTicketTags,
-    useRemoveTagFromTicket,
     useUpdateTicket,
 } from "@/api/hooks";
 import { useGetTicketAttachments } from "@/api/hooks";
@@ -27,16 +24,8 @@ import { useGetTicketAttachments } from "@/api/hooks";
 import styles from "./TicketDetail.module.scss";
 import { TicketDetailProps } from "./types";
 import { MarkdownViewer } from "../../atoms/MarkdownViewer";
-import { LabelChipGroup, LabelOption } from "../../molecules/LabelChipGroup";
+import { TicketClassification } from "./TicketClassification";
 import { usePlatform } from '@/platform/context';
-
-const COLOR_MAP: Record<string, string> = {
-    ROJO: "#e53935",
-    CELESTE: "#00BCD4",
-    MORADO: "#9C27B0",
-    NARANJA: "#FB8C00",
-    AMARILLO: "#FDD835",
-};
 
 const TicketDetailContent: React.FC<TicketDetailProps> = ({
     ticketId,
@@ -65,50 +54,8 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
         error: attachmentsError,
         refetch: refetchAttachments,
     } = useGetTicketAttachments(ticketId);
-    const {
-        data: ticketTags,
-        refetch: refetchTags,
-        loading: isTagsLoading,
-    } = useGetTicketTags(ticketId);
-    const { data: tagCatalog } = useGetTicketTagCatalog();
-    const { addTag } = useAddTagToTicket();
-    const { removeTag } = useRemoveTagFromTicket();
-
-    const labels: LabelOption[] = ticketTags.map((tag) => ({
-        value: tag.id,
-        label: tag.nombre,
-        color: "#ffffff",
-        backgroundColor: COLOR_MAP[tag.color ?? ""] ?? tag.color ?? undefined,
-    }));
-
-    const availableOptions: LabelOption[] = tagCatalog.map((tag) => ({
-        value: tag.id,
-        label: tag.nombre,
-        color: "#ffffff",
-        backgroundColor: COLOR_MAP[tag.color ?? ""] ?? tag.color ?? undefined,
-    }));
-
-    const handleLabelsChange = async (newLabels: LabelOption[]) => {
-        const currentIds = ticketTags.map((t) => t.id);
-        const newIds = newLabels.map((l) => l.value);
-
-        const added = newIds.filter((id) => !currentIds.includes(id));
-        const removed = currentIds.filter((id) => !newIds.includes(id));
-
-        try {
-            await Promise.all([
-                ...added.map((id) => addTag(ticketId, parseInt(id, 10))),
-                ...removed.map((id) => removeTag(ticketId, parseInt(id, 10))),
-            ]);
-            await refetchTags();
-        } catch (err) {
-            setActionError(
-                "No se pudieron actualizar las etiquetas. Reintenta la operación.",
-            );
-            console.error("Error actualizando etiquetas:", err);
-        }
-    };
-
+    const { data: tagCatalog, error: catalogError, loading: catalogLoading, refetch: refetchCatalog } = useGetTicketTagCatalog();
+    const [tagCount,setTagCount] = useState<number|null>(null), [tagDirty,setTagDirty] = useState(false), [tagBusy,setTagBusy] = useState(false), [historyRevision,setHistoryRevision] = useState(0);
 
     const handleOnTicketCancel = async (
         e: React.MouseEvent<HTMLButtonElement>,
@@ -171,7 +118,7 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
     const canAttend = platform
         ? platform.actor.admin || (platform.capabilities.attend && Number(ticketData?.usuarioAsignadoId) === platform.actor.id)
         : role !== "USUARIO";
-    const canManageTags = platform ? platform.actor.admin || platform.capabilities.attend : role !== "USUARIO";
+    const canManageTags = Boolean(platform && [2,3].includes(stateId) && ticketData?.usuarioAsignadoId && canAttend);
     const canCancel = [1, 2, 3].includes(stateId) && (platform
         ? platform.actor.admin || (Number(ticketData?.usuarioCreadorId) === platform.actor.id && !ticketData?.usuarioAsignadoId)
         : !["asignado"].includes(ticketState || ""));
@@ -352,7 +299,7 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
                             aria-labelledby={tabsId + "-historial"}
                             hidden={tab !== "historial"}
                         >
-                            <HistoryMessage
+                            <HistoryMessage key={historyRevision}
                                 ticketId={ticketId}
                                 variant="table"
                                 actorNames={{
@@ -421,20 +368,16 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
                             <h2>Archivos</h2>
                             {files}
                         </section>
-                        {(canManageTags || canCancel) && (
+                        <section className={styles.card} aria-label="Clasificación del trabajo">
+                            <h2>Clasificación del trabajo</h2>
+                            {catalogLoading && <p role="status">Cargando catálogo de etiquetas…</p>}
+                            {catalogError && <div role="alert"><p>No se pudo cargar el catálogo de etiquetas.</p><Button variant="outlined" onClick={()=>void refetchCatalog()}>Reintentar catálogo</Button></div>}
+                            <TicketClassification ticketId={ticketId} catalog={tagCatalog} editable={canManageTags && !catalogError && !catalogLoading} admin={Boolean(platform?.actor.admin)} onDirtyChange={setTagDirty} onBusyChange={setTagBusy} onCountChange={setTagCount} onSaved={async()=>{setActionError("");setHistoryRevision(value=>value+1);}} />
+                        </section>
+                        {(canStart || canResolve || canCancel) && (
                             <section className={styles.card}>
                                 <h2>Gestión del ticket</h2>
-                                {isTagsLoading ? (
-                                    <p role="status">Cargando etiquetas…</p>
-                                ) : (
-                                    <LabelChipGroup
-                                        role={role}
-                                        editable={canManageTags}
-                                        labels={labels}
-                                        availableOptions={availableOptions}
-                                        onChange={handleLabelsChange}
-                                    />
-                                )}
+                                {canResolve && (tagCount === null || tagCount === 0 || tagDirty) && <p className={styles.muted}>Guarda al menos una etiqueta de trabajo antes de resolver el ticket.</p>}
                                 <div className={styles.ticketActions}>
                                     {canCancel && (
                                         <Button
@@ -455,9 +398,7 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
                                             onClick={handleOnTicketProcess}
                                             fullWidth
                                             state={
-                                                isUpdating
-                                                    ? "loading"
-                                                    : "default"
+                                                isUpdating ? "loading" : tagDirty || tagBusy ? "disabled" : "default"
                                             }
                                         >
                                             Iniciar atención
@@ -467,9 +408,7 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
                                             onClick={handleOnTicketFinish}
                                             fullWidth
                                             state={
-                                                isUpdating
-                                                    ? "loading"
-                                                    : "default"
+                                                isUpdating ? "loading" : tagCount === null || tagCount === 0 || tagDirty || tagBusy ? "disabled" : "default"
                                             }
                                         >
                                             Resolver ticket

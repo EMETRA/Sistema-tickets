@@ -1,0 +1,18 @@
+.report {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 0;
+}
+.empty {
+    padding: 24px 0;
+    color: var(--tickets-text-secondary);
+    font-size: 13px;
+}
+.srOnly {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+}

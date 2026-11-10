@@ -3,6 +3,7 @@ const http = require("node:http");
 const { randomUUID, createHash } = require("node:crypto");
 const { parse, getOperationAST, valueFromASTUntyped } = require("graphql");
 const { State, definitions, clone, now } = require("./estado.cjs");
+const ticketLabels = require('./ticket-labels.cjs');
 const fail = (status, message) => {
   throw Object.assign(new Error(message), { status });
 };
@@ -704,6 +705,7 @@ async function createLab(file, options = {}) {
       });
     }
     if (parts[0] === "tickets") {
+      if(p==='/tickets/reports/labels') return ticketLabels.report(s,a,q);
       if (parts.length === 1) {
         const scope = q.get("scope") || "creados";
         if (scope === "cola" && !a.admin && a.mode !== "ASIGNACION")
@@ -755,6 +757,18 @@ async function createLab(file, options = {}) {
           .map((u) => ({ id: u.id, nombre: u.nombre }));
       }
       if (parts.length === 2) return { ...t, id: t.id, estado: t.estadoId };
+      if(parts[2]==='tags') {
+        if(req.method==='GET')return {id:t.id,version:t.version,puedeEditar:ticketLabels.canEdit(a,t),etiquetas:ticketLabels.labels(t).map(tag=>({...tag,id:Number(tag.id)}))};
+        return command(s,a,req,p,body,proof=>{
+          verifyVersion(t,body);
+          if(!ticketLabels.canEdit(a,t))fail(403,'Solo el responsable o el administrador puede clasificar un ticket abierto y asignado.');
+          if(!Array.isArray(body.tagIds)||body.tagIds.length>10||new Set(body.tagIds).size!==body.tagIds.length||body.tagIds.some(id=>!ticketLabels.catalog.some(tag=>Number(tag.id)===id)))fail(400,'Etiquetas inválidas.');
+          const before=ticketLabels.labels(t);t.tagIds=[...body.tagIds];t.version++;const after=ticketLabels.labels(t);
+          s.ticketHistory.push({id:randomUUID(),ticketId:t.id,usuarioId:a.id,accion:'ETIQUETAS',valorAnterior:before.map(x=>x.nombre).join(', ')||'Sin etiquetas',valorNuevo:after.map(x=>x.nombre).join(', ')||'Sin etiquetas',tag:after.map(x=>x.nombre).join(', '),fecha:now()});
+          audit(s,a,'tickets',String(t.id),'ETIQUETAS',{etiquetas:before},{etiquetas:after},body,proof);
+          return {id:t.id,version:t.version,etiquetas:after.map(tag=>({...tag,id:Number(tag.id)}))};
+        });
+      }
       return command(s, a, req, p, body, (proof) => {
         verifyVersion(t, body);
         const before = clone(t),
@@ -775,6 +789,12 @@ async function createLab(file, options = {}) {
         } else if (action === "start" || action === "resolve") {
           if (!a.admin && t.usuarioAsignadoId !== a.id)
             fail(403, "El ticket corresponde a otro responsable.");
+          if((action==='start'&&t.estadoId!==2)||(action==='resolve'&&t.estadoId!==3))fail(409,'El estado no permite esta acción.');
+          if(action==='resolve'){
+            const tags=ticketLabels.labels(t);
+            if(!t.usuarioAsignadoId||!tags.length)fail(409,'Asigna al menos una etiqueta antes de resolver el ticket.');
+            t.clasificacionCierre={clasificacionVersion:1,usuarioAsignadoId:t.usuarioAsignadoId,etiquetas:tags.map(tag=>({...tag,id:Number(tag.id)}))};t.fechaCierre=now();
+          }
           t.estadoId = action === "start" ? 3 : 5;
           t.atendidoEn ??= now();
         } else if (action === "cancel") {
@@ -1122,8 +1142,8 @@ async function createLab(file, options = {}) {
             nombre,
             esFinal: i >= 3 ? 1 : 0,
           })),
-        ticketTagCatalog: () => [],
-        ticketTags: () => [],
+        ticketTagCatalog: () => ticketLabels.catalog,
+        ticketTags: () => ticketLabels.labels(s.tickets.find(t=>t.id===Number(args.ticketId))||{}),
         ticketAttachments: () => [],
         ticketComments: () =>
           s.comments.filter((r) => r.ticketId === Number(args.ticketId)),

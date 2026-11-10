@@ -6,6 +6,7 @@ import { MetricCard } from "@/components/client/molecules/MetricCard";
 import { usePlatform } from "@/platform/context";
 import { platformFetch } from "@/platform/client";
 import { displayDate } from "@/components/client/organisms/ResourceWorkspace/RecordDetail";
+import { TicketTagReport } from "./TicketTagReport";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
 import {
     metricsQuery,
@@ -54,6 +55,7 @@ export function MetricsWorkspace() {
         [error, setError] = useState(""),
         [offset, setOffset] = useState(0);
     const request = useRef<AbortController | null>(null);
+    const [section,setSection] = useState<'activity'|'labels'>('activity');
     const [applied, setApplied] = useState<MetricsSelection | null>(null);
     async function load(
         page = 0,
@@ -109,8 +111,11 @@ export function MetricsWorkspace() {
         return () => request.current?.abort();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+    const sections = data?.actor.admin && <nav className={styles.actions} aria-label="Secciones de métricas"><Button variant={section==='activity' ? 'contained' : 'outlined'} aria-pressed={section==='activity'} onClick={()=>setSection('activity')}>Atención y actividad</Button><Button variant={section==='labels' ? 'contained' : 'outlined'} aria-pressed={section==='labels'} onClick={()=>setSection('labels')}>Por técnico y etiqueta</Button></nav>;
+    if(section==='labels' && data?.actor.admin) return <section className={styles.page}>{sections}<TicketTagReport/></section>;
     return (
         <section className={styles.page}>
+            {sections}
             <div>
                 <h2>Métricas de atención y actividad</h2>
                 <p className={styles.muted}>

@@ -121,7 +121,7 @@ const Tickets = ({ scope = "role" }: { scope?: "role" | "created" }) => {
     ticketsData?.map((ticket) => {
         return {
             id: ticket.id,
-            code: ticket.codigo,
+            code: ticket.codigo || '#' + ticket.id,
             user: {
                 id: ticket.usuarioCreadorId,
                 name: ticket.creador.nombre,

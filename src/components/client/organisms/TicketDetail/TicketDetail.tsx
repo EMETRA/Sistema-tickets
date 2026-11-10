@@ -28,6 +28,7 @@ import styles from "./TicketDetail.module.scss";
 import { TicketDetailProps } from "./types";
 import { MarkdownViewer } from "../../atoms/MarkdownViewer";
 import { LabelChipGroup, LabelOption } from "../../molecules/LabelChipGroup";
+import { usePlatform } from '@/platform/context';
 
 const COLOR_MAP: Record<string, string> = {
     ROJO: "#e53935",
@@ -50,6 +51,7 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
     const [viewedFile, setViewedFile] = useState<ViewedFile | null>(null);
     const tabsId = useId();
     const role = useAuthStore((state) => state.getRole());
+    const {data: platform} = usePlatform();
     const { updateTicket, loading: isUpdating } = useUpdateTicket();
     const {
         data: ticketData,
@@ -162,11 +164,19 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
         }
     };
 
-    const ticketState = ticketData?.estadoNombre.toLowerCase();
-    const canCancel =
-        ticketState &&
-        !["asignado", "completado", "resuelto", "cancelado"].includes(ticketState);
-    const canStart = ["creado", "sin asignar", "asignado"].includes(ticketState || "");
+    const code = ticketData?.codigo?.trim();
+    const ticketCode = code && !/^(null|undefined)$/i.test(code) ? code : '#' + ticketId;
+    const ticketState = ticketData?.estadoNombre?.toLowerCase();
+    const stateId = Number(ticketData?.estadoId);
+    const canAttend = platform
+        ? platform.actor.admin || (platform.capabilities.attend && Number(ticketData?.usuarioAsignadoId) === platform.actor.id)
+        : role !== "USUARIO";
+    const canManageTags = platform ? platform.actor.admin || platform.capabilities.attend : role !== "USUARIO";
+    const canCancel = [1, 2, 3].includes(stateId) && (platform
+        ? platform.actor.admin || (Number(ticketData?.usuarioCreadorId) === platform.actor.id && !ticketData?.usuarioAsignadoId)
+        : !["asignado"].includes(ticketState || ""));
+    const canStart = stateId === 2 && canAttend;
+    const canResolve = stateId === 3 && canAttend;
 
     const state = ticketState?.replaceAll(" ", "_") as ChipState | undefined;
     const tabs = [
@@ -210,7 +220,7 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
                 <nav className={styles.breadcrumb} aria-label="Ruta del ticket">
                     <Link href={returnHref}>Tickets</Link>
                     <span aria-hidden="true">/</span>
-                    <span>{ticketData?.codigo || "#" + ticketId}</span>
+                    <span>{ticketCode}</span>
                 </nav>
             )}
             <header className={styles.header}>
@@ -218,13 +228,13 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
                     {presentation === "page" ? (
                         <h1>
                             {ticketData
-                                ? `${ticketData.codigo} · ${ticketData.titulo}`
+                                ? `${ticketCode} · ${ticketData.titulo}`
                                 : `Ticket #${ticketId}`}
                         </h1>
                     ) : (
                         <h2>
                             {ticketData
-                                ? `${ticketData.codigo} · ${ticketData.titulo}`
+                                ? `${ticketCode} · ${ticketData.titulo}`
                                 : `Ticket #${ticketId}`}
                         </h2>
                     )}
@@ -258,7 +268,7 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
             {viewedFile && <FileViewer key={viewedFile.id} ticketId={ticketId} file={viewedFile} onClose={() => setViewedFile(null)} />}
             {actionError && (
                 <p className={styles.error} role="alert">
-                    {actionError}
+                    {actionError} <button onClick={() => void refetchTicket()}>Actualizar detalle</button>
                 </p>
             )}
             {isTicketLoading && !ticketData ? (
@@ -411,7 +421,7 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
                             <h2>Archivos</h2>
                             {files}
                         </section>
-                        {role !== "USUARIO" && (
+                        {(canManageTags || canCancel) && (
                             <section className={styles.card}>
                                 <h2>Gestión del ticket</h2>
                                 {isTagsLoading ? (
@@ -419,6 +429,7 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
                                 ) : (
                                     <LabelChipGroup
                                         role={role}
+                                        editable={canManageTags}
                                         labels={labels}
                                         availableOptions={availableOptions}
                                         onChange={handleLabelsChange}
@@ -451,7 +462,7 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
                                         >
                                             Iniciar atención
                                         </Button>
-                                    ) : ["en trabajo", "en atención"].includes(ticketState || "") ? (
+                                    ) : canResolve ? (
                                         <Button
                                             onClick={handleOnTicketFinish}
                                             fullWidth
@@ -492,6 +503,6 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
 };
 
 const TicketDetail: React.FC<TicketDetailProps> = (props) =>
-    props.isOpen && props.ticketId ? <TicketDetailContent {...props} /> : null;
+    props.isOpen && props.ticketId ? <TicketDetailContent key={props.ticketId} {...props} /> : null;
 
 export default TicketDetail;

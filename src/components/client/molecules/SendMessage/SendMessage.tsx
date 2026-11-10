@@ -10,6 +10,7 @@ import classNames from "classnames";
 import { Icon } from "../../atoms/Icon";
 import { SendMessageProps } from "./types";
 import styles from "./SendMessage.module.scss";
+import { AdministrativeChangeCancelled } from '@/api/administrative-confirmation';
 
 export const SendMessage = ({
     onSend,
@@ -32,8 +33,8 @@ export const SendMessage = ({
             await onSend(message.trim(), files);
             setMessage("");
             setFiles([]);
-        } catch {
-            setError(
+        } catch (error) {
+            if (!(error instanceof AdministrativeChangeCancelled)) setError(
                 "No se pudo enviar el comentario. Conservamos el texto y los archivos para que reintentes.",
             );
         } finally {
@@ -47,12 +48,13 @@ export const SendMessage = ({
         }
     };
     const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-        if (event.target.files?.length)
+        const selected = Array.from(event.currentTarget.files || []);
+        if (selected.length)
             setFiles((current) => [
                 ...current,
-                ...Array.from(event.target.files!),
+                ...selected,
             ]);
-        event.target.value = "";
+        event.currentTarget.value = "";
     };
     return (
         <div className={classNames(styles.wrapper, className)}>

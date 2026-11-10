@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useId, useRef, useState } from "react";
 import { Button } from "@/components/client/atoms/Button";
-import { platformFetch } from "@/platform/client";
+import { platformFetch, PlatformError } from "@/platform/client";
 import styles from "./FileViewer.module.scss";
 export type ViewedFile = { id: string; name: string };
 type Preview = { url: string; mime: string; text?: string };
@@ -46,6 +46,7 @@ export function FileViewer({
     const [revision, setRevision] = useState(0),
         [loading, setLoading] = useState(true),
         [error, setError] = useState("");
+    const [reference, setReference] = useState<string | undefined>();
     const [preview, setPreview] = useState<Preview | null>(null);
     useEffect(() => {
         const node = dialog.current;
@@ -75,11 +76,17 @@ export function FileViewer({
                 url = URL.createObjectURL(blob);
                 setPreview({ url, mime, text });
             })
-            .catch(() => {
-                if (!controller.signal.aborted)
+            .catch((failure: unknown) => {
+                if (!controller.signal.aborted) {
                     setError(
-                        "No se pudo abrir el archivo. Revisa tu acceso al ticket o reintenta.",
+                        failure instanceof PlatformError && failure.status === 404
+                            ? "El archivo no está disponible. Solicita que lo revisen y reintenta."
+                            : failure instanceof PlatformError && failure.status === 403
+                                ? "No tienes acceso a este archivo del ticket."
+                                : "No se pudo abrir el archivo. Revisa tu acceso al ticket o reintenta.",
                     );
+                    setReference(failure instanceof PlatformError ? failure.reference : undefined);
+                }
             })
             .finally(() => {
                 if (!controller.signal.aborted) setLoading(false);
@@ -137,11 +144,13 @@ export function FileViewer({
                 {!loading && error && (
                     <div role="alert">
                         <p>{error}</p>
+                        {reference && <p>Referencia: {reference}</p>}
                         <Button
                             variant="outlined"
                             onClick={() => {
                                 setLoading(true);
                                 setError("");
+                                setReference(undefined);
                                 setPreview(null);
                                 setRevision((v) => v + 1);
                             }}

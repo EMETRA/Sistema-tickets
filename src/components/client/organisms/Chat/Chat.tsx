@@ -57,22 +57,24 @@ const Chat: React.FC<ChatProps> = ({ ticketId, classname, onOpenFile }) => {
                 ) : ticketMessages.length === 0 ? (
                     !messagesError && <p className={styles.empty}>Todavía no hay comentarios en este ticket.</p>
                 ) : (
-                    ticketMessages.map((message, index) => (
-                        <MessageText
-                            key={index}
-                            text={message.textoMensaje}
-                            files={
-                                message.archivos.map((archivo) => ({
-                                    id: archivo.id,
-                                    name: archivo.nombreArchivo || "Archivo adjunto",
-                                    onClick: () => (onOpenFile || setViewedFile)({ id: archivo.id, name: archivo.nombreArchivo || "Archivo adjunto" })
-                                }))
-                            }
-                            timestamp={message.fechaEnvio}
-                            userName={message.nombre_usuario}
-                            avatarProps={{ initials: message.nombre_usuario.charAt(0).toUpperCase() + (message.nombre_usuario.split(" ")[1]?.charAt(0).toUpperCase() || "") }}
-                        />
-                    ))
+                    ticketMessages.map((message, index) => {
+                        const name = message.nombre_usuario?.trim() || `Usuario ${message.usuario}`;
+                        return (
+                            <MessageText
+                                key={index}
+                                text={message.textoMensaje}
+                                files={
+                                    message.archivos.map((archivo) => ({
+                                        id: archivo.id,
+                                        name: archivo.nombreArchivo || "Archivo adjunto",
+                                        onClick: () => (onOpenFile || setViewedFile)({ id: archivo.id, name: archivo.nombreArchivo || "Archivo adjunto" })
+                                    }))
+                                }
+                                timestamp={message.fechaEnvio}
+                                userName={name}
+                                avatarProps={{ initials: name.charAt(0).toUpperCase() + (name.split(" ")[1]?.charAt(0).toUpperCase() || "") }}
+                            />
+                        );})
                 )}
             </div>
             <SendMessage

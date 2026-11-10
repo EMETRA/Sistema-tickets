@@ -37,6 +37,7 @@ const labels: Record<string, string> = {
     sendEmailNotification: "Enviar una notificación",
     addTagToTicket: "Agregar una etiqueta al ticket",
     removeTagFromTicket: "Quitar una etiqueta del ticket",
+    sendTicketMessage: "Enviar un comentario al ticket",
 };
 
 export function describeGraphqlChange(

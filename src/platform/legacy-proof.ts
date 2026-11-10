@@ -4,6 +4,7 @@ import { platformFetch } from "./client";
 import { getPlatformRuntime } from "./runtime";
 const pending = new Map<string, string>();
 function canonical(value: unknown): string {
+    if (value instanceof Date) return JSON.stringify(value.toISOString());
     if (Array.isArray(value)) return "[" + value.map(canonical).join(",") + "]";
     if (value && typeof value === "object")
         return (

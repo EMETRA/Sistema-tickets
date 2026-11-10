@@ -25,7 +25,7 @@ export interface TicketUser {
  */
 export interface Ticket {
   id: string;
-  codigo: string;
+  codigo: string | null;
   titulo: string;
   descripcion: string;
   tiempoEstimado: number;
@@ -53,24 +53,6 @@ export interface GetTicketsResponse {
   tickets: Ticket[];
 }
 
-// ========================================
-// COMENTARIOS DE TICKET
-// ========================================
-
-export interface TicketComentario {
-  id: string;
-  ticketId: number;
-  usuarioId: number;
-  comentario: string;
-  esInterno: number;
-  fecha: string;
-}
-
-export interface GetTicketCommentsResponse {
-  ticketComments: TicketComentario[];
-}
-
-
 export interface SendTicketMessageInput {
     ticketId: number;
     usuarioId: number;
@@ -90,7 +72,7 @@ export interface TicketChatMessage {
   fechaEnvio: string;
   textoMensaje: string;
   usuario: number;
-  nombre_usuario: string;
+  nombre_usuario: string | null;
 }
 
 export interface GetTicketMessagesResponse {
@@ -223,13 +205,6 @@ export interface UpdateTicketInput {
   tiempoEstimado?: number;
   codigo?: string;
 }
-export interface AddTicketCommentInput {
-  ticketId: string;
-  usuarioId: number;
-  comentario: string;
-  esInterno?: boolean;
-}
-
 // ========================================
 // RESPUESTAS DE MUTACIONES DE TICKET
 // ========================================
@@ -250,7 +225,6 @@ export interface CreateTicketResponse {
 
 export interface UpdateTicketResponse { updateTicket: Ticket; [key: string]: unknown; }
 export interface DeleteTicketResponse { deleteTicket: boolean; [key: string]: unknown; }
-export interface AddTicketCommentResponse { addTicketComment: TicketComentario; [key: string]: unknown; }
 
 // ========================================
 // TAGS DE TICKET

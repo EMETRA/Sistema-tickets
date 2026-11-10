@@ -1276,7 +1276,7 @@ async function createLab(file, options = {}) {
       const id = sessions.get(
           (req.headers.authorization || "").replace(/^Bearer\s+/i, ""),
         ),
-        a = actor(state.data, id);
+        a = actor(state.data, typeof options.incident === 'function' && url.pathname === '/platform/integrations/panel-errors' && options.incidentToken && req.headers.authorization === 'Bearer '+options.incidentToken ? 1 : id);
       const injected = failures.find(
         (f) => f.restantes > 0 && url.pathname.startsWith(f.ruta),
       );
@@ -1321,6 +1321,7 @@ async function createLab(file, options = {}) {
         }
       } else if (buffer.length) body = JSON.parse(buffer.toString("utf8"));
       const fn = (s) =>
+        typeof options.incident === 'function' && ['/platform/integrations/panel-errors','/platform/client-errors'].includes(url.pathname) ? options.incident(s,body,url.pathname) :
         url.pathname === "/graphql"
           ? graphql(s, a, req, body)
           : dispatch(s, a, req, url, body, upload);

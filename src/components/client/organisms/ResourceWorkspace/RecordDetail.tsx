@@ -80,6 +80,7 @@ export function RecordDetail({
         current.visibilidad === "EMPRESA" &&
         !data!.actor.admin;
     const employment = current.datos._rrhh as { unidad?: string; puesto?: string } | undefined;
+    const automatic = current.datos._automatico as { cantidad?: number; primeraVez?: string; ultimaVez?: string } | undefined;
     useEffect(() => {
         dialog.current?.showModal();
         const controller = new AbortController();
@@ -327,6 +328,7 @@ export function RecordDetail({
                 ) : (
                     <>
                         <section className={styles.card}>
+                            {type === 'incidencias' && automatic && <div><h3>Detectada automáticamente</h3><p>Ocurrencias: {automatic.cantidad} · Primera detección: {displayDate(automatic.primeraVez)} · Última detección: {displayDate(automatic.ultimaVez)}</p></div>}
                             {employment && <div className={styles.card}><h3>Datos de RRHH</h3><p className={styles.muted}>Unidad institucional: {type === "equipos" ? current.nombre : data!.teams.find(t => t.id === current.equipoId)?.nombre || "Consulta la ficha del equipo"}. El puesto se actualiza al generar equipos desde RRHH.</p>{employment.puesto && <p><strong>Puesto: </strong>{employment.puesto}</p>}</div>}
                             {["activos", "dispositivos"].includes(type) &&
                                 !data!.inventoryConnected && (

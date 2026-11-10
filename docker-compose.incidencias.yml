@@ -1,0 +1,9 @@
+services:
+  sistema-tickets-web:
+    environment:
+      TICKETS_ERROR_QUEUE_DIR: /var/lib/tickets-incidencias
+    volumes:
+      - tickets-incidencias:/var/lib/tickets-incidencias
+
+volumes:
+  tickets-incidencias:

@@ -1,3 +1,4 @@
+import { queuePanelIncident } from '@/observability/server-incidents';
 import { NextRequest } from 'next/server';
 import { getGraphqlEndpoint } from '@/api/config/env';
 export const runtime='nodejs';
@@ -5,7 +6,7 @@ export const dynamic='force-dynamic';
 async function proxy(request:NextRequest,context:{params:Promise<{path:string[]}>}){
     if(process.env.TICKETS_PLATFORM_ENABLED!=='true')return Response.json({codigo:'FEATURE_DISABLED',message:'Los módulos nuevos de Tickets todavía no están habilitados.'},{status:503,headers:{'Cache-Control':'private, no-store'}});
     const {path}=await context.params;
-    if(!['bootstrap','catalog','search','people','access-options','network','records','confirmations','rbac','requests','audit','metrics','monitor','repositories','objects','tickets','files','organization'].includes(path[0]))return Response.json({message:'Ruta no disponible'},{status:404});
+    if(!['bootstrap','catalog','search','people','access-options','network','records','confirmations','rbac','requests','audit','metrics','monitor','repositories','objects','tickets','files','organization','client-errors'].includes(path[0]))return Response.json({message:'Ruta no disponible'},{status:404});
     if(path.length>6||path.some(x=>!/^[-a-zA-Z0-9]+$/.test(x)))return Response.json({message:'Ruta inválida'},{status:400});
     const authorization=request.headers.get('authorization');if(!authorization||!/^Bearer \S+$/.test(authorization))return Response.json({message:'Inicia sesión para continuar.'},{status:401});
     const endpoint=new URL(getGraphqlEndpoint());endpoint.pathname=endpoint.pathname.replace(/\/graphql\/?$/,'')+'/platform/'+path.join('/');endpoint.search=request.nextUrl.search;
@@ -30,6 +31,6 @@ async function proxy(request:NextRequest,context:{params:Promise<{path:string[]}
         const resultHeaders=new Headers({'Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff'});
         for(const key of ['content-type','content-disposition']){const value=upstream.headers.get(key);if(value)resultHeaders.set(key,value);}
         return new Response(upstream.body,{status:upstream.status,headers:resultHeaders});
-    }catch{return Response.json({message:'No se pudo comunicar con Tickets. Conserva los datos y reintenta.'},{status:503,headers:{'Cache-Control':'no-store'}});}
+    }catch(error){const referencia = path[0] === 'client-errors' ? undefined : await queuePanelIncident('Platform.'+path[0],error); return Response.json({message:'No se pudo comunicar con Tickets. Conserva los datos y reintenta.',referencia},{status:503,headers:{'Cache-Control':'no-store'}});}
 }
 export {proxy as GET,proxy as POST,proxy as PATCH,proxy as PUT,proxy as DELETE};

@@ -16,7 +16,7 @@ import styles from './MOD04.module.scss';
 const MOD04: React.FC = () => {
     const { exportar, loading: exportLoading, error: exportError } = useGetVisaNominaExportExcel();
 
-    const [company, setCompany] = useState<string>('');
+    const [company, setCompany] = useState<string>('97');
     const [paystubType, setPaystubType] = useState<string>('');
     const [playrollManager, setPlayrollManager] = useState<string>('');
     const [paymentType, setPaymentType] = useState<string>('');
@@ -42,7 +42,8 @@ const MOD04: React.FC = () => {
             unidadPresupuestaria: budgetUnit,
         });
 
-        if (result) {
+        if (result?.totalEmpleados === 0) setValidation('No se encontraron empleados con estos filtros. Revisa los códigos de empresa, nómina, maestro y unidad presupuestaria.');
+        else if (result) {
             setIsModalOpen(true);
         }
     };
@@ -60,7 +61,7 @@ const MOD04: React.FC = () => {
                         type="text"
                         value={company}
                         onChange={(e) => setCompany(e.target.value)}
-                        placeholder="Ingresa el nombre de la empresa"
+                        placeholder="Código de empresa (ej. 97)"
                         // state={loading ? "disabled" : "default"}
                         required
                     />
@@ -86,7 +87,7 @@ const MOD04: React.FC = () => {
                         type="text"
                         value={playrollManager}
                         onChange={(e) => setPlayrollManager(e.target.value)}
-                        placeholder="Ingresa el nombre del maestro de nómina"
+                        placeholder="Código del maestro de nómina"
                         // state={loading ? "disabled" : "default"}
                         required
                     />

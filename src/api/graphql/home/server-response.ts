@@ -1,11 +1,12 @@
 import { randomUUID } from 'node:crypto';
 import { NextResponse } from 'next/server';
 import { diagnosticoErrorGraphql, estadoErrorGraphql } from '@/api/graphql/server-error';
+import { queuePanelIncident } from '@/observability/server-incidents';
 
 export const headersInicio = { 'Cache-Control': 'private, no-store' };
 
-export function falloInicio(error: unknown, operacion: 'myActivity' | 'myStats') {
-    const referencia = randomUUID();
+export async function falloInicio(error: unknown, operacion: 'myActivity' | 'myStats') {
+    const referencia = await queuePanelIncident('Inicio.'+operacion,error,randomUUID());
     const status = estadoErrorGraphql(error);
     console.error({
         evento: 'PANEL_INICIO_FALLIDO', operacion, referencia, status,

@@ -41,7 +41,8 @@ export function platformSections(data: PlatformContextData) {
     return PLATFORM_SECTIONS.filter((s) => {
         if (["calendario", "metricas", "asignacion", "busqueda"].includes(s.id))
             return true;
-        if (s.id === "accesos") return data.actor.admin;
+        if (s.id === "accesos")
+            return data.actor.admin || data.capabilities.corporateAccess;
         if (s.id === "auditoria") return data.capabilities.audit;
         if (s.id === "solicitudes") return !!data.definitions.solicitudes;
         return Object.values(data.definitions).some((d) => d.group === s.id);

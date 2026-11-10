@@ -10,8 +10,6 @@ import { MetricsWorkspace } from "./MetricsWorkspace";
 import { AssignmentsWorkspace } from "./AssignmentsWorkspace";
 import { NetworkWorkspace } from "./NetworkWorkspace";
 import { AccessWorkspace } from "./AccessWorkspace";
-import { useAppsCatalogContext } from "@/context/AppsCatalogContext";
-import { getModule } from "@/config/apps-catalog";
 import { OrganizationWorkspace } from "./OrganizationWorkspace";
 import { SystemsWorkspace } from "./SystemsWorkspace";
 import { MonitoringWorkspace } from "./MonitoringWorkspace";
@@ -19,7 +17,6 @@ import { AuditWorkspace } from "./AuditWorkspace";
 import { AccessNavigation } from "@/components/client/molecules/AccessNavigation/AccessNavigation";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
 export function PlatformRoute({ section }: { section: string }) {
-    const { catalog, loading: catalogLoading } = useAppsCatalogContext();
     const { data, loading, error, disabled, refresh } = usePlatform();
     if (loading && !data)
         return (
@@ -47,16 +44,15 @@ export function PlatformRoute({ section }: { section: string }) {
                 </Button>
             </section>
         );
-    if (section === "accesos" && !data.actor.admin && catalogLoading)
-        return <p role="status" className={styles.card}>Consultando tus aplicaciones autorizadas…</p>;
-    if (!platformSections(data).some((s) => s.id === section) && !(section === "accesos" && catalog && getModule("informatica", "permisos", "mod06", catalog)))
+    if (!platformSections(data).some((s) => s.id === section))
         return (
             <p role="alert" className={styles.card}>
                 No tienes permiso para consultar esta sección.
             </p>
         );
     switch (section) {
-        case "organizacion": return <OrganizationWorkspace />;
+        case "organizacion":
+            return <OrganizationWorkspace />;
         case "busqueda":
             return <SearchWorkspace />;
         case "calendario":

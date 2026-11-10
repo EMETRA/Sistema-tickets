@@ -1,289 +1,283 @@
 "use client";
-
-import React, { useState } from "react";
-import { FormField } from "../../components/client/molecules/FormField";
-import { Input } from "../../components/client/atoms/Input";
-import { TextArea } from "../../components/client/atoms/TextArea";
-import { Select } from "../../components/client/atoms/Select";
-import { FileDropzone } from "../../components/client/molecules/FileDropzone";
-import { FileItem } from "../../components/client/molecules/FileItem";
-import { FormActions } from "../../components/client/molecules/FormActions";
-import { Button } from "../../components/client/atoms/Button";
-import MOD10Modal from "../../components/client/organisms/MOD10Modal";
-
-import styles from "./MOD10.module.scss";
-import type { casesNotificationFormData, UploadedFile } from "./types";
+import { useEffect, useRef, useState } from "react";
+import { Button } from "@/components/client/atoms/Button";
+import { graphqlRequestClient } from "@/api/graphql/client";
 import { useSendEmailNotification } from "@/api/hooks";
-
-const destinyAreas = [
-    { label: "PMT", value: "PMT" },
-    { label: "Semaforización", value: "SEMAFORIZACION" },
-    { label: "Jurídico", value: "JURIDICO" },
-];
-
-export const MOD10: React.FC = () => {
-    // Mutations
+import type { SendEmailNotificationInput } from "@/api/graphql/apps/types";
+import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
+type Area = {
+    codigo: string;
+    etiqueta: string;
+    correoDestino: string;
+    modoPrueba: boolean;
+};
+export const MOD10 = () => {
+    const [areas, setAreas] = useState<Area[] | null>(null),
+        [revision, reload] = useState(0),
+        [error, setError] = useState(""),
+        [message, setMessage] = useState(""),
+        [area, setArea] = useState(""),
+        [file, setFile] = useState<File | null>(null),
+        [input, setInput] = useState<SendEmailNotificationInput | null>(null);
+    const dialog = useRef<HTMLDialogElement>(null),
+        form = useRef<HTMLFormElement>(null),
+        busy = useRef(false);
     const { sendNotification, loading } = useSendEmailNotification();
-
-    const [feedback, setFeedback] = useState("");
-    const [sendError, setSendError] = useState("");
-    // Estados del formulario
-    const [destinyArea, setDestinyArea] = useState<string>('');
-    const [documentDate, setDocumentDate] = useState<string>('');
-    const [issuedBy, setIssuedBy] = useState<string>('');
-    const [caseNumber, setCaseNumber] = useState<string>('');
-    const [pageNumbers, setPageNumbers] = useState<number | undefined>(0);
-    const [name, setName] = useState<string>('');
-    const [reference, setReference] = useState<string>('');
-    const [uploadedFile, setUploadedFile] = useState<UploadedFile>();
-    const [rejectedFiles, setRejectedFiles] = useState<string[]>([]);
-    
-    // Estados del modal
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [pendingFormData, setPendingFormData] = useState<casesNotificationFormData | null>(null);
-    
-    const ALLOWED_EXTENSIONS = ['pdf'];
-
-    const handleFile = (files: File[]) => {
-        if (files.length === 0) return;
-
-        const file = files[0];
-        setRejectedFiles([]);
-
-        // El archivo debe ser PDF 
-        if (!ALLOWED_EXTENSIONS.some(ext => file.name.toLowerCase().endsWith(`.${ext}`))) {
-            setRejectedFiles(prev => [...prev, file.name]);
-            return;
-        }
-
-        const newFile: UploadedFile = {
-            id: Date.now(),
-            name: file.name,
-            status: "uploading",
-            progress: 0,
-            file,
-        };
-
-        setUploadedFile(newFile);
-
-        // Simular progreso de carga
-        const interval = setInterval(() => {
-            setUploadedFile(prev => {
-                if (!prev) return prev;
-                const newProgress = prev.progress ? prev.progress + 20 : 20;
-                if (newProgress >= 100) {
-                    clearInterval(interval);
-                    return { ...prev, progress: 100, status: "ready" };
+    useEffect(() => {
+        let active = true;
+        graphqlRequestClient<{ notificacionCorreoAreas: Area[] }>(
+            `query NotificacionAreas { notificacionCorreoAreas { codigo etiqueta correoDestino modoPrueba } }`,
+        )
+            .then((r) => {
+                if (active) {
+                    setAreas(r.notificacionCorreoAreas);
+                    setError("");
                 }
-                return { ...prev, progress: newProgress };
+            })
+            .catch(() => {
+                if (active)
+                    setError(
+                        "No se pudieron consultar los destinatarios. Reintenta antes de preparar el documento.",
+                    );
             });
-        }, 500);
-    };
-    // Eliminar archivo
-    const handleRemoveFile = () => {
-        setUploadedFile(undefined);
-    };
-
-    // Manejar envío del formulario
-    const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        setFeedback(""); setSendError("");
-
-        if (!uploadedFile) {
-            setFeedback("Por favor, sube un archivo PDF antes de enviar el formulario.");
-            return;
-        }
-
-        if (destinyArea==='' || documentDate==='' || issuedBy==='' || caseNumber==='' || (!pageNumbers || pageNumbers < 1) || name==='' || reference==='') {
-            setFeedback("Por favor, completa todos los campos obligatorios antes de enviar el formulario.");
-            return;
-        }
-
-        const formData: casesNotificationFormData = {
-            destinyArea,
-            documentDate,
-            issuedBy,
-            caseNumber,
-            pageNumbers,
-            name,
-            reference,
-            file: uploadedFile,
+        return () => {
+            active = false;
         };
-
-        // Abrir el modal con los datos
-        setPendingFormData(formData);
-        setIsModalOpen(true);
-    };
-
-    const handleModalSubmit = async (data: casesNotificationFormData) => {
-        if (loading) return;
-        setSendError("");
+    }, [revision]);
+    const destination = areas?.find((a) => a.codigo === area);
+    async function send() {
+        if (!input || !file || busy.current) return;
+        busy.current = true;
+        setError("");
         try {
-            const result = await sendNotification(
-                {
-                    areaDestino: data.destinyArea,
-                    fechaDocumento: data.documentDate,
-                    emitidoPor: data.issuedBy,
-                    numeroExpediente: data.caseNumber,
-                    numeroFolio: data.pageNumbers,
-                    nombre: data.name,
-                    referencia: data.reference,
-                },
-                data.file.file
-            );
-            if (!result?.success) throw new Error("ENVIO_NO_CONFIRMADO");
-            setFeedback("Notificación enviada correctamente.");
-            setIsModalOpen(false);
-            setPendingFormData(null);
+            const r = await sendNotification(input, file);
+            if (!r.success) throw Error();
+            setMessage(`Notificación enviada a ${r.correoDestino}.`);
+            dialog.current?.close();
+            setInput(null);
         } catch {
-            setSendError("No se pudo enviar la notificación. Los datos y el PDF se conservaron para reintentar.");
+            setError(
+                "No se pudo confirmar el envío. Conservamos el documento y los datos; consulta el historial antes de reenviar.",
+            );
+        } finally {
+            busy.current = false;
         }
-    };
-
+    }
     return (
-        <div className={styles.mainContainer}>
-            <form onSubmit={handleSubmit} className={styles.form}>
-                {feedback && <p role="status">{feedback}</p>}
-                <div className={styles.fieldsRow}>
-                    <div className={styles.fieldsColumn}>
-                        {/* Área destino */}
-                        <FormField label="Área destino" htmlFor="destinyArea" required className={styles.fieldDestinyArea}>
-                            <Select
-                                id="destinyArea"
-                                value={destinyArea}
-                                onChange={(e) => setDestinyArea(e.target.value)}
-                                options={destinyAreas}
-                                placeholder="Selecciona un área"
-                                // state={loading ? "disabled" : "default"}
-                                required
-                            />
-                        </FormField>
-
-                        {/* Fecha del documento */}
-                        <FormField label="Fecha del documento" htmlFor="documentDate" required className={styles.fieldDocumentDate}>
-                            <Input
-                                id="documentDate"
-                                type="date"
-                                value={documentDate}
-                                onChange={(e) => setDocumentDate(e.target.value)}
-                                placeholder="Ingresa la fecha del documento"
-                                // state={loading ? "disabled" : "default"}
-                                required
-                            />
-                        </FormField>
-
-                        {/* Emitido por */}
-                        <FormField label="Emitido por" htmlFor="issuedBy" required className={styles.fieldIssuedBy}>
-                            <Input
-                                id="issuedBy"
-                                type="text"
-                                value={issuedBy}
-                                onChange={(e) => setIssuedBy(e.target.value)}
-                                placeholder="Ingresa el nombre de quien emite el documento"
-                                // state={loading ? "disabled" : "default"}
-                                required
-                            />
-                        </FormField>
-
-                        {/* Número de expediente */}
-                        <FormField label="Número de expediente" htmlFor="caseNumber" required className={styles.fieldCaseNumber}>
-                            <Input
-                                id="caseNumber"
-                                type="text"
-                                value={caseNumber}
-                                onChange={(e) => setCaseNumber(e.target.value)}
-                                placeholder="Ingresa el número de expediente"
-                                // state={loading ? "disabled" : "default"}
-                                required
-                            />
-                        </FormField>
-
-                        {/* Número de folios */}
-                        <FormField label="Número de folios" htmlFor="pageNumbers" required className={styles.fieldPageNumbers}>
-                            <Input
-                                id="pageNumbers"
-                                type="number"
-                                value={pageNumbers}
-                                onChange={(e) => setPageNumbers(+e.target.value)}
-                                placeholder="Ingresa el número de folios"
-                                // state={loading ? "disabled" : "default"}
-                                required
-                            />
-                        </FormField>
-
-                        {/* Nombre */}
-                        <FormField label="Nombre" htmlFor="name" required className={styles.fieldName}>
-                            <Input
-                                id="name"
-                                type="text"
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
-                                placeholder="Ingresa el nombre del caso o asunto"
-                                // state={loading ? "disabled" : "default"}
-                                required
-                            />
-                        </FormField>
-                    </div>
-
-                    {/* Referencia (text area) */}
-                    <FormField label="Referencia" htmlFor="reference" className={styles.fieldReference}>
-                        <TextArea
-                            id="reference"
-                            value={reference}
-                            onChange={(e) => setReference(e.target.value)}
-                            placeholder="Ingresa una referencia o descripción adicional (opcional)"
-                            rows={4}
-                            required
-                        />
-                    </FormField>
-                </div>
-
-                {/* Archivos */}
-                <div className={styles.filesSection}>
-                    <FileDropzone onFiles={handleFile} rejectedFiles={rejectedFiles} />
-
-                    {uploadedFile && (
-                        <FileItem
-                            key={uploadedFile.id}
-                            name={uploadedFile.name}
-                            status={uploadedFile.status}
-                            progress={uploadedFile.progress}
-                            onRemove={handleRemoveFile}
-                        />
+        <section className={styles.page}>
+            <header>
+                <h2>Preparación y destinatario</h2>
+                <p className={styles.muted}>
+                    Prepara el PDF y revisa el destinatario antes de autorizar
+                    el envío.
+                </p>
+            </header>
+            {error && (
+                <p role="alert" className={styles.error}>
+                    {error}
+                </p>
+            )}
+            {message && <p role="status">{message}</p>}
+            {areas && (
+                <Button variant="outlined" onClick={() => reload((r) => r + 1)}>
+                    Actualizar destinatarios
+                </Button>
+            )}
+            {!areas ? (
+                <Button variant="outlined" onClick={() => reload((r) => r + 1)}>
+                    Reintentar destinatarios
+                </Button>
+            ) : (
+                <form
+                    ref={form}
+                    className={styles.card}
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        if (!file || !destination) return;
+                        const d = new FormData(e.currentTarget);
+                        setError("");
+                        setInput({
+                            destinatarioEsperado: destination.correoDestino,
+                            pruebaEsperada: destination.modoPrueba,
+                            areaDestino: area,
+                            fechaDocumento: String(d.get("fecha")),
+                            emitidoPor: String(d.get("emitido")),
+                            numeroExpediente: String(d.get("expediente")),
+                            numeroFolio: Number(d.get("folios")),
+                            nombre: String(d.get("nombre")),
+                            referencia: String(d.get("referencia")),
+                        });
+                        dialog.current?.showModal();
+                    }}
+                >
+                    {destination?.modoPrueba && (
+                        <p role="status">
+                            Prueba controlada: todos los documentos se enviarán
+                            únicamente a {destination.correoDestino}. Los
+                            destinatarios habituales se conservan.
+                        </p>
                     )}
-                </div>
-
-                {/* Botones de acción */}
-                <FormActions align="center">
+                    <div className={styles.formGrid}>
+                        <label className={styles.field}>
+                            Área destino
+                            <select
+                                className={styles.control}
+                                aria-label="Área destino"
+                                required
+                                value={area}
+                                onChange={(e) => setArea(e.target.value)}
+                            >
+                                <option value="">Seleccionar área</option>
+                                {areas.map((a) => (
+                                    <option key={a.codigo} value={a.codigo}>
+                                        {a.etiqueta}
+                                    </option>
+                                ))}
+                            </select>
+                        </label>
+                        <label className={styles.field}>
+                            Fecha del documento
+                            <input
+                                className={styles.control}
+                                name="fecha"
+                                type="date"
+                                required
+                            />
+                        </label>
+                        <label className={styles.field}>
+                            Emitido por
+                            <input
+                                className={styles.control}
+                                name="emitido"
+                                maxLength={250}
+                                required
+                            />
+                        </label>
+                        <label className={styles.field}>
+                            Número de expediente
+                            <input
+                                className={styles.control}
+                                name="expediente"
+                                maxLength={100}
+                                required
+                            />
+                        </label>
+                        <label className={styles.field}>
+                            Número de folios
+                            <input
+                                className={styles.control}
+                                name="folios"
+                                type="number"
+                                min="1"
+                                required
+                            />
+                        </label>
+                        <label className={styles.field}>
+                            Nombre
+                            <input
+                                className={styles.control}
+                                name="nombre"
+                                maxLength={300}
+                                required
+                            />
+                        </label>
+                        <label className={styles.field}>
+                            Referencia
+                            <textarea
+                                className={styles.control}
+                                name="referencia"
+                                required
+                            />
+                        </label>
+                        <label className={styles.field}>
+                            Documento PDF
+                            <input
+                                type="file"
+                                accept=".pdf,application/pdf"
+                                required
+                                onChange={(e) => {
+                                    const f = e.target.files?.[0];
+                                    if (
+                                        f &&
+                                        (f.size > 10 * 1024 * 1024 ||
+                                            !f.name
+                                                .toLowerCase()
+                                                .endsWith(".pdf"))
+                                    ) {
+                                        setError(
+                                            "Selecciona un PDF de hasta 10 MB.",
+                                        );
+                                        setFile(null);
+                                        e.target.value = "";
+                                    } else setFile(f || null);
+                                }}
+                            />
+                        </label>
+                    </div>
+                    <p>
+                        Destinatario efectivo:{" "}
+                        <strong>
+                            {destination?.correoDestino || "Selecciona un área"}
+                        </strong>
+                    </p>
                     <Button
                         type="submit"
-                        variant="contained"
-                        color="default"
-                        rounded
-                        // state={loading ? "loading" : "default"}
-                        loadingText="Enviando..."
+                        state={file && destination ? "default" : "disabled"}
                     >
-                        Enviar
+                        Revisar documento
                     </Button>
-                </FormActions>
-            </form>
-
-            {/* Modal de vista previa */}
-            {pendingFormData && (
-                <MOD10Modal
-                    loading={loading}
-                    error={sendError}
-                    isOpen={isModalOpen}
-                    onClose={() => {
-                        setIsModalOpen(false);
-                        setPendingFormData(null);
-                    }}
-                    onSubmit={handleModalSubmit}
-                    {...pendingFormData}
-                />
+                </form>
             )}
-        </div>
+            <dialog
+                ref={dialog}
+                className={styles.dialog}
+                onCancel={(e) => {
+                    if (loading) e.preventDefault();
+                }}
+            >
+                <div className={styles.dialogHeader}>
+                    <h2>
+                        {destination?.modoPrueba
+                            ? "Confirmar prueba de correo"
+                            : "Confirmar notificación"}
+                    </h2>
+                </div>
+                <div className={styles.dialogBody}>
+                    <p>
+                        Destinatario:{" "}
+                        <strong>{destination?.correoDestino}</strong>
+                    </p>
+                    <p>
+                        Expediente: {input?.numeroExpediente} · Archivo:{" "}
+                        {file?.name}
+                    </p>
+                    <p>
+                        El envío queda registrado en el historial. Revisa que el
+                        documento corresponda al expediente.
+                    </p>
+                    {error && (
+                        <p role="alert" className={styles.error}>
+                            {error}
+                        </p>
+                    )}
+                    <Button
+                        variant="outlined"
+                        state={loading ? "disabled" : "default"}
+                        onClick={() => dialog.current?.close()}
+                    >
+                        Volver al documento
+                    </Button>
+                    <Button
+                        state={loading ? "loading" : "default"}
+                        onClick={() => void send()}
+                    >
+                        {destination?.modoPrueba
+                            ? "Enviar prueba"
+                            : "Enviar notificación"}
+                    </Button>
+                </div>
+            </dialog>
+        </section>
     );
 };
-
 export default MOD10;

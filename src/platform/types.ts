@@ -39,6 +39,7 @@ export type PlatformContextData = {
     teams: { id: string; nombre: string }[];
     memberships: { equipoId: string; funcion: string }[];
     capabilities: {
+        corporateAccess?: boolean;
         assign: boolean;
         attend: boolean;
         audit: boolean;

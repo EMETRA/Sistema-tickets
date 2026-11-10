@@ -3,7 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/client/atoms/Button";
 import { PlatformField } from "@/components/client/molecules/PlatformField/PlatformField";
 import { usePlatform } from "@/platform/context";
-import { platformCommand } from "@/platform/client";
+import { InventoryPicker, inventoryClass } from "./InventoryPicker";
+import { platformCommand, platformFetch } from "@/platform/client";
 import type { PlatformRecord } from "@/platform/types";
 import styles from "../../templates/PlatformPage/PlatformPage.module.scss";
 export function RecordEditor({
@@ -56,9 +57,37 @@ export function RecordEditor({
         dialog.current?.showModal();
     }, []);
     const fields = def.fields.filter(
-        (f) => !["x", "y", "planoX", "planoY"].includes(f.key),
+        (f) =>
+            (f.key !== "activoId" ||
+                context!.definitions.activos?.actions.LEER) &&
+            !["x", "y", "planoX", "planoY", "inventarioReferencia"].includes(
+                f.key,
+            ),
     );
-    const fromHr = ["equipos", "miembros"].includes(type) && !!record?.datos._rrhh;
+    const fromHr =
+        ["equipos", "miembros"].includes(type) && !!record?.datos._rrhh;
+    async function changeField(key: string, value: unknown) {
+        setDatos((p) => ({ ...p, [key]: value }));
+        if (type === "dispositivos" && key === "activoId" && value) {
+            try {
+                const asset = await platformFetch<PlatformRecord>(
+                    "/records/activos/" + value,
+                );
+                setNombre(asset.nombre);
+                setDatos((p) => ({
+                    ...p,
+                    numeroInventario: asset.datos.numeroInventario,
+                    inventarioReferencia: asset.datos.inventarioReferencia,
+                    serie: asset.datos.serie,
+                    modelo: asset.datos.modelo,
+                }));
+            } catch {
+                setError(
+                    "No se pudo cargar la ficha vinculada. Reintenta antes de guardar.",
+                );
+            }
+        }
+    }
     async function save(event: React.SubmitEvent<HTMLFormElement>) {
         event.preventDefault();
         if (busyRef.current) return;
@@ -120,6 +149,40 @@ export function RecordEditor({
                     Cerrar
                 </Button>
             </div>
+            {!record && ["activos", "dispositivos"].includes(type) && (
+                <InventoryPicker
+                    type={type}
+                    onSelect={(item) => {
+                        setNombre(
+                            item.descripcion.slice(0, 200) ||
+                                "Bien " + item.numeroInventario,
+                        );
+                        const clase = inventoryClass(
+                            item.descripcion,
+                            type === "dispositivos",
+                        );
+                        setDatos((p) => ({
+                            ...p,
+                            inventarioReferencia: item.referencia,
+                            numeroInventario: item.numeroInventario,
+                            serie: item.serie,
+                            modelo: item.modelo,
+                            ...(clase ? { clase } : {}),
+                            ...(type === "activos"
+                                ? { detalle: item.descripcion }
+                                : {}),
+                        }));
+                    }}
+                />
+            )}
+            {typeof datos.inventarioReferencia === "string" && (
+                <p role="status" className={styles.card}>
+                    Vinculado al bien institucional{" "}
+                    {String(datos.numeroInventario)}. Revisa el tipo sugerido,
+                    la instalación y el responsable técnico; en red confirma
+                    también los puertos reales.
+                </p>
+            )}
             <form onSubmit={save} className={styles.dialogBody}>
                 <div className={styles.split}>
                     <section className={styles.card}>
@@ -163,16 +226,15 @@ export function RecordEditor({
                                     value={datos[field.key]}
                                     disabled={
                                         busy ||
+                                        (field.key === "numeroInventario" &&
+                                            !!datos.inventarioReferencia) ||
                                         (fromHr && field.key === "unidadRh") ||
                                         (type === "miembros" &&
                                             Boolean(record) &&
                                             field.key === "usuarioId")
                                     }
                                     onChange={(value) =>
-                                        setDatos((previous) => ({
-                                            ...previous,
-                                            [field.key]: value,
-                                        }))
+                                        void changeField(field.key, value)
                                     }
                                 />
                             ))}
@@ -232,13 +294,19 @@ export function RecordEditor({
                     </section>
                     <aside className={styles.card}>
                         <h3>Resumen</h3>
-                        {fromHr && <p className={styles.muted}>La unidad se actualiza desde RRHH. Puedes revisar las responsabilidades y los ajustes del equipo sin perder su origen institucional.</p>}
+                        {fromHr && (
+                            <p className={styles.muted}>
+                                La unidad se actualiza desde RRHH. Puedes
+                                revisar las responsabilidades y los ajustes del
+                                equipo sin perder su origen institucional.
+                            </p>
+                        )}
                         {["activos", "dispositivos"].includes(type) &&
-                            !context!.inventoryConnected && (
+                            !datos.inventarioReferencia && (
                                 <p className={styles.error}>
-                                    Inventario oficial pendiente de verificar.
-                                    Se conservará el número ingresado hasta
-                                    conectar el catálogo institucional.
+                                    Número ingresado manualmente. Selecciona el
+                                    bien de su tarjeta para vincularlo al
+                                    inventario institucional.
                                 </p>
                             )}
                         <p>{nombre || def.singular}</p>

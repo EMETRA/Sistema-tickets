@@ -17,7 +17,9 @@ function isInternalPath(pathname: string) {
 }
 
 function matchRoute(pathname: string, routes: string[]) {
-    return routes.some((route) => pathname === route || pathname.startsWith(`${route}/`));
+    return routes.some(
+        (route) => pathname === route || pathname.startsWith(`${route}/`),
+    );
 }
 
 export function proxy(request: NextRequest) {
@@ -44,6 +46,19 @@ export function proxy(request: NextRequest) {
     if ((isProtectedRoute || isSessionOnlyRoute) && !session) {
         return NextResponse.redirect(new URL("/login", request.url));
     }
+
+    const legacyModule = pathname.match(
+        /^\/home\/[^/]+\/[^/]+\/(mod06|proc01|mod13)\/?$/,
+    )?.[1];
+    if (session && legacyModule)
+        return NextResponse.redirect(
+            new URL(
+                legacyModule === "mod06"
+                    ? "/espacio/accesos?tab=corporate"
+                    : "/aplicaciones/en-desuso",
+                request.url,
+            ),
+        );
 
     if (isNologRoute && session) {
         return NextResponse.redirect(new URL("/home", request.url));

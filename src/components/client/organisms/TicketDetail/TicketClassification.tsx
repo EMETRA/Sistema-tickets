@@ -18,6 +18,8 @@ export function TicketClassification({
     onDirtyChange,
     onBusyChange,
     onCountChange,
+    onCatalogChanged,
+    catalogReady = true,
 }: {
     ticketId: string;
     catalog: Tag[];
@@ -27,11 +29,16 @@ export function TicketClassification({
     onDirtyChange: (dirty: boolean) => void;
     onBusyChange: (busy: boolean) => void;
     onCountChange: (count: number | null) => void;
+    onCatalogChanged?: () => Promise<unknown>;
+    catalogReady?: boolean;
 }) {
     const [selected, setSelected] = useState<string[]>([]),
         [search, setSearch] = useState(""),
         [busy, setBusy] = useState(false),
         [error, setError] = useState("");
+    const [newName, setNewName] = useState(""),
+        [newColor, setNewColor] = useState("#4763E4"),
+        [catalogMessage, setCatalogMessage] = useState("");
     const [reference, setReference] = useState<string>();
     const [saved, setSaved] = useState(false);
     const [applied, setApplied] = useState<{
@@ -173,8 +180,116 @@ export function TicketClassification({
             onBusyChange(false);
         }
     }
+    async function manageCatalog(initial = false) {
+        setBusy(true);
+        onBusyChange(true);
+        setError("");
+        setCatalogMessage("");
+        setReference(undefined);
+        try {
+            await platformCommand(
+                "/tickets/tag-catalog" + (initial ? "/initialize" : ""),
+                "POST",
+                initial ? {} : { nombre: newName, color: newColor },
+                true,
+                initial
+                    ? "Crear etiquetas iniciales de trabajo"
+                    : "Crear etiqueta " + newName,
+            );
+            await onCatalogChanged?.();
+            setNewName("");
+            setCatalogMessage(
+                initial
+                    ? "Catálogo inicial disponible. Ya puedes escoger etiquetas."
+                    : "Etiqueta creada. Ya puedes seleccionarla.",
+            );
+        } catch (failure) {
+            if (!(failure instanceof AdministrativeChangeCancelled)) {
+                setError(
+                    failure instanceof Error
+                        ? failure.message
+                        : "No se pudo actualizar el catálogo",
+                );
+                setReference(
+                    failure instanceof PlatformError
+                        ? failure.reference
+                        : undefined,
+                );
+            }
+        } finally {
+            setBusy(false);
+            onBusyChange(false);
+        }
+    }
     return (
         <div className={styles.classification}>
+            {admin && catalogReady && (
+                <section aria-label="Administrar catálogo de etiquetas">
+                    {!catalog.length && (
+                        <>
+                            <p>
+                                El catálogo está vacío. Puedes cargar
+                                Mantenimiento, Reporte, Formulario, Instalación,
+                                Limpieza y Diagnóstico.
+                            </p>
+                            <Button
+                                type="button"
+                                variant="outlined"
+                                state={busy ? "loading" : "default"}
+                                onClick={() => void manageCatalog(true)}
+                            >
+                                Crear etiquetas iniciales
+                            </Button>
+                        </>
+                    )}
+                    <details>
+                        <summary>Nueva etiqueta de trabajo</summary>
+                        <form
+                            onSubmit={(e) => {
+                                e.preventDefault();
+                                void manageCatalog();
+                            }}
+                        >
+                            <label className={styles.search}>
+                                Nombre de la etiqueta
+                                <input
+                                    aria-label="Nombre de la etiqueta"
+                                    required
+                                    maxLength={50}
+                                    value={newName}
+                                    disabled={busy}
+                                    onChange={(e) => setNewName(e.target.value)}
+                                />
+                            </label>
+                            <label className={styles.search}>
+                                Color de la etiqueta
+                                <input
+                                    aria-label="Color de la etiqueta"
+                                    type="color"
+                                    value={newColor}
+                                    disabled={busy}
+                                    onChange={(e) =>
+                                        setNewColor(e.target.value)
+                                    }
+                                />
+                            </label>
+                            <Button
+                                type="submit"
+                                state={busy ? "loading" : "default"}
+                            >
+                                Crear etiqueta
+                            </Button>
+                        </form>
+                    </details>
+                    {catalogMessage && <p role="status">{catalogMessage}</p>}
+                    {error && (
+                        <p role="alert">
+                            {error}
+                            {reference ? " Referencia: " + reference : ""}
+                        </p>
+                    )}
+                </section>
+            )}
             <div className={styles.applied} aria-label="Etiquetas guardadas">
                 {savedTags.length ? (
                     savedTags.map((tag) => (

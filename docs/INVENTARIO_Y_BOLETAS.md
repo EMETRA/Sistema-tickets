@@ -25,4 +25,4 @@ node test/integracion/office-preview-browser.cjs
 
 Los dos recorridos usan Next/BFF compilados, Chromium local y datos ficticios. No conectan Oracle ni SMTP institucional. El segundo usa el parser Office real del API y verifica que se preserven Word DOC/DOCX y Excel XLS/XLSX al instalar SheetJS localmente. Requieren api-tickets compilado en la carpeta hermana (o TICKETS_API_SOURCE), Chromium en /usr/bin/chromium y los puertos de loopback libres.
 
-Pendiente en eme02: ejecutar los scripts revisados, contrastar las fuentes con BDSAL y recibir las pruebas controladas. El PDF institucional de ejemplo no llegó adjunto; falta contrastar la plantilla neutral con ese documento antes de aprobar el formato final.
+Pendiente en eme02: ejecutar los scripts revisados, contrastar las fuentes con BDSAL y recibir las pruebas controladas. El formato se ajustó al PDF institucional recibido. La autorización inicia el envío y los errores quedan junto al lote. El catálogo inicial de etiquetas también puede cargarse desde la ficha de un administrador. Consultar BOLETAS_FORMATO_Y_ETIQUETAS.md del API.

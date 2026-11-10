@@ -372,7 +372,7 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
                             <h2>Clasificación del trabajo</h2>
                             {catalogLoading && <p role="status">Cargando catálogo de etiquetas…</p>}
                             {catalogError && <div role="alert"><p>No se pudo cargar el catálogo de etiquetas.</p><Button variant="outlined" onClick={()=>void refetchCatalog()}>Reintentar catálogo</Button></div>}
-                            <TicketClassification ticketId={ticketId} catalog={tagCatalog} editable={canManageTags && !catalogError && !catalogLoading} admin={Boolean(platform?.actor.admin)} onDirtyChange={setTagDirty} onBusyChange={setTagBusy} onCountChange={setTagCount} onSaved={async()=>{setActionError("");setHistoryRevision(value=>value+1);}} />
+                            <TicketClassification catalogReady={!catalogLoading&&!catalogError} onCatalogChanged={refetchCatalog} ticketId={ticketId} catalog={tagCatalog} editable={canManageTags && !catalogError && !catalogLoading} admin={Boolean(platform?.actor.admin)} onDirtyChange={setTagDirty} onBusyChange={setTagBusy} onCountChange={setTagCount} onSaved={async()=>{setActionError("");setHistoryRevision(value=>value+1);}} />
                         </section>
                         {(canStart || canResolve || canCancel) && (
                             <section className={styles.card}>

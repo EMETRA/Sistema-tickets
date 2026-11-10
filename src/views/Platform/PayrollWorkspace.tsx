@@ -3,7 +3,11 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/client/atoms/Button";
 import { usePlatform } from "@/platform/context";
 import { useModuleActions } from "@/components/client/organisms/ModuleAccessGate/ModuleAccessGate";
-import { platformCommand, platformFetch } from "@/platform/client";
+import {
+    platformCommand,
+    platformFetch,
+    PlatformError,
+} from "@/platform/client";
 import layout from "./PayrollWorkspace.module.scss";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
 type Options = {
@@ -52,6 +56,8 @@ export function PayrollWorkspace() {
         [status, setStatus] = useState<Status | null>(null),
         [busy, setBusy] = useState(false),
         [sending, setSending] = useState(false),
+        [deliveryError, setDeliveryError] = useState(""),
+        [deliveryMessage, setDeliveryMessage] = useState(""),
         [error, setError] = useState(""),
         [message, setMessage] = useState(""),
         [pdf, setPdf] = useState(""),
@@ -63,7 +69,9 @@ export function PayrollWorkspace() {
     const pdfDialog = useRef<HTMLDialogElement>(null),
         stop = useRef(false),
         mounted = useRef(true),
-        flight = useRef(false);
+        flight = useRef(false),
+        selectedJob = useRef(""),
+        statusRequest = useRef(0);
     useEffect(() => {
         mounted.current = true;
         return () => {
@@ -92,6 +100,17 @@ export function PayrollWorkspace() {
             active = false;
         };
     }, [tipo]);
+    async function loadStatus(id: string) {
+        const request = ++statusRequest.current;
+        const result = await platformFetch<Status>("/boletas/jobs/" + id);
+        if (
+            mounted.current &&
+            selectedJob.current === id &&
+            request === statusRequest.current
+        )
+            setStatus(result);
+        return result;
+    }
     async function refreshJobs() {
         setJobs(await platformFetch<Job[]>("/boletas/jobs"));
     }
@@ -124,11 +143,105 @@ export function PayrollWorkspace() {
             setBusy(false);
         }
     }
+    async function processJob(id: string) {
+        if (!mounted.current) return;
+        stop.current = false;
+        setSending(true);
+        setDeliveryError("");
+        setDeliveryMessage("Iniciando envío del lote…");
+        try {
+            while (!stop.current) {
+                const r = await platformFetch<{
+                    procesado: boolean;
+                    estado?: string;
+                    referencia?: string;
+                }>("/boletas/jobs/" + id + "/send-next", {
+                    method: "POST",
+                    body: "{}",
+                });
+                const progress = await loadStatus(id);
+                if (!r.procesado) {
+                    if (progress.pendientes > 0) {
+                        setDeliveryError(
+                            "No se pudo iniciar un envío. El lote conserva " +
+                                progress.pendientes +
+                                " boletas pendientes; actualiza su estado antes de continuar.",
+                        );
+                        setDeliveryMessage("");
+                    } else if (
+                        progress.items.some((i) => i.estado !== "ACEPTADO_SMTP")
+                    ) {
+                        setDeliveryError(
+                            "El lote tiene resultados que requieren revisión. Consulta el diagnóstico de cada boleta antes de reenviar.",
+                        );
+                        setDeliveryMessage("");
+                    } else
+                        setDeliveryMessage(
+                            "El servidor SMTP aceptó " +
+                                progress.items.length +
+                                " boleta(s). Revisa el buzón destinatario; la aceptación no confirma la entrega final.",
+                        );
+                    break;
+                }
+                if (r.estado !== "ACEPTADO_SMTP") {
+                    setDeliveryError(
+                        "El envío requiere revisión. Los registros pendientes se conservaron." +
+                            (r.referencia
+                                ? " Referencia: " + r.referencia
+                                : ""),
+                    );
+                    setDeliveryMessage("");
+                    break;
+                }
+                const accepted = progress.items.filter(
+                    (i) => i.estado === "ACEPTADO_SMTP",
+                ).length;
+                setDeliveryMessage(
+                    accepted +
+                        " aceptada(s) por SMTP · " +
+                        progress.pendientes +
+                        " pendientes.",
+                );
+                if (progress.pendientes === 0) {
+                    setDeliveryMessage(
+                        "El servidor SMTP aceptó " +
+                            accepted +
+                            " boleta(s). Revisa el buzón destinatario; la aceptación no confirma la entrega final.",
+                    );
+                    break;
+                }
+            }
+            if (stop.current && mounted.current)
+                setDeliveryMessage(
+                    "Lote pausado. Los resultados y las boletas pendientes se conservaron.",
+                );
+            if (mounted.current) await refreshJobs();
+        } catch (e) {
+            if (mounted.current) {
+                setDeliveryMessage("");
+                setDeliveryError(
+                    (e instanceof Error
+                        ? e.message
+                        : "No se pudo confirmar el envío. Actualiza el lote antes de reintentar.") +
+                        (e instanceof PlatformError
+                            ? " HTTP " +
+                              e.status +
+                              (e.reference
+                                  ? " · Referencia: " + e.reference
+                                  : "")
+                            : ""),
+                );
+            }
+        } finally {
+            if (mounted.current) setSending(false);
+        }
+    }
     async function authorize() {
         if (!preview || flight.current) return;
         flight.current = true;
         setBusy(true);
         setError("");
+        setDeliveryError("");
         try {
             const r = await platformCommand<{ id: string }>(
                 "/boletas/jobs",
@@ -140,64 +253,44 @@ export function PayrollWorkspace() {
                     hash: preview.hash,
                 },
                 !!data?.actor.admin,
-                `Autorizar ${preview.aptos} boletas · ${preview.modo} · ${preview.destinoPrueba || "correos personales de nómina"}`,
+                `Autorizar y enviar ${preview.aptos} boleta(s) · ${preview.modo} · ${preview.destinoPrueba || "correos personales de nómina"}`,
             );
+            selectedJob.current = r.id;
+            setJobs((previous) => [
+                {
+                    id: r.id,
+                    tipo,
+                    maestro: Number(maestro),
+                    modo: preview.modo,
+                    pendientes: preview.aptos,
+                },
+                ...previous.filter((item) => item.id !== r.id),
+            ]);
             setJob(r.id);
-            setStatus(await platformFetch<Status>("/boletas/jobs/" + r.id));
-            setMessage(
-                "Lote autorizado. Puedes iniciar el envío y seguir su avance aquí.",
-            );
             setPreview(null);
-            await refreshJobs();
-        } catch (e) {
-            setError(e instanceof Error ? e.message : "No se pudo autorizar");
-        } finally {
-            flight.current = false;
-            setBusy(false);
-        }
-    }
-    async function run() {
-        if (!job || flight.current) return;
-        flight.current = true;
-        stop.current = false;
-        setSending(true);
-        setError("");
-        try {
-            while (!stop.current) {
-                const r = await platformFetch<{
-                    procesado: boolean;
-                    referencia?: string;
-                    estado?: string;
-                }>("/boletas/jobs/" + job + "/send-next", {
-                    method: "POST",
-                    body: "{}",
-                });
-                if (mounted.current)
-                    setStatus(
-                        await platformFetch<Status>("/boletas/jobs/" + job),
-                    );
-                if (!r.procesado) break;
-                if (r.estado !== "ACEPTADO_SMTP") {
-                    setError(
-                        "Se detuvo el proceso para revisar un resultado de envío. Los registros pendientes se conservaron." +
-                            (r.referencia
-                                ? " Referencia: " + r.referencia
-                                : ""),
-                    );
-                    break;
-                }
-            }
-            await refreshJobs();
+            setMessage(
+                "Lote autorizado. Consulta su avance en Lotes y resultados.",
+            );
+            await processJob(r.id);
         } catch (e) {
             if (mounted.current)
                 setError(
                     e instanceof Error
                         ? e.message
-                        : "No se confirmó el resultado. Consulta el lote antes de continuar.",
+                        : "No se pudo autorizar el lote",
                 );
         } finally {
             flight.current = false;
-            if (mounted.current) setSending(false);
+            if (mounted.current) setBusy(false);
+        }
+    }
+    async function run() {
+        if (!job || flight.current) return;
+        flight.current = true;
+        try {
+            await processJob(job);
+        } finally {
+            flight.current = false;
         }
     }
     async function openPdf() {
@@ -212,6 +305,19 @@ export function PayrollWorkspace() {
             );
         } finally {
             setBusy(false);
+        }
+    }
+    async function refreshDelivery() {
+        setDeliveryError("");
+        try {
+            await refreshJobs();
+            if (selectedJob.current) await loadStatus(selectedJob.current);
+        } catch (e) {
+            setDeliveryError(
+                e instanceof Error
+                    ? e.message
+                    : "No se pudo actualizar el lote",
+            );
         }
     }
     async function reconcile() {
@@ -285,7 +391,7 @@ export function PayrollWorkspace() {
                             className={styles.control}
                             value={tipo}
                             required
-                            disabled={sending}
+                            disabled={sending || busy}
                             onChange={(e) => {
                                 setTipo(e.target.value);
                                 setMaestro("");
@@ -305,7 +411,7 @@ export function PayrollWorkspace() {
                             className={styles.control}
                             value={maestro}
                             required
-                            disabled={sending}
+                            disabled={sending || busy}
                             onChange={(e) => {
                                 setMaestro(e.target.value);
                                 clear();
@@ -330,7 +436,7 @@ export function PayrollWorkspace() {
                             type="number"
                             min="1"
                             value={empleado}
-                            disabled={sending}
+                            disabled={sending || busy}
                             onChange={(e) => {
                                 setEmpleado(e.target.value);
                                 clear();
@@ -351,8 +457,15 @@ export function PayrollWorkspace() {
                 <section className={`${styles.card} ${layout.stack}`}>
                     <h3>Revisión antes del envío</h3>
                     <p>
-                        {preview.total} empleados · {preview.aptos} boletas
-                        aptas · {preview.excluidos.length} excluidos.
+                        {preview.total}{" "}
+                        {preview.total === 1 ? "empleado" : "empleados"} ·{" "}
+                        {preview.aptos}{" "}
+                        {preview.aptos === 1 ? "boleta apta" : "boletas aptas"}{" "}
+                        · {preview.excluidos.length}{" "}
+                        {preview.excluidos.length === 1
+                            ? "excluido"
+                            : "excluidos"}
+                        .
                     </p>
                     <p>
                         Modo: <strong>{preview.modo}</strong>.{" "}
@@ -459,13 +572,22 @@ export function PayrollWorkspace() {
                             }
                             onClick={() => void authorize()}
                         >
-                            Autorizar {preview.aptos} boletas
+                            Autorizar y enviar{" "}
+                            {preview.aptos === 1
+                                ? "boleta"
+                                : `${preview.aptos} boletas`}
                         </Button>
                     </div>
                 </section>
             )}
             <section className={`${styles.card} ${layout.stack}`}>
                 <h3>Lotes y resultados</h3>
+                {deliveryError && (
+                    <p role="alert" className={styles.error}>
+                        {deliveryError}
+                    </p>
+                )}
+                {deliveryMessage && <p role="status">{deliveryMessage}</p>}
                 <div className={styles.toolbar}>
                     <label className={styles.field}>
                         Lote
@@ -473,17 +595,23 @@ export function PayrollWorkspace() {
                             aria-label="Lote autorizado"
                             className={styles.control}
                             value={job}
-                            disabled={sending}
+                            disabled={sending || busy}
                             onChange={(e) => {
                                 const id = e.target.value;
+                                selectedJob.current = id;
                                 setJob(id);
                                 setStatus(null);
+                                setDeliveryError("");
+                                setDeliveryMessage("");
                                 if (id)
-                                    void platformFetch<Status>(
-                                        "/boletas/jobs/" + id,
-                                    )
-                                        .then(setStatus)
-                                        .catch((e) => setError(e.message));
+                                    void loadStatus(id).catch((e) => {
+                                        if (selectedJob.current === id)
+                                            setDeliveryError(
+                                                e instanceof Error
+                                                    ? e.message
+                                                    : "No se pudo consultar el lote",
+                                            );
+                                    });
                             }}
                         >
                             <option value="">Seleccionar lote</option>
@@ -497,9 +625,8 @@ export function PayrollWorkspace() {
                     </label>
                     <Button
                         variant="outlined"
-                        onClick={() =>
-                            void refreshJobs().catch((e) => setError(e.message))
-                        }
+                        state={busy || sending ? "disabled" : "default"}
+                        onClick={() => void refreshDelivery()}
                     >
                         Actualizar lotes
                     </Button>
@@ -525,13 +652,14 @@ export function PayrollWorkspace() {
                                 state={
                                     !actions.INSERTAR ||
                                     !status.pendientes ||
-                                    sending
+                                    sending ||
+                                    busy
                                         ? "disabled"
                                         : "default"
                                 }
                                 onClick={() => void run()}
                             >
-                                Enviar boletas autorizadas
+                                Continuar envío del lote
                             </Button>
                             {sending && (
                                 <Button

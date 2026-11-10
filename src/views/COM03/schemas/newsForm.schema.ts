@@ -1,3 +1,4 @@
+import { newsLocationInput } from "@/api/cms/news-location";
 import { z } from "zod";
 import type { NewsFormErrors } from "@/components/client/organisms/NewsForm";
 import { ddMmYyyyToIsoDate } from "@/helpers/dateInput";
@@ -38,14 +39,20 @@ export const newsPublishSchema = z.object({
     idioma: requiredText("Selecciona un idioma"),
     visibilidad: requiredText("Selecciona la visibilidad"),
     // Se escribe dd/mm/aaaa; al enviar se convierte a ISO (buildGuardarNoticiaPayload).
-    fechaPublicacion: requiredText("La fecha de publicación es obligatoria")
-        .refine(isValidFecha, FECHA_INVALIDA),
-    slug: requiredText("La URL (slug) es obligatoria")
-        .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Usa solo minúsculas, números y guiones"),
-    tiempoLectura: z.string().trim().refine(
-        (value) => value === "" || (/^\d+$/.test(value) && Number(value) > 0),
-        "Ingresa un número entero mayor a 0",
+    fechaPublicacion: requiredText(
+        "La fecha de publicación es obligatoria",
+    ).refine(isValidFecha, FECHA_INVALIDA),
+    slug: requiredText("La URL (slug) es obligatoria").regex(
+        /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+        "Usa solo minúsculas, números y guiones",
     ),
+    tiempoLectura: z
+        .string()
+        .trim()
+        .refine(
+            (value) => value === "" || (/^\d+$/.test(value) && Number(value) > 0),
+            "Ingresa un número entero mayor a 0",
+        ),
     // TODO [COM03-BACKEND]: opcional mientras no exista la subida de imágenes (#3). Cuando exista,
     // volver a exigirla: .refine((value) => value !== null, "La imagen o video principal es obligatorio")
     // y quitar mainFileRequired={false} en NewsFormView.
@@ -60,10 +67,10 @@ export const newsPublishSchema = z.object({
  */
 export const newsDraftSchema = z.object({
     titulo: requiredText("El título es obligatorio"),
-    fechaPublicacion: z.string().trim().refine(
-        (value) => value === "" || isValidFecha(value),
-        FECHA_INVALIDA,
-    ),
+    fechaPublicacion: z
+        .string()
+        .trim()
+        .refine((value) => value === "" || isValidFecha(value), FECHA_INVALIDA),
 });
 
 export type NewsValidationMode = "publicar" | "borrador";
@@ -72,12 +79,23 @@ export type NewsValidationMode = "publicar" | "borrador";
  * Valida los valores y devuelve los errores por ruta ("titulo", "secciones.1.contenido", ...).
  * Un objeto vacío significa que el formulario es válido.
  */
-export function validateNewsForm(values: unknown, mode: NewsValidationMode): NewsFormErrors {
+export function validateNewsForm(
+    values: unknown,
+    mode: NewsValidationMode,
+): NewsFormErrors {
     const schema = mode === "publicar" ? newsPublishSchema : newsDraftSchema;
     const result = schema.safeParse(values);
-    if (result.success) return {};
+    let locationError = "";
+    try {
+        newsLocationInput(values as Parameters<typeof newsLocationInput>[0]);
+    } catch (e) {
+        locationError = e instanceof Error ? e.message : "Revisa la ubicación";
+    }
+    if (result.success) return locationError ? { ubicacion: locationError } : {};
 
-    const errors: NewsFormErrors = {};
+    const errors: NewsFormErrors = locationError
+        ? { ubicacion: locationError }
+        : {};
     result.error.issues.forEach((issue) => {
         const path = issue.path.join(".");
         if (!errors[path]) errors[path] = issue.message;

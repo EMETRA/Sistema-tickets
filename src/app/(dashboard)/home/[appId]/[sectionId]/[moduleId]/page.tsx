@@ -23,6 +23,7 @@ export default async function ModuleAppPage({ params }: PageProps) {
 
     return (
         <ModuleWorkspace
+            moduleId={moduleId}
             title={moduleMeta.title}
             showHeading={moduleId !== "noticias"}
         >

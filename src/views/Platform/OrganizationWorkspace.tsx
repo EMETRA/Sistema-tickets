@@ -5,10 +5,14 @@ import { ResourceWorkspace } from "@/components/client/organisms/ResourceWorkspa
 import { usePlatform } from "@/platform/context";
 import { platformCommand, platformFetch } from "@/platform/client";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
+import { OrganizationPeople, type OrganizationPerson } from "@/components/client/organisms/OrganizationPeople/OrganizationPeople";
 type Plan = {
     huella: string;
     empresa: number;
     sinUsuario: number;
+    sinUnidad: number;
+    personal: OrganizationPerson[];
+    cuentaActualVinculada: boolean;
     unidades: {
         clave: string;
         nombre: string;
@@ -86,8 +90,8 @@ export function OrganizationWorkspace() {
                             <h2>Equipos desde RRHH</h2>
                             <p className={styles.muted}>
                                 Una unidad institucional forma un equipo; los
-                                empleados activos con cuenta habilitada forman
-                                sus miembros.
+                                empleados activos aparecen en la vista previa.
+                                Para incorporarse como miembros con acceso necesitan una cuenta habilitada.
                             </p>
                         </div>
                         <Button
@@ -113,8 +117,8 @@ export function OrganizationWorkspace() {
                     {plan && (
                         <div className={styles.page}>
                             <p>
-                                Unidades: {plan.unidades.length} · Cambios: {plan.cambios.length} · Empleados sin cuenta habilitada: {plan.sinUsuario}.
-                                Sus unidades se incluyen; podrán incorporarse como miembros en la siguiente generación cuando tengan cuenta.
+                                Unidades con nombre: {plan.unidades.length} · Cambios: {plan.cambios.length} · Empleados sin cuenta habilitada: {plan.sinUsuario}.
+                                Las unidades identificadas se incluyen; podrán incorporarse como miembros cuando tengan cuenta habilitada.
                             </p>
                             <p className={styles.muted}>
                                 La vista previa incluye altas, actualizaciones y
@@ -122,6 +126,9 @@ export function OrganizationWorkspace() {
                                 Conserva las membresías manuales y los equipos
                                 con historial.
                             </p>
+                            {!!plan.sinUnidad && <p role="status" className={styles.card}>Unidad pendiente para {plan.sinUnidad} empleados. Se conservan sus asignaciones anteriores; revisa los datos de RRHH antes de incorporarlos a un equipo.</p>}
+                            {plan.cuentaActualVinculada === false && <p role="status" className={styles.card}>Tu cuenta no está vinculada a un empleado activo en esta lectura de RRHH. Para incluirte como miembro, revisa el código de empleado asociado a tu cuenta.</p>}
+                            <OrganizationPeople key={plan.huella} people={plan.personal || []} />
                             <div className={styles.tableRegion}>
                                 <table className={styles.table}>
                                     <thead>

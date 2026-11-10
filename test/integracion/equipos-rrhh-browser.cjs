@@ -22,8 +22,8 @@ async function run() {
     await page.route('**/api/platform/organization/preview', route => {
       assert.match(route.request().headers().authorization, /^Bearer laboratorio-/);
       previews++;
-      return route.fulfill({ json: { huella: (stale ? 'a' : 'b').repeat(64), empresa: 97, sinUsuario: 1,
-        unidades: [{ clave: '97:10', nombre: 'Dirección ficticia de Informática', empleados: 2, usuarios: 1 }],
+      return route.fulfill({ json: { huella: (stale ? 'a' : 'b').repeat(64), empresa: 97, sinUsuario: 29, sinUnidad:1, cuentaActualVinculada:false, personal:[{empresa:97,empleado:100,nombre:'Colaborador ficticio',puesto:'Analista de prueba',unidad:'Dirección ficticia de Informática',sinUnidad:false,cuentasHabilitadas:1},{empresa:97,empleado:101,nombre:'Jefe de prueba',puesto:'Director',unidadCodigo:11,unidad:null,sinUnidad:true,cuentasHabilitadas:0},...Array.from({length:28},(_,i)=>({empresa:97,empleado:102+i,nombre:'Personal de prueba '+i,puesto:'Analista',unidad:'Dirección ficticia de Informática',sinUnidad:false,cuentasHabilitadas:0}))],
+        unidades: [{ clave: '97:10', nombre: 'Dirección ficticia de Informática', empleados: 29, usuarios: 1 }],
         cambios: [{ id: instance.lab.state.data.ids.it, tipo: 'equipos', accion: 'EDITAR', nombre: 'Dirección ficticia de Informática', unidad: 'Dirección ficticia de Informática', puesto: '', funcion: null },
           { id: '11111111-1111-4111-8111-111111111111', tipo: 'miembros', accion: 'INSERTAR', nombre: 'Colaborador ficticio', unidad: 'Dirección ficticia de Informática', puesto: 'Analista de prueba', funcion: 'MIEMBRO' }] } });
     });
@@ -55,7 +55,16 @@ async function run() {
     assert.equal(previews, 0, 'no consulta RRHH en cada visita al panel');
     assert.equal(await section.getByRole('button', { name: 'Aplicar generación de equipos', exact: true }).count(), 0);
     await section.getByRole('button', { name: 'Preparar desde RRHH', exact: true }).click();
-    await section.getByRole('cell', { name: 'Analista de prueba', exact: true }).waitFor();
+    await section.getByRole('cell', { name: 'Analista de prueba', exact: true }).first().waitFor();
+    const people=page.getByRole('region',{name:'Personal de RRHH',exact:true});
+    await people.getByRole('button',{name:'Siguiente personal',exact:true}).click();
+    await people.getByRole('cell',{name:'Personal de prueba 27',exact:true}).waitFor();
+    await people.getByRole('button',{name:'Anterior personal',exact:true}).click();
+    await people.getByLabel('Buscar persona, puesto o código',{exact:true}).fill('Jefe');
+    await people.getByRole('cell',{name:'Jefe de prueba',exact:true}).waitFor();
+    await people.getByRole('cell',{name:'Sin cuenta habilitada',exact:true}).waitFor();
+    await people.getByRole('cell',{name:'Unidad 11 · Nombre pendiente',exact:true}).waitFor();
+    await people.getByLabel('Buscar persona, puesto o código',{exact:true}).fill('');
     await page.screenshot({ path: path.join(out, 'equipos-vista-previa.png'), fullPage: true });
     for (const width of [1024, 390]) {
       await page.setViewportSize({ width, height: 1100 });
@@ -66,7 +75,7 @@ async function run() {
     await section.getByRole('button', { name: 'Aplicar generación de equipos', exact: true }).click();
     await confirm();
     await section.getByRole('alert').filter({ hasText: 'Actualiza la vista previa' }).waitFor();
-    await section.getByRole('cell', { name: 'Analista de prueba', exact: true }).waitFor();
+    await section.getByRole('cell', { name: 'Analista de prueba', exact: true }).first().waitFor();
     assert.equal(writes, 0);
     stale = false;
     await section.getByRole('button', { name: 'Preparar desde RRHH', exact: true }).click();

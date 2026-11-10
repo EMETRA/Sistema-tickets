@@ -17,6 +17,7 @@ const HistoryMessage: React.FC<HistoryMessageProps> = ({ ticketId, className, va
         CREACION: "ticket-solid",
         ASIGNACION: "user-add",
         TAGGED: "tag",
+        ETIQUETAS: "tag",
         EN_TRABAJO: "in-progress",
         CAMBIO_ESTADO: "hourglass-half-solid",
         COMPLETADO: "check-solid"
@@ -26,6 +27,7 @@ const HistoryMessage: React.FC<HistoryMessageProps> = ({ ticketId, className, va
         CREACION: "#A9DAFF",
         ASIGNACION: "#FFEFC8",
         TAGGED: "#D0F4DE",
+        ETIQUETAS: "#D0F4DE",
         EN_TRABAJO: "#FFEFC8",
         CAMBIO_ESTADO: "#FCAB64",
         COMPLETADO: "#D0F4DE"
@@ -35,6 +37,7 @@ const HistoryMessage: React.FC<HistoryMessageProps> = ({ ticketId, className, va
         CREACION: "#82BCE9",
         ASIGNACION: "#FFCD52",
         TAGGED: "#93EDB6",
+        ETIQUETAS: "#93EDB6",
         EN_TRABAJO: "#FFCD52",
         CAMBIO_ESTADO: "#FCD29F",
         COMPLETADO: "#93EDB6"
@@ -50,6 +53,8 @@ const HistoryMessage: React.FC<HistoryMessageProps> = ({ ticketId, className, va
             return `asignó el ticket`;
         case "TAGGED":
             return `ha asignado la etiqueta`;
+        case "ETIQUETAS":
+            return "actualizó las etiquetas";
         case "EN_TRABAJO":
             return "marcó como en progreso el ticket";
         case "CAMBIO_ESTADO":
@@ -90,13 +95,13 @@ const HistoryMessage: React.FC<HistoryMessageProps> = ({ ticketId, className, va
     };
 
     if (variant === "table") {
-        const actions: Record<string, string> = { CREACION: "Creado", ASIGNACION: "Asignado", TAGGED: "Etiquetado", EN_TRABAJO: "En trabajo", CAMBIO_ESTADO: "Cambio de estado", COMPLETADO: "Completado", CANCELACION: "Cancelado" };
+        const actions: Record<string, string> = { CREACION: "Creado", ASIGNACION: "Asignado", TAGGED: "Etiquetado", ETIQUETAS: "Clasificación actualizada", ESTADO: "Cambio de estado", EN_TRABAJO: "En trabajo", CAMBIO_ESTADO: "Cambio de estado", COMPLETADO: "Completado", CANCELACION: "Cancelado" };
         const rows = historyItems.filter(item => [actions[item.accion] || item.accion, actorNames[item.usuarioId] || String(item.usuarioId), item.valorAnterior, item.valorNuevo, item.asignado_a, item.status, item.tag].join(" ").toLocaleLowerCase("es").includes(query.trim().toLocaleLowerCase("es")));
         return <section className={styles.tableView} aria-label="Historial del ticket">
             <div className={styles.toolbar}><input type="search" aria-label="Buscar en el historial" placeholder="Buscar en el historial" value={query} onChange={event => setQuery(event.target.value)} /><button onClick={() => void refetch()} disabled={isHistoryLoading}>Actualizar historial</button></div>
             {error && <p role="alert" className={styles.error}>No se pudo consultar el historial. Reintenta la consulta.</p>}
             {isHistoryLoading && <p role="status">Cargando historial…</p>}
-            <div className={styles.tableRegion}><table><thead><tr><th>Fecha</th><th>Actor</th><th>Acción</th><th>Detalle</th></tr></thead><tbody>{rows.map(item => <tr key={item.id}><td>{displayDate(item.fecha)}</td><td>{actorNames[item.usuarioId] || `Usuario #${item.usuarioId}`}</td><td>{actions[item.accion] || item.accion.replaceAll("_", " ")}</td><td>{item.asignado_a || item.status || item.tag || (item.valorAnterior || item.valorNuevo ? `${item.valorAnterior || "—"} → ${item.valorNuevo || "—"}` : "—")}</td></tr>)}</tbody></table></div>
+            <div className={styles.tableRegion}><table><thead><tr><th>Fecha</th><th>Actor</th><th>Acción</th><th>Detalle</th></tr></thead><tbody>{rows.map(item => <tr key={item.id}><td>{displayDate(item.fecha)}</td><td>{actorNames[item.usuarioId] || `Usuario #${item.usuarioId}`}</td><td>{actions[item.accion] || item.accion.replaceAll("_", " ")}</td><td>{item.accion === "ETIQUETAS" ? `${item.valorAnterior || "Sin etiquetas"} → ${item.valorNuevo || "Sin etiquetas"}` : item.asignado_a || item.status || item.tag || (item.valorAnterior || item.valorNuevo ? `${item.valorAnterior || "—"} → ${item.valorNuevo || "—"}` : "—")}</td></tr>)}</tbody></table></div>
             {!isHistoryLoading && !error && !rows.length && <p className={styles.empty}>{query ? "No hay coincidencias en el historial." : "No hay movimientos registrados para este ticket."}</p>}
             <p className={styles.count}>{rows.length} movimientos · Se conserva la trazabilidad de cada actuación.</p>
         </section>;

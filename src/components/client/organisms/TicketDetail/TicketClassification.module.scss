@@ -78,3 +78,21 @@
 .count {
     font-size: 11px;
 }
+
+.classification details {
+    margin-top: 14px;
+    border: 1px solid var(--tickets-border);
+    border-radius: 8px;
+    padding: 12px;
+    background: var(--tickets-surface);
+}
+.classification summary {
+    color: var(--tickets-text);
+    cursor: pointer;
+    font-weight: 600;
+}
+.classification input[type="color"] {
+    width: 80px;
+    height: 40px;
+    padding: 4px;
+}

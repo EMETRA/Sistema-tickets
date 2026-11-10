@@ -13,6 +13,7 @@ import { usePlatform } from "@/platform/context";
 import { platformCommand, platformFetch } from "@/platform/client";
 import { ResourceWorkspace } from "@/components/client/organisms/ResourceWorkspace/ResourceWorkspace";
 import MOD06 from "@/views/MOD06";
+import { ModuleAccessGate } from "@/components/client/organisms/ModuleAccessGate/ModuleAccessGate";
 import { PlatformField } from "@/components/client/molecules/PlatformField/PlatformField";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
 type Named = { id: number; nombre: string; descripcion: string };
@@ -40,7 +41,7 @@ export function AccessWorkspace() {
     const params = useSearchParams();
     const { data } = usePlatform();
     const tab = accessTab(params.get("tab"));
-    if (tab === "corporate") return <section className={styles.page}><AccessNavigation active="corporate" admin={!!data?.actor.admin} corporate /><MOD06 /></section>;
+    if (tab === "corporate") return <section className={styles.page}><AccessNavigation active="corporate" admin={!!data?.actor.admin} corporate /><ModuleAccessGate moduleId="mod06"><MOD06 /></ModuleAccessGate></section>;
     if (!data?.actor.admin) return <p role="alert">No tienes permiso para administrar estos accesos.</p>;
     return <AccessCatalog key={tab} tab={tab} />;
 }

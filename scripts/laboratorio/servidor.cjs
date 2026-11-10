@@ -373,6 +373,13 @@ async function createLab(file, options = {}) {
       q = url.searchParams;
     if (p === "/bootstrap") return bootstrap(s, a);
     if (p === "/catalog") return s.applicationCatalog || {}; // Catálogo ficticio explícito de los recorridos; sin trámites externos.
+    if (parts[0] === 'module-access') {
+      const id = parts[1], custom = s.moduleAccess?.[a.id]?.[id];
+      if (custom) return { moduloId:id, ...custom };
+      const visible = Object.values(s.applicationCatalog || {}).some(app => Object.values(app.sections || {}).some(section => (section.modules || []).some(module => module.id===id)));
+      const actions = { LEER:!!(a.admin || visible), INSERTAR:!!a.admin, EDITAR:!!a.admin, ELIMINAR:!!a.admin };
+      return { moduloId:id, allowed:actions.LEER && (!['proc01','mod01','mod10'].includes(id) || actions.INSERTAR), actions };
+    }
     if (p === "/people")
       return s.users
         .filter(

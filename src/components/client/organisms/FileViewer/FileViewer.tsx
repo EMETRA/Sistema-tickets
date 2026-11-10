@@ -3,6 +3,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import { Button } from "@/components/client/atoms/Button";
 import { platformFetch, PlatformError } from "@/platform/client";
 import styles from "./FileViewer.module.scss";
+import { OfficePreview, type OfficeDocument } from "./OfficePreview";
 export type ViewedFile = { id: string; name: string };
 type Preview = { url: string; mime: string; text?: string };
 function FilePreview({
@@ -48,6 +49,10 @@ export function FileViewer({
         [error, setError] = useState("");
     const [reference, setReference] = useState<string | undefined>();
     const [preview, setPreview] = useState<Preview | null>(null);
+    const [office, setOffice] = useState<OfficeDocument | null>(null),
+        [officeLoading, setOfficeLoading] = useState(false),
+        [officeError, setOfficeError] = useState("");
+    const officeFile = /\.(docx?|xlsx?)$/i.test(file.name);
     useEffect(() => {
         const node = dialog.current;
         node?.showModal();
@@ -58,6 +63,9 @@ export function FileViewer({
     useEffect(() => {
         const controller = new AbortController();
         let url: string | undefined;
+        setOffice(null);
+        setOfficeError("");
+        setOfficeLoading(false);
         platformFetch<Blob>(
             `/tickets/${encodeURIComponent(ticketId)}/files/${encodeURIComponent(file.id)}`,
             { signal: controller.signal },
@@ -75,17 +83,49 @@ export function FileViewer({
                 if (controller.signal.aborted) return;
                 url = URL.createObjectURL(blob);
                 setPreview({ url, mime, text });
+                if (officeFile) {
+                    setLoading(false);
+                    setOfficeLoading(true);
+                    try {
+                        const document = await platformFetch<OfficeDocument>(
+                            `/tickets/${encodeURIComponent(ticketId)}/files/${encodeURIComponent(file.id)}/preview`,
+                            { signal: controller.signal },
+                        );
+                        if (!controller.signal.aborted) setOffice(document);
+                    } catch (failure: unknown) {
+                        if (!controller.signal.aborted) {
+                            setOfficeError(
+                                failure instanceof PlatformError
+                                    ? failure.message
+                                    : "No se pudo preparar la vista previa. Puedes descargar el original o reintentar.",
+                            );
+                            setReference(
+                                failure instanceof PlatformError
+                                    ? failure.reference
+                                    : undefined,
+                            );
+                        }
+                    } finally {
+                        if (!controller.signal.aborted) setOfficeLoading(false);
+                    }
+                }
             })
             .catch((failure: unknown) => {
                 if (!controller.signal.aborted) {
                     setError(
-                        failure instanceof PlatformError && failure.status === 404
+                        failure instanceof PlatformError &&
+                            failure.status === 404
                             ? "El archivo no está disponible. Solicita que lo revisen y reintenta."
-                            : failure instanceof PlatformError && failure.status === 403
+                            : failure instanceof PlatformError &&
+                                failure.status === 403
                                 ? "No tienes acceso a este archivo del ticket."
                                 : "No se pudo abrir el archivo. Revisa tu acceso al ticket o reintenta.",
                     );
-                    setReference(failure instanceof PlatformError ? failure.reference : undefined);
+                    setReference(
+                        failure instanceof PlatformError
+                            ? failure.reference
+                            : undefined,
+                    );
                 }
             })
             .finally(() => {
@@ -95,7 +135,14 @@ export function FileViewer({
             controller.abort();
             if (url) URL.revokeObjectURL(url);
         };
-    }, [ticketId, file.id, revision]);
+    }, [ticketId, file.id, revision, officeFile]);
+    function retry() {
+        setLoading(true);
+        setError("");
+        setReference(undefined);
+        setPreview(null);
+        setRevision((value) => value + 1);
+    }
     function close() {
         dialog.current?.close();
         onClose();
@@ -138,28 +185,41 @@ export function FileViewer({
             <section
                 className={styles.content}
                 aria-label="Vista previa del archivo"
-                aria-busy={loading}
+                aria-busy={loading || officeLoading}
             >
                 {loading && <p role="status">Cargando archivo…</p>}
                 {!loading && error && (
                     <div role="alert">
                         <p>{error}</p>
                         {reference && <p>Referencia: {reference}</p>}
-                        <Button
-                            variant="outlined"
-                            onClick={() => {
-                                setLoading(true);
-                                setError("");
-                                setReference(undefined);
-                                setPreview(null);
-                                setRevision((v) => v + 1);
-                            }}
-                        >
+                        <Button variant="outlined" onClick={retry}>
                             Reintentar archivo
                         </Button>
                     </div>
                 )}
-                {!loading && !error && preview && (
+                {!loading && !error && officeLoading && (
+                    <p role="status">Preparando vista previa…</p>
+                )}
+                {!loading && !error && officeError && (
+                    <div role="alert">
+                        <p>{officeError}</p>
+                        {reference && <p>Referencia: {reference}</p>}
+                        <p>
+                            El original está disponible en «Descargar archivo».
+                        </p>
+                        <Button variant="outlined" onClick={retry}>
+                            Reintentar vista previa
+                        </Button>
+                    </div>
+                )}
+                {!loading && !error && office && (
+                    <OfficePreview
+                        key={file.id + ":" + revision}
+                        document={office}
+                        name={file.name}
+                    />
+                )}
+                {!loading && !error && !officeFile && preview && (
                     <FilePreview
                         preview={preview}
                         name={file.name}

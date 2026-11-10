@@ -118,9 +118,25 @@ export async function graphqlProof(
         )
     )
         return {};
+    const uploads = new Set(
+        (operation.variableDefinitions || [])
+            .filter((def) => {
+                let type = def.type;
+                while (type.kind !== Kind.NAMED_TYPE) type = type.type;
+                return type.name.value === "Upload";
+            })
+            .map((def) => def.variable.name.value),
+    );
     const args = Object.fromEntries(
         (field.arguments || [])
-            .filter((a) => a.name.value !== "files")
+            .filter(
+                (a) =>
+                    a.name.value !== "files" &&
+                    !(
+                        a.value.kind === Kind.VARIABLE &&
+                        uploads.has(a.value.name.value)
+                    ),
+            )
             .map((a) => [a.name.value, valueFromASTUntyped(a.value, variables)])
             .filter(([, v]) => v !== undefined),
     );

@@ -330,11 +330,11 @@ export function RecordDetail({
                         <section className={styles.card}>
                             {type === 'incidencias' && automatic && <div><h3>Detectada automáticamente</h3><p>Ocurrencias: {automatic.cantidad} · Primera detección: {displayDate(automatic.primeraVez)} · Última detección: {displayDate(automatic.ultimaVez)}</p></div>}
                             {employment && <div className={styles.card}><h3>Datos de RRHH</h3><p className={styles.muted}>Unidad institucional: {type === "equipos" ? current.nombre : data!.teams.find(t => t.id === current.equipoId)?.nombre || "Consulta la ficha del equipo"}. El puesto se actualiza al generar equipos desde RRHH.</p>{employment.puesto && <p><strong>Puesto: </strong>{employment.puesto}</p>}</div>}
+                            {["activos","dispositivos"].includes(type) && !!current.datos._inventario && <section className={styles.card}><h3>Asignación institucional</h3><p>Tarjeta: {String((current.datos._inventario as {tarjeta?:string}).tarjeta||'')}</p><p>Empleado: {String((current.datos._inventario as {nombreEmpleado?:string}).nombreEmpleado||'')} · {String((current.datos._inventario as {empleado?:number}).empleado||'')}</p><p className={styles.muted}>La tarjeta se consulta en el inventario institucional. El responsable técnico de esta ficha se gestiona por separado.</p></section>}
                             {["activos", "dispositivos"].includes(type) &&
-                                !data!.inventoryConnected && (
+                                !current.datos.inventarioReferencia && (
                                     <p className={styles.error}>
-                                        Inventario oficial pendiente de
-                                        verificar
+                                        Este registro aún no está vinculado a una tarjeta de responsabilidad institucional.
                                     </p>
                                 )}
                             <dl className={styles.detail}>

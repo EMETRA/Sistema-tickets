@@ -38,7 +38,11 @@ export async function platformFetch<T>(
     }
     if (response.headers.get("content-type")?.includes("application/json"))
         return response.json();
-    if (!/^\/files\/[-a-f0-9]+$/.test(path) && !/^\/tickets\/[1-9]\d*\/files\/[1-9]\d*$/.test(path))
+    if (
+        !/^\/boletas\/pdf\?/.test(path) &&
+        !/^\/files\/[-a-f0-9]+$/.test(path) &&
+        !/^\/tickets\/[1-9]\d*\/files\/[1-9]\d*$/.test(path)
+    )
         throw new PlatformError(
             "Tickets devolvió un formato inesperado. Conserva los datos y reintenta.",
             502,

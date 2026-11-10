@@ -1,4 +1,6 @@
 export interface SendEmailNotificationInput {
+    destinatarioEsperado?: string;
+    pruebaEsperada?: boolean;
     areaDestino: string;
     fechaDocumento: string;
     emitidoPor: string;
@@ -9,6 +11,7 @@ export interface SendEmailNotificationInput {
 }
 
 export interface SendEmailNotificationResult {
+    correoDestino: string;
     success: boolean;
     message: string;
     destinationArea: string;

@@ -6,6 +6,7 @@
     flex-direction: column;
     gap: 10px;
     min-width: 0;
+    width: 100%;
     legend {
         font-size: 12px;
         font-weight: 600;
@@ -30,6 +31,7 @@
 .choices {
     max-height: 290px;
     overflow: auto;
+    overscroll-behavior: contain;
     border: 1px solid var(--tickets-border);
     border-radius: 8px;
     background: #fff;

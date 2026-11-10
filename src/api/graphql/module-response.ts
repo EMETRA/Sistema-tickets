@@ -1,10 +1,11 @@
 import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
 import { diagnosticoErrorGraphql, estadoErrorGraphql } from "./server-error";
+import { queuePanelIncident } from '@/observability/server-incidents';
 
 /** Error público de los módulos: conserva sesión/permisos y un diagnóstico correlacionable. */
-export function falloModulo(error: unknown, operacion: string) {
-    const referencia = randomUUID();
+export async function falloModulo(error: unknown, operacion: string) {
+    const referencia = await queuePanelIncident(operacion, error, randomUUID());
     const status = estadoErrorGraphql(error);
     console.error({ evento: "PANEL_MODULO_FALLIDO", operacion, referencia, status, ...diagnosticoErrorGraphql(error) });
     const message = status === 401 ? "Tu sesión expiró. Inicia sesión nuevamente."

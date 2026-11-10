@@ -45,7 +45,7 @@ export function useGetVisaNominaExportExcel(): UseGetVisaNominaExportExcelReturn
                 throw new Error('La respuesta del servidor no contiene los datos necesarios para descargar el archivo.');
             }
 
-            downloadBase64File(exportData.contentBase64, exportData.filename, exportData.mimeType);
+            if (exportData.totalEmpleados > 0) downloadBase64File(exportData.contentBase64, exportData.filename, exportData.mimeType);
             return exportData;
         } catch (err) {
             const errorValue = err instanceof Error ? err : new Error(String(err));

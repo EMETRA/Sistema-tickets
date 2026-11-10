@@ -32,7 +32,7 @@ def huella_montajes(montajes):
     return resultado
 
 
-def validar_montajes(config, servicio, actuales):
+def validar_montajes(config, servicio, actuales, habilitar_incidencias=False):
     previstos = set()
     for v in config['services'][servicio].get('volumes', []):
         if v['type'] == 'bind':
@@ -42,8 +42,11 @@ def validar_montajes(config, servicio, actuales):
         else:
             raise RuntimeError('Montaje no soportado; no se recrea automaticamente.')
         previstos.add((v['target'], v['type'], origen, bool(v.get('read_only'))))
-    if previstos != huella_montajes(actuales):
+    originales = huella_montajes(actuales)
+    extra_permitido = {('/var/lib/tickets-incidencias', 'volume', config.get('volumes', {}).get('tickets-incidencias', {}).get('name'), False)}
+    if originales - previstos or (previstos - originales and (not habilitar_incidencias or previstos - originales != extra_permitido)):
         raise RuntimeError('Los montajes previstos difieren de los actuales. Corregir las rutas/variables de Compose antes de recrear; se conserva el contenedor actual.')
+    return previstos
 
 
 def restaurar_redes(contenedor, originales, actuales):
@@ -61,9 +64,10 @@ def restaurar_redes(contenedor, originales, actuales):
 
 
 def main(argv):
-    if len(argv) not in (1, 2) or (len(argv) == 2 and argv[1] != '--comprobar'):
-        raise RuntimeError('Uso: actualizar-servicio-preservando.py CONTENEDOR [--comprobar]')
+    if not argv or len(argv) > 3 or len(set(argv[1:])) != len(argv[1:]) or any(flag not in ('--comprobar', '--habilitar-incidencias') for flag in argv[1:]):
+        raise RuntimeError('Uso: actualizar-servicio-preservando.py CONTENEDOR [--comprobar] [--habilitar-incidencias]')
     contenedor = argv[0]
+    habilitar_incidencias = '--habilitar-incidencias' in argv
     labels = inspeccionar(contenedor, '.Config.Labels')
     directorio = labels.get('com.docker.compose.project.working_dir', '')
     servicio = labels.get('com.docker.compose.service', '')
@@ -71,14 +75,20 @@ def main(argv):
     archivos = labels.get('com.docker.compose.project.config_files', '').split(',')
     if not directorio or os.path.realpath(directorio) != os.path.realpath(os.getcwd()) or not servicio or not proyecto or any(not os.path.isfile(a) for a in archivos):
         raise RuntimeError('El directorio/servicio o alguno de sus Compose no corresponde al despliegue; no se recrea.')
+    if habilitar_incidencias:
+        override = os.path.realpath('docker-compose.incidencias.yml')
+        if servicio != 'sistema-tickets-web' or not os.path.isfile(override):
+            raise RuntimeError('El servicio o el Compose de incidencias no corresponde; no se recrea.')
+        if override not in [os.path.realpath(a) for a in archivos]:
+            archivos.append(override)
     compose = ['docker', 'compose', '-p', proyecto]
     for archivo in archivos:
         compose += ['-f', archivo]
     montajes = inspeccionar(contenedor, '.Mounts')
     redes = inspeccionar(contenedor, '.NetworkSettings.Networks')
     config = json.loads(ejecutar(compose + ['config', '--format', 'json']))
-    validar_montajes(config, servicio, montajes)
-    if len(argv) == 2:
+    previstos = validar_montajes(config, servicio, montajes, habilitar_incidencias)
+    if '--comprobar' in argv:
         print('CONFIGURACION_Y_MONTAJES_OK; no se modifico el servicio')
         return
     ejecutar(compose + ['build', servicio], capturar=False)
@@ -86,7 +96,7 @@ def main(argv):
     nuevo = ejecutar(compose + ['ps', '-a', '-q', servicio])
     if not nuevo or '\n' in nuevo:
         raise RuntimeError('No se obtuvo un unico contenedor actualizado.')
-    if huella_montajes(inspeccionar(nuevo, '.Mounts')) != huella_montajes(montajes):
+    if huella_montajes(inspeccionar(nuevo, '.Mounts')) != previstos:
         raise RuntimeError('Los montajes reales cambiaron; revisar antes de utilizar el servicio.')
     restaurar_redes(nuevo, redes, inspeccionar(nuevo, '.NetworkSettings.Networks'))
     if set(inspeccionar(nuevo, '.NetworkSettings.Networks')) != set(redes):

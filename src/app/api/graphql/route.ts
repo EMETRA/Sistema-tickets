@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
 import { getGraphqlEndpoint } from '@/api/config/env';
+import { queuePanelIncident } from '@/observability/server-incidents';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -25,11 +26,16 @@ export async function POST(request: NextRequest) {
             duplex: 'half', cache: 'no-store', redirect: 'error',
             signal: AbortSignal.timeout(Number.isFinite(timeout) && timeout > 0 ? timeout : 60000),
         } as RequestInit & { duplex: 'half' });
+        if (response.status >= 500) {
+            const body = await response.clone().json().catch(() => ({}));
+            await queuePanelIncident('GraphQL.Proxy',{ response:{status:response.status,errors:body.errors} });
+        }
         return new Response(response.body, { status: response.status, headers: {
             ...privateHeaders, 'Content-Type': response.headers.get('content-type') || 'application/json',
         } });
     } catch (error) {
+        const referencia = await queuePanelIncident('GraphQL.Proxy',error);
         const timeout = error instanceof Error && ['TimeoutError', 'AbortError'].includes(error.name);
-        return Response.json({ errors: [{ message: timeout ? 'La API tardó demasiado en responder' : 'No se pudo contactar api-tickets', extensions: { code: timeout ? 'GATEWAY_TIMEOUT' : 'BAD_GATEWAY' } }] }, { status: timeout ? 504 : 502, headers: privateHeaders });
+        return Response.json({ errors: [{ message: timeout ? 'La API tardó demasiado en responder' : 'No se pudo contactar api-tickets', extensions: { code: timeout ? 'GATEWAY_TIMEOUT' : 'BAD_GATEWAY', referencia } }] }, { status: timeout ? 504 : 502, headers: privateHeaders });
     }
 }

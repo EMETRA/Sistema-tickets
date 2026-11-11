@@ -28,6 +28,16 @@ test('un fallo judicial muestra solo la referencia saneada que permite encontrar
  const invalid=api.mensajeJuzgado({graphQLErrors:[{extensions:{statusCode:503,referencia:'token=privado'}}]});
  assert.doesNotMatch(invalid,/token|Referencia/);
 });
+test('la generación fallida conserva su referencia HTTP y explica que solo falta el documento',()=>{
+ const referencia='b06f32ff-c167-4575-ad76-d5b5400ae908';
+ const error={statusCode:503,body:{codigo:'ARCHIVO_ALMACENAMIENTO_NO_CONFIGURADO',referencia,error:'SQL privado'}};
+ const message=api.mensajeJuzgado(error,'documento');
+ assert.match(message,/resolución está registrada/);assert.match(message,/configurar el almacenamiento/);assert.match(message,new RegExp(referencia));assert.doesNotMatch(message,/SQL/);
+ assert.match(api.mensajeJuzgado({statusCode:503},'documento'),/reintenta únicamente el documento/);
+ const {ArchivoJuzgadoError}=load('src/api/graphql/juzgado-archivo.ts');
+ assert.match(api.mensajeJuzgado(new ArchivoJuzgadoError(503,'ARCHIVO_NO_DISPONIBLE',referencia)),new RegExp(referencia));
+ assert.doesNotMatch(new ArchivoJuzgadoError(503,undefined,'token=privado').message,/privado|token/);
+});
 test('el error público de búsqueda orienta a seis caracteres y reconoce statusCode de GraphQL sin copiar SQL',()=>{
  assert.match(api.mensajeJuzgado({graphQLErrors:[{message:'No mostrar SQL privado',extensions:{code:'BUSQUEDA_DEMASIADO_AMPLIA',statusCode:400}}]},'busqueda'),/20 coincidencias.*6 caracteres/);
  assert.match(api.mensajeJuzgado({graphQLErrors:[{extensions:{statusCode:403}}]},'busqueda'),/no tiene permiso/);

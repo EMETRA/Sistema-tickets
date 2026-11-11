@@ -17,37 +17,13 @@ export const APPS_CATALOG_DUMMY: AppsCatalog = {
                     id: "reportes",
                     label: "REPORTES",
                     title: "Reportes",
-                    iconName: "chart-pie-solid",
+                    iconName: "chart-bar-solid",
                 },
                 modules: [
                     {
-                        id: "mod01",
-                        label: "MOD01",
-                        title: "Reporte semanal informática",
-                        iconName: "clipboard-solid",
-                    },
-                    {
-                        id: "exportmod01",
-                        label: "EXPORT MOD01",
-                        title: "Exportar reporte semanal informática",
-                        iconName: "layer-group-solid",
-                    },
-                    {
-                        id: "save-mod01",
-                        label: "SAVE MOD01",
-                        title: "Reporte Guardado",
-                        iconName: "clipboard-solid",
-                    },
-                    {
-                        id: "dashboard-proyectos",
-                        label: "DASHBOARD PROYECTOS",
-                        title: "Dashboard de indicadores - Informática",
-                        iconName: "chart-bar-solid",
-                    },
-                    {
-                        id: "dashboard-colaboradores",
-                        label: "DASHBOARD COLABORADORES",
-                        title: "Dashboard por colaborador - Informática",
+                        id: "vivi-reportes",
+                        label: "VIVI",
+                        title: "Reportes de VIVI",
                         iconName: "chart-bar-solid",
                     },
                 ],
@@ -221,16 +197,26 @@ export const APPS_CATALOG_DUMMY: AppsCatalog = {
                     {
                         id: "mod10",
                         label: "MOD10",
-                        title: "Formulario reporte de visa nóminas",
+                        title: "Notificar documento",
                         iconName: "chart-bar-solid",
                     },
                 ],
             },
-            juz01: {
+        },
+    },
+    juzgado: {
+        meta: {
+            id: "juzgado",
+            label: "JUZGADO",
+            title: "Aplicaciones Juzgado",
+            iconName: "clipboard-solid",
+        },
+        sections: {
+            consultas: {
                 meta: {
-                    id: "juz01",
-                    label: "JUZ01",
-                    title: "Consultar caso",
+                    id: "consultas",
+                    label: "CONSULTAS",
+                    title: "Consultas",
                     iconName: "chart-bar-solid",
                 },
                 modules: [
@@ -239,8 +225,8 @@ export const APPS_CATALOG_DUMMY: AppsCatalog = {
                         label: "JUZ01",
                         title: "Consultar caso",
                         iconName: "chart-bar-solid",
-                    }
-                ]
+                    },
+                ],
             },
         },
     },

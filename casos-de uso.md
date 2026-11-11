@@ -1,6 +1,6 @@
 # Casos de uso — Sistema-tickets
 
-Base documental: `926fe45d27922c595c63e8f79e1e82b1594470eb`; actualización de consulta de casos: `cd953b4ea8731336669948645a55032e5f5eabba`; actualización de vistas y diagnóstico judicial: `9d497b6ff471410ea5a96ba6df5e707ccebd8e43`; línea de integración revisada: `Dev + fix/vistas_presentacion_y_layout`. Describe la base y la actualización citadas; la configuración y las autorizaciones efectivas de un servidor se comprueban por separado. Esta edición se preparó sin conectarse a Oracle, SMTP ni servidores institucionales.
+Base documental: `926fe45d27922c595c63e8f79e1e82b1594470eb`; actualización de consulta de casos: `cd953b4ea8731336669948645a55032e5f5eabba`; actualización de vistas y diagnóstico judicial: `9d497b6ff471410ea5a96ba6df5e707ccebd8e43`; actualización documental: `b77da403cba653095c8156b0e2c13035a96b606b`; actualización de catálogo: `e3f8676f5121223c9f23aaa036833260efe236f9`; reportes VIVI: `b29ea52c21307f21bb49041ba2e8f76fb8080f44`; línea de integración revisada: `Dev + fix/pdf_judicial_proxy`. Describe la base y la actualización citadas; la configuración y las autorizaciones efectivas de un servidor se comprueban por separado. Esta edición se preparó sin conectarse a Oracle, SMTP ni servidores institucionales.
 
 Los enlaces de código fijan esa revisión para que sigan siendo consultables cuando `main` excluya herramientas de desarrollo. Al modificar un comportamiento se deben actualizar su caso de uso, configuración y referencia de código.
 
@@ -27,11 +27,12 @@ Guía de arquitectura, configuración y cambios: [manual-técnico.md](manual-t%C
 - [CU-16 · Consultar vehículo SAT y manuales o reporte de anulaciones](#cu-16)
 - [CU-17 · Consultar RRHH y exportar visa de nóminas](#cu-17)
 - [CU-18 · Preparar PDF y enviar boletas de pago autorizadas](#cu-18)
-- [CU-19 · Guardar y exportar reporte semanal](#cu-19)
+- [CU-19 · Guardar y exportar reporte semanal (deshabilitado)](#cu-19)
 - [CU-20 · Administrar noticias y notificar documentos jurídicos](#cu-20)
 - [CU-21 · Buscar y tramitar casos judiciales VIVI](#cu-21)
 - [CU-22 · Cambiar la vista para presentaciones y pruebas visuales](#cu-22)
 
+- [CU-23 · Consultar usuarios y actividad de VIVI desde Informática](#cu-23)
 - [Índice de operaciones y rutas](#operaciones)
 - [Criterios de cobertura](#cobertura)
 
@@ -209,7 +210,8 @@ flowchart TD
 
 - Catálogo no disponible no se sustituye por permisos abiertos.
 - Funciones corporativas solo se accede desde Personas y accesos.
-- MOD13 y grabación LPR no se ofrecen como procesos activos.
+- MOD13, grabación LPR, los tres reportes semanales y los dos dashboards de Informática no se ofrecen como aplicaciones activas. Las métricas siguen en su sección.
+- Consultar caso se ubica en Aplicaciones Juzgado → Consultas; solo se traslada si ya está autorizado en el catálogo. Notificar documento permanece en Jurídico.
 
 **Objetos y persistencia**
 
@@ -228,9 +230,9 @@ Indirecto: catálogo y permisos de api-tickets; no consulta tablas desde el nave
 - [src/app/(dashboard)/home/[appId]/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/home/%5BappId%5D/page.tsx)
 - [src/app/api/apps-catalog/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/apps-catalog/route.ts)
 - [src/app/unauthorized/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/unauthorized/page.tsx)
-- [src/config/app-registry.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/config/app-registry.ts)
+- [src/config/app-registry.ts](https://github.com/EMETRA/Sistema-tickets/blob/b29ea52c21307f21bb49041ba2e8f76fb8080f44/src/config/app-registry.ts)
 - [src/config/apps-access.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/config/apps-access.ts)
-- [src/config/apps-catalog.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/config/apps-catalog.ts)
+- [src/config/apps-catalog.ts](https://github.com/EMETRA/Sistema-tickets/blob/e3f8676f5121223c9f23aaa036833260efe236f9/src/config/apps-catalog.ts)
 - [src/config/constants.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/config/constants.ts)
 - [src/config/navigation.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/config/navigation.ts)
 - [src/config/protected-routes.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/config/protected-routes.ts)
@@ -352,7 +354,7 @@ Indirecto: TB_TICKET_MENSAJE, TB_TICKET_MENSAJE_ARCHIVO, TB_TICKET_ADJUNTO y TB_
 **Archivos involucrados**
 
 - [src/app/(dashboard)/mis-tickets/[ticketId]/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/mis-tickets/%5BticketId%5D/page.tsx)
-- [src/app/api/platform/[...path]/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/platform/%5B...path%5D/route.ts)
+- [src/app/api/platform/[...path]/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/b29ea52c21307f21bb49041ba2e8f76fb8080f44/src/app/api/platform/%5B...path%5D/route.ts)
 - [src/app/api/ticket-attachments/[ticketId]/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/ticket-attachments/%5BticketId%5D/route.ts)
 - [src/app/api/ticket-history/[ticketId]/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/ticket-history/%5BticketId%5D/route.ts)
 - [src/app/api/ticket/[id]/attachments/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/ticket/%5Bid%5D/attachments/route.ts)
@@ -1031,40 +1033,37 @@ Indirecto: nómina ADMINSIAF; ADMEMETRANOTIFICACIONES.TB_TK_BOLETA_LOTES y TB_TK
 
 <a id="cu-19"></a>
 
-## CU-19 · Guardar y exportar reporte semanal
+## CU-19 · Guardar y exportar reporte semanal (deshabilitado)
 
-**Actor:** Usuario del Panel según su alcance.
+**Estado:** Deshabilitado. Se documenta para mantener la trazabilidad del código y de los datos históricos.
 
-**Precondiciones y entrada:** Sesión válida y capability o permiso del módulo; backend correspondiente configurado.
+**Actor:** Usuario autenticado, incluido administrador.
 
 **Flujo y resultado**
 
-1. Seleccionar colaborador y semana.
-2. Consultar o editar tareas, bloqueos y plan.
-3. Guardar el reporte autorizado.
-4. Abrir seguimiento o exportar Excel.
+1. El catálogo no ofrece Reporte semanal informática, Exportar reporte semanal informática ni Reporte Guardado.
+2. Un marcador antiguo muestra la pantalla de desuso del Panel.
+3. Una llamada directa al resolver semanal es rechazada por el interceptor del API antes de consultar o modificar datos.
+4. Los indicadores y reportes vigentes se consultan desde Métricas.
 
 ```mermaid
 flowchart TD
-  inicio["Seleccionar colaborador y semana"]
-  control{"Entrada y autorización válidas"}
-  inicio --> control
-  control -->|No| rechazo["Informar la excepción descrita; no completar la operación"]
-  paso1["Consultar o editar tareas, bloqueos y plan"]
-  control -->|Sí| paso1
-  paso2["Guardar el reporte autorizado"]
-  paso1 --> paso2
-  paso3["Abrir seguimiento o exportar Excel"]
-  paso2 --> paso3
+  entrada["Intento de acceso a un reporte retirado"] --> canal{"Canal"}
+  canal -->|Panel| desuso["Mostrar aplicación en desuso"]
+  canal -->|API| bloqueo["Rechazar antes de ejecutar el resolver"]
+  desuso --> historico["Conservar registros históricos"]
+  bloqueo --> historico
 ```
 
 **Excepciones y alternativas**
 
-- Sin acceso no habilitar edición.
-- Error conserva el contenido.
-- Exportación sin filas requiere aviso.
+- Un permiso antiguo o la administración no reactiva el proceso.
+- Desactivar la plataforma general no elude el bloqueo del resolver.
+- Los dashboards de Informática se retiran como aplicaciones; sus marcadores dirigen a Métricas. El resolver compartido de indicadores permanece disponible.
 
 **Objetos y persistencia**
+
+Referencias históricas conservadas; este caso no ejecuta nuevas lecturas, escrituras ni exportaciones.
 
 Indirecto: reportes semanales y detalles en ADMEMETRAIT mediante api-tickets.
 
@@ -1182,6 +1181,8 @@ Referencias de implementación relacionadas (incluye dependencias compartidas; e
 
 **Precondiciones y entrada:** Sesión válida y capability o permiso del módulo; backend correspondiente configurado.
 
+**Entrada del catálogo:** Aplicaciones Juzgado → Consultas → Consultar caso, `/home/juzgado/consultas/juz01`. Los marcadores anteriores de Jurídico redirigen conservando el caso; los permisos judiciales se mantienen.
+
 **Flujo y resultado**
 
 1. Escribir al menos tres caracteres (incluidos seis o el código completo).
@@ -1213,6 +1214,8 @@ flowchart TD
 - Si hay más de 20 coincidencias, `BUSQUEDA_DEMASIADO_AMPLIA` pide precisar con seis caracteres o el código completo.
 - Acción no permitida por estado se bloquea.
 - Reintentos no duplican resolución.
+- Una decisión confirmada puede tener PDF pendiente. El fallo de generación conserva la referencia HTTP del API y el aviso indica reintentar únicamente el documento. Cada clic documental obtiene un comando y confirmaciones nuevos, conservando el mismo ID de resolución; no modifica la identidad de la decisión.
+- El proxy solo acepta JSON para generar metadata y tipos de archivo permitidos para descargar. Registra los fallos técnicos que no tengan una referencia del API y no devuelve mensajes internos.
 
 **Objetos y persistencia**
 
@@ -1220,9 +1223,9 @@ Indirecto: dominio judicial ADMEMETRAVEHICULAR mediante api-tickets; archivos pr
 
 **Archivos involucrados**
 
-- [src/api/graphql/juzgado.ts](https://github.com/EMETRA/Sistema-tickets/blob/9d497b6ff471410ea5a96ba6df5e707ccebd8e43/src/api/graphql/juzgado.ts)
+- [src/api/graphql/juzgado.ts](https://github.com/EMETRA/Sistema-tickets/blob/b77da403cba653095c8156b0e2c13035a96b606b/src/api/graphql/juzgado.ts)
 - [src/api/graphql/juzgado-vista.ts](https://github.com/EMETRA/Sistema-tickets/blob/cd953b4ea8731336669948645a55032e5f5eabba/src/api/graphql/juzgado-vista.ts)
-- [src/app/api/JUZ01/[...path]/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/JUZ01/%5B...path%5D/route.ts)
+- [src/app/api/JUZ01/[...path]/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/b77da403cba653095c8156b0e2c13035a96b606b/src/app/api/JUZ01/%5B...path%5D/route.ts)
 - [src/views/JUZ01/JUZ01.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/cd953b4ea8731336669948645a55032e5f5eabba/src/views/JUZ01/JUZ01.module.scss)
 - [src/views/JUZ01/JUZ01.schema.ts](https://github.com/EMETRA/Sistema-tickets/blob/cd953b4ea8731336669948645a55032e5f5eabba/src/views/JUZ01/JUZ01.schema.ts)
 - [src/views/JUZ01/JUZ01.tsx](https://github.com/EMETRA/Sistema-tickets/blob/cd953b4ea8731336669948645a55032e5f5eabba/src/views/JUZ01/JUZ01.tsx)
@@ -1230,7 +1233,7 @@ Indirecto: dominio judicial ADMEMETRAVEHICULAR mediante api-tickets; archivos pr
 - [src/views/JUZ01Detail/AnalisisEvidencias.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/JUZ01Detail/AnalisisEvidencias.tsx)
 - [src/views/JUZ01Detail/EvidenciasCaso.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/JUZ01Detail/EvidenciasCaso.tsx)
 - [src/views/JUZ01Detail/JUZ01Detail.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/cd953b4ea8731336669948645a55032e5f5eabba/src/views/JUZ01Detail/JUZ01Detail.module.scss)
-- [src/views/JUZ01Detail/JUZ01Detail.tsx](https://github.com/EMETRA/Sistema-tickets/blob/cd953b4ea8731336669948645a55032e5f5eabba/src/views/JUZ01Detail/JUZ01Detail.tsx)
+- [src/views/JUZ01Detail/JUZ01Detail.tsx](https://github.com/EMETRA/Sistema-tickets/blob/b77da403cba653095c8156b0e2c13035a96b606b/src/views/JUZ01Detail/JUZ01Detail.tsx)
 - [src/views/JUZ01Detail/types.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/JUZ01Detail/types.tsx)
 
 <a id="cu-22"></a>
@@ -1276,6 +1279,70 @@ No escribe en Oracle ni cambia perfiles, roles, cookies o token. Reutiliza el bo
 - [Shell y aviso de presentación](https://github.com/EMETRA/Sistema-tickets/blob/9d497b6ff471410ea5a96ba6df5e707ccebd8e43/src/components/client/templates/SystemLayout/SystemLayout.tsx).
 - [Portada según vista](https://github.com/EMETRA/Sistema-tickets/blob/9d497b6ff471410ea5a96ba6df5e707ccebd8e43/src/views/Platform/HomeWorkspace.tsx).
 
+<a id="cu-23"></a>
+
+## CU-23 · Consultar usuarios y actividad de VIVI desde Informática
+
+**Actor:** Administración efectiva de Tickets o cuenta con TICKETS_VIVI_REPORTES_LEER. El nombre USER_ADMIN por sí solo no concede acceso.
+
+**Precondiciones y entrada:** Plataforma activa, módulo `vivi-reportes` registrado y activo, sesión Bearer y SELECT de la cuenta técnica sobre las fuentes. El complemento SQL solo prepara catálogo y permiso funcional. La ruta es `/home/informatica/reportes/vivi-reportes`.
+
+**Flujo y resultado**
+
+1. Entrar a Aplicaciones de Informática → Reportes → Reportes de VIVI; comprobar permiso antes de mostrar el formulario.
+2. Consultar usuarios por nombre, correo, teléfono o ID, cuenta activa/inactiva, con/sin actividad y fecha de inscripción.
+3. Mostrar total del filtro completo, distribución de cuentas, usuarios con/sin publicaciones y página de hasta 50 usuarios. Los contadores por usuario incluyen su historial completo.
+4. Abrir la ficha: nombres, apellidos, correo, teléfono, fecha/estado de registro, DPI, NIT, nacimiento, códigos de sexo/etnia/residencia, zona, dirección y placa declarada. Distinguir nulos de cero y datos declarados de identidad o propiedad acreditada.
+5. Consultar su actividad, o abrir Avisos y reportes para una consulta global. Filtrar por ID VIVI, origen, estado y fecha en que se guardó el registro; agrupar los totales por origen/estado.
+6. Mostrar avisos con caso, placa y motivo, y reportes de incidentes con estado de publicación. No confundir IDs iguales de orígenes distintos; vincular siempre NOUSUARIO con ID_USUARIO_VIVI.
+7. Cambiar de página conservando los filtros aplicados o descargar el CSV de la página confirmada. No modificar cuentas, casos ni publicaciones.
+
+```mermaid
+flowchart TD
+  entrada["Abrir Reportes de VIVI"] --> permiso{"Sesión, módulo y permiso vigentes"}
+  permiso -->|No| denegar["No mostrar formulario ni consultar fuentes"]
+  permiso -->|Sí| usuarios["Filtrar y contar usuarios inscritos"]
+  usuarios --> ficha["Consultar ficha de registro declarada"]
+  ficha --> actividad["Consultar avisos y reportes del usuario"]
+  permiso -->|Sí| actividad
+  actividad --> resultado["Agrupar por origen y estado y paginar"]
+  usuarios --> pagina["Exportar solo la página confirmada"]
+  resultado --> pagina
+```
+
+**Excepciones y alternativas**
+
+- Un módulo inactivo o un permiso ausente se deniega incluso mediante acceso directo. No se infiere acceso por nombre de perfil.
+- Fechas inválidas o invertidas, filtros desconocidos/repetidos, ID no positivo, estado incompatible con el origen o página inválida se rechazan antes de leer las fuentes VIVI.
+- Las fechas incluyen los días completos de Guatemala. Sin fechas, el historial no se limita a los últimos 30 días.
+- Un usuario inexistente devuelve 404; una consulta sin coincidencias devuelve totales cero y lista vacía.
+- No publicado no se presenta como publicado ni como un fallo de correo; una cuenta activa no acredita identidad del titular.
+- Una caída o un ORA conserva el diagnóstico saneado por referencia e incidencia. La pantalla conserva resultados confirmados y permite reintentar; no fabrica un total cero ante un fallo.
+- No se consultan HASH_CLAVE, CREDENCIAL_VERSION, PUSH_TOKEN, OTP, sesiones, documentos ni evidencias.
+- El CSV contiene solo las filas de la página actual; no se anuncia como una exportación de todo el universo filtrado.
+
+**Objetos y persistencia**
+
+| Objeto | Uso |
+| --- | --- |
+| ADMEMETRAIDENTIDAD.TB_VIVI_USUARIOS | Registro y ficha declarada; clave NOUSUARIO. |
+| ADMEMETRAVEHICULAR.TB_VIVI_DENUNCIAS | Avisos, caso, placa, estado y fecha de registro. |
+| ADMEMETRAVEHICULAR.TB_VIVI_REPORTES | Incidentes, usuario VIVI, fecha y publicación. |
+| ADMEMETRAVEHICULAR.TB_VIVI_REGLAMENTO | Descripción del motivo del aviso. |
+| ADMEMETRANOTIFICACIONES.TB_VIVI_TIPOS_INCIDENTE | Nombre del incidente. |
+| ADMEMETRAIDENTIDAD.TB_TK_MODULOS | Entrada activa y permiso estable del formulario. |
+| ADMAUTEMETRA.TB_PERMISOS | Permiso funcional TICKETS_VIVI_REPORTES_LEER. |
+
+Persistencia remota mediante api-tickets. El Panel no conecta a Oracle ni replica estos perfiles en almacenamiento local. Los datos de la ficha y los resultados permanecen en el estado de la pantalla.
+
+**Archivos involucrados**
+
+- [src/views/Platform/ViviReportsWorkspace.tsx](https://github.com/EMETRA/Sistema-tickets/blob/b29ea52c21307f21bb49041ba2e8f76fb8080f44/src/views/Platform/ViviReportsWorkspace.tsx)
+- [src/views/Platform/ViviReportsWorkspace.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/b29ea52c21307f21bb49041ba2e8f76fb8080f44/src/views/Platform/ViviReportsWorkspace.module.scss)
+- [src/platform/vivi-reports.ts](https://github.com/EMETRA/Sistema-tickets/blob/b29ea52c21307f21bb49041ba2e8f76fb8080f44/src/platform/vivi-reports.ts)
+- [src/config/app-registry.ts](https://github.com/EMETRA/Sistema-tickets/blob/b29ea52c21307f21bb49041ba2e8f76fb8080f44/src/config/app-registry.ts)
+- [src/app/api/platform/[...path]/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/b29ea52c21307f21bb49041ba2e8f76fb8080f44/src/app/api/platform/%5B...path%5D/route.ts)
+
 <a id="operaciones"></a>
 
 ## Índice de operaciones y rutas
@@ -1317,7 +1384,7 @@ Las carpetas entre paréntesis agrupan rutas App Router sin añadirse a la URL; 
 | BFF | [src/app/api/COM03/permisos/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/COM03/permisos/route.ts) | [CU-20](#cu-20) |
 | BFF | [src/app/api/COM03/recursos/externos/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/COM03/recursos/externos/route.ts) | [CU-20](#cu-20) |
 | BFF | [src/app/api/COM03/recursos/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/COM03/recursos/route.ts) | [CU-20](#cu-20) |
-| BFF | [src/app/api/JUZ01/[...path]/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/JUZ01/%5B...path%5D/route.ts) | [CU-21](#cu-21) |
+| BFF | [src/app/api/JUZ01/[...path]/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/b77da403cba653095c8156b0e2c13035a96b606b/src/app/api/JUZ01/%5B...path%5D/route.ts) | [CU-21](#cu-21) |
 | BFF | [src/app/api/MOD01/reporteSemanal/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/MOD01/reporteSemanal/route.ts) | [CU-19](#cu-19) |
 | BFF | [src/app/api/MOD01/reporteSemanalColaboradores/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/MOD01/reporteSemanalColaboradores/route.ts) | [CU-19](#cu-19) |
 | BFF | [src/app/api/MOD01/reporteSemanalExcel/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/MOD01/reporteSemanalExcel/route.ts) | [CU-19](#cu-19) |
@@ -1356,7 +1423,7 @@ Las carpetas entre paréntesis agrupan rutas App Router sin añadirse a la URL; 
 | BFF | [src/app/api/my-activity/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/my-activity/route.ts) | [CU-02](#cu-02) |
 | BFF | [src/app/api/my-stats/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/my-stats/route.ts) | [CU-02](#cu-02) |
 | BFF | [src/app/api/perfil-equipo/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/perfil-equipo/route.ts) | [CU-10](#cu-10) |
-| BFF | [src/app/api/platform/[...path]/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/platform/%5B...path%5D/route.ts) | [CU-05](#cu-05) |
+| BFF | [src/app/api/platform/[...path]/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/b29ea52c21307f21bb49041ba2e8f76fb8080f44/src/app/api/platform/%5B...path%5D/route.ts) | [CU-05](#cu-05) |
 | BFF | [src/app/api/rbac/roles/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/rbac/roles/route.ts) | [CU-07](#cu-07) |
 | BFF | [src/app/api/technician-events/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/technician-events/route.ts) | [CU-02](#cu-02) |
 | BFF | [src/app/api/technician-last-tickets/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/technician-last-tickets/route.ts) | [CU-02](#cu-02) |
@@ -1382,7 +1449,7 @@ Las carpetas entre paréntesis agrupan rutas App Router sin añadirse a la URL; 
 
 ## Criterios de cobertura
 
-Esta edición contiene **22 casos agrupados**. El inventario incluye 0 entradas Nest decoradas, 23 páginas Next y 70 manejadores BFF, según corresponda. Los procesos internos, servicios asíncronos y almacenamiento local se cubren en los casos aunque no expongan HTTP. Las operaciones heredadas se identifican como tales; una ruta conservada en código no implica que deba aparecer habilitada en el catálogo de aplicaciones. Las funciones pendientes no se presentan como implementadas.
+Esta edición contiene **23 casos agrupados**. El inventario incluye 0 entradas Nest decoradas, 23 páginas Next y 70 manejadores BFF, según corresponda. Los procesos internos, servicios asíncronos y almacenamiento local se cubren en los casos aunque no expongan HTTP. Las operaciones heredadas se identifican como tales; una ruta conservada en código no implica que deba aparecer habilitada en el catálogo de aplicaciones. Las funciones pendientes no se presentan como implementadas.
 
 Para mantener la cobertura: al añadir o retirar una ruta, resolver, tarea programada o pantalla, actualizar su caso, su fila en este índice, los objetos usados y el diagrama. Si una función depende de otro repositorio, conservar explícito ese límite y actualizar también el contrato del receptor.
 

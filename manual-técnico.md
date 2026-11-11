@@ -1,6 +1,6 @@
 # Manual técnico — Sistema-tickets
 
-Base documental: `926fe45d27922c595c63e8f79e1e82b1594470eb`; actualización de consulta de casos: `cd953b4ea8731336669948645a55032e5f5eabba`; actualización de vistas y diagnóstico judicial: `9d497b6ff471410ea5a96ba6df5e707ccebd8e43`; línea de integración revisada: `Dev + fix/vistas_presentacion_y_layout`. Describe la base y la actualización citadas; la configuración y las autorizaciones efectivas de un servidor se comprueban por separado. Esta edición se preparó sin conectarse a Oracle, SMTP ni servidores institucionales.
+Base documental: `926fe45d27922c595c63e8f79e1e82b1594470eb`; actualización de consulta de casos: `cd953b4ea8731336669948645a55032e5f5eabba`; actualización de vistas y diagnóstico judicial: `9d497b6ff471410ea5a96ba6df5e707ccebd8e43`; actualización documental: `b77da403cba653095c8156b0e2c13035a96b606b`; actualización de catálogo: `e3f8676f5121223c9f23aaa036833260efe236f9`; reportes VIVI: `b29ea52c21307f21bb49041ba2e8f76fb8080f44`; línea de integración revisada: `Dev + fix/pdf_judicial_proxy`. Describe la base y la actualización citadas; la configuración y las autorizaciones efectivas de un servidor se comprueban por separado. Esta edición se preparó sin conectarse a Oracle, SMTP ni servidores institucionales.
 
 Los enlaces de código fijan esa revisión para que sigan siendo consultables cuando `main` excluya herramientas de desarrollo. Al modificar un comportamiento se deben actualizar su caso de uso, configuración y referencia de código.
 
@@ -116,6 +116,16 @@ El BFF valida sesión, ruta permitida y contrato; no es un proxy abierto a URLs 
 
 La vista de presentación requiere `actor.admin=true` del bootstrap. `WorkspaceViewProvider` conserva una selección temporal para esa sesión y cuenta, y proyecta solo portada/navegación mediante `presentation.ts`. El bootstrap original, `getPlatformRuntime()`, cookies, token y permisos se conservan para autorizar peticiones y acciones. La interfaz avisa que los datos pertenecen a la cuenta actual; para verificar permisos de otra persona se usa una sesión de esa persona. El nombre USER_ADMIN por sí solo no habilita el selector.
 
+El catálogo vigente sitúa **Consultar caso** en **Aplicaciones Juzgado → Consultas** (`/home/juzgado/consultas/juz01`), conservando `VIVI_JUZGADO_*`. **Notificar documento** permanece en Jurídico. Los tres reportes semanales (`mod01`, `exportmod01`, `save-mod01`) están deshabilitados; los dos dashboards de Informática se retiran del catálogo y su acceso queda en **Métricas** (`/espacio/metricas`). Se conservan tablas y registros históricos.
+
+[`publicAppsCatalog`](https://github.com/EMETRA/Sistema-tickets/blob/e3f8676f5121223c9f23aaa036833260efe236f9/src/config/apps-catalog.ts) normaliza catálogos anteriores sin inventar acceso a Juzgado. El respaldo usa la misma ubicación. Los marcadores judiciales antiguos conservan `caseNumber`; los reportes llevan a desuso y los dashboards a Métricas. El destino exige sesión y permisos, y la retirada se aplica también en el API. No requiere SQL.
+
+Los **Reportes de VIVI** se ubican en Aplicaciones de Informática → Reportes (`/home/informatica/reportes/vivi-reportes`). Ofrecen usuarios inscritos, ficha de los datos declarados y actividad del usuario con avisos vehiculares y reportes de incidentes, además de cuentas activas/inactivas y sin actividad. Los filtros de inscripción afectan al universo de usuarios; sus contadores de actividad son históricos completos. En actividad se filtra la fecha de registro, no el hecho ni su evidencia. Los días son inclusivos de Guatemala y se convierten a UTC.
+
+El formulario se monta solo después de comprobar `vivi-reportes` con ModuleAccessGate. El BFF conserva Bearer, origen fijo y respuesta privada sin caché. La pantalla muestra nulos, vacíos y errores como estados distintos, mantiene los últimos resultados confirmados y permite reintentar. La paginación usa los filtros aplicados y el CSV exporta solo la página confirmada (hasta 50 filas), con protección frente a fórmulas; no incluye la ficha privada completa. Las peticiones anteriores se abortan al cambiar de consulta para impedir cruces de resultados.
+
+La entrada requiere registrar el catálogo en api-tickets con `sql/vivi/04_reportes_informatica.sql`; tener solo la vista local no habilita las fuentes. Acceso efectivo: `TICKETS_ADMINISTRAR` o `TICKETS_VIVI_REPORTES_LEER`. La implementación está en [src/views/Platform/ViviReportsWorkspace.tsx](https://github.com/EMETRA/Sistema-tickets/blob/b29ea52c21307f21bb49041ba2e8f76fb8080f44/src/views/Platform/ViviReportsWorkspace.tsx) y [src/platform/vivi-reports.ts](https://github.com/EMETRA/Sistema-tickets/blob/b29ea52c21307f21bb49041ba2e8f76fb8080f44/src/platform/vivi-reports.ts).
+
 <a id="operacion"></a>
 
 ## 8. Operación, fallos y recuperación
@@ -127,6 +137,8 @@ Las incidencias de navegador/BFF no deben bloquear la operación original ni exp
 La consulta judicial acepta los primeros 3 o 6 caracteres o el código completo y resalta el prefijo coincidente. La recepción de papelería oculta los campos mientras no haya juzgados válidos y mantiene confirmación previa. El estado vacío de actuaciones reemplaza los encabezados sin filas; la tabla con datos se adapta a tarjetas móviles. Actualizar estado no descarta una solicitud cuyo resultado siga incierto.
 
 El shell ocupa la ventana con posición fija y concentra el desplazamiento en `main`; evita que el documento exterior deje un área vacía al llegar al final de una bitácora larga. El bloqueo de scroll exterior solo se aplica cuando existe `data-workspace-shell`, sin afectar los formularios de autenticación. Los fallos judiciales con referencia UUID válida la muestran en el aviso para localizar la incidencia; no se copian errores SQL a la pantalla.
+
+El proxy JUZ01 conserva la referencia UUID del API y su HTTP. Los fallos técnicos sin referencia del API se encolan como incidencias del Panel; sesión, permiso y conflicto no se convierten en bugs. La generación de PDF exige JSON y la descarga valida el tipo del archivo. El reintento documental obtiene un comando revisado nuevo por clic para no quedar bloqueado por un intento anterior incierto; usa el mismo ID de resolución y la idempotencia documental del API. Esta excepción no altera la identidad de las decisiones judiciales ni de otras mutaciones. El aviso indica que la resolución ya está registrada y que se debe reintentar únicamente el PDF.
 
 <a id="validacion"></a>
 

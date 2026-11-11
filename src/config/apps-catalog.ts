@@ -156,24 +156,84 @@ export function buildModulePath(
     return `/home/${appId}/${sectionId}/${moduleId}`;
 }
 
-/** Los accesos corporativos tienen una ubicación única; los procesos retirados no vuelven por un catálogo antiguo. */
+/** Catálogo público vigente, incluso si el API conserva la ubicación anterior. */
 export function publicAppsCatalog(catalog: AppsCatalog): AppsCatalog {
-    return Object.fromEntries(
-        Object.entries(catalog).flatMap(([id, app]) => {
-            const sections = Object.fromEntries(
-                Object.entries(app.sections).flatMap(([sid, section]) => {
-                    const modules = section.modules.filter(
-                        (m) => !["proc01", "mod13", "mod06"].includes(m.id),
-                    );
-                    return modules.length || section.modules.length === 0
-                        ? [[sid, { ...section, modules }]]
-                        : [];
-                }),
-            );
-            return Object.keys(sections).length ||
-                Object.keys(app.sections).length === 0
-                ? [[id, { ...app, sections }]]
-                : [];
-        }),
+    const result: AppsCatalog = {};
+    let caseModule: AppMeta | undefined;
+    const hidden = [
+        "proc01",
+        "mod13",
+        "mod06",
+        "mod01",
+        "exportmod01",
+        "save-mod01",
+        "dashboard-proyectos",
+        "dashboard-colaboradores",
+    ];
+    for (const [appId, app] of Object.entries(catalog)) {
+        const sections: Record<string, AppSection> = {};
+        for (const [sectionId, section] of Object.entries(app.sections)) {
+            const modules = section.modules.filter((module) => {
+                if (hidden.includes(module.id)) return false;
+                if (module.id === "juz01") {
+                    caseModule ??= module;
+                    return false;
+                }
+                return true;
+            });
+            if (modules.length || section.modules.length === 0)
+                sections[sectionId] = { ...section, modules };
+        }
+        if (
+            Object.keys(sections).length ||
+            Object.keys(app.sections).length === 0
+        )
+            result[appId] = { ...app, sections };
+    }
+    // Solo se traslada un módulo ya autorizado; nunca se crea un acceso nuevo.
+    if (caseModule) {
+        const app = result.juzgado;
+        const section = app?.sections.consultas;
+        const iconName = caseModule.iconName;
+        const meta = (id: string, title: string): AppMeta => ({
+            id,
+            label: title,
+            title,
+            iconName,
+        });
+        result.juzgado = {
+            meta: meta("juzgado", "Aplicaciones Juzgado"),
+            sections: {
+                ...app?.sections,
+                consultas: {
+                    meta: meta("consultas", "Consultas"),
+                    modules: [...(section?.modules ?? []), { ...caseModule }],
+                },
+            },
+        };
+    }
+    return result;
+}
+
+/** Destinos de marcadores antiguos; el destino conserva sus controles de acceso. */
+export function legacyApplicationDestination(pathname: string): string | null {
+    const match = pathname.match(
+        /^\/home\/[^/]+\/[^/]+\/([^/]+)(\/detail)?\/?$/,
     );
+    if (!match) return null;
+    const [, moduleId, detail = ""] = match;
+    if (moduleId === "juz01") {
+        const target = `/home/juzgado/consultas/juz01${detail}`;
+        return pathname.replace(/\/$/, "") === target ? null : target;
+    }
+    if (["dashboard-proyectos", "dashboard-colaboradores"].includes(moduleId))
+        return "/espacio/metricas";
+    if (moduleId === "mod06") return "/espacio/accesos?tab=corporate";
+    if (
+        ["proc01", "mod13", "mod01", "exportmod01", "save-mod01"].includes(
+            moduleId,
+        )
+    )
+        return "/aplicaciones/en-desuso";
+    return null;
 }

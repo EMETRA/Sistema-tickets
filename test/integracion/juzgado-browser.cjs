@@ -11,7 +11,8 @@ async function run() {
   const permisos = ['VIVI_JUZGADO_CONSULTAR', 'VIVI_JUZGADO_RECIBIR', 'VIVI_JUZGADO_RESOLVER'];
   const user = { id_usuario: '12', nombre: 'Usuario QA controlado', email: 'qa@example.invalid', rol: 'USUARIO', permisos, departamento: 'Prueba' };
   const llamadas = [];
-  let archivoHttp=503, conActuaciones=false;
+  let archivoHttp=503, conActuaciones=false, generacionPdfFalla=true;
+  const referenciaPdf='b06f32ff-c167-4575-ad76-d5b5400ae908';
   let sedesFalla = true, sedesVacias = false, perfilFalla = true, recepcionFalla = true, recibida = false, resuelta = false, pdf = false;
   const documento = { id: '80', tipoDocumento: 'RESOLUCION', numeroVersion: '1', versionPlantilla: 'DEN09-BORRADOR-1', mime: 'application/pdf', tamanoBytes: '40', generadoEn: '2026-10-08T20:00:00Z' };
   const detalle = () => ({ codigoCaso: codigo, estadoCaso: resuelta ? 'REMISION_EMITIDA' : recibida ? 'EN_JUZGADO' : 'NOTIFICADA', caso: { id: '8003', codigoCaso: codigo, usoPlaca: 'P', placa: '113BBB', regla: '39', observaciones: 'Observación QA', estado: 'NOTIFICADA', registradaEn: '2026-10-08T17:00:00Z', evidenciasDenuncia: [{id:'81',origen:'DENUNCIA',mime:'image/png',tamanoBytes:'68',estado:'DISPONIBLE'},{id:'82',origen:'DENUNCIA',mime:'image/png',tamanoBytes:'68',estado:'DISPONIBLE'}], analisisEvidencias: {disponible:true,estado:'ACEPTADA',modelo:'modelo-qa',versionPolitica:'EVIDENCIA_V5_CONJUNTO',creadoEn:'2026-10-29T17:00:00Z',terminadoEn:'2026-10-29T17:01:00Z',referenciaEstado:'DISPONIBLE',referenciaFuente:'SAT_MUNI',errorReferencia:null,codigoError:null,esPoliticaConjunto:true,archivos:[{idEvidencia:'81',decision:'REVISION',motivo:'INSUFICIENTE',hecho:'RELACIONADO',placa:'NO_VISIBLE',comparacionPlaca:'NO_DETERMINABLE',compatibilidad:'COMPATIBLE',marca:'NO_DETERMINABLE',indicioMarca:'NO_RECONOCIBLE',contenidoSensible:false,posiblePantalla:false,analizadoEn:'2026-10-29T17:01:00Z',fotogramas:1},{idEvidencia:'82',decision:'REVISION',motivo:'INSUFICIENTE',hecho:'AJENO',placa:'PARCIAL',comparacionPlaca:'NO_DETERMINABLE',compatibilidad:'NO_DETERMINABLE',marca:'COINCIDE',indicioMarca:null,contenidoSensible:false,posiblePantalla:false,analizadoEn:'2026-10-29T17:01:00Z',fotogramas:1}]}, defensa: null }, expediente: recibida ? { id: '77', version: '2', codigoJuzgado: 'JUZ_QA', nombreJuzgado: 'Sede QA controlada', direccionJuzgado: 'Dirección QA controlada', horarioJuzgado: 'Horario QA controlado', estado: resuelta ? 'RESUELTO' : 'RECIBIDO', idActorReceptor: '12', recibidaEn: '2026-10-08T18:00:00Z', numeroInterno: 'EXP-QA-77', observacion: null, gestiones: conActuaciones ? [{id:'1',idActor:'12',tipoGestion:'REVISION',ocurridaEn:'2026-10-08T18:10:00Z',observacion:'Revisión de papelería y evidencias del expediente controlado.'},{id:'2',idActor:'12',tipoGestion:'ENTREGA_DOCUMENTOS',ocurridaEn:'2026-10-08T18:20:00Z',observacion:'Documentación recibida para continuar el análisis del caso.'}] : [], resolucion: resuelta ? { id: '79', decision: 'NO_ACOGIDA', fundamento: 'Fundamento QA controlado', autoridadSnapshot: user.nombre, versionPlantilla: 'DEN09-BORRADOR-1', resueltaEn: '2026-10-08T19:00:00Z', idActorJuez: '12' } : null, remision: resuelta ? { ciudad: '1', serie: 'V', numero: '8003' } : null, documentos: pdf ? [documento] : [] } : null });
@@ -24,7 +25,10 @@ async function run() {
     if(req.url==='/platform/module-access/JUZ01')return json({moduloId:'JUZ01',allowed:true,actions:{LEER:true,INSERTAR:true,EDITAR:true,ELIMINAR:false}});
     if(req.url==='/platform/bootstrap')return json({codigo:'FEATURE_DISABLED',message:'Fixture sin plataforma general'},503);
     if(req.url.includes('/evidencias/')){if(archivoHttp!==200)return json({codigo:'ARCHIVO_NO_DISPONIBLE',mensaje:'ruta privada no debe exponerse'},archivoHttp);res.writeHead(200,{'Content-Type':'image/png'});return res.end(Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=','base64'));}
-    if (req.url.includes('/documento/generar')) { pdf = true; return json(documento); }
+    if (req.url.includes('/documento/generar')) {
+      if(generacionPdfFalla)return json({codigo:'ARCHIVO_ALMACENAMIENTO_NO_CONFIGURADO',referencia:referenciaPdf,mensaje:'/ruta/privada'},503);
+      pdf = true; return json(documento);
+    }
     if (req.url.includes('/documentos/')) { res.writeHead(200, { 'Content-Type': 'application/pdf', 'Content-Disposition': 'attachment; filename="resolucion.pdf"' }); return res.end('%PDF-1.4\nQA\n%%EOF'); }
     if (q.includes('mutation Login')) return json({ data: { login: { token: 'qa-token-controlado', refresh_token: 'qa-refresh-controlado', expires_in: 3600 } } });
     if (q.includes('query GetUser')) return perfilFalla ? json({ errors: [{ message: 'ORA-00942 consulta privada', extensions: { code: 'INTERNAL_SERVER_ERROR' } }] }) : json({ data: { usuario: user } });
@@ -83,8 +87,14 @@ async function run() {
     // La sesión siguiente es una fixture declarada, no una cuenta administrativa.
     await context.addCookies([{ name: 'auth_token', value: 'qa-token-controlado', url: 'http://127.0.0.1:3741' }, { name: 'auth_role', value: 'USUARIO', url: 'http://127.0.0.1:3741' }]);
     await page.evaluate(({ user }) => localStorage.setItem('auth-storage', JSON.stringify({ state: { token: 'qa-token-controlado', user, userId: user.id_usuario }, version: 0 })), { user });
-    const url = `http://127.0.0.1:3741/home/juridico/juz01/juz01/detail?caseNumber=${codigo}`;
+    const url = `http://127.0.0.1:3741/home/juzgado/consultas/juz01/detail?caseNumber=${codigo}`;
+    await page.goto('http://127.0.0.1:3741/aplicaciones');
+    await page.getByRole('button', { name: 'Ingresar a Aplicaciones Juzgado', exact: true }).click();
+    await page.waitForURL('**/home/juzgado/consultas');
+    await page.getByRole('button', { name: 'Ingresar a Consultar caso', exact: true }).click();
+    await page.waitForURL('**/home/juzgado/consultas/juz01');
     await page.goto('http://127.0.0.1:3741/home/juridico/juz01/juz01');
+    await page.waitForURL('**/home/juzgado/consultas/juz01');
     await page.locator('#caseNumber').fill('ab');await page.getByRole('button',{name:'Consultar caso',exact:true}).click();
     await page.getByRole('alert').filter({hasText:'primeros 3 caracteres'}).waitFor();
     assert.equal(llamadas.filter(l=>l.query.includes('viviJuzgadoBuscar')).length,0);
@@ -126,6 +136,9 @@ async function run() {
     assert.ok(!page.url().includes('/detail'));assert.equal(llamadas.filter(l=>l.query.includes('viviJuzgadoDetalle')).length,0);
     await page.getByRole('button',{name:'Abrir caso '+codigo,exact:true}).click();
 
+    await page.waitForURL(url);
+    await page.goto(`http://127.0.0.1:3741/home/juridico/juz01/juz01/detail?caseNumber=${codigo}`);
+    await page.waitForURL(url);
     await page.getByRole('button', { name: 'Reintentar juzgados' }).waitFor();
     assert.ok((await page.locator('body').innerText()).includes(codigo));
     await page.getByRole('heading',{name:'Análisis automático de evidencias'}).waitFor();
@@ -254,9 +267,19 @@ async function run() {
     await page.getByRole('button', { name: 'Reintentar PDF de resolución' }).waitFor();
     assert.equal(llamadas.filter(l => l.query.includes('viviJuzgadoResolverNoAcogida')).length, 1);
     await page.getByRole('button', { name: 'Reintentar PDF de resolución' }).click();
+    await page.getByText('La resolución está registrada. Falta configurar el almacenamiento para generar su PDF.',{exact:false}).waitFor();
+    await page.getByText(referenciaPdf,{exact:false}).waitFor();
+    assert.equal(llamadas.filter(l=>l.ruta.includes('/documento/generar')).length,1);
+    assert.equal(llamadas.filter(l => l.query.includes('viviJuzgadoResolverNoAcogida')).length, 1);
+    assert.ok(!(await page.locator('body').innerText()).includes('/ruta/privada'));
+    generacionPdfFalla=false;
+    await page.getByRole('button', { name: 'Reintentar PDF de resolución' }).click();
     await page.getByRole('button', { name: 'Reintentar PDF de resolución' }).waitFor({ state: 'detached' });
     assert.equal(llamadas.filter(l => l.query.includes('viviJuzgadoResolverNoAcogida')).length, 1);
     const doc = llamadas.find(l => l.ruta.includes('/documento/generar')); assert.equal(doc.auth, 'Bearer qa-token-controlado');
+    const download=page.waitForEvent('download');await page.getByText('resolucion-'+codigo+'.pdf',{exact:true}).click();
+    assert.ok((await fs.readFile(await (await download).path())).toString().startsWith('%PDF-'));
+    assert.equal(llamadas.find(l=>l.ruta.includes('/documentos/80')).auth,'Bearer qa-token-controlado');
     await page.screenshot({ path: path.join(out, 'panel-resolucion.png'), fullPage: false });
     // El rol USUARIO con permisos vacíos no habilita consulta ni mutaciones.
     await page.evaluate(({ user }) => localStorage.setItem('auth-storage', JSON.stringify({ state: { token: 'qa-token-controlado', user: { ...user, permisos: [] }, userId: user.id_usuario }, version: 0 })), { user });

@@ -55,6 +55,7 @@ import {
 } from "../constants";
 import { useNewsForm } from "../hooks/useNewsForm";
 import styles from "./NewsFormView.module.scss";
+import NewsActivity from "@/components/client/organisms/NewsActivity/NewsActivity";
 
 interface NewsFormViewProps {
   /** null = crear; con valor = editar */
@@ -456,6 +457,8 @@ function NewsFormContent({
           Revisa los campos marcados antes de continuar.
         </Text>
       )}
+
+      {initial && <NewsActivity activity={initial.actividadEditorial} />}
 
       <NewsForm
         heading={initial ? "Editar noticia" : "Crear noticia"}

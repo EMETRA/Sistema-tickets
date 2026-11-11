@@ -1,5 +1,5 @@
 import { graphqlRequestClient, apiFetch } from "./client";
-import { ArchivoJuzgadoError } from "./juzgado-archivo";
+import { ArchivoJuzgadoError, referenciaArchivo } from "./juzgado-archivo";
 export type CoincidenciaJuzgado = {
   codigoCaso: string;
   usoPlaca: string;
@@ -293,7 +293,7 @@ export async function obtenerArchivoJuzgado(
     });
     if (!response.ok) {
         const body = await response.json().catch(() => ({}));
-        throw new ArchivoJuzgadoError(response.status, body.codigo);
+        throw new ArchivoJuzgadoError(response.status, body.codigo, body.referencia);
     }
     if (
         !/^(image\/(jpeg|png)|video\/mp4|application\/(pdf|octet-stream))(;|$)/i.test(
@@ -326,30 +326,40 @@ export function idSolicitudJuzgado(): string {
         "juz-" + Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("")
     );
 }
-export function mensajeJuzgado(error: unknown, contexto: "actuacion" | "busqueda" = "actuacion"): string {
+export function mensajeJuzgado(error: unknown, contexto: "actuacion" | "busqueda" | "documento" = "actuacion"): string {
+    if (error instanceof ArchivoJuzgadoError) return error.message;
     const e = error as {
     statusCode?: number;
+    referencia?: unknown;
+    body?: { referencia?: unknown; codigo?: unknown };
     graphQLErrors?: {
       extensions?: { code?: string; statusCode?: number; referencia?: string; originalError?: { statusCode?: number } };
     }[];
   };
     const ext = e.graphQLErrors?.[0]?.extensions;
     const status = e.statusCode || ext?.statusCode || ext?.originalError?.statusCode;
+    const ref = referenciaArchivo(ext?.referencia) || referenciaArchivo(e.body?.referencia) || referenciaArchivo(e.referencia);
+    const referencia = ref ? ` Referencia: ${ref}.` : "";
     if (status === 401 || ext?.code === "UNAUTHENTICATED")
         return "La sesión venció. Vuelve a iniciar sesión.";
     if (status === 403 || ext?.code === "FORBIDDEN")
         return "Tu cuenta no tiene permiso para esta operación.";
-    if (status === 404) return "No se encontró el caso o expediente solicitado.";
+    if (status === 404) return contexto === "documento"
+        ? "No se encontró la resolución o el documento. Actualiza el caso para comprobar su estado."
+        : "No se encontró el caso o expediente solicitado.";
     if (status === 409)
-        return "El expediente cambió o ya tiene otra actuación. Consulta su estado actual antes de continuar.";
+        return contexto === "documento"
+            ? "Consulta el estado actual del documento antes de reenviar su generación."
+            : "El expediente cambió o ya tiene otra actuación. Consulta su estado actual antes de continuar.";
     if (ext?.code === "BUSQUEDA_DEMASIADO_AMPLIA")
         return "Hay más de 20 coincidencias. Usa los primeros 6 caracteres o el código completo para precisar la búsqueda.";
     if (status === 400)
         return contexto === "busqueda"
             ? "Revisa el código. Debe tener entre 3 y 36 caracteres; puedes usar sus primeros 6 caracteres o pegarlo completo."
             : "Revisa los datos de la actuación y vuelve a intentar.";
-    const referencia = typeof ext?.referencia === "string" &&
-        /^[a-f0-9]{8}-[a-f0-9]{4}-[1-5][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(ext.referencia)
-        ? ` Referencia: ${ext.referencia}.` : "";
+    if (contexto === "documento")
+        return (e.body?.codigo === "ARCHIVO_ALMACENAMIENTO_NO_CONFIGURADO"
+            ? "La resolución está registrada. Falta configurar el almacenamiento para generar su PDF."
+            : "La resolución está registrada. No fue posible preparar el PDF; reintenta únicamente el documento.") + referencia;
     return "No se pudo completar la operación. Puedes reintentar la misma solicitud o consultar el estado actual del caso." + referencia;
 }

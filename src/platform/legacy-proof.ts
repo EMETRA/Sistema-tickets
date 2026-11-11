@@ -58,7 +58,12 @@ export async function legacyProof(
     try {
         remembered = sessionStorage.getItem("tk-legacy-" + key);
     } catch {}
-    const requestId = pending.get(key) || remembered || crypto.randomUUID();
+    // El PDF se reconstruye por ID de resolución y el servicio reutiliza su fila.
+    // Cada clic debe poder obtener una revisión nueva, aunque el intento anterior
+    // quedara INCIERTO en la auditoría. Las demás mutaciones conservan su identidad.
+    const documentRetry = /^\/legacy\/vivi\/juzgado\/resoluciones\/[1-9]\d{0,18}\/documento\/generar$/.test(path);
+    const requestId = documentRetry ? crypto.randomUUID()
+        : pending.get(key) || remembered || crypto.randomUUID();
     pending.set(key, requestId);
     try {
         sessionStorage.setItem("tk-legacy-" + key, requestId);

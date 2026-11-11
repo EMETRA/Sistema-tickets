@@ -163,6 +163,7 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
     async function ejecutar(
         accion: () => Promise<unknown>,
         confirmar?: () => void,
+        contexto: "actuacion" | "documento" = "actuacion",
     ) {
         if (enCurso.current) return;
         enCurso.current = true;
@@ -180,7 +181,7 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
                 );
             }
         } catch (e) {
-            setAviso(mensajeJuzgado(e));
+            setAviso(mensajeJuzgado(e, contexto));
         } finally {
             enCurso.current = false;
             setBusy(false);
@@ -596,10 +597,10 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
                                                     <Button
                                                         state={busy ? "disabled" : "default"}
                                                         onClick={() => {
-                                                            void ejecutar(() =>
-                                                                generarDocumentoJuzgado(
-                                currentCase.resolucion!.id,
-                                                                ),
+                                                            void ejecutar(
+                                                                () => generarDocumentoJuzgado(currentCase.resolucion!.id),
+                                                                undefined,
+                                                                "documento",
                                                             );
                                                         }}
                                                     >

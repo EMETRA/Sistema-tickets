@@ -1,6 +1,6 @@
 # Casos de uso — Sistema-tickets
 
-Código de referencia: `926fe45d27922c595c63e8f79e1e82b1594470eb`; línea de integración revisada: `Dev + feat/casos_catalogos_oracle_github`. Describe capacidades presentes en esa revisión; la configuración y las autorizaciones efectivas de un servidor se comprueban por separado. Esta edición se preparó sin conectarse a Oracle, SMTP ni servidores institucionales.
+Base documental: `926fe45d27922c595c63e8f79e1e82b1594470eb`; actualización de consulta de casos: `cd953b4ea8731336669948645a55032e5f5eabba`; línea de integración revisada: `Dev + fix/consulta_caso_ux_prefijos`. Describe la base y la actualización citadas; la configuración y las autorizaciones efectivas de un servidor se comprueban por separado. Esta edición se preparó sin conectarse a Oracle, SMTP ni servidores institucionales.
 
 Los enlaces de código fijan esa revisión para que sigan siendo consultables cuando `main` excluya herramientas de desarrollo. Al modificar un comportamiento se deben actualizar su caso de uso, configuración y referencia de código.
 
@@ -1183,7 +1183,7 @@ Referencias de implementación relacionadas (incluye dependencias compartidas; e
 
 **Flujo y resultado**
 
-1. Escribir al menos seis caracteres.
+1. Escribir al menos tres caracteres (incluidos seis o el código completo).
 2. Mostrar resultados con placa y datos de identificación permitidos.
 3. Abrir caso dentro de la sede autorizada.
 4. Consultar evidencia y registrar gestión o resolución.
@@ -1191,7 +1191,7 @@ Referencias de implementación relacionadas (incluye dependencias compartidas; e
 
 ```mermaid
 flowchart TD
-  inicio["Escribir al menos seis caracteres"]
+  inicio["Escribir al menos tres caracteres (incluidos seis o el código completo)"]
   control{"Entrada y autorización válidas"}
   inicio --> control
   control -->|No| rechazo["Informar la excepción descrita; no completar la operación"]
@@ -1207,8 +1207,9 @@ flowchart TD
 
 **Excepciones y alternativas**
 
-- Búsqueda corta no llama al API.
+- Búsqueda menor de tres caracteres no llama al API; con tres, seis o el código completo se consulta por el inicio.
 - Tabla y tarjetas móviles conservan identificación equivalente.
+- Si hay más de 20 coincidencias, `BUSQUEDA_DEMASIADO_AMPLIA` pide precisar con seis caracteres o el código completo.
 - Acción no permitida por estado se bloquea.
 - Reintentos no duplican resolución.
 
@@ -1218,15 +1219,17 @@ Indirecto: dominio judicial ADMEMETRAVEHICULAR mediante api-tickets; archivos pr
 
 **Archivos involucrados**
 
+- [src/api/graphql/juzgado.ts](https://github.com/EMETRA/Sistema-tickets/blob/cd953b4ea8731336669948645a55032e5f5eabba/src/api/graphql/juzgado.ts)
+- [src/api/graphql/juzgado-vista.ts](https://github.com/EMETRA/Sistema-tickets/blob/cd953b4ea8731336669948645a55032e5f5eabba/src/api/graphql/juzgado-vista.ts)
 - [src/app/api/JUZ01/[...path]/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/JUZ01/%5B...path%5D/route.ts)
-- [src/views/JUZ01/JUZ01.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/JUZ01/JUZ01.module.scss)
-- [src/views/JUZ01/JUZ01.schema.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/JUZ01/JUZ01.schema.ts)
-- [src/views/JUZ01/JUZ01.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/JUZ01/JUZ01.tsx)
+- [src/views/JUZ01/JUZ01.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/cd953b4ea8731336669948645a55032e5f5eabba/src/views/JUZ01/JUZ01.module.scss)
+- [src/views/JUZ01/JUZ01.schema.ts](https://github.com/EMETRA/Sistema-tickets/blob/cd953b4ea8731336669948645a55032e5f5eabba/src/views/JUZ01/JUZ01.schema.ts)
+- [src/views/JUZ01/JUZ01.tsx](https://github.com/EMETRA/Sistema-tickets/blob/cd953b4ea8731336669948645a55032e5f5eabba/src/views/JUZ01/JUZ01.tsx)
 - [src/views/JUZ01/index.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/JUZ01/index.tsx)
 - [src/views/JUZ01Detail/AnalisisEvidencias.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/JUZ01Detail/AnalisisEvidencias.tsx)
 - [src/views/JUZ01Detail/EvidenciasCaso.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/JUZ01Detail/EvidenciasCaso.tsx)
-- [src/views/JUZ01Detail/JUZ01Detail.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/JUZ01Detail/JUZ01Detail.module.scss)
-- [src/views/JUZ01Detail/JUZ01Detail.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/JUZ01Detail/JUZ01Detail.tsx)
+- [src/views/JUZ01Detail/JUZ01Detail.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/cd953b4ea8731336669948645a55032e5f5eabba/src/views/JUZ01Detail/JUZ01Detail.module.scss)
+- [src/views/JUZ01Detail/JUZ01Detail.tsx](https://github.com/EMETRA/Sistema-tickets/blob/cd953b4ea8731336669948645a55032e5f5eabba/src/views/JUZ01Detail/JUZ01Detail.tsx)
 - [src/views/JUZ01Detail/types.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/JUZ01Detail/types.tsx)
 
 <a id="operaciones"></a>
@@ -1338,3 +1341,5 @@ Las carpetas entre paréntesis agrupan rutas App Router sin añadirse a la URL; 
 Esta edición contiene **21 casos agrupados**. El inventario incluye 0 entradas Nest decoradas, 23 páginas Next y 70 manejadores BFF, según corresponda. Los procesos internos, servicios asíncronos y almacenamiento local se cubren en los casos aunque no expongan HTTP. Las operaciones heredadas se identifican como tales; una ruta conservada en código no implica que deba aparecer habilitada en el catálogo de aplicaciones. Las funciones pendientes no se presentan como implementadas.
 
 Para mantener la cobertura: al añadir o retirar una ruta, resolver, tarea programada o pantalla, actualizar su caso, su fila en este índice, los objetos usados y el diagrama. Si una función depende de otro repositorio, conservar explícito ese límite y actualizar también el contrato del receptor.
+
+Actualización de UX judicial: la recepción muestra los campos solo al disponer de juzgados activos; distingue carga, error y catálogo vacío. La bitácora vacía no muestra una tabla sin filas. Actualizar el estado conserva las solicitudes de resultado incierto para reintentar con la misma identidad.

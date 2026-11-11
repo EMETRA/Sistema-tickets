@@ -326,15 +326,15 @@ export function idSolicitudJuzgado(): string {
         "juz-" + Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("")
     );
 }
-export function mensajeJuzgado(error: unknown): string {
+export function mensajeJuzgado(error: unknown, contexto: "actuacion" | "busqueda" = "actuacion"): string {
     const e = error as {
     statusCode?: number;
     graphQLErrors?: {
-      extensions?: { code?: string; originalError?: { statusCode?: number } };
+      extensions?: { code?: string; statusCode?: number; originalError?: { statusCode?: number } };
     }[];
   };
     const ext = e.graphQLErrors?.[0]?.extensions;
-    const status = e.statusCode || ext?.originalError?.statusCode;
+    const status = e.statusCode || ext?.statusCode || ext?.originalError?.statusCode;
     if (status === 401 || ext?.code === "UNAUTHENTICATED")
         return "La sesión venció. Vuelve a iniciar sesión.";
     if (status === 403 || ext?.code === "FORBIDDEN")
@@ -342,7 +342,11 @@ export function mensajeJuzgado(error: unknown): string {
     if (status === 404) return "No se encontró el caso o expediente solicitado.";
     if (status === 409)
         return "El expediente cambió o ya tiene otra actuación. Consulta su estado actual antes de continuar.";
+    if (ext?.code === "BUSQUEDA_DEMASIADO_AMPLIA")
+        return "Hay más de 20 coincidencias. Usa los primeros 6 caracteres o el código completo para precisar la búsqueda.";
     if (status === 400)
-        return "Revisa los datos de la actuación y vuelve a intentar.";
+        return contexto === "busqueda"
+            ? "Revisa el código. Debe tener entre 3 y 36 caracteres; puedes usar sus primeros 6 caracteres o pegarlo completo."
+            : "Revisa los datos de la actuación y vuelve a intentar.";
     return "No se pudo completar la operación. Puedes reintentar la misma solicitud o consultar el estado actual del caso.";
 }

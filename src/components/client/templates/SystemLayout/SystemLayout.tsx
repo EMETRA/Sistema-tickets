@@ -252,7 +252,8 @@ export const SystemLayout = ({
                                 <Link href={`/home/${appContext.appId}`}>
                                     {catalog[appContext.appId]?.meta.label}
                                 </Link>
-                                {appContext.sectionId && (
+                                {appContext.sectionId && (!appContext.moduleId ||
+                                    catalog[appContext.appId]?.sections[appContext.sectionId]?.meta.label.trim().toLocaleLowerCase() !== activePage.title.trim().toLocaleLowerCase()) && (
                                     <>
                                         <span aria-hidden="true">/</span>
                                         <Link

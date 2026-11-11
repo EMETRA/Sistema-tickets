@@ -12,7 +12,7 @@ import {
 } from "@/components/client/organisms/RecentActions/RecentActions";
 import { AgendaPreview } from "@/components/client/organisms/AgendaPreview/AgendaPreview";
 import { TicketDetail } from "@/components/client/organisms/TicketDetail";
-import { usePlatform } from "@/platform/context";
+import { useWorkspaceView } from "@/platform/presentation-context";
 import { platformSections } from "@/platform/navigation";
 import { platformFetch } from "@/platform/client";
 import type { PageResult, PlatformRecord } from "@/platform/types";
@@ -84,7 +84,7 @@ const views: Record<string, [string, string, string]> = {
     ],
 };
 export function HomeWorkspace() {
-    const { data } = usePlatform();
+    const { data, active: presentationActive } = useWorkspaceView();
     const [summary, setSummary] = useState<Summary | null>(null),
         [tickets, setTickets] = useState<PageResult<Ticket> | null>(null);
     const [activities, setActivities] = useState<PlatformRecord[]>([]),
@@ -99,16 +99,18 @@ export function HomeWorkspace() {
     const mode = data!.actor.mode,
         personal = mode === "USUARIO";
     const head = data!.memberships.find((m) => m.funcion === "JEFATURA");
+    const headTeam = head?.equipoId || (presentationActive && mode === "JEFATURA"
+        ? data!.defaultTicketTeamId || data!.teams[0]?.id : undefined);
     const team = data!.capabilities.teamMetrics
         ? data!.actor.admin
             ? data!.defaultTicketTeamId
-            : head?.equipoId
+            : headTeam
         : undefined;
     const scope = data!.capabilities.assign
         ? "cola"
         : data!.capabilities.attend
           ? "asignados"
-          : head
+          : headTeam
             ? "equipo"
             : "creados";
     useEffect(() => {
@@ -138,7 +140,7 @@ export function HomeWorkspace() {
             platformFetch<PageResult<Ticket>>(
                 "/tickets?scope=" +
                     scope +
-                    (scope === "equipo" ? "&equipoId=" + head?.equipoId : "") +
+                    (scope === "equipo" ? "&equipoId=" + headTeam : "") +
                     "&limit=3",
                 { signal: c.signal },
             )
@@ -162,7 +164,7 @@ export function HomeWorkspace() {
             .catch(() => fail("calendar"))
             .finally(() => finish("calendar"));
         return () => c.abort();
-    }, [team, scope, head?.equipoId, revision, personal]);
+    }, [team, scope, headTeam, revision, personal]);
     const retry = () => {
         setPending({ metrics: true, tickets: !personal, calendar: true });
         setErrors({});

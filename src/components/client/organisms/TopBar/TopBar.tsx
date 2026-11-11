@@ -27,6 +27,7 @@ export const TopBar = ({
     menuOpen,
     unit,
     profilePath,
+    onChangeView,
 }: TopBarProps) => (
     <header className={classNames(styles.topBar, className)}>
         <div className={styles.pageContext}>
@@ -89,6 +90,7 @@ export const TopBar = ({
                 status={userStatus}
                 onMenuClick={onProfileClick}
                 profilePath={profilePath}
+                onChangeView={onChangeView}
             />
         </div>
     </header>

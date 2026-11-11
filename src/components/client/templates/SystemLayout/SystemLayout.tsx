@@ -1,7 +1,7 @@
 "use client";
 
 import { usePlatform } from "@/platform/context";
-import { homeNavigation, PLATFORM_SECTIONS } from "@/platform/navigation";
+import { PLATFORM_SECTIONS } from "@/platform/navigation";
 import { usePathname, useRouter } from "next/navigation";
 import { Button } from "../../atoms/Button";
 import { SideBarNavigation } from "../../organisms/SideBarNavigation";
@@ -25,6 +25,9 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { ApplicationLoadError } from "../../organisms/ApplicationLoadError/ApplicationLoadError";
 import { PageHeading } from "../../molecules/PageHeading/PageHeading";
 import { AdministrativeConfirmation } from "../../organisms/AdministrativeConfirmation/AdministrativeConfirmation";
+import { useWorkspaceView } from "@/platform/presentation-context";
+import { WORKSPACE_VIEWS, workspaceViewNavigation } from "@/platform/presentation";
+import { WorkspaceViewSwitcher } from "../../organisms/WorkspaceViewSwitcher/WorkspaceViewSwitcher";
 
 export const SystemLayout = ({
     children,
@@ -35,12 +38,21 @@ export const SystemLayout = ({
 }) => {
     const pathname = usePathname();
     const router = useRouter();
+    useEffect(() => {
+        document.getElementById("main-content")?.scrollTo({ top: 0, left: 0 });
+    }, [pathname]);
     const getRole = useAuthStore((state) => state.getRole);
     const user = useAuthStore((state) => state.user);
     const isHydrated = useAuthStore((state) => state.isHydrated);
     const token = useAuthStore((state) => state.token);
     const logout = useAuthStore((state) => state.logout);
     const [menuOpen, setMenuOpen] = useState(false);
+    const [viewDialogOpen, setViewDialogOpen] = useState(false);
+    const workspaceView = useWorkspaceView();
+    const closeViewDialog = () => {
+        setViewDialogOpen(false);
+        requestAnimationFrame(() => document.querySelector<HTMLButtonElement>('[aria-label="Menú de usuario"]')?.focus());
+    };
     useEffect(() => {
         const close = (event: KeyboardEvent) => {
             if (event.key === "Escape") setMenuOpen(false);
@@ -97,10 +109,10 @@ export const SystemLayout = ({
             label: page.label,
             iconName: page.iconName,
         }));
-    const workspaceNavigation = platform.data ? homeNavigation(platform.data) : null;
+    const workspaceNavigation = platform.data ? workspaceViewNavigation(platform.data, workspaceView.mode) : null;
     const secondaryItems = workspaceNavigation ? [
         ...workspaceNavigation.secondary,
-        ...navItems.filter(item=>!workspaceNavigation.primary.some(p=>p.path===item.path)
+        ...navItems.filter(item=>!workspaceView.active && !workspaceNavigation.primary.some(p=>p.path===item.path)
             && !workspaceNavigation.secondary.some(p=>p.path===item.path)),
     ] : [];
     const sections = appId && catalog ? getSections(appId, catalog) : [];
@@ -176,7 +188,10 @@ export const SystemLayout = ({
     return (
         <RoleProvider role={currentRole}>
             <AdministrativeConfirmation />
-            <div className={classNames(styles.layout, className)}>
+            {workspaceView.canChangeView && <WorkspaceViewSwitcher key={workspaceView.mode + String(viewDialogOpen)}
+                open={viewDialogOpen} mode={workspaceView.mode} onClose={closeViewDialog}
+                onApply={workspaceView.setMode} />}
+            <div data-workspace-shell className={classNames(styles.layout, className)}>
                 <a href="#main-content" className={styles.skipLink}>
                     Ir al contenido
                 </a>
@@ -201,6 +216,7 @@ export const SystemLayout = ({
 
                 <div className={styles.container}>
                     <TopBar
+                        onChangeView={workspaceView.canChangeView ? () => setViewDialogOpen(true) : undefined}
                         applications={applicationLinks}
                         profilePath={
                             user?.id_usuario
@@ -214,7 +230,7 @@ export const SystemLayout = ({
                         }
                         notificationsPath="/mis-tickets"
                         settingsPath={
-                            platform.data
+                            workspaceView.active ? undefined : platform.data
                                 ? platform.data.actor.admin
                                     ? "/espacio/accesos"
                                     : undefined
@@ -229,13 +245,20 @@ export const SystemLayout = ({
                         iconName={activePage.iconName}
                         userName={user?.nombre || "Usuario"}
                         userRole={
-                            user?.rol?.trim() ||
+                            (workspaceView.active ? WORKSPACE_VIEWS.find((view) => view.id === workspaceView.mode)?.label : undefined) || user?.rol?.trim() ||
                             currentRole.charAt(0).toUpperCase() +
                                 currentRole.slice(1).toLowerCase()
                         }
                         userAvatarUrl={user?.avatar}
                         userStatus="online"
                     />
+
+                    {workspaceView.active && <div className={styles.presentation} role="status">
+                        <div><strong>Vista de presentación: {WORKSPACE_VIEWS.find((view) => view.id === workspaceView.mode)?.label}</strong>
+                            <span>Los datos y permisos corresponden a tu cuenta.</span></div>
+                        <div><Link href="/home">Ver inicio de esta vista</Link>
+                            <button type="button" onClick={() => workspaceView.setMode("ACTUAL")}>Volver a mi vista</button></div>
+                    </div>}
 
                     <main
                         id="main-content"

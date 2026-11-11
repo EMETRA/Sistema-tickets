@@ -6,4 +6,5 @@ export interface UserMenuProps {
   onMenuClick?: () => void;
   className?: string;
   profilePath?: string;
+  onChangeView?: () => void;
 }

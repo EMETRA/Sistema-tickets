@@ -2,6 +2,7 @@ import { SystemLayout } from "@/components/client/templates/SystemLayout";
 import { PlatformProvider } from "@/platform/context";
 import { AppsCatalogProvider } from "@/context/AppsCatalogContext";
 import { RuntimeIncidents } from '@/observability/RuntimeIncidents';
+import { WorkspaceViewProvider } from "@/platform/presentation-context";
 
 export default function DashboardLayout({
     children,
@@ -10,10 +11,12 @@ export default function DashboardLayout({
 }) {
     return (
         <PlatformProvider>
-            <RuntimeIncidents />
-            <AppsCatalogProvider>
-                <SystemLayout>{children}</SystemLayout>
-            </AppsCatalogProvider>
+            <WorkspaceViewProvider>
+                <RuntimeIncidents />
+                <AppsCatalogProvider>
+                    <SystemLayout>{children}</SystemLayout>
+                </AppsCatalogProvider>
+            </WorkspaceViewProvider>
         </PlatformProvider>
     );
 }

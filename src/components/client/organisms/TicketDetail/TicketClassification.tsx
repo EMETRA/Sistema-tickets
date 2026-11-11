@@ -7,6 +7,7 @@ import {
     PlatformError,
 } from "@/platform/client";
 import { AdministrativeChangeCancelled } from "@/api/administrative-confirmation";
+import { TagInput } from "@/components/client/molecules/TagInput/TagInput";
 import styles from "./TicketClassification.module.scss";
 type Tag = { id: string; nombre: string; color?: string | null };
 export function TicketClassification({
@@ -33,11 +34,9 @@ export function TicketClassification({
     catalogReady?: boolean;
 }) {
     const [selected, setSelected] = useState<string[]>([]),
-        [search, setSearch] = useState(""),
         [busy, setBusy] = useState(false),
         [error, setError] = useState("");
-    const [newName, setNewName] = useState(""),
-        [newColor, setNewColor] = useState("#4763E4"),
+    const [createdTags, setCreatedTags] = useState<Tag[]>([]),
         [catalogMessage, setCatalogMessage] = useState("");
     const [reference, setReference] = useState<string>();
     const [saved, setSaved] = useState(false);
@@ -99,23 +98,21 @@ export function TicketClassification({
         savedTags.every((tag) => ids.includes(tag.id));
     const dirty = !same(selected);
     const options = [
-        ...catalog,
-        ...savedTags.filter(
-            (tag) => !catalog.some((item) => item.id === tag.id),
-        ),
+        ...new Map(
+            [...savedTags, ...createdTags, ...catalog].map((tag) => [
+                tag.id,
+                tag,
+            ]),
+        ).values(),
     ];
     const fold = (value: string) =>
         value
             .normalize("NFD")
             .replace(/[\u0300-\u036f]/g, "")
-            .toLocaleLowerCase("es");
-    const visible = options.filter((tag) =>
-        fold(tag.nombre).includes(fold(search)),
-    );
-    function toggle(id: string) {
-        const next = selected.includes(id)
-            ? selected.filter((value) => value !== id)
-            : [...selected, id];
+            .toLocaleLowerCase("es")
+            .trim()
+            .replace(/\s+/g, " ");
+    function select(next: string[]) {
         setSelected(next);
         setSaved(false);
         onDirtyChange(!same(next));
@@ -161,6 +158,7 @@ export function TicketClassification({
             onDirtyChange(false);
             onCountChange(result.etiquetas.length);
             await onSaved();
+            setCatalogMessage("");
             setSaved(true);
         } catch (failure) {
             if (!(failure instanceof AdministrativeChangeCancelled)) {
@@ -180,29 +178,51 @@ export function TicketClassification({
             onBusyChange(false);
         }
     }
-    async function manageCatalog(initial = false) {
+    async function manageCatalog(initial = false, name = "") {
         setBusy(true);
         onBusyChange(true);
         setError("");
         setCatalogMessage("");
         setReference(undefined);
         try {
-            await platformCommand(
+            const result = await platformCommand<{
+                etiquetas: {
+                    id: number;
+                    nombre: string;
+                    color: string | null;
+                }[];
+            }>(
                 "/tickets/tag-catalog" + (initial ? "/initialize" : ""),
                 "POST",
-                initial ? {} : { nombre: newName, color: newColor },
+                initial ? {} : { nombre: name, color: "#4763E4" },
                 true,
                 initial
                     ? "Crear etiquetas iniciales de trabajo"
-                    : "Crear etiqueta " + newName,
+                    : "Crear etiqueta " + name,
             );
+            if (!initial) {
+                const tag = result.etiquetas.find(
+                    (t) => fold(t.nombre.trim()) === fold(name.trim()),
+                );
+                if (!tag)
+                    throw new Error(
+                        "La etiqueta se creó pero no pudo seleccionarse. Actualiza el catálogo antes de continuar.",
+                    );
+                const created = { ...tag, id: String(tag.id) };
+                setCreatedTags((previous) => [
+                    ...previous.filter((t) => t.id !== created.id),
+                    created,
+                ]);
+                if (!selected.includes(created.id))
+                    select([...selected, created.id]);
+            }
             await onCatalogChanged?.();
-            setNewName("");
             setCatalogMessage(
                 initial
                     ? "Catálogo inicial disponible. Ya puedes escoger etiquetas."
-                    : "Etiqueta creada. Ya puedes seleccionarla.",
+                    : "Etiqueta creada y seleccionada. Guarda las etiquetas para aplicarla al ticket.",
             );
+            return true;
         } catch (failure) {
             if (!(failure instanceof AdministrativeChangeCancelled)) {
                 setError(
@@ -216,6 +236,7 @@ export function TicketClassification({
                         : undefined,
                 );
             }
+            return false;
         } finally {
             setBusy(false);
             onBusyChange(false);
@@ -223,82 +244,44 @@ export function TicketClassification({
     }
     return (
         <div className={styles.classification}>
-            {admin && catalogReady && (
+            {admin && catalogReady && !catalog.length && (
                 <section aria-label="Administrar catálogo de etiquetas">
-                    {!catalog.length && (
-                        <>
-                            <p>
-                                El catálogo está vacío. Puedes cargar
-                                Mantenimiento, Reporte, Formulario, Instalación,
-                                Limpieza y Diagnóstico.
-                            </p>
-                            <Button
-                                type="button"
-                                variant="outlined"
-                                state={busy ? "loading" : "default"}
-                                onClick={() => void manageCatalog(true)}
-                            >
-                                Crear etiquetas iniciales
-                            </Button>
-                        </>
-                    )}
-                    <details>
-                        <summary>Nueva etiqueta de trabajo</summary>
-                        <form
-                            onSubmit={(e) => {
-                                e.preventDefault();
-                                void manageCatalog();
-                            }}
-                        >
-                            <label className={styles.search}>
-                                Nombre de la etiqueta
-                                <input
-                                    aria-label="Nombre de la etiqueta"
-                                    required
-                                    maxLength={50}
-                                    value={newName}
-                                    disabled={busy}
-                                    onChange={(e) => setNewName(e.target.value)}
-                                />
-                            </label>
-                            <label className={styles.search}>
-                                Color de la etiqueta
-                                <input
-                                    aria-label="Color de la etiqueta"
-                                    type="color"
-                                    value={newColor}
-                                    disabled={busy}
-                                    onChange={(e) =>
-                                        setNewColor(e.target.value)
-                                    }
-                                />
-                            </label>
-                            <Button
-                                type="submit"
-                                state={busy ? "loading" : "default"}
-                            >
-                                Crear etiqueta
-                            </Button>
-                        </form>
-                    </details>
-                    {catalogMessage && <p role="status">{catalogMessage}</p>}
-                    {error && (
-                        <p role="alert">
-                            {error}
-                            {reference ? " Referencia: " + reference : ""}
-                        </p>
-                    )}
+                    <p>
+                        El catálogo está vacío. Puedes cargar Mantenimiento,
+                        Reporte, Formulario, Instalación, Limpieza y
+                        Diagnóstico.
+                    </p>
+                    <Button
+                        type="button"
+                        variant="outlined"
+                        state={busy ? "loading" : "default"}
+                        onClick={() => void manageCatalog(true)}
+                    >
+                        Crear etiquetas iniciales
+                    </Button>
                 </section>
             )}
-            <div className={styles.applied} aria-label="Etiquetas guardadas">
-                {savedTags.length ? (
-                    savedTags.map((tag) => (
-                        <span key={tag.id}>{tag.nombre}</span>
-                    ))
-                ) : (
-                    <p>Sin etiquetas guardadas.</p>
-                )}
-            </div>
+            {catalogMessage && <p role="status">{catalogMessage}</p>}
+            {error && applied && !(editable && applied.puedeEditar) && (
+                <p role="alert">
+                    {error}
+                    {reference ? " Referencia: " + reference : ""}
+                </p>
+            )}
+            {!(applied && editable && applied.puedeEditar) && (
+                <div
+                    className={styles.applied}
+                    aria-label="Etiquetas guardadas"
+                >
+                    {savedTags.length ? (
+                        savedTags.map((tag) => (
+                            <span key={tag.id}>{tag.nombre}</span>
+                        ))
+                    ) : (
+                        <p>Sin etiquetas guardadas.</p>
+                    )}
+                </div>
+            )}
             {loading && <p role="status">Consultando clasificación…</p>}
             {!loading && error && !applied && (
                 <div role="alert">
@@ -323,39 +306,17 @@ export function TicketClassification({
                         Clasifica el trabajo realizado. Guarda al menos una
                         etiqueta antes de resolver el ticket.
                     </p>
-                    <label className={styles.search}>
-                        Buscar etiqueta
-                        <input
-                            type="search"
-                            value={search}
-                            onChange={(event) => setSearch(event.target.value)}
-                            disabled={busy}
-                        />
-                    </label>
-                    <fieldset disabled={busy} className={styles.options}>
-                        <legend>Tipos de trabajo</legend>
-                        {visible.map((tag) => (
-                            <label key={tag.id}>
-                                <input
-                                    type="checkbox"
-                                    checked={selected.includes(tag.id)}
-                                    disabled={
-                                        !selected.includes(tag.id) &&
-                                        selected.length >= 10
-                                    }
-                                    onChange={() => toggle(tag.id)}
-                                />
-                                <span>{tag.nombre}</span>
-                            </label>
-                        ))}
-                        {!visible.length && (
-                            <p>
-                                {catalog.length
-                                    ? "No hay etiquetas con ese nombre."
-                                    : "El catálogo está vacío. Solicita que se carguen las etiquetas de trabajo."}
-                            </p>
-                        )}
-                    </fieldset>
+                    <TagInput
+                        options={options}
+                        value={selected}
+                        onChange={select}
+                        disabled={busy || !catalogReady}
+                        onCreate={
+                            admin && catalogReady
+                                ? (name) => manageCatalog(false, name)
+                                : undefined
+                        }
+                    />
                     <p className={styles.count}>
                         {selected.length} de 10 seleccionadas
                         {dirty ? " · Cambios sin guardar" : ""}

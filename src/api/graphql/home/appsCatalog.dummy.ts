@@ -12,6 +12,22 @@ export const APPS_CATALOG_DUMMY: AppsCatalog = {
             iconName: "network-wired-solid",
         },
         sections: {
+            reportes: {
+                meta: {
+                    id: "reportes",
+                    label: "REPORTES",
+                    title: "Reportes",
+                    iconName: "chart-bar-solid",
+                },
+                modules: [
+                    {
+                        id: "vivi-reportes",
+                        label: "VIVI",
+                        title: "Reportes de VIVI",
+                        iconName: "chart-bar-solid",
+                    },
+                ],
+            },
             permisos: {
                 meta: {
                     id: "permisos",

@@ -47,7 +47,7 @@ test('no duplica el caso durante una actualización entre API y Panel', () => {
 test('el catálogo de respaldo ofrece la misma ubicación y no anuncia reportes retirados', () => {
     const result = publicAppsCatalog(load('src/api/graphql/home/appsCatalog.dummy.ts').APPS_CATALOG_DUMMY);
     assert.equal(result.juridico.sections.juz01, undefined);
-    assert.equal(result.informatica.sections.reportes, undefined);
+    assert.deepEqual(result.informatica.sections.reportes.modules.map(m => m.id), ['vivi-reportes']);
     assert.equal(result.juzgado.sections.consultas.modules[0].id, 'juz01');
 });
 

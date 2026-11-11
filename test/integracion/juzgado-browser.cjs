@@ -7,14 +7,14 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 const { chromium } = require('playwright');
 async function run() {
-  const codigo = 'QA-JUZ-8003';
+  const codigo = 'abc12345-1111-4444-8888-111111111111';
   const permisos = ['VIVI_JUZGADO_CONSULTAR', 'VIVI_JUZGADO_RECIBIR', 'VIVI_JUZGADO_RESOLVER'];
   const user = { id_usuario: '12', nombre: 'Usuario QA controlado', email: 'qa@example.invalid', rol: 'USUARIO', permisos, departamento: 'Prueba' };
   const llamadas = [];
-  let archivoHttp=503;
+  let archivoHttp=503, conActuaciones=false;
   let sedesFalla = true, sedesVacias = false, perfilFalla = true, recepcionFalla = true, recibida = false, resuelta = false, pdf = false;
   const documento = { id: '80', tipoDocumento: 'RESOLUCION', numeroVersion: '1', versionPlantilla: 'DEN09-BORRADOR-1', mime: 'application/pdf', tamanoBytes: '40', generadoEn: '2026-10-08T20:00:00Z' };
-  const detalle = () => ({ codigoCaso: codigo, estadoCaso: resuelta ? 'REMISION_EMITIDA' : recibida ? 'EN_JUZGADO' : 'NOTIFICADA', caso: { id: '8003', codigoCaso: codigo, usoPlaca: 'P', placa: '113BBB', regla: '39', observaciones: 'Observación QA', estado: 'NOTIFICADA', registradaEn: '2026-10-08T17:00:00Z', evidenciasDenuncia: [{id:'81',origen:'DENUNCIA',mime:'image/png',tamanoBytes:'68',estado:'DISPONIBLE'},{id:'82',origen:'DENUNCIA',mime:'image/png',tamanoBytes:'68',estado:'DISPONIBLE'}], analisisEvidencias: {disponible:true,estado:'ACEPTADA',modelo:'modelo-qa',versionPolitica:'EVIDENCIA_V5_CONJUNTO',creadoEn:'2026-10-29T17:00:00Z',terminadoEn:'2026-10-29T17:01:00Z',referenciaEstado:'DISPONIBLE',referenciaFuente:'SAT_MUNI',errorReferencia:null,codigoError:null,esPoliticaConjunto:true,archivos:[{idEvidencia:'81',decision:'REVISION',motivo:'INSUFICIENTE',hecho:'RELACIONADO',placa:'NO_VISIBLE',comparacionPlaca:'NO_DETERMINABLE',compatibilidad:'COMPATIBLE',marca:'NO_DETERMINABLE',indicioMarca:'NO_RECONOCIBLE',contenidoSensible:false,posiblePantalla:false,analizadoEn:'2026-10-29T17:01:00Z',fotogramas:1},{idEvidencia:'82',decision:'REVISION',motivo:'INSUFICIENTE',hecho:'AJENO',placa:'PARCIAL',comparacionPlaca:'NO_DETERMINABLE',compatibilidad:'NO_DETERMINABLE',marca:'COINCIDE',indicioMarca:null,contenidoSensible:false,posiblePantalla:false,analizadoEn:'2026-10-29T17:01:00Z',fotogramas:1}]}, defensa: null }, expediente: recibida ? { id: '77', version: '2', codigoJuzgado: 'JUZ_QA', nombreJuzgado: 'Sede QA controlada', direccionJuzgado: 'Dirección QA controlada', horarioJuzgado: 'Horario QA controlado', estado: resuelta ? 'RESUELTO' : 'RECIBIDO', idActorReceptor: '12', recibidaEn: '2026-10-08T18:00:00Z', numeroInterno: 'EXP-QA-77', observacion: null, gestiones: [], resolucion: resuelta ? { id: '79', decision: 'NO_ACOGIDA', fundamento: 'Fundamento QA controlado', autoridadSnapshot: user.nombre, versionPlantilla: 'DEN09-BORRADOR-1', resueltaEn: '2026-10-08T19:00:00Z', idActorJuez: '12' } : null, remision: resuelta ? { ciudad: '1', serie: 'V', numero: '8003' } : null, documentos: pdf ? [documento] : [] } : null });
+  const detalle = () => ({ codigoCaso: codigo, estadoCaso: resuelta ? 'REMISION_EMITIDA' : recibida ? 'EN_JUZGADO' : 'NOTIFICADA', caso: { id: '8003', codigoCaso: codigo, usoPlaca: 'P', placa: '113BBB', regla: '39', observaciones: 'Observación QA', estado: 'NOTIFICADA', registradaEn: '2026-10-08T17:00:00Z', evidenciasDenuncia: [{id:'81',origen:'DENUNCIA',mime:'image/png',tamanoBytes:'68',estado:'DISPONIBLE'},{id:'82',origen:'DENUNCIA',mime:'image/png',tamanoBytes:'68',estado:'DISPONIBLE'}], analisisEvidencias: {disponible:true,estado:'ACEPTADA',modelo:'modelo-qa',versionPolitica:'EVIDENCIA_V5_CONJUNTO',creadoEn:'2026-10-29T17:00:00Z',terminadoEn:'2026-10-29T17:01:00Z',referenciaEstado:'DISPONIBLE',referenciaFuente:'SAT_MUNI',errorReferencia:null,codigoError:null,esPoliticaConjunto:true,archivos:[{idEvidencia:'81',decision:'REVISION',motivo:'INSUFICIENTE',hecho:'RELACIONADO',placa:'NO_VISIBLE',comparacionPlaca:'NO_DETERMINABLE',compatibilidad:'COMPATIBLE',marca:'NO_DETERMINABLE',indicioMarca:'NO_RECONOCIBLE',contenidoSensible:false,posiblePantalla:false,analizadoEn:'2026-10-29T17:01:00Z',fotogramas:1},{idEvidencia:'82',decision:'REVISION',motivo:'INSUFICIENTE',hecho:'AJENO',placa:'PARCIAL',comparacionPlaca:'NO_DETERMINABLE',compatibilidad:'NO_DETERMINABLE',marca:'COINCIDE',indicioMarca:null,contenidoSensible:false,posiblePantalla:false,analizadoEn:'2026-10-29T17:01:00Z',fotogramas:1}]}, defensa: null }, expediente: recibida ? { id: '77', version: '2', codigoJuzgado: 'JUZ_QA', nombreJuzgado: 'Sede QA controlada', direccionJuzgado: 'Dirección QA controlada', horarioJuzgado: 'Horario QA controlado', estado: resuelta ? 'RESUELTO' : 'RECIBIDO', idActorReceptor: '12', recibidaEn: '2026-10-08T18:00:00Z', numeroInterno: 'EXP-QA-77', observacion: null, gestiones: conActuaciones ? [{id:'1',idActor:'12',tipoGestion:'REVISION',ocurridaEn:'2026-10-08T18:10:00Z',observacion:'Revisión de papelería y evidencias del expediente controlado.'},{id:'2',idActor:'12',tipoGestion:'ENTREGA_DOCUMENTOS',ocurridaEn:'2026-10-08T18:20:00Z',observacion:'Documentación recibida para continuar el análisis del caso.'}] : [], resolucion: resuelta ? { id: '79', decision: 'NO_ACOGIDA', fundamento: 'Fundamento QA controlado', autoridadSnapshot: user.nombre, versionPlantilla: 'DEN09-BORRADOR-1', resueltaEn: '2026-10-08T19:00:00Z', idActorJuez: '12' } : null, remision: resuelta ? { ciudad: '1', serie: 'V', numero: '8003' } : null, documentos: pdf ? [documento] : [] } : null });
   const backend = http.createServer(async (req, res) => {
     let body = ''; for await (const chunk of req) body += chunk;
     const datos = body ? JSON.parse(body) : {};
@@ -28,7 +28,12 @@ async function run() {
     if (req.url.includes('/documentos/')) { res.writeHead(200, { 'Content-Type': 'application/pdf', 'Content-Disposition': 'attachment; filename="resolucion.pdf"' }); return res.end('%PDF-1.4\nQA\n%%EOF'); }
     if (q.includes('mutation Login')) return json({ data: { login: { token: 'qa-token-controlado', refresh_token: 'qa-refresh-controlado', expires_in: 3600 } } });
     if (q.includes('query GetUser')) return perfilFalla ? json({ errors: [{ message: 'ORA-00942 consulta privada', extensions: { code: 'INTERNAL_SERVER_ERROR' } }] }) : json({ data: { usuario: user } });
-    if(q.includes('viviJuzgadoBuscar')) return json({data:{viviJuzgadoBuscar:[{codigoCaso:codigo,usoPlaca:'P',placa:'113BBB',estado:'NOTIFICADA',registradaEn:'2026-10-08T17:00:00Z'},{codigoCaso:'QA-JUZ-8004',usoPlaca:'P',placa:'114BBB',estado:'EN_JUZGADO',registradaEn:'2026-10-09T17:00:00Z'}]}});
+    if(q.includes('viviJuzgadoBuscar')) {
+      const prefijo=String(datos.variables?.prefijo || '').toUpperCase();
+      if(prefijo==='MUC') return json({errors:[{message:'Hay más de 20 coincidencias. Escribe los primeros 6 caracteres o el código completo para precisar la búsqueda.',extensions:{code:'BUSQUEDA_DEMASIADO_AMPLIA',statusCode:400}}]});
+      const casos=[{codigoCaso:codigo,usoPlaca:'P',placa:'113BBB',estado:'NOTIFICADA',registradaEn:'2026-10-08T17:00:00Z'},{codigoCaso:'abc12399-2222-4444-8888-222222222222',usoPlaca:'P',placa:'114BBB',estado:'EN_JUZGADO',registradaEn:'2026-10-09T17:00:00Z'}];
+      return json({data:{viviJuzgadoBuscar:casos.filter(c=>c.codigoCaso.toUpperCase().startsWith(prefijo))}});
+    }
     if (q.includes('viviJuzgadoDetalle')) {
       const caso = detalle();
       const analisis = caso.caso.analisisEvidencias;
@@ -80,17 +85,42 @@ async function run() {
     await page.evaluate(({ user }) => localStorage.setItem('auth-storage', JSON.stringify({ state: { token: 'qa-token-controlado', user, userId: user.id_usuario }, version: 0 })), { user });
     const url = `http://127.0.0.1:3741/home/juridico/juz01/juz01/detail?caseNumber=${codigo}`;
     await page.goto('http://127.0.0.1:3741/home/juridico/juz01/juz01');
-    await page.locator('#caseNumber').fill('QA-JU');await page.getByRole('button',{name:'Consultar caso',exact:true}).click();
-    await page.getByText(/Escribe los primeros 6 caracteres/).waitFor();
+    await page.locator('#caseNumber').fill('ab');await page.getByRole('button',{name:'Consultar caso',exact:true}).click();
+    await page.getByRole('alert').filter({hasText:'primeros 3 caracteres'}).waitFor();
     assert.equal(llamadas.filter(l=>l.query.includes('viviJuzgadoBuscar')).length,0);
-    await page.locator('#caseNumber').fill('QA-JUZ');await page.getByRole('button',{name:'Consultar caso',exact:true}).click();
-    await page.getByRole('button',{name:'Abrir caso '+codigo,exact:true}).waitFor();
+    assert.equal(await page.locator('#caseNumber').evaluate(el=>el===document.activeElement),true);
+    const buscar=async valor=>{
+      await page.locator('#caseNumber').fill(valor);
+      await page.locator('#caseNumber').press('Enter');
+      await page.getByRole('heading',{name:'Resultados de la búsqueda'}).waitFor();
+      await page.getByRole('button',{name:'Consultar caso',exact:true}).waitFor();
+    };
+    await buscar('abc');
+    assert.equal(llamadas.filter(l=>l.query.includes('viviJuzgadoBuscar')).at(-1).variables.prefijo,'abc');
     await page.getByText('P - 113BBB',{exact:true}).waitFor();
+    assert.equal(await page.locator('tbody mark').first().innerText(),'abc');
+    await page.getByText('En juzgado',{exact:true}).waitFor();
+    await buscar('abc123');
+    assert.equal(llamadas.filter(l=>l.query.includes('viviJuzgadoBuscar')).at(-1).variables.prefijo,'abc123');
+    await buscar(' '+codigo+' ');
+    assert.equal(llamadas.filter(l=>l.query.includes('viviJuzgadoBuscar')).at(-1).variables.prefijo,codigo);
+    assert.equal(await page.getByRole('button',{name:/Abrir caso /}).count(),1);
+    assert.equal(await page.locator('#caseNumber').inputValue(),codigo);
+    await buscar('zzz');
+    await page.getByRole('heading',{name:'No encontramos coincidencias'}).waitFor();
+    assert.equal(await page.locator('table').count(),0);
+    await page.locator('#caseNumber').fill('MUC');await page.locator('#caseNumber').press('Enter');
+    await page.getByRole('alert').filter({hasText:'20 coincidencias'}).waitFor();
+    assert.equal(await page.getByRole('button',{name:/Abrir caso /}).count(),0);
+    await page.getByRole('button',{name:'Limpiar',exact:true}).click();
+    assert.equal(await page.locator('#caseNumber').inputValue(),'');
+    assert.equal(await page.locator('#caseNumber').evaluate(el=>el===document.activeElement),true);
+    await buscar('abc');
     const searchOut=process.env.QA_SCREENSHOT_DIR || path.resolve(__dirname,'../../../../capturas');await fs.mkdir(searchOut,{recursive:true});
     for(const width of [1440,1024,390]){
       await page.setViewportSize({width,height:1050});
       assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
-      await page.screenshot({path:path.join(searchOut,'busqueda-casos-'+width+'.png'),fullPage:true});
+      await page.screenshot({path:path.join(searchOut,'busqueda-casos-'+width+'.png'),fullPage:false});
     }
     await page.setViewportSize({width:1440,height:1050});
     assert.ok(!page.url().includes('/detail'));assert.equal(llamadas.filter(l=>l.query.includes('viviJuzgadoDetalle')).length,0);
@@ -123,20 +153,27 @@ async function run() {
     await page.getByRole('dialog').locator('img').waitFor();
     await page.getByRole('button',{name:'Cerrar',exact:true}).click();
     assert.ok(llamadas.some(l=>l.ruta.includes('/evidencias/81') && l.auth==='Bearer qa-token-controlado'));
-    assert.equal(await page.getByRole('button', { name: 'Confirmar recepción de papelería' }).isDisabled(), true);
+    assert.equal(await page.getByRole('button', { name: 'Confirmar recepción de papelería' }).count(), 0);
+    assert.equal(await page.locator('#numeroInterno, #observacion').count(),0);
     sedesFalla = false; sedesVacias = true;
     await page.getByRole('button', { name: 'Reintentar juzgados' }).click();
     await page.getByText('No hay juzgados activos configurados.', { exact: false }).waitFor();
-    assert.equal(await page.locator('#juzgado option').count(), 1);
-    assert.equal(await page.getByRole('button', { name: 'Confirmar recepción de papelería' }).isDisabled(), true);
+    assert.equal(await page.locator('#juzgado').count(), 0);
+    assert.equal(await page.locator('#actuaciones table').count(),0);
+    await page.getByRole('heading',{name:'Aún no hay actuaciones registradas'}).waitFor();
+    await page.locator('#gestion-expediente').scrollIntoViewIfNeeded();
+    await page.screenshot({path:path.join(searchOut,'recepcion-sin-juzgados-1440.png'),fullPage:false});
+    assert.equal(await page.getByRole('button', { name: 'Confirmar recepción de papelería' }).count(), 0);
+    assert.equal(await page.locator('#numeroInterno, #observacion').count(),0);
     sedesVacias = false;
     await page.getByRole('button', { name: 'Actualizar juzgados' }).click();
     await page.locator('#juzgado option[value=JUZ_QA]').waitFor({ state: 'attached' });
+    assert.equal(await page.locator('#juzgado').inputValue(),'JUZ_QA','Único juzgado seleccionado, sin guardar automáticamente');
     assert.equal(llamadas.filter(l => l.query.startsWith('mutation') && !l.query.includes('Login')).length, 0);
     const out = process.env.QA_SCREENSHOT_DIR || path.resolve(__dirname, '../../../../capturas'); await fs.mkdir(out, { recursive: true });
-    await page.screenshot({ path: path.join(out, 'panel-juzgado.png'), fullPage: true });
+    await page.screenshot({ path: path.join(out, 'panel-juzgado.png'), fullPage: false });
     await page.locator('#analisis-ia').scrollIntoViewIfNeeded();
-    await page.screenshot({path:path.join(out,'panel-analisis-ia.png'),fullPage:true});
+    await page.screenshot({path:path.join(out,'panel-analisis-ia.png'),fullPage:false});
     // En escritorio y tablet la evidencia y la IA deben poder compararse en paralelo.
     for (const width of [1920,1440,1180]) {
       await page.setViewportSize({width,height:1100});
@@ -152,11 +189,11 @@ async function run() {
     await page.setViewportSize({width:1024,height:768});
     assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Tablet sin desbordamiento');
     await page.locator('main').evaluate(el=>{el.scrollTop=0});
-    await page.screenshot({path:path.join(out,'panel-juzgado-tablet.png'),fullPage:true});
+    await page.screenshot({path:path.join(out,'panel-juzgado-tablet.png'),fullPage:false});
     await page.setViewportSize({width:1920,height:1300});
     await page.getByRole('button',{name:'Ocultar vista',exact:true}).click();
     await page.locator('main').evaluate(el=>{el.scrollTop=0});
-    await page.screenshot({path:path.join(out,'panel-juzgado-escritorio.png'),fullPage:true});
+    await page.screenshot({path:path.join(out,'panel-juzgado-escritorio.png'),fullPage:false});
     await page.setViewportSize({width:768,height:1024});
     assert.ok(await page.evaluate(()=>{
       const d=document.getElementById('denuncia').getBoundingClientRect();
@@ -166,18 +203,24 @@ async function run() {
     await page.setViewportSize({width:390,height:844});
     assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth),'Sin desbordamiento horizontal');
     await page.locator('#analisis-ia').scrollIntoViewIfNeeded();
-    await page.screenshot({path:path.join(out,'panel-juzgado-movil.png'),fullPage:true});
+    await page.screenshot({path:path.join(out,'panel-juzgado-movil.png'),fullPage:false});
     await page.setViewportSize({width:1440,height:1100});
     await page.locator('#juzgado').selectOption('JUZ_QA');
     await page.getByText('Dirección QA controlada', { exact: false }).waitFor();
     await page.getByText('Horario QA controlado', { exact: false }).waitFor();
     await page.locator('#numeroInterno').fill('EXP-QA-77');
     assert.ok((await page.locator('#numeroInternoAyuda').innerText()).includes('expediente físico'));
+    await page.locator('#gestion-expediente').scrollIntoViewIfNeeded();
+    await page.screenshot({path:path.join(out,'recepcion-formulario-1440.png'),fullPage:false});
     await page.getByRole('button', { name: 'Confirmar recepción de papelería' }).click();
     await page.getByRole('button', { name: 'Confirmar', exact: true }).dblclick();
     await page.getByRole('alert').filter({ hasText: 'reintentar' }).waitFor();
     assert.equal(llamadas.filter(l => l.query.includes('viviJuzgadoRegistrarRecepcion')).length, 1);
     assert.equal(await page.locator('#juzgado').isDisabled(), true);
+    await page.getByRole('button',{name:'Actualizar estado',exact:true}).click();
+    await page.getByRole('button',{name:'Actualizar estado',exact:true}).waitFor();
+    assert.equal(await page.locator('#juzgado').isDisabled(),true,'Consultar estado no libera un envío incierto');
+    assert.equal(await page.locator('#numeroInterno').inputValue(),'EXP-QA-77');
     recepcionFalla = false;
     await page.getByRole('button', { name: 'Confirmar recepción de papelería' }).click();
     await page.getByRole('button', { name: 'Confirmar', exact: true }).click();
@@ -187,6 +230,18 @@ async function run() {
     assert.deepEqual(recepciones[0].variables, recepciones[1].variables);
     assert.equal(recepciones[0].variables.input.idActor, undefined);
     assert.equal(recepciones[0].variables.input.numeroInterno, 'EXP-QA-77');
+    conActuaciones = true;
+    await page.getByRole('button',{name:'Actualizar estado',exact:true}).click();
+    await page.locator('#actuaciones tbody tr').first().waitFor();
+    assert.equal(await page.locator('#actuaciones tbody tr').count(),2);
+    assert.equal(await page.locator('#actuaciones').getByText('No disponible',{exact:true}).count(),0);
+    for(const width of [1440,390]){
+      await page.setViewportSize({width,height:1050});
+      await page.locator('#actuaciones').scrollIntoViewIfNeeded();
+      assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+      await page.screenshot({path:path.join(out,'actuaciones-'+width+'.png'),fullPage:false});
+    }
+    await page.setViewportSize({width:1440,height:1100});
     await page.getByRole('button', { name: 'Resolver defensa', exact: true }).click();
     await page.getByText('No acogido', { exact: true }).click(); await page.locator('#fundament').fill('Fundamento QA controlado');
     await page.getByRole('button', { name: 'Enviar resolución', exact: true }).click();
@@ -198,13 +253,13 @@ async function run() {
     await page.getByRole('button', { name: 'Reintentar PDF de resolución' }).waitFor({ state: 'detached' });
     assert.equal(llamadas.filter(l => l.query.includes('viviJuzgadoResolverNoAcogida')).length, 1);
     const doc = llamadas.find(l => l.ruta.includes('/documento/generar')); assert.equal(doc.auth, 'Bearer qa-token-controlado');
-    await page.screenshot({ path: path.join(out, 'panel-resolucion.png'), fullPage: true });
+    await page.screenshot({ path: path.join(out, 'panel-resolucion.png'), fullPage: false });
     // El rol USUARIO con permisos vacíos no habilita consulta ni mutaciones.
     await page.evaluate(({ user }) => localStorage.setItem('auth-storage', JSON.stringify({ state: { token: 'qa-token-controlado', user: { ...user, permisos: [] }, userId: user.id_usuario }, version: 0 })), { user });
     const antes = llamadas.length;
     await page.reload(); await page.getByText('Tu cuenta no tiene permiso para consultar casos del juzgado.').waitFor();
     assert.equal(llamadas.slice(antes).filter(l => l.query.includes('viviJuzgado')).length, 0);
-    console.log('OK | Perfil 502 sin sesión parcial ni ORA público; JUZ01 conserva el caso ante fallo de sedes, muestra catálogo vacío/dirección/horario/referencia, recepción 503/reintento, doble clic, NO_ACOGIDA, PDF independiente, Bearer y permisos reales. Backend controlado.');
+    console.log('OK | Perfil 502 sin sesión parcial ni ORA público; JUZ01 busca por 3/6/código completo, conserva el caso ante fallo de sedes, muestra catálogo vacío/dirección/horario/referencia, recepción 503/reintento, doble clic, NO_ACOGIDA, PDF independiente, Bearer y permisos reales. Backend controlado.');
   } catch (error) { console.error('Diagnóstico QA:', JSON.stringify({ rutas: llamadas.map(l => ({ ruta: l.ruta, operacion: l.query.split('{')[0] })), texto: page ? await page.locator('body').innerText() : salida })); throw error; }
   finally { if (browser) await browser.close(); next.kill('SIGTERM'); backend.close(); }
 }

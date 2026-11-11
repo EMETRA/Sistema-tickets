@@ -4,9 +4,9 @@ export const JUZ01Schema = z.object({
     caseNumber: z
         .string()
         .trim()
-        .regex(/^[A-Za-z0-9_-]{6,36}$/, {
+        .regex(/^[A-Za-z0-9_-]{3,36}$/, {
             message:
-        "Escribe los primeros 6 caracteres o el código completo del caso (hasta 36).",
+        "Escribe al menos los primeros 3 caracteres o el código completo del caso (hasta 36).",
         }),
 });
 

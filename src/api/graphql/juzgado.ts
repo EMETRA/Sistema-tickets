@@ -2,6 +2,8 @@ import { graphqlRequestClient, apiFetch } from "./client";
 import { ArchivoJuzgadoError } from "./juzgado-archivo";
 export type CoincidenciaJuzgado = {
   codigoCaso: string;
+  usoPlaca: string;
+  placa: string;
   estado: string;
   registradaEn: string;
 };
@@ -11,7 +13,7 @@ export async function buscarCasosJuzgado(
     const data = await graphqlRequestClient<{
     viviJuzgadoBuscar: CoincidenciaJuzgado[];
   }>(
-      "query BuscarCasos($prefijo: String!) { viviJuzgadoBuscar(prefijo:$prefijo) { codigoCaso estado registradaEn } }",
+      "query BuscarCasos($prefijo: String!) { viviJuzgadoBuscar(prefijo:$prefijo) { codigoCaso usoPlaca placa estado registradaEn } }",
       { variables: { prefijo } },
   );
     return data.viviJuzgadoBuscar;

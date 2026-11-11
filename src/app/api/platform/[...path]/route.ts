@@ -6,7 +6,7 @@ export const dynamic='force-dynamic';
 async function proxy(request:NextRequest,context:{params:Promise<{path:string[]}>}){
     if(process.env.TICKETS_PLATFORM_ENABLED!=='true')return Response.json({codigo:'FEATURE_DISABLED',message:'Los módulos nuevos de Tickets todavía no están habilitados.'},{status:503,headers:{'Cache-Control':'private, no-store'}});
     const {path}=await context.params;
-    if(!['bootstrap','catalog','search','people','access-options','network','records','confirmations','rbac','requests','audit','metrics','monitor','repositories','objects','tickets','files','organization','client-errors','module-access','inventory','boletas'].includes(path[0]))return Response.json({message:'Ruta no disponible'},{status:404});
+    if(!['bootstrap','catalog','search','people','access-options','network','records','confirmations','rbac','requests','audit','metrics','monitor','repositories','sources','objects','tickets','files','organization','client-errors','module-access','inventory','boletas'].includes(path[0]))return Response.json({message:'Ruta no disponible'},{status:404});
     if(path.length>6||path.some(x=>!/^[-a-zA-Z0-9]+$/.test(x)))return Response.json({message:'Ruta inválida'},{status:400});
     const authorization=request.headers.get('authorization');if(!authorization||!/^Bearer \S+$/.test(authorization))return Response.json({message:'Inicia sesión para continuar.'},{status:401});
     const endpoint=new URL(getGraphqlEndpoint());endpoint.pathname=endpoint.pathname.replace(/\/graphql\/?$/,'')+'/platform/'+path.join('/');endpoint.search=request.nextUrl.search;

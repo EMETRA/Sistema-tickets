@@ -1,6 +1,6 @@
 # Casos de uso — Sistema-tickets
 
-Base documental: `926fe45d27922c595c63e8f79e1e82b1594470eb`; actualización de consulta de casos: `cd953b4ea8731336669948645a55032e5f5eabba`; línea de integración revisada: `Dev + fix/consulta_caso_ux_prefijos`. Describe la base y la actualización citadas; la configuración y las autorizaciones efectivas de un servidor se comprueban por separado. Esta edición se preparó sin conectarse a Oracle, SMTP ni servidores institucionales.
+Base documental: `926fe45d27922c595c63e8f79e1e82b1594470eb`; actualización de consulta de casos: `cd953b4ea8731336669948645a55032e5f5eabba`; actualización de vistas y diagnóstico judicial: `9d497b6ff471410ea5a96ba6df5e707ccebd8e43`; línea de integración revisada: `Dev + fix/vistas_presentacion_y_layout`. Describe la base y la actualización citadas; la configuración y las autorizaciones efectivas de un servidor se comprueban por separado. Esta edición se preparó sin conectarse a Oracle, SMTP ni servidores institucionales.
 
 Los enlaces de código fijan esa revisión para que sigan siendo consultables cuando `main` excluya herramientas de desarrollo. Al modificar un comportamiento se deben actualizar su caso de uso, configuración y referencia de código.
 
@@ -30,6 +30,7 @@ Guía de arquitectura, configuración y cambios: [manual-técnico.md](manual-t%C
 - [CU-19 · Guardar y exportar reporte semanal](#cu-19)
 - [CU-20 · Administrar noticias y notificar documentos jurídicos](#cu-20)
 - [CU-21 · Buscar y tramitar casos judiciales VIVI](#cu-21)
+- [CU-22 · Cambiar la vista para presentaciones y pruebas visuales](#cu-22)
 
 - [Índice de operaciones y rutas](#operaciones)
 - [Criterios de cobertura](#cobertura)
@@ -136,7 +137,7 @@ Indirecto: tickets e historial de ADMEMETRAIT y perfil en ADMAUTEMETRA mediante 
 
 **Archivos involucrados**
 
-- [src/app/(dashboard)/home/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/home/page.tsx)
+- [src/app/(dashboard)/home/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/9d497b6ff471410ea5a96ba6df5e707ccebd8e43/src/app/%28dashboard%29/home/page.tsx)
 - [src/app/(dashboard)/statistics/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/statistics/page.tsx)
 - [src/app/api/admin-dashboard/last-movements/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/admin-dashboard/last-movements/route.ts)
 - [src/app/api/admin-dashboard/last-ticket/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/admin-dashboard/last-ticket/route.ts)
@@ -164,7 +165,7 @@ Indirecto: tickets e historial de ADMEMETRAIT y perfil en ADMAUTEMETRA mediante 
 - [src/views/Home/User/UserHome.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Home/User/UserHome.tsx)
 - [src/views/Home/User/index.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Home/User/index.tsx)
 - [src/views/Platform/HomeWorkspace.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Platform/HomeWorkspace.module.scss)
-- [src/views/Platform/HomeWorkspace.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Platform/HomeWorkspace.tsx)
+- [src/views/Platform/HomeWorkspace.tsx](https://github.com/EMETRA/Sistema-tickets/blob/9d497b6ff471410ea5a96ba6df5e707ccebd8e43/src/views/Platform/HomeWorkspace.tsx)
 - [src/views/Profile/Profile.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Profile/Profile.module.scss)
 - [src/views/Profile/Profile.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Profile/Profile.tsx)
 - [src/views/Profile/index.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Profile/index.tsx)
@@ -1219,7 +1220,7 @@ Indirecto: dominio judicial ADMEMETRAVEHICULAR mediante api-tickets; archivos pr
 
 **Archivos involucrados**
 
-- [src/api/graphql/juzgado.ts](https://github.com/EMETRA/Sistema-tickets/blob/cd953b4ea8731336669948645a55032e5f5eabba/src/api/graphql/juzgado.ts)
+- [src/api/graphql/juzgado.ts](https://github.com/EMETRA/Sistema-tickets/blob/9d497b6ff471410ea5a96ba6df5e707ccebd8e43/src/api/graphql/juzgado.ts)
 - [src/api/graphql/juzgado-vista.ts](https://github.com/EMETRA/Sistema-tickets/blob/cd953b4ea8731336669948645a55032e5f5eabba/src/api/graphql/juzgado-vista.ts)
 - [src/app/api/JUZ01/[...path]/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/JUZ01/%5B...path%5D/route.ts)
 - [src/views/JUZ01/JUZ01.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/cd953b4ea8731336669948645a55032e5f5eabba/src/views/JUZ01/JUZ01.module.scss)
@@ -1231,6 +1232,49 @@ Indirecto: dominio judicial ADMEMETRAVEHICULAR mediante api-tickets; archivos pr
 - [src/views/JUZ01Detail/JUZ01Detail.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/cd953b4ea8731336669948645a55032e5f5eabba/src/views/JUZ01Detail/JUZ01Detail.module.scss)
 - [src/views/JUZ01Detail/JUZ01Detail.tsx](https://github.com/EMETRA/Sistema-tickets/blob/cd953b4ea8731336669948645a55032e5f5eabba/src/views/JUZ01Detail/JUZ01Detail.tsx)
 - [src/views/JUZ01Detail/types.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/JUZ01Detail/types.tsx)
+
+<a id="cu-22"></a>
+
+## CU-22 · Cambiar la vista para presentaciones y pruebas visuales
+
+**Actor:** Cuenta con administración efectiva de Tickets, confirmada por el bootstrap.
+
+**Precondiciones:** Sesión válida y `actor.admin=true`; no basta un perfil llamado USER_ADMIN.
+
+**Flujo y resultado**
+
+1. Abrir Menú de usuario → Cambiar vista.
+2. Elegir Usuario, Técnico, Desarrollador, DevOps, Asignación o Jefatura y aplicar.
+3. Consultar la portada y navegación de esa vista. Si estaba en un formulario, se conserva la pantalla y el aviso ofrece Ver inicio de esta vista.
+4. Navegar entre pantallas; la selección continúa mientras permanezca esa sesión y el layout.
+5. Pulsar Volver a mi vista o seleccionar Mi vista actual para restaurar la presentación habitual.
+
+```mermaid
+flowchart TD
+  inicio["Abrir menú de usuario"] --> admin{"Administración efectiva"}
+  admin -->|No| sinSelector["Conservar vista habitual sin selector"]
+  admin -->|Sí| elegir["Elegir y aplicar vista"]
+  elegir --> mostrar["Proyectar portada y navegación; mostrar aviso"]
+  mostrar --> navegar["Consultar datos autorizados de la misma cuenta"]
+  navegar --> volver["Volver a la vista habitual"]
+```
+
+**Excepciones y alternativas**
+
+- Cancelar o Escape conserva la selección anterior y devuelve el foco al menú.
+- Recargar, cerrar sesión, cambiar de cuenta/sesión o perder administración desactiva la presentación temporal.
+- El aviso aclara que datos y permisos pertenecen a la cuenta real. Las pruebas de autorización de otra persona necesitan una sesión de esa persona.
+- Una selección desconocida no proyecta privilegios ni habilita el selector.
+
+**Objetos y archivos involucrados**
+
+No escribe en Oracle ni cambia perfiles, roles, cookies o token. Reutiliza el bootstrap y consultas existentes de métricas, tickets y calendario, autorizadas por api-tickets. El runtime original de permisos se conserva.
+
+- [Proyección y navegación](https://github.com/EMETRA/Sistema-tickets/blob/9d497b6ff471410ea5a96ba6df5e707ccebd8e43/src/platform/presentation.ts).
+- [Contexto temporal por cuenta y sesión](https://github.com/EMETRA/Sistema-tickets/blob/9d497b6ff471410ea5a96ba6df5e707ccebd8e43/src/platform/presentation-context.tsx).
+- [Selector accesible](https://github.com/EMETRA/Sistema-tickets/blob/9d497b6ff471410ea5a96ba6df5e707ccebd8e43/src/components/client/organisms/WorkspaceViewSwitcher/WorkspaceViewSwitcher.tsx).
+- [Shell y aviso de presentación](https://github.com/EMETRA/Sistema-tickets/blob/9d497b6ff471410ea5a96ba6df5e707ccebd8e43/src/components/client/templates/SystemLayout/SystemLayout.tsx).
+- [Portada según vista](https://github.com/EMETRA/Sistema-tickets/blob/9d497b6ff471410ea5a96ba6df5e707ccebd8e43/src/views/Platform/HomeWorkspace.tsx).
 
 <a id="operaciones"></a>
 
@@ -1254,7 +1298,7 @@ Las carpetas entre paréntesis agrupan rutas App Router sin añadirse a la URL; 
 | Pantalla | [src/app/(dashboard)/home/[appId]/[sectionId]/[moduleId]/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/home/%5BappId%5D/%5BsectionId%5D/%5BmoduleId%5D/page.tsx) | [CU-03](#cu-03) |
 | Pantalla | [src/app/(dashboard)/home/[appId]/[sectionId]/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/home/%5BappId%5D/%5BsectionId%5D/page.tsx) | [CU-03](#cu-03) |
 | Pantalla | [src/app/(dashboard)/home/[appId]/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/home/%5BappId%5D/page.tsx) | [CU-03](#cu-03) |
-| Pantalla | [src/app/(dashboard)/home/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/home/page.tsx) | [CU-02](#cu-02) |
+| Pantalla | [src/app/(dashboard)/home/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/9d497b6ff471410ea5a96ba6df5e707ccebd8e43/src/app/%28dashboard%29/home/page.tsx) | [CU-02](#cu-02) |
 | Pantalla | [src/app/(dashboard)/mis-tickets/[ticketId]/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/mis-tickets/%5BticketId%5D/page.tsx) | [CU-05](#cu-05) |
 | Pantalla | [src/app/(dashboard)/mis-tickets/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/mis-tickets/page.tsx) | [CU-04](#cu-04) |
 | Pantalla | [src/app/(dashboard)/statistics/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/statistics/page.tsx) | [CU-02](#cu-02) |
@@ -1338,7 +1382,7 @@ Las carpetas entre paréntesis agrupan rutas App Router sin añadirse a la URL; 
 
 ## Criterios de cobertura
 
-Esta edición contiene **21 casos agrupados**. El inventario incluye 0 entradas Nest decoradas, 23 páginas Next y 70 manejadores BFF, según corresponda. Los procesos internos, servicios asíncronos y almacenamiento local se cubren en los casos aunque no expongan HTTP. Las operaciones heredadas se identifican como tales; una ruta conservada en código no implica que deba aparecer habilitada en el catálogo de aplicaciones. Las funciones pendientes no se presentan como implementadas.
+Esta edición contiene **22 casos agrupados**. El inventario incluye 0 entradas Nest decoradas, 23 páginas Next y 70 manejadores BFF, según corresponda. Los procesos internos, servicios asíncronos y almacenamiento local se cubren en los casos aunque no expongan HTTP. Las operaciones heredadas se identifican como tales; una ruta conservada en código no implica que deba aparecer habilitada en el catálogo de aplicaciones. Las funciones pendientes no se presentan como implementadas.
 
 Para mantener la cobertura: al añadir o retirar una ruta, resolver, tarea programada o pantalla, actualizar su caso, su fila en este índice, los objetos usados y el diagrama. Si una función depende de otro repositorio, conservar explícito ese límite y actualizar también el contrato del receptor.
 

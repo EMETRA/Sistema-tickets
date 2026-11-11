@@ -330,7 +330,7 @@ export function mensajeJuzgado(error: unknown, contexto: "actuacion" | "busqueda
     const e = error as {
     statusCode?: number;
     graphQLErrors?: {
-      extensions?: { code?: string; statusCode?: number; originalError?: { statusCode?: number } };
+      extensions?: { code?: string; statusCode?: number; referencia?: string; originalError?: { statusCode?: number } };
     }[];
   };
     const ext = e.graphQLErrors?.[0]?.extensions;
@@ -348,5 +348,8 @@ export function mensajeJuzgado(error: unknown, contexto: "actuacion" | "busqueda
         return contexto === "busqueda"
             ? "Revisa el código. Debe tener entre 3 y 36 caracteres; puedes usar sus primeros 6 caracteres o pegarlo completo."
             : "Revisa los datos de la actuación y vuelve a intentar.";
-    return "No se pudo completar la operación. Puedes reintentar la misma solicitud o consultar el estado actual del caso.";
+    const referencia = typeof ext?.referencia === "string" &&
+        /^[a-f0-9]{8}-[a-f0-9]{4}-[1-5][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(ext.referencia)
+        ? ` Referencia: ${ext.referencia}.` : "";
+    return "No se pudo completar la operación. Puedes reintentar la misma solicitud o consultar el estado actual del caso." + referencia;
 }

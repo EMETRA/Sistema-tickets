@@ -239,6 +239,10 @@ async function run() {
       await page.setViewportSize({width,height:1050});
       await page.locator('#actuaciones').scrollIntoViewIfNeeded();
       assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+      await page.locator('main').evaluate(el=>{el.scrollTop=el.scrollHeight;});
+      await page.mouse.wheel(0,3000);
+      await page.evaluate(()=>window.scrollTo(0,document.documentElement.scrollHeight));
+      assert.deepEqual(await page.evaluate(()=>({scrollY,height:document.documentElement.scrollHeight,viewport:innerHeight})),{scrollY:0,height:1050,viewport:1050},'Solo main se desplaza; no aparece un vacío exterior al final');
       await page.screenshot({path:path.join(out,'actuaciones-'+width+'.png'),fullPage:false});
     }
     await page.setViewportSize({width:1440,height:1100});

@@ -1,6 +1,6 @@
 # Manual técnico — Sistema-tickets
 
-Base documental: `926fe45d27922c595c63e8f79e1e82b1594470eb`; actualización de consulta de casos: `cd953b4ea8731336669948645a55032e5f5eabba`; actualización de vistas y diagnóstico judicial: `9d497b6ff471410ea5a96ba6df5e707ccebd8e43`; línea de integración revisada: `Dev + fix/vistas_presentacion_y_layout`. Describe la base y la actualización citadas; la configuración y las autorizaciones efectivas de un servidor se comprueban por separado. Esta edición se preparó sin conectarse a Oracle, SMTP ni servidores institucionales.
+Base documental: `926fe45d27922c595c63e8f79e1e82b1594470eb`; actualización de consulta de casos: `cd953b4ea8731336669948645a55032e5f5eabba`; actualización de vistas y diagnóstico judicial: `9d497b6ff471410ea5a96ba6df5e707ccebd8e43`; actualización documental: `b77da403cba653095c8156b0e2c13035a96b606b`; línea de integración revisada: `Dev + fix/pdf_judicial_proxy`. Describe la base y la actualización citadas; la configuración y las autorizaciones efectivas de un servidor se comprueban por separado. Esta edición se preparó sin conectarse a Oracle, SMTP ni servidores institucionales.
 
 Los enlaces de código fijan esa revisión para que sigan siendo consultables cuando `main` excluya herramientas de desarrollo. Al modificar un comportamiento se deben actualizar su caso de uso, configuración y referencia de código.
 
@@ -127,6 +127,8 @@ Las incidencias de navegador/BFF no deben bloquear la operación original ni exp
 La consulta judicial acepta los primeros 3 o 6 caracteres o el código completo y resalta el prefijo coincidente. La recepción de papelería oculta los campos mientras no haya juzgados válidos y mantiene confirmación previa. El estado vacío de actuaciones reemplaza los encabezados sin filas; la tabla con datos se adapta a tarjetas móviles. Actualizar estado no descarta una solicitud cuyo resultado siga incierto.
 
 El shell ocupa la ventana con posición fija y concentra el desplazamiento en `main`; evita que el documento exterior deje un área vacía al llegar al final de una bitácora larga. El bloqueo de scroll exterior solo se aplica cuando existe `data-workspace-shell`, sin afectar los formularios de autenticación. Los fallos judiciales con referencia UUID válida la muestran en el aviso para localizar la incidencia; no se copian errores SQL a la pantalla.
+
+El proxy JUZ01 conserva la referencia UUID del API y su HTTP. Los fallos técnicos sin referencia del API se encolan como incidencias del Panel; sesión, permiso y conflicto no se convierten en bugs. La generación de PDF exige JSON y la descarga valida el tipo del archivo. El reintento documental obtiene un comando revisado nuevo por clic para no quedar bloqueado por un intento anterior incierto; usa el mismo ID de resolución y la idempotencia documental del API. Esta excepción no altera la identidad de las decisiones judiciales ni de otras mutaciones. El aviso indica que la resolución ya está registrada y que se debe reintentar únicamente el PDF.
 
 <a id="validacion"></a>
 

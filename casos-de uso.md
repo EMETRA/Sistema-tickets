@@ -1,6 +1,6 @@
 # Casos de uso — Sistema-tickets
 
-Base documental: `926fe45d27922c595c63e8f79e1e82b1594470eb`; actualización de consulta de casos: `cd953b4ea8731336669948645a55032e5f5eabba`; actualización de vistas y diagnóstico judicial: `9d497b6ff471410ea5a96ba6df5e707ccebd8e43`; línea de integración revisada: `Dev + fix/vistas_presentacion_y_layout`. Describe la base y la actualización citadas; la configuración y las autorizaciones efectivas de un servidor se comprueban por separado. Esta edición se preparó sin conectarse a Oracle, SMTP ni servidores institucionales.
+Base documental: `926fe45d27922c595c63e8f79e1e82b1594470eb`; actualización de consulta de casos: `cd953b4ea8731336669948645a55032e5f5eabba`; actualización de vistas y diagnóstico judicial: `9d497b6ff471410ea5a96ba6df5e707ccebd8e43`; actualización documental: `b77da403cba653095c8156b0e2c13035a96b606b`; línea de integración revisada: `Dev + fix/pdf_judicial_proxy`. Describe la base y la actualización citadas; la configuración y las autorizaciones efectivas de un servidor se comprueban por separado. Esta edición se preparó sin conectarse a Oracle, SMTP ni servidores institucionales.
 
 Los enlaces de código fijan esa revisión para que sigan siendo consultables cuando `main` excluya herramientas de desarrollo. Al modificar un comportamiento se deben actualizar su caso de uso, configuración y referencia de código.
 
@@ -1213,6 +1213,8 @@ flowchart TD
 - Si hay más de 20 coincidencias, `BUSQUEDA_DEMASIADO_AMPLIA` pide precisar con seis caracteres o el código completo.
 - Acción no permitida por estado se bloquea.
 - Reintentos no duplican resolución.
+- Una decisión confirmada puede tener PDF pendiente. El fallo de generación conserva la referencia HTTP del API y el aviso indica reintentar únicamente el documento. Cada clic documental obtiene un comando y confirmaciones nuevos, conservando el mismo ID de resolución; no modifica la identidad de la decisión.
+- El proxy solo acepta JSON para generar metadata y tipos de archivo permitidos para descargar. Registra los fallos técnicos que no tengan una referencia del API y no devuelve mensajes internos.
 
 **Objetos y persistencia**
 
@@ -1220,9 +1222,9 @@ Indirecto: dominio judicial ADMEMETRAVEHICULAR mediante api-tickets; archivos pr
 
 **Archivos involucrados**
 
-- [src/api/graphql/juzgado.ts](https://github.com/EMETRA/Sistema-tickets/blob/9d497b6ff471410ea5a96ba6df5e707ccebd8e43/src/api/graphql/juzgado.ts)
+- [src/api/graphql/juzgado.ts](https://github.com/EMETRA/Sistema-tickets/blob/b77da403cba653095c8156b0e2c13035a96b606b/src/api/graphql/juzgado.ts)
 - [src/api/graphql/juzgado-vista.ts](https://github.com/EMETRA/Sistema-tickets/blob/cd953b4ea8731336669948645a55032e5f5eabba/src/api/graphql/juzgado-vista.ts)
-- [src/app/api/JUZ01/[...path]/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/JUZ01/%5B...path%5D/route.ts)
+- [src/app/api/JUZ01/[...path]/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/b77da403cba653095c8156b0e2c13035a96b606b/src/app/api/JUZ01/%5B...path%5D/route.ts)
 - [src/views/JUZ01/JUZ01.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/cd953b4ea8731336669948645a55032e5f5eabba/src/views/JUZ01/JUZ01.module.scss)
 - [src/views/JUZ01/JUZ01.schema.ts](https://github.com/EMETRA/Sistema-tickets/blob/cd953b4ea8731336669948645a55032e5f5eabba/src/views/JUZ01/JUZ01.schema.ts)
 - [src/views/JUZ01/JUZ01.tsx](https://github.com/EMETRA/Sistema-tickets/blob/cd953b4ea8731336669948645a55032e5f5eabba/src/views/JUZ01/JUZ01.tsx)
@@ -1230,7 +1232,7 @@ Indirecto: dominio judicial ADMEMETRAVEHICULAR mediante api-tickets; archivos pr
 - [src/views/JUZ01Detail/AnalisisEvidencias.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/JUZ01Detail/AnalisisEvidencias.tsx)
 - [src/views/JUZ01Detail/EvidenciasCaso.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/JUZ01Detail/EvidenciasCaso.tsx)
 - [src/views/JUZ01Detail/JUZ01Detail.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/cd953b4ea8731336669948645a55032e5f5eabba/src/views/JUZ01Detail/JUZ01Detail.module.scss)
-- [src/views/JUZ01Detail/JUZ01Detail.tsx](https://github.com/EMETRA/Sistema-tickets/blob/cd953b4ea8731336669948645a55032e5f5eabba/src/views/JUZ01Detail/JUZ01Detail.tsx)
+- [src/views/JUZ01Detail/JUZ01Detail.tsx](https://github.com/EMETRA/Sistema-tickets/blob/b77da403cba653095c8156b0e2c13035a96b606b/src/views/JUZ01Detail/JUZ01Detail.tsx)
 - [src/views/JUZ01Detail/types.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/JUZ01Detail/types.tsx)
 
 <a id="cu-22"></a>
@@ -1317,7 +1319,7 @@ Las carpetas entre paréntesis agrupan rutas App Router sin añadirse a la URL; 
 | BFF | [src/app/api/COM03/permisos/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/COM03/permisos/route.ts) | [CU-20](#cu-20) |
 | BFF | [src/app/api/COM03/recursos/externos/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/COM03/recursos/externos/route.ts) | [CU-20](#cu-20) |
 | BFF | [src/app/api/COM03/recursos/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/COM03/recursos/route.ts) | [CU-20](#cu-20) |
-| BFF | [src/app/api/JUZ01/[...path]/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/JUZ01/%5B...path%5D/route.ts) | [CU-21](#cu-21) |
+| BFF | [src/app/api/JUZ01/[...path]/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/b77da403cba653095c8156b0e2c13035a96b606b/src/app/api/JUZ01/%5B...path%5D/route.ts) | [CU-21](#cu-21) |
 | BFF | [src/app/api/MOD01/reporteSemanal/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/MOD01/reporteSemanal/route.ts) | [CU-19](#cu-19) |
 | BFF | [src/app/api/MOD01/reporteSemanalColaboradores/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/MOD01/reporteSemanalColaboradores/route.ts) | [CU-19](#cu-19) |
 | BFF | [src/app/api/MOD01/reporteSemanalExcel/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/MOD01/reporteSemanalExcel/route.ts) | [CU-19](#cu-19) |

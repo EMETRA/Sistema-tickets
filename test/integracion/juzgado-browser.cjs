@@ -87,8 +87,14 @@ async function run() {
     // La sesión siguiente es una fixture declarada, no una cuenta administrativa.
     await context.addCookies([{ name: 'auth_token', value: 'qa-token-controlado', url: 'http://127.0.0.1:3741' }, { name: 'auth_role', value: 'USUARIO', url: 'http://127.0.0.1:3741' }]);
     await page.evaluate(({ user }) => localStorage.setItem('auth-storage', JSON.stringify({ state: { token: 'qa-token-controlado', user, userId: user.id_usuario }, version: 0 })), { user });
-    const url = `http://127.0.0.1:3741/home/juridico/juz01/juz01/detail?caseNumber=${codigo}`;
+    const url = `http://127.0.0.1:3741/home/juzgado/consultas/juz01/detail?caseNumber=${codigo}`;
+    await page.goto('http://127.0.0.1:3741/aplicaciones');
+    await page.getByRole('button', { name: 'Ingresar a Aplicaciones Juzgado', exact: true }).click();
+    await page.waitForURL('**/home/juzgado/consultas');
+    await page.getByRole('button', { name: 'Ingresar a Consultar caso', exact: true }).click();
+    await page.waitForURL('**/home/juzgado/consultas/juz01');
     await page.goto('http://127.0.0.1:3741/home/juridico/juz01/juz01');
+    await page.waitForURL('**/home/juzgado/consultas/juz01');
     await page.locator('#caseNumber').fill('ab');await page.getByRole('button',{name:'Consultar caso',exact:true}).click();
     await page.getByRole('alert').filter({hasText:'primeros 3 caracteres'}).waitFor();
     assert.equal(llamadas.filter(l=>l.query.includes('viviJuzgadoBuscar')).length,0);
@@ -130,6 +136,9 @@ async function run() {
     assert.ok(!page.url().includes('/detail'));assert.equal(llamadas.filter(l=>l.query.includes('viviJuzgadoDetalle')).length,0);
     await page.getByRole('button',{name:'Abrir caso '+codigo,exact:true}).click();
 
+    await page.waitForURL(url);
+    await page.goto(`http://127.0.0.1:3741/home/juridico/juz01/juz01/detail?caseNumber=${codigo}`);
+    await page.waitForURL(url);
     await page.getByRole('button', { name: 'Reintentar juzgados' }).waitFor();
     assert.ok((await page.locator('body').innerText()).includes(codigo));
     await page.getByRole('heading',{name:'Análisis automático de evidencias'}).waitFor();

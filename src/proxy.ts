@@ -7,6 +7,7 @@ import {
 } from "@/config/protected-routes";
 import { getSessionFromRequest } from "@/auth/session";
 import { canAccessPath } from "@/config/route-access";
+import { legacyApplicationDestination } from "@/config/apps-catalog";
 
 function isInternalPath(pathname: string) {
     return (
@@ -47,18 +48,13 @@ export function proxy(request: NextRequest) {
         return NextResponse.redirect(new URL("/login", request.url));
     }
 
-    const legacyModule = pathname.match(
-        /^\/home\/[^/]+\/[^/]+\/(mod06|proc01|mod13)\/?$/,
-    )?.[1];
-    if (session && legacyModule)
-        return NextResponse.redirect(
-            new URL(
-                legacyModule === "mod06"
-                    ? "/espacio/accesos?tab=corporate"
-                    : "/aplicaciones/en-desuso",
-                request.url,
-            ),
-        );
+    const destination = legacyApplicationDestination(pathname);
+    if (session && destination) {
+        const target = new URL(destination, request.url);
+        if (destination.startsWith("/home/juzgado/"))
+            target.search = request.nextUrl.search;
+        return NextResponse.redirect(target);
+    }
 
     if (isNologRoute && session) {
         return NextResponse.redirect(new URL("/home", request.url));

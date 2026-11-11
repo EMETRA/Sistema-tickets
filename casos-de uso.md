@@ -1,6 +1,6 @@
 # Casos de uso — Sistema-tickets
 
-Base documental: `926fe45d27922c595c63e8f79e1e82b1594470eb`; actualización de consulta de casos: `cd953b4ea8731336669948645a55032e5f5eabba`; actualización de vistas y diagnóstico judicial: `9d497b6ff471410ea5a96ba6df5e707ccebd8e43`; actualización documental: `b77da403cba653095c8156b0e2c13035a96b606b`; línea de integración revisada: `Dev + fix/pdf_judicial_proxy`. Describe la base y la actualización citadas; la configuración y las autorizaciones efectivas de un servidor se comprueban por separado. Esta edición se preparó sin conectarse a Oracle, SMTP ni servidores institucionales.
+Base documental: `926fe45d27922c595c63e8f79e1e82b1594470eb`; actualización de consulta de casos: `cd953b4ea8731336669948645a55032e5f5eabba`; actualización de vistas y diagnóstico judicial: `9d497b6ff471410ea5a96ba6df5e707ccebd8e43`; actualización documental: `b77da403cba653095c8156b0e2c13035a96b606b`; actualización de catálogo: `e3f8676f5121223c9f23aaa036833260efe236f9`; línea de integración revisada: `Dev + fix/pdf_judicial_proxy`. Describe la base y la actualización citadas; la configuración y las autorizaciones efectivas de un servidor se comprueban por separado. Esta edición se preparó sin conectarse a Oracle, SMTP ni servidores institucionales.
 
 Los enlaces de código fijan esa revisión para que sigan siendo consultables cuando `main` excluya herramientas de desarrollo. Al modificar un comportamiento se deben actualizar su caso de uso, configuración y referencia de código.
 
@@ -27,7 +27,7 @@ Guía de arquitectura, configuración y cambios: [manual-técnico.md](manual-t%C
 - [CU-16 · Consultar vehículo SAT y manuales o reporte de anulaciones](#cu-16)
 - [CU-17 · Consultar RRHH y exportar visa de nóminas](#cu-17)
 - [CU-18 · Preparar PDF y enviar boletas de pago autorizadas](#cu-18)
-- [CU-19 · Guardar y exportar reporte semanal](#cu-19)
+- [CU-19 · Guardar y exportar reporte semanal (deshabilitado)](#cu-19)
 - [CU-20 · Administrar noticias y notificar documentos jurídicos](#cu-20)
 - [CU-21 · Buscar y tramitar casos judiciales VIVI](#cu-21)
 - [CU-22 · Cambiar la vista para presentaciones y pruebas visuales](#cu-22)
@@ -209,7 +209,8 @@ flowchart TD
 
 - Catálogo no disponible no se sustituye por permisos abiertos.
 - Funciones corporativas solo se accede desde Personas y accesos.
-- MOD13 y grabación LPR no se ofrecen como procesos activos.
+- MOD13, grabación LPR, los tres reportes semanales y los dos dashboards de Informática no se ofrecen como aplicaciones activas. Las métricas siguen en su sección.
+- Consultar caso se ubica en Aplicaciones Juzgado → Consultas; solo se traslada si ya está autorizado en el catálogo. Notificar documento permanece en Jurídico.
 
 **Objetos y persistencia**
 
@@ -228,9 +229,9 @@ Indirecto: catálogo y permisos de api-tickets; no consulta tablas desde el nave
 - [src/app/(dashboard)/home/[appId]/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/home/%5BappId%5D/page.tsx)
 - [src/app/api/apps-catalog/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/apps-catalog/route.ts)
 - [src/app/unauthorized/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/unauthorized/page.tsx)
-- [src/config/app-registry.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/config/app-registry.ts)
+- [src/config/app-registry.ts](https://github.com/EMETRA/Sistema-tickets/blob/e3f8676f5121223c9f23aaa036833260efe236f9/src/config/app-registry.ts)
 - [src/config/apps-access.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/config/apps-access.ts)
-- [src/config/apps-catalog.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/config/apps-catalog.ts)
+- [src/config/apps-catalog.ts](https://github.com/EMETRA/Sistema-tickets/blob/e3f8676f5121223c9f23aaa036833260efe236f9/src/config/apps-catalog.ts)
 - [src/config/constants.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/config/constants.ts)
 - [src/config/navigation.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/config/navigation.ts)
 - [src/config/protected-routes.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/config/protected-routes.ts)
@@ -1031,40 +1032,37 @@ Indirecto: nómina ADMINSIAF; ADMEMETRANOTIFICACIONES.TB_TK_BOLETA_LOTES y TB_TK
 
 <a id="cu-19"></a>
 
-## CU-19 · Guardar y exportar reporte semanal
+## CU-19 · Guardar y exportar reporte semanal (deshabilitado)
 
-**Actor:** Usuario del Panel según su alcance.
+**Estado:** Deshabilitado. Se documenta para mantener la trazabilidad del código y de los datos históricos.
 
-**Precondiciones y entrada:** Sesión válida y capability o permiso del módulo; backend correspondiente configurado.
+**Actor:** Usuario autenticado, incluido administrador.
 
 **Flujo y resultado**
 
-1. Seleccionar colaborador y semana.
-2. Consultar o editar tareas, bloqueos y plan.
-3. Guardar el reporte autorizado.
-4. Abrir seguimiento o exportar Excel.
+1. El catálogo no ofrece Reporte semanal informática, Exportar reporte semanal informática ni Reporte Guardado.
+2. Un marcador antiguo muestra la pantalla de desuso del Panel.
+3. Una llamada directa al resolver semanal es rechazada por el interceptor del API antes de consultar o modificar datos.
+4. Los indicadores y reportes vigentes se consultan desde Métricas.
 
 ```mermaid
 flowchart TD
-  inicio["Seleccionar colaborador y semana"]
-  control{"Entrada y autorización válidas"}
-  inicio --> control
-  control -->|No| rechazo["Informar la excepción descrita; no completar la operación"]
-  paso1["Consultar o editar tareas, bloqueos y plan"]
-  control -->|Sí| paso1
-  paso2["Guardar el reporte autorizado"]
-  paso1 --> paso2
-  paso3["Abrir seguimiento o exportar Excel"]
-  paso2 --> paso3
+  entrada["Intento de acceso a un reporte retirado"] --> canal{"Canal"}
+  canal -->|Panel| desuso["Mostrar aplicación en desuso"]
+  canal -->|API| bloqueo["Rechazar antes de ejecutar el resolver"]
+  desuso --> historico["Conservar registros históricos"]
+  bloqueo --> historico
 ```
 
 **Excepciones y alternativas**
 
-- Sin acceso no habilitar edición.
-- Error conserva el contenido.
-- Exportación sin filas requiere aviso.
+- Un permiso antiguo o la administración no reactiva el proceso.
+- Desactivar la plataforma general no elude el bloqueo del resolver.
+- Los dashboards de Informática se retiran como aplicaciones; sus marcadores dirigen a Métricas. El resolver compartido de indicadores permanece disponible.
 
 **Objetos y persistencia**
+
+Referencias históricas conservadas; este caso no ejecuta nuevas lecturas, escrituras ni exportaciones.
 
 Indirecto: reportes semanales y detalles en ADMEMETRAIT mediante api-tickets.
 
@@ -1181,6 +1179,8 @@ Referencias de implementación relacionadas (incluye dependencias compartidas; e
 **Actor:** Usuario del Panel según su alcance.
 
 **Precondiciones y entrada:** Sesión válida y capability o permiso del módulo; backend correspondiente configurado.
+
+**Entrada del catálogo:** Aplicaciones Juzgado → Consultas → Consultar caso, `/home/juzgado/consultas/juz01`. Los marcadores anteriores de Jurídico redirigen conservando el caso; los permisos judiciales se mantienen.
 
 **Flujo y resultado**
 

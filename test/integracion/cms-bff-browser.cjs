@@ -9,7 +9,7 @@ async function run() {
   const calls = [];
   const image = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a4uUAAAAASUVORK5CYII=', 'base64');
   const resource = { id: 7, tipo: 'imagen', url: '/uploads/noticias/qa.png', tipo_mime: 'image/png' };
-  const news = { id: 21, titulo: 'Noticia QA controlada', slug: 'qa', idioma: 'es-GT', estado: 'borrador', visibilidad: 'publica', recurso_principal: resource };
+  const news = { id: 21, titulo: 'Noticia QA controlada', slug: 'qa', idioma: 'es-GT', estado: 'borrador', visibilidad: 'publica', ubicacion: 'Referencia de prueba, zona 5', latitud: 14.6, longitud: -90.5, recurso_principal: resource };
   const backend = http.createServer(async (req, res) => {
     const chunks = []; for await (const chunk of req) chunks.push(Buffer.from(chunk));
     calls.push({ path: req.url, auth: req.headers.authorization, type: req.headers['content-type'], body: Buffer.concat(chunks) });
@@ -44,7 +44,9 @@ async function run() {
     assert.ok(output.includes('Ready in'));
     const get = async path => { const r = await fetch(base + path, { headers }); assert.equal(r.status, 200); return r.json(); };
     assert.equal((await get('/noticias')).data[0].titulo, news.titulo);
-    assert.equal((await get('/noticia/21')).data.recursoPrincipal.url, '/api/COM03/media/noticias/qa.png');
+    const detail = (await get('/noticia/21')).data;
+    assert.equal(detail.recursoPrincipal.url, '/api/COM03/media/noticias/qa.png');
+    assert.equal(detail.ubicacion,news.ubicacion);assert.equal(detail.latitud,14.6);assert.equal(detail.longitud,-90.5);
     assert.equal((await get('/autores')).data[0].nombre, 'Autor QA');
     assert.equal((await get('/categorias')).data[0].nombre, 'Categoría QA');
     assert.equal((await get('/etiquetas')).data[0].nombre, 'Etiqueta QA');

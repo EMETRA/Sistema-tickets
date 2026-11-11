@@ -21,11 +21,14 @@ async function run() {
     const json = (data, status = 200) => { res.writeHead(status, { 'Content-Type': 'application/json' }); res.end(JSON.stringify(data)); };
     llamadas.push({ ruta: req.url, query: datos.query || '', variables: datos.variables, auth: req.headers.authorization });
     const q = datos.query || '';
+    if(req.url==='/platform/module-access/JUZ01')return json({moduloId:'JUZ01',allowed:true,actions:{LEER:true,INSERTAR:true,EDITAR:true,ELIMINAR:false}});
+    if(req.url==='/platform/bootstrap')return json({codigo:'FEATURE_DISABLED',message:'Fixture sin plataforma general'},503);
     if(req.url.includes('/evidencias/')){if(archivoHttp!==200)return json({codigo:'ARCHIVO_NO_DISPONIBLE',mensaje:'ruta privada no debe exponerse'},archivoHttp);res.writeHead(200,{'Content-Type':'image/png'});return res.end(Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=','base64'));}
     if (req.url.includes('/documento/generar')) { pdf = true; return json(documento); }
     if (req.url.includes('/documentos/')) { res.writeHead(200, { 'Content-Type': 'application/pdf', 'Content-Disposition': 'attachment; filename="resolucion.pdf"' }); return res.end('%PDF-1.4\nQA\n%%EOF'); }
     if (q.includes('mutation Login')) return json({ data: { login: { token: 'qa-token-controlado', refresh_token: 'qa-refresh-controlado', expires_in: 3600 } } });
     if (q.includes('query GetUser')) return perfilFalla ? json({ errors: [{ message: 'ORA-00942 consulta privada', extensions: { code: 'INTERNAL_SERVER_ERROR' } }] }) : json({ data: { usuario: user } });
+    if(q.includes('viviJuzgadoBuscar')) return json({data:{viviJuzgadoBuscar:[{codigoCaso:codigo,estado:'NOTIFICADA',registradaEn:'2026-10-08T17:00:00Z'},{codigoCaso:'QA-JUZ-8004',estado:'EN_JUZGADO',registradaEn:'2026-10-09T17:00:00Z'}]}});
     if (q.includes('viviJuzgadoDetalle')) {
       const caso = detalle();
       const analisis = caso.caso.analisisEvidencias;
@@ -46,7 +49,7 @@ async function run() {
     return json({ data: {} });
   });
   backend.listen(3742, '127.0.0.1'); await once(backend, 'listening');
-  const next = spawn(process.execPath, ['node_modules/next/dist/bin/next', 'start', '-p', '3741', '-H', '127.0.0.1'], { env: { ...process.env, GRAPHQL_ENDPOINT: 'http://127.0.0.1:3742/graphql', NEXT_TELEMETRY_DISABLED: '1' }, stdio: ['ignore', 'pipe', 'pipe'] });
+  const next = spawn(process.execPath, ['node_modules/next/dist/bin/next', 'start', '-p', '3741', '-H', '127.0.0.1'], { env: { ...process.env, TICKETS_PLATFORM_ENABLED:'false', GRAPHQL_ENDPOINT: 'http://127.0.0.1:3742/graphql', NEXT_TELEMETRY_DISABLED: '1' }, stdio: ['ignore', 'pipe', 'pipe'] });
   let salida = ''; next.stdout.on('data', b => salida += b); next.stderr.on('data', b => salida += b);
   let browser, page;
   try {
@@ -56,6 +59,13 @@ async function run() {
     const context = await browser.newContext({ viewport: { width: 1440, height: 1100 }, acceptDownloads: true });
     page = await context.newPage();
     await page.route('**/*', route => new URL(route.request().url()).hostname === '127.0.0.1' ? route.continue() : route.abort());
+    // El catálogo general no forma parte de esta fixture. La comprobación local
+    // declara el permiso judicial; su rechazo antes de Oracle se prueba en el API.
+    await page.route('**/api/platform/module-access/*', route => {
+      const moduloId = decodeURIComponent(new URL(route.request().url()).pathname.split('/').pop());
+      assert.equal(moduloId.toUpperCase(), 'JUZ01');
+      return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({moduloId,allowed:true,actions:{LEER:true,INSERTAR:true,EDITAR:true,ELIMINAR:false}})});
+    });
     await page.goto('http://127.0.0.1:3741/login');
     await page.locator('#email').fill('qa@example.invalid'); await page.locator('#clave').fill('clave-controlada');
     await page.getByRole('button', { name: 'Iniciar Sesión', exact: true }).dblclick();
@@ -69,7 +79,12 @@ async function run() {
     await context.addCookies([{ name: 'auth_token', value: 'qa-token-controlado', url: 'http://127.0.0.1:3741' }, { name: 'auth_role', value: 'USUARIO', url: 'http://127.0.0.1:3741' }]);
     await page.evaluate(({ user }) => localStorage.setItem('auth-storage', JSON.stringify({ state: { token: 'qa-token-controlado', user, userId: user.id_usuario }, version: 0 })), { user });
     const url = `http://127.0.0.1:3741/home/juridico/juz01/juz01/detail?caseNumber=${codigo}`;
-    await page.goto(url);
+    await page.goto('http://127.0.0.1:3741/home/juridico/juz01/juz01');
+    await page.locator('#caseNumber').fill('QA-JU');await page.getByRole('button',{name:'Consultar caso',exact:true}).click();
+    await page.getByRole('button',{name:codigo+' · NOTIFICADA',exact:true}).waitFor();
+    assert.ok(!page.url().includes('/detail'));assert.equal(llamadas.filter(l=>l.query.includes('viviJuzgadoDetalle')).length,0);
+    await page.getByRole('button',{name:codigo+' · NOTIFICADA',exact:true}).click();
+
     await page.getByRole('button', { name: 'Reintentar juzgados' }).waitFor();
     assert.ok((await page.locator('body').innerText()).includes(codigo));
     await page.getByRole('heading',{name:'Análisis automático de evidencias'}).waitFor();

@@ -1,156 +1,209 @@
 "use client";
 
-import React, { useState } from "react";
+import { useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { z } from "zod";
-import { Title } from "../../components/client/atoms/Title";
-import { FormField } from "../../components/client/molecules/FormField";
-import { Input } from "../../components/client/atoms/Input";
-import { Button } from "../../components/client/atoms/Button";
-import { Text } from "../../components/client/atoms/Text";
-import { JUZ01Schema } from "./JUZ01.schema";
-
-import styles from "./JUZ01.module.scss";
+import { FormField } from "@/components/client/molecules/FormField";
+import { Input } from "@/components/client/atoms/Input";
+import { Button } from "@/components/client/atoms/Button";
+import { displayDate } from "@/components/client/organisms/ResourceWorkspace/RecordDetail";
 import {
     buscarCasosJuzgado,
     mensajeJuzgado,
-    CoincidenciaJuzgado,
+    type CoincidenciaJuzgado,
 } from "@/api/graphql/juzgado";
-import { useRef } from "react";
+import { JUZ01Schema } from "./JUZ01.schema";
+import styles from "./JUZ01.module.scss";
 
-const JUZ01: React.FC = () => {
-    const router = useRouter();
-    const pathname = usePathname();
+export default function JUZ01() {
+    const router = useRouter(),
+        pathname = usePathname();
     const [caseNumber, setCaseNumber] = useState("");
     const [matches, setMatches] = useState<CoincidenciaJuzgado[]>([]);
     const [fieldError, setFieldError] = useState<string | null>(null);
-    const [message, setMessage] = useState<string | null>(null);
-    const enCurso = useRef(false);
+    const [searched, setSearched] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<{ message: string } | null>(null);
-
-    const handleExecute = async () => {
+    const [error, setError] = useState("");
+    const enCurso = useRef(false);
+    const search = async () => {
         if (enCurso.current) return;
-        setError(null);
-        setMessage(null);
-        setMatches([]);
-
         const parsed = JUZ01Schema.safeParse({ caseNumber });
         if (!parsed.success) {
-            const message =
-        z.flattenError(parsed.error).fieldErrors.caseNumber?.[0] ??
-        "El código de caso es requerido";
-            setFieldError(message);
+            setFieldError(
+                z.flattenError(parsed.error).fieldErrors.caseNumber?.[0] ||
+          "Revisa el código del caso",
+            );
             return;
         }
-
         setFieldError(null);
+        setError("");
+        setMatches([]);
+        setSearched(false);
         setCaseNumber(parsed.data.caseNumber);
         setLoading(true);
         enCurso.current = true;
-
         try {
-            const result = await buscarCasosJuzgado(parsed.data.caseNumber);
-            if (!result.length) {
-                setMessage("Sin resultados");
-                return;
-            }
-            setMatches(result);
-        } catch (err) {
-            setError({
-                message: mensajeJuzgado(err),
-            });
+            setMatches(await buscarCasosJuzgado(parsed.data.caseNumber));
+            setSearched(true);
+        } catch (e) {
+            setError(mensajeJuzgado(e));
         } finally {
             setLoading(false);
             enCurso.current = false;
         }
     };
-
     return (
-        <div className={styles.mainContainer}>
-            <div className={styles.formContainer}>
-                <Title variant="mid" tag="h3" className={styles.title}>
-                    Parámetros de consulta
-                </Title>
-
-                {/* Numero de caso */}
-                <FormField
-                    label="Código de caso"
-                    htmlFor="caseNumber"
-                    required
-                    className={styles.fieldCaseNumber}
-                >
-                    <Input
-                        id="caseNumber"
-                        type="text"
-                        value={caseNumber}
-                        onChange={(e) => {
-                            setCaseNumber(e.target.value);
-                            setMatches([]);
-                            if (fieldError) setFieldError(null);
-                        }}
-                        placeholder="Primeros 5 o 6 caracteres del caso"
-                        state={loading ? "disabled" : fieldError ? "error" : "default"}
-                        errorMessage={fieldError ?? undefined}
-                        aria-describedby="codigoCasoAyuda"
+        <section className={styles.page}>
+            <form
+                className={styles.searchPanel}
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    void search();
+                }}
+            >
+                <header>
+                    <h2>Buscar un caso</h2>
+                    <p>
+                        Ingresa al menos los primeros seis caracteres del código recibido
+                        por correo o en el documento.
+                    </p>
+                </header>
+                <div className={styles.searchControls}>
+                    <FormField
+                        label="Código de caso"
+                        htmlFor="caseNumber"
                         required
-                    />
-                </FormField>
-
-                <p id="codigoCasoAyuda">
-                    Escribe el inicio del código que aparece en el correo o PDF. Después
-                    selecciona el caso completo para revisarlo.
+                        className={styles.field}
+                    >
+                        <Input
+                            id="caseNumber"
+                            type="text"
+                            value={caseNumber}
+                            maxLength={36}
+                            autoComplete="off"
+                            spellCheck={false}
+                            onChange={(e) => {
+                                setCaseNumber(e.target.value);
+                                setMatches([]);
+                                setSearched(false);
+                                setError("");
+                                setFieldError(null);
+                            }}
+                            placeholder="Primeros 6 caracteres o código completo"
+                            state={loading ? "disabled" : fieldError ? "error" : "default"}
+                            errorMessage={fieldError || undefined}
+                            aria-describedby="codigoCasoAyuda"
+                            required
+                        />
+                    </FormField>
+                    <Button
+                        type="submit"
+                        variant="contained"
+                        state={loading ? "disabled" : "default"}
+                    >
+                        {loading ? "Buscando…" : "Consultar caso"}
+                    </Button>
+                </div>
+                <p id="codigoCasoAyuda" className={styles.help}>
+                    Puedes pegar el código completo. Comprueba la placa antes de abrir el
+                    expediente.
                 </p>
-                {!!matches.length && (
-                    <div aria-label="Casos encontrados">
-                        <p>{matches.length} coincidencia(s). Selecciona el caso:</p>
-                        <ul>
-                            {matches.map((item) => (
-                                <li key={item.codigoCaso}>
-                                    <Button
-                                        variant="outlined"
-                                        onClick={() =>
-                                            router.push(
-                                                `${pathname}/detail?caseNumber=${encodeURIComponent(item.codigoCaso)}`,
-                                            )
-                                        }
-                                    >
-                                        {item.codigoCaso} · {item.estado.replaceAll("_", " ")}
-                                    </Button>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                )}
-
-                <Button
-                    variant="contained"
-                    color="default"
-                    onClick={handleExecute}
-                    className={styles.executeButton}
-                    state={loading ? "disabled" : "default"}
-                >
-                    {loading ? "Consultando caso..." : "Consultar caso"}
-                </Button>
-
                 {error && (
-                    <Text variant="caption" className={styles.errorText}>
-                        Error: {error.message}
-                    </Text>
+                    <p className={styles.error} role="alert">
+                        {error}
+                    </p>
                 )}
-
-                {message && (
-                    <Text variant="body" className={styles.messageText}>
-                        {message}
-                    </Text>
+                {loading && (
+                    <p role="status" className={styles.help}>
+                        Buscando coincidencias…
+                    </p>
                 )}
-
-                <Text variant="caption" className={styles.footerText}>
-                    Dirección de Informática · Municipalidad de Guatemala
-                </Text>
-            </div>
-        </div>
+            </form>
+            {searched && (
+                <section className={styles.results} aria-labelledby="casos-titulo">
+                    <header className={styles.resultsHeader}>
+                        <div>
+                            <h2 id="casos-titulo">Resultados de la búsqueda</h2>
+                            <p role="status">
+                                {matches.length === 1
+                                    ? "1 caso encontrado"
+                                    : `${matches.length} casos encontrados`}
+                            </p>
+                        </div>
+                        {!!matches.length && (
+                            <span className={styles.help}>
+                                Selecciona el caso que corresponde a la placa.
+                            </span>
+                        )}
+                    </header>
+                    {!matches.length ? (
+                        <div className={styles.empty}>
+                            <h3>No encontramos coincidencias</h3>
+                            <p>
+                                Revisa los seis caracteres iniciales o busca con el código
+                                completo.
+                            </p>
+                        </div>
+                    ) : (
+                        <table className={styles.table}>
+                            <caption className={styles.srOnly}>
+                                Casos encontrados, con placa, código, estado y fecha de registro
+                            </caption>
+                            <thead>
+                                <tr>
+                                    <th scope="col">Placa</th>
+                                    <th scope="col">Código del caso</th>
+                                    <th scope="col">Estado</th>
+                                    <th scope="col">Registrado</th>
+                                    <th scope="col">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {matches.map((item) => (
+                                    <tr key={item.codigoCaso}>
+                                        <td data-label="Placa">
+                                            <strong className={styles.plate}>
+                                                {item.placa
+                                                    ? [item.usoPlaca, item.placa]
+                                                        .filter(Boolean)
+                                                        .join(" - ")
+                                                    : "Sin placa registrada"}
+                                            </strong>
+                                        </td>
+                                        <td
+                                            data-label="Código del caso"
+                                            className={styles.caseCode}
+                                        >
+                                            <code>{item.codigoCaso}</code>
+                                        </td>
+                                        <td data-label="Estado">
+                                            <span className={styles.status}>
+                                                {item.estado.replaceAll("_", " ")}
+                                            </span>
+                                        </td>
+                                        <td data-label="Registrado">
+                                            {displayDate(item.registradaEn)}
+                                        </td>
+                                        <td className={styles.open}>
+                                            <Button
+                                                variant="outlined"
+                                                aria-label={`Abrir caso ${item.codigoCaso}`}
+                                                onClick={() =>
+                                                    router.push(
+                                                        `${pathname}/detail?caseNumber=${encodeURIComponent(item.codigoCaso)}`,
+                                                    )
+                                                }
+                                            >
+                                                Ver caso
+                                            </Button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    )}
+                </section>
+            )}
+        </section>
     );
-};
-
-export default JUZ01;
+}

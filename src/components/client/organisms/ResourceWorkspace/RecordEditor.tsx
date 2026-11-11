@@ -11,12 +11,14 @@ export function RecordEditor({
     type,
     record,
     initial,
+    initialName,
     onClose,
     onSaved,
 }: {
     type: string;
     record?: PlatformRecord;
     initial?: Record<string, unknown>;
+    initialName?: string;
     onClose: () => void;
     onSaved: (record: PlatformRecord) => void;
 }) {
@@ -32,7 +34,7 @@ export function RecordEditor({
         ),
         dialog = useRef<HTMLDialogElement>(null),
         busyRef = useRef(false);
-    const [nombre, setNombre] = useState(record?.nombre || ""),
+    const [nombre, setNombre] = useState(record?.nombre || initialName || ""),
         [equipoId, setEquipo] = useState(
             record?.equipoId || availableTeams[0]?.id || "",
         ),

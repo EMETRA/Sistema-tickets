@@ -28,7 +28,7 @@ async function run() {
     if (req.url.includes('/documentos/')) { res.writeHead(200, { 'Content-Type': 'application/pdf', 'Content-Disposition': 'attachment; filename="resolucion.pdf"' }); return res.end('%PDF-1.4\nQA\n%%EOF'); }
     if (q.includes('mutation Login')) return json({ data: { login: { token: 'qa-token-controlado', refresh_token: 'qa-refresh-controlado', expires_in: 3600 } } });
     if (q.includes('query GetUser')) return perfilFalla ? json({ errors: [{ message: 'ORA-00942 consulta privada', extensions: { code: 'INTERNAL_SERVER_ERROR' } }] }) : json({ data: { usuario: user } });
-    if(q.includes('viviJuzgadoBuscar')) return json({data:{viviJuzgadoBuscar:[{codigoCaso:codigo,estado:'NOTIFICADA',registradaEn:'2026-10-08T17:00:00Z'},{codigoCaso:'QA-JUZ-8004',estado:'EN_JUZGADO',registradaEn:'2026-10-09T17:00:00Z'}]}});
+    if(q.includes('viviJuzgadoBuscar')) return json({data:{viviJuzgadoBuscar:[{codigoCaso:codigo,usoPlaca:'P',placa:'113BBB',estado:'NOTIFICADA',registradaEn:'2026-10-08T17:00:00Z'},{codigoCaso:'QA-JUZ-8004',usoPlaca:'P',placa:'114BBB',estado:'EN_JUZGADO',registradaEn:'2026-10-09T17:00:00Z'}]}});
     if (q.includes('viviJuzgadoDetalle')) {
       const caso = detalle();
       const analisis = caso.caso.analisisEvidencias;
@@ -81,9 +81,20 @@ async function run() {
     const url = `http://127.0.0.1:3741/home/juridico/juz01/juz01/detail?caseNumber=${codigo}`;
     await page.goto('http://127.0.0.1:3741/home/juridico/juz01/juz01');
     await page.locator('#caseNumber').fill('QA-JU');await page.getByRole('button',{name:'Consultar caso',exact:true}).click();
-    await page.getByRole('button',{name:codigo+' · NOTIFICADA',exact:true}).waitFor();
+    await page.getByText(/Escribe los primeros 6 caracteres/).waitFor();
+    assert.equal(llamadas.filter(l=>l.query.includes('viviJuzgadoBuscar')).length,0);
+    await page.locator('#caseNumber').fill('QA-JUZ');await page.getByRole('button',{name:'Consultar caso',exact:true}).click();
+    await page.getByRole('button',{name:'Abrir caso '+codigo,exact:true}).waitFor();
+    await page.getByText('P - 113BBB',{exact:true}).waitFor();
+    const searchOut=process.env.QA_SCREENSHOT_DIR || path.resolve(__dirname,'../../../../capturas');await fs.mkdir(searchOut,{recursive:true});
+    for(const width of [1440,1024,390]){
+      await page.setViewportSize({width,height:1050});
+      assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+      await page.screenshot({path:path.join(searchOut,'busqueda-casos-'+width+'.png'),fullPage:true});
+    }
+    await page.setViewportSize({width:1440,height:1050});
     assert.ok(!page.url().includes('/detail'));assert.equal(llamadas.filter(l=>l.query.includes('viviJuzgadoDetalle')).length,0);
-    await page.getByRole('button',{name:codigo+' · NOTIFICADA',exact:true}).click();
+    await page.getByRole('button',{name:'Abrir caso '+codigo,exact:true}).click();
 
     await page.getByRole('button', { name: 'Reintentar juzgados' }).waitFor();
     assert.ok((await page.locator('body').innerText()).includes(codigo));

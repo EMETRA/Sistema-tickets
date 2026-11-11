@@ -1,0 +1,1340 @@
+# Casos de uso — Sistema-tickets
+
+Código de referencia: `926fe45d27922c595c63e8f79e1e82b1594470eb`; línea de integración revisada: `Dev + feat/casos_catalogos_oracle_github`. Describe capacidades presentes en esa revisión; la configuración y las autorizaciones efectivas de un servidor se comprueban por separado. Esta edición se preparó sin conectarse a Oracle, SMTP ni servidores institucionales.
+
+Los enlaces de código fijan esa revisión para que sigan siendo consultables cuando `main` excluya herramientas de desarrollo. Al modificar un comportamiento se deben actualizar su caso de uso, configuración y referencia de código.
+
+
+Guía de arquitectura, configuración y cambios: [manual-técnico.md](manual-t%C3%A9cnico.md).
+
+## Índice
+
+- [CU-01 · Entrar y recuperar acceso institucional](#cu-01)
+- [CU-02 · Consultar inicio, perfil y rendimiento personal](#cu-02)
+- [CU-03 · Navegar aplicaciones, detectar desuso y bloquear acceso previo](#cu-03)
+- [CU-04 · Crear ticket y consultar listados](#cu-04)
+- [CU-05 · Conversar en un ticket y abrir adjuntos Word, Excel, PDF o imagen](#cu-05)
+- [CU-06 · Asignar, etiquetar y resolver tickets](#cu-06)
+- [CU-07 · Administrar personas, perfiles, roles y permisos](#cu-07)
+- [CU-08 · Consultar y modificar funciones corporativas autorizadas](#cu-08)
+- [CU-09 · Consultar calendario semanal y actividades](#cu-09)
+- [CU-10 · Preparar equipos desde RRHH y revisar miembros](#cu-10)
+- [CU-11 · Gestionar fichas de activos, visitas y cableado](#cu-11)
+- [CU-12 · Consultar servidores, contenedores y logs observados](#cu-12)
+- [CU-13 · Vincular aplicaciones con GitHub y objetos Oracle](#cu-13)
+- [CU-14 · Consultar métricas, reportes por etiqueta y trazabilidad](#cu-14)
+- [CU-15 · Operar los espacios de plataforma, buscar y consultar ayuda](#cu-15)
+- [CU-16 · Consultar vehículo SAT y manuales o reporte de anulaciones](#cu-16)
+- [CU-17 · Consultar RRHH y exportar visa de nóminas](#cu-17)
+- [CU-18 · Preparar PDF y enviar boletas de pago autorizadas](#cu-18)
+- [CU-19 · Guardar y exportar reporte semanal](#cu-19)
+- [CU-20 · Administrar noticias y notificar documentos jurídicos](#cu-20)
+- [CU-21 · Buscar y tramitar casos judiciales VIVI](#cu-21)
+
+- [Índice de operaciones y rutas](#operaciones)
+- [Criterios de cobertura](#cobertura)
+
+Los casos agrupan variantes de una misma finalidad (por ejemplo consultar, crear y modificar un catálogo). Las rutas y operaciones del anexo permiten encontrar el caso sin recorrer todo el código. Los diagramas describen decisiones principales; las excepciones de cada caso completan los caminos alternativos.
+
+<a id="cu-01"></a>
+
+## CU-01 · Entrar y recuperar acceso institucional
+
+**Actor:** Usuario del Panel según su alcance.
+
+**Precondiciones y entrada:** Sesión válida y capability o permiso del módulo; backend correspondiente configurado.
+
+**Flujo y resultado**
+
+1. Abrir acceso o recuperación.
+2. Validar campos y enviar al BFF.
+3. Resolver respuesta institucional.
+4. Establecer sesión o mostrar instrucciones de recuperación.
+5. Navegar al inicio permitido.
+
+```mermaid
+flowchart TD
+  inicio["Abrir acceso o recuperación"]
+  control{"Entrada y autorización válidas"}
+  inicio --> control
+  control -->|No| rechazo["Informar la excepción descrita; no completar la operación"]
+  paso1["Validar campos y enviar al BFF"]
+  control -->|Sí| paso1
+  paso2["Resolver respuesta institucional"]
+  paso1 --> paso2
+  paso3["Establecer sesión o mostrar instrucciones de recuperación"]
+  paso2 --> paso3
+  paso4["Navegar al inicio permitido"]
+  paso3 --> paso4
+```
+
+**Excepciones y alternativas**
+
+- Fallo de perfil se distingue de credenciales inválidas.
+- Recuperación no equivale a OTP vecinal de VIVI.
+- No mostrar tokens ni respuesta interna completa.
+
+**Objetos y persistencia**
+
+Indirecto: api-autenticacion y ADMAUTEMETRA.TB_USUARIOS, TB_CLAVE_RECUPERACION y TB_CORREO_VALIDACION; el Panel no accede a Oracle.
+
+**Archivos involucrados**
+
+- [src/app/(auth)/forgot-password/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28auth%29/forgot-password/page.tsx)
+- [src/app/(auth)/login/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28auth%29/login/page.tsx)
+- [src/app/api/auth/recovery/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/auth/recovery/route.ts)
+- [src/app/api/graphql/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/graphql/route.ts)
+- [src/auth/constants.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/auth/constants.ts)
+- [src/auth/normalizeRole.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/auth/normalizeRole.ts)
+- [src/auth/recovery.server.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/auth/recovery.server.ts)
+- [src/auth/session.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/auth/session.ts)
+- [src/views/ForgotPassword/ForgotPassword.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/ForgotPassword/ForgotPassword.module.scss)
+- [src/views/ForgotPassword/ForgotPassword.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/ForgotPassword/ForgotPassword.tsx)
+- [src/views/ForgotPassword/index.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/ForgotPassword/index.tsx)
+- [src/views/Login/Login.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Login/Login.module.scss)
+- [src/views/Login/Login.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Login/Login.tsx)
+- [src/views/Login/index.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Login/index.tsx)
+
+<a id="cu-02"></a>
+
+## CU-02 · Consultar inicio, perfil y rendimiento personal
+
+**Actor:** Usuario del Panel según su alcance.
+
+**Precondiciones y entrada:** Sesión válida y capability o permiso del módulo; backend correspondiente configurado.
+
+**Flujo y resultado**
+
+1. Obtener sesión y bootstrap.
+2. Seleccionar vista del actor y cargar indicadores.
+3. Mostrar solicitudes, actividad y calendario autorizados.
+4. Abrir perfil, estadísticas o detalle relacionado.
+
+```mermaid
+flowchart TD
+  inicio["Obtener sesión y bootstrap"]
+  control{"Entrada y autorización válidas"}
+  inicio --> control
+  control -->|No| rechazo["Informar la excepción descrita; no completar la operación"]
+  paso1["Seleccionar vista del actor y cargar indicadores"]
+  control -->|Sí| paso1
+  paso2["Mostrar solicitudes, actividad y calendario autorizados"]
+  paso1 --> paso2
+  paso3["Abrir perfil, estadísticas o detalle relacionado"]
+  paso2 --> paso3
+```
+
+**Excepciones y alternativas**
+
+- Indicador fallido conserva referencia y no inventa valores.
+- Un nombre de perfil administrativo no cambia actor.admin.
+- Listado vacío y carga fallida son estados distintos.
+
+**Objetos y persistencia**
+
+Indirecto: tickets e historial de ADMEMETRAIT y perfil en ADMAUTEMETRA mediante api-tickets; estadísticas son consultas remotas.
+
+**Archivos involucrados**
+
+- [src/app/(dashboard)/home/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/home/page.tsx)
+- [src/app/(dashboard)/statistics/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/statistics/page.tsx)
+- [src/app/api/admin-dashboard/last-movements/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/admin-dashboard/last-movements/route.ts)
+- [src/app/api/admin-dashboard/last-ticket/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/admin-dashboard/last-ticket/route.ts)
+- [src/app/api/admin-dashboard/stats/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/admin-dashboard/stats/route.ts)
+- [src/app/api/admin-dashboard/team-members/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/admin-dashboard/team-members/route.ts)
+- [src/app/api/admin-dashboard/user-performance/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/admin-dashboard/user-performance/route.ts)
+- [src/app/api/annual-report/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/annual-report/route.ts)
+- [src/app/api/my-activity/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/my-activity/route.ts)
+- [src/app/api/my-stats/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/my-stats/route.ts)
+- [src/app/api/technician-events/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/technician-events/route.ts)
+- [src/app/api/technician-last-tickets/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/technician-last-tickets/route.ts)
+- [src/app/api/technician-stats/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/technician-stats/route.ts)
+- [src/app/api/usuario/[userId]/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/usuario/%5BuserId%5D/route.ts)
+- [src/app/api/usuario/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/usuario/route.ts)
+- [src/views/Home/Admin/AdminHome.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Home/Admin/AdminHome.module.scss)
+- [src/views/Home/Admin/AdminHome.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Home/Admin/AdminHome.tsx)
+- [src/views/Home/Admin/index.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Home/Admin/index.tsx)
+- [src/views/Home/Admin/types.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Home/Admin/types.tsx)
+- [src/views/Home/Home.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Home/Home.module.scss)
+- [src/views/Home/HomeHeading.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Home/HomeHeading.tsx)
+- [src/views/Home/Tech/TechHome.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Home/Tech/TechHome.module.scss)
+- [src/views/Home/Tech/TechHome.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Home/Tech/TechHome.tsx)
+- [src/views/Home/Tech/index.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Home/Tech/index.tsx)
+- [src/views/Home/User/UserHome.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Home/User/UserHome.module.scss)
+- [src/views/Home/User/UserHome.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Home/User/UserHome.tsx)
+- [src/views/Home/User/index.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Home/User/index.tsx)
+- [src/views/Platform/HomeWorkspace.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Platform/HomeWorkspace.module.scss)
+- [src/views/Platform/HomeWorkspace.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Platform/HomeWorkspace.tsx)
+- [src/views/Profile/Profile.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Profile/Profile.module.scss)
+- [src/views/Profile/Profile.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Profile/Profile.tsx)
+- [src/views/Profile/index.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Profile/index.tsx)
+- [src/views/Statistics/Statistics.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Statistics/Statistics.module.scss)
+- [src/views/Statistics/Statistics.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Statistics/Statistics.tsx)
+- [src/views/Statistics/index.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Statistics/index.tsx)
+
+<a id="cu-03"></a>
+
+## CU-03 · Navegar aplicaciones, detectar desuso y bloquear acceso previo
+
+**Actor:** Usuario del Panel según su alcance.
+
+**Precondiciones y entrada:** Sesión válida y capability o permiso del módulo; backend correspondiente configurado.
+
+**Flujo y resultado**
+
+1. Cargar catálogo y capacidades.
+2. Mostrar aplicaciones y módulos permitidos.
+3. Comprobar acceso antes de habilitar formulario.
+4. Entrar al módulo o mostrar denegación.
+5. Identificar aplicaciones retiradas sin ejecutar sus procesos.
+
+```mermaid
+flowchart TD
+  inicio["Cargar catálogo y capacidades"]
+  control{"Entrada y autorización válidas"}
+  inicio --> control
+  control -->|No| rechazo["Informar la excepción descrita; no completar la operación"]
+  paso1["Mostrar aplicaciones y módulos permitidos"]
+  control -->|Sí| paso1
+  paso2["Comprobar acceso antes de habilitar formulario"]
+  paso1 --> paso2
+  paso3["Entrar al módulo o mostrar denegación"]
+  paso2 --> paso3
+  paso4["Identificar aplicaciones retiradas sin ejecutar sus procesos"]
+  paso3 --> paso4
+```
+
+**Excepciones y alternativas**
+
+- Catálogo no disponible no se sustituye por permisos abiertos.
+- Funciones corporativas solo se accede desde Personas y accesos.
+- MOD13 y grabación LPR no se ofrecen como procesos activos.
+
+**Objetos y persistencia**
+
+Indirecto: catálogo y permisos de api-tickets; no consulta tablas desde el navegador.
+
+**Archivos involucrados**
+
+- [src/app/(dashboard)/aplicaciones/en-desuso/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/aplicaciones/en-desuso/page.tsx)
+- [src/app/(dashboard)/aplicaciones/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/aplicaciones/page.tsx)
+- [src/app/(dashboard)/home/[appId]/[sectionId]/SectionApps.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/home/%5BappId%5D/%5BsectionId%5D/SectionApps.module.scss)
+- [src/app/(dashboard)/home/[appId]/[sectionId]/SectionAppsView.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/home/%5BappId%5D/%5BsectionId%5D/SectionAppsView.tsx)
+- [src/app/(dashboard)/home/[appId]/[sectionId]/[moduleId]/detail/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/home/%5BappId%5D/%5BsectionId%5D/%5BmoduleId%5D/detail/page.tsx)
+- [src/app/(dashboard)/home/[appId]/[sectionId]/[moduleId]/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/home/%5BappId%5D/%5BsectionId%5D/%5BmoduleId%5D/page.tsx)
+- [src/app/(dashboard)/home/[appId]/[sectionId]/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/home/%5BappId%5D/%5BsectionId%5D/page.tsx)
+- [src/app/(dashboard)/home/[appId]/error.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/home/%5BappId%5D/error.tsx)
+- [src/app/(dashboard)/home/[appId]/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/home/%5BappId%5D/page.tsx)
+- [src/app/api/apps-catalog/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/apps-catalog/route.ts)
+- [src/app/unauthorized/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/unauthorized/page.tsx)
+- [src/config/app-registry.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/config/app-registry.ts)
+- [src/config/apps-access.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/config/apps-access.ts)
+- [src/config/apps-catalog.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/config/apps-catalog.ts)
+- [src/config/constants.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/config/constants.ts)
+- [src/config/navigation.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/config/navigation.ts)
+- [src/config/protected-routes.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/config/protected-routes.ts)
+- [src/config/require-app-catalog.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/config/require-app-catalog.ts)
+- [src/config/route-access.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/config/route-access.ts)
+- [src/views/Applications/Applications.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Applications/Applications.tsx)
+- [src/views/MOD13/MOD13.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/MOD13/MOD13.module.scss)
+- [src/views/MOD13/MOD13.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/MOD13/MOD13.tsx)
+- [src/views/MOD13/index.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/MOD13/index.tsx)
+- [src/views/MOD13/types.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/MOD13/types.tsx)
+- [src/views/PROC01/PROC01.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/PROC01/PROC01.module.scss)
+- [src/views/PROC01/PROC01.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/PROC01/PROC01.tsx)
+- [src/views/PROC01/types.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/PROC01/types.tsx)
+- [src/views/Platform/LegacyModuleBridge.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Platform/LegacyModuleBridge.tsx)
+
+<a id="cu-04"></a>
+
+## CU-04 · Crear ticket y consultar listados
+
+**Actor:** Usuario del Panel según su alcance.
+
+**Precondiciones y entrada:** Sesión válida y capability o permiso del módulo; backend correspondiente configurado.
+
+**Flujo y resultado**
+
+1. Comprobar acceso y cargar catálogos.
+2. Completar solicitud y archivos.
+3. Validar y enviar creación al BFF.
+4. Mostrar el registro confirmado.
+5. Consultar tickets propios o cola autorizada.
+
+```mermaid
+flowchart TD
+  inicio["Comprobar acceso y cargar catálogos"]
+  control{"Entrada y autorización válidas"}
+  inicio --> control
+  control -->|No| rechazo["Informar la excepción descrita; no completar la operación"]
+  paso1["Completar solicitud y archivos"]
+  control -->|Sí| paso1
+  paso2["Validar y enviar creación al BFF"]
+  paso1 --> paso2
+  paso3["Mostrar el registro confirmado"]
+  paso2 --> paso3
+  paso4["Consultar tickets propios o cola autorizada"]
+  paso3 --> paso4
+```
+
+**Excepciones y alternativas**
+
+- Catálogo vacío impide una selección válida y debe informarse.
+- Error de creación conserva el formulario.
+- No mostrar null como referencia ni asumir IDs fijos de estado.
+
+**Objetos y persistencia**
+
+Indirecto: ADMEMETRAIT.TB_TICKET, TB_TICKET_ESTADO, TB_TICKET_CATEGORIA, TB_TICKET_PRIORIDAD y adjuntos, a través de api-tickets.
+
+**Archivos involucrados**
+
+- [src/app/(dashboard)/mis-tickets/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/mis-tickets/page.tsx)
+- [src/app/(dashboard)/tickets-creation/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/tickets-creation/page.tsx)
+- [src/app/(dashboard)/tickets/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/tickets/page.tsx)
+- [src/app/api/catalogs/categories/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/catalogs/categories/route.ts)
+- [src/app/api/catalogs/priorities/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/catalogs/priorities/route.ts)
+- [src/app/api/catalogs/statuses/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/catalogs/statuses/route.ts)
+- [src/app/api/ticket-categories/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/ticket-categories/route.ts)
+- [src/app/api/ticket-priorities/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/ticket-priorities/route.ts)
+- [src/app/api/ticket-statuses/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/ticket-statuses/route.ts)
+- [src/app/api/tickets/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/tickets/route.ts)
+- [src/app/api/tickets/usuario/[userId]/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/tickets/usuario/%5BuserId%5D/route.ts)
+- [src/views/Tickets/Tickets.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Tickets/Tickets.tsx)
+- [src/views/TicketsCreation/TicketsCreation.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/TicketsCreation/TicketsCreation.module.scss)
+- [src/views/TicketsCreation/TicketsCreation.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/TicketsCreation/TicketsCreation.tsx)
+- [src/views/TicketsCreation/index.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/TicketsCreation/index.tsx)
+
+<a id="cu-05"></a>
+
+## CU-05 · Conversar en un ticket y abrir adjuntos Word, Excel, PDF o imagen
+
+**Actor:** Usuario del Panel según su alcance.
+
+**Precondiciones y entrada:** Sesión válida y capability o permiso del módulo; backend correspondiente configurado.
+
+**Flujo y resultado**
+
+1. Abrir detalle y cargar conversación e historial.
+2. Escribir comentario y adjuntar archivos.
+3. Enviar mensaje conservando datos ante fallo.
+4. Solicitar archivo mediante ruta protegida.
+5. Mostrar visor compatible o descarga alternativa.
+
+```mermaid
+flowchart TD
+  inicio["Abrir detalle y cargar conversación e historial"]
+  control{"Entrada y autorización válidas"}
+  inicio --> control
+  control -->|No| rechazo["Informar la excepción descrita; no completar la operación"]
+  paso1["Escribir comentario y adjuntar archivos"]
+  control -->|Sí| paso1
+  paso2["Enviar mensaje conservando datos ante fallo"]
+  paso1 --> paso2
+  paso3["Solicitar archivo mediante ruta protegida"]
+  paso2 --> paso3
+  paso4["Mostrar visor compatible o descarga alternativa"]
+  paso3 --> paso4
+```
+
+**Excepciones y alternativas**
+
+- Comentario no debe requerir doble confirmación administrativa.
+- NO_DISPONIBLE se correlaciona por referencia sin perder texto.
+- Archivo sin permiso o inexistente no abre un visor vacío definitivo.
+- No enviar el documento a conversores públicos.
+
+**Objetos y persistencia**
+
+Indirecto: TB_TICKET_MENSAJE, TB_TICKET_MENSAJE_ARCHIVO, TB_TICKET_ADJUNTO y TB_TICKET_HISTORIAL en ADMEMETRAIT; vista Office generada por backend con librerías locales.
+
+**Archivos involucrados**
+
+- [src/app/(dashboard)/mis-tickets/[ticketId]/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/mis-tickets/%5BticketId%5D/page.tsx)
+- [src/app/api/platform/[...path]/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/platform/%5B...path%5D/route.ts)
+- [src/app/api/ticket-attachments/[ticketId]/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/ticket-attachments/%5BticketId%5D/route.ts)
+- [src/app/api/ticket-history/[ticketId]/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/ticket-history/%5BticketId%5D/route.ts)
+- [src/app/api/ticket/[id]/attachments/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/ticket/%5Bid%5D/attachments/route.ts)
+- [src/app/api/ticket/[id]/history/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/ticket/%5Bid%5D/history/route.ts)
+- [src/app/api/ticket/[id]/messages/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/ticket/%5Bid%5D/messages/route.ts)
+- [src/app/api/ticket/[id]/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/ticket/%5Bid%5D/route.ts)
+- [src/views/Tickets/TicketView.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Tickets/TicketView.tsx)
+
+<a id="cu-06"></a>
+
+## CU-06 · Asignar, etiquetar y resolver tickets
+
+**Actor:** Usuario del Panel según su alcance.
+
+**Precondiciones y entrada:** Sesión válida y capability o permiso del módulo; backend correspondiente configurado.
+
+**Flujo y resultado**
+
+1. Consultar cola y responsables disponibles.
+2. Revisar asignación y confirmar la acción requerida.
+3. Agregar etiquetas desde el input de selección.
+4. Ejecutar transición permitida.
+5. Exigir etiqueta antes de resolver.
+
+```mermaid
+flowchart TD
+  inicio["Consultar cola y responsables disponibles"]
+  control{"Entrada y autorización válidas"}
+  inicio --> control
+  control -->|No| rechazo["Informar la excepción descrita; no completar la operación"]
+  paso1["Revisar asignación y confirmar la acción requerida"]
+  control -->|Sí| paso1
+  paso2["Agregar etiquetas desde el input de selección"]
+  paso1 --> paso2
+  paso3["Ejecutar transición permitida"]
+  paso2 --> paso3
+  paso4["Exigir etiqueta antes de resolver"]
+  paso3 --> paso4
+```
+
+**Excepciones y alternativas**
+
+- Ticket sin etiqueta no se resuelve.
+- Confirmación para otra acción no se reutiliza.
+- Responsable no autorizado no aparece como asignación válida.
+
+**Objetos y persistencia**
+
+Indirecto: TB_TICKET, TB_TK_TICKET_CONTROL, TB_TICKET_TAG y TB_TICKET_TAG_REL; comandos y confirmaciones de api-tickets.
+
+**Archivos involucrados**
+
+- [src/api/hooks/useAddTagToTicket.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/api/hooks/useAddTagToTicket.ts)
+- [src/api/hooks/useRemoveTagFromTicket.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/api/hooks/useRemoveTagFromTicket.ts)
+- [src/app/api/ticket-tag-catalog/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/ticket-tag-catalog/route.ts)
+- [src/app/api/ticket-tags/[ticketId]/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/ticket-tags/%5BticketId%5D/route.ts)
+- [src/views/Platform/AssignmentsWorkspace.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Platform/AssignmentsWorkspace.tsx)
+- [src/views/Tickets/TicketView.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Tickets/TicketView.tsx)
+
+<a id="cu-07"></a>
+
+## CU-07 · Administrar personas, perfiles, roles y permisos
+
+**Actor:** Usuario del Panel según su alcance.
+
+**Precondiciones y entrada:** Sesión válida y capability o permiso del módulo; backend correspondiente configurado.
+
+**Flujo y resultado**
+
+1. Entrar con capacidades administrativas.
+2. Navegar usuarios, perfiles, roles, módulos y permisos.
+3. Consultar y revisar el cambio de acceso.
+4. Confirmar comando y refrescar acceso efectivo.
+5. Tramitar solicitud o provisión cuando corresponda.
+
+```mermaid
+flowchart TD
+  inicio["Entrar con capacidades administrativas"]
+  control{"Entrada y autorización válidas"}
+  inicio --> control
+  control -->|No| rechazo["Informar la excepción descrita; no completar la operación"]
+  paso1["Navegar usuarios, perfiles, roles, módulos y permisos"]
+  control -->|Sí| paso1
+  paso2["Consultar y revisar el cambio de acceso"]
+  paso1 --> paso2
+  paso3["Confirmar comando y refrescar acceso efectivo"]
+  paso2 --> paso3
+  paso4["Tramitar solicitud o provisión cuando corresponda"]
+  paso3 --> paso4
+```
+
+**Excepciones y alternativas**
+
+- actor.admin falso no se corrige cambiando solo el menú.
+- Error del catálogo no habilita acciones.
+- Concesión de aplicación no otorga privilegios Oracle.
+
+**Objetos y persistencia**
+
+Indirecto: ADMAUTEMETRA, ADMEMETRAIDENTIDAD.TB_TK_USUARIO_ROL/TB_TK_USUARIO_PERM y solicitudes/confirmaciones de plataforma.
+
+**Archivos involucrados**
+
+- [src/app/(dashboard)/config/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/config/page.tsx)
+- [src/app/(dashboard)/usuarios/[id]/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/usuarios/%5Bid%5D/page.tsx)
+- [src/app/(dashboard)/usuarios/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/usuarios/page.tsx)
+- [src/app/api/configuration/pending-requests/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/configuration/pending-requests/route.ts)
+- [src/app/api/rbac/roles/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/rbac/roles/route.ts)
+- [src/app/api/users/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/users/route.ts)
+- [src/views/Configuration/Configuration.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Configuration/Configuration.module.scss)
+- [src/views/Configuration/Configuration.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Configuration/Configuration.tsx)
+- [src/views/Configuration/index.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Configuration/index.tsx)
+- [src/views/Platform/AccessWorkspace.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Platform/AccessWorkspace.tsx)
+- [src/views/Users/Users.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Users/Users.module.scss)
+- [src/views/Users/Users.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Users/Users.tsx)
+- [src/views/Users/index.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Users/index.tsx)
+
+<a id="cu-08"></a>
+
+## CU-08 · Consultar y modificar funciones corporativas autorizadas
+
+**Actor:** Usuario del Panel según su alcance.
+
+**Precondiciones y entrada:** Sesión válida y capability o permiso del módulo; backend correspondiente configurado.
+
+**Flujo y resultado**
+
+1. Comprobar permiso antes del formulario.
+2. Cargar empresas, usuarios y aplicaciones.
+3. Consultar funciones de la selección.
+4. Editar dentro de un contenedor de lista limitado.
+5. Guardar o confirmar copia entre usuarios.
+
+```mermaid
+flowchart TD
+  inicio["Comprobar permiso antes del formulario"]
+  control{"Entrada y autorización válidas"}
+  inicio --> control
+  control -->|No| rechazo["Informar la excepción descrita; no completar la operación"]
+  paso1["Cargar empresas, usuarios y aplicaciones"]
+  control -->|Sí| paso1
+  paso2["Consultar funciones de la selección"]
+  paso1 --> paso2
+  paso3["Editar dentro de un contenedor de lista limitado"]
+  paso2 --> paso3
+  paso4["Guardar o confirmar copia entre usuarios"]
+  paso3 --> paso4
+```
+
+**Excepciones y alternativas**
+
+- Catálogos fallidos ofrecen reintento sin borrar la selección.
+- Lista larga no debe extender la página sin control.
+- Copiar todas las aplicaciones requiere advertencia de alcance.
+
+**Objetos y persistencia**
+
+Indirecto: ADMINSIAF.TB_EMPRESA, TB_ASIGNA_USUARIOS, TB_APLICACIONES, TB_FUNCIONES y TB_FUNCIONES_POR_USUARIOS mediante api-tickets.
+
+**Archivos involucrados**
+
+- [src/app/api/MOD06/aplicaciones/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/MOD06/aplicaciones/route.ts)
+- [src/app/api/MOD06/empresas/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/MOD06/empresas/route.ts)
+- [src/app/api/MOD06/permisos/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/MOD06/permisos/route.ts)
+- [src/app/api/MOD06/usuarios/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/MOD06/usuarios/route.ts)
+- [src/views/MOD06/MOD06.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/MOD06/MOD06.module.scss)
+- [src/views/MOD06/MOD06.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/MOD06/MOD06.tsx)
+- [src/views/MOD06/index.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/MOD06/index.tsx)
+
+<a id="cu-09"></a>
+
+## CU-09 · Consultar calendario semanal y actividades
+
+**Actor:** Usuario del Panel según su alcance.
+
+**Precondiciones y entrada:** Sesión válida y capability o permiso del módulo; backend correspondiente configurado.
+
+**Flujo y resultado**
+
+1. Obtener actividades dentro del alcance.
+2. Elegir equipo, general y periodo.
+3. Ubicar eventos por día y hora institucional.
+4. Consultar detalle o cambiar semana.
+5. Refrescar conservando filtros.
+
+```mermaid
+flowchart TD
+  inicio["Obtener actividades dentro del alcance"]
+  control{"Entrada y autorización válidas"}
+  inicio --> control
+  control -->|No| rechazo["Informar la excepción descrita; no completar la operación"]
+  paso1["Elegir equipo, general y periodo"]
+  control -->|Sí| paso1
+  paso2["Ubicar eventos por día y hora institucional"]
+  paso1 --> paso2
+  paso3["Consultar detalle o cambiar semana"]
+  paso2 --> paso3
+  paso4["Refrescar conservando filtros"]
+  paso3 --> paso4
+```
+
+**Excepciones y alternativas**
+
+- No mostrar eventos de otro equipo sin autorización.
+- Lista vacía no es fallo de carga.
+- Evitar duplicar encabezados y mantener alternativa accesible.
+
+**Objetos y persistencia**
+
+Indirecto: ADMEMETRAIT.TB_TK_ACTIVIDADES y equipos de plataforma.
+
+**Archivos involucrados**
+
+- [src/platform/calendar.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/platform/calendar.ts)
+- [src/platform/dates.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/platform/dates.ts)
+- [src/views/Platform/CalendarWorkspace.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Platform/CalendarWorkspace.module.scss)
+- [src/views/Platform/CalendarWorkspace.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Platform/CalendarWorkspace.tsx)
+
+<a id="cu-10"></a>
+
+## CU-10 · Preparar equipos desde RRHH y revisar miembros
+
+**Actor:** Usuario del Panel según su alcance.
+
+**Precondiciones y entrada:** Sesión válida y capability o permiso del módulo; backend correspondiente configurado.
+
+**Flujo y resultado**
+
+1. Consultar personal y vista previa de unidades.
+2. Mostrar empleados con y sin cuenta.
+3. Identificar partidas o nombres pendientes.
+4. Preparar equipos con confirmación.
+5. Revisar responsabilidades sin asignar jefaturas por inferencia.
+
+```mermaid
+flowchart TD
+  inicio["Consultar personal y vista previa de unidades"]
+  control{"Entrada y autorización válidas"}
+  inicio --> control
+  control -->|No| rechazo["Informar la excepción descrita; no completar la operación"]
+  paso1["Mostrar empleados con y sin cuenta"]
+  control -->|Sí| paso1
+  paso2["Identificar partidas o nombres pendientes"]
+  paso1 --> paso2
+  paso3["Preparar equipos con confirmación"]
+  paso2 --> paso3
+  paso4["Revisar responsabilidades sin asignar jefaturas por inferencia"]
+  paso3 --> paso4
+```
+
+**Excepciones y alternativas**
+
+- Solo una cuenta habilitada no debe ocultar al resto de empleados.
+- Unidades de 2026 sin catálogo no toman nombres antiguos automáticamente.
+- Vínculo de empleado erróneo requiere corrección explícita.
+
+**Objetos y persistencia**
+
+Indirecto: ADMINSIAF.TB_EMPLEADOS, TB_ASIGNACION_PROGRAMATICA y TB_UNIDADES_P; equipos y miembros de ADMEMETRAIT.
+
+**Archivos involucrados**
+
+- [src/app/(dashboard)/equipo/[id]/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/equipo/%5Bid%5D/page.tsx)
+- [src/app/(dashboard)/equipo/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/equipo/page.tsx)
+- [src/app/api/departments/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/departments/route.ts)
+- [src/app/api/perfil-equipo/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/perfil-equipo/route.ts)
+- [src/views/Platform/OrganizationWorkspace.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Platform/OrganizationWorkspace.tsx)
+- [src/views/Team/Team.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Team/Team.module.scss)
+- [src/views/Team/Team.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Team/Team.tsx)
+- [src/views/Team/index.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Team/index.tsx)
+
+<a id="cu-11"></a>
+
+## CU-11 · Gestionar fichas de activos, visitas y cableado
+
+**Actor:** Usuario del Panel según su alcance.
+
+**Precondiciones y entrada:** Sesión válida y capability o permiso del módulo; backend correspondiente configurado.
+
+**Flujo y resultado**
+
+1. Consultar fichas y bienes institucionales.
+2. Seleccionar origen y relación del activo.
+3. Revisar alta o modificación y confirmaciones.
+4. Guardar ficha o enlace de red.
+5. Consultar representación e historial.
+
+```mermaid
+flowchart TD
+  inicio["Consultar fichas y bienes institucionales"]
+  control{"Entrada y autorización válidas"}
+  inicio --> control
+  control -->|No| rechazo["Informar la excepción descrita; no completar la operación"]
+  paso1["Seleccionar origen y relación del activo"]
+  control -->|Sí| paso1
+  paso2["Revisar alta o modificación y confirmaciones"]
+  paso1 --> paso2
+  paso3["Guardar ficha o enlace de red"]
+  paso2 --> paso3
+  paso4["Consultar representación e historial"]
+  paso3 --> paso4
+```
+
+**Excepciones y alternativas**
+
+- No confundir número de tarjeta con número del bien.
+- Referencia duplicada o relación inválida requiere revisión.
+- Movimiento visual de red debe respetar permisos de cambio.
+
+**Objetos y persistencia**
+
+Indirecto: ADMEMETRAIT.TB_TK_ACTIVOS, TB_TK_INTERVENCIONES, TB_TK_MOV_ACTIVOS, TB_TK_RED_DISPOSITIVOS y TB_TK_RED_ENLACES; inventario fuente retenido en ADMEMETRA.
+
+**Archivos involucrados**
+
+- [src/app/(dashboard)/espacio/registro/[type]/[id]/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/espacio/registro/%5Btype%5D/%5Bid%5D/page.tsx)
+- [src/views/Platform/NetworkWorkspace.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Platform/NetworkWorkspace.tsx)
+- [src/views/Platform/RecordPage.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Platform/RecordPage.tsx)
+
+<a id="cu-12"></a>
+
+## CU-12 · Consultar servidores, contenedores y logs observados
+
+**Actor:** Usuario del Panel según su alcance.
+
+**Precondiciones y entrada:** Sesión válida y capability o permiso del módulo; backend correspondiente configurado.
+
+**Flujo y resultado**
+
+1. Abrir Estado observado y elegir servidor.
+2. Leer snapshot y fecha de actualización.
+3. Seleccionar contenedor y métricas.
+4. Mostrar líneas de log autorizadas si fueron enviadas.
+5. Actualizar sin ejecutar comandos en el servidor.
+
+```mermaid
+flowchart TD
+  inicio["Abrir Estado observado y elegir servidor"]
+  control{"Entrada y autorización válidas"}
+  inicio --> control
+  control -->|No| rechazo["Informar la excepción descrita; no completar la operación"]
+  paso1["Leer snapshot y fecha de actualización"]
+  control -->|Sí| paso1
+  paso2["Seleccionar contenedor y métricas"]
+  paso1 --> paso2
+  paso3["Mostrar líneas de log autorizadas si fueron enviadas"]
+  paso2 --> paso3
+  paso4["Actualizar sin ejecutar comandos en el servidor"]
+  paso3 --> paso4
+```
+
+**Excepciones y alternativas**
+
+- Sin líneas de log se informa ausencia de captura.
+- Snapshot antiguo no se muestra como lectura en tiempo real.
+- El Panel no obtiene por sí mismo acceso al socket Docker.
+
+**Objetos y persistencia**
+
+Indirecto: ADMEMETRAIT.TB_TK_SERVIDORES, TB_TK_CONTENEDORES y TB_TK_OBSERVACIONES; observador Python instalado en cada servidor.
+
+**Archivos involucrados**
+
+- [src/platform/monitoring.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/platform/monitoring.ts)
+- [src/views/Platform/MonitoringWorkspace.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Platform/MonitoringWorkspace.tsx)
+
+<a id="cu-13"></a>
+
+## CU-13 · Vincular aplicaciones con GitHub y objetos Oracle
+
+**Actor:** Usuario del Panel según su alcance.
+
+**Precondiciones y entrada:** Sesión válida y capability o permiso del módulo; backend correspondiente configurado.
+
+**Flujo y resultado**
+
+1. Entrar en Aplicaciones y sistemas con permiso.
+2. Consultar fuentes y filtrar owner o esquema.
+3. Elegir repositorio, rama u objeto real.
+4. Revisar y confirmar vinculación.
+5. Recargar la ficha con las referencias guardadas.
+
+```mermaid
+flowchart TD
+  inicio["Entrar en Aplicaciones y sistemas con permiso"]
+  control{"Entrada y autorización válidas"}
+  inicio --> control
+  control -->|No| rechazo["Informar la excepción descrita; no completar la operación"]
+  paso1["Consultar fuentes y filtrar owner o esquema"]
+  control -->|Sí| paso1
+  paso2["Elegir repositorio, rama u objeto real"]
+  paso1 --> paso2
+  paso3["Revisar y confirmar vinculación"]
+  paso2 --> paso3
+  paso4["Recargar la ficha con las referencias guardadas"]
+  paso3 --> paso4
+```
+
+**Excepciones y alternativas**
+
+- GitHub sin credencial muestra configuración pendiente.
+- No aceptar identificadores libres como si se hubieran descubierto.
+- La operación no crea objetos Oracle ni otorga permisos.
+
+**Objetos y persistencia**
+
+Indirecto: metadatos consultados por api-tickets, GitHub REST y registros TB_TK_APLICACIONES/TB_TK_REPOSITORIOS/TB_TK_ESQUEMAS.
+
+**Archivos involucrados**
+
+- [src/components/client/organisms/SourceCatalog/SourceCatalog.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/components/client/organisms/SourceCatalog/SourceCatalog.module.scss)
+- [src/components/client/organisms/SourceCatalog/SourceCatalog.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/components/client/organisms/SourceCatalog/SourceCatalog.tsx)
+- [src/platform/client.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/platform/client.ts)
+- [src/views/Platform/SystemsWorkspace.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Platform/SystemsWorkspace.tsx)
+
+<a id="cu-14"></a>
+
+## CU-14 · Consultar métricas, reportes por etiqueta y trazabilidad
+
+**Actor:** Usuario del Panel según su alcance.
+
+**Precondiciones y entrada:** Sesión válida y capability o permiso del módulo; backend correspondiente configurado.
+
+**Flujo y resultado**
+
+1. Seleccionar periodo y alcance.
+2. Consultar indicadores confirmados.
+3. Diferenciar tickets de operaciones de aplicaciones.
+4. Abrir registros que forman el indicador.
+5. Consultar reporte por técnico y etiqueta o auditoría.
+
+```mermaid
+flowchart TD
+  inicio["Seleccionar periodo y alcance"]
+  control{"Entrada y autorización válidas"}
+  inicio --> control
+  control -->|No| rechazo["Informar la excepción descrita; no completar la operación"]
+  paso1["Consultar indicadores confirmados"]
+  control -->|Sí| paso1
+  paso2["Diferenciar tickets de operaciones de aplicaciones"]
+  paso1 --> paso2
+  paso3["Abrir registros que forman el indicador"]
+  paso2 --> paso3
+  paso4["Consultar reporte por técnico y etiqueta o auditoría"]
+  paso3 --> paso4
+```
+
+**Excepciones y alternativas**
+
+- Cero eventos no se reemplaza por visitas.
+- Indicadores fallidos no se muestran como cero confirmado.
+- Actor sin alcance no consulta métricas globales.
+
+**Objetos y persistencia**
+
+Indirecto: ADMEMETRAAUDITORIA.TB_TK_METRICA_EVENTO/TB_TK_AUDITORIA y tickets/etiquetas en ADMEMETRAIT.
+
+**Archivos involucrados**
+
+- [src/platform/metrics.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/platform/metrics.ts)
+- [src/platform/ticket-reports.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/platform/ticket-reports.ts)
+- [src/views/Platform/AuditWorkspace.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Platform/AuditWorkspace.tsx)
+- [src/views/Platform/MetricsWorkspace.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Platform/MetricsWorkspace.tsx)
+- [src/views/Platform/TicketTagReport.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Platform/TicketTagReport.module.scss)
+- [src/views/Platform/TicketTagReport.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Platform/TicketTagReport.tsx)
+
+<a id="cu-15"></a>
+
+## CU-15 · Operar los espacios de plataforma, buscar y consultar ayuda
+
+**Actor:** Usuario del Panel según su alcance.
+
+**Precondiciones y entrada:** Sesión válida y capability o permiso del módulo; backend correspondiente configurado.
+
+**Flujo y resultado**
+
+1. Resolver sección y capacidades.
+2. Cargar workspace o ficha autorizada.
+3. Buscar registros dentro del alcance.
+4. Mostrar estados de carga, ausencia y error.
+5. Navegar a ficha o ayuda sin perder contexto.
+
+```mermaid
+flowchart TD
+  inicio["Resolver sección y capacidades"]
+  control{"Entrada y autorización válidas"}
+  inicio --> control
+  control -->|No| rechazo["Informar la excepción descrita; no completar la operación"]
+  paso1["Cargar workspace o ficha autorizada"]
+  control -->|Sí| paso1
+  paso2["Buscar registros dentro del alcance"]
+  paso1 --> paso2
+  paso3["Mostrar estados de carga, ausencia y error"]
+  paso2 --> paso3
+  paso4["Navegar a ficha o ayuda sin perder contexto"]
+  paso3 --> paso4
+```
+
+**Excepciones y alternativas**
+
+- Sección desconocida o no permitida no expone un workspace.
+- Registro eliminado no se representa como activo.
+- Errores saneados se capturan sin datos sensibles.
+
+**Objetos y persistencia**
+
+Indirecto: registros de ADMEMETRAIT; captura de incidencias mediante api-tickets. No hay consulta Oracle desde el frontend.
+
+**Archivos involucrados**
+
+- [src/app/(dashboard)/ayuda/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/ayuda/page.tsx)
+- [src/app/(dashboard)/espacio/[section]/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/espacio/%5Bsection%5D/page.tsx)
+- [src/observability/server-incidents.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/observability/server-incidents.ts)
+- [src/views/Platform/PlatformRoute.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Platform/PlatformRoute.tsx)
+- [src/views/Platform/SearchWorkspace.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Platform/SearchWorkspace.tsx)
+
+<a id="cu-16"></a>
+
+## CU-16 · Consultar vehículo SAT y manuales o reporte de anulaciones
+
+**Actor:** Usuario del Panel según su alcance.
+
+**Precondiciones y entrada:** Sesión válida y capability o permiso del módulo; backend correspondiente configurado.
+
+**Flujo y resultado**
+
+1. Comprobar acceso antes del formulario.
+2. Elegir uso y placa o filtros de documento.
+3. Enviar consulta y esperar respuesta controlada.
+4. Mostrar ficha legible o archivo exportado.
+
+```mermaid
+flowchart TD
+  inicio["Comprobar acceso antes del formulario"]
+  control{"Entrada y autorización válidas"}
+  inicio --> control
+  control -->|No| rechazo["Informar la excepción descrita; no completar la operación"]
+  paso1["Elegir uso y placa o filtros de documento"]
+  control -->|Sí| paso1
+  paso2["Enviar consulta y esperar respuesta controlada"]
+  paso1 --> paso2
+  paso3["Mostrar ficha legible o archivo exportado"]
+  paso2 --> paso3
+```
+
+**Excepciones y alternativas**
+
+- Error TLS/WSDL no se presenta como vehículo inexistente.
+- Decodificar contenido textual sin inyectar HTML.
+- Documento no encontrado no debe abrir un visor aparentemente vacío.
+
+**Objetos y persistencia**
+
+Indirecto: SAT vía api-tickets; manuales y bitácoras en sus fuentes configuradas. No SQL directo.
+
+**Archivos involucrados**
+
+- [src/app/api/MOD07/manual/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/MOD07/manual/route.ts)
+- [src/app/api/MOD07/manualesAgrupados/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/MOD07/manualesAgrupados/route.ts)
+- [src/app/api/MOD07/manualesCategorias/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/MOD07/manualesCategorias/route.ts)
+- [src/app/api/MOD07/manualesDisponibles/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/MOD07/manualesDisponibles/route.ts)
+- [src/app/api/MOD08/reporteAnuladosExcel/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/MOD08/reporteAnuladosExcel/route.ts)
+- [src/app/api/MOD08/reporteAnuladosResultados/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/MOD08/reporteAnuladosResultados/route.ts)
+- [src/app/api/MOD08/reporteAnuladosTipos/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/MOD08/reporteAnuladosTipos/route.ts)
+- [src/views/ConsultaVehiculos/ConsultaVehiculos.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/ConsultaVehiculos/ConsultaVehiculos.module.scss)
+- [src/views/ConsultaVehiculos/ConsultaVehiculos.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/ConsultaVehiculos/ConsultaVehiculos.tsx)
+- [src/views/ConsultaVehiculos/index.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/ConsultaVehiculos/index.tsx)
+- [src/views/ConsultaVehiculos/types.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/ConsultaVehiculos/types.tsx)
+- [src/views/MOD07/MOD07.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/MOD07/MOD07.module.scss)
+- [src/views/MOD07/MOD07.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/MOD07/MOD07.tsx)
+- [src/views/MOD07/index.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/MOD07/index.tsx)
+- [src/views/MOD08/MOD08.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/MOD08/MOD08.module.scss)
+- [src/views/MOD08/MOD08.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/MOD08/MOD08.tsx)
+- [src/views/MOD08/index.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/MOD08/index.tsx)
+
+<a id="cu-17"></a>
+
+## CU-17 · Consultar RRHH y exportar visa de nóminas
+
+**Actor:** Usuario del Panel según su alcance.
+
+**Precondiciones y entrada:** Sesión válida y capability o permiso del módulo; backend correspondiente configurado.
+
+**Flujo y resultado**
+
+1. Comprobar permiso del módulo antes de seleccionar.
+2. Cargar filtros y campos.
+3. Consultar datos o exportación.
+4. Informar resultado vacío o descargar Excel con datos.
+
+```mermaid
+flowchart TD
+  inicio["Comprobar permiso del módulo antes de seleccionar"]
+  control{"Entrada y autorización válidas"}
+  inicio --> control
+  control -->|No| rechazo["Informar la excepción descrita; no completar la operación"]
+  paso1["Cargar filtros y campos"]
+  control -->|Sí| paso1
+  paso2["Consultar datos o exportación"]
+  paso1 --> paso2
+  paso3["Informar resultado vacío o descargar Excel con datos"]
+  paso2 --> paso3
+```
+
+**Excepciones y alternativas**
+
+- Permiso denegado se muestra antes de completar el proceso.
+- Archivo de solo encabezados no se confunde con consulta exitosa con filas.
+- Los datos de empleados no se migran.
+
+**Objetos y persistencia**
+
+Indirecto: ADMINSIAF y fuentes de ReporteRh/VisaNomina de api-tickets.
+
+**Archivos involucrados**
+
+- [src/app/api/MOD04/visaNominaExportExcel/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/MOD04/visaNominaExportExcel/route.ts)
+- [src/app/api/MOD05/reporteRhCamposDisponibles/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/MOD05/reporteRhCamposDisponibles/route.ts)
+- [src/app/api/MOD05/reporteRhEstatusOpciones/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/MOD05/reporteRhEstatusOpciones/route.ts)
+- [src/app/api/MOD05/reporteRhExportExcel/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/MOD05/reporteRhExportExcel/route.ts)
+- [src/app/api/MOD05/reporteRhResultados/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/MOD05/reporteRhResultados/route.ts)
+- [src/views/MOD04/MOD04.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/MOD04/MOD04.module.scss)
+- [src/views/MOD04/MOD04.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/MOD04/MOD04.tsx)
+- [src/views/MOD04/index.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/MOD04/index.tsx)
+- [src/views/MOD05/MOD05.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/MOD05/MOD05.module.scss)
+- [src/views/MOD05/MOD05.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/MOD05/MOD05.tsx)
+- [src/views/MOD05/index.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/MOD05/index.tsx)
+
+<a id="cu-18"></a>
+
+## CU-18 · Preparar PDF y enviar boletas de pago autorizadas
+
+**Actor:** Usuario del Panel según su alcance.
+
+**Precondiciones y entrada:** Sesión válida y capability o permiso del módulo; backend correspondiente configurado.
+
+**Flujo y resultado**
+
+1. Elegir tipo y maestro de nómina.
+2. Consultar previa y abrir el PDF.
+3. Autorizar lote y revisar destinatario de prueba.
+4. Enviar boletas autorizadas.
+5. Actualizar resultados y conciliar si son inciertos.
+
+```mermaid
+flowchart TD
+  inicio["Elegir tipo y maestro de nómina"]
+  control{"Entrada y autorización válidas"}
+  inicio --> control
+  control -->|No| rechazo["Informar la excepción descrita; no completar la operación"]
+  paso1["Consultar previa y abrir el PDF"]
+  control -->|Sí| paso1
+  paso2["Autorizar lote y revisar destinatario de prueba"]
+  paso1 --> paso2
+  paso3["Enviar boletas autorizadas"]
+  paso2 --> paso3
+  paso4["Actualizar resultados y conciliar si son inciertos"]
+  paso3 --> paso4
+```
+
+**Excepciones y alternativas**
+
+- PENDIENTE no significa enviado.
+- Aceptado por SMTP no acredita entrega al buzón.
+- Error en send-next conserva lote y referencia.
+- Un reenvío requiere revisar resultado anterior.
+
+**Objetos y persistencia**
+
+Indirecto: nómina ADMINSIAF; ADMEMETRANOTIFICACIONES.TB_TK_BOLETA_LOTES y TB_TK_BOLETA_ENVIOS vía api-tickets.
+
+**Archivos involucrados**
+
+- [src/views/Platform/PayrollWorkspace.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Platform/PayrollWorkspace.module.scss)
+- [src/views/Platform/PayrollWorkspace.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Platform/PayrollWorkspace.tsx)
+
+<a id="cu-19"></a>
+
+## CU-19 · Guardar y exportar reporte semanal
+
+**Actor:** Usuario del Panel según su alcance.
+
+**Precondiciones y entrada:** Sesión válida y capability o permiso del módulo; backend correspondiente configurado.
+
+**Flujo y resultado**
+
+1. Seleccionar colaborador y semana.
+2. Consultar o editar tareas, bloqueos y plan.
+3. Guardar el reporte autorizado.
+4. Abrir seguimiento o exportar Excel.
+
+```mermaid
+flowchart TD
+  inicio["Seleccionar colaborador y semana"]
+  control{"Entrada y autorización válidas"}
+  inicio --> control
+  control -->|No| rechazo["Informar la excepción descrita; no completar la operación"]
+  paso1["Consultar o editar tareas, bloqueos y plan"]
+  control -->|Sí| paso1
+  paso2["Guardar el reporte autorizado"]
+  paso1 --> paso2
+  paso3["Abrir seguimiento o exportar Excel"]
+  paso2 --> paso3
+```
+
+**Excepciones y alternativas**
+
+- Sin acceso no habilitar edición.
+- Error conserva el contenido.
+- Exportación sin filas requiere aviso.
+
+**Objetos y persistencia**
+
+Indirecto: reportes semanales y detalles en ADMEMETRAIT mediante api-tickets.
+
+**Archivos involucrados**
+
+- [src/app/api/MOD01/reporteSemanal/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/MOD01/reporteSemanal/route.ts)
+- [src/app/api/MOD01/reporteSemanalColaboradores/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/MOD01/reporteSemanalColaboradores/route.ts)
+- [src/app/api/MOD01/reporteSemanalExcel/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/MOD01/reporteSemanalExcel/route.ts)
+- [src/app/api/MOD01/reporteSemanalSeguimiento/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/MOD01/reporteSemanalSeguimiento/route.ts)
+- [src/app/api/MOD01/reportesSemanales/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/MOD01/reportesSemanales/route.ts)
+- [src/views/DashboardCollaborators/DashboardCollaborators.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/DashboardCollaborators/DashboardCollaborators.module.scss)
+- [src/views/DashboardCollaborators/DashboardCollaborators.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/DashboardCollaborators/DashboardCollaborators.tsx)
+- [src/views/DashboardCollaborators/index.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/DashboardCollaborators/index.tsx)
+- [src/views/DashboardProjects/DashboardProjects.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/DashboardProjects/DashboardProjects.module.scss)
+- [src/views/DashboardProjects/DashboardProjects.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/DashboardProjects/DashboardProjects.tsx)
+- [src/views/DashboardProjects/index.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/DashboardProjects/index.tsx)
+- [src/views/ExportMOD01/ExportMOD01.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/ExportMOD01/ExportMOD01.module.scss)
+- [src/views/ExportMOD01/ExportMOD01.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/ExportMOD01/ExportMOD01.tsx)
+- [src/views/ExportMOD01/index.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/ExportMOD01/index.tsx)
+- [src/views/MOD01/MOD01.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/MOD01/MOD01.module.scss)
+- [src/views/MOD01/MOD01.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/MOD01/MOD01.tsx)
+- [src/views/MOD01/index.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/MOD01/index.tsx)
+- [src/views/SaveMOD01/ExportMOD01/SaveMOD01.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/SaveMOD01/ExportMOD01/SaveMOD01.module.scss)
+- [src/views/SaveMOD01/ExportMOD01/SaveMOD01.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/SaveMOD01/ExportMOD01/SaveMOD01.tsx)
+- [src/views/SaveMOD01/ExportMOD01/index.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/SaveMOD01/ExportMOD01/index.tsx)
+
+<a id="cu-20"></a>
+
+## CU-20 · Administrar noticias y notificar documentos jurídicos
+
+**Actor:** Usuario del Panel según su alcance.
+
+**Precondiciones y entrada:** Sesión válida y capability o permiso del módulo; backend correspondiente configurado.
+
+**Flujo y resultado**
+
+1. Comprobar permisos y cargar catálogos.
+2. Preparar contenido o documento.
+3. Revisar destinatario o publicación.
+4. Confirmar y enviar comando.
+5. Mostrar resultado y referencia sin duplicar la acción.
+
+```mermaid
+flowchart TD
+  inicio["Comprobar permisos y cargar catálogos"]
+  control{"Entrada y autorización válidas"}
+  inicio --> control
+  control -->|No| rechazo["Informar la excepción descrita; no completar la operación"]
+  paso1["Preparar contenido o documento"]
+  control -->|Sí| paso1
+  paso2["Revisar destinatario o publicación"]
+  paso1 --> paso2
+  paso3["Confirmar y enviar comando"]
+  paso2 --> paso3
+  paso4["Mostrar resultado y referencia sin duplicar la acción"]
+  paso3 --> paso4
+```
+
+**Excepciones y alternativas**
+
+- Prueba jurídica debe mantener destinatario institucional de prueba configurado.
+- Error de carga no habilita publicar contenido incompleto.
+- Envío SMTP y entrega son estados distintos.
+
+**Objetos y persistencia**
+
+Indirecto: CMS api-portal y registro de notificaciones de api-tickets; no escribe directamente en tablas editoriales.
+
+Referencias de implementación relacionadas (incluye dependencias compartidas; el propietario dinámico se resuelve según el manual):
+
+| Objeto citado | Archivo |
+| --- | --- |
+| `TB_CATEGORIA` | [src/views/COM03/NewsFormView/NewsFormView.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/COM03/NewsFormView/NewsFormView.tsx) |
+| `TB_NOTICIA` | [src/views/COM03/constants.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/COM03/constants.ts) |
+| `TB_RECURSO` | [src/views/COM03/hooks/useNewsForm.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/COM03/hooks/useNewsForm.ts) |
+
+**Archivos involucrados**
+
+- [src/app/api/COM03/autores/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/COM03/autores/route.ts)
+- [src/app/api/COM03/categorias/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/COM03/categorias/route.ts)
+- [src/app/api/COM03/etiquetas/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/COM03/etiquetas/route.ts)
+- [src/app/api/COM03/media/[...path]/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/COM03/media/%5B...path%5D/route.ts)
+- [src/app/api/COM03/noticia/[id]/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/COM03/noticia/%5Bid%5D/route.ts)
+- [src/app/api/COM03/noticias/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/COM03/noticias/route.ts)
+- [src/app/api/COM03/notificaciones/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/COM03/notificaciones/route.ts)
+- [src/app/api/COM03/permisos/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/COM03/permisos/route.ts)
+- [src/app/api/COM03/recursos/externos/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/COM03/recursos/externos/route.ts)
+- [src/app/api/COM03/recursos/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/COM03/recursos/route.ts)
+- [src/views/COM03/COM03.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/COM03/COM03.module.scss)
+- [src/views/COM03/COM03.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/COM03/COM03.tsx)
+- [src/views/COM03/NewsFormView/NewsFormView.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/COM03/NewsFormView/NewsFormView.module.scss)
+- [src/views/COM03/NewsFormView/NewsFormView.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/COM03/NewsFormView/NewsFormView.tsx)
+- [src/views/COM03/NewsFormView/flowTexts.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/COM03/NewsFormView/flowTexts.ts)
+- [src/views/COM03/NewsListView/NewsListView.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/COM03/NewsListView/NewsListView.module.scss)
+- [src/views/COM03/NewsListView/NewsListView.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/COM03/NewsListView/NewsListView.tsx)
+- [src/views/COM03/constants.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/COM03/constants.ts)
+- [src/views/COM03/hooks/useNewsForm.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/COM03/hooks/useNewsForm.ts)
+- [src/views/COM03/index.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/COM03/index.tsx)
+- [src/views/COM03/schemas/newsForm.schema.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/COM03/schemas/newsForm.schema.ts)
+- [src/views/COM03/types.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/COM03/types.tsx)
+- [src/views/COM03/utils/buildGuardarNoticiaPayload.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/COM03/utils/buildGuardarNoticiaPayload.ts)
+- [src/views/COM03/utils/claveIdempotente.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/COM03/utils/claveIdempotente.ts)
+- [src/views/COM03/utils/permisos.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/COM03/utils/permisos.ts)
+- [src/views/COM03/utils/prepareGuardarNoticiaPayload.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/COM03/utils/prepareGuardarNoticiaPayload.ts)
+- [src/views/MOD10/MOD10.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/MOD10/MOD10.module.scss)
+- [src/views/MOD10/MOD10.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/MOD10/MOD10.tsx)
+- [src/views/MOD10/index.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/MOD10/index.tsx)
+- [src/views/MOD10/types.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/MOD10/types.tsx)
+
+<a id="cu-21"></a>
+
+## CU-21 · Buscar y tramitar casos judiciales VIVI
+
+**Actor:** Usuario del Panel según su alcance.
+
+**Precondiciones y entrada:** Sesión válida y capability o permiso del módulo; backend correspondiente configurado.
+
+**Flujo y resultado**
+
+1. Escribir al menos seis caracteres.
+2. Mostrar resultados con placa y datos de identificación permitidos.
+3. Abrir caso dentro de la sede autorizada.
+4. Consultar evidencia y registrar gestión o resolución.
+5. Mostrar documento y resultado persistido.
+
+```mermaid
+flowchart TD
+  inicio["Escribir al menos seis caracteres"]
+  control{"Entrada y autorización válidas"}
+  inicio --> control
+  control -->|No| rechazo["Informar la excepción descrita; no completar la operación"]
+  paso1["Mostrar resultados con placa y datos de identificación permitidos"]
+  control -->|Sí| paso1
+  paso2["Abrir caso dentro de la sede autorizada"]
+  paso1 --> paso2
+  paso3["Consultar evidencia y registrar gestión o resolución"]
+  paso2 --> paso3
+  paso4["Mostrar documento y resultado persistido"]
+  paso3 --> paso4
+```
+
+**Excepciones y alternativas**
+
+- Búsqueda corta no llama al API.
+- Tabla y tarjetas móviles conservan identificación equivalente.
+- Acción no permitida por estado se bloquea.
+- Reintentos no duplican resolución.
+
+**Objetos y persistencia**
+
+Indirecto: dominio judicial ADMEMETRAVEHICULAR mediante api-tickets; archivos privados por rutas autorizadas.
+
+**Archivos involucrados**
+
+- [src/app/api/JUZ01/[...path]/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/JUZ01/%5B...path%5D/route.ts)
+- [src/views/JUZ01/JUZ01.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/JUZ01/JUZ01.module.scss)
+- [src/views/JUZ01/JUZ01.schema.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/JUZ01/JUZ01.schema.ts)
+- [src/views/JUZ01/JUZ01.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/JUZ01/JUZ01.tsx)
+- [src/views/JUZ01/index.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/JUZ01/index.tsx)
+- [src/views/JUZ01Detail/AnalisisEvidencias.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/JUZ01Detail/AnalisisEvidencias.tsx)
+- [src/views/JUZ01Detail/EvidenciasCaso.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/JUZ01Detail/EvidenciasCaso.tsx)
+- [src/views/JUZ01Detail/JUZ01Detail.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/JUZ01Detail/JUZ01Detail.module.scss)
+- [src/views/JUZ01Detail/JUZ01Detail.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/JUZ01Detail/JUZ01Detail.tsx)
+- [src/views/JUZ01Detail/types.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/JUZ01Detail/types.tsx)
+
+<a id="operaciones"></a>
+
+## Índice de operaciones y rutas
+
+Las carpetas entre paréntesis agrupan rutas App Router sin añadirse a la URL; `[id]` y segmentos equivalentes son parámetros. Los BFF son intermediarios del mismo origen y no acceden por sí mismos a Oracle.
+
+| Tipo | Archivo / ruta | Caso |
+| --- | --- | --- |
+| Pantalla | [src/app/(auth)/forgot-password/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28auth%29/forgot-password/page.tsx) | [CU-01](#cu-01) |
+| Pantalla | [src/app/(auth)/login/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28auth%29/login/page.tsx) | [CU-01](#cu-01) |
+| Pantalla | [src/app/(dashboard)/aplicaciones/en-desuso/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/aplicaciones/en-desuso/page.tsx) | [CU-03](#cu-03) |
+| Pantalla | [src/app/(dashboard)/aplicaciones/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/aplicaciones/page.tsx) | [CU-03](#cu-03) |
+| Pantalla | [src/app/(dashboard)/ayuda/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/ayuda/page.tsx) | [CU-15](#cu-15) |
+| Pantalla | [src/app/(dashboard)/config/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/config/page.tsx) | [CU-07](#cu-07) |
+| Pantalla | [src/app/(dashboard)/equipo/[id]/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/equipo/%5Bid%5D/page.tsx) | [CU-10](#cu-10) |
+| Pantalla | [src/app/(dashboard)/equipo/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/equipo/page.tsx) | [CU-10](#cu-10) |
+| Pantalla | [src/app/(dashboard)/espacio/[section]/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/espacio/%5Bsection%5D/page.tsx) | [CU-15](#cu-15) |
+| Pantalla | [src/app/(dashboard)/espacio/registro/[type]/[id]/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/espacio/registro/%5Btype%5D/%5Bid%5D/page.tsx) | [CU-11](#cu-11) |
+| Pantalla | [src/app/(dashboard)/home/[appId]/[sectionId]/[moduleId]/detail/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/home/%5BappId%5D/%5BsectionId%5D/%5BmoduleId%5D/detail/page.tsx) | [CU-03](#cu-03) |
+| Pantalla | [src/app/(dashboard)/home/[appId]/[sectionId]/[moduleId]/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/home/%5BappId%5D/%5BsectionId%5D/%5BmoduleId%5D/page.tsx) | [CU-03](#cu-03) |
+| Pantalla | [src/app/(dashboard)/home/[appId]/[sectionId]/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/home/%5BappId%5D/%5BsectionId%5D/page.tsx) | [CU-03](#cu-03) |
+| Pantalla | [src/app/(dashboard)/home/[appId]/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/home/%5BappId%5D/page.tsx) | [CU-03](#cu-03) |
+| Pantalla | [src/app/(dashboard)/home/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/home/page.tsx) | [CU-02](#cu-02) |
+| Pantalla | [src/app/(dashboard)/mis-tickets/[ticketId]/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/mis-tickets/%5BticketId%5D/page.tsx) | [CU-05](#cu-05) |
+| Pantalla | [src/app/(dashboard)/mis-tickets/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/mis-tickets/page.tsx) | [CU-04](#cu-04) |
+| Pantalla | [src/app/(dashboard)/statistics/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/statistics/page.tsx) | [CU-02](#cu-02) |
+| Pantalla | [src/app/(dashboard)/tickets-creation/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/tickets-creation/page.tsx) | [CU-04](#cu-04) |
+| Pantalla | [src/app/(dashboard)/tickets/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/tickets/page.tsx) | [CU-04](#cu-04) |
+| Pantalla | [src/app/(dashboard)/usuarios/[id]/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/usuarios/%5Bid%5D/page.tsx) | [CU-07](#cu-07) |
+| Pantalla | [src/app/(dashboard)/usuarios/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/usuarios/page.tsx) | [CU-07](#cu-07) |
+| Pantalla | [src/app/unauthorized/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/unauthorized/page.tsx) | [CU-03](#cu-03) |
+| BFF | [src/app/api/COM03/autores/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/COM03/autores/route.ts) | [CU-20](#cu-20) |
+| BFF | [src/app/api/COM03/categorias/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/COM03/categorias/route.ts) | [CU-20](#cu-20) |
+| BFF | [src/app/api/COM03/etiquetas/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/COM03/etiquetas/route.ts) | [CU-20](#cu-20) |
+| BFF | [src/app/api/COM03/media/[...path]/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/COM03/media/%5B...path%5D/route.ts) | [CU-20](#cu-20) |
+| BFF | [src/app/api/COM03/noticia/[id]/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/COM03/noticia/%5Bid%5D/route.ts) | [CU-20](#cu-20) |
+| BFF | [src/app/api/COM03/noticias/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/COM03/noticias/route.ts) | [CU-20](#cu-20) |
+| BFF | [src/app/api/COM03/notificaciones/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/COM03/notificaciones/route.ts) | [CU-20](#cu-20) |
+| BFF | [src/app/api/COM03/permisos/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/COM03/permisos/route.ts) | [CU-20](#cu-20) |
+| BFF | [src/app/api/COM03/recursos/externos/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/COM03/recursos/externos/route.ts) | [CU-20](#cu-20) |
+| BFF | [src/app/api/COM03/recursos/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/COM03/recursos/route.ts) | [CU-20](#cu-20) |
+| BFF | [src/app/api/JUZ01/[...path]/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/JUZ01/%5B...path%5D/route.ts) | [CU-21](#cu-21) |
+| BFF | [src/app/api/MOD01/reporteSemanal/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/MOD01/reporteSemanal/route.ts) | [CU-19](#cu-19) |
+| BFF | [src/app/api/MOD01/reporteSemanalColaboradores/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/MOD01/reporteSemanalColaboradores/route.ts) | [CU-19](#cu-19) |
+| BFF | [src/app/api/MOD01/reporteSemanalExcel/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/MOD01/reporteSemanalExcel/route.ts) | [CU-19](#cu-19) |
+| BFF | [src/app/api/MOD01/reporteSemanalSeguimiento/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/MOD01/reporteSemanalSeguimiento/route.ts) | [CU-19](#cu-19) |
+| BFF | [src/app/api/MOD01/reportesSemanales/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/MOD01/reportesSemanales/route.ts) | [CU-19](#cu-19) |
+| BFF | [src/app/api/MOD04/visaNominaExportExcel/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/MOD04/visaNominaExportExcel/route.ts) | [CU-17](#cu-17) |
+| BFF | [src/app/api/MOD05/reporteRhCamposDisponibles/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/MOD05/reporteRhCamposDisponibles/route.ts) | [CU-17](#cu-17) |
+| BFF | [src/app/api/MOD05/reporteRhEstatusOpciones/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/MOD05/reporteRhEstatusOpciones/route.ts) | [CU-17](#cu-17) |
+| BFF | [src/app/api/MOD05/reporteRhExportExcel/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/MOD05/reporteRhExportExcel/route.ts) | [CU-17](#cu-17) |
+| BFF | [src/app/api/MOD05/reporteRhResultados/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/MOD05/reporteRhResultados/route.ts) | [CU-17](#cu-17) |
+| BFF | [src/app/api/MOD06/aplicaciones/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/MOD06/aplicaciones/route.ts) | [CU-08](#cu-08) |
+| BFF | [src/app/api/MOD06/empresas/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/MOD06/empresas/route.ts) | [CU-08](#cu-08) |
+| BFF | [src/app/api/MOD06/permisos/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/MOD06/permisos/route.ts) | [CU-08](#cu-08) |
+| BFF | [src/app/api/MOD06/usuarios/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/MOD06/usuarios/route.ts) | [CU-08](#cu-08) |
+| BFF | [src/app/api/MOD07/manual/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/MOD07/manual/route.ts) | [CU-16](#cu-16) |
+| BFF | [src/app/api/MOD07/manualesAgrupados/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/MOD07/manualesAgrupados/route.ts) | [CU-16](#cu-16) |
+| BFF | [src/app/api/MOD07/manualesCategorias/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/MOD07/manualesCategorias/route.ts) | [CU-16](#cu-16) |
+| BFF | [src/app/api/MOD07/manualesDisponibles/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/MOD07/manualesDisponibles/route.ts) | [CU-16](#cu-16) |
+| BFF | [src/app/api/MOD08/reporteAnuladosExcel/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/MOD08/reporteAnuladosExcel/route.ts) | [CU-16](#cu-16) |
+| BFF | [src/app/api/MOD08/reporteAnuladosResultados/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/MOD08/reporteAnuladosResultados/route.ts) | [CU-16](#cu-16) |
+| BFF | [src/app/api/MOD08/reporteAnuladosTipos/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/MOD08/reporteAnuladosTipos/route.ts) | [CU-16](#cu-16) |
+| BFF | [src/app/api/admin-dashboard/last-movements/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/admin-dashboard/last-movements/route.ts) | [CU-02](#cu-02) |
+| BFF | [src/app/api/admin-dashboard/last-ticket/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/admin-dashboard/last-ticket/route.ts) | [CU-02](#cu-02) |
+| BFF | [src/app/api/admin-dashboard/stats/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/admin-dashboard/stats/route.ts) | [CU-02](#cu-02) |
+| BFF | [src/app/api/admin-dashboard/team-members/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/admin-dashboard/team-members/route.ts) | [CU-02](#cu-02) |
+| BFF | [src/app/api/admin-dashboard/user-performance/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/admin-dashboard/user-performance/route.ts) | [CU-02](#cu-02) |
+| BFF | [src/app/api/annual-report/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/annual-report/route.ts) | [CU-02](#cu-02) |
+| BFF | [src/app/api/apps-catalog/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/apps-catalog/route.ts) | [CU-03](#cu-03) |
+| BFF | [src/app/api/auth/recovery/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/auth/recovery/route.ts) | [CU-01](#cu-01) |
+| BFF | [src/app/api/catalogs/categories/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/catalogs/categories/route.ts) | [CU-04](#cu-04) |
+| BFF | [src/app/api/catalogs/priorities/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/catalogs/priorities/route.ts) | [CU-04](#cu-04) |
+| BFF | [src/app/api/catalogs/statuses/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/catalogs/statuses/route.ts) | [CU-04](#cu-04) |
+| BFF | [src/app/api/configuration/pending-requests/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/configuration/pending-requests/route.ts) | [CU-07](#cu-07) |
+| BFF | [src/app/api/departments/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/departments/route.ts) | [CU-10](#cu-10) |
+| BFF | [src/app/api/graphql/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/graphql/route.ts) | [CU-01](#cu-01) |
+| BFF | [src/app/api/my-activity/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/my-activity/route.ts) | [CU-02](#cu-02) |
+| BFF | [src/app/api/my-stats/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/my-stats/route.ts) | [CU-02](#cu-02) |
+| BFF | [src/app/api/perfil-equipo/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/perfil-equipo/route.ts) | [CU-10](#cu-10) |
+| BFF | [src/app/api/platform/[...path]/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/platform/%5B...path%5D/route.ts) | [CU-05](#cu-05) |
+| BFF | [src/app/api/rbac/roles/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/rbac/roles/route.ts) | [CU-07](#cu-07) |
+| BFF | [src/app/api/technician-events/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/technician-events/route.ts) | [CU-02](#cu-02) |
+| BFF | [src/app/api/technician-last-tickets/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/technician-last-tickets/route.ts) | [CU-02](#cu-02) |
+| BFF | [src/app/api/technician-stats/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/technician-stats/route.ts) | [CU-02](#cu-02) |
+| BFF | [src/app/api/ticket-attachments/[ticketId]/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/ticket-attachments/%5BticketId%5D/route.ts) | [CU-05](#cu-05) |
+| BFF | [src/app/api/ticket-categories/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/ticket-categories/route.ts) | [CU-04](#cu-04) |
+| BFF | [src/app/api/ticket-history/[ticketId]/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/ticket-history/%5BticketId%5D/route.ts) | [CU-05](#cu-05) |
+| BFF | [src/app/api/ticket-priorities/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/ticket-priorities/route.ts) | [CU-04](#cu-04) |
+| BFF | [src/app/api/ticket-statuses/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/ticket-statuses/route.ts) | [CU-04](#cu-04) |
+| BFF | [src/app/api/ticket-tag-catalog/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/ticket-tag-catalog/route.ts) | [CU-06](#cu-06) |
+| BFF | [src/app/api/ticket-tags/[ticketId]/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/ticket-tags/%5BticketId%5D/route.ts) | [CU-06](#cu-06) |
+| BFF | [src/app/api/ticket/[id]/attachments/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/ticket/%5Bid%5D/attachments/route.ts) | [CU-05](#cu-05) |
+| BFF | [src/app/api/ticket/[id]/history/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/ticket/%5Bid%5D/history/route.ts) | [CU-05](#cu-05) |
+| BFF | [src/app/api/ticket/[id]/messages/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/ticket/%5Bid%5D/messages/route.ts) | [CU-05](#cu-05) |
+| BFF | [src/app/api/ticket/[id]/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/ticket/%5Bid%5D/route.ts) | [CU-05](#cu-05) |
+| BFF | [src/app/api/tickets/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/tickets/route.ts) | [CU-04](#cu-04) |
+| BFF | [src/app/api/tickets/usuario/[userId]/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/tickets/usuario/%5BuserId%5D/route.ts) | [CU-04](#cu-04) |
+| BFF | [src/app/api/users/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/users/route.ts) | [CU-07](#cu-07) |
+| BFF | [src/app/api/usuario/[userId]/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/usuario/%5BuserId%5D/route.ts) | [CU-02](#cu-02) |
+| BFF | [src/app/api/usuario/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/usuario/route.ts) | [CU-02](#cu-02) |
+
+<a id="cobertura"></a>
+
+## Criterios de cobertura
+
+Esta edición contiene **21 casos agrupados**. El inventario incluye 0 entradas Nest decoradas, 23 páginas Next y 70 manejadores BFF, según corresponda. Los procesos internos, servicios asíncronos y almacenamiento local se cubren en los casos aunque no expongan HTTP. Las operaciones heredadas se identifican como tales; una ruta conservada en código no implica que deba aparecer habilitada en el catálogo de aplicaciones. Las funciones pendientes no se presentan como implementadas.
+
+Para mantener la cobertura: al añadir o retirar una ruta, resolver, tarea programada o pantalla, actualizar su caso, su fila en este índice, los objetos usados y el diagrama. Si una función depende de otro repositorio, conservar explícito ese límite y actualizar también el contrato del receptor.

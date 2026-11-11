@@ -93,6 +93,16 @@ async function run() {
         body: JSON.stringify({ data: [], total: 0 }),
       }),
     );
+    const sourceCalls=[];
+    await page.route("**/api/platform/sources/*", route => {
+      const url=new URL(route.request().url());sourceCalls.push(url.pathname);
+      return route.fulfill({json:url.pathname.endsWith('/github') ? {organizaciones:['EMETRA'],organizacion:'EMETRA',disponible:true,estado:'VIGENTE',pagina:1,limite:50,hayMas:false,items:[{nombre:'api-tickets',nombreCompleto:'EMETRA/api-tickets',url:'https://github.com/EMETRA/api-tickets',ramaPredeterminada:'main',privado:true}]} : {limite:100,limitado:false,items:[{owner:'ADMEMETRAIT',objetos:12,invalidos:0}]}});
+    });
+    const objectCalls=[];
+    await page.route("**/api/platform/objects/*", route => {
+      objectCalls.push(new URL(route.request().url()));
+      return route.fulfill({json:{owner:'ADMEMETRAIT',consultadoEn:new Date().toISOString(),limite:500,objects:[{nombre:'TB_TK_APLICACIONES',tipo:'TABLE',estado:'VALID',ultimaModificacion:new Date().toISOString()}],constraints:[{tabla:'TB_TK_APLICACIONES',nombre:'PK_TK_APLICACIONES',tipo:'P',estado:'ENABLED',validado:'VALIDATED'}]}});
+    });
     let connected = true;
     await page.route("**/api/platform/repositories/*", (route) =>
       route.fulfill({
@@ -205,6 +215,55 @@ async function run() {
         fullPage: true,
       });
     }
+    await page.setViewportSize({width:1440,height:1100});
+    await page.getByRole('button',{name:'Buscar y vincular desde GitHub',exact:true}).click();
+    const github=page.getByRole('region',{name:'Repositorios disponibles en GitHub'});
+    await github.getByRole('link',{name:'EMETRA/api-tickets',exact:true}).waitFor();
+    await github.getByRole('button',{name:'Vincular EMETRA/api-tickets',exact:true}).click();
+    const editor=page.getByRole('dialog',{name:'Registrar repositorio',exact:true});
+    await editor.waitFor();
+    assert.equal(await editor.getByRole('textbox',{name:/^Repositorio/}).inputValue(),'https://github.com/EMETRA/api-tickets');
+    assert.equal(await editor.getByRole('textbox',{name:/^Rama de despliegue/}).inputValue(),'');
+    await editor.getByRole('button',{name:'Cancelar',exact:true}).click();
+    for(const width of [1440,390]){
+      await page.setViewportSize({width,height:1100});
+      await page.waitForTimeout(250); // Esperar la transición del menú al cambiar de viewport.
+      assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+      await page.screenshot({path:path.join(out,'catalogo-github-'+width+'.png'),fullPage:true});
+    }
+    await page.setViewportSize({width:1440,height:1100});
+    await page.getByRole('button',{name:'Objetos de Oracle',exact:true}).click();
+    await page.getByRole('button',{name:'Buscar y vincular desde Oracle',exact:true}).click();
+    await page.getByRole('button',{name:'Vincular ADMEMETRAIT',exact:true}).click();
+    const schemaEditor=page.getByRole('dialog',{name:'Registrar esquema',exact:true});
+    await schemaEditor.waitFor();
+    assert.equal(await schemaEditor.getByRole('textbox',{name:/^Esquema Oracle/}).inputValue(),'ADMEMETRAIT');
+    await schemaEditor.getByRole('combobox',{name:/^Aplicación/}).selectOption(instance.lab.state.data.ids.app);
+    await schemaEditor.getByRole('button',{name:'Guardar',exact:true}).click();
+    await page.getByRole('dialog',{name:'Revisa el cambio',exact:true}).waitFor();
+    assert.ok(!instance.lab.state.data.resources.esquemas.some(r=>r.datos.owner==='ADMEMETRAIT' && r.nombre==='ADMEMETRAIT'));
+    await page.getByRole('button',{name:'Confirmar revisión · 1 de 2',exact:true}).click();
+    await page.getByLabel('He revisado la acción y quiero aplicarla.').check();
+    await page.getByRole('button',{name:'Confirmar y aplicar · 2 de 2',exact:true}).click();
+    await page.getByText('Esquema ADMEMETRAIT vinculado.',{exact:true}).waitFor();
+    assert.ok(instance.lab.state.data.resources.esquemas.some(r=>r.datos.owner==='ADMEMETRAIT' && r.nombre==='ADMEMETRAIT'));
+    await page.getByRole('cell',{name:'TB_TK_APLICACIONES',exact:true}).waitFor();
+    const schemaId=instance.lab.state.data.resources.esquemas.find(r=>r.nombre==='ADMEMETRAIT').id;
+    await page.getByLabel('Esquema registrado',{exact:true}).getByRole('option',{name:'ADMEMETRAIT',exact:true}).waitFor({state:'attached'});
+    assert.equal(await page.getByLabel('Esquema registrado',{exact:true}).inputValue(),schemaId);
+    assert.ok(objectCalls.at(-1).pathname.endsWith('/'+schemaId));
+    await page.getByLabel('Filtrar nombres',{exact:true}).fill('TB_TK');
+    await page.waitForTimeout(400);
+    assert.equal(objectCalls.at(-1).searchParams.get('q'),'TB_TK');
+    for(const width of [1440,390]){
+      await page.setViewportSize({width,height:1100});
+      await page.waitForTimeout(250); // Esperar la transición del menú al cambiar de viewport.
+      assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+      await page.screenshot({path:path.join(out,'catalogo-oracle-'+width+'.png'),fullPage:true});
+    }
+    assert.deepEqual([...new Set(sourceCalls)].sort(),['/api/platform/sources/github','/api/platform/sources/oracle']);
+    await page.getByRole('button',{name:'Estado de repositorios',exact:true}).click();
+    await page.getByLabel('Repositorio vinculado',{exact:true}).selectOption(repoId);
     connected = false;
     await page
       .getByRole("button", { name: "Consultar GitHub", exact: true })

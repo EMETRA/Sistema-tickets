@@ -75,7 +75,7 @@ const Team: React.FC = () => {
         <div className={style.mainContainer}>
             <div className={style.teamContainer}>
                 {!isReady && <p role="status">Tu unidad no está vinculada al catálogo de departamentos. Informática puede revisar el personal y sus bienes en Equipos y responsables.</p>}
-            <FilterUsersBar
+                <FilterUsersBar
                     variant="categories"
                     searchValue={search}
                     onSearchChange={setSearch}

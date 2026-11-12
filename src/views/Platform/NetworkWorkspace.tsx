@@ -4,6 +4,7 @@ import { Button } from "@/components/client/atoms/Button";
 import { PlatformField } from "@/components/client/molecules/PlatformField/PlatformField";
 import { RecordDetail } from "@/components/client/organisms/ResourceWorkspace/RecordDetail";
 import { RecordEditor } from "@/components/client/organisms/ResourceWorkspace/RecordEditor";
+import { InventoryWorkspace } from "@/components/client/organisms/ResourceWorkspace/InventoryWorkspace";
 import { ResourceWorkspace } from "@/components/client/organisms/ResourceWorkspace/ResourceWorkspace";
 import { usePlatform } from "@/platform/context";
 import { platformCommand, platformFetch } from "@/platform/client";
@@ -155,8 +156,9 @@ export function NetworkWorkspace() {
                 >
                     Dispositivos y enlaces
                 </button>
+                {data?.definitions.dispositivos?.actions.LEER && <button aria-current={tab === "inventario" ? "page" : undefined} onClick={()=>setTab("inventario")}>Activos Fijos</button>}
             </nav>
-            {tab === "registros" ? (
+            {tab === "inventario" ? <InventoryWorkspace type="dispositivos"/> : tab === "registros" ? (
                 <ResourceWorkspace group="red" />
             ) : (
                 <>
@@ -220,7 +222,7 @@ export function NetworkWorkspace() {
                     {!site && (
                         <p className={styles.card}>
                             Selecciona una instalación para ver sus
-                            dispositivos, puertos y conexiones.
+                            dispositivos, puertos y conexiones. Para preparar un dispositivo desde su tarjeta de responsabilidad, abre Activos Fijos.
                         </p>
                     )}
                     {graph && (

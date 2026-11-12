@@ -1,10 +1,11 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/client/atoms/Button";
+import { resourceDefinition } from "@/platform/resources";
 import { usePlatform } from "@/platform/context";
 import { platformCommand, platformFetch } from "@/platform/client";
 import type { PlatformRecord } from "@/platform/types";
-import { InventoryCatalog } from "./InventoryPicker";
+import Link from "next/link";
 import { RecordFiles } from "./RecordFiles";
 import styles from "../../templates/PlatformPage/PlatformPage.module.scss";
 export function displayDate(value: unknown) {
@@ -58,7 +59,7 @@ export function RecordDetail({
     onChanged: () => void;
 }) {
     const { data } = usePlatform(),
-        def = data!.definitions[type],
+        def = resourceDefinition(type, data!.definitions[type]),
         dialog = useRef<HTMLDialogElement>(null),
         [current, setCurrent] = useState<
             PlatformRecord & {
@@ -251,8 +252,7 @@ export function RecordDetail({
                         )}
                     </div>
                 </div>
-                {type === "equipos" && data?.definitions.activos?.actions.LEER && <InventoryCatalog key={current.id} equipoId={current.id} title="Bienes asignados al personal del equipo"/>}
-                {type === "miembros" && current.usuarioId && data?.definitions.activos?.actions.LEER && <InventoryCatalog key={current.id} usuarioId={String(current.usuarioId)} title="Bienes asignados al miembro"/>}
+                {["equipos","miembros"].includes(type) && data?.definitions.activos?.actions.LEER && <Link className={styles.link} href={"/espacio/inventario?view=inventario&"+(type==="equipos" ? "equipoId="+current.id : "usuarioId="+current.usuarioId)}>Ver bienes asignados en el inventario</Link>}
                 {readOnly && (
                     <p className={styles.muted}>
                         Este registro está disponible solo para consulta.

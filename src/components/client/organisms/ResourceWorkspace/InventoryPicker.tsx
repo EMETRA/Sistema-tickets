@@ -114,7 +114,7 @@ export function InventoryCatalog({
     function search(e?: { preventDefault(): void }) {
         e?.preventDefault();
         setFilters(
-            new URLSearchParams({ empleado, tarjeta, numero, q }).toString(),
+            new URLSearchParams(Object.entries({ empleado, tarjeta, numero, q }).filter(([,value])=>value.trim()).map(([key,value])=>[key,value.trim()])).toString(),
         );
         setOffset(0);
         setRevision((v) => v + 1);
@@ -274,7 +274,7 @@ export function InventoryCatalog({
                                                             onSelect(i)
                                                         }
                                                     >
-                                                        Preparar ficha{" "}
+                                                        Crear ficha técnica{" "}
                                                         {i.numeroInventario}
                                                     </Button>
                                                 ) : (

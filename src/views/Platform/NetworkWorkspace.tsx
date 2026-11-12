@@ -1,10 +1,12 @@
 "use client";
+import Link from "next/link";
+import {WorkspaceNavigation,useWorkspaceTab,type WorkspaceTab} from "./WorkspaceNavigation";
+import {InventoryLinkDialog} from "./InventoryLinkDialog";
 import { startTransition, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/client/atoms/Button";
 import { PlatformField } from "@/components/client/molecules/PlatformField/PlatformField";
 import { RecordDetail } from "@/components/client/organisms/ResourceWorkspace/RecordDetail";
 import { RecordEditor } from "@/components/client/organisms/ResourceWorkspace/RecordEditor";
-import { InventoryWorkspace } from "@/components/client/organisms/ResourceWorkspace/InventoryWorkspace";
 import { ResourceWorkspace } from "@/components/client/organisms/ResourceWorkspace/ResourceWorkspace";
 import { usePlatform } from "@/platform/context";
 import { platformCommand, platformFetch } from "@/platform/client";
@@ -37,8 +39,13 @@ export function NetworkWorkspace() {
         [planId, setPlanId] = useState("");
     const svg = useRef<SVGSVGElement>(null),
         drag = useRef<{ id: string; dx: number; dy: number } | null>(null),
-        [tab, setTab] = useState("topologia"),
         [zoom, setZoom] = useState(1);
+    const [picker,setPicker]=useState(false);
+    const tabs:WorkspaceTab[]=[];
+    if(data?.definitions.dispositivos?.actions.LEER)tabs.push({id:'dispositivos',label:'Dispositivos',description:'Vincula un bien de Activos Fijos o registra un dispositivo; completa su ubicación y cantidad de puertos.'});
+    if(data?.definitions.conexiones?.actions.LEER)tabs.push({id:'conexiones',label:'Conexiones',description:'Une dos dispositivos seleccionando un puerto de origen y uno de destino.'});
+    if(data?.definitions.dispositivos?.actions.LEER && data?.definitions.conexiones?.actions.LEER && data?.definitions.instalaciones?.actions.LEER)tabs.push({id:'mapa',label:'Mapa de red',description:'Selecciona una ubicación para visualizar sus dispositivos y conexiones. El mapa utiliza los mismos registros de las otras pestañas.'});
+    const {current,select}=useWorkspaceTab(tabs);
     useEffect(() => {
         startTransition(() => {
             setGraph(null);
@@ -142,32 +149,19 @@ export function NetworkWorkspace() {
     }
     const canEdit = data!.definitions.dispositivos?.actions.EDITAR;
     return (
-        <section className={styles.page}>
-            <nav className={styles.tabs} aria-label="Cableado">
-                <button
-                    aria-current={tab === "topologia" ? "page" : undefined}
-                    onClick={() => setTab("topologia")}
-                >
-                    Mapa de conexiones
-                </button>
-                <button
-                    aria-current={tab === "registros" ? "page" : undefined}
-                    onClick={() => setTab("registros")}
-                >
-                    Dispositivos y enlaces
-                </button>
-                {data?.definitions.dispositivos?.actions.LEER && <button aria-current={tab === "inventario" ? "page" : undefined} onClick={()=>setTab("inventario")}>Activos Fijos</button>}
-            </nav>
-            {tab === "inventario" ? <InventoryWorkspace type="dispositivos"/> : tab === "registros" ? (
-                <ResourceWorkspace group="red" />
-            ) : (
+        <section className={`${styles.page} ${styles.workspace}`}>
+            <div className={styles.toolbar}><p className={styles.muted}>Las ubicaciones se comparten con Activos y mantenimiento.</p>{data?.definitions.instalaciones?.actions.LEER && <Link className={styles.shortcut} href="/espacio/inventario?view=ubicaciones">Administrar ubicaciones</Link>}</div>
+            <WorkspaceNavigation tabs={tabs} current={current} onSelect={select} label="Red y cableado"/>
+            {picker && <InventoryLinkDialog onClose={()=>setPicker(false)} onSaved={()=>{setPicker(false);setRevision(v=>v+1);}}/>}
+            {current?.id === 'dispositivos' ? <ResourceWorkspace key={'devices-'+revision} group="red" initialType="dispositivos" types={['dispositivos']} hideTabs hideDescription extraActions={data?.definitions.dispositivos?.actions.INSERTAR && <Button variant="outlined" onClick={()=>setPicker(true)}>Vincular bien de Activos Fijos</Button>}/>
+                : current?.id === 'conexiones' ? <ResourceWorkspace group="red" initialType="conexiones" types={['conexiones']} hideTabs hideDescription/> : current?.id === 'mapa' ? (
                 <>
                     <div className={styles.toolbar}>
                         <div className={styles.search}>
                             <PlatformField
                                 field={{
                                     key: "instalacionId",
-                                    label: "Instalación / nivel",
+                                    label: "Ubicación / nivel",
                                     type: "ref",
                                     resource: "instalaciones",
                                 }}
@@ -221,8 +215,7 @@ export function NetworkWorkspace() {
                     {loading && <p role="status">Cargando conexiones…</p>}
                     {!site && (
                         <p className={styles.card}>
-                            Selecciona una instalación para ver sus
-                            dispositivos, puertos y conexiones. Para preparar un dispositivo desde su tarjeta de responsabilidad, abre Activos Fijos.
+                            Selecciona una ubicación para ver sus dispositivos, puertos y conexiones. Si aún no tiene dispositivos, regístralos en la pestaña Dispositivos.
                         </p>
                     )}
                     {graph && (
@@ -753,7 +746,7 @@ export function NetworkWorkspace() {
                         </>
                     )}
                 </>
-            )}
+            ) : <p className={styles.card}>No tienes registros de red disponibles.</p>}
             {editing !== undefined && (
                 <RecordEditor
                     type="dispositivos"

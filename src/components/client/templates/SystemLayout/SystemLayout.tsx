@@ -1,7 +1,7 @@
 "use client";
 
 import { usePlatform } from "@/platform/context";
-import { PLATFORM_SECTIONS } from "@/platform/navigation";
+import { PLATFORM_SECTIONS, platformSections } from "@/platform/navigation";
 import { usePathname, useRouter } from "next/navigation";
 import { Button } from "../../atoms/Button";
 import { SideBarNavigation } from "../../organisms/SideBarNavigation";
@@ -101,6 +101,7 @@ export const SystemLayout = ({
         .filter(
             (page) =>
                 page.path !== "/tickets-creation" &&
+                !(page.path === "/equipo" && platform.data && platformSections(platform.data).some(s=>s.id === "organizacion")) &&
                 (!platform.data ||
                     !["/tickets", "/config", "/usuarios"].includes(page.path)),
         )

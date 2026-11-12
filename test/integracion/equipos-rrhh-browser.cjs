@@ -19,6 +19,7 @@ async function run() {
     page.setDefaultTimeout(20000);
     page.on('pageerror', e => errors.push(e.message));
     await page.route('**/*', route => /^https?:/.test(route.request().url()) && new URL(route.request().url()).hostname !== '127.0.0.1' ? route.abort() : route.continue());
+    await page.route('**/api/platform/organization/people',route=>route.fulfill({json:{empresa:97,personal:[{empresa:97,empleado:100,nombre:'Colaborador ficticio',puesto:'Analista de prueba',unidad:'Dirección ficticia de Informática',sinUnidad:false,cuentasHabilitadas:1},{empresa:97,empleado:101,nombre:'Jefe de prueba',puesto:'Director',unidadCodigo:11,unidad:null,sinUnidad:true,cuentasHabilitadas:0},...Array.from({length:28},(_,i)=>({empresa:97,empleado:102+i,nombre:'Personal de prueba '+i,puesto:'Analista',unidad:'Dirección ficticia de Informática',sinUnidad:false,cuentasHabilitadas:0}))]}}));
     await page.route('**/api/platform/organization/preview', route => {
       assert.match(route.request().headers().authorization, /^Bearer laboratorio-/);
       previews++;
@@ -50,12 +51,6 @@ async function run() {
     };
     await visit('/__laboratorio/entrar?usuario=1');
     await visit('/espacio/organizacion');
-    const section = page.getByRole('region', { name: 'Generación de equipos desde RRHH', exact: true });
-    await section.getByRole('button', { name: 'Preparar desde RRHH', exact: true }).waitFor();
-    assert.equal(previews, 0, 'no consulta RRHH en cada visita al panel');
-    assert.equal(await section.getByRole('button', { name: 'Aplicar generación de equipos', exact: true }).count(), 0);
-    await section.getByRole('button', { name: 'Preparar desde RRHH', exact: true }).click();
-    await section.getByRole('cell', { name: 'Analista de prueba', exact: true }).first().waitFor();
     const people=page.getByRole('region',{name:'Personal de RRHH',exact:true});
     await people.getByRole('button',{name:'Siguiente personal',exact:true}).click();
     await people.getByRole('cell',{name:'Personal de prueba 27',exact:true}).waitFor();
@@ -72,22 +67,29 @@ async function run() {
       await page.screenshot({ path: path.join(out, 'equipos-' + width + '.png'), fullPage: true });
     }
     await page.setViewportSize({ width: 1440, height: 1100 });
-    await section.getByRole('button', { name: 'Aplicar generación de equipos', exact: true }).click();
+    await page.getByRole('button',{name:'Equipos de trabajo',exact:true}).click();
+    await page.getByText('Sincronizar equipos desde RRHH',{exact:true}).click();
+    const section=page.getByRole('region',{name:'Generación de equipos desde RRHH',exact:true});
+    await section.getByRole('button',{name:'Consultar cambios de RRHH',exact:true}).waitFor();
+    assert.equal(previews,0,'consultar personas no prepara una sincronización');
+    await section.getByRole('button',{name:'Consultar cambios de RRHH',exact:true}).click();
+    await section.getByRole('cell',{name:'Analista de prueba',exact:true}).first().waitFor();
+    await section.getByRole('button', { name: 'Confirmar sincronización de equipos', exact: true }).click();
     await confirm();
     await section.getByRole('alert').filter({ hasText: 'Actualiza la vista previa' }).waitFor();
     await section.getByRole('cell', { name: 'Analista de prueba', exact: true }).first().waitFor();
     assert.equal(writes, 0);
     stale = false;
-    await section.getByRole('button', { name: 'Preparar desde RRHH', exact: true }).click();
+    await section.getByRole('button', { name: 'Consultar cambios de RRHH', exact: true }).click();
     await section.getByRole('alert').waitFor({ state: 'hidden' });
-    await section.getByRole('button', { name: 'Aplicar generación de equipos', exact: true }).click();
+    await section.getByRole('button', { name: 'Confirmar sincronización de equipos', exact: true }).click();
     await confirm();
     await section.getByRole('status').filter({ hasText: '2 cambios aplicados' }).waitFor();
     assert.equal(writes, 1);
     await visit('/__laboratorio/entrar?usuario=7');
     await visit('/espacio/organizacion');
     await page.getByRole('alert').filter({ hasText: 'No tienes permiso para consultar esta sección' }).waitFor();
-    assert.equal(await page.getByRole('button', { name: 'Preparar desde RRHH', exact: true }).count(), 0);
+    assert.equal(await page.getByRole('button', { name: 'Consultar cambios de RRHH', exact: true }).count(), 0);
     assert.deepEqual(errors, []);
     console.log('EQUIPOS_RRHH_BROWSER_OK; vista previa, alcance, puesto, dos confirmaciones, conflicto conservado y aplicación única; capturas=' + out);
   } catch (e) { if (page) { await page.screenshot({ path: path.join(out, 'fallo-equipos.png'), fullPage: true }).catch(() => {}); await fs.writeFile(path.join(out, 'fallo-equipos.txt'), await page.locator('body').innerText()).catch(() => {}); } throw e; }

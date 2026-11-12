@@ -14,11 +14,15 @@ import styles from "../../templates/PlatformPage/PlatformPage.module.scss";
 export function InventoryWorkspace({
     type = "activos",
     equipoId,
+    usuarioId,
     empleado,
+    onSaved,
 }: {
     type?: string;
     equipoId?: string;
+    usuarioId?: string;
     empleado?: number;
+    onSaved?: ()=>void;
 }) {
     const { data } = usePlatform();
     const [item, setItem] = useState<InventoryItem | null>(null),
@@ -58,6 +62,7 @@ export function InventoryWorkspace({
                 key={revision}
                 type={type}
                 equipoId={equipoId}
+                usuarioId={usuarioId}
                 empleado={empleado}
                 onSelect={
                     def.actions.INSERTAR
@@ -90,6 +95,7 @@ export function InventoryWorkspace({
                         setItem(null);
                         setRecord(null);
                         setRevision((v) => v + 1);
+                        onSaved?.();
                     }}
                 />
             )}

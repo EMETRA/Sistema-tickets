@@ -385,3 +385,21 @@
     min-width: 560px;
   }
 }
+
+.workspace {
+  .search, .field { font-size: 12px; }
+  .toolbar h2 { font-size: 20px; line-height: 1.4; }
+  summary { font-size: 14px; font-weight: 600; cursor: pointer; }
+}
+.shortcut {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 14px;
+  border: 1px solid var(--tickets-border);
+  border-radius: 8px;
+  background: var(--tickets-surface);
+  color: var(--tickets-primary);
+  font-size: 12px;
+  text-decoration: none;
+  &:focus-visible { outline: 2px solid var(--tickets-primary); outline-offset: 2px; }
+}

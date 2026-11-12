@@ -1,7 +1,7 @@
 "use client";
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import { usePlatform } from "@/platform/context";
-import { InventoryWorkspace } from "../ResourceWorkspace/InventoryWorkspace";
 import { Button } from "@/components/client/atoms/Button";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
 export type OrganizationPerson = {
@@ -13,6 +13,7 @@ export type OrganizationPerson = {
     unidad: string | null;
     sinUnidad: boolean;
     cuentasHabilitadas: number;
+    usuariosIds?: number[];
 };
 const searchText = (value: string) =>
     value
@@ -25,7 +26,6 @@ export function OrganizationPeople({
     people: OrganizationPerson[];
 }) {
     const { data } = usePlatform();
-    const [employee, setEmployee] = useState<number | null>(null);
     const [query, setQuery] = useState(""),
         [filter, setFilter] = useState("TODOS"),
         [page, setPage] = useState(0);
@@ -52,14 +52,6 @@ export function OrganizationPeople({
     const offset = page * 25;
     return (
         <section aria-label="Personal de RRHH" className={styles.page}>
-            <div>
-                <h3>Personal consultado en RRHH</h3>
-                <p className={styles.muted}>
-                    Incluye empleados activos aunque todavía no tengan cuenta en
-                    Tickets. Las jefaturas se revisan por su puesto; no se
-                    conceden permisos por aparecer en este listado.
-                </p>
-            </div>
             <div className={styles.toolbar}>
                 <label className={styles.search}>
                     Buscar persona, puesto o código
@@ -110,7 +102,7 @@ export function OrganizationPeople({
                         {filtered.slice(offset, offset + 25).map((person) => (
                             <tr key={person.empresa + ":" + person.empleado}>
                                 <td>{person.empleado}</td>
-                                <td>{person.nombre}</td>
+                                <td>{person.usuariosIds?.length===1?<Link className={styles.link} href={'/equipo/'+person.usuariosIds[0]}>{person.nombre}</Link>:person.nombre}</td>
                                 <td>{person.puesto}</td>
                                 <td>
                                     {person.unidad ||
@@ -125,14 +117,7 @@ export function OrganizationPeople({
                                 </td>
                                 {data?.definitions.activos?.actions.LEER && (
                                     <td>
-                                        <Button
-                                            variant="outlined"
-                                            onClick={() =>
-                                                setEmployee(person.empleado)
-                                            }
-                                        >
-                                            Ver bienes de {person.empleado}
-                                        </Button>
+                                        <Link className={styles.link} href={"/espacio/inventario?view=inventario&empleado="+person.empleado}>Ver bienes</Link>
                                     </td>
                                 )}
                             </tr>
@@ -180,17 +165,7 @@ export function OrganizationPeople({
                     </Button>
                 </div>
             </div>
-            {employee && (
-                <section aria-label="Bienes del empleado seleccionado">
-                    <Button
-                        variant="outlined"
-                        onClick={() => setEmployee(null)}
-                    >
-                        Cerrar bienes
-                    </Button>
-                    <InventoryWorkspace key={employee} empleado={employee} />
-                </section>
-            )}
+
         </section>
     );
 }

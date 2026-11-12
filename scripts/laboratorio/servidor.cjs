@@ -373,6 +373,10 @@ async function createLab(file, options = {}) {
       parts = p.split("/").filter(Boolean),
       q = url.searchParams;
     if (p === "/bootstrap") return bootstrap(s, a);
+    if (p === "/organization/people") {
+      if (!a.admin) fail(403, "Solo Informática consulta el directorio institucional.");
+      return {empresa:97,personal:s.users.map(u=>({empresa:97,empleado:9000000+u.id,nombre:u.nombre,puesto:u.rol,unidadCodigo:u.equipoId===s.ids.it?1:2,unidad:u.equipoId===s.ids.it?'Informática ficticia':'Contabilidad ficticia',sinUnidad:false,cuentasHabilitadas:1,usuariosIds:[u.id]}))};
+    }
     if (p === "/catalog") return s.applicationCatalog || {}; // Catálogo ficticio explícito de los recorridos; sin trámites externos.
     if (parts[0] === 'module-access') {
       const id = parts[1], custom = s.moduleAccess?.[a.id]?.[id];

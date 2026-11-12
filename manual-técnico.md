@@ -1,6 +1,6 @@
 # Manual técnico — Sistema-tickets
 
-Base documental: `926fe45d27922c595c63e8f79e1e82b1594470eb`; actualización de consulta de casos: `cd953b4ea8731336669948645a55032e5f5eabba`; actualización de vistas y diagnóstico judicial: `9d497b6ff471410ea5a96ba6df5e707ccebd8e43`; actualización documental: `b77da403cba653095c8156b0e2c13035a96b606b`; actualización de catálogo: `e3f8676f5121223c9f23aaa036833260efe236f9`; reportes VIVI: `b29ea52c21307f21bb49041ba2e8f76fb8080f44`; responsables de noticias: `55827f0694bf6f736264c3c5d41622b7cc59a88a`; línea de integración revisada: `Dev + feat/noticias_responsables`. Describe la base y la actualización citadas; la configuración y las autorizaciones efectivas de un servidor se comprueban por separado. Esta edición se preparó sin conectarse a Oracle, SMTP ni servidores institucionales.
+Base documental: `926fe45d27922c595c63e8f79e1e82b1594470eb`; actualización de consulta de casos: `cd953b4ea8731336669948645a55032e5f5eabba`; actualización de vistas y diagnóstico judicial: `9d497b6ff471410ea5a96ba6df5e707ccebd8e43`; actualización documental: `b77da403cba653095c8156b0e2c13035a96b606b`; actualización de catálogo: `e3f8676f5121223c9f23aaa036833260efe236f9`; reportes VIVI: `b29ea52c21307f21bb49041ba2e8f76fb8080f44`; responsables de noticias: `55827f0694bf6f736264c3c5d41622b7cc59a88a`; inventario institucional: `9daff7769ccb684b8eb5497a8b8b82b902e050e0`; línea de integración revisada: `Dev + fix/inventario-activos-fijos`. Describe la base y la actualización citadas; la configuración y las autorizaciones efectivas de un servidor se comprueban por separado. Esta edición se preparó sin conectarse a Oracle, SMTP ni servidores institucionales.
 
 Los enlaces de código fijan esa revisión para que sigan siendo consultables cuando `main` excluya herramientas de desarrollo. Al modificar un comportamiento se deben actualizar su caso de uso, configuración y referencia de código.
 
@@ -13,6 +13,7 @@ Los enlaces de código fijan esa revisión para que sigan siendo consultables cu
 - [4. Patrones, nomenclatura y estilo](#convenciones)
 - [5. Preparación y configuración](#configuracion)
 - [6. Datos y transacciones](#datos)
+- [Inventario institucional en equipos y cableado](#inventario-institucional)
 - [7. Autenticación, permisos y privacidad](#seguridad)
 - [8. Operación, fallos y recuperación](#operacion)
 - [9. Validación y mantenimiento](#validacion)
@@ -111,6 +112,18 @@ Los siguientes comandos son las entradas reales de `package.json`; el listado no
 Sin DataSource ni SQL Oracle directo. api-tickets persiste tickets/plataforma en ADMEMETRAIT, accesos en ADMEMETRAIDENTIDAD y auditoría/métricas en ADMEMETRAAUDITORIA; Auth administra ADMAUTEMETRA. RRHH y nómina permanecen en ADMINSIAF. El estado React/Zustand/contextos es estado de cliente, no evidencia de commit. Los casos señalan fuentes remotas para localizar el cambio del backend correcto.
 
 Cada caso detalla las tablas de su recorrido. El índice de persistencia distingue entidades mapeadas y referencias literales: una entidad de referencia no implica autorización de escritura. Conservar nombres entrecomillados y capitalización cuando el DDL los use. Usar binds para valores y listas validadas para identificadores; el esquema autenticado no sustituye al propietario de cada dominio.
+
+<a id="inventario-institucional"></a>
+
+### Inventario institucional en equipos y cableado
+
+[InventoryCatalog e InventoryPicker](https://github.com/EMETRA/Sistema-tickets/blob/9daff7769ccb684b8eb5497a8b8b82b902e050e0/src/components/client/organisms/ResourceWorkspace/InventoryPicker.tsx) comparten filtros y paginación; [InventoryWorkspace](https://github.com/EMETRA/Sistema-tickets/blob/9daff7769ccb684b8eb5497a8b8b82b902e050e0/src/components/client/organisms/ResourceWorkspace/InventoryWorkspace.tsx) agrega preparación/apertura de fichas según permisos. Usan el BFF autenticado `/api/platform/inventory/:type`, sin caché, y cancelan lecturas al desmontar o cambiar el alcance.
+
+Activos y visitas inicia en Equipos de Informática / Activos Fijos. La pestaña Fichas técnicas en Tickets conserva los registros locales. Cableado y red ofrece Activos Fijos; preparar un dispositivo no inventa instalación, puertos ni conexiones. En la ficha del equipo organizativo se consultan bienes por `equipoId`; la vista previa de personal RRHH permite consultarlos por código incluso sin cuenta en Tickets.
+
+El [perfil](https://github.com/EMETRA/Sistema-tickets/blob/9daff7769ccb684b8eb5497a8b8b82b902e050e0/src/views/Profile/Profile.tsx) envía `usuarioId`, nunca lo utiliza como código de empleado. El [encabezado](https://github.com/EMETRA/Sistema-tickets/blob/9daff7769ccb684b8eb5497a8b8b82b902e050e0/src/components/client/organisms/ProfileHeader/ProfileHeader.tsx) habilita Perfil/Mantenimiento para llegar a los bienes. Una cuenta mal vinculada muestra la explicación del API. La búsqueda embebida en el editor utiliza un contenedor sin formulario anidado para que Consultar bienes no guarde una ficha accidentalmente.
+
+La lectura automática no crea registros ni cambia las asignaciones de origen. Se conservan filtros aplicados, páginas y referencias de error. Un 403 oculta los filtros; solo la comprobación del servidor autoriza. Actualizar api-tickets antes del Panel; no se requieren tablas ni configuración nuevas. Contrato y diagnóstico: [guía del API](https://github.com/EMETRA/api-tickets/blob/6999a6b0c9b9130c10d2d27d451144422bf62436/docs/guia-inventario-activos-fijos.md). Verificación: [proxy BFF](https://github.com/EMETRA/Sistema-tickets/blob/9daff7769ccb684b8eb5497a8b8b82b902e050e0/test/integracion/plataforma.test.cjs) y [navegador con datos ficticios](https://github.com/EMETRA/Sistema-tickets/blob/9daff7769ccb684b8eb5497a8b8b82b902e050e0/test/integracion/inventario-browser.cjs).
 
 <a id="seguridad"></a>
 

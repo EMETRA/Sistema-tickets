@@ -45,8 +45,17 @@ export enum TipoRecurso {
   EXTERNO = "externo",
 }
 
+/** Responsables del registro CMS; el autor editorial es independiente. */
+export interface ActividadEditorialNoticia {
+  creadoPor: { id: number; nombre: string | null } | null;
+  actualizadoPor: { id: number; nombre: string | null } | null;
+  creadoEn: string | null;
+  actualizadoEn: string | null;
+}
+
 /** Noticia del listado (TB_NOTICIA). No incluye la notificación push: esa viene de VIVI. */
 export interface NoticiaListItem {
+  actividadEditorial?: ActividadEditorialNoticia;
   estadoNotificacion?: EstadoNotificacion | null;
   id: string;
   titulo: string;
@@ -163,6 +172,7 @@ export interface SeccionNoticia {
  * (TB_NOTICIA_RECURSO: principal, galeria, adjunto, og).
  */
 export interface NoticiaDetalle {
+  actividadEditorial?: ActividadEditorialNoticia;
   ubicacion?: string | null;
   latitud?: number | null;
   longitud?: number | null;

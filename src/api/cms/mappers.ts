@@ -5,54 +5,60 @@ import {
     TipoRecurso,
 } from "@/api/graphql/COM03/types";
 import type {
+    ActividadEditorialNoticia,
     CategoriaNoticia,
     NoticiaDetalle,
     NoticiaListItem,
     RecursoNoticia,
 } from "@/api/graphql/COM03/types";
 export type CmsResourceDto = {
-  id: number;
-  tipo: string;
-  url: string;
-  tipo_mime?: string | null;
-  ancho?: number | null;
-  alto?: number | null;
-  duracion_segundos?: number | null;
-  texto_alternativo?: string | null;
-  pie_imagen?: string | null;
-  creditos?: string | null;
+    id: number;
+    tipo: string;
+    url: string;
+    tipo_mime?: string | null;
+    ancho?: number | null;
+    alto?: number | null;
+    duracion_segundos?: number | null;
+    texto_alternativo?: string | null;
+    pie_imagen?: string | null;
+    creditos?: string | null;
 };
 export type CmsNewsDto = {
-  ubicacion?: string | null;
-  latitud?: number | null;
-  longitud?: number | null;
-  id: number;
-  titulo: string;
-  slug: string;
-  idioma: string;
-  estado: string;
-  visibilidad: string;
-  resumen?: string | null;
-  fecha_publicacion?: string | null;
-  tiempo_lectura?: number | null;
-  autor?: { id: number; nombre: string } | null;
-  autores?: { id: number; nombre: string; rol: string; orden: number }[];
-  categorias?: { id: number; nombre: string; slug: string }[];
-  etiquetas?: { id: number }[];
-  recurso_principal?: CmsResourceDto | null;
-  secciones?: {
+    actividadEditorial?: ActividadEditorialNoticia;
+    creado_por?: number | null;
+    actualizado_por?: number | null;
+    creado?: string | null;
+    actualizado?: string | null;
+    ubicacion?: string | null;
+    latitud?: number | null;
+    longitud?: number | null;
     id: number;
-    orden: number;
-    encabezado?: string | null;
-    contenido_html?: string | null;
-    recurso?: CmsResourceDto | null;
-  }[];
-  galeria?: { orden: number; recurso: CmsResourceDto }[];
-  notificacionPush?: {
+    titulo: string;
+    slug: string;
+    idioma: string;
     estado: string;
-    versionPublicacion?: number;
-    alcance?: string;
-  };
+    visibilidad: string;
+    resumen?: string | null;
+    fecha_publicacion?: string | null;
+    tiempo_lectura?: number | null;
+    autor?: { id: number; nombre: string } | null;
+    autores?: { id: number; nombre: string; rol: string; orden: number }[];
+    categorias?: { id: number; nombre: string; slug: string }[];
+    etiquetas?: { id: number }[];
+    recurso_principal?: CmsResourceDto | null;
+    secciones?: {
+        id: number;
+        orden: number;
+        encabezado?: string | null;
+        contenido_html?: string | null;
+        recurso?: CmsResourceDto | null;
+    }[];
+    galeria?: { orden: number; recurso: CmsResourceDto }[];
+    notificacionPush?: {
+        estado: string;
+        versionPublicacion?: number;
+        alcance?: string;
+    };
 };
 const pushStates: Record<string, EstadoNotificacion> = {
     enviada: EstadoNotificacion.ENVIADO,
@@ -88,7 +94,15 @@ export function mapRecurso(dto?: CmsResourceDto | null): RecursoNoticia | null {
     };
 }
 export function mapNoticia(dto: CmsNewsDto): NoticiaListItem {
+    const actor = (id?: number | null) =>
+        id && Number.isSafeInteger(id) && id > 0 ? { id, nombre: null } : null;
     return {
+        actividadEditorial: dto.actividadEditorial ?? {
+            creadoPor: actor(dto.creado_por),
+            actualizadoPor: actor(dto.actualizado_por),
+            creadoEn: dto.creado ?? null,
+            actualizadoEn: dto.actualizado ?? null,
+        },
         id: String(dto.id),
         titulo: dto.titulo,
         slug: dto.slug,
@@ -106,15 +120,16 @@ export function mapDetalle(
 ): NoticiaDetalle {
     const ids = (dto.categorias || []).map((c) => String(c.id));
     const root =
-    ids.find(
-        (id) => categorias.find((c) => c.id === id)?.categoriaPadreId === null,
-    ) || null;
+        ids.find(
+            (id) =>
+                categorias.find((c) => c.id === id)?.categoriaPadreId === null,
+        ) || null;
     const child = root
         ? ids.find(
-            (id) =>
-                categorias.find((c) => c.id === id)?.categoriaPadreId === root &&
-          id !== root,
-        ) || null
+              (id) =>
+                  categorias.find((c) => c.id === id)?.categoriaPadreId ===
+                      root && id !== root,
+          ) || null
         : null;
     return {
         ...mapNoticia(dto),
@@ -124,7 +139,9 @@ export function mapDetalle(
         longitud: dto.longitud ?? null,
         categoriaId: root,
         subcategoriaId: child,
-        categoriaIdsAdicionales: ids.filter((id) => id !== root && id !== child),
+        categoriaIdsAdicionales: ids.filter(
+            (id) => id !== root && id !== child,
+        ),
         etiquetaIds: (dto.etiquetas || []).map((e) => String(e.id)),
         fechaPublicacion: dto.fecha_publicacion ?? null,
         tiempoLectura: dto.tiempo_lectura ?? null,
@@ -147,10 +164,10 @@ export function mapDetalle(
     };
 }
 export type CmsCategoryDto = {
-  id: number;
-  nombre: string;
-  slug: string;
-  padre?: { id: number } | number | null;
+    id: number;
+    nombre: string;
+    slug: string;
+    padre?: { id: number } | number | null;
 };
 export function mapCategoria(c: CmsCategoryDto): CategoriaNoticia {
     const padre = typeof c.padre === "object" ? c.padre?.id : c.padre;

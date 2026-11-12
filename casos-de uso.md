@@ -1,6 +1,6 @@
 # Casos de uso — Sistema-tickets
 
-Base documental: `926fe45d27922c595c63e8f79e1e82b1594470eb`; actualización de consulta de casos: `cd953b4ea8731336669948645a55032e5f5eabba`; actualización de vistas y diagnóstico judicial: `9d497b6ff471410ea5a96ba6df5e707ccebd8e43`; actualización documental: `b77da403cba653095c8156b0e2c13035a96b606b`; actualización de catálogo: `e3f8676f5121223c9f23aaa036833260efe236f9`; reportes VIVI: `b29ea52c21307f21bb49041ba2e8f76fb8080f44`; línea de integración revisada: `Dev + fix/pdf_judicial_proxy`. Describe la base y la actualización citadas; la configuración y las autorizaciones efectivas de un servidor se comprueban por separado. Esta edición se preparó sin conectarse a Oracle, SMTP ni servidores institucionales.
+Base documental: `926fe45d27922c595c63e8f79e1e82b1594470eb`; actualización de consulta de casos: `cd953b4ea8731336669948645a55032e5f5eabba`; actualización de vistas y diagnóstico judicial: `9d497b6ff471410ea5a96ba6df5e707ccebd8e43`; actualización documental: `b77da403cba653095c8156b0e2c13035a96b606b`; actualización de catálogo: `e3f8676f5121223c9f23aaa036833260efe236f9`; reportes VIVI: `b29ea52c21307f21bb49041ba2e8f76fb8080f44`; responsables de noticias: `55827f0694bf6f736264c3c5d41622b7cc59a88a`; línea de integración revisada: `Dev + feat/noticias_responsables`. Describe la base y la actualización citadas; la configuración y las autorizaciones efectivas de un servidor se comprueban por separado. Esta edición se preparó sin conectarse a Oracle, SMTP ni servidores institucionales.
 
 Los enlaces de código fijan esa revisión para que sigan siendo consultables cuando `main` excluya herramientas de desarrollo. Al modificar un comportamiento se deben actualizar su caso de uso, configuración y referencia de código.
 
@@ -1121,6 +1121,20 @@ flowchart TD
   paso4["Mostrar resultado y referencia sin duplicar la acción"]
   paso3 --> paso4
 ```
+
+**Identificar creación y última actualización de una noticia**
+
+El listado incluye «Autor editorial» y «Registro y edición» como datos distintos. Al abrir una noticia para editar, una ficha de solo lectura muestra quién la creó y quién la actualizó por última vez, junto a las fechas del CMS en hora de Guatemala. Estos valores no se envían como campos editables ni aparecen en la vista previa editorial. No se trata de un historial completo de cambios.
+
+```mermaid
+flowchart LR
+  lectura["Listado o detalle privado COM03"] --> bff["BFF conserva actividadEditorial"]
+  bff --> mapa["Adaptar responsables y fechas"]
+  mapa --> tabla["Columna Registro y edición"]
+  mapa --> ficha["Ficha de responsables al editar"]
+```
+
+Si falta responsable histórico, mostrar «Sin registro»; con ID conocido y nombre no disponible, «Usuario #ID». No asignar el nombre del autor editorial como sustituto. Objetos indirectos: `ADMEMETRANOTIFICACIONES.TB_NOTICIA` y `ADMAUTEMETRA.TB_USUARIOS` mediante api-tickets/api-portal; el Panel no consulta Oracle. Implementación: [src/components/client/organisms/NewsActivity/NewsActivity.tsx](https://github.com/EMETRA/Sistema-tickets/blob/55827f0694bf6f736264c3c5d41622b7cc59a88a/src/components/client/organisms/NewsActivity/NewsActivity.tsx), [src/components/client/organisms/NewsTablePanel/NewsTablePanel.tsx](https://github.com/EMETRA/Sistema-tickets/blob/55827f0694bf6f736264c3c5d41622b7cc59a88a/src/components/client/organisms/NewsTablePanel/NewsTablePanel.tsx), [src/views/COM03/NewsFormView/NewsFormView.tsx](https://github.com/EMETRA/Sistema-tickets/blob/55827f0694bf6f736264c3c5d41622b7cc59a88a/src/views/COM03/NewsFormView/NewsFormView.tsx).
 
 **Excepciones y alternativas**
 

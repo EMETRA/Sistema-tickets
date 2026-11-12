@@ -26,8 +26,8 @@ export const PAGES_CONFIG: Record<string, PageMetadata> = {
     },
     equipo: {
         path: "/equipo",
-        label: "Equipo",
-        title: "Gestión de Personal",
+        label: "Mi equipo",
+        title: "Personal del equipo",
         iconName: "people-group-solid",
     },
     usuarios: {

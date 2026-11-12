@@ -1,6 +1,9 @@
 "use client"
 
-import React, { useMemo } from "react";
+import {usePlatform} from "@/platform/context";
+import {platformSections} from "@/platform/navigation";
+import {useRouter} from "next/navigation";
+import React, { useEffect, useMemo } from "react";
 import { FilterUsersBar } from "@/components/client/organisms/FilterUsersBar";
 import style from "./Team.module.scss";
 import { UsersGrid } from "@/components/client/organisms/UsersGrid";
@@ -10,7 +13,7 @@ import { useGetTeamMembers } from "@/api/hooks";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useGetDepartments } from "@/api/hooks/useGetDepartments";
 
-const Team: React.FC = () => {
+const LegacyTeam: React.FC = () => {
     const [cat, setCat] = useState("todos");
     const [search, setSearch] = useState("");
 
@@ -74,7 +77,7 @@ const Team: React.FC = () => {
     return (
         <div className={style.mainContainer}>
             <div className={style.teamContainer}>
-                {!isReady && <p role="status">Tu unidad no está vinculada al catálogo de departamentos. Informática puede revisar el personal y sus bienes en Equipos y responsables.</p>}
+                {!isReady && <p role="status">Tu unidad no está vinculada al catálogo de departamentos. Informática puede revisar el personal y sus bienes en Personal y equipos.</p>}
                 <FilterUsersBar
                     variant="categories"
                     searchValue={search}
@@ -103,4 +106,10 @@ const Team: React.FC = () => {
     );
 };
 
-export default Team;
+export default function Team(){
+    const {data,loading}=usePlatform(),router=useRouter();
+    const unified=!!data&&platformSections(data).some(s=>s.id==='organizacion');
+    useEffect(()=>{if(unified)router.replace('/espacio/organizacion?view=personas');},[unified,router]);
+    if(loading||unified)return <p role="status">Abriendo personal y equipos…</p>;
+    return <LegacyTeam/>;
+}

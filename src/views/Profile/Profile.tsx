@@ -1,5 +1,8 @@
 "use client";
 import { useMemo, useState } from "react";
+import Link from "next/link";
+import {usePlatform} from "@/platform/context";
+import {platformSections} from "@/platform/navigation";
 import { ProfileHeader } from "@/components/client/organisms/ProfileHeader";
 import { MetricCard } from "@/components/client/molecules/MetricCard/MetricCard";
 import { useGetUserById } from "@/api/hooks/useGetUserById";
@@ -10,6 +13,7 @@ import { InventoryCatalog } from "@/components/client/organisms/ResourceWorkspac
 import styles from "./Profile.module.scss";
 
 export default function Profile({ userId }: { userId?: string }) {
+    const {data: platform}=usePlatform();
     const currentUserId = useAuthStore((state) => state.getUserId());
     const id = userId || currentUserId || "";
     const [view, setView] = useState("perfil");
@@ -37,6 +41,7 @@ export default function Profile({ userId }: { userId?: string }) {
         );
     return (
         <div className={styles.container}>
+            <Link href={platform && platformSections(platform).some(s=>s.id==="organizacion") ? "/espacio/organizacion?view=personas" : "/equipo"}>Volver al personal</Link>
             <ProfileHeader
                 bannerSrc="/images/city.png"
                 avatarSrc={user.avatar}
@@ -45,7 +50,7 @@ export default function Profile({ userId }: { userId?: string }) {
                 role={user.rol || "Usuario"}
                 switchOptions={[
                     { label: "Perfil", value: "perfil" },
-                    { label: "Mantenimiento", value: "mantenimiento" },
+                    { label: "Bienes asignados", value: "mantenimiento" },
                 ]}
                 switchValue={view}
                 onSwitchChange={setView}

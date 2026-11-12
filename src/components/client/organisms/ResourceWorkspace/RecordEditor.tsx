@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/client/atoms/Button";
 import { PlatformField } from "@/components/client/molecules/PlatformField/PlatformField";
+import { resourceDefinition } from "@/platform/resources";
 import { usePlatform } from "@/platform/context";
 import { InventoryPicker, inventoryClass } from "./InventoryPicker";
 import { platformCommand, platformFetch } from "@/platform/client";
@@ -12,6 +13,7 @@ export function RecordEditor({
     record,
     initial,
     initialName,
+    initialTeamId,
     onClose,
     onSaved,
 }: {
@@ -19,11 +21,12 @@ export function RecordEditor({
     record?: PlatformRecord;
     initial?: Record<string, unknown>;
     initialName?: string;
+    initialTeamId?: string;
     onClose: () => void;
     onSaved: (record: PlatformRecord) => void;
 }) {
     const { data: context } = usePlatform(),
-        def = context!.definitions[type],
+        def = resourceDefinition(type, context!.definitions[type]),
         availableTeams = context!.teams.filter(
             (t) =>
                 context!.actor.admin ||
@@ -34,9 +37,10 @@ export function RecordEditor({
         ),
         dialog = useRef<HTMLDialogElement>(null),
         busyRef = useRef(false);
+    const [searchInventory, setSearchInventory] = useState(false);
     const [nombre, setNombre] = useState(record?.nombre || initialName || ""),
         [equipoId, setEquipo] = useState(
-            record?.equipoId || availableTeams[0]?.id || "",
+            record?.equipoId || initialTeamId || availableTeams[0]?.id || "",
         ),
         [visibilidad, setVisibility] = useState(
             record?.visibilidad ||
@@ -152,7 +156,8 @@ export function RecordEditor({
                 </Button>
             </div>
             {!record && !datos.inventarioReferencia && def.actions.LEER && ["activos", "dispositivos"].includes(type) && (
-                <InventoryPicker
+                <section className={styles.card}>
+                {!searchInventory ? <Button type="button" variant="outlined" onClick={()=>setSearchInventory(true)}>Buscar un bien en Activos Fijos</Button> : <InventoryPicker
                     type={type}
                     onSelect={(item) => {
                         setNombre(
@@ -175,7 +180,8 @@ export function RecordEditor({
                                 : {}),
                         }));
                     }}
-                />
+                />}
+                </section>
             )}
             {typeof datos.inventarioReferencia === "string" && (
                 <p role="status" className={styles.card}>
@@ -205,6 +211,7 @@ export function RecordEditor({
                                     Equipo de trabajo *
                                     <select
                                         className={styles.control}
+                                        aria-label="Equipo de trabajo"
                                         value={equipoId}
                                         onChange={(e) =>
                                             setEquipo(e.target.value)

@@ -1,7 +1,7 @@
 "use client";
-import { useState } from "react";
+import { startTransition, useEffect, useState } from "react";
 import { Button } from "@/components/client/atoms/Button";
-import { platformFetch } from "@/platform/client";
+import { PlatformError, platformFetch } from "@/platform/client";
 import styles from "../../templates/PlatformPage/PlatformPage.module.scss";
 export type InventoryItem = {
     referencia: string;
@@ -13,6 +13,8 @@ export type InventoryItem = {
     serie: string;
     modelo: string;
     entrada: number;
+    fichaCompleta: boolean;
+    fichaId?: string | null;
 };
 export function inventoryClass(description: string, network: boolean) {
     const s = description
@@ -30,6 +32,303 @@ export function inventoryClass(description: string, network: boolean) {
     if (/SERVIDOR/.test(s)) return "SERVIDOR";
     return undefined;
 }
+export function inventoryInitial(item: InventoryItem, type: string) {
+    const clase = inventoryClass(item.descripcion, type === "dispositivos");
+    return {
+        inventarioReferencia: item.referencia,
+        numeroInventario: item.numeroInventario,
+        serie: item.serie,
+        modelo: item.modelo,
+        ...(clase ? { clase } : {}),
+        ...(type === "activos" ? { detalle: item.descripcion } : {}),
+    };
+}
+type Result = { items: InventoryItem[]; hayMas: boolean; message?: string };
+export function InventoryCatalog({
+    type = "activos",
+    usuarioId,
+    equipoId,
+    empleado: fixedEmployee,
+    onSelect,
+    onOpen,
+    title = "Bienes de Activos Fijos",
+    embedded = false,
+}: {
+    type?: string;
+    usuarioId?: string;
+    equipoId?: string;
+    empleado?: number;
+    onSelect?: (item: InventoryItem) => void;
+    onOpen?: (id: string) => void;
+    title?: string;
+    embedded?: boolean;
+}) {
+    const [empleado, setEmpleado] = useState(""),
+        [tarjeta, setTarjeta] = useState(""),
+        [numero, setNumero] = useState(""),
+        [q, setQ] = useState(""),
+        [filters, setFilters] = useState(""),
+        [offset, setOffset] = useState(0),
+        [revision, setRevision] = useState(0),
+        [result, setResult] = useState<Result | null>(null),
+        [busy, setBusy] = useState(true),
+        [error, setError] = useState(""),
+        [denied, setDenied] = useState(false);
+    useEffect(() => {
+        const controller = new AbortController();
+        const params = new URLSearchParams(filters);
+        if (usuarioId) params.set("usuarioId", usuarioId);
+        if (equipoId) params.set("equipoId", equipoId);
+        if (fixedEmployee) params.set("empleado", String(fixedEmployee));
+        params.set("offset", String(offset));
+        startTransition(() => {
+            setBusy(true);
+            setError("");
+            setDenied(false);
+            setResult(null);
+        });
+        platformFetch<Result>(`/inventory/${type}?${params}`, {
+            signal: controller.signal,
+        })
+            .then((r) => {
+                if (!controller.signal.aborted) setResult(r);
+            })
+            .catch((e) => {
+                if (!controller.signal.aborted) {
+                    setDenied(e instanceof PlatformError && e.status === 403);
+                    setError(
+                        (e instanceof Error
+                            ? e.message
+                            : "No se pudo consultar Activos Fijos.") +
+                            (e instanceof PlatformError && e.reference
+                                ? ` Referencia: ${e.reference}`
+                                : ""),
+                    );
+                }
+            })
+            .finally(() => {
+                if (!controller.signal.aborted) setBusy(false);
+            });
+        return () => controller.abort();
+    }, [type, usuarioId, equipoId, fixedEmployee, filters, offset, revision]);
+    function search(e?: { preventDefault(): void }) {
+        e?.preventDefault();
+        setFilters(
+            new URLSearchParams({ empleado, tarjeta, numero, q }).toString(),
+        );
+        setOffset(0);
+        setRevision((v) => v + 1);
+    }
+    const FilterContainer = embedded ? "div" : "form";
+    return (
+        <section className={styles.card} aria-label="Inventario institucional">
+            <div className={styles.toolbar}>
+                <div>
+                    <h3>{title}</h3>
+                    <p className={styles.muted}>
+                        Tarjetas y asignaciones vigentes de EMETRA. Se consultan
+                        en Activos Fijos; los datos técnicos se completan en
+                        Tickets.
+                    </p>
+                </div>
+                <Button
+                    type="button"
+                    variant="outlined"
+                    state={busy ? "disabled" : "default"}
+                    onClick={() => setRevision((v) => v + 1)}
+                >
+                    Actualizar bienes
+                </Button>
+            </div>
+            {!denied && (
+                <FilterContainer
+                    onSubmit={embedded ? undefined : search}
+                    onKeyDown={(e) => {
+                        if (embedded && e.key === "Enter") {
+                            e.preventDefault();
+                            search();
+                        }
+                    }}
+                    className={styles.toolbar}
+                >
+                    {!usuarioId && !fixedEmployee && (
+                        <label className={styles.field}>
+                            Código de empleado (opcional)
+                            <input
+                                className={styles.control}
+                                type="number"
+                                min="1"
+                                value={empleado}
+                                onChange={(e) => setEmpleado(e.target.value)}
+                            />
+                        </label>
+                    )}
+                    <label className={styles.field}>
+                        Tarjeta de responsabilidad
+                        <input
+                            className={styles.control}
+                            maxLength={40}
+                            value={tarjeta}
+                            onChange={(e) => setTarjeta(e.target.value)}
+                        />
+                    </label>
+                    <label className={styles.field}>
+                        Número de inventario
+                        <input
+                            className={styles.control}
+                            inputMode="numeric"
+                            pattern="[0-9]*"
+                            maxLength={16}
+                            value={numero}
+                            onChange={(e) => setNumero(e.target.value)}
+                        />
+                    </label>
+                    <label className={styles.field}>
+                        Descripción o serie
+                        <input
+                            className={styles.control}
+                            maxLength={100}
+                            value={q}
+                            onChange={(e) => setQ(e.target.value)}
+                        />
+                    </label>
+                    <Button
+                        type={embedded ? "button" : "submit"}
+                        onClick={embedded ? () => search() : undefined}
+                        state={busy ? "disabled" : "default"}
+                    >
+                        Consultar bienes
+                    </Button>
+                </FilterContainer>
+            )}
+            {busy && <p role="status">Consultando Activos Fijos…</p>}
+            {error && (
+                <p role="alert" className={styles.error}>
+                    {error}
+                </p>
+            )}
+            {result?.message && <p role="status">{result.message}</p>}
+            {result && !result.message && (
+                <>
+                    <div className={styles.tableRegion}>
+                        <table className={styles.table}>
+                            <thead>
+                                <tr>
+                                    <th>Inventario / descripción</th>
+                                    <th>Asignación institucional</th>
+                                    <th>Serie / modelo</th>
+                                    {(onSelect || onOpen) && (
+                                        <th>Ficha técnica</th>
+                                    )}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {result.items.map((i, index) => (
+                                    <tr
+                                        key={`${i.referencia}:${i.tarjeta}:${i.empleado}:${index}`}
+                                    >
+                                        <td>
+                                            <strong>
+                                                {i.numeroInventario}
+                                            </strong>
+                                            <p>
+                                                {i.descripcion ||
+                                                    "Descripción pendiente en Activos Fijos"}
+                                            </p>
+                                            {!i.fichaCompleta && (
+                                                <small>
+                                                    Ficha del bien incompleta en
+                                                    origen
+                                                </small>
+                                            )}
+                                        </td>
+                                        <td>
+                                            Tarjeta {i.tarjeta}
+                                            <p>
+                                                {i.nombreEmpleado || "Empleado"}{" "}
+                                                · {i.empleado}
+                                            </p>
+                                        </td>
+                                        <td>
+                                            {i.serie || "Sin serie"}
+                                            <p>{i.modelo || "Sin modelo"}</p>
+                                        </td>
+                                        {(onSelect || onOpen) && (
+                                            <td>
+                                                {i.fichaId && onOpen ? (
+                                                    <Button
+                                                        type="button"
+                                                        variant="outlined"
+                                                        onClick={() =>
+                                                            onOpen(i.fichaId!)
+                                                        }
+                                                    >
+                                                        Ver ficha
+                                                    </Button>
+                                                ) : onSelect &&
+                                                  i.fichaCompleta ? (
+                                                    <Button
+                                                        type="button"
+                                                        variant="outlined"
+                                                        onClick={() =>
+                                                            onSelect(i)
+                                                        }
+                                                    >
+                                                        Preparar ficha{" "}
+                                                        {i.numeroInventario}
+                                                    </Button>
+                                                ) : (
+                                                    "Solo consulta"
+                                                )}
+                                            </td>
+                                        )}
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                    {!result.items.length && (
+                        <p role="status">
+                            No se encontraron bienes vigentes con estos filtros.
+                            Revisa el código de empleado y la tarjeta en Activos
+                            Fijos.
+                        </p>
+                    )}
+                    <div className={styles.toolbar}>
+                        <p className={styles.muted}>
+                            {result.items.length} asignaciones en esta página ·
+                            Página {Math.floor(offset / 50) + 1}
+                        </p>
+                        <div className={styles.actions}>
+                            <Button
+                                type="button"
+                                variant="outlined"
+                                state={busy || !offset ? "disabled" : "default"}
+                                onClick={() =>
+                                    setOffset((v) => Math.max(0, v - 50))
+                                }
+                            >
+                                Bienes anteriores
+                            </Button>
+                            <Button
+                                type="button"
+                                variant="outlined"
+                                state={
+                                    busy || !result.hayMas
+                                        ? "disabled"
+                                        : "default"
+                                }
+                                onClick={() => setOffset((v) => v + 50)}
+                            >
+                                Bienes siguientes
+                            </Button>
+                        </div>
+                    </div>
+                </>
+            )}
+        </section>
+    );
+}
 export function InventoryPicker({
     type,
     onSelect,
@@ -37,150 +336,12 @@ export function InventoryPicker({
     type: string;
     onSelect: (item: InventoryItem) => void;
 }) {
-    const [empleado, setEmpleado] = useState(""),
-        [tarjeta, setTarjeta] = useState(""),
-        [items, setItems] = useState<InventoryItem[] | null>(null),
-        [offset, setOffset] = useState(0),
-        [more, setMore] = useState(false),
-        [busy, setBusy] = useState(false),
-        [error, setError] = useState("");
-    async function search(next = 0) {
-        setBusy(true);
-        setError("");
-        try {
-            const r = await platformFetch<{
-                items: InventoryItem[];
-                hayMas: boolean;
-            }>(
-                `/inventory/${type}?empleado=${encodeURIComponent(empleado)}&tarjeta=${encodeURIComponent(tarjeta)}&offset=${next}`,
-            );
-            setItems(r.items);
-            setOffset(next);
-            setMore(r.hayMas);
-        } catch (e) {
-            setError(
-                e instanceof Error
-                    ? e.message
-                    : "No se pudo consultar el inventario",
-            );
-            setItems(null);
-        } finally {
-            setBusy(false);
-        }
-    }
     return (
-        <section className={styles.card} aria-label="Inventario institucional">
-            <h3>Usar un bien de la tarjeta de responsabilidad</h3>
-            <p className={styles.muted}>
-                Consulta el inventario institucional y completa únicamente los
-                datos técnicos. La tarjeta y su asignación se conservan en el
-                sistema de origen.
-            </p>
-            <div className={styles.toolbar}>
-                <label className={styles.field}>
-                    Código de empleado
-                    <input
-                        aria-label="Código de empleado"
-                        className={styles.control}
-                        type="number"
-                        min="1"
-                        value={empleado}
-                        onChange={(e) => {
-                            setEmpleado(e.target.value);
-                            setItems(null);
-                            setOffset(0);
-                        }}
-                    />
-                </label>
-                <label className={styles.field}>
-                    Tarjeta (opcional)
-                    <input
-                        aria-label="Tarjeta de responsabilidad"
-                        className={styles.control}
-                        value={tarjeta}
-                        maxLength={40}
-                        onChange={(e) => {
-                            setTarjeta(e.target.value);
-                            setItems(null);
-                            setOffset(0);
-                        }}
-                    />
-                </label>
-                <Button
-                    type="button"
-                    variant="outlined"
-                    state={
-                        busy ? "loading" : !empleado ? "disabled" : "default"
-                    }
-                    onClick={() => void search(0)}
-                >
-                    Consultar bienes
-                </Button>
-            </div>
-            {error && (
-                <p role="alert" className={styles.error}>
-                    {error}
-                </p>
-            )}
-            {items && (
-                <>
-                    <p role="status">
-                        {items.length} bienes vigentes encontrados.
-                    </p>
-                    <div style={{ maxHeight: 260, overflow: "auto" }}>
-                        {items.map((i) => (
-                            <div
-                                key={
-                                    i.referencia +
-                                    ":" +
-                                    i.tarjeta +
-                                    ":" +
-                                    i.empleado
-                                }
-                                className={styles.toolbar}
-                            >
-                                <span>
-                                    <strong>{i.numeroInventario}</strong> ·{" "}
-                                    {i.descripcion}
-                                    <br />
-                                    <small>
-                                        Tarjeta {i.tarjeta} · {i.nombreEmpleado}{" "}
-                                        · Serie {i.serie || "sin dato"}
-                                    </small>
-                                </span>
-                                <Button
-                                    variant="outlined"
-                                    type="button"
-                                    onClick={() => onSelect(i)}
-                                >
-                                    Usar bien {i.numeroInventario}
-                                </Button>
-                            </div>
-                        ))}
-                    </div>
-                    <div className={styles.toolbar}>
-                        <Button
-                            variant="outlined"
-                            type="button"
-                            state={busy || !offset ? "disabled" : "default"}
-                            onClick={() =>
-                                void search(Math.max(0, offset - 50))
-                            }
-                        >
-                            Bienes anteriores
-                        </Button>
-                        <span>Página {Math.floor(offset / 50) + 1}</span>
-                        <Button
-                            variant="outlined"
-                            type="button"
-                            state={busy || !more ? "disabled" : "default"}
-                            onClick={() => void search(offset + 50)}
-                        >
-                            Bienes siguientes
-                        </Button>
-                    </div>
-                </>
-            )}
-        </section>
+        <InventoryCatalog
+            type={type}
+            onSelect={onSelect}
+            embedded
+            title="Usar un bien de la tarjeta de responsabilidad"
+        />
     );
 }

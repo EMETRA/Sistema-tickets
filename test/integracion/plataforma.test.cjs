@@ -41,3 +41,21 @@ test('las fuentes usan el proxy autenticado del API y conservan las denegaciones
   assert.equal(calls.length,2);
  }finally{global.fetch=original;if(old===undefined)delete process.env.TICKETS_PLATFORM_ENABLED;else process.env.TICKETS_PLATFORM_ENABLED=old;}
 });
+
+test('el proxy de inventario conserva filtros y denegaciones sin caché ni rutas alternativas',async()=>{
+ const previous=process.env.TICKETS_PLATFORM_ENABLED,original=global.fetch;
+ process.env.TICKETS_PLATFORM_ENABLED='true';let calls=[];
+ try{
+  global.fetch=async(url,init)=>{calls.push({url:String(url),init});return Response.json({items:[],codigo:'CUENTA_SIN_VINCULO_EMPLEADO'});};
+  const route=loader(root,{'@/api/config/env':{getGraphqlEndpoint:()=> 'https://tickets.example.invalid/web/graphql'}})('src/app/api/platform/[...path]/route.ts');
+  for(const query of ['offset=0','usuarioId=7&offset=50','equipoId=2ccebf7f-0814-4684-8b80-cfaa4dccf710&numero=456']){
+   const result=await route.GET(new NextRequest('https://panel.example.invalid/api/platform/inventory/activos?'+query,{headers:{Authorization:'Bearer ficticio'}}),{params:Promise.resolve({path:['inventory','activos']})});
+   assert.equal(result.status,200);assert.equal(result.headers.get('cache-control'),'private, no-store');
+   assert.equal(calls.at(-1).url,'https://tickets.example.invalid/web/platform/inventory/activos?'+query);
+   assert.equal(calls.at(-1).init.headers.get('Authorization'),'Bearer ficticio');
+  }
+  global.fetch=async()=>Response.json({message:'Sin permiso'},{status:403});
+  const denied=await route.GET(new NextRequest('https://panel.example.invalid/api/platform/inventory/activos',{headers:{Authorization:'Bearer ficticio'}}),{params:Promise.resolve({path:['inventory','activos']})});
+  assert.equal(denied.status,403);
+ }finally{global.fetch=original;if(previous===undefined)delete process.env.TICKETS_PLATFORM_ENABLED;else process.env.TICKETS_PLATFORM_ENABLED=previous;}
+});

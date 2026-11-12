@@ -1,5 +1,7 @@
 "use client";
 import { useMemo, useState } from "react";
+import { usePlatform } from "@/platform/context";
+import { InventoryWorkspace } from "../ResourceWorkspace/InventoryWorkspace";
 import { Button } from "@/components/client/atoms/Button";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
 export type OrganizationPerson = {
@@ -22,6 +24,8 @@ export function OrganizationPeople({
 }: {
     people: OrganizationPerson[];
 }) {
+    const { data } = usePlatform();
+    const [employee, setEmployee] = useState<number | null>(null);
     const [query, setQuery] = useState(""),
         [filter, setFilter] = useState("TODOS"),
         [page, setPage] = useState(0);
@@ -97,6 +101,9 @@ export function OrganizationPeople({
                             <th>Puesto</th>
                             <th>Unidad institucional</th>
                             <th>Cuenta en Tickets</th>
+                            {data?.definitions.activos?.actions.LEER && (
+                                <th>Bienes</th>
+                            )}
                         </tr>
                     </thead>
                     <tbody>
@@ -116,11 +123,29 @@ export function OrganizationPeople({
                                         ? "Habilitada"
                                         : "Sin cuenta habilitada"}
                                 </td>
+                                {data?.definitions.activos?.actions.LEER && (
+                                    <td>
+                                        <Button
+                                            variant="outlined"
+                                            onClick={() =>
+                                                setEmployee(person.empleado)
+                                            }
+                                        >
+                                            Ver bienes de {person.empleado}
+                                        </Button>
+                                    </td>
+                                )}
                             </tr>
                         ))}
                         {!filtered.length && (
                             <tr>
-                                <td colSpan={5}>
+                                <td
+                                    colSpan={
+                                        data?.definitions.activos?.actions.LEER
+                                            ? 6
+                                            : 5
+                                    }
+                                >
                                     No hay empleados que coincidan con estos
                                     filtros.
                                 </td>
@@ -155,6 +180,17 @@ export function OrganizationPeople({
                     </Button>
                 </div>
             </div>
+            {employee && (
+                <section aria-label="Bienes del empleado seleccionado">
+                    <Button
+                        variant="outlined"
+                        onClick={() => setEmployee(null)}
+                    >
+                        Cerrar bienes
+                    </Button>
+                    <InventoryWorkspace key={employee} empleado={employee} />
+                </section>
+            )}
         </section>
     );
 }

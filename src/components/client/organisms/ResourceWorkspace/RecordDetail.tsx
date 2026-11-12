@@ -4,6 +4,7 @@ import { Button } from "@/components/client/atoms/Button";
 import { usePlatform } from "@/platform/context";
 import { platformCommand, platformFetch } from "@/platform/client";
 import type { PlatformRecord } from "@/platform/types";
+import { InventoryCatalog } from "./InventoryPicker";
 import { RecordFiles } from "./RecordFiles";
 import styles from "../../templates/PlatformPage/PlatformPage.module.scss";
 export function displayDate(value: unknown) {
@@ -250,6 +251,8 @@ export function RecordDetail({
                         )}
                     </div>
                 </div>
+                {type === "equipos" && data?.definitions.activos?.actions.LEER && <InventoryCatalog key={current.id} equipoId={current.id} title="Bienes asignados al personal del equipo"/>}
+                {type === "miembros" && current.usuarioId && data?.definitions.activos?.actions.LEER && <InventoryCatalog key={current.id} usuarioId={String(current.usuarioId)} title="Bienes asignados al miembro"/>}
                 {readOnly && (
                     <p className={styles.muted}>
                         Este registro está disponible solo para consulta.

@@ -74,7 +74,8 @@ const Team: React.FC = () => {
     return (
         <div className={style.mainContainer}>
             <div className={style.teamContainer}>
-                <FilterUsersBar 
+                {!isReady && <p role="status">Tu unidad no está vinculada al catálogo de departamentos. Informática puede revisar el personal y sus bienes en Equipos y responsables.</p>}
+            <FilterUsersBar
                     variant="categories"
                     searchValue={search}
                     onSearchChange={setSearch}
@@ -89,7 +90,7 @@ const Team: React.FC = () => {
                     disabled={isLoading || !!error || users.length === 0}
                 />
                 <div className={style.users}>
-                    <UsersGrid 
+                    <UsersGrid
                         title=""
                         iconName=""
                         users={filteredUsers}

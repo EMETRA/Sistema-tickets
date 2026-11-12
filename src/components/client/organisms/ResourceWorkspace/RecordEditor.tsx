@@ -151,7 +151,7 @@ export function RecordEditor({
                     Cerrar
                 </Button>
             </div>
-            {!record && ["activos", "dispositivos"].includes(type) && (
+            {!record && !datos.inventarioReferencia && def.actions.LEER && ["activos", "dispositivos"].includes(type) && (
                 <InventoryPicker
                     type={type}
                     onSelect={(item) => {

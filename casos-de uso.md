@@ -1,6 +1,6 @@
 # Casos de uso — Sistema-tickets
 
-Base documental: `926fe45d27922c595c63e8f79e1e82b1594470eb`; actualización de consulta de casos: `cd953b4ea8731336669948645a55032e5f5eabba`; actualización de vistas y diagnóstico judicial: `9d497b6ff471410ea5a96ba6df5e707ccebd8e43`; actualización documental: `b77da403cba653095c8156b0e2c13035a96b606b`; actualización de catálogo: `e3f8676f5121223c9f23aaa036833260efe236f9`; reportes VIVI: `b29ea52c21307f21bb49041ba2e8f76fb8080f44`; responsables de noticias: `55827f0694bf6f736264c3c5d41622b7cc59a88a`; inventario institucional: `9daff7769ccb684b8eb5497a8b8b82b902e050e0`; línea de integración revisada: `Dev + fix/inventario-activos-fijos`. Describe la base y la actualización citadas; la configuración y las autorizaciones efectivas de un servidor se comprueban por separado. Esta edición se preparó sin conectarse a Oracle, SMTP ni servidores institucionales.
+Base documental: `926fe45d27922c595c63e8f79e1e82b1594470eb`; actualización de consulta de casos: `cd953b4ea8731336669948645a55032e5f5eabba`; actualización de vistas y diagnóstico judicial: `9d497b6ff471410ea5a96ba6df5e707ccebd8e43`; actualización documental: `b77da403cba653095c8156b0e2c13035a96b606b`; actualización de catálogo: `e3f8676f5121223c9f23aaa036833260efe236f9`; reportes VIVI: `b29ea52c21307f21bb49041ba2e8f76fb8080f44`; responsables de noticias: `55827f0694bf6f736264c3c5d41622b7cc59a88a`; inventario institucional: `9daff7769ccb684b8eb5497a8b8b82b902e050e0`; navegación de personal, activos y red: `db60d821fdbc9b5e2cee31f98cc7422626a4ff22`; línea de integración revisada: `Dev + fix/navegacion-activos-personal`. Describe la base y la actualización citadas; la configuración y las autorizaciones efectivas de un servidor se comprueban por separado. Esta edición se preparó sin conectarse a Oracle, SMTP ni servidores institucionales.
 
 Los enlaces de código fijan esa revisión para que sigan siendo consultables cuando `main` excluya herramientas de desarrollo. Al modificar un comportamiento se deben actualizar su caso de uso, configuración y referencia de código.
 
@@ -18,8 +18,8 @@ Guía de arquitectura, configuración y cambios: [manual-técnico.md](manual-t%C
 - [CU-07 · Administrar personas, perfiles, roles y permisos](#cu-07)
 - [CU-08 · Consultar y modificar funciones corporativas autorizadas](#cu-08)
 - [CU-09 · Consultar calendario semanal y actividades](#cu-09)
-- [CU-10 · Preparar equipos desde RRHH y revisar miembros](#cu-10)
-- [CU-11 · Gestionar fichas de activos, visitas y cableado](#cu-11)
+- [CU-10 · Consultar personal y administrar equipos de trabajo](#cu-10)
+- [CU-11 · Consultar bienes, registrar atención y configurar la red](#cu-11)
 - [CU-12 · Consultar servidores, contenedores y logs observados](#cu-12)
 - [CU-13 · Vincular aplicaciones con GitHub y objetos Oracle](#cu-13)
 - [CU-14 · Consultar métricas, reportes por etiqueta y trazabilidad](#cu-14)
@@ -575,47 +575,40 @@ Indirecto: ADMEMETRAIT.TB_TK_ACTIVIDADES y equipos de plataforma.
 
 <a id="cu-10"></a>
 
-## CU-10 · Preparar equipos desde RRHH y revisar miembros
+## CU-10 · Consultar personal y administrar equipos de trabajo
 
-**Actor:** Usuario del Panel según su alcance.
-
-**Precondiciones y entrada:** Sesión válida y capability o permiso del módulo; backend correspondiente configurado.
+**Actores:** Administración para el directorio institucional y sincronización; usuarios con permisos de organización para sus equipos y responsabilidades.
 
 **Flujo y resultado**
 
-1. Consultar personal y vista previa de unidades.
-2. Mostrar empleados con y sin cuenta.
-3. Identificar partidas o nombres pendientes.
-4. Preparar equipos con confirmación.
-5. Revisar responsabilidades sin asignar jefaturas por inferencia.
+1. Abrir Personal y equipos. Administración ve automáticamente Personal de RRHH, incluidos empleados activos sin cuenta o con nombre de unidad pendiente.
+2. Buscar por persona, código, puesto o unidad; filtrar y paginar. Abrir el perfil cuando existe una cuenta habilitada inequívoca o Ver bienes para ir al inventario filtrado por empleado.
+3. Equipos de trabajo consulta grupos de personas; el nombre abre su ficha y desde allí se puede ir al inventario del equipo.
+4. Responsabilidades permite filtrar el equipo y gestionar funciones de miembros con cuenta. El formulario comienza con el equipo elegido.
+5. Sincronizar equipos desde RRHH se despliega dentro de Equipos de trabajo. Consultar cambios presenta unidades y diferencias; confirmar conserva las dos confirmaciones administrativas. Un conflicto mantiene la vista previa y requiere actualizarla.
+6. El acceso antiguo Equipo redirige a este espacio cuando está autorizado. No aparece una segunda entrada para el mismo directorio; los usuarios sin el módulo conservan su directorio heredado permitido.
 
 ```mermaid
 flowchart TD
-  inicio["Consultar personal y vista previa de unidades"]
-  control{"Entrada y autorización válidas"}
-  inicio --> control
-  control -->|No| rechazo["Informar la excepción descrita; no completar la operación"]
-  paso1["Mostrar empleados con y sin cuenta"]
-  control -->|Sí| paso1
-  paso2["Identificar partidas o nombres pendientes"]
-  paso1 --> paso2
-  paso3["Preparar equipos con confirmación"]
-  paso2 --> paso3
-  paso4["Revisar responsabilidades sin asignar jefaturas por inferencia"]
-  paso3 --> paso4
+  inicio["Personal y equipos"] --> tarea{"Finalidad"}
+  tarea -->|Personas| directorio["Leer empleados sin preparar cambios"]
+  directorio --> perfil["Perfil o inventario por empleado"]
+  tarea -->|Equipos| equipo["Ficha del equipo y alcance"]
+  equipo --> bienes["Inventario filtrado por equipo"]
+  tarea -->|Responsabilidades| miembro["Equipo y función de cada miembro"]
+  equipo --> sincronizar["Acción administrativa: consultar cambios RRHH"]
+  sincronizar --> confirmar["Dos confirmaciones y verificación de vigencia"]
 ```
 
 **Excepciones y alternativas**
 
-- Solo una cuenta habilitada no debe ocultar al resto de empleados.
-- Unidades de 2026 sin catálogo no toman nombres antiguos automáticamente.
-- Vínculo de empleado erróneo requiere corrección explícita.
+- Sin cuenta en Tickets no se ofrece un perfil ni se concede acceso, pero los bienes se consultan por código de empleado si el actor está autorizado.
+- Unidades sin catálogo vigente muestran código/nombre pendiente; no usan nombres antiguos ni generan jefaturas automáticamente.
+- Cuenta con varios vínculos no abre un perfil elegido arbitrariamente.
+- Accesos al sistema se gestionan en Personas y accesos; una responsabilidad de equipo no reemplaza esos permisos.
+- Lectura del personal, vista previa y aplicación son operaciones distintas; abrir la pantalla no ejecuta cambios.
 
-**Bienes del personal**
-
-La ficha del equipo consulta Activos Fijos con `equipoId`; los equipos de RRHH abarcan sus empleados activos aunque aún no tengan cuenta. Los equipos manuales abarcan solo sus miembros vinculados. En la vista previa de personal, Ver bienes utiliza el código del empleado seleccionado, incluso sin cuenta. En Equipo → colaborador → Mantenimiento, el API resuelve `usuarioId` contra la identidad institucional. No se deben deducir esos vínculos por nombre ni confundir el ID del Panel con el empleado.
-
-Archivos actualizados: [personal RRHH](https://github.com/EMETRA/Sistema-tickets/blob/9daff7769ccb684b8eb5497a8b8b82b902e050e0/src/components/client/organisms/OrganizationPeople/OrganizationPeople.tsx), [detalle de equipo/miembro](https://github.com/EMETRA/Sistema-tickets/blob/9daff7769ccb684b8eb5497a8b8b82b902e050e0/src/components/client/organisms/ResourceWorkspace/RecordDetail.tsx), [perfil](https://github.com/EMETRA/Sistema-tickets/blob/9daff7769ccb684b8eb5497a8b8b82b902e050e0/src/views/Profile/Profile.tsx).
+Implementación: [directorio y tareas](https://github.com/EMETRA/Sistema-tickets/blob/db60d821fdbc9b5e2cee31f98cc7422626a4ff22/src/views/Platform/OrganizationWorkspace.tsx), [sincronización](https://github.com/EMETRA/Sistema-tickets/blob/db60d821fdbc9b5e2cee31f98cc7422626a4ff22/src/views/Platform/OrganizationSync.tsx), [personal](https://github.com/EMETRA/Sistema-tickets/blob/db60d821fdbc9b5e2cee31f98cc7422626a4ff22/src/components/client/organisms/OrganizationPeople/OrganizationPeople.tsx), [compatibilidad Equipo](https://github.com/EMETRA/Sistema-tickets/blob/db60d821fdbc9b5e2cee31f98cc7422626a4ff22/src/views/Team/Team.tsx), [perfil y bienes asignados](https://github.com/EMETRA/Sistema-tickets/blob/db60d821fdbc9b5e2cee31f98cc7422626a4ff22/src/views/Profile/Profile.tsx).
 
 **Objetos y persistencia**
 
@@ -623,57 +616,52 @@ Indirecto: ADMINSIAF.TB_EMPLEADOS, TB_ASIGNACION_PROGRAMATICA y TB_UNIDADES_P; e
 
 **Archivos involucrados**
 
-- [src/app/(dashboard)/equipo/[id]/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/equipo/%5Bid%5D/page.tsx)
-- [src/app/(dashboard)/equipo/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/equipo/page.tsx)
-- [src/app/api/departments/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/departments/route.ts)
-- [src/app/api/perfil-equipo/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/perfil-equipo/route.ts)
-- [src/views/Platform/OrganizationWorkspace.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Platform/OrganizationWorkspace.tsx)
-- [src/views/Team/Team.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Team/Team.module.scss)
-- [src/views/Team/Team.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Team/Team.tsx)
-- [src/views/Team/index.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Team/index.tsx)
+- [src/app/(dashboard)/equipo/[id]/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/db60d821fdbc9b5e2cee31f98cc7422626a4ff22/src/app/%28dashboard%29/equipo/%5Bid%5D/page.tsx)
+- [src/app/(dashboard)/equipo/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/db60d821fdbc9b5e2cee31f98cc7422626a4ff22/src/app/%28dashboard%29/equipo/page.tsx)
+- [src/app/api/departments/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/db60d821fdbc9b5e2cee31f98cc7422626a4ff22/src/app/api/departments/route.ts)
+- [src/app/api/perfil-equipo/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/db60d821fdbc9b5e2cee31f98cc7422626a4ff22/src/app/api/perfil-equipo/route.ts)
+- [src/views/Platform/OrganizationWorkspace.tsx](https://github.com/EMETRA/Sistema-tickets/blob/db60d821fdbc9b5e2cee31f98cc7422626a4ff22/src/views/Platform/OrganizationWorkspace.tsx)
+- [src/views/Team/Team.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/db60d821fdbc9b5e2cee31f98cc7422626a4ff22/src/views/Team/Team.module.scss)
+- [src/views/Team/Team.tsx](https://github.com/EMETRA/Sistema-tickets/blob/db60d821fdbc9b5e2cee31f98cc7422626a4ff22/src/views/Team/Team.tsx)
+- [src/views/Team/index.tsx](https://github.com/EMETRA/Sistema-tickets/blob/db60d821fdbc9b5e2cee31f98cc7422626a4ff22/src/views/Team/index.tsx)
 
 <a id="cu-11"></a>
 
-## CU-11 · Gestionar fichas de activos, visitas y cableado
+## CU-11 · Consultar bienes, registrar atención y configurar la red
 
-**Actor:** Usuario del Panel según su alcance.
-
-**Precondiciones y entrada:** Sesión válida y capability o permiso del módulo; backend correspondiente configurado.
+**Actor:** Usuario con permiso de lectura y, para cambios, la acción correspondiente sobre el registro.
 
 **Flujo y resultado**
 
-1. Abrir Activos y visitas; se selecciona Equipos de Informática / Activos Fijos y carga una página automáticamente. En Cableado y red, abrir Activos Fijos.
-2. Filtrar por empleado, tarjeta, inventario o descripción/serie; consultar, actualizar y navegar páginas de 50 asignaciones.
-3. Ver la asignación institucional, serie, modelo y metadatos incompletos. La ausencia de resultados se distingue de error y de cuenta mal vinculada.
-4. Abrir una ficha técnica accesible o Preparar ficha si hay datos de origen y permiso de inserción. Se copian referencia, número, serie y modelo; la clase se sugiere para revisión.
-5. Completar los datos técnicos y confirmar con el flujo existente. En dispositivos son necesarios instalación y puertos reales antes de aparecer en el mapa.
-6. Consultar fichas locales en Fichas técnicas en Tickets; la lectura de Activos Fijos no las crea ni modifica asignaciones de origen.
+1. Activos y mantenimiento abre Inventario de bienes automáticamente, con `offset=0`. Buscar por empleado, tarjeta, número, descripción o serie; distinguir ausencia de bienes, metadatos incompletos y error/reintento.
+2. Ver ficha abre una ficha técnica existente y autorizada; Crear ficha técnica prepara datos de origen, para completar responsable y características en Tickets. Fichas técnicas consulta únicamente los registros locales, con columnas de inventario, tipo, serie, ubicación y técnico.
+3. Mantenimientos y visitas registra trabajos y próximas revisiones. Ubicaciones mantiene el catálogo compartido por bienes y red. Movimientos es la bitácora de una operación autorizada, sin modificar la tarjeta oficial.
+4. Red y cableado abre Dispositivos, mostrando inventario, ubicación y puertos. Vincular bien de Activos Fijos abre una búsqueda; seleccionar el bien y completar ubicación/puertos prepara el dispositivo. Las confirmaciones existentes se conservan; después de guardar se cierra la búsqueda y recarga el listado.
+5. Conexiones gestiona los puertos de origen/destino y el medio del enlace. Mapa de red visualiza esos mismos dispositivos y conexiones por ubicación; mantiene los controles y autorización de edición del plano.
+6. Administrar ubicaciones lleva al único catálogo en Activos y mantenimiento. El parámetro `view` identifica la tarea y el historial permite volver a la pestaña anterior.
 
 ```mermaid
 flowchart TD
-  inicio["Consultar fichas y bienes institucionales"]
-  control{"Entrada y autorización válidas"}
-  inicio --> control
-  control -->|No| rechazo["Informar la excepción descrita; no completar la operación"]
-  paso1["Seleccionar origen y relación del activo"]
-  control -->|Sí| paso1
-  paso2["Revisar alta o modificación y confirmaciones"]
-  paso1 --> paso2
-  paso3["Guardar ficha o enlace de red"]
-  paso2 --> paso3
-  paso4["Consultar representación e historial"]
-  paso3 --> paso4
+  persona["Persona o equipo"] --> inventario["Inventario filtrado de Activos Fijos"]
+  inventario --> ficha["Ficha técnica en Tickets"]
+  ficha --> trabajo["Mantenimiento, visita o movimiento documentado"]
+  inventario --> dispositivo["Vincular dispositivo: ubicación y puertos"]
+  dispositivo --> conexion["Conectar puertos entre dispositivos"]
+  conexion --> mapa["Mapa de red de la ubicación"]
+  ubicacion["Catálogo único de ubicaciones"] --> ficha
+  ubicacion --> dispositivo
 ```
 
 **Excepciones y alternativas**
 
-- No confundir número de tarjeta con número del bien.
-- Referencia duplicada o relación inválida requiere revisión.
-- Movimiento visual de red debe respetar permisos de cambio.
-- Un 403 oculta los filtros; la autorización del API sigue siendo obligatoria.
-- Un bien sin ficha de origen se muestra para consulta, sin preparar un alta incompleta.
-- La búsqueda dentro del formulario de registro no puede enviar el formulario de alta.
-- Los errores muestran su referencia y permiten reintentar; no se mantienen bienes anteriores bajo otro alcance.
+- Una versión antigua del API que exige empleado rechaza la carga inicial; comprobar el código compilado y reconstruir desde QA. No cambiar datos ni retirar validaciones para ocultar ese problema.
+- Un bien sin detalle de origen se muestra como consulta; no se ofrece crear una ficha incompleta. Se distingue inventario de número de tarjeta.
+- Las lecturas cancelan solicitudes obsoletas. Errores y listas vacías no muestran bienes de un alcance anterior.
+- No se crean ubicaciones, fichas, puertos, conexiones ni movimientos al consultar. La clase sugerida por descripción se revisa antes de guardar.
+- Las referencias privadas no revelan sus nombres en las tablas; el API resuelve etiquetas por lote y aplica el alcance de cada recurso.
+- Buscar dentro de un formulario no lo guarda. Crear o modificar mantiene permisos, versiones, idempotencia y confirmaciones del contrato existente.
+
+Implementación: [tareas de activos](https://github.com/EMETRA/Sistema-tickets/blob/db60d821fdbc9b5e2cee31f98cc7422626a4ff22/src/views/Platform/AssetsWorkspace.tsx), [red](https://github.com/EMETRA/Sistema-tickets/blob/db60d821fdbc9b5e2cee31f98cc7422626a4ff22/src/views/Platform/NetworkWorkspace.tsx), [vinculación](https://github.com/EMETRA/Sistema-tickets/blob/db60d821fdbc9b5e2cee31f98cc7422626a4ff22/src/views/Platform/InventoryLinkDialog.tsx), [columnas y nombres](https://github.com/EMETRA/Sistema-tickets/blob/db60d821fdbc9b5e2cee31f98cc7422626a4ff22/src/platform/resources.ts), [listados](https://github.com/EMETRA/Sistema-tickets/blob/db60d821fdbc9b5e2cee31f98cc7422626a4ff22/src/components/client/organisms/ResourceWorkspace/ResourceWorkspace.tsx), [búsqueda de inventario](https://github.com/EMETRA/Sistema-tickets/blob/db60d821fdbc9b5e2cee31f98cc7422626a4ff22/src/components/client/organisms/ResourceWorkspace/InventoryPicker.tsx). [Actualización del API y comprobación de versión](https://github.com/EMETRA/api-tickets/blob/e077b221b4efdd01c60b7051331bea6b5392a13d/docs/guia-inventario-activos-fijos.md).
 
 **Objetos y persistencia**
 
@@ -681,18 +669,18 @@ Indirecto: ADMEMETRAIT.TB_TK_ACTIVOS, TB_TK_INTERVENCIONES, TB_TK_MOV_ACTIVOS, T
 
 **Contrato y verificación**
 
-[Fuente, permisos y diagnóstico del API](https://github.com/EMETRA/api-tickets/blob/6999a6b0c9b9130c10d2d27d451144422bf62436/docs/guia-inventario-activos-fijos.md). [Prueba de navegador](https://github.com/EMETRA/Sistema-tickets/blob/9daff7769ccb684b8eb5497a8b8b82b902e050e0/test/integracion/inventario-browser.cjs): carga automática, filtros, paginación, error/reintento, preparación, ausencia de formularios anidados, red, perfil, permisos y móvil con datos ficticios. No se comprobó Oracle institucional desde este entorno.
+[Fuente, permisos y diagnóstico del API](https://github.com/EMETRA/api-tickets/blob/e077b221b4efdd01c60b7051331bea6b5392a13d/docs/guia-inventario-activos-fijos.md). [Prueba de navegador](https://github.com/EMETRA/Sistema-tickets/blob/db60d821fdbc9b5e2cee31f98cc7422626a4ff22/test/integracion/inventario-browser.cjs): carga automática, filtros, paginación, error/reintento, preparación, ausencia de formularios anidados, red, perfil, permisos y móvil con datos ficticios. No se comprobó Oracle institucional desde este entorno.
 
 **Archivos involucrados**
 
-- [InventoryPicker / InventoryCatalog](https://github.com/EMETRA/Sistema-tickets/blob/9daff7769ccb684b8eb5497a8b8b82b902e050e0/src/components/client/organisms/ResourceWorkspace/InventoryPicker.tsx)
-- [InventoryWorkspace](https://github.com/EMETRA/Sistema-tickets/blob/9daff7769ccb684b8eb5497a8b8b82b902e050e0/src/components/client/organisms/ResourceWorkspace/InventoryWorkspace.tsx)
-- [ResourceWorkspace](https://github.com/EMETRA/Sistema-tickets/blob/9daff7769ccb684b8eb5497a8b8b82b902e050e0/src/components/client/organisms/ResourceWorkspace/ResourceWorkspace.tsx)
-- [RecordEditor](https://github.com/EMETRA/Sistema-tickets/blob/9daff7769ccb684b8eb5497a8b8b82b902e050e0/src/components/client/organisms/ResourceWorkspace/RecordEditor.tsx)
+- [InventoryPicker / InventoryCatalog](https://github.com/EMETRA/Sistema-tickets/blob/db60d821fdbc9b5e2cee31f98cc7422626a4ff22/src/components/client/organisms/ResourceWorkspace/InventoryPicker.tsx)
+- [InventoryWorkspace](https://github.com/EMETRA/Sistema-tickets/blob/db60d821fdbc9b5e2cee31f98cc7422626a4ff22/src/components/client/organisms/ResourceWorkspace/InventoryWorkspace.tsx)
+- [ResourceWorkspace](https://github.com/EMETRA/Sistema-tickets/blob/db60d821fdbc9b5e2cee31f98cc7422626a4ff22/src/components/client/organisms/ResourceWorkspace/ResourceWorkspace.tsx)
+- [RecordEditor](https://github.com/EMETRA/Sistema-tickets/blob/db60d821fdbc9b5e2cee31f98cc7422626a4ff22/src/components/client/organisms/ResourceWorkspace/RecordEditor.tsx)
 
-- [src/app/(dashboard)/espacio/registro/[type]/[id]/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/espacio/registro/%5Btype%5D/%5Bid%5D/page.tsx)
-- [src/views/Platform/NetworkWorkspace.tsx](https://github.com/EMETRA/Sistema-tickets/blob/9daff7769ccb684b8eb5497a8b8b82b902e050e0/src/views/Platform/NetworkWorkspace.tsx)
-- [src/views/Platform/RecordPage.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Platform/RecordPage.tsx)
+- [src/app/(dashboard)/espacio/registro/[type]/[id]/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/db60d821fdbc9b5e2cee31f98cc7422626a4ff22/src/app/%28dashboard%29/espacio/registro/%5Btype%5D/%5Bid%5D/page.tsx)
+- [src/views/Platform/NetworkWorkspace.tsx](https://github.com/EMETRA/Sistema-tickets/blob/db60d821fdbc9b5e2cee31f98cc7422626a4ff22/src/views/Platform/NetworkWorkspace.tsx)
+- [src/views/Platform/RecordPage.tsx](https://github.com/EMETRA/Sistema-tickets/blob/db60d821fdbc9b5e2cee31f98cc7422626a4ff22/src/views/Platform/RecordPage.tsx)
 
 <a id="cu-12"></a>
 

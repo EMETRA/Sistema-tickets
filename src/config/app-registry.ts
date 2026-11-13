@@ -1,3 +1,8 @@
+import {
+    CctConsultas,
+    CctFormularios,
+    CctReportes,
+} from "@/views/Platform/CctWorkspace";
 import { ViviReportsWorkspace } from "@/views/Platform/ViviReportsWorkspace";
 import { PayrollWorkspace } from "@/views/Platform/PayrollWorkspace";
 import type { ComponentType } from "react";
@@ -24,6 +29,9 @@ export const APP_REGISTRY: Record<string, ComponentType> = {
     mod10: MOD10,
     "rh-boletas": PayrollWorkspace,
     "vivi-reportes": ViviReportsWorkspace,
+    "cct-consultas": CctConsultas,
+    "cct-cepos": CctFormularios,
+    "cct-reportes": CctReportes,
     // COM-03: la clave es el id del módulo en la ruta /home/comunicacion/contenido/noticias
     noticias: COM03,
     "consulta-vehiculos": ConsultaVehiculos,

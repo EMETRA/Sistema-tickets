@@ -151,9 +151,25 @@ export function HrCampaignsWorkspace() {
             if (mounted.current) setBusy(false);
         }
     }
+    const publication = useRef<{ key: string; inicio: string } | null>(null);
     async function create(event: FormEvent) {
         event.preventDefault();
         await perform(async () => {
+            const key = JSON.stringify({
+                name,
+                description,
+                mode,
+                now,
+                start: now ? null : start,
+                end,
+                fields,
+            });
+            if (!publication.current || publication.current.key !== key)
+                publication.current = {
+                    key,
+                    inicio: now ? new Date().toISOString() : hrLocalIso(start),
+                };
+
             const r = await platformCommand<{ id: string; convocados: number }>(
                 "/hr/campaigns/create",
                 "POST",
@@ -162,9 +178,7 @@ export function HrCampaignsWorkspace() {
                         nombre: name,
                         descripcion: description,
                         modo: mode,
-                        inicio: now
-                            ? new Date().toISOString()
-                            : hrLocalIso(start),
+                        inicio: publication.current.inicio,
                         fin: hrLocalIso(end),
                         campos: Object.values(fields),
                     },
@@ -173,6 +187,7 @@ export function HrCampaignsWorkspace() {
                 "Publicar campaña obligatoria de actualización de datos",
             );
             if (!mounted.current) return;
+            publication.current = null;
             setCreating(false);
             setName("");
             setDescription("");

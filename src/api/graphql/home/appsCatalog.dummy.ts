@@ -228,6 +228,10 @@ export const APPS_CATALOG_DUMMY: AppsCatalog = {
                     },
                 ],
             },
+            reportes: {
+                meta: {id:'reportes',label:'REPORTES',title:'Reportes',iconName:'chart-bar-solid'},
+                modules: [{id:'juz02',label:'JUZ02',title:'Reimpresión de boletas de tránsito N',iconName:'clipboard-solid'}],
+            },
         },
     },
     // TODO [COM03-BACKEND]: entrada dummy; debe venir del catálogo real de backend.

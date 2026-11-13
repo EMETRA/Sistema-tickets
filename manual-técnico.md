@@ -2,7 +2,7 @@
 
 Implementación CCT: `ea3e8e71ed354ac5a5422ff16e5fbd2e898c29fc`.
 
-Base documental: `926fe45d27922c595c63e8f79e1e82b1594470eb`; actualización de consulta de casos: `cd953b4ea8731336669948645a55032e5f5eabba`; actualización de vistas y diagnóstico judicial: `9d497b6ff471410ea5a96ba6df5e707ccebd8e43`; actualización documental: `b77da403cba653095c8156b0e2c13035a96b606b`; actualización de catálogo: `e3f8676f5121223c9f23aaa036833260efe236f9`; reportes VIVI: `b29ea52c21307f21bb49041ba2e8f76fb8080f44`; responsables de noticias: `55827f0694bf6f736264c3c5d41622b7cc59a88a`; inventario institucional: `9daff7769ccb684b8eb5497a8b8b82b902e050e0`; navegación de personal, activos y red: `db60d821fdbc9b5e2cee31f98cc7422626a4ff22`; línea de integración revisada: `Dev + fix/navegacion-activos-personal`. Describe la base y la actualización citadas; la configuración y las autorizaciones efectivas de un servidor se comprueban por separado. Esta edición se preparó sin conectarse a Oracle, SMTP ni servidores institucionales.
+Base documental: `926fe45d27922c595c63e8f79e1e82b1594470eb`; actualización de consulta de casos: `cd953b4ea8731336669948645a55032e5f5eabba`; actualización de vistas y diagnóstico judicial: `9d497b6ff471410ea5a96ba6df5e707ccebd8e43`; actualización documental: `b77da403cba653095c8156b0e2c13035a96b606b`; actualización de catálogo: `e3f8676f5121223c9f23aaa036833260efe236f9`; reportes VIVI: `b29ea52c21307f21bb49041ba2e8f76fb8080f44`; responsables de noticias: `55827f0694bf6f736264c3c5d41622b7cc59a88a`; inventario institucional: `9daff7769ccb684b8eb5497a8b8b82b902e050e0`; navegación de personal, activos y red: `db60d821fdbc9b5e2cee31f98cc7422626a4ff22`; reimpresión de boletas N: `670c69364feb7e84dff997dc8e9644277a9d43f5`; línea de integración revisada: `Dev + fix/navegacion-activos-personal`. Describe la base y la actualización citadas; la configuración y las autorizaciones efectivas de un servidor se comprueban por separado. Esta edición se preparó sin conectarse a Oracle, SMTP ni servidores institucionales.
 
 Los enlaces de código fijan esa revisión para que sigan siendo consultables cuando `main` excluya herramientas de desarrollo. Al modificar un comportamiento se deben actualizar su caso de uso, configuración y referencia de código.
 
@@ -18,6 +18,7 @@ Los enlaces de código fijan esa revisión para que sigan siendo consultables cu
 - [5. Preparación y configuración](#configuracion)
 - [6. Datos y transacciones](#datos)
 - [Inventario institucional en equipos y cableado](#inventario-institucional)
+- [Reimpresión de boletas de tránsito N](#reimpresion-n)
 - [7. Autenticación, permisos y privacidad](#seguridad)
 - [8. Operación, fallos y recuperación](#operacion)
 - [9. Validación y mantenimiento](#validacion)
@@ -140,6 +141,22 @@ El inventario oficial es de solo lectura. Crear ficha técnica copia referencia,
 Actualizar primero api-tickets y después Panel. El error inicial observado con `offset=0` se diagnosticó leyendo el compilado del contenedor: seguía instalada una versión del API que exigía empleado. [Guía de actualización y comprobación](https://github.com/EMETRA/api-tickets/blob/e077b221b4efdd01c60b7051331bea6b5392a13d/docs/guia-inventario-activos-fijos.md). No requiere migración ni variables nuevas.
 
 Pruebas: [navegación y presentación de valores](https://github.com/EMETRA/Sistema-tickets/blob/db60d821fdbc9b5e2cee31f98cc7422626a4ff22/test/integracion/navegacion-inventario.test.cjs), [recorridos de navegador](https://github.com/EMETRA/Sistema-tickets/blob/db60d821fdbc9b5e2cee31f98cc7422626a4ff22/test/integracion/inventario-browser.cjs) y [sincronización RRHH](https://github.com/EMETRA/Sistema-tickets/blob/db60d821fdbc9b5e2cee31f98cc7422626a4ff22/test/integracion/equipos-rrhh-browser.cjs). Incluyen persona sin cuenta, filtros, historial, autorización, confirmaciones, conflictos, dispositivo nuevo, conexiones, mapa y móvil con datos ficticios.
+
+<a id="reimpresion-n"></a>
+
+## Reimpresión de boletas de tránsito N
+
+Ruta: `/home/juzgado/reportes/juz02`, en **Aplicaciones Juzgado → Reportes**. El módulo se monta desde APP_REGISTRY y mantiene ModuleAccessGate antes del formulario. Su catálogo real se registra en api-tickets; la entrada dummy solo sirve al laboratorio y no habilita producción. Exige `TICKETS_ADMINISTRAR` o `TICKETS_JUZGADO_BOLETAS_N_LEER`; el API vuelve a comprobar ambos controles en cada consulta.
+
+[src/views/Platform/TransitReprintsWorkspace.tsx](https://github.com/EMETRA/Sistema-tickets/blob/670c69364feb7e84dff997dc8e9644277a9d43f5/src/views/Platform/TransitReprintsWorkspace.tsx) permite escribir el número o pegar `N-1234567`, valida antes de enviar y consulta solo al pulsar el botón. Conserva la entrada ante errores, muestra su referencia y ofrece reintento. La placa se destaca para contrastar la boleta; vehículo, infractor, fecha, agente, artículos, importe y saldo de referencia aparecen en una tarjeta blanca adaptable. Al cambiar la entrada se retiran el detalle y PDF anteriores para no confundir documentos.
+
+[src/platform/transit-reprints.ts](https://github.com/EMETRA/Sistema-tickets/blob/670c69364feb7e84dff997dc8e9644277a9d43f5/src/platform/transit-reprints.ts) normaliza el número como texto de hasta 15 dígitos y valida la respuesta. `platformFetch` incorpora Bearer y permite bytes solo en la ruta PDF prevista. El BFF existente reenvía `GET /api/platform/transit-reprints/N/:numero[/pdf]` al API con `cache: no-store`, conserva HTTP/referencia y los encabezados del archivo, y marca la respuesta privada. No consultar Oracle desde Next ni hacer cálculos de multas en React.
+
+La vista previa comprueba MIME `application/pdf` y firma `%PDF-`, crea un blob URL privado y lo revoca al reemplazar, cerrar o desmontar. Ofrece abrir en otra pestaña para usar la impresión del visor nativo y descargar con nombre seguro; no confirma que una impresión física haya ocurrido. Las peticiones se cancelan al desmontar y disponen de timeout. No persiste datos del infractor en localStorage ni necesita variables, montajes o enlaces públicos nuevos.
+
+Actualizar api-tickets y luego el Panel; habilitar el módulo según [sql/juzgado/README.md](https://github.com/EMETRA/api-tickets/blob/9e2cd60aca0726bcd3b5861fbe5a1b96ec36bbf4/sql/juzgado/README.md). La cuenta Oracle del API necesita leer las fuentes heredadas y ejecutar sus calendarios. Objetos indirectos: BASEDATOS.EMT_REMISIONES, EMT_VEHICULOS, EMT_CONDUCTORES, EMT_DETALLES_INFRACCION y EMT_REGLAMENTO_DE_TRANSITO; ADMINSIAF.TB_REMISIONES_TEMP y TB_EMPLEADOS; ADMEMETRA.TB_EMPALME_AGENTES y FN_SUMAR_DIAS_HABILES; SEMANA_HABIL. El detalle y PDF conservan las reglas documentadas por el API; no liquidan pagos ni generan remisiones.
+
+Validación local: `pnpm typecheck`, `pnpm build`, `pnpm test:integracion`. La prueba [test/integracion/reimpresion-n-browser.cjs](https://github.com/EMETRA/Sistema-tickets/blob/670c69364feb7e84dff997dc8e9644277a9d43f5/test/integracion/reimpresion-n-browser.cjs) necesita el build del Panel y `/tmp/reimpresion-n-ejemplo.pdf`, generado en el API con `node scripts/preview-reimpresion-n.cjs`, o una ruta indicada mediante `REIMPRESION_N_PDF`. Usa backend, sesión y datos ficticios; prueba bloqueo previo, número/serie, 404, errores con referencia, recuperación del PDF, bytes de descarga, nueva pestaña y anchos 1440/1024/390 sin desbordamiento. Queda validar una boleta real y la impresión en el entorno institucional.
 
 <a id="seguridad"></a>
 

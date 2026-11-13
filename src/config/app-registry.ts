@@ -3,6 +3,7 @@ import {
     CctFormularios,
     CctReportes,
 } from "@/views/Platform/CctWorkspace";
+import { TransitReprintsWorkspace } from '@/views/Platform/TransitReprintsWorkspace';
 import { ViviReportsWorkspace } from "@/views/Platform/ViviReportsWorkspace";
 import { PayrollWorkspace } from "@/views/Platform/PayrollWorkspace";
 import type { ComponentType } from "react";
@@ -36,6 +37,7 @@ export const APP_REGISTRY: Record<string, ComponentType> = {
     noticias: COM03,
     "consulta-vehiculos": ConsultaVehiculos,
     juz01: JUZ01,
+    juz02: TransitReprintsWorkspace,
 };
 
 export function getAppComponent(moduleId: string): ComponentType | null {

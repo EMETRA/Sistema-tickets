@@ -1,6 +1,7 @@
 import { TransitReprintsWorkspace } from '@/views/Platform/TransitReprintsWorkspace';
 import { ViviReportsWorkspace } from "@/views/Platform/ViviReportsWorkspace";
 import { PayrollWorkspace } from "@/views/Platform/PayrollWorkspace";
+import { HrCampaignsWorkspace } from "@/views/Platform/HrCampaignsWorkspace";
 import type { ComponentType } from "react";
 import ConsultaVehiculos from "@/views/ConsultaVehiculos";
 
@@ -24,6 +25,7 @@ export const APP_REGISTRY: Record<string, ComponentType> = {
     mod08: MOD08,
     mod10: MOD10,
     "rh-boletas": PayrollWorkspace,
+    "rh-datos": HrCampaignsWorkspace,
     "vivi-reportes": ViviReportsWorkspace,
     // COM-03: la clave es el id del módulo en la ruta /home/comunicacion/contenido/noticias
     noticias: COM03,

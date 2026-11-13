@@ -78,6 +78,7 @@ export const APPS_CATALOG_DUMMY: AppsCatalog = {
                     iconName: "clipboard-list-solid",
                 },
                 modules: [
+                    {id:"rh-datos",label:"RRHH",title:"Actualización de datos del personal",iconName:"clipboard-list-solid"},
                     {
                         id: "mod04",
                         label: "MOD04",

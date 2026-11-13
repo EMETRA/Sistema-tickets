@@ -1,4 +1,5 @@
 "use client";
+import { HrProfileWorkspace } from "@/views/Platform/HrProfileWorkspace";
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import {usePlatform} from "@/platform/context";
@@ -12,7 +13,7 @@ import { HomeState } from "../Home/HomeHeading";
 import { InventoryCatalog } from "@/components/client/organisms/ResourceWorkspace/InventoryPicker";
 import styles from "./Profile.module.scss";
 
-export default function Profile({ userId }: { userId?: string }) {
+function ColleagueProfile({ userId }: { userId?: string }) {
     const {data: platform}=usePlatform();
     const currentUserId = useAuthStore((state) => state.getUserId());
     const id = userId || currentUserId || "";
@@ -121,3 +122,5 @@ export default function Profile({ userId }: { userId?: string }) {
         </div>
     );
 }
+
+export default function Profile({userId}:{userId?:string}){const own=useAuthStore(s=>s.getUserId());return !userId||(own&&String(own)===String(userId))?<HrProfileWorkspace/>:<ColleagueProfile userId={userId}/>;}

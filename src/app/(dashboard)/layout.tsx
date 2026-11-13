@@ -1,3 +1,4 @@
+import { HrNotificationsProvider } from "@/platform/hr-notifications";
 import { SystemLayout } from "@/components/client/templates/SystemLayout";
 import { PlatformProvider } from "@/platform/context";
 import { AppsCatalogProvider } from "@/context/AppsCatalogContext";
@@ -14,7 +15,7 @@ export default function DashboardLayout({
             <WorkspaceViewProvider>
                 <RuntimeIncidents />
                 <AppsCatalogProvider>
-                    <SystemLayout>{children}</SystemLayout>
+                    <HrNotificationsProvider><SystemLayout>{children}</SystemLayout></HrNotificationsProvider>
                 </AppsCatalogProvider>
             </WorkspaceViewProvider>
         </PlatformProvider>

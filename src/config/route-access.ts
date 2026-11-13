@@ -20,7 +20,7 @@ function getAllowedPathsForRole(role: UserRole): string[] {
  */
 export function canAccessPath(role: UserRole | null | undefined, pathname: string): boolean {
     if (!role) return false;
-    if(pathname.startsWith("/espacio/") || pathname === "/ayuda") return true;
+    if(pathname.startsWith("/espacio/") || pathname === "/ayuda" || pathname === "/mi-perfil" || pathname === "/notificaciones") return true;
 
     const allowedPaths = getAllowedPathsForRole(role);
 

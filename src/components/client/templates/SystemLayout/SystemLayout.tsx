@@ -5,6 +5,7 @@ import { PLATFORM_SECTIONS, platformSections } from "@/platform/navigation";
 import { usePathname, useRouter } from "next/navigation";
 import { Button } from "../../atoms/Button";
 import { SideBarNavigation } from "../../organisms/SideBarNavigation";
+import { HrMandatoryNotice } from "@/platform/hr-notifications";
 import { TopBar } from "../../organisms/TopBar";
 import { PAGES_CONFIG, getMenuByRole } from "@/config/navigation";
 import { canAccessPath } from "@/config/route-access";
@@ -219,17 +220,13 @@ export const SystemLayout = ({
                     <TopBar
                         onChangeView={workspaceView.canChangeView ? () => setViewDialogOpen(true) : undefined}
                         applications={applicationLinks}
-                        profilePath={
-                            user?.id_usuario
-                                ? `/equipo/${encodeURIComponent(user.id_usuario)}`
-                                : undefined
-                        }
+                        profilePath="/mi-perfil"
                         createTicketPath={
                             canAccessPath(currentRole, "/tickets-creation")
                                 ? "/tickets-creation"
                                 : undefined
                         }
-                        notificationsPath="/mis-tickets"
+                        notificationsPath="/notificaciones"
                         settingsPath={
                             workspaceView.active ? undefined : platform.data
                                 ? platform.data.actor.admin
@@ -261,6 +258,7 @@ export const SystemLayout = ({
                             <button type="button" onClick={() => workspaceView.setMode("ACTUAL")}>Volver a mi vista</button></div>
                     </div>}
 
+                    <HrMandatoryNotice />
                     <main
                         id="main-content"
                         tabIndex={-1}

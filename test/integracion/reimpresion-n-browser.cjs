@@ -19,6 +19,7 @@ async function main() {
     let body='';for await(const b of req)body+=b;
     const url=new URL(req.url,'http://localhost');calls.push({path:url.pathname,method:req.method,authorization:req.headers.authorization});
     const json=(value,status=200)=>{res.writeHead(status,{'Content-Type':'application/json'});res.end(JSON.stringify(value));};
+    if(url.pathname==='/platform/hr/inbox')return json({habilitado:false,items:[],pendientes:0});
     if(url.pathname==='/platform/catalog')return json(catalog);
     if(url.pathname==='/platform/bootstrap')return json({enabled:true,actor:{id:1,admin:true,mode:'ADMINISTRADOR'},definitions:{},teams:[],memberships:[],capabilities:{}});
     if(url.pathname==='/platform/module-access/juz02')return json({moduloId:'juz02',allowed,actions:{LEER:allowed,INSERTAR:false,EDITAR:false,ELIMINAR:false}});

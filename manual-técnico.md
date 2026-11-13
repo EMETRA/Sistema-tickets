@@ -1,11 +1,15 @@
 # Manual técnico — Sistema-tickets
 
-Base documental: `926fe45d27922c595c63e8f79e1e82b1594470eb`; actualización de consulta de casos: `cd953b4ea8731336669948645a55032e5f5eabba`; actualización de vistas y diagnóstico judicial: `9d497b6ff471410ea5a96ba6df5e707ccebd8e43`; actualización documental: `b77da403cba653095c8156b0e2c13035a96b606b`; actualización de catálogo: `e3f8676f5121223c9f23aaa036833260efe236f9`; reportes VIVI: `b29ea52c21307f21bb49041ba2e8f76fb8080f44`; responsables de noticias: `55827f0694bf6f736264c3c5d41622b7cc59a88a`; inventario institucional: `9daff7769ccb684b8eb5497a8b8b82b902e050e0`; navegación de personal, activos y red: `db60d821fdbc9b5e2cee31f98cc7422626a4ff22`; perfil y campañas de RRHH: `d4bd5264975a6663e3399bdc155f65141b38d7d9`; reimpresión de boletas N: `670c69364feb7e84dff997dc8e9644277a9d43f5`; línea de integración revisada: `Dev + feat/perfil_campanas_rrhh`. Describe la base y la actualización citadas; la configuración y las autorizaciones efectivas de un servidor se comprueban por separado. Esta edición se preparó sin conectarse a Oracle, SMTP ni servidores institucionales.
+Implementación CCT: `ea3e8e71ed354ac5a5422ff16e5fbd2e898c29fc`.
+
+Base documental: `926fe45d27922c595c63e8f79e1e82b1594470eb`; actualización de consulta de casos: `cd953b4ea8731336669948645a55032e5f5eabba`; actualización de vistas y diagnóstico judicial: `9d497b6ff471410ea5a96ba6df5e707ccebd8e43`; actualización documental: `b77da403cba653095c8156b0e2c13035a96b606b`; actualización de catálogo: `e3f8676f5121223c9f23aaa036833260efe236f9`; reportes VIVI: `b29ea52c21307f21bb49041ba2e8f76fb8080f44`; responsables de noticias: `55827f0694bf6f736264c3c5d41622b7cc59a88a`; inventario institucional: `9daff7769ccb684b8eb5497a8b8b82b902e050e0`; navegación de personal, activos y red: `db60d821fdbc9b5e2cee31f98cc7422626a4ff22`; reimpresión de boletas N: `670c69364feb7e84dff997dc8e9644277a9d43f5`; perfil y campañas de RRHH: `d4bd5264975a6663e3399bdc155f65141b38d7d9`; línea de integración revisada: `Dev + fix/navegacion-activos-personal`. Describe la base y la actualización citadas; la configuración y las autorizaciones efectivas de un servidor se comprueban por separado. Esta edición se preparó sin conectarse a Oracle, SMTP ni servidores institucionales.
 
 Los enlaces de código fijan esa revisión para que sigan siendo consultables cuando `main` excluya herramientas de desarrollo. Al modificar un comportamiento se deben actualizar su caso de uso, configuración y referencia de código.
 
 
 ## Índice
+
+- [CCT: arquitectura, configuración y mantenimiento](#cct)
 
 - [1. Propósito y límites](#orientacion)
 - [2. Arquitectura y dependencias](#arquitectura)
@@ -278,3 +282,45 @@ Referencias literales del código (tablas, vistas y paquetes). Los nombres sin p
 | `TB_NOTICIA_RECURSO` | [src/api/graphql/COM03/types.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/api/graphql/COM03/types.ts) |
 | `TB_RECURSO` | [src/api/graphql/COM03/types.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/api/graphql/COM03/types.ts) |
 | `TB_SECCION_NOTICIA` | [src/api/graphql/COM03/types.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/api/graphql/COM03/types.ts) |
+
+
+<a id="cct"></a>
+
+## CCT: arquitectura, configuración y mantenimiento
+
+La aplicación CCT se integra en las rutas dinámicas del catálogo; no añade un login ni acceso directo a Oracle. Tres entradas de [app-registry.ts](https://github.com/EMETRA/Sistema-tickets/blob/ea3e8e71ed354ac5a5422ff16e5fbd2e898c29fc/src/config/app-registry.ts) montan consultas, gestión de cepos y reportes. El ModuleAccessGate existente debe resolver el permiso **antes** de montar los formularios.
+
+| Archivo | Responsabilidad |
+| --- | --- |
+| [CctWorkspace.tsx](https://github.com/EMETRA/Sistema-tickets/blob/ea3e8e71ed354ac5a5422ff16e5fbd2e898c29fc/src/views/Platform/CctWorkspace.tsx) | Bootstrap de disponibilidad, pestañas de consultas/directorios, resultados, detalle, notificación y reporte PDF |
+| [CctCepos.tsx](https://github.com/EMETRA/Sistema-tickets/blob/ea3e8e71ed354ac5a5422ff16e5fbd2e898c29fc/src/views/Platform/CctCepos.tsx) | Consulta de avisos, selección/alta de vehículo e ingreso; formularios separados según estado y permiso |
+| [CctParts.tsx](https://github.com/EMETRA/Sistema-tickets/blob/ea3e8e71ed354ac5a5422ff16e5fbd2e898c29fc/src/views/Platform/CctParts.tsx) | Ficha, tabla, paginación y selector de catálogo con búsqueda y páginas |
+| [CctWorkspace.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/ea3e8e71ed354ac5a5422ff16e5fbd2e898c29fc/src/views/Platform/CctWorkspace.module.scss) | Tarjetas, rejillas adaptables, revisión de acción y visor coherentes con los tokens del Panel |
+| [platform/cct.ts](https://github.com/EMETRA/Sistema-tickets/blob/ea3e8e71ed354ac5a5422ff16e5fbd2e898c29fc/src/platform/cct.ts) | Contratos de filas/páginas/capacidades, etiquetas, URLSearchParams, CSV y hora civil de Guatemala |
+| [platform/client.ts](https://github.com/EMETRA/Sistema-tickets/blob/ea3e8e71ed354ac5a5422ff16e5fbd2e898c29fc/src/platform/client.ts) | Bearer, error con referencia, binario permitido del PDF y comando estable con requestId/confirmación |
+
+### Interacción y nomenclatura
+
+Los alias de lectura Oracle se mantienen en mayúsculas; los campos de comandos usan camelCase. Fuente, serie y número se conservan juntos; no convertir placa ni IDs a Number. Las fechas civiles del cepo se presentan sin reinterpretar como UTC. Los importes de multa vienen de la ficha del API. La interfaz no elige el valor de la sanción.
+
+No se consulta una placa vacía al entrar. Los filtros aplicados se guardan separados del formulario editado: paginar o abrir el detalle utiliza la consulta que produjo el resultado. AbortController cancela consultas anteriores para evitar mostrar una ficha que llegó tarde. Los selectores de catálogo cargan 50 opciones, permiten buscar/cargar más y conservan la opción seleccionada al cambiar la búsqueda.
+
+Antes de una escritura se revisan disponibilidad/estado y datos obligatorios; una casilla confirma la revisión y se reinicia al editar los datos. La operación de administración conserva las dos confirmaciones comunes. Un error mantiene los datos y muestra referencia; un reintento idéntico reutiliza requestId, incluso si la primera respuesta se perdió. No desactivar esa persistencia para resolver un error visual.
+
+### Rutas y configuración
+
+| Ruta del Panel | API privado |
+| --- | --- |
+| /home/cct/consultas/cct-consultas | /api/platform/cct/bootstrap, remisiones/detalle, vehiculos, pilotos, agentes, notificaciones |
+| /home/cct/formularios/cct-cepos | /api/platform/cct/cepos, vehiculos/referencias, catalogos y comandos de cepo |
+| /home/cct/reportes/cct-reportes | /api/platform/cct/reportes y reportes/pdf |
+
+El BFF permite el segmento cct sobre el origen fijo configurado por GRAPHQL_ENDPOINT y conserva Bearer, confirmación, errores y respuestas privadas. Solo la ruta binaria de reporte está añadida al cliente; no abrir cualquier respuesta HTML/binaria como si fuera una consulta. El Panel requiere su flag de plataforma habitual; los flags CCT, SQL y reglas se configuran en api-tickets.
+
+Persistencia y propietarios: [manual API](https://github.com/EMETRA/api-tickets/blob/f74ac37a48e307ccc518034bbf5b6a46d44f1466/manual-t%C3%A9cnico.md#cct). Tablas de negocio y trigger permanecen en Oracle; tablas propias de operador/control y recibos/auditoría las administra el API. El Panel no guarda datos corporativos como fuente oficial.
+
+### Preparación y pruebas
+
+La activación requiere catálogo/privilegios/operadores y el corte descrito en [guía del API](https://github.com/EMETRA/api-tickets/blob/96f6e5119741f9d6562a223ff81899259db3cd47/sql/cct/README.md). El anterior puede seguir atendiendo durante la comparación de lecturas. Después se detiene, se inicializa la numeración y se habilitan las escrituras del nuevo; no son dos escritores concurrentes.
+
+[Test de integración](https://github.com/EMETRA/Sistema-tickets/blob/ea3e8e71ed354ac5a5422ff16e5fbd2e898c29fc/test/integracion/cct.test.cjs) verifica tipos, CSV y BFF privado. [Recorrido Chromium](https://github.com/EMETRA/Sistema-tickets/blob/ea3e8e71ed354ac5a5422ff16e5fbd2e898c29fc/test/integracion/cct-browser.cjs) usa servicios locales ficticios, sesión de prueba y [PDF ficticio](https://github.com/EMETRA/Sistema-tickets/blob/ea3e8e71ed354ac5a5422ff16e5fbd2e898c29fc/test/fixtures/cct-estado-cuenta.pdf). Tras compilar, ejecutar `node test/integracion/cct-browser.cjs` con Chromium/Playwright disponibles. Usa puertos 3791/3792 y guarda capturas en /tmp/cct-browser. Cubre permisos antes de abrir, detalle, homónimos, notificación, pago recuperable, liberación, daño, ingreso y reportes en 1440/1024/390 px. No sustituye la aceptación sobre Oracle, SAT o permisos institucionales.

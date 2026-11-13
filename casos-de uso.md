@@ -1,6 +1,8 @@
 # Casos de uso — Sistema-tickets
 
-Base documental: `926fe45d27922c595c63e8f79e1e82b1594470eb`; actualización de consulta de casos: `cd953b4ea8731336669948645a55032e5f5eabba`; actualización de vistas y diagnóstico judicial: `9d497b6ff471410ea5a96ba6df5e707ccebd8e43`; actualización documental: `b77da403cba653095c8156b0e2c13035a96b606b`; actualización de catálogo: `e3f8676f5121223c9f23aaa036833260efe236f9`; reportes VIVI: `b29ea52c21307f21bb49041ba2e8f76fb8080f44`; responsables de noticias: `55827f0694bf6f736264c3c5d41622b7cc59a88a`; inventario institucional: `9daff7769ccb684b8eb5497a8b8b82b902e050e0`; navegación de personal, activos y red: `db60d821fdbc9b5e2cee31f98cc7422626a4ff22`; perfil y campañas de RRHH: `d4bd5264975a6663e3399bdc155f65141b38d7d9`; reimpresión de boletas N: `670c69364feb7e84dff997dc8e9644277a9d43f5`; línea de integración revisada: `Dev + feat/perfil_campanas_rrhh`. Describe la base y la actualización citadas; la configuración y las autorizaciones efectivas de un servidor se comprueban por separado. Esta edición se preparó sin conectarse a Oracle, SMTP ni servidores institucionales.
+Implementación CCT: `ea3e8e71ed354ac5a5422ff16e5fbd2e898c29fc`.
+
+Base documental: `926fe45d27922c595c63e8f79e1e82b1594470eb`; actualización de consulta de casos: `cd953b4ea8731336669948645a55032e5f5eabba`; actualización de vistas y diagnóstico judicial: `9d497b6ff471410ea5a96ba6df5e707ccebd8e43`; actualización documental: `b77da403cba653095c8156b0e2c13035a96b606b`; actualización de catálogo: `e3f8676f5121223c9f23aaa036833260efe236f9`; reportes VIVI: `b29ea52c21307f21bb49041ba2e8f76fb8080f44`; responsables de noticias: `55827f0694bf6f736264c3c5d41622b7cc59a88a`; inventario institucional: `9daff7769ccb684b8eb5497a8b8b82b902e050e0`; navegación de personal, activos y red: `db60d821fdbc9b5e2cee31f98cc7422626a4ff22`; reimpresión de boletas N: `670c69364feb7e84dff997dc8e9644277a9d43f5`; perfil y campañas de RRHH: `d4bd5264975a6663e3399bdc155f65141b38d7d9`; línea de integración revisada: `Dev + fix/navegacion-activos-personal`. Describe la base y la actualización citadas; la configuración y las autorizaciones efectivas de un servidor se comprueban por separado. Esta edición se preparó sin conectarse a Oracle, SMTP ni servidores institucionales.
 
 Los enlaces de código fijan esa revisión para que sigan siendo consultables cuando `main` excluya herramientas de desarrollo. Al modificar un comportamiento se deben actualizar su caso de uso, configuración y referencia de código.
 
@@ -33,6 +35,11 @@ Guía de arquitectura, configuración y cambios: [manual-técnico.md](manual-t%C
 - [CU-22 · Cambiar la vista para presentaciones y pruebas visuales](#cu-22)
 
 - [CU-23 · Consultar usuarios y actividad de VIVI desde Informática](#cu-23)
+- [CU-25 · Consultar y seleccionar registros de CCT](#cu-25)
+- [CU-26 · Revisar y registrar una notificación CCT](#cu-26)
+- [CU-27 · Gestionar ingreso, pago, liberación e incidencia de cepos](#cu-27)
+- [CU-28 · Consultar y descargar reportes privados de CCT](#cu-28)
+
 - [CU-RH-01 · Mi ficha y campañas obligatorias de RRHH](#cu-rh-01)
 
 - [CU-24 · Reimprimir una boleta de tránsito N desde Juzgado](#cu-24)
@@ -1569,8 +1576,94 @@ Las rutas de [CU-24](#cu-24) son `/home/juzgado/reportes/juz02`, `GET /api/platf
 
 ## Criterios de cobertura
 
-Esta edición contiene **25 casos agrupados**. El inventario incluye 0 entradas Nest decoradas, 25 páginas Next y 70 manejadores BFF, según corresponda. Los procesos internos, servicios asíncronos y almacenamiento local se cubren en los casos aunque no expongan HTTP. Las operaciones heredadas se identifican como tales; una ruta conservada en código no implica que deba aparecer habilitada en el catálogo de aplicaciones. Las funciones pendientes no se presentan como implementadas.
+Esta edición contiene **29 casos agrupados**. Las rutas y sus permisos se detallan en el índice de operaciones y en los casos incorporados. Los procesos internos, servicios asíncronos y almacenamiento local se cubren en los casos aunque no expongan HTTP. Las operaciones heredadas se identifican como tales; una ruta conservada en código no implica que deba aparecer habilitada en el catálogo de aplicaciones. Las funciones pendientes no se presentan como implementadas.
 
 Para mantener la cobertura: al añadir o retirar una ruta, resolver, tarea programada o pantalla, actualizar su caso, su fila en este índice, los objetos usados y el diagrama. Si una función depende de otro repositorio, conservar explícito ese límite y actualizar también el contrato del receptor.
 
 Actualización de UX judicial: la recepción muestra los campos solo al disponer de juzgados activos; distingue carga, error y catálogo vacío. La bitácora vacía no muestra una tabla sin filas. Actualizar el estado conserva las solicitudes de resultado incierto para reintentar con la misma identidad.
+
+
+<a id="cu-25"></a>
+
+## CU-25 · Consultar y seleccionar registros de CCT
+
+**Actor y precondiciones:** sesión institucional, catálogo CCT y módulo cct-consultas permitido. El bootstrap distingue acceso de consulta y acciones disponibles. **Entrada:** placa/tipo, serie/número o agente; directorios de vehículos, pilotos y agentes con sus filtros propios.
+
+**Flujo:** abrir módulo desde Aplicaciones → CCT → Consultas; elegir tarea; completar filtros y consultar. La interfaz muestra fuente, filas, conteo e importe cuando corresponde. Paginar mantiene los filtros aplicados. Abrir detalle de una remisión muestra infracciones, pagos y observaciones; vehículos muestran cuenta/expedientes. Ante homónimos de pilotos, escoger el código antes de abrir capacitaciones/tarjetones.
+
+```mermaid
+flowchart TD
+  modulo["Acceso previo al módulo"] --> tarea["Elegir consulta y filtros"]
+  tarea --> pagina["Resultados y paginación"]
+  pagina --> seleccion["Seleccionar registro exacto"]
+  seleccion --> ficha["Detalle privado y acciones permitidas"]
+```
+
+**Excepciones:** sin permiso no monta el formulario; error preserva filtros y referencia; vacío muestra mensaje distinto; clave ambigua exige revisión y no abre una escritura. Cambiar de selección cancela la petición anterior.
+
+**Objetos DB a través del API:** EMT_REMISIONES/EMT_VEHICULOS/TB_CEPOS_PMT, remisiones de empresa/instituciones, TB_EMPALME_PLACAS, TB_PILOTOS, capacitaciones/tarjetones, TB_EMPALME_AGENTES y TB_EMPLEADOS. Pagos y demás tablas se documentan en [CU-25 API](https://github.com/EMETRA/api-tickets/blob/f74ac37a48e307ccc518034bbf5b6a46d44f1466/casos-de%20uso.md#cu-25).
+
+**Archivos:** [CctWorkspace](https://github.com/EMETRA/Sistema-tickets/blob/ea3e8e71ed354ac5a5422ff16e5fbd2e898c29fc/src/views/Platform/CctWorkspace.tsx), [CctParts](https://github.com/EMETRA/Sistema-tickets/blob/ea3e8e71ed354ac5a5422ff16e5fbd2e898c29fc/src/views/Platform/CctParts.tsx), contratos platform/cct.ts, app-registry y BFF. **Ruta:** /home/cct/consultas/cct-consultas.
+
+
+<a id="cu-26"></a>
+
+## CU-26 · Revisar y registrar una notificación CCT
+
+**Actor:** capacidad notificar y operador/corte habilitados según API. **Flujo:** desde una remisión sin notificación, escribir nombre y revisar; para placa, preparar antes la vista previa de claves. Confirmar la revisión y aplicar; administración completa las dos confirmaciones comunes. Recargar detalle desde API y conservar las notificaciones anteriores. Esta acción registra nombre/fecha; no envía correo.
+
+```mermaid
+flowchart TD
+  detalle["Remisión sin notificar"] --> alcance["Individual o vista previa por placa"]
+  alcance --> revisar["Nombre y revisión explícita"]
+  revisar --> api["Comando autorizado e idempotente"]
+  api --> resultado{"¿Confirmado?"}
+  resultado -->|Sí| recargar["Actualizar ficha"]
+  resultado -->|No| conservar["Conservar datos y referencia"]
+```
+
+**Excepciones:** no hay formulario activo si falta permiso/operador/corte; si la clave es ambigua, ya está notificada o cambió el lote, se pide actualizar en lugar de sobrescribir. El nombre se valida también contra bytes de la columna en el servidor.
+
+**Objetos:** EMT_REMISIONES, TB_REMISIONES_EMPRESA, TB_REMISIONES_INSTITUCIONES, operador/control y auditoría/comandos. **Archivos/rutas:** componente Notification en [CctWorkspace](https://github.com/EMETRA/Sistema-tickets/blob/ea3e8e71ed354ac5a5422ff16e5fbd2e898c29fc/src/views/Platform/CctWorkspace.tsx), platformCommand y POST /api/platform/cct/notificaciones o notificaciones/placa; GET notificaciones/preview. Contrato completo: [CU-26 API](https://github.com/EMETRA/api-tickets/blob/f74ac37a48e307ccc518034bbf5b6a46d44f1466/casos-de%20uso.md#cu-26).
+
+
+<a id="cu-27"></a>
+
+## CU-27 · Gestionar ingreso, pago, liberación e incidencia de cepos
+
+**Actor:** módulo cct-cepos con permiso específico por acción y operador habilitado tras corte. **Flujo de ingreso:** buscar placa, seleccionar vehículo o registrar uno con datos revisados (SAT opcional); elegir catálogos, chapa, cepo físico y fecha; confirmar revisión e ingresar. **Flujo de acción:** consultar aviso/placa, abrir ficha y escoger solo una transición permitida: C→P, P→L o C→D/R. El importe de daño/robo llega del API y se muestra antes de confirmar. Éxito recarga ficha; error conserva campos y requestId.
+
+```mermaid
+flowchart TD
+  consultar["Consultar aviso o registrar uno nuevo"] --> ficha["Ficha y disponibilidad efectiva"]
+  ficha --> accion{"¿Acción habilitada?"}
+  accion -->|Sí| formulario["Datos específicos y revisión"]
+  accion -->|No| motivo["Mostrar el motivo antes de completar datos"]
+  formulario --> comando["Confirmación y comando idempotente"]
+  comando --> estado["Recargar estado o conservar entrada con referencia"]
+```
+
+**Excepciones:** vehículo huérfano conserva antecedente y bloquea generar multa; un estado histórico no editable no presenta botones activos; permiso/operador/chapa/corte faltantes se muestran antes de completar el proceso. Reintento tras pérdida de respuesta recupera el recibo, sin duplicar multa o aviso. Registrar pago no es cobrar ni validar una liquidación bancaria.
+
+**Objetos:** BASEDATOS.TB_CEPOS_PMT/EMT_VEHICULOS/S_VEHICULOS y catálogos; ADMEMETRA.TB_REMISIONES_INSTITUCIONES/TB_EMPALME_AGENTES; SQ_CCT_CEPOS/SQ_CCT_REMISIONES y trazabilidad propia. El trigger conserva sus destinos de bancos y SIAF; el Panel no los escribe.
+
+**Archivos/rutas:** [CctCepos](https://github.com/EMETRA/Sistema-tickets/blob/ea3e8e71ed354ac5a5422ff16e5fbd2e898c29fc/src/views/Platform/CctCepos.tsx), [selectores](https://github.com/EMETRA/Sistema-tickets/blob/ea3e8e71ed354ac5a5422ff16e5fbd2e898c29fc/src/views/Platform/CctParts.tsx), platformCommand; /home/cct/formularios/cct-cepos y /api/platform/cct/cepos/:id/pago|liberar|danio|robo, cepos/crear, vehiculos/registrar. Reglas: [CU-27 y CU-28 API](https://github.com/EMETRA/api-tickets/blob/f74ac37a48e307ccc518034bbf5b6a46d44f1466/casos-de%20uso.md#cu-27).
+
+
+<a id="cu-28"></a>
+
+## CU-28 · Consultar y descargar reportes privados de CCT
+
+**Actor:** permiso REPORTAR y módulo cct-reportes. **Flujo:** completar filtros; por placa puede elegir todas las fuentes. Revisar grupos y totales; el PDF recorre todas las páginas del snapshot, mientras CSV exporta solo las filas cargadas. Abrir visor modal privado, descargar si se necesita y cerrarlo. URLs Blob se revocan al reemplazar/cerrar la vista; las solicitudes conservan Bearer y no-store.
+
+```mermaid
+flowchart TD
+  filtros["Reporte autorizado y filtros"] --> grupos["Revisar fuente, registros e importe"]
+  grupos --> formato{"Formato"}
+  formato -->|PDF| servidor["Reporte completo del API y visor privado"]
+  formato -->|CSV| pagina["Exportar página con textos neutralizados"]
+```
+
+**Excepciones:** sin REPORTAR no abre el módulo; exceso de 2000 registros por fuente pide delimitar, sin ocultar filas; fallo del proveedor/PDF conserva filtros y referencia. CSV neutraliza fórmulas y conserva ceros/acentos. No se publican PDFs por placa.
+
+**Objetos:** solo lectura de las fuentes de CU-25 y proveedores corporativos del API. **Archivos:** [CctWorkspace](https://github.com/EMETRA/Sistema-tickets/blob/ea3e8e71ed354ac5a5422ff16e5fbd2e898c29fc/src/views/Platform/CctWorkspace.tsx), [CSV/contratos](https://github.com/EMETRA/Sistema-tickets/blob/ea3e8e71ed354ac5a5422ff16e5fbd2e898c29fc/src/platform/cct.ts), platform/client.ts y BFF. **Rutas:** /home/cct/reportes/cct-reportes; GET /api/platform/cct/reportes y reportes/pdf; [CU-29 API](https://github.com/EMETRA/api-tickets/blob/f74ac37a48e307ccc518034bbf5b6a46d44f1466/casos-de%20uso.md#cu-29).

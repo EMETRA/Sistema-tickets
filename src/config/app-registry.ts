@@ -1,3 +1,8 @@
+import {
+    CctConsultas,
+    CctFormularios,
+    CctReportes,
+} from "@/views/Platform/CctWorkspace";
 import { TransitReprintsWorkspace } from '@/views/Platform/TransitReprintsWorkspace';
 import { ViviReportsWorkspace } from "@/views/Platform/ViviReportsWorkspace";
 import { PayrollWorkspace } from "@/views/Platform/PayrollWorkspace";
@@ -27,6 +32,9 @@ export const APP_REGISTRY: Record<string, ComponentType> = {
     "rh-boletas": PayrollWorkspace,
     "rh-datos": HrCampaignsWorkspace,
     "vivi-reportes": ViviReportsWorkspace,
+    "cct-consultas": CctConsultas,
+    "cct-cepos": CctFormularios,
+    "cct-reportes": CctReportes,
     // COM-03: la clave es el id del módulo en la ruta /home/comunicacion/contenido/noticias
     noticias: COM03,
     "consulta-vehiculos": ConsultaVehiculos,

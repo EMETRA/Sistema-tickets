@@ -11,6 +11,7 @@ export type CctPage = {
     expedientes?: CctRow[];
     historialExpedientes?: CctRow[];
     grupos?: CctPage[];
+    limitaciones?: string[];
 };
 export type CctBootstrap = {
     enabled: boolean;
@@ -50,6 +51,17 @@ export const CCT_STATES: Record<string, string> = {
 };
 export const CCT_LABELS: Record<string, string> = {
     SERIE: "Serie",
+    CONDICION_PAGO: "Situación del pago",
+    PAGO_RESUMEN: "Pagos registrados",
+    REGISTRADO_SERVICIO: "Registro de servicio",
+    REGISTRO_SERVICIO: "Número de registro",
+    REGISTRO: "Número de registro",
+    SERVICIO: "Servicio",
+    TIPO_VEHICULO_NOMBRE: "Tipo de vehículo",
+    MOTIVO_NOMBRE: "Motivo",
+    EMPLEADO: "Código de empleado",
+    PUESTO: "Código de puesto",
+    PUESTO_FUNCIONAL: "Puesto funcional",
     REMISION: "Remisión",
     FECHA: "Fecha",
     MONTO: "Importe",
@@ -145,10 +157,16 @@ export type CctCepoReportFilters = {
     estado: string;
     tipoAgente: string;
     agente: string;
+    tipoVehiculo?: string;
+    motivo?: string;
 };
 export type CctCepoReport = CctPage & {
     filtros: CctCepoReportFilters;
-    resumen: { total: number; estados: Record<string, number> };
+    resumen: {
+        total: number;
+        estados: Record<string, number>;
+        distribucion?: CctRow[];
+    };
 };
 export const CCT_REPORT_DATE_LABELS: Record<string, string> = {
     COLOCACION: "Fecha de colocación",

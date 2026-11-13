@@ -9,6 +9,8 @@ Los enlaces de código fijan esa revisión para que sigan siendo consultables cu
 
 ## Índice
 
+- [Bandeja PMT de Avísame](#avisame-pmt)
+
 - [CCT: asignaciones de remisiones del agente](#cct-asignaciones)
 
 - [CCT: arquitectura, configuración y mantenimiento](#cct)
@@ -113,6 +115,22 @@ Los siguientes comandos son las entradas reales de `package.json`; el listado no
 | `storybook` | `storybook dev` |
 | `build-storybook` | `storybook build` |
 | `test:integracion` | `node --test test/integracion/*.test.cjs` |
+
+<a id="avisame-pmt"></a>
+
+## Bandeja PMT de Avísame
+
+Ruta /home/pmt/formularios/pmt-avisame, componente registrado en APP_REGISTRY y catálogo de la API. El gate comprueba permiso antes de montar consultas/formulario. Cola paginada, visor privado, reserva temporal y decisión fundamentada usan los componentes y estilos existentes. El BFF solo transmite identidad Bearer y confirmaciones, sin exponer rutas privadas.
+
+La respuesta incierta conserva el fundamento, bloquea repetir e invita a consultar el caso. La API decide permisos, vigencia y unicidad de la multa. USER_ADMIN usa el circuito de dos confirmaciones. Correo y PDF de la multa mantienen su formato; las evidencias son adjuntos. Las decisiones de emisor/corrección proceden del API.
+
+Código verificado: `020eba03b650968a7490f7fae5b9d5856d32e3a8`. Archivos: [src/views/Platform/ViviPmtWorkspace.tsx](https://github.com/EMETRA/Sistema-tickets/blob/020eba03b650968a7490f7fae5b9d5856d32e3a8/src/views/Platform/ViviPmtWorkspace.tsx), [src/platform/client.ts](https://github.com/EMETRA/Sistema-tickets/blob/020eba03b650968a7490f7fae5b9d5856d32e3a8/src/platform/client.ts), [src/app/api/platform/[...path]/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/020eba03b650968a7490f7fae5b9d5856d32e3a8/src/app/api/platform/[...path]/route.ts), [docs/AVISAME_PMT.md](https://github.com/EMETRA/Sistema-tickets/blob/020eba03b650968a7490f7fae5b9d5856d32e3a8/docs/AVISAME_PMT.md).
+
+### Estado de copia de las evidencias
+
+La configuración del API incluye `evidenciasConfiguradas`; si falta almacenamiento, la bandeja explica el motivo y bloquea imponer, manteniendo la revisión/descartado. El backend vuelve a exigirlo antes de emitir. Tras confirmar una multa se muestra por separado `publicacionEvidencias`: PUBLICADO confirma la copia al archivo de la remisión, PENDIENTE/EN_PROCESO mantienen el número de multa y explican el reintento automático. NO_PROGRAMADA requiere revisión del registro. No mostrar una copia pendiente como fallo de emisión ni habilitar otra imposición para resolverla.
+
+Consultar estado actual usa GET: no copia, manda correo ni crea otra multa. Los reintentos de copia pertenecen al publicador persistente de api-tickets, posterior al COMMIT. El navegador no recibe claves ni rutas de evidencia y no intenta mover archivos. La prueba de Chromium cubre bloqueo por montaje pendiente, activación, copia pendiente, respuesta perdida y actualización a PUBLICADO sin una segunda multa, a 1440/1024/390 píxeles. Archivos: [src/views/Platform/ViviPmtWorkspace.tsx](https://github.com/EMETRA/Sistema-tickets/blob/020eba03b650968a7490f7fae5b9d5856d32e3a8/src/views/Platform/ViviPmtWorkspace.tsx), [test/integracion/vivi-pmt-browser.cjs](https://github.com/EMETRA/Sistema-tickets/blob/020eba03b650968a7490f7fae5b9d5856d32e3a8/test/integracion/vivi-pmt-browser.cjs).
 
 <a id="cct-asignaciones"></a>
 
@@ -300,7 +318,7 @@ Referencias literales del código (tablas, vistas y paquetes). Los nombres sin p
 
 ## CCT: arquitectura, configuración y mantenimiento
 
-La aplicación CCT se integra en las rutas dinámicas del catálogo; no añade un login ni acceso directo a Oracle. Tres entradas de [app-registry.ts](https://github.com/EMETRA/Sistema-tickets/blob/56366222ec5da0e18071a51c24e80b6d0a1ca89d/src/config/app-registry.ts) montan consultas, gestión de cepos y reportes. El ModuleAccessGate existente debe resolver el permiso **antes** de montar los formularios.
+La aplicación CCT se integra en las rutas dinámicas del catálogo; no añade un login ni acceso directo a Oracle. Tres entradas de [app-registry.ts](https://github.com/EMETRA/Sistema-tickets/blob/020eba03b650968a7490f7fae5b9d5856d32e3a8/src/config/app-registry.ts) montan consultas, gestión de cepos y reportes. El ModuleAccessGate existente debe resolver el permiso **antes** de montar los formularios.
 
 | Archivo | Responsabilidad |
 | --- | --- |
@@ -311,7 +329,7 @@ La aplicación CCT se integra en las rutas dinámicas del catálogo; no añade u
 | [CctCepoReport.tsx](https://github.com/EMETRA/Sistema-tickets/blob/56366222ec5da0e18071a51c24e80b6d0a1ca89d/src/views/Platform/CctCepoReport.tsx) | Reporte operativo, filtros aplicados, resumen/página, CSV completo y visor privado con recuperación |
 | [CctWorkspace.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/56366222ec5da0e18071a51c24e80b6d0a1ca89d/src/views/Platform/CctWorkspace.module.scss) | Tarjetas, rejillas adaptables, revisión de acción y visor coherentes con los tokens del Panel |
 | [platform/cct.ts](https://github.com/EMETRA/Sistema-tickets/blob/56366222ec5da0e18071a51c24e80b6d0a1ca89d/src/platform/cct.ts) | Contratos de filas/páginas/capacidades, etiquetas, URLSearchParams, CSV y hora civil de Guatemala |
-| [platform/client.ts](https://github.com/EMETRA/Sistema-tickets/blob/56366222ec5da0e18071a51c24e80b6d0a1ca89d/src/platform/client.ts) | Bearer, error con referencia, binario permitido del PDF y comando estable con requestId/confirmación |
+| [platform/client.ts](https://github.com/EMETRA/Sistema-tickets/blob/020eba03b650968a7490f7fae5b9d5856d32e3a8/src/platform/client.ts) | Bearer, error con referencia, binario permitido del PDF y comando estable con requestId/confirmación |
 
 ### Interacción y nomenclatura
 

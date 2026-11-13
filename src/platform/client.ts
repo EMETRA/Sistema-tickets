@@ -39,6 +39,9 @@ export async function platformFetch<T>(
     if (response.headers.get("content-type")?.includes("application/json"))
         return response.json();
     if (
+        !/^\/vivi-pmt\/casos\/[1-9]\d{0,18}\/evidencias\/[1-9]\d{0,18}$/.test(
+            path,
+        ) &&
         !/^\/boletas\/pdf\?/.test(path) &&
         !/^\/cct\/reportes\/pdf\?/.test(path) &&
         !/^\/cct\/reportes\/cepos\/pdf\?/.test(path) &&

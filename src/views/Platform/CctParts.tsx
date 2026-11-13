@@ -34,11 +34,13 @@ export function CctTable({
     onSelect,
     label = "Resultados",
     columns,
+    wide = false,
 }: {
     items: CctRow[];
     onSelect?: (row: CctRow) => void;
     label?: string;
     columns?: string[];
+    wide?: boolean;
 }) {
     const preferred = [
         "AVISO",
@@ -79,9 +81,9 @@ export function CctTable({
             <p className={local.empty}>No hay registros para esta consulta.</p>
         );
     return (
-        <div className={styles.tableRegion}>
-            <table className={styles.table + (onSelect ? " " + local.selectable : "")}>
-                <caption>{label}</caption>
+        <div className={styles.tableRegion} tabIndex={wide ? 0 : undefined} role={wide ? "region" : undefined} aria-label={wide ? label : undefined}>
+            <table className={styles.table + (onSelect ? " " + local.selectable : "") + (wide ? " " + local.wideTable : "")}>
+                <caption className={local.tableCaption}>{label}</caption>
                 <thead>
                     <tr>
                         {shown.map((k) => (

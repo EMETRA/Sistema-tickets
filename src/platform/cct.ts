@@ -85,6 +85,8 @@ export const CCT_LABELS: Record<string, string> = {
     NUMERO_VEHICULO: "Número de vehículo",
     TIPO_VEHICULO: "Tipo de vehículo",
     CRUCERO: "Crucero",
+    AGENTE: "Chapa del agente",
+    FECHA_DEPOSITO: "Pago registrado el",
     MOTIVO: "Motivo",
     DELEGACION: "Delegación",
     ORIGEN_PAGO: "Origen de pago",
@@ -134,4 +136,32 @@ export function cctCsv(rows: CctRow[]) {
 }
 export function cctCivilNow() {
     return new Date(Date.now() - 6 * 3600000).toISOString().slice(0, 16);
+}
+
+export type CctCepoReportFilters = {
+    desde: string;
+    hasta: string;
+    fechaBase: string;
+    estado: string;
+    tipoAgente: string;
+    agente: string;
+};
+export type CctCepoReport = CctPage & {
+    filtros: CctCepoReportFilters;
+    resumen: { total: number; estados: Record<string, number> };
+};
+export const CCT_REPORT_DATE_LABELS: Record<string, string> = {
+    COLOCACION: "Fecha de colocación",
+    PAGO: "Fecha del pago registrado",
+    LIBERACION: "Fecha de liberación",
+};
+export async function cctPdfBlob(blob: Blob) {
+    if (
+        !blob.type.includes("application/pdf") ||
+        (await blob.slice(0, 5).text()) !== "%PDF-"
+    )
+        throw new Error(
+            "No se recibió un PDF válido. Conserva los filtros y reintenta.",
+        );
+    return blob;
 }

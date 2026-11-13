@@ -1502,7 +1502,7 @@ flowchart TD
 
 **Excepciones:** sin permiso no monta el formulario; error preserva filtros y referencia; vacío muestra mensaje distinto; clave ambigua exige revisión y no abre una escritura. Cambiar de selección cancela la petición anterior.
 
-**Objetos DB a través del API:** EMT_REMISIONES/EMT_VEHICULOS/TB_CEPOS_PMT, remisiones de empresa/instituciones, TB_EMPALME_PLACAS, TB_PILOTOS, capacitaciones/tarjetones, TB_EMPALME_AGENTES y TB_EMPLEADOS. Pagos y demás tablas se documentan en [CU-25 API](https://github.com/EMETRA/api-tickets/blob/bf48c39f48f7df5e6453c50c72e80c1f1819ab37/casos-de%20uso.md#cu-25).
+**Objetos DB a través del API:** EMT_REMISIONES/EMT_VEHICULOS/TB_CEPOS_PMT, remisiones de empresa/instituciones, TB_EMPALME_PLACAS, TB_PILOTOS, capacitaciones/tarjetones, TB_EMPALME_AGENTES y TB_EMPLEADOS. Pagos y demás tablas se documentan en [CU-25 API](https://github.com/EMETRA/api-tickets/blob/4289a5de34de1f269d63d2f5b0c67ac4197510f2/casos-de%20uso.md#cu-25).
 
 **Archivos:** [CctWorkspace](https://github.com/EMETRA/Sistema-tickets/blob/ea3e8e71ed354ac5a5422ff16e5fbd2e898c29fc/src/views/Platform/CctWorkspace.tsx), [CctParts](https://github.com/EMETRA/Sistema-tickets/blob/ea3e8e71ed354ac5a5422ff16e5fbd2e898c29fc/src/views/Platform/CctParts.tsx), contratos platform/cct.ts, app-registry y BFF. **Ruta:** /home/cct/consultas/cct-consultas.
 
@@ -1525,7 +1525,7 @@ flowchart TD
 
 **Excepciones:** no hay formulario activo si falta permiso/operador/corte; si la clave es ambigua, ya está notificada o cambió el lote, se pide actualizar en lugar de sobrescribir. El nombre se valida también contra bytes de la columna en el servidor.
 
-**Objetos:** EMT_REMISIONES, TB_REMISIONES_EMPRESA, TB_REMISIONES_INSTITUCIONES, operador/control y auditoría/comandos. **Archivos/rutas:** componente Notification en [CctWorkspace](https://github.com/EMETRA/Sistema-tickets/blob/ea3e8e71ed354ac5a5422ff16e5fbd2e898c29fc/src/views/Platform/CctWorkspace.tsx), platformCommand y POST /api/platform/cct/notificaciones o notificaciones/placa; GET notificaciones/preview. Contrato completo: [CU-26 API](https://github.com/EMETRA/api-tickets/blob/bf48c39f48f7df5e6453c50c72e80c1f1819ab37/casos-de%20uso.md#cu-26).
+**Objetos:** EMT_REMISIONES, TB_REMISIONES_EMPRESA, TB_REMISIONES_INSTITUCIONES, operador/control y auditoría/comandos. **Archivos/rutas:** componente Notification en [CctWorkspace](https://github.com/EMETRA/Sistema-tickets/blob/ea3e8e71ed354ac5a5422ff16e5fbd2e898c29fc/src/views/Platform/CctWorkspace.tsx), platformCommand y POST /api/platform/cct/notificaciones o notificaciones/placa; GET notificaciones/preview. Contrato completo: [CU-26 API](https://github.com/EMETRA/api-tickets/blob/4289a5de34de1f269d63d2f5b0c67ac4197510f2/casos-de%20uso.md#cu-26).
 
 
 <a id="cu-26"></a>
@@ -1548,7 +1548,7 @@ flowchart TD
 
 **Objetos:** BASEDATOS.TB_CEPOS_PMT/EMT_VEHICULOS/S_VEHICULOS y catálogos; ADMEMETRA.TB_REMISIONES_INSTITUCIONES/TB_EMPALME_AGENTES; SQ_CCT_CEPOS/SQ_CCT_REMISIONES y trazabilidad propia. El trigger conserva sus destinos de bancos y SIAF; el Panel no los escribe.
 
-**Archivos/rutas:** [CctCepos](https://github.com/EMETRA/Sistema-tickets/blob/ea3e8e71ed354ac5a5422ff16e5fbd2e898c29fc/src/views/Platform/CctCepos.tsx), [selectores](https://github.com/EMETRA/Sistema-tickets/blob/ea3e8e71ed354ac5a5422ff16e5fbd2e898c29fc/src/views/Platform/CctParts.tsx), platformCommand; /home/cct/formularios/cct-cepos y /api/platform/cct/cepos/:id/pago|liberar|danio|robo, cepos/crear, vehiculos/registrar. Reglas: [CU-27 y CU-28 API](https://github.com/EMETRA/api-tickets/blob/bf48c39f48f7df5e6453c50c72e80c1f1819ab37/casos-de%20uso.md#cu-27).
+**Archivos/rutas:** [CctCepos](https://github.com/EMETRA/Sistema-tickets/blob/ea3e8e71ed354ac5a5422ff16e5fbd2e898c29fc/src/views/Platform/CctCepos.tsx), [selectores](https://github.com/EMETRA/Sistema-tickets/blob/ea3e8e71ed354ac5a5422ff16e5fbd2e898c29fc/src/views/Platform/CctParts.tsx), platformCommand; /home/cct/formularios/cct-cepos y /api/platform/cct/cepos/:id/pago|liberar|danio|robo, cepos/crear, vehiculos/registrar. Reglas: [CU-27 y CU-28 API](https://github.com/EMETRA/api-tickets/blob/4289a5de34de1f269d63d2f5b0c67ac4197510f2/casos-de%20uso.md#cu-27).
 
 
 <a id="cu-27"></a>
@@ -1567,4 +1567,4 @@ flowchart TD
 
 **Excepciones:** sin REPORTAR no abre el módulo; exceso de 2000 registros por fuente pide delimitar, sin ocultar filas; fallo del proveedor/PDF conserva filtros y referencia. CSV neutraliza fórmulas y conserva ceros/acentos. No se publican PDFs por placa.
 
-**Objetos:** solo lectura de las fuentes de CU-24 y proveedores corporativos del API. **Archivos:** [CctWorkspace](https://github.com/EMETRA/Sistema-tickets/blob/ea3e8e71ed354ac5a5422ff16e5fbd2e898c29fc/src/views/Platform/CctWorkspace.tsx), [CSV/contratos](https://github.com/EMETRA/Sistema-tickets/blob/ea3e8e71ed354ac5a5422ff16e5fbd2e898c29fc/src/platform/cct.ts), platform/client.ts y BFF. **Rutas:** /home/cct/reportes/cct-reportes; GET /api/platform/cct/reportes y reportes/pdf; [CU-29 API](https://github.com/EMETRA/api-tickets/blob/bf48c39f48f7df5e6453c50c72e80c1f1819ab37/casos-de%20uso.md#cu-29).
+**Objetos:** solo lectura de las fuentes de CU-24 y proveedores corporativos del API. **Archivos:** [CctWorkspace](https://github.com/EMETRA/Sistema-tickets/blob/ea3e8e71ed354ac5a5422ff16e5fbd2e898c29fc/src/views/Platform/CctWorkspace.tsx), [CSV/contratos](https://github.com/EMETRA/Sistema-tickets/blob/ea3e8e71ed354ac5a5422ff16e5fbd2e898c29fc/src/platform/cct.ts), platform/client.ts y BFF. **Rutas:** /home/cct/reportes/cct-reportes; GET /api/platform/cct/reportes y reportes/pdf; [CU-29 API](https://github.com/EMETRA/api-tickets/blob/4289a5de34de1f269d63d2f5b0c67ac4197510f2/casos-de%20uso.md#cu-29).

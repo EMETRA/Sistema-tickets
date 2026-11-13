@@ -9,6 +9,8 @@ Los enlaces de código fijan esa revisión para que sigan siendo consultables cu
 
 ## Índice
 
+- [Bandeja PMT de Avísame](#avisame-pmt)
+
 - [CCT: arquitectura, configuración y mantenimiento](#cct)
 
 - [1. Propósito y límites](#orientacion)
@@ -111,6 +113,16 @@ Los siguientes comandos son las entradas reales de `package.json`; el listado no
 | `storybook` | `storybook dev` |
 | `build-storybook` | `storybook build` |
 | `test:integracion` | `node --test test/integracion/*.test.cjs` |
+
+<a id="avisame-pmt"></a>
+
+## Bandeja PMT de Avísame
+
+Ruta /home/pmt/formularios/pmt-avisame, componente registrado en APP_REGISTRY y catálogo de la API. El gate comprueba permiso antes de montar consultas/formulario. Cola paginada, visor privado, reserva temporal y decisión fundamentada usan los componentes y estilos existentes. El BFF solo transmite identidad Bearer y confirmaciones, sin exponer rutas privadas.
+
+La respuesta incierta conserva el fundamento, bloquea repetir e invita a consultar el caso. La API decide permisos, vigencia y unicidad de la multa. USER_ADMIN usa el circuito de dos confirmaciones. Correo y PDF de la multa mantienen su formato; las evidencias son adjuntos. Las decisiones de emisor/corrección proceden del API.
+
+Código verificado: `7b54604191c9f1cf248a311c56048417f48179f4`. Archivos: [src/views/Platform/ViviPmtWorkspace.tsx](https://github.com/EMETRA/Sistema-tickets/blob/7b54604191c9f1cf248a311c56048417f48179f4/src/views/Platform/ViviPmtWorkspace.tsx), [src/platform/client.ts](https://github.com/EMETRA/Sistema-tickets/blob/7b54604191c9f1cf248a311c56048417f48179f4/src/platform/client.ts), [src/app/api/platform/[...path]/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/7b54604191c9f1cf248a311c56048417f48179f4/src/app/api/platform/[...path]/route.ts), [docs/AVISAME_PMT.md](https://github.com/EMETRA/Sistema-tickets/blob/7b54604191c9f1cf248a311c56048417f48179f4/docs/AVISAME_PMT.md).
 
 <a id="datos"></a>
 
@@ -288,7 +300,7 @@ Referencias literales del código (tablas, vistas y paquetes). Los nombres sin p
 
 ## CCT: arquitectura, configuración y mantenimiento
 
-La aplicación CCT se integra en las rutas dinámicas del catálogo; no añade un login ni acceso directo a Oracle. Tres entradas de [app-registry.ts](https://github.com/EMETRA/Sistema-tickets/blob/1d6410f5b827c68e1bd97f0b8e2bc7e9f5894567/src/config/app-registry.ts) montan consultas, gestión de cepos y reportes. El ModuleAccessGate existente debe resolver el permiso **antes** de montar los formularios.
+La aplicación CCT se integra en las rutas dinámicas del catálogo; no añade un login ni acceso directo a Oracle. Tres entradas de [app-registry.ts](https://github.com/EMETRA/Sistema-tickets/blob/7b54604191c9f1cf248a311c56048417f48179f4/src/config/app-registry.ts) montan consultas, gestión de cepos y reportes. El ModuleAccessGate existente debe resolver el permiso **antes** de montar los formularios.
 
 | Archivo | Responsabilidad |
 | --- | --- |
@@ -298,7 +310,7 @@ La aplicación CCT se integra en las rutas dinámicas del catálogo; no añade u
 | [CctCepoReport.tsx](https://github.com/EMETRA/Sistema-tickets/blob/1d6410f5b827c68e1bd97f0b8e2bc7e9f5894567/src/views/Platform/CctCepoReport.tsx) | Reporte operativo, filtros aplicados, resumen/página, CSV completo y visor privado con recuperación |
 | [CctWorkspace.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/1d6410f5b827c68e1bd97f0b8e2bc7e9f5894567/src/views/Platform/CctWorkspace.module.scss) | Tarjetas, rejillas adaptables, revisión de acción y visor coherentes con los tokens del Panel |
 | [platform/cct.ts](https://github.com/EMETRA/Sistema-tickets/blob/1d6410f5b827c68e1bd97f0b8e2bc7e9f5894567/src/platform/cct.ts) | Contratos de filas/páginas/capacidades, etiquetas, URLSearchParams, CSV y hora civil de Guatemala |
-| [platform/client.ts](https://github.com/EMETRA/Sistema-tickets/blob/1d6410f5b827c68e1bd97f0b8e2bc7e9f5894567/src/platform/client.ts) | Bearer, error con referencia, binario permitido del PDF y comando estable con requestId/confirmación |
+| [platform/client.ts](https://github.com/EMETRA/Sistema-tickets/blob/7b54604191c9f1cf248a311c56048417f48179f4/src/platform/client.ts) | Bearer, error con referencia, binario permitido del PDF y comando estable con requestId/confirmación |
 
 ### Interacción y nomenclatura
 

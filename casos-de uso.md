@@ -11,6 +11,8 @@ Guía de arquitectura, configuración y cambios: [manual-técnico.md](manual-t%C
 
 ## Índice
 
+- [CU-PMT-01 · Revisar reportes Avísame desde PMT](#cu-pmt-01)
+
 - [CU-01 · Entrar y recuperar acceso institucional](#cu-01)
 - [CU-02 · Consultar inicio, perfil y rendimiento personal](#cu-02)
 - [CU-03 · Navegar aplicaciones, detectar desuso y bloquear acceso previo](#cu-03)
@@ -47,6 +49,34 @@ Guía de arquitectura, configuración y cambios: [manual-técnico.md](manual-t%C
 - [Criterios de cobertura](#cobertura)
 
 Los casos agrupan variantes de una misma finalidad (por ejemplo consultar, crear y modificar un catálogo). Las rutas y operaciones del anexo permiten encontrar el caso sin recorrer todo el código. Los diagramas describen decisiones principales; las excepciones de cada caso completan los caminos alternativos.
+
+<a id="cu-pmt-01"></a>
+
+## CU-PMT-01 · Revisar reportes Avísame desde PMT
+
+**Actor:** Revisor PMT autorizado. **Precondiciones:** catálogo activo, permisos explícitos y reporte REVISION_PMT_V1.
+
+**Flujo:** consultar cola/expediente → reservar 15 minutos → revisar lugar, placa y cada foto/video → fundamentar → IMPONER o DESCARTAR. Imponer valida emisor/talonario y registra causa PMT, multa, auditoría y recibo en una transacción. Descartar archiva conservando evidencia y fundamento.
+
+```mermaid
+flowchart TD
+  cola["Reportes pendientes o reserva vencida"] --> reserva{"Reserva propia y vigente"}
+  reserva -->|No| conflicto["Actualizar o tomar otro reporte"]
+  reserva -->|Sí| revisar["Verificar evidencia, fecha, lugar y placa"]
+  revisar --> decision{"Decisión fundamentada"}
+  decision -->|Descartar| archivo["Archivar y auditar; sin multa"]
+  decision -->|Imponer| tx["SP institucional, causa PMT y recibo: un COMMIT"]
+  tx --> worker["Mismo formato de multas; evidencia adjunta"]
+  tx -->|Fallo| rollback["Revertir emisión y consultar estado"]
+```
+
+**Excepciones:** sin permiso no se carga el formulario; otra reserva/versión/vencimiento genera conflicto. Falta de evidencia, emisor o talonario bloquea imponer. La corrección de placa/falta solo se habilita por configuración y conserva el reporte original. Respuesta perdida: consultar estado y recuperar el mismo requestId, sin crear otra multa.
+
+**Configuración pendiente de definición operativa:** emisor REVISOR/INSTITUCIONAL y habilitación de correcciones. La emisión queda bloqueada si no se elige un modo. La aceptación sobre Oracle y teléfonos/SMTP reales se realiza en QA.
+
+**Objetos de DB:** Sin acceso Oracle directo. API-tickets utiliza revisiones PMT, denuncias/evidencias, agente/talonario y auditoría; el navegador solo recibe el expediente autorizado.
+
+**Archivos involucrados:** [src/views/Platform/ViviPmtWorkspace.tsx](https://github.com/EMETRA/Sistema-tickets/blob/7b54604191c9f1cf248a311c56048417f48179f4/src/views/Platform/ViviPmtWorkspace.tsx), [src/views/Platform/ViviPmtWorkspace.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/7b54604191c9f1cf248a311c56048417f48179f4/src/views/Platform/ViviPmtWorkspace.module.scss), [src/config/app-registry.ts](https://github.com/EMETRA/Sistema-tickets/blob/7b54604191c9f1cf248a311c56048417f48179f4/src/config/app-registry.ts), [test/integracion/vivi-pmt-browser.cjs](https://github.com/EMETRA/Sistema-tickets/blob/7b54604191c9f1cf248a311c56048417f48179f4/test/integracion/vivi-pmt-browser.cjs).
 
 <a id="cu-01"></a>
 
@@ -240,7 +270,7 @@ Indirecto: catálogo y permisos de api-tickets; no consulta tablas desde el nave
 - [src/app/(dashboard)/home/[appId]/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/%28dashboard%29/home/%5BappId%5D/page.tsx)
 - [src/app/api/apps-catalog/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/apps-catalog/route.ts)
 - [src/app/unauthorized/page.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/unauthorized/page.tsx)
-- [src/config/app-registry.ts](https://github.com/EMETRA/Sistema-tickets/blob/b29ea52c21307f21bb49041ba2e8f76fb8080f44/src/config/app-registry.ts)
+- [src/config/app-registry.ts](https://github.com/EMETRA/Sistema-tickets/blob/7b54604191c9f1cf248a311c56048417f48179f4/src/config/app-registry.ts)
 - [src/config/apps-access.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/config/apps-access.ts)
 - [src/config/apps-catalog.ts](https://github.com/EMETRA/Sistema-tickets/blob/e3f8676f5121223c9f23aaa036833260efe236f9/src/config/apps-catalog.ts)
 - [src/config/constants.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/config/constants.ts)
@@ -785,7 +815,7 @@ Indirecto: metadatos consultados por api-tickets, GitHub REST y registros TB_TK_
 
 - [src/components/client/organisms/SourceCatalog/SourceCatalog.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/components/client/organisms/SourceCatalog/SourceCatalog.module.scss)
 - [src/components/client/organisms/SourceCatalog/SourceCatalog.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/components/client/organisms/SourceCatalog/SourceCatalog.tsx)
-- [src/platform/client.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/platform/client.ts)
+- [src/platform/client.ts](https://github.com/EMETRA/Sistema-tickets/blob/7b54604191c9f1cf248a311c56048417f48179f4/src/platform/client.ts)
 - [src/views/Platform/SystemsWorkspace.tsx](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/views/Platform/SystemsWorkspace.tsx)
 
 <a id="cu-14"></a>
@@ -1372,7 +1402,7 @@ Persistencia remota mediante api-tickets. El Panel no conecta a Oracle ni replic
 - [src/views/Platform/ViviReportsWorkspace.tsx](https://github.com/EMETRA/Sistema-tickets/blob/b29ea52c21307f21bb49041ba2e8f76fb8080f44/src/views/Platform/ViviReportsWorkspace.tsx)
 - [src/views/Platform/ViviReportsWorkspace.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/b29ea52c21307f21bb49041ba2e8f76fb8080f44/src/views/Platform/ViviReportsWorkspace.module.scss)
 - [src/platform/vivi-reports.ts](https://github.com/EMETRA/Sistema-tickets/blob/b29ea52c21307f21bb49041ba2e8f76fb8080f44/src/platform/vivi-reports.ts)
-- [src/config/app-registry.ts](https://github.com/EMETRA/Sistema-tickets/blob/b29ea52c21307f21bb49041ba2e8f76fb8080f44/src/config/app-registry.ts)
+- [src/config/app-registry.ts](https://github.com/EMETRA/Sistema-tickets/blob/7b54604191c9f1cf248a311c56048417f48179f4/src/config/app-registry.ts)
 - [src/app/api/platform/[...path]/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/b29ea52c21307f21bb49041ba2e8f76fb8080f44/src/app/api/platform/%5B...path%5D/route.ts)
 
 <a id="cu-rh-01"></a>
@@ -1423,7 +1453,7 @@ flowchart TD
 
 **Objetos DB indirectos:** ADMINSIAF.TB_EMPLEADOS; ADMAUTEMETRA.TB_USUARIOS; ADMEMETRAIT.TB_TK_RH_CAMPANAS, TB_TK_RH_DESTINOS y TB_TK_RH_ENTREGAS; catálogo, permisos, confirmaciones, comandos y auditoría de la plataforma. Solo el API consulta/aplica datos corporativos.
 
-**Archivos:** [src/views/Platform/HrProfileWorkspace.tsx](https://github.com/EMETRA/Sistema-tickets/blob/d4bd5264975a6663e3399bdc155f65141b38d7d9/src/views/Platform/HrProfileWorkspace.tsx), [src/views/Platform/HrCampaignsWorkspace.tsx](https://github.com/EMETRA/Sistema-tickets/blob/d4bd5264975a6663e3399bdc155f65141b38d7d9/src/views/Platform/HrCampaignsWorkspace.tsx), [src/views/Platform/HrDeliveryHistory.tsx](https://github.com/EMETRA/Sistema-tickets/blob/d4bd5264975a6663e3399bdc155f65141b38d7d9/src/views/Platform/HrDeliveryHistory.tsx), [src/platform/hr-notifications.tsx](https://github.com/EMETRA/Sistema-tickets/blob/d4bd5264975a6663e3399bdc155f65141b38d7d9/src/platform/hr-notifications.tsx), [src/platform/hr.ts](https://github.com/EMETRA/Sistema-tickets/blob/d4bd5264975a6663e3399bdc155f65141b38d7d9/src/platform/hr.ts), [src/app/api/platform/[...path]/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/d4bd5264975a6663e3399bdc155f65141b38d7d9/src/app/api/platform/[...path]/route.ts). Preparación QA: [sql/rrhh/README.md](https://github.com/EMETRA/api-tickets/blob/68f2223df8324c0ec39dac4e0e521c4ff29a240e/sql/rrhh/README.md); arquitectura y contratos: [manual técnico](manual-t%C3%A9cnico.md#rrhh-personal).
+**Archivos:** [src/views/Platform/HrProfileWorkspace.tsx](https://github.com/EMETRA/Sistema-tickets/blob/d4bd5264975a6663e3399bdc155f65141b38d7d9/src/views/Platform/HrProfileWorkspace.tsx), [src/views/Platform/HrCampaignsWorkspace.tsx](https://github.com/EMETRA/Sistema-tickets/blob/d4bd5264975a6663e3399bdc155f65141b38d7d9/src/views/Platform/HrCampaignsWorkspace.tsx), [src/views/Platform/HrDeliveryHistory.tsx](https://github.com/EMETRA/Sistema-tickets/blob/d4bd5264975a6663e3399bdc155f65141b38d7d9/src/views/Platform/HrDeliveryHistory.tsx), [src/platform/hr-notifications.tsx](https://github.com/EMETRA/Sistema-tickets/blob/d4bd5264975a6663e3399bdc155f65141b38d7d9/src/platform/hr-notifications.tsx), [src/platform/hr.ts](https://github.com/EMETRA/Sistema-tickets/blob/d4bd5264975a6663e3399bdc155f65141b38d7d9/src/platform/hr.ts), [src/app/api/platform/[...path]/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/7b54604191c9f1cf248a311c56048417f48179f4/src/app/api/platform/[...path]/route.ts). Preparación QA: [sql/rrhh/README.md](https://github.com/EMETRA/api-tickets/blob/68f2223df8324c0ec39dac4e0e521c4ff29a240e/sql/rrhh/README.md); arquitectura y contratos: [manual técnico](manual-t%C3%A9cnico.md#rrhh-personal).
 
 **Datos complementarios de este mismo caso**
 
@@ -1464,7 +1494,7 @@ flowchart TD
 
 **Objetos DB indirectos:** Fuentes de remisiones, vehículos, conductores y reglamento en BASEDATOS; saldo y empleados en ADMINSIAF; empalme de agentes y función de días hábiles en ADMEMETRA; SEMANA_HABIL; catálogo y permisos de Tickets. Solo api-tickets abre estas fuentes. Detalle del contrato y reglas: [manual técnico](manual-t%C3%A9cnico.md#reimpresion-n).
 
-**Archivos:** [src/views/Platform/TransitReprintsWorkspace.tsx](https://github.com/EMETRA/Sistema-tickets/blob/670c69364feb7e84dff997dc8e9644277a9d43f5/src/views/Platform/TransitReprintsWorkspace.tsx), [src/views/Platform/TransitReprintsWorkspace.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/670c69364feb7e84dff997dc8e9644277a9d43f5/src/views/Platform/TransitReprintsWorkspace.module.scss), [src/platform/transit-reprints.ts](https://github.com/EMETRA/Sistema-tickets/blob/670c69364feb7e84dff997dc8e9644277a9d43f5/src/platform/transit-reprints.ts), [src/config/app-registry.ts](https://github.com/EMETRA/Sistema-tickets/blob/670c69364feb7e84dff997dc8e9644277a9d43f5/src/config/app-registry.ts), [src/platform/client.ts](https://github.com/EMETRA/Sistema-tickets/blob/670c69364feb7e84dff997dc8e9644277a9d43f5/src/platform/client.ts), [src/app/api/platform/[...path]/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/670c69364feb7e84dff997dc8e9644277a9d43f5/src/app/api/platform/[...path]/route.ts). Pruebas: [test/integracion/reimpresion-n.test.cjs](https://github.com/EMETRA/Sistema-tickets/blob/670c69364feb7e84dff997dc8e9644277a9d43f5/test/integracion/reimpresion-n.test.cjs) y [test/integracion/reimpresion-n-browser.cjs](https://github.com/EMETRA/Sistema-tickets/blob/670c69364feb7e84dff997dc8e9644277a9d43f5/test/integracion/reimpresion-n-browser.cjs). La habilitación del catálogo y los permisos corresponde a api-tickets; no depende de modificar el catálogo dummy en el servidor.
+**Archivos:** [src/views/Platform/TransitReprintsWorkspace.tsx](https://github.com/EMETRA/Sistema-tickets/blob/670c69364feb7e84dff997dc8e9644277a9d43f5/src/views/Platform/TransitReprintsWorkspace.tsx), [src/views/Platform/TransitReprintsWorkspace.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/670c69364feb7e84dff997dc8e9644277a9d43f5/src/views/Platform/TransitReprintsWorkspace.module.scss), [src/platform/transit-reprints.ts](https://github.com/EMETRA/Sistema-tickets/blob/670c69364feb7e84dff997dc8e9644277a9d43f5/src/platform/transit-reprints.ts), [src/config/app-registry.ts](https://github.com/EMETRA/Sistema-tickets/blob/7b54604191c9f1cf248a311c56048417f48179f4/src/config/app-registry.ts), [src/platform/client.ts](https://github.com/EMETRA/Sistema-tickets/blob/7b54604191c9f1cf248a311c56048417f48179f4/src/platform/client.ts), [src/app/api/platform/[...path]/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/7b54604191c9f1cf248a311c56048417f48179f4/src/app/api/platform/[...path]/route.ts). Pruebas: [test/integracion/reimpresion-n.test.cjs](https://github.com/EMETRA/Sistema-tickets/blob/670c69364feb7e84dff997dc8e9644277a9d43f5/test/integracion/reimpresion-n.test.cjs) y [test/integracion/reimpresion-n-browser.cjs](https://github.com/EMETRA/Sistema-tickets/blob/670c69364feb7e84dff997dc8e9644277a9d43f5/test/integracion/reimpresion-n-browser.cjs). La habilitación del catálogo y los permisos corresponde a api-tickets; no depende de modificar el catálogo dummy en el servidor.
 
 <a id="operaciones"></a>
 

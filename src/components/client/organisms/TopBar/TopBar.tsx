@@ -1,3 +1,4 @@
+import { HrNotificationBadge } from "@/platform/hr-notifications";
 import React from "react";
 import Link from "next/link";
 import { TopBarProps } from "./types";
@@ -74,7 +75,7 @@ export const TopBar = ({
                     />
                 )
             )}
-            {notificationsPath && <Link href={notificationsPath} className={styles.notification} aria-label="Seguimiento de mis tickets" title="Respuestas y actualizaciones de mis tickets"><WorkspaceIcon name="bell-regular" size={21}/></Link>}
+            {notificationsPath && <Link href={notificationsPath} className={styles.notification} aria-label="Notificaciones" title="Actualizaciones de RRHH y seguimiento de tickets"><span style={{position:"relative",display:"inline-flex"}}><WorkspaceIcon name="bell-regular" size={21}/><HrNotificationBadge/></span></Link>}
             {!notificationsPath && onNotificationsClick && (
                 <IconButton
                     icon="bell-regular"

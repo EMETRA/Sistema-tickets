@@ -13,6 +13,7 @@ async function main(){
  const resultPage=(items)=>({items,total:items.length,offset:0,hayMas:false});
  const cepo=()=>({datos:{AVISO:'41',ESTATUS:state,CEPO_FISICO:'14',FECHA:'2026-01-02T10:00',TIPO_VEHICULO:'6',VEHICULO:'200',ORIGEN_PAGO:state==='C'?null:'3',BOLETA:state==='C'?null:'200'},version:(state==='C'?'a':'b').repeat(64),vehiculo:{TPLACA:'P',NPLACA:'001ABC',MARCA:'Marca ficticia'},vehiculoPendiente:false,tarifas:{DANIO:'8000',ROBO:'7000',regla:'122'}});
  const backend=http.createServer(async(req,res)=>{let text='';for await(const b of req)text+=b;const body=text?JSON.parse(text):{};const u=new URL(req.url,'http://localhost'),p=u.pathname;calls.push({path:p,query:u.searchParams.toString(),method:req.method,body,auth:req.headers.authorization});const json=(d,status=200)=>{res.writeHead(status,{'Content-Type':'application/json'});res.end(JSON.stringify(d));};
+ if(p==='/platform/hr/inbox')return json({habilitado:false,items:[],pendientes:0});
  if(p==='/platform/catalog')return json(catalog);
  if(p==='/platform/bootstrap')return json({enabled:true,actor:{id:1,admin:true,mode:'ADMINISTRADOR'},definitions:{},teams:[],memberships:[],capabilities:{}});
  if(p.startsWith('/platform/module-access/'))return json({moduloId:p.split('/').pop(),allowed,actions:{LEER:allowed,INSERTAR:allowed,EDITAR:allowed,ELIMINAR:false}});

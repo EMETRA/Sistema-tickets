@@ -2,7 +2,7 @@
 
 Implementación CCT: `ea3e8e71ed354ac5a5422ff16e5fbd2e898c29fc`.
 
-Base documental: `926fe45d27922c595c63e8f79e1e82b1594470eb`; actualización de consulta de casos: `cd953b4ea8731336669948645a55032e5f5eabba`; actualización de vistas y diagnóstico judicial: `9d497b6ff471410ea5a96ba6df5e707ccebd8e43`; actualización documental: `b77da403cba653095c8156b0e2c13035a96b606b`; actualización de catálogo: `e3f8676f5121223c9f23aaa036833260efe236f9`; reportes VIVI: `b29ea52c21307f21bb49041ba2e8f76fb8080f44`; responsables de noticias: `55827f0694bf6f736264c3c5d41622b7cc59a88a`; inventario institucional: `9daff7769ccb684b8eb5497a8b8b82b902e050e0`; navegación de personal, activos y red: `db60d821fdbc9b5e2cee31f98cc7422626a4ff22`; reimpresión de boletas N: `670c69364feb7e84dff997dc8e9644277a9d43f5`; línea de integración revisada: `Dev + fix/navegacion-activos-personal`. Describe la base y la actualización citadas; la configuración y las autorizaciones efectivas de un servidor se comprueban por separado. Esta edición se preparó sin conectarse a Oracle, SMTP ni servidores institucionales.
+Base documental: `926fe45d27922c595c63e8f79e1e82b1594470eb`; actualización de consulta de casos: `cd953b4ea8731336669948645a55032e5f5eabba`; actualización de vistas y diagnóstico judicial: `9d497b6ff471410ea5a96ba6df5e707ccebd8e43`; actualización documental: `b77da403cba653095c8156b0e2c13035a96b606b`; actualización de catálogo: `e3f8676f5121223c9f23aaa036833260efe236f9`; reportes VIVI: `b29ea52c21307f21bb49041ba2e8f76fb8080f44`; responsables de noticias: `55827f0694bf6f736264c3c5d41622b7cc59a88a`; inventario institucional: `9daff7769ccb684b8eb5497a8b8b82b902e050e0`; navegación de personal, activos y red: `db60d821fdbc9b5e2cee31f98cc7422626a4ff22`; reimpresión de boletas N: `670c69364feb7e84dff997dc8e9644277a9d43f5`; perfil y campañas de RRHH: `d4bd5264975a6663e3399bdc155f65141b38d7d9`; línea de integración revisada: `Dev + fix/navegacion-activos-personal`. Describe la base y la actualización citadas; la configuración y las autorizaciones efectivas de un servidor se comprueban por separado. Esta edición se preparó sin conectarse a Oracle, SMTP ni servidores institucionales.
 
 Los enlaces de código fijan esa revisión para que sigan siendo consultables cuando `main` excluya herramientas de desarrollo. Al modificar un comportamiento se deben actualizar su caso de uso, configuración y referencia de código.
 
@@ -39,6 +39,8 @@ Guía de arquitectura, configuración y cambios: [manual-técnico.md](manual-t%C
 - [CU-26 · Revisar y registrar una notificación CCT](#cu-26)
 - [CU-27 · Gestionar ingreso, pago, liberación e incidencia de cepos](#cu-27)
 - [CU-28 · Consultar y descargar reportes privados de CCT](#cu-28)
+
+- [CU-RH-01 · Mi ficha y campañas obligatorias de RRHH](#cu-rh-01)
 
 - [CU-24 · Reimprimir una boleta de tránsito N desde Juzgado](#cu-24)
 - [Índice de operaciones y rutas](#operaciones)
@@ -1373,6 +1375,64 @@ Persistencia remota mediante api-tickets. El Panel no conecta a Oracle ni replic
 - [src/config/app-registry.ts](https://github.com/EMETRA/Sistema-tickets/blob/b29ea52c21307f21bb49041ba2e8f76fb8080f44/src/config/app-registry.ts)
 - [src/app/api/platform/[...path]/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/b29ea52c21307f21bb49041ba2e8f76fb8080f44/src/app/api/platform/%5B...path%5D/route.ts)
 
+<a id="cu-rh-01"></a>
+
+## CU-RH-01 · Ver mi ficha de RRHH y gestionar actualizaciones obligatorias
+
+**Actores:** Usuario autenticado para su propio perfil; personal de RRHH con permisos específicos para convocar y revisar; administración efectiva de Tickets.
+
+**Entradas:** `/mi-perfil`, `/notificaciones`, `/mi-perfil?campana=...` y `/home/rrhh/formularios/rh-datos`. Campañas requieren preparación y bandera en el API. El perfil no usa el nombre del usuario para resolver al empleado.
+
+**Recorrido personal**
+
+1. Abrir Mi perfil desde el menú de usuario. Presentar la ficha oficial agrupada, su código vinculado y las campañas; explicar un vínculo pendiente sin mostrar otra ficha.
+2. Consultar el recordatorio obligatorio en la campana, el aviso y Notificaciones; acceder desde ahí a la campaña.
+3. Revisar campos, modo de aplicación y cierre. Antes de apertura/después del cierre, mostrar estado sin habilitar envío.
+4. Editar únicamente los campos permitidos o confirmar los solicitados. Para corregir un dato de solo confirmación, exigir observación y enviarla a RRHH sin modificar ese dato.
+5. Enviar con idempotencia; mantener lo escrito ante errores y mostrar referencia. Informar si se aplicaron los editables o quedaron pendientes de aprobación.
+6. Actualizar perfil/avisos y consultar observaciones del revisor. Una devolución durante el plazo vuelve a habilitar el formulario y el recordatorio.
+
+**Recorrido de RRHH**
+
+1. Validar acceso antes de mostrar configuración y datos. Elegir nombre, instrucciones, campos, modo y periodo en hora de Guatemala.
+2. Publicar para el grupo de cuentas habilitadas de empresa 97; conservar el grupo, campos y modo publicados.
+3. Abrir avance y consultar porcentaje de enviados, pendientes, aplicados/confirmados, contacto y revisados. Paginar o filtrar sin cambiar el total convocado.
+4. Abrir cada envío, comparar anterior/propuesta y consultar observaciones, contacto y versiones anteriores.
+5. Aprobar/aplicar, devolver solo durante plazo y sin aplicar, o solicitar atención sin aplicar incluso después del cierre. Registrar nota visible.
+6. Contactar al empleado para los datos observados y finalizar la atención, conservando la trazabilidad. Cerrar anticipadamente si corresponde.
+
+```mermaid
+flowchart TD
+  usuario["Usuario abre Mi perfil o Notificaciones"] --> vinculo{"Vínculo y campaña disponibles"}
+  vinculo -->|No| estado["Explicar vínculo pendiente, programación o cierre"]
+  vinculo -->|Sí| campos["Editar o confirmar campos solicitados"]
+  campos --> corregir{"Solicita corrección"}
+  corregir -->|Sí| nota["Observación obligatoria para RRHH"]
+  corregir -->|No| enviar["Enviar actualización propia"]
+  nota --> enviar
+  enviar --> resultado{"Aplicar al enviar"}
+  resultado -->|Sí| aplicado["Mostrar resultado de aplicación"]
+  resultado -->|No| pendiente["Mostrar pendiente de aprobación"]
+  aplicado --> reporte["RRHH consulta avance y cada envío"]
+  pendiente --> reporte
+  reporte --> revision["Aprobar, devolver o atender por contacto"]
+  revision --> final["Registrar decisión y actualizar estado e indicadores"]
+```
+
+**Excepciones:** 401/403 → bloquear acceso; 400 → indicar campo inválido sin perder el formulario; 409 → consultar estado/recargar datos oficiales y revisar confirmaciones; fallo técnico → referencia y reintento. No aceptar un PDF/archivo como dato editable ni escribir sueldos o claves laborales. Una cuenta sin vínculo no puede actualizar un empleado supuesto. Una campaña cerrada no habilita proceso de envío. Un envío automático no se presenta como revisión humana. Los fallos temporales de bandeja conservan el aviso conocido y usan espera creciente; 401/403 detienen repetición automática.
+
+**Objetos DB indirectos:** ADMINSIAF.TB_EMPLEADOS; ADMAUTEMETRA.TB_USUARIOS; ADMEMETRAIT.TB_TK_RH_CAMPANAS, TB_TK_RH_DESTINOS y TB_TK_RH_ENTREGAS; catálogo, permisos, confirmaciones, comandos y auditoría de la plataforma. Solo el API consulta/aplica datos corporativos.
+
+**Archivos:** [src/views/Platform/HrProfileWorkspace.tsx](https://github.com/EMETRA/Sistema-tickets/blob/d4bd5264975a6663e3399bdc155f65141b38d7d9/src/views/Platform/HrProfileWorkspace.tsx), [src/views/Platform/HrCampaignsWorkspace.tsx](https://github.com/EMETRA/Sistema-tickets/blob/d4bd5264975a6663e3399bdc155f65141b38d7d9/src/views/Platform/HrCampaignsWorkspace.tsx), [src/views/Platform/HrDeliveryHistory.tsx](https://github.com/EMETRA/Sistema-tickets/blob/d4bd5264975a6663e3399bdc155f65141b38d7d9/src/views/Platform/HrDeliveryHistory.tsx), [src/platform/hr-notifications.tsx](https://github.com/EMETRA/Sistema-tickets/blob/d4bd5264975a6663e3399bdc155f65141b38d7d9/src/platform/hr-notifications.tsx), [src/platform/hr.ts](https://github.com/EMETRA/Sistema-tickets/blob/d4bd5264975a6663e3399bdc155f65141b38d7d9/src/platform/hr.ts), [src/app/api/platform/[...path]/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/d4bd5264975a6663e3399bdc155f65141b38d7d9/src/app/api/platform/[...path]/route.ts). Preparación QA: [sql/rrhh/README.md](https://github.com/EMETRA/api-tickets/blob/68f2223df8324c0ec39dac4e0e521c4ff29a240e/sql/rrhh/README.md); arquitectura y contratos: [manual técnico](manual-t%C3%A9cnico.md#rrhh-personal).
+
+**Datos complementarios de este mismo caso**
+
+- RRHH selecciona por separado familiares, formación académica y alergias a medicamentos, con edición o solo confirmación.
+- El usuario agrega varias filas o declara que no tiene registros; no responder queda distinto de una declaración negativa. Carrera/nivel y su estado se registran por separado, incluyendo cierre de pénsum.
+- El servidor valida los registros y conserva anterior/propuesta. AL_ENVIAR o APROBAR aplica solo las secciones solicitadas a `ADMEMETRAIDENTIDAD.TB_RH_FICHAS_EXT`, `TB_RH_FAMILIARES`, `TB_RH_ESTUDIOS` y `TB_RH_ALERGIAS`; un campo de confirmación conserva su observación sin modificar filas.
+- Las sustituciones retiran lógicamente filas con autor/fecha; las versiones de entrega conservan historial. Un fallo revierte la aplicación en la transacción y no marca el envío como aplicado.
+- Sin la bandera de ampliación no se consultan esas tablas. La preparación adicional es `sql/rrhh/05–07`; el registro oficial del empleado permanece en ADMINSIAF y su cuenta en ADMAUTEMETRA.
+
 <a id="cu-24"></a>
 
 ## CU-24 · Reimprimir una boleta de tránsito N desde Juzgado
@@ -1508,13 +1568,15 @@ Las carpetas entre paréntesis agrupan rutas App Router sin añadirse a la URL; 
 | BFF | [src/app/api/usuario/[userId]/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/usuario/%5BuserId%5D/route.ts) | [CU-02](#cu-02) |
 | BFF | [src/app/api/usuario/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/926fe45d27922c595c63e8f79e1e82b1594470eb/src/app/api/usuario/route.ts) | [CU-02](#cu-02) |
 
+Las rutas de [CU-RH-01](#cu-rh-01) son `/mi-perfil`, `/notificaciones`, `/mi-perfil?campana=...` y `/home/rrhh/formularios/rh-datos`. Las consultas/escrituras `/api/platform/hr/...` pasan por el BFF de plataforma existente; no se añade un manejador independiente. El listado de las 12 entradas del receptor está en [casos del API](https://github.com/EMETRA/api-tickets/blob/68f2223df8324c0ec39dac4e0e521c4ff29a240e/src/platform/platform.hr.controller.ts).
+
 Las rutas de [CU-24](#cu-24) son `/home/juzgado/reportes/juz02`, `GET /api/platform/transit-reprints/N/:numero` y `GET /api/platform/transit-reprints/N/:numero/pdf`, atendidas por el módulo y el BFF de plataforma existentes. No se añade un manejador BFF independiente.
 
 <a id="cobertura"></a>
 
 ## Criterios de cobertura
 
-Esta edición contiene **28 casos agrupados**. El inventario incluye 0 entradas Nest decoradas, 23 páginas Next y 70 manejadores BFF, según corresponda. Los procesos internos, servicios asíncronos y almacenamiento local se cubren en los casos aunque no expongan HTTP. Las operaciones heredadas se identifican como tales; una ruta conservada en código no implica que deba aparecer habilitada en el catálogo de aplicaciones. Las funciones pendientes no se presentan como implementadas.
+Esta edición contiene **29 casos agrupados**. Las rutas y sus permisos se detallan en el índice de operaciones y en los casos incorporados. Los procesos internos, servicios asíncronos y almacenamiento local se cubren en los casos aunque no expongan HTTP. Las operaciones heredadas se identifican como tales; una ruta conservada en código no implica que deba aparecer habilitada en el catálogo de aplicaciones. Las funciones pendientes no se presentan como implementadas.
 
 Para mantener la cobertura: al añadir o retirar una ruta, resolver, tarea programada o pantalla, actualizar su caso, su fila en este índice, los objetos usados y el diagrama. Si una función depende de otro repositorio, conservar explícito ese límite y actualizar también el contrato del receptor.
 

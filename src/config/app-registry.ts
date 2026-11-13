@@ -6,6 +6,7 @@ import {
 import { TransitReprintsWorkspace } from '@/views/Platform/TransitReprintsWorkspace';
 import { ViviReportsWorkspace } from "@/views/Platform/ViviReportsWorkspace";
 import { PayrollWorkspace } from "@/views/Platform/PayrollWorkspace";
+import { HrCampaignsWorkspace } from "@/views/Platform/HrCampaignsWorkspace";
 import type { ComponentType } from "react";
 import ConsultaVehiculos from "@/views/ConsultaVehiculos";
 
@@ -29,6 +30,7 @@ export const APP_REGISTRY: Record<string, ComponentType> = {
     mod08: MOD08,
     mod10: MOD10,
     "rh-boletas": PayrollWorkspace,
+    "rh-datos": HrCampaignsWorkspace,
     "vivi-reportes": ViviReportsWorkspace,
     "cct-consultas": CctConsultas,
     "cct-cepos": CctFormularios,

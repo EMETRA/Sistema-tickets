@@ -8,12 +8,14 @@ import {
     CCT_SOURCES,
     cctCsv,
     cctQuery,
+    cctPdfBlob,
     type CctBootstrap,
     type CctPage,
     type CctRow,
 } from "@/platform/cct";
 import { CctData, CctPager, CctTable, cctError } from "./CctParts";
 import { CctCepos } from "./CctCepos";
+import { CctCepoReport } from "./CctCepoReport";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
 import local from "./CctWorkspace.module.scss";
 function downloadCsv(rows: CctRow[]) {
@@ -345,6 +347,7 @@ function Remisiones({
             const blob = await platformFetch<Blob>(
                 "/cct/reportes/pdf?" + cctQuery(applied),
             );
+            await cctPdfBlob(blob);
             if (pdfUrl.current) URL.revokeObjectURL(pdfUrl.current);
             const url = URL.createObjectURL(blob);
             pdfUrl.current = url;
@@ -379,12 +382,13 @@ function Remisiones({
             <section className={styles.card}>
                 <h2>
                     {report
-                        ? "Estado de cuenta y reportes"
+                        ? "Estado de cuenta por placa"
                         : "Remisiones y solvencias"}
                 </h2>
                 <p className={local.hint}>
-                    Consulta los registros de cada fuente y sus antecedentes por
-                    placa, boleta o agente.
+                    {report
+                        ? "Prepara un documento por placa, con el resumen de las fuentes seleccionadas para revisar, descargar e imprimir."
+                        : "Consulta los registros de cada fuente y sus antecedentes por placa, boleta o agente."}
                 </p>
                 <form
                     onSubmit={(e) => {
@@ -393,19 +397,25 @@ function Remisiones({
                     }}
                 >
                     <div className={local.form}>
-                        <div>
-                            <label htmlFor="cct-busqueda">Buscar por</label>
-                            <select
-                                id="cct-busqueda"
-                                className={styles.control}
-                                value={form.tipo}
-                                onChange={(e) => set("tipo", e.target.value)}
-                            >
-                                <option value="placa">Placa</option>
-                                <option value="boleta">Boleta / aviso</option>
-                                <option value="agente">Agente</option>
-                            </select>
-                        </div>
+                        {!report && (
+                            <div>
+                                <label htmlFor="cct-busqueda">Buscar por</label>
+                                <select
+                                    id="cct-busqueda"
+                                    className={styles.control}
+                                    value={form.tipo}
+                                    onChange={(e) =>
+                                        set("tipo", e.target.value)
+                                    }
+                                >
+                                    <option value="placa">Placa</option>
+                                    <option value="boleta">
+                                        Boleta / aviso
+                                    </option>
+                                    <option value="agente">Agente</option>
+                                </select>
+                            </div>
+                        )}
                         {fields.map(([k, label, max]) => (
                             <div key={k}>
                                 <label htmlFor={"cct-" + k}>{label} *</label>
@@ -464,7 +474,11 @@ function Remisiones({
                         </div>
                     </div>
                     <Button type="submit" state={busy ? "disabled" : "default"}>
-                        {busy ? "Consultando…" : "Consultar remisiones"}
+                        {busy
+                            ? "Consultando…"
+                            : report
+                              ? "Preparar estado de cuenta"
+                              : "Consultar remisiones"}
                     </Button>
                 </form>
             </section>
@@ -479,7 +493,11 @@ function Remisiones({
                     aria-label="Resultados de remisiones"
                 >
                     <div className={styles.toolbar}>
-                        <h2>Resultados de la consulta</h2>
+                        <h2>
+                            {report
+                                ? "Resumen del estado de cuenta"
+                                : "Resultados de la consulta"}
+                        </h2>
                         <div className={local.buttons}>
                             {report && (
                                 <Button
@@ -968,7 +986,8 @@ function Directory({ kind }: { kind: "vehiculos" | "pilotos" | "agentes" }) {
 function CctWorkspace({ module }: { module: string }) {
     const [bootstrap, setBootstrap] = useState<CctBootstrap | null>(null),
         [error, setError] = useState(""),
-        [tab, setTab] = useState("remisiones");
+        [tab, setTab] = useState("remisiones"),
+        [report, setReport] = useState("cepos");
     const request = useRef<AbortController | null>(null);
     async function load() {
         request.current?.abort();
@@ -1037,7 +1056,39 @@ function CctWorkspace({ module }: { module: string }) {
                     )}
                 </>
             ) : module === "cct-reportes" ? (
-                <Remisiones bootstrap={bootstrap} report />
+                <>
+                    <div
+                        className={local.reportChoices}
+                        aria-label="Reportes disponibles"
+                    >
+                        <button
+                            aria-pressed={report === "cepos"}
+                            onClick={() => setReport("cepos")}
+                        >
+                            <strong>Reporte operativo de cepos</strong>
+                            <span>
+                                Avisos por período, estado y agente. Pagos y
+                                liberaciones registrados, resumen y exportación
+                                completa.
+                            </span>
+                        </button>
+                        <button
+                            aria-pressed={report === "cuenta"}
+                            onClick={() => setReport("cuenta")}
+                        >
+                            <strong>Estado de cuenta por placa</strong>
+                            <span>
+                                Documento de remisiones por fuente para revisar,
+                                descargar e imprimir.
+                            </span>
+                        </button>
+                    </div>
+                    {report === "cepos" ? (
+                        <CctCepoReport />
+                    ) : (
+                        <Remisiones bootstrap={bootstrap} report />
+                    )}
+                </>
             ) : (
                 <CctCepos bootstrap={bootstrap} />
             )}

@@ -50,6 +50,7 @@ function CreateCepo({
             vin: "",
         }),
         [form, setFormRaw] = useState<Record<string, string>>({
+            aviso: "",
             crucero: "",
             tipoAgente: "",
             agente: "",
@@ -385,6 +386,33 @@ function CreateCepo({
                 <form onSubmit={create}>
                     <h3>Datos de colocación</h3>
                     <div className={local.form}>
+                        <div>
+                            <label htmlFor="cct-new-aviso">
+                                Número de aviso físico *
+                            </label>
+                            <input
+                                id="cct-new-aviso"
+                                className={styles.control}
+                                inputMode="numeric"
+                                pattern="[0-9]{1,18}"
+                                maxLength={18}
+                                disabled={busy}
+                                required
+                                value={form.aviso}
+                                onChange={(e) =>
+                                    setForm((f) => ({
+                                        ...f,
+                                        aviso: e.target.value,
+                                    }))
+                                }
+                                aria-describedby="cct-new-aviso-help"
+                            />
+                            <p id="cct-new-aviso-help" className={local.hint}>
+                                Ingresa el número del documento entregado por el
+                                agente. Si ya está registrado, se solicitará
+                                revisar ese aviso.
+                            </p>
+                        </div>
                         <CctPicker
                             kind="cruceros"
                             label="Crucero"
@@ -861,28 +889,76 @@ export function CctCepos({ bootstrap }: { bootstrap: CctBootstrap }) {
         );
     return (
         <>
-            <section className={styles.card}>
+            <section className={styles.card} aria-label="Registrar nuevo cepo">
                 <div className={styles.toolbar}>
-                    <h2>Consultar cepos</h2>
-                    {bootstrap.disponibilidad.crear.habilitado && (
-                        <Button
-                            onClick={() => {
-                                setCreate(true);
-                                setMessage("");
-                            }}
-                        >
-                            Registrar nuevo aviso
-                        </Button>
+                    <div>
+                        <h2>Registrar nuevo cepo</h2>
+                        <p className={local.hint}>
+                            Registra la colocación: vehículo, cepo físico,
+                            fecha, lugar y agente responsable.
+                        </p>
+                    </div>
+                    <Button
+                        state={
+                            bootstrap.disponibilidad.crear.habilitado
+                                ? "default"
+                                : "disabled"
+                        }
+                        onClick={() => {
+                            setCreate(true);
+                            setMessage("");
+                        }}
+                        aria-describedby="cct-ingreso-disponibilidad"
+                    >
+                        Registrar nuevo cepo
+                    </Button>
+                </div>
+                <div id="cct-ingreso-disponibilidad">
+                    {!bootstrap.disponibilidad.crear.habilitado ? (
+                        <>
+                            <p className={local.hint}>
+                                El registro de nuevos cepos está pendiente de
+                                habilitación. Puedes seguir consultando los
+                                avisos existentes.
+                            </p>
+                            <ul
+                                className={local.readiness}
+                                aria-label="Disponibilidad del registro de cepos"
+                            >
+                                <li>
+                                    {bootstrap.acciones.crear
+                                        ? "✓"
+                                        : "Pendiente:"}{" "}
+                                    Permiso para registrar cepos.
+                                </li>
+                                <li>
+                                    {bootstrap.operador ? "✓" : "Pendiente:"}{" "}
+                                    Operador de CCT vinculado a tu cuenta.
+                                </li>
+                                <li>
+                                    {bootstrap.escrituras ? "✓" : "Pendiente:"}{" "}
+                                    Registro de operaciones habilitado.
+                                </li>
+                                <li>
+                                    {bootstrap.numeracionLista
+                                        ? "✓"
+                                        : "Pendiente:"}{" "}
+                                    Activación operativa del nuevo CCT
+                                    confirmada.
+                                </li>
+                            </ul>
+                        </>
+                    ) : (
+                        <p className={local.hint}>
+                            Registro habilitado para tu cuenta.
+                        </p>
                     )}
                 </div>
-                {!bootstrap.escrituras ||
-                !bootstrap.numeracionLista ||
-                !bootstrap.operador ? (
-                    <p className={local.hint}>
-                        {bootstrap.disponibilidad.crear.motivo ||
-                            "Consulta disponible; las acciones requieren habilitación de Informática."}
-                    </p>
-                ) : null}
+            </section>
+            <section className={styles.card}>
+                <div className={styles.toolbar}>
+                    <h2>Consultar avisos de cepo</h2>
+                </div>
                 <form
                     onSubmit={(e) => {
                         e.preventDefault();

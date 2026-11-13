@@ -12,7 +12,7 @@ import {
     type CctCepoReport as Report,
     type CctCepoReportFilters,
 } from "@/platform/cct";
-import { CctPager, CctTable, cctError } from "./CctParts";
+import { CctPager, CctTable, CctPicker, cctError } from "./CctParts";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
 import local from "./CctWorkspace.module.scss";
 const day = (s: string) =>
@@ -29,6 +29,8 @@ function defaults(): CctCepoReportFilters {
         estado: "",
         tipoAgente: "",
         agente: "",
+        tipoVehiculo: "",
+        motivo: "",
     };
 }
 export function CctCepoReport() {
@@ -208,22 +210,15 @@ export function CctCepoReport() {
                                 )}
                             </select>
                         </div>
-                        <div>
-                            <label htmlFor="cct-report-tipoAgente">
-                                Tipo de agente (código, opcional)
-                            </label>
-                            <input
-                                id="cct-report-tipoAgente"
-                                className={styles.control}
-                                inputMode="numeric"
-                                pattern="[1-9][0-9]{0,17}"
-                                maxLength={18}
-                                value={form.tipoAgente}
-                                onChange={(e) =>
-                                    set("tipoAgente", e.target.value)
-                                }
-                            />
-                        </div>
+                        <CctPicker
+                            id="cct-report-tipoAgente"
+                            kind="agentes"
+                            label="Tipo de agente"
+                            optional
+                            module="cct-reportes"
+                            value={form.tipoAgente}
+                            onChange={(v) => set("tipoAgente", v)}
+                        />
                         <div>
                             <label htmlFor="cct-report-agente">
                                 Chapa del agente colocador (opcional)
@@ -238,6 +233,24 @@ export function CctCepoReport() {
                                 onChange={(e) => set("agente", e.target.value)}
                             />
                         </div>
+                        <CctPicker
+                            id="cct-report-tipoVehiculo"
+                            kind="tipos"
+                            label="Tipo de vehículo"
+                            optional
+                            module="cct-reportes"
+                            value={form.tipoVehiculo || ""}
+                            onChange={(v) => set("tipoVehiculo", v)}
+                        />
+                        <CctPicker
+                            id="cct-report-motivo"
+                            kind="motivos"
+                            label="Motivo del cepo"
+                            optional
+                            module="cct-reportes"
+                            value={form.motivo || ""}
+                            onChange={(v) => set("motivo", v)}
+                        />
                     </div>
                     <Button type="submit" state={busy ? "disabled" : "default"}>
                         {busy ? "Preparando…" : "Generar reporte de cepos"}
@@ -287,7 +300,9 @@ export function CctCepoReport() {
                         {day(applied.desde)} al {day(applied.hasta)} ·{" "}
                         {CCT_STATES[applied.estado] || "Todos los estados"} ·
                         Tipo de agente: {applied.tipoAgente || "Todos"} · Chapa:{" "}
-                        {applied.agente || "Todas"}
+                        {applied.agente || "Todas"} · Tipo vehículo:{" "}
+                        {applied.tipoVehiculo || "Todos"} · Motivo:{" "}
+                        {applied.motivo || "Todos"}
                     </p>
                     <div
                         className={local.summary}
@@ -315,19 +330,49 @@ export function CctCepoReport() {
                         Resumen de todos los resultados filtrados. Las
                         exportaciones incluyen el reporte completo hasta 2000
                         avisos; si se supera ese límite, se solicitará
-                        delimitarlo.
-                        {" "}Desplaza la tabla horizontalmente para consultar todas las columnas.
+                        delimitarlo. Desplaza la tabla horizontalmente para
+                        consultar todas las columnas.
                     </p>
+                    {Boolean(result.resumen.distribucion?.length) && (
+                        <details className={local.distribution}>
+                            <summary>
+                                Distribución por tipo de vehículo y motivo
+                            </summary>
+                            <CctTable
+                                items={result.resumen.distribucion!}
+                                columns={[
+                                    "TIPO_VEHICULO",
+                                    "TIPO_VEHICULO_NOMBRE",
+                                    "MOTIVO",
+                                    "MOTIVO_NOMBRE",
+                                    "TOTAL",
+                                ]}
+                                label="Distribución de cepos"
+                            />
+                        </details>
+                    )}
                     <CctTable
                         wide
                         label="Cepos por período"
-                        items={result.items}
+                        items={result.items.map((row) => ({
+                            ...row,
+                            TIPO_VEHICULO_NOMBRE:
+                                row.TIPO_VEHICULO_NOMBRE ||
+                                (row.TIPO_VEHICULO
+                                    ? "Tipo " + row.TIPO_VEHICULO
+                                    : null),
+                            MOTIVO_NOMBRE:
+                                row.MOTIVO_NOMBRE ||
+                                (row.MOTIVO ? "Motivo " + row.MOTIVO : null),
+                        }))}
                         columns={[
                             "AVISO",
                             "FECHA",
                             "TPLACA",
                             "NPLACA",
                             "CEPO_FISICO",
+                            "TIPO_VEHICULO_NOMBRE",
+                            "MOTIVO_NOMBRE",
                             "ESTATUS",
                             "TIPO_AGENTE",
                             "AGENTE",

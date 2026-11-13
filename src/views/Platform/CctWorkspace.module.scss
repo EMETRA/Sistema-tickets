@@ -280,3 +280,130 @@ table.wideTable {
         overflow-wrap: anywhere;
     }
 }
+
+.workspace {
+    gap: 16px;
+    > section {
+        padding: 20px;
+    }
+    h2 {
+        margin-bottom: 8px;
+    }
+    .hint {
+        margin: 6px 0 12px;
+    }
+    .form {
+        margin: 14px 0;
+        gap: 14px;
+    }
+    .data {
+        grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
+        gap: 14px 20px;
+    }
+    .summary {
+        padding: 12px 16px;
+        margin: 12px 0;
+        gap: 18px;
+        font-size: 12px;
+        strong {
+            font-size: 20px;
+        }
+    }
+    .reportChoices {
+        display: flex;
+        gap: 4px;
+        margin: 0;
+        border-bottom: 1px solid var(--tickets-border);
+        padding-bottom: 10px;
+        flex-wrap: wrap;
+        button {
+            padding: 10px 14px;
+            border-radius: 8px;
+            strong {
+                font-size: 13px;
+                margin: 0;
+            }
+            span {
+                display: none;
+            }
+        }
+    }
+}
+.workspaceNav {
+    overflow-x: auto;
+    border-bottom: 1px solid var(--tickets-border);
+    padding: 0 0 12px;
+    > div {
+        display: flex;
+        gap: 6px;
+        min-width: max-content;
+    }
+    a {
+        padding: 9px 14px;
+        border: 1px solid transparent;
+        border-radius: 8px;
+        text-decoration: none;
+        color: var(--tickets-text-secondary);
+        font-size: 13px;
+        &[aria-current="page"] {
+            background: var(--tickets-primary-soft, #eef1ff);
+            color: var(--tickets-primary);
+            border-color: var(--tickets-border);
+            font-weight: 600;
+        }
+        &:focus-visible {
+            outline: 2px solid var(--tickets-primary);
+            outline-offset: -2px;
+        }
+    }
+}
+.availability,
+.notice,
+.distribution {
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--tickets-text-secondary);
+    margin: 10px 0;
+}
+.availability {
+    background: var(--tickets-surface-subtle, #f7f9fd);
+    padding: 10px 14px;
+    border-radius: 8px;
+    summary {
+        cursor: pointer;
+    }
+}
+.notice {
+    border-left: 3px solid var(--tickets-border);
+    padding-left: 12px;
+}
+.distribution {
+    summary {
+        cursor: pointer;
+        font-weight: 600;
+        padding: 8px 0;
+    }
+}
+@media (max-width: 600px) {
+    .workspaceNav > div {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        min-width: 0;
+        gap: 5px;
+    }
+    .workspaceNav a {
+        text-align: center;
+        padding: 8px 6px;
+    }
+}
+.pickerSearch {
+    margin-top: 6px;
+    summary {
+        font-size: 11px;
+        color: var(--tickets-text-secondary);
+        cursor: pointer;
+    }
+    .inline {
+        margin-top: 8px;
+    }
+}

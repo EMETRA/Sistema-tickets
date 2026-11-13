@@ -71,6 +71,33 @@ export type HrMine = {
     perfil: HrProfile;
     entrega: HrDelivery | null;
 };
+export function hrDraft(
+    data: HrMine,
+    prior: Record<string, HrAnswer> = {},
+): Record<string, HrAnswer> {
+    const returned = data.estado === "DEVUELTA" ? data.entrega?.respuestas : null;
+    return Object.fromEntries(
+        data.campana.campos.map((field) => {
+            const local = prior[field.codigo];
+            const previous = returned?.[field.codigo];
+            if (field.modo === "CONFIRMAR")
+                return [
+                    field.codigo,
+                    {
+                        observacion:
+                            local?.observacion ?? previous?.observacion ?? "",
+                    },
+                ];
+            const source =
+                local && Object.hasOwn(local, "valor")
+                    ? local
+                    : previous && Object.hasOwn(previous, "valor")
+                      ? previous
+                      : { valor: data.perfil.datos[field.codigo] };
+            return [field.codigo, { valor: source.valor ?? "" }];
+        }),
+    );
+}
 export type HrReview = {
     contacto?: { telefono: string | null; correo: string | null } | null;
     campana: HrCampaign;

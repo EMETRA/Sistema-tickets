@@ -18,6 +18,7 @@ import {
 import {
     HR_STATES,
     hrDate,
+    hrDraft,
     type HrAnswer,
     type HrMine,
     type HrProfile,
@@ -132,21 +133,7 @@ function HrUpdateForm({ id, onSent }: { id: string; onSent: () => void }) {
             );
             if (controller.signal.aborted) return;
             setData(r);
-            setAnswers((prior) =>
-                Object.fromEntries(
-                    r.campana.campos.map((f) => [
-                        f.codigo,
-                        f.modo === "EDITAR"
-                            ? {
-                                  valor:
-                                      prior[f.codigo]?.valor ??
-                                      r.perfil.datos[f.codigo] ??
-                                      "",
-                              }
-                            : {},
-                    ]),
-                ),
-            );
+            setAnswers((prior) => hrDraft(r, prior));
         } catch (e) {
             if (!controller.signal.aborted) setError(hrError(e));
         }
@@ -372,6 +359,11 @@ function HrUpdateForm({ id, onSent }: { id: string; onSent: () => void }) {
                                                                     confirmacion:
                                                                         e.target
                                                                             .value as HrAnswer["confirmacion"],
+                                                                    observacion:
+                                                                        e.target
+                                                                            .value === "CORRECTO"
+                                                                            ? ""
+                                                                            : value.observacion,
                                                                 },
                                                             )
                                                         }

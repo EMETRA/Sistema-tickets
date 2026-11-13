@@ -1,6 +1,14 @@
 const test=require('node:test'),assert=require('node:assert/strict'),path=require('node:path');
 const root=path.resolve(__dirname,'../..');const load=require('./load-ts.cjs');
-const {hrLocalIso,hrLocalInput,hrDeadline}=load(root)('src/platform/hr.ts');
+const {hrLocalIso,hrLocalInput,hrDeadline,hrDraft}=load(root)('src/platform/hr.ts');
+test('al corregir una devolución conserva la propuesta y las observaciones sin confirmar por el usuario',()=>{
+ const data={estado:'DEVUELTA',campana:{campos:[{codigo:'TELEFONO',modo:'EDITAR'},{codigo:'DPI',modo:'CONFIRMAR'}]},perfil:{datos:{TELEFONO:'original'}},entrega:{respuestas:{TELEFONO:{valor:'propuesto'},DPI:{confirmacion:'CORREGIR',observacion:'Revisar documento'}}}};
+ assert.deepEqual(hrDraft(data),{TELEFONO:{valor:'propuesto'},DPI:{observacion:'Revisar documento'}});
+ assert.deepEqual(hrDraft(data,{TELEFONO:{valor:''},DPI:{confirmacion:'CORRECTO',observacion:''}}),{TELEFONO:{valor:''},DPI:{observacion:''}});
+ assert.equal(hrDraft(data,{TELEFONO:{valor:null}}).TELEFONO.valor,'');
+ assert.equal(hrDraft({...data,estado:'PENDIENTE'}).TELEFONO.valor,'original');
+ assert.deepEqual(hrDraft(data,{TELEFONO:{valor:'borrador'},DPI:{confirmacion:'CORREGIR',observacion:'Nota local'}}),{TELEFONO:{valor:'borrador'},DPI:{observacion:'Nota local'}});
+});
 test('plazos de 1,3,7 días y un mes se calculan en Guatemala sin perder fin de mes',()=>{
  const start=new Date('2027-01-31T15:00:00Z');
  assert.equal(hrDeadline(start,'mes').toISOString(),'2027-02-28T15:00:00.000Z');

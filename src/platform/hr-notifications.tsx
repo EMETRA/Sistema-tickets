@@ -53,7 +53,12 @@ export function HrNotificationsProvider({
                 e instanceof PlatformError &&
                 ([401, 403].includes(e.status) ||
                     e.code === "FEATURE_DISABLED");
-            if (denied) setData(null);
+            if (denied)
+                setData(
+                    e instanceof PlatformError && e.code === "FEATURE_DISABLED"
+                        ? { habilitado: false, items: [], pendientes: 0 }
+                        : null,
+                );
             setBlocked(denied);
             setFailures((v) => v + 1);
             setError(

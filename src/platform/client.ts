@@ -40,6 +40,7 @@ export async function platformFetch<T>(
         return response.json();
     if (
         !/^\/boletas\/pdf\?/.test(path) &&
+        !/^\/transit-reprints\/N\/[1-9]\d{0,14}\/pdf$/.test(path) &&
         !/^\/files\/[-a-f0-9]+$/.test(path) &&
         !/^\/tickets\/[1-9]\d*\/files\/[1-9]\d*$/.test(path)
     )

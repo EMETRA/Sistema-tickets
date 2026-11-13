@@ -1,9 +1,10 @@
+import { ViviPmtWorkspace } from "@/views/Platform/ViviPmtWorkspace";
 import {
     CctConsultas,
     CctFormularios,
     CctReportes,
 } from "@/views/Platform/CctWorkspace";
-import { TransitReprintsWorkspace } from '@/views/Platform/TransitReprintsWorkspace';
+import { TransitReprintsWorkspace } from "@/views/Platform/TransitReprintsWorkspace";
 import { ViviReportsWorkspace } from "@/views/Platform/ViviReportsWorkspace";
 import { PayrollWorkspace } from "@/views/Platform/PayrollWorkspace";
 import { HrCampaignsWorkspace } from "@/views/Platform/HrCampaignsWorkspace";
@@ -32,6 +33,7 @@ export const APP_REGISTRY: Record<string, ComponentType> = {
     "rh-boletas": PayrollWorkspace,
     "rh-datos": HrCampaignsWorkspace,
     "vivi-reportes": ViviReportsWorkspace,
+    "pmt-avisame": ViviPmtWorkspace,
     "cct-consultas": CctConsultas,
     "cct-cepos": CctFormularios,
     "cct-reportes": CctReportes,

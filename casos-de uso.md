@@ -11,6 +11,8 @@ Guía de arquitectura, configuración y cambios: [manual-técnico.md](manual-t%C
 
 ## Índice
 
+- [CU-CCT-ASIG · Consultar los talonarios de un agente](#cu-cct-asig)
+
 - [CU-01 · Entrar y recuperar acceso institucional](#cu-01)
 - [CU-02 · Consultar inicio, perfil y rendimiento personal](#cu-02)
 - [CU-03 · Navegar aplicaciones, detectar desuso y bloquear acceso previo](#cu-03)
@@ -47,6 +49,18 @@ Guía de arquitectura, configuración y cambios: [manual-técnico.md](manual-t%C
 - [Criterios de cobertura](#cobertura)
 
 Los casos agrupan variantes de una misma finalidad (por ejemplo consultar, crear y modificar un catálogo). Las rutas y operaciones del anexo permiten encontrar el caso sin recorrer todo el código. Los diagramas describen decisiones principales; las excepciones de cada caso completan los caminos alternativos.
+
+<a id="cu-cct-asig"></a>
+
+## CU-CCT-ASIG · Consultar los talonarios de un agente
+
+**Actor:** Operador con acceso a consultas CCT. **Flujo:** buscar agente → abrir ficha → leer asignaciones por tipo/chapa → recorrer páginas de 50 y consultar intervalo, boleta actual y fechas. No altera talonarios.
+
+**Excepciones:** sin permiso no consulta; tipo ausente se informa como vínculo pendiente; fallo del proveedor permite reintentar. Los metadatos nuevos se conservan como evidencia técnica; no convierten los códigos de incautación en decisiones operativas.
+
+**Objetos de DB:** ADMEMETRA.TB_ASIGNACION_REMISIONES, clave (TIPO_AGENTE,AGENTE,TALONARIO), y catálogo de agentes/empalmes del directorio. En el Panel la relación es indirecta por API.
+
+**Archivos involucrados:** [src/views/Platform/CctAgentAssignments.tsx](https://github.com/EMETRA/Sistema-tickets/blob/a235bd0d18472a3d08cafe423e34dcc07e5afdac/src/views/Platform/CctAgentAssignments.tsx), [src/views/Platform/CctWorkspace.tsx](https://github.com/EMETRA/Sistema-tickets/blob/a235bd0d18472a3d08cafe423e34dcc07e5afdac/src/views/Platform/CctWorkspace.tsx).
 
 <a id="cu-01"></a>
 
@@ -1603,7 +1617,7 @@ flowchart TD
 
 **Objetos DB a través del API:** EMT_REMISIONES/EMT_VEHICULOS/TB_CEPOS_PMT, remisiones de empresa/instituciones, TB_EMPALME_PLACAS, TB_PILOTOS, capacitaciones/tarjetones, TB_EMPALME_AGENTES y TB_EMPLEADOS. Pagos y demás tablas se documentan en [CU-25 API](https://github.com/EMETRA/api-tickets/blob/6625af9f3b33dba0cb7cf50f62b5d5e85d435f34/casos-de%20uso.md#cu-25).
 
-**Archivos:** [CctWorkspace](https://github.com/EMETRA/Sistema-tickets/blob/56366222ec5da0e18071a51c24e80b6d0a1ca89d/src/views/Platform/CctWorkspace.tsx), [CctParts](https://github.com/EMETRA/Sistema-tickets/blob/56366222ec5da0e18071a51c24e80b6d0a1ca89d/src/views/Platform/CctParts.tsx), contratos platform/cct.ts, app-registry y BFF. **Ruta:** /home/cct/consultas/cct-consultas.
+**Archivos:** [CctWorkspace](https://github.com/EMETRA/Sistema-tickets/blob/a235bd0d18472a3d08cafe423e34dcc07e5afdac/src/views/Platform/CctWorkspace.tsx), [CctParts](https://github.com/EMETRA/Sistema-tickets/blob/56366222ec5da0e18071a51c24e80b6d0a1ca89d/src/views/Platform/CctParts.tsx), contratos platform/cct.ts, app-registry y BFF. **Ruta:** /home/cct/consultas/cct-consultas.
 
 
 ### Ampliación de CU-25: solvencia y directorios
@@ -1629,7 +1643,7 @@ flowchart TD
 
 **Excepciones:** no hay formulario activo si falta permiso/operador/corte; si la clave es ambigua, ya está notificada o cambió el lote, se pide actualizar en lugar de sobrescribir. El nombre se valida también contra bytes de la columna en el servidor.
 
-**Objetos:** EMT_REMISIONES, TB_REMISIONES_EMPRESA, TB_REMISIONES_INSTITUCIONES, operador/control y auditoría/comandos. **Archivos/rutas:** componente Notification en [CctWorkspace](https://github.com/EMETRA/Sistema-tickets/blob/56366222ec5da0e18071a51c24e80b6d0a1ca89d/src/views/Platform/CctWorkspace.tsx), platformCommand y POST /api/platform/cct/notificaciones o notificaciones/placa; GET notificaciones/preview. Contrato completo: [CU-26 API](https://github.com/EMETRA/api-tickets/blob/6625af9f3b33dba0cb7cf50f62b5d5e85d435f34/casos-de%20uso.md#cu-26).
+**Objetos:** EMT_REMISIONES, TB_REMISIONES_EMPRESA, TB_REMISIONES_INSTITUCIONES, operador/control y auditoría/comandos. **Archivos/rutas:** componente Notification en [CctWorkspace](https://github.com/EMETRA/Sistema-tickets/blob/a235bd0d18472a3d08cafe423e34dcc07e5afdac/src/views/Platform/CctWorkspace.tsx), platformCommand y POST /api/platform/cct/notificaciones o notificaciones/placa; GET notificaciones/preview. Contrato completo: [CU-26 API](https://github.com/EMETRA/api-tickets/blob/6625af9f3b33dba0cb7cf50f62b5d5e85d435f34/casos-de%20uso.md#cu-26).
 
 
 <a id="cu-27"></a>

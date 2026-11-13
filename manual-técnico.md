@@ -9,6 +9,8 @@ Los enlaces de código fijan esa revisión para que sigan siendo consultables cu
 
 ## Índice
 
+- [CCT: asignaciones de remisiones del agente](#cct-asignaciones)
+
 - [CCT: arquitectura, configuración y mantenimiento](#cct)
 
 - [1. Propósito y límites](#orientacion)
@@ -111,6 +113,16 @@ Los siguientes comandos son las entradas reales de `package.json`; el listado no
 | `storybook` | `storybook dev` |
 | `build-storybook` | `storybook build` |
 | `test:integracion` | `node --test test/integracion/*.test.cjs` |
+
+<a id="cct-asignaciones"></a>
+
+## CCT: asignaciones de remisiones del agente
+
+La ficha del agente incorpora talonarios, serie, intervalo/boleta actual, saldo de boletas, estado y fechas, enlazados por tipo de agente y chapa. Se pagina de 50 y conserva la separación de asignaciones entre agentes/tipos. Sin un tipo registrado se informa la falta de relación; no se atribuyen talonarios solo por chapa. Es una consulta de lectura y no modifica boletas ni correlativos.
+
+Los metadatos recibidos confirman las estructuras de incautaciones y tablas candidatas PMT de accidentes. Sus altas/ediciones permanecen pendientes del significado de códigos y de confirmar la familia vigente. No se añaden botones que simulen guardar.
+
+Código verificado: `a235bd0d18472a3d08cafe423e34dcc07e5afdac`. Archivos: [src/views/Platform/CctAgentAssignments.tsx](https://github.com/EMETRA/Sistema-tickets/blob/a235bd0d18472a3d08cafe423e34dcc07e5afdac/src/views/Platform/CctAgentAssignments.tsx), [src/views/Platform/CctWorkspace.tsx](https://github.com/EMETRA/Sistema-tickets/blob/a235bd0d18472a3d08cafe423e34dcc07e5afdac/src/views/Platform/CctWorkspace.tsx).
 
 <a id="datos"></a>
 
@@ -292,7 +304,7 @@ La aplicación CCT se integra en las rutas dinámicas del catálogo; no añade u
 
 | Archivo | Responsabilidad |
 | --- | --- |
-| [CctWorkspace.tsx](https://github.com/EMETRA/Sistema-tickets/blob/56366222ec5da0e18071a51c24e80b6d0a1ca89d/src/views/Platform/CctWorkspace.tsx) | Bootstrap de disponibilidad, pestañas de consultas/directorios, resultados, detalle, notificación y reporte PDF |
+| [CctWorkspace.tsx](https://github.com/EMETRA/Sistema-tickets/blob/a235bd0d18472a3d08cafe423e34dcc07e5afdac/src/views/Platform/CctWorkspace.tsx) | Bootstrap de disponibilidad, pestañas de consultas/directorios, resultados, detalle, notificación y reporte PDF |
 | [CctCepos.tsx](https://github.com/EMETRA/Sistema-tickets/blob/56366222ec5da0e18071a51c24e80b6d0a1ca89d/src/views/Platform/CctCepos.tsx) | Consulta de avisos, selección/alta de vehículo e ingreso; formularios separados según estado y permiso |
 | [CctEditCepo.tsx](https://github.com/EMETRA/Sistema-tickets/blob/56366222ec5da0e18071a51c24e80b6d0a1ca89d/src/views/Platform/CctEditCepo.tsx) | Edición de colocación, revisión, confirmaciones, conservación de datos y recibo estable |
 | [CctParts.tsx](https://github.com/EMETRA/Sistema-tickets/blob/56366222ec5da0e18071a51c24e80b6d0a1ca89d/src/views/Platform/CctParts.tsx) | Ficha, tabla, paginación y selector de catálogo con búsqueda y páginas |
@@ -329,7 +341,7 @@ Persistencia y propietarios: [manual API](https://github.com/EMETRA/api-tickets/
 
 El reporte operativo solo necesita REPORTAR y módulo activo; puede usarse con las escrituras apagadas y sin operador. No requiere SQL nuevo. La activación de escrituras requiere catálogo/privilegios/operadores y el corte descrito en [guía del API](https://github.com/EMETRA/api-tickets/blob/c30f7d0b19e1db158483cc7053a70ac07f4814a2/sql/cct/README.md). El anterior puede seguir atendiendo durante la comparación de lecturas. Después se detiene, se inicializa el correlativo de multas de daño/robo y se habilitan las escrituras del nuevo; no son dos escritores concurrentes.
 
-[Test de integración](https://github.com/EMETRA/Sistema-tickets/blob/56366222ec5da0e18071a51c24e80b6d0a1ca89d/test/integracion/cct.test.cjs) verifica tipos, CSV y BFF privado. [Recorrido Chromium](https://github.com/EMETRA/Sistema-tickets/blob/56366222ec5da0e18071a51c24e80b6d0a1ca89d/test/integracion/cct-browser.cjs) usa servicios locales ficticios, sesión de prueba y [PDF ficticio](https://github.com/EMETRA/Sistema-tickets/blob/56366222ec5da0e18071a51c24e80b6d0a1ca89d/test/fixtures/cct-estado-cuenta.pdf). Tras compilar, ejecutar `node test/integracion/cct-browser.cjs` con Chromium/Playwright disponibles. Usa puertos 3791/3792 y guarda capturas en /tmp/cct-expanded-browser. Cubre permisos antes de abrir, detalle, homónimos, notificación, pago recuperable, liberación, daño, entrada de alta visible pero bloqueada sin preparación, aviso físico obligatorio, reporte por fecha/estado/agente, páginas, CSV completo de 51 avisos, filtros aplicados estables, recuperación de PDF y estado de cuenta separado en 1440/1024/390 px. No sustituye la aceptación sobre Oracle, SAT o permisos institucionales.
+[Test de integración](https://github.com/EMETRA/Sistema-tickets/blob/56366222ec5da0e18071a51c24e80b6d0a1ca89d/test/integracion/cct.test.cjs) verifica tipos, CSV y BFF privado. [Recorrido Chromium](https://github.com/EMETRA/Sistema-tickets/blob/a235bd0d18472a3d08cafe423e34dcc07e5afdac/test/integracion/cct-browser.cjs) usa servicios locales ficticios, sesión de prueba y [PDF ficticio](https://github.com/EMETRA/Sistema-tickets/blob/56366222ec5da0e18071a51c24e80b6d0a1ca89d/test/fixtures/cct-estado-cuenta.pdf). Tras compilar, ejecutar `node test/integracion/cct-browser.cjs` con Chromium/Playwright disponibles. Usa puertos 3791/3792 y guarda capturas en /tmp/cct-expanded-browser. Cubre permisos antes de abrir, detalle, homónimos, notificación, pago recuperable, liberación, daño, entrada de alta visible pero bloqueada sin preparación, aviso físico obligatorio, reporte por fecha/estado/agente, páginas, CSV completo de 51 avisos, filtros aplicados estables, recuperación de PDF y estado de cuenta separado en 1440/1024/390 px. No sustituye la aceptación sobre Oracle, SAT o permisos institucionales.
 
 ### Ampliación operativa y diseño compacto de CCT
 

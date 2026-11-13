@@ -1,6 +1,6 @@
 # Casos de uso — Sistema-tickets
 
-Base documental: `926fe45d27922c595c63e8f79e1e82b1594470eb`; actualización de consulta de casos: `cd953b4ea8731336669948645a55032e5f5eabba`; actualización de vistas y diagnóstico judicial: `9d497b6ff471410ea5a96ba6df5e707ccebd8e43`; actualización documental: `b77da403cba653095c8156b0e2c13035a96b606b`; actualización de catálogo: `e3f8676f5121223c9f23aaa036833260efe236f9`; reportes VIVI: `b29ea52c21307f21bb49041ba2e8f76fb8080f44`; responsables de noticias: `55827f0694bf6f736264c3c5d41622b7cc59a88a`; inventario institucional: `9daff7769ccb684b8eb5497a8b8b82b902e050e0`; navegación de personal, activos y red: `db60d821fdbc9b5e2cee31f98cc7422626a4ff22`; perfil y campañas de RRHH: `d4bd5264975a6663e3399bdc155f65141b38d7d9`; línea de integración revisada: `Dev + feat/perfil_campanas_rrhh`. Describe la base y la actualización citadas; la configuración y las autorizaciones efectivas de un servidor se comprueban por separado. Esta edición se preparó sin conectarse a Oracle, SMTP ni servidores institucionales.
+Base documental: `926fe45d27922c595c63e8f79e1e82b1594470eb`; actualización de consulta de casos: `cd953b4ea8731336669948645a55032e5f5eabba`; actualización de vistas y diagnóstico judicial: `9d497b6ff471410ea5a96ba6df5e707ccebd8e43`; actualización documental: `b77da403cba653095c8156b0e2c13035a96b606b`; actualización de catálogo: `e3f8676f5121223c9f23aaa036833260efe236f9`; reportes VIVI: `b29ea52c21307f21bb49041ba2e8f76fb8080f44`; responsables de noticias: `55827f0694bf6f736264c3c5d41622b7cc59a88a`; inventario institucional: `9daff7769ccb684b8eb5497a8b8b82b902e050e0`; navegación de personal, activos y red: `db60d821fdbc9b5e2cee31f98cc7422626a4ff22`; perfil y campañas de RRHH: `d4bd5264975a6663e3399bdc155f65141b38d7d9`; reimpresión de boletas N: `670c69364feb7e84dff997dc8e9644277a9d43f5`; línea de integración revisada: `Dev + feat/perfil_campanas_rrhh`. Describe la base y la actualización citadas; la configuración y las autorizaciones efectivas de un servidor se comprueban por separado. Esta edición se preparó sin conectarse a Oracle, SMTP ni servidores institucionales.
 
 Los enlaces de código fijan esa revisión para que sigan siendo consultables cuando `main` excluya herramientas de desarrollo. Al modificar un comportamiento se deben actualizar su caso de uso, configuración y referencia de código.
 
@@ -34,6 +34,8 @@ Guía de arquitectura, configuración y cambios: [manual-técnico.md](manual-t%C
 
 - [CU-23 · Consultar usuarios y actividad de VIVI desde Informática](#cu-23)
 - [CU-RH-01 · Mi ficha y campañas obligatorias de RRHH](#cu-rh-01)
+
+- [CU-24 · Reimprimir una boleta de tránsito N desde Juzgado](#cu-24)
 - [Índice de operaciones y rutas](#operaciones)
 - [Criterios de cobertura](#cobertura)
 
@@ -1424,6 +1426,39 @@ flowchart TD
 - Las sustituciones retiran lógicamente filas con autor/fecha; las versiones de entrega conservan historial. Un fallo revierte la aplicación en la transacción y no marca el envío como aplicado.
 - Sin la bandera de ampliación no se consultan esas tablas. La preparación adicional es `sql/rrhh/05–07`; el registro oficial del empleado permanece en ADMINSIAF y su cuenta en ADMAUTEMETRA.
 
+<a id="cu-24"></a>
+
+## CU-24 · Reimprimir una boleta de tránsito N desde Juzgado
+
+**Actor y precondición:** Cuenta con sesión válida, módulo `juz02` activo y administración efectiva o `TICKETS_JUZGADO_BOLETAS_N_LEER`. Se comprueba el acceso antes de presentar el formulario, además de la comprobación del API.
+
+1. Abrir Aplicaciones Juzgado → Reportes → Reimpresión de boletas de tránsito N.
+2. Escribir el número o pegar `N-1234567`; enviar la consulta manualmente.
+3. Validar y mostrar el detalle privado: placa destacada, fecha, vehículo, infractor, agente, artículos e importe.
+4. Contrastar los datos y pulsar Ver PDF para reimpresión.
+5. Recuperar el PDF autenticado, validar sus bytes y abrir la vista previa.
+6. Abrir el PDF para imprimir desde el navegador o descargarlo. Al cambiar el número, cerrar o abandonar la vista, retirar el documento previo y revocar su URL.
+
+```mermaid
+flowchart TD
+  inicio["Abrir reporte en Juzgado"] --> permiso{"Acceso permitido"}
+  permiso -->|No| bloqueo["Bloquear formulario antes de completarlo"]
+  permiso -->|Sí| numero["Escribir número N y consultar"]
+  numero --> respuesta{"Detalle válido"}
+  respuesta -->|No| error["Conservar entrada y ofrecer reintento"]
+  respuesta -->|Sí| contraste["Contrastar placa y artículos"]
+  contraste --> pdf["Recuperar PDF privado"]
+  pdf --> documento{"PDF válido"}
+  documento -->|No| reintento["Mostrar referencia y reintentar PDF"]
+  documento -->|Sí| salida["Vista previa, descarga o impresión"]
+```
+
+**Excepciones:** Otra serie o número inválido → no enviar consulta. Sin sesión/permiso → bloquear acceso. Boleta inexistente → explicar el 404 y conservar el número. Fallo Oracle/transporte → mostrar referencia del API y permitir reintento, sin repetir acciones de emisión. PDF de otro formato o detalle incompatible → no presentarlo como documento válido. Cambiar el número → retirar resultados y archivo anteriores. Las acciones no generan multas, pagos ni firmas y no acreditan impresión física.
+
+**Objetos DB indirectos:** Fuentes de remisiones, vehículos, conductores y reglamento en BASEDATOS; saldo y empleados en ADMINSIAF; empalme de agentes y función de días hábiles en ADMEMETRA; SEMANA_HABIL; catálogo y permisos de Tickets. Solo api-tickets abre estas fuentes. Detalle del contrato y reglas: [manual técnico](manual-t%C3%A9cnico.md#reimpresion-n).
+
+**Archivos:** [src/views/Platform/TransitReprintsWorkspace.tsx](https://github.com/EMETRA/Sistema-tickets/blob/670c69364feb7e84dff997dc8e9644277a9d43f5/src/views/Platform/TransitReprintsWorkspace.tsx), [src/views/Platform/TransitReprintsWorkspace.module.scss](https://github.com/EMETRA/Sistema-tickets/blob/670c69364feb7e84dff997dc8e9644277a9d43f5/src/views/Platform/TransitReprintsWorkspace.module.scss), [src/platform/transit-reprints.ts](https://github.com/EMETRA/Sistema-tickets/blob/670c69364feb7e84dff997dc8e9644277a9d43f5/src/platform/transit-reprints.ts), [src/config/app-registry.ts](https://github.com/EMETRA/Sistema-tickets/blob/670c69364feb7e84dff997dc8e9644277a9d43f5/src/config/app-registry.ts), [src/platform/client.ts](https://github.com/EMETRA/Sistema-tickets/blob/670c69364feb7e84dff997dc8e9644277a9d43f5/src/platform/client.ts), [src/app/api/platform/[...path]/route.ts](https://github.com/EMETRA/Sistema-tickets/blob/670c69364feb7e84dff997dc8e9644277a9d43f5/src/app/api/platform/[...path]/route.ts). Pruebas: [test/integracion/reimpresion-n.test.cjs](https://github.com/EMETRA/Sistema-tickets/blob/670c69364feb7e84dff997dc8e9644277a9d43f5/test/integracion/reimpresion-n.test.cjs) y [test/integracion/reimpresion-n-browser.cjs](https://github.com/EMETRA/Sistema-tickets/blob/670c69364feb7e84dff997dc8e9644277a9d43f5/test/integracion/reimpresion-n-browser.cjs). La habilitación del catálogo y los permisos corresponde a api-tickets; no depende de modificar el catálogo dummy en el servidor.
+
 <a id="operaciones"></a>
 
 ## Índice de operaciones y rutas
@@ -1528,11 +1563,13 @@ Las carpetas entre paréntesis agrupan rutas App Router sin añadirse a la URL; 
 
 Las rutas de [CU-RH-01](#cu-rh-01) son `/mi-perfil`, `/notificaciones`, `/mi-perfil?campana=...` y `/home/rrhh/formularios/rh-datos`. Las consultas/escrituras `/api/platform/hr/...` pasan por el BFF de plataforma existente; no se añade un manejador independiente. El listado de las 12 entradas del receptor está en [casos del API](https://github.com/EMETRA/api-tickets/blob/68f2223df8324c0ec39dac4e0e521c4ff29a240e/src/platform/platform.hr.controller.ts).
 
+Las rutas de [CU-24](#cu-24) son `/home/juzgado/reportes/juz02`, `GET /api/platform/transit-reprints/N/:numero` y `GET /api/platform/transit-reprints/N/:numero/pdf`, atendidas por el módulo y el BFF de plataforma existentes. No se añade un manejador BFF independiente.
+
 <a id="cobertura"></a>
 
 ## Criterios de cobertura
 
-Esta edición contiene **24 casos agrupados**. El inventario incluye 0 entradas Nest decoradas, 25 páginas Next y 70 manejadores BFF, según corresponda. Los procesos internos, servicios asíncronos y almacenamiento local se cubren en los casos aunque no expongan HTTP. Las operaciones heredadas se identifican como tales; una ruta conservada en código no implica que deba aparecer habilitada en el catálogo de aplicaciones. Las funciones pendientes no se presentan como implementadas.
+Esta edición contiene **25 casos agrupados**. El inventario incluye 0 entradas Nest decoradas, 25 páginas Next y 70 manejadores BFF, según corresponda. Los procesos internos, servicios asíncronos y almacenamiento local se cubren en los casos aunque no expongan HTTP. Las operaciones heredadas se identifican como tales; una ruta conservada en código no implica que deba aparecer habilitada en el catálogo de aplicaciones. Las funciones pendientes no se presentan como implementadas.
 
 Para mantener la cobertura: al añadir o retirar una ruta, resolver, tarea programada o pantalla, actualizar su caso, su fila en este índice, los objetos usados y el diagrama. Si una función depende de otro repositorio, conservar explícito ese límite y actualizar también el contrato del receptor.
 

@@ -32,6 +32,7 @@ type Caso = {
     USO_PLACA_CONFIRMADO?: string;
     PLACA_CONFIRMADA?: string;
     REGLA_CONFIRMADA?: number;
+    publicacionEvidencias?: { estado: string; codigo?: string | null };
 };
 type Archivo = { ID: string; MIME: string; BYTES: string; ESTADO: string };
 type Detail = {
@@ -43,6 +44,7 @@ type Config = {
     acciones: { revisar: boolean; imponer: boolean };
     permiteCorrecciones: boolean;
     emisionConfigurada: boolean;
+    evidenciasConfiguradas: boolean;
     reservaMinutos: number;
 };
 const estados: Record<string, string> = {
@@ -636,6 +638,15 @@ export function ViviPmtWorkspace() {
                                 {active.PLACA_CONFIRMADA}
                             </p>
                         )}
+                        {active.NUMERO_REMISION && active.publicacionEvidencias && (
+                            <p role="status" className={styles.muted}>
+                                {active.publicacionEvidencias.estado === "PUBLICADO"
+                                    ? "Evidencias copiadas al archivo de la remisión."
+                                    : active.publicacionEvidencias.estado === "NO_PROGRAMADA"
+                                      ? "La multa ya fue emitida, pero no tiene una copia de evidencias programada. Solicita la revisión del registro."
+                                    : "La multa ya fue emitida. La copia de evidencias está pendiente; se reintentará automáticamente sin emitir otra multa."}
+                            </p>
+                        )}
                         {active.FUNDAMENTO && (
                             <p>
                                 <strong>Fundamento registrado:</strong>{" "}
@@ -758,12 +769,18 @@ export function ViviPmtWorkspace() {
                                         imponer multas.
                                     </p>
                                 )}
+                                {!config.evidenciasConfiguradas && (
+                                    <p className={styles.error}>
+                                        Falta preparar el almacenamiento de evidencias de las remisiones.
+                                    </p>
+                                )}
                                 <div className={styles.actions}>
                                     <Button
                                         state={
                                             !canDecide ||
                                             !config.acciones.imponer ||
-                                            !config.emisionConfigurada
+                                            !config.emisionConfigurada ||
+                                            !config.evidenciasConfiguradas
                                                 ? "disabled"
                                                 : "default"
                                         }

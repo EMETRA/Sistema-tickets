@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/client/atoms/Button";
 import { usePlatform } from "@/platform/context";
@@ -243,7 +244,9 @@ function Remisiones({
             serie: "",
             numero: "",
             agente: "",
-            fuente: report ? "TODAS" : "TRANSITO",
+            tipoLicencia: "",
+            licencia: "",
+            fuente: "TODAS",
             estado: "PENDIENTES",
         }),
         [result, setResult] = useState<CctPage | null>(null),
@@ -271,8 +274,13 @@ function Remisiones({
         setForm((f) => ({
             ...f,
             [k]: v,
-            ...(k === "tipo" && v !== "placa" && f.fuente === "TODAS"
-                ? { fuente: "TRANSITO" }
+            ...(k === "tipo"
+                ? {
+                      estado: ["agente", "licencia"].includes(v)
+                          ? "HISTORIAL"
+                          : "PENDIENTES",
+                      fuente: "TODAS",
+                  }
                 : {}),
         }));
     function current() {
@@ -285,6 +293,11 @@ function Remisiones({
             Object.assign(q, { tipoPlaca: form.tipoPlaca, placa: form.placa });
         else if (form.tipo === "boleta")
             Object.assign(q, { serie: form.serie, numero: form.numero });
+        else if (form.tipo === "licencia")
+            Object.assign(q, {
+                tipoLicencia: form.tipoLicencia,
+                licencia: form.licencia,
+            });
         else q.agente = form.agente;
         return q;
     }
@@ -313,11 +326,14 @@ function Remisiones({
             if (!ctl.signal.aborted) setBusy(false);
         }
     }
-    async function open(row: CctRow) {
+    async function open(
+        row: CctRow,
+        source = row.FUENTE || result?.fuente || applied!.fuente,
+    ) {
         detailRequest.current?.abort();
         const ctl = new AbortController();
         detailRequest.current = ctl;
-        setSelected(row);
+        setSelected({ ...row, FUENTE: source });
         setDetail(null);
         setDetailBusy(true);
         setDetailError("");
@@ -326,7 +342,7 @@ function Remisiones({
                 await platformFetch(
                     "/cct/remisiones/detalle?" +
                         cctQuery({
-                            fuente: applied!.fuente,
+                            fuente: source,
                             serie: row.SERIE!,
                             numero: row.REMISION!,
                         }),
@@ -376,19 +392,20 @@ function Remisiones({
                         18,
                     ],
                 ]
-              : [["agente", "Chapa del agente", 18]];
+              : form.tipo === "licencia"
+                ? [
+                      ["tipoLicencia", "Tipo de licencia", 1],
+                      ["licencia", "Número de licencia", 18],
+                  ]
+                : [["agente", "Chapa del agente", 18]];
     return (
         <>
             <section className={styles.card}>
-                <h2>
-                    {report
-                        ? "Estado de cuenta por placa"
-                        : "Remisiones y solvencias"}
-                </h2>
+                <h2>{report ? "Estado de cuenta por placa" : "Solvencia"}</h2>
                 <p className={local.hint}>
                     {report
                         ? "Prepara un documento por placa, con el resumen de las fuentes seleccionadas para revisar, descargar e imprimir."
-                        : "Consulta los registros de cada fuente y sus antecedentes por placa, boleta o agente."}
+                        : "Consulta todas las infracciones y cepos. Por placa se muestran pendientes; por agente o licencia, el historial completo con sus pagos registrados."}
                 </p>
                 <form
                     onSubmit={(e) => {
@@ -413,25 +430,55 @@ function Remisiones({
                                         Boleta / aviso
                                     </option>
                                     <option value="agente">Agente</option>
+                                    <option value="licencia">
+                                        Licencia del conductor
+                                    </option>
                                 </select>
                             </div>
                         )}
                         {fields.map(([k, label, max]) => (
                             <div key={k}>
-                                <label htmlFor={"cct-" + k}>{label} *</label>
-                                <input
-                                    id={"cct-" + k}
-                                    className={styles.control}
-                                    value={form[k as keyof typeof form]}
-                                    onChange={(e) =>
-                                        set(
-                                            k as keyof typeof form,
-                                            e.target.value.toUpperCase(),
-                                        )
-                                    }
-                                    maxLength={Number(max)}
-                                    required
-                                />
+                                <label htmlFor={"cct-" + k}>
+                                    {label}
+                                    {k === "tipoLicencia"
+                                        ? " (opcional)"
+                                        : " *"}
+                                </label>
+                                {k === "tipoLicencia" ? (
+                                    <select
+                                        id="cct-tipoLicencia"
+                                        className={styles.control}
+                                        value={form.tipoLicencia}
+                                        onChange={(e) =>
+                                            set("tipoLicencia", e.target.value)
+                                        }
+                                    >
+                                        <option value="">
+                                            Todos los tipos
+                                        </option>
+                                        {["A", "B", "C", "M", "E"].map(
+                                            (type) => (
+                                                <option key={type} value={type}>
+                                                    {type}
+                                                </option>
+                                            ),
+                                        )}
+                                    </select>
+                                ) : (
+                                    <input
+                                        id={"cct-" + k}
+                                        className={styles.control}
+                                        value={form[k as keyof typeof form]}
+                                        onChange={(e) =>
+                                            set(
+                                                k as keyof typeof form,
+                                                e.target.value.toUpperCase(),
+                                            )
+                                        }
+                                        maxLength={Number(max)}
+                                        required
+                                    />
+                                )}
                             </div>
                         ))}
                         <div>
@@ -442,16 +489,20 @@ function Remisiones({
                                 value={form.fuente}
                                 onChange={(e) => set("fuente", e.target.value)}
                             >
-                                {report && form.tipo === "placa" && (
+                                {(!report || form.tipo === "placa") && (
                                     <option value="TODAS">
                                         Todas las fuentes
                                     </option>
                                 )}
                                 {Object.entries(CCT_SOURCES)
-                                    .filter(
-                                        ([k]) =>
-                                            form.tipo !== "agente" ||
-                                            k !== "EMPRESA",
+                                    .filter(([k]) =>
+                                        form.tipo === "licencia"
+                                            ? [
+                                                  "TRANSITO",
+                                                  "INSTITUCIONES",
+                                              ].includes(k)
+                                            : form.tipo !== "agente" ||
+                                              k !== "EMPRESA",
                                     )
                                     .map(([k, label]) => (
                                         <option key={k} value={k}>
@@ -466,10 +517,15 @@ function Remisiones({
                                 id="cct-alcance"
                                 className={styles.control}
                                 value={form.estado}
+                                disabled={["agente", "licencia"].includes(
+                                    form.tipo,
+                                )}
                                 onChange={(e) => set("estado", e.target.value)}
                             >
                                 <option value="PENDIENTES">Pendientes</option>
-                                <option value="HISTORIAL">Historial</option>
+                                <option value="HISTORIAL">
+                                    Historial completo: pendiente y pagado
+                                </option>
                             </select>
                         </div>
                     </div>
@@ -532,15 +588,25 @@ function Remisiones({
                             ? "Placa " + applied.tipoPlaca + " " + applied.placa
                             : applied?.tipo === "agente"
                               ? "Agente " + applied.agente
-                              : "Boleta " +
-                                applied?.serie +
-                                "-" +
-                                applied?.numero}{" "}
+                              : applied?.tipo === "licencia"
+                                ? "Licencia " +
+                                  applied.tipoLicencia +
+                                  " " +
+                                  applied.licencia
+                                : "Boleta " +
+                                  applied?.serie +
+                                  "-" +
+                                  applied?.numero}{" "}
                         ·{" "}
                         {applied?.estado === "HISTORIAL"
                             ? "Historial"
                             : "Pendientes"}
                     </p>
+                    {result.limitaciones?.map((note) => (
+                        <p className={local.notice} key={note}>
+                            {note}
+                        </p>
+                    ))}
                     {result.grupos ? (
                         result.grupos.map((group) => (
                             <section key={group.fuente}>
@@ -558,6 +624,17 @@ function Remisiones({
                                 <CctTable
                                     label={"Remisiones de " + group.fuente}
                                     items={group.items}
+                                    wide={Boolean(
+                                        group.items.some(
+                                            (row) => row.PAGO_RESUMEN,
+                                        ),
+                                    )}
+                                    onSelect={
+                                        report
+                                            ? undefined
+                                            : (row) =>
+                                                  void open(row, group.fuente!)
+                                    }
                                 />
                                 {group.hayMas && (
                                     <Button
@@ -587,6 +664,11 @@ function Remisiones({
                                 </div>
                             </div>
                             <CctTable
+                                wide={Boolean(
+                                    result.items.some(
+                                        (row) => row.PAGO_RESUMEN,
+                                    ),
+                                )}
                                 items={result.items}
                                 onSelect={
                                     report ? undefined : (row) => void open(row)
@@ -677,12 +759,12 @@ function Remisiones({
                         .disponible ? (
                         <Notification
                             key={
-                                applied!.fuente +
-                                selected.SERIE +
+                                String(selected.FUENTE || applied!.fuente) +
+                                String(selected.SERIE) +
                                 selected.REMISION
                             }
                             row={selected}
-                            source={applied!.fuente}
+                            source={selected.FUENTE || applied!.fuente}
                             bootstrap={bootstrap}
                             admin={Boolean(runtime?.actor.admin)}
                             plate={
@@ -752,6 +834,7 @@ function Directory({ kind }: { kind: "vehiculos" | "pilotos" | "agentes" }) {
             : kind === "pilotos"
               ? {
                     codigo: "Código de piloto",
+                    tarjeton: "Tarjetón",
                     licencia: "Licencia",
                     nombre: "Nombre",
                 }
@@ -767,12 +850,14 @@ function Directory({ kind }: { kind: "vehiculos" | "pilotos" | "agentes" }) {
             : kind === "pilotos"
               ? mode === "codigo"
                   ? [["codigo", "Código de piloto"]]
-                  : mode === "nombre"
-                    ? [["nombre", "Nombre del piloto"]]
-                    : [
-                          ["tipoLicencia", "Tipo de licencia"],
-                          ["licencia", "Número de licencia"],
-                      ]
+                  : mode === "tarjeton"
+                    ? [["tarjeton", "Número de tarjetón"]]
+                    : mode === "nombre"
+                      ? [["nombre", "Nombre del piloto"]]
+                      : [
+                            ["tipoLicencia", "Tipo de licencia"],
+                            ["licencia", "Número de licencia"],
+                        ]
               : [
                     [
                         "codigo",
@@ -825,11 +910,19 @@ function Directory({ kind }: { kind: "vehiculos" | "pilotos" | "agentes" }) {
         setSelected(row);
         setDetail(null);
         setError("");
-        if (kind === "pilotos") {
+        if (kind === "pilotos" || kind === "agentes") {
             setBusy(true);
             try {
                 const d = await platformFetch<Record<string, unknown>>(
-                    "/cct/pilotos/" + encodeURIComponent(row.CODIGO_PILOTO!),
+                    kind === "pilotos"
+                        ? "/cct/pilotos/" +
+                              encodeURIComponent(row.CODIGO_PILOTO!)
+                        : "/cct/agentes/" +
+                              encodeURIComponent(
+                                  row.TIPO_AGENTE || "SIN_TIPO",
+                              ) +
+                              "/" +
+                              encodeURIComponent(row.CHAPA!),
                     { signal: c.signal },
                 );
                 if (!c.signal.aborted) setDetail(d);
@@ -972,7 +1065,15 @@ function Directory({ kind }: { kind: "vehiculos" | "pilotos" | "agentes" }) {
                                     <h3>
                                         {k === "capacitaciones"
                                             ? "Capacitaciones"
-                                            : "Tarjetones"}
+                                            : k === "tarjetones"
+                                              ? "Tarjetones"
+                                              : k === "datos"
+                                                ? "Datos del agente"
+                                                : k === "empleados"
+                                                  ? "Datos laborales y vínculos"
+                                                  : k === "asignaciones"
+                                                    ? "Asignaciones de remisiones"
+                                                    : k}
                                     </h3>
                                     <CctTable items={v as CctRow[]} />
                                 </section>
@@ -988,6 +1089,15 @@ function CctWorkspace({ module }: { module: string }) {
         [error, setError] = useState(""),
         [tab, setTab] = useState("remisiones"),
         [report, setReport] = useState("cepos");
+    const params = useSearchParams();
+    useEffect(() => {
+        const v = params.get("vista");
+        setTab(
+            v && ["remisiones", "vehiculos", "pilotos", "agentes"].includes(v)
+                ? v
+                : "remisiones",
+        );
+    }, [params]);
     const request = useRef<AbortController | null>(null);
     async function load() {
         request.current?.abort();
@@ -1022,30 +1132,49 @@ function CctWorkspace({ module }: { module: string }) {
         );
     if (!bootstrap) return <p role="status">Preparando CCT…</p>;
     return (
-        <div className={styles.page}>
+        <div className={styles.page + " " + local.workspace}>
+            <nav className={local.workspaceNav} aria-label="Áreas de CCT">
+                <div>
+                    {[
+                        ["remisiones", "Solvencia"],
+                        ["vehiculos", "Vehículos"],
+                        ["pilotos", "Pilotos"],
+                        ["agentes", "Agentes"],
+                    ].map(([key, label]) => (
+                        <Link
+                            aria-current={
+                                module === "cct-consultas" && tab === key
+                                    ? "page"
+                                    : undefined
+                            }
+                            key={key}
+                            href={
+                                "/home/cct/consultas/cct-consultas?vista=" + key
+                            }
+                        >
+                            {label}
+                        </Link>
+                    ))}
+                    <Link
+                        aria-current={
+                            module === "cct-cepos" ? "page" : undefined
+                        }
+                        href="/home/cct/formularios/cct-cepos"
+                    >
+                        Cepos
+                    </Link>
+                    <Link
+                        aria-current={
+                            module === "cct-reportes" ? "page" : undefined
+                        }
+                        href="/home/cct/reportes/cct-reportes"
+                    >
+                        Reportes
+                    </Link>
+                </div>
+            </nav>
             {module === "cct-consultas" ? (
                 <>
-                    <div
-                        className={local.tabs}
-                        role="tablist"
-                        aria-label="Consultas de CCT"
-                    >
-                        {[
-                            ["remisiones", "Remisiones y solvencias"],
-                            ["vehiculos", "Vehículos"],
-                            ["pilotos", "Pilotos"],
-                            ["agentes", "Agentes"],
-                        ].map(([key, label]) => (
-                            <button
-                                role="tab"
-                                aria-selected={tab === key}
-                                key={key}
-                                onClick={() => setTab(key)}
-                            >
-                                {label}
-                            </button>
-                        ))}
-                    </div>
                     {tab === "remisiones" ? (
                         <Remisiones bootstrap={bootstrap} />
                     ) : (

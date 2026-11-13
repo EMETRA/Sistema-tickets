@@ -12,6 +12,7 @@ import {
     type CctPage,
     type CctRow,
 } from "@/platform/cct";
+import { CctEditCepo } from "./CctEditCepo";
 import { CctData, CctPager, CctPicker, CctTable, cctError } from "./CctParts";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
 import local from "./CctWorkspace.module.scss";
@@ -796,9 +797,10 @@ function CepoAction({
 export function CctCepos({ bootstrap }: { bootstrap: CctBootstrap }) {
     const { data: runtime } = usePlatform(),
         admin = Boolean(runtime?.actor.admin);
-    const [mode, setMode] = useState("aviso"),
+    const [mode, setMode] = useState("placa"),
         [fields, setFields] = useState({
             aviso: "",
+            cepoFisico: "",
             tipoPlaca: "P",
             placa: "",
         }),
@@ -823,7 +825,9 @@ export function CctCepos({ bootstrap }: { bootstrap: CctBootstrap }) {
     function query(): Record<string, string> {
         return mode === "aviso"
             ? { aviso: fields.aviso }
-            : { tipoPlaca: fields.tipoPlaca, placa: fields.placa };
+            : mode === "cepoFisico"
+              ? { cepoFisico: fields.cepoFisico }
+              : { tipoPlaca: fields.tipoPlaca, placa: fields.placa };
     }
     async function search(q: Record<string, string> = query(), offset = 0) {
         request.current?.abort();
@@ -889,13 +893,13 @@ export function CctCepos({ bootstrap }: { bootstrap: CctBootstrap }) {
         );
     return (
         <>
-            <section className={styles.card} aria-label="Registrar nuevo cepo">
+            <section className={styles.card} aria-label="Gestión de cepos">
                 <div className={styles.toolbar}>
                     <div>
-                        <h2>Registrar nuevo cepo</h2>
+                        <h2>Cepos</h2>
                         <p className={local.hint}>
-                            Registra la colocación: vehículo, cepo físico,
-                            fecha, lugar y agente responsable.
+                            Busca una colocación para revisar su ficha,
+                            registrar una actuación o corregir sus datos.
                         </p>
                     </div>
                     <Button
@@ -914,50 +918,41 @@ export function CctCepos({ bootstrap }: { bootstrap: CctBootstrap }) {
                     </Button>
                 </div>
                 <div id="cct-ingreso-disponibilidad">
-                    {!bootstrap.disponibilidad.crear.habilitado ? (
-                        <>
-                            <p className={local.hint}>
-                                El registro de nuevos cepos está pendiente de
-                                habilitación. Puedes seguir consultando los
-                                avisos existentes.
-                            </p>
+                    {!bootstrap.disponibilidad.crear.habilitado && (
+                        <details className={local.availability}>
+                            <summary>
+                                Registro pendiente de habilitación · Ver
+                                requisitos
+                            </summary>
                             <ul
                                 className={local.readiness}
                                 aria-label="Disponibilidad del registro de cepos"
                             >
-                                <li>
-                                    {bootstrap.acciones.crear
-                                        ? "✓"
-                                        : "Pendiente:"}{" "}
-                                    Permiso para registrar cepos.
-                                </li>
-                                <li>
-                                    {bootstrap.operador ? "✓" : "Pendiente:"}{" "}
-                                    Operador de CCT vinculado a tu cuenta.
-                                </li>
-                                <li>
-                                    {bootstrap.escrituras ? "✓" : "Pendiente:"}{" "}
-                                    Registro de operaciones habilitado.
-                                </li>
-                                <li>
-                                    {bootstrap.numeracionLista
-                                        ? "✓"
-                                        : "Pendiente:"}{" "}
-                                    Activación operativa del nuevo CCT
-                                    confirmada.
-                                </li>
+                                {[
+                                    [
+                                        bootstrap.acciones.crear,
+                                        "Permiso para registrar cepos",
+                                    ],
+                                    [
+                                        bootstrap.operador,
+                                        "Operador vinculado a tu cuenta",
+                                    ],
+                                    [
+                                        bootstrap.escrituras,
+                                        "Registro de operaciones habilitado",
+                                    ],
+                                    [
+                                        bootstrap.numeracionLista,
+                                        "Corte al nuevo CCT confirmado",
+                                    ],
+                                ].map(([ready, label]) => (
+                                    <li key={String(label)}>
+                                        {ready ? "✓" : "Pendiente:"} {label}
+                                    </li>
+                                ))}
                             </ul>
-                        </>
-                    ) : (
-                        <p className={local.hint}>
-                            Registro habilitado para tu cuenta.
-                        </p>
+                        </details>
                     )}
-                </div>
-            </section>
-            <section className={styles.card}>
-                <div className={styles.toolbar}>
-                    <h2>Consultar avisos de cepo</h2>
                 </div>
                 <form
                     onSubmit={(e) => {
@@ -976,14 +971,17 @@ export function CctCepos({ bootstrap }: { bootstrap: CctBootstrap }) {
                             >
                                 <option value="aviso">Número de aviso</option>
                                 <option value="placa">Placa</option>
+                                <option value="cepoFisico">Cepo físico</option>
                             </select>
                         </div>
                         {(mode === "aviso"
                             ? [["aviso", "Número de aviso"]]
-                            : [
-                                  ["tipoPlaca", "Tipo de placa"],
-                                  ["placa", "Placa"],
-                              ]
+                            : mode === "cepoFisico"
+                              ? [["cepoFisico", "Número de cepo físico"]]
+                              : [
+                                    ["tipoPlaca", "Tipo de placa"],
+                                    ["placa", "Placa"],
+                                ]
                         ).map(([key, label]) => (
                             <div key={key}>
                                 <label htmlFor={"cct-cepo-" + key}>
@@ -1069,6 +1067,22 @@ export function CctCepos({ bootstrap }: { bootstrap: CctBootstrap }) {
                         </p>
                     )}
                     <div className={local.buttons}>
+                        {detail.datos.ESTATUS === "C" &&
+                            !detail.datos.BOLETA &&
+                            bootstrap.acciones.editar && (
+                                <Button
+                                    variant="outlined"
+                                    state={
+                                        bootstrap.disponibilidad.editar
+                                            ?.habilitado
+                                            ? "default"
+                                            : "disabled"
+                                    }
+                                    onClick={() => setAction("EDITAR")}
+                                >
+                                    Editar colocación
+                                </Button>
+                            )}
                         {Object.entries(labels)
                             .filter(([key]) =>
                                 key === "LIBERAR"
@@ -1112,18 +1126,34 @@ export function CctCepos({ bootstrap }: { bootstrap: CctBootstrap }) {
                                 ) : null;
                             })}
                     </div>
-                    {action && (
-                        <CepoAction
-                            key={detail.datos.AVISO + action + detail.version}
+                    {action === "EDITAR" ? (
+                        <CctEditCepo
+                            key={detail.version}
                             detail={detail}
-                            action={action}
                             admin={admin}
-                            onDone={(msg) => {
-                                setMessage(msg);
+                            onCancel={() => setAction("")}
+                            onDone={() => {
+                                setMessage("Colocación actualizada.");
                                 setAction("");
                                 void open(detail.datos.AVISO!);
                             }}
                         />
+                    ) : (
+                        action && (
+                            <CepoAction
+                                key={
+                                    detail.datos.AVISO + action + detail.version
+                                }
+                                detail={detail}
+                                action={action}
+                                admin={admin}
+                                onDone={(msg) => {
+                                    setMessage(msg);
+                                    setAction("");
+                                    void open(detail.datos.AVISO!);
+                                }}
+                            />
+                        )
                     )}
                 </section>
             )}

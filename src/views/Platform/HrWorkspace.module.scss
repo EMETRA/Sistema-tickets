@@ -198,3 +198,55 @@
         max-width: 100%;
     }
 }
+
+.collectionEditor {
+    border: 1px solid var(--tickets-border);
+    border-radius: 10px;
+    padding: 18px;
+    margin: 18px 0;
+    min-width: 0;
+    legend {
+        font-weight: 600;
+        padding: 0 6px;
+    }
+    label {
+        display: block;
+        font-size: 12px;
+        margin: 10px 0 7px;
+    }
+}
+.collectionRow {
+    border-top: 1px solid var(--tickets-border);
+    margin-top: 18px;
+    padding-top: 18px;
+    .formGrid {
+        margin-top: 12px;
+    }
+}
+.collectionView {
+    list-style: none;
+    padding: 0;
+    margin: 8px 0;
+    max-height: 420px;
+    overflow: auto;
+    li {
+        padding: 12px;
+        margin-bottom: 8px;
+        border: 1px solid var(--tickets-border);
+        border-radius: 8px;
+    }
+    dl {
+        margin: 0;
+    }
+    dl > div {
+        margin-bottom: 6px;
+    }
+    dt {
+        font-size: 11px;
+        color: var(--tickets-text-secondary);
+    }
+    dd {
+        margin: 0;
+        overflow-wrap: anywhere;
+    }
+}

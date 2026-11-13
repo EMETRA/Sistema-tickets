@@ -2,7 +2,7 @@ export type HrField = {
     codigo: string;
     etiqueta: string;
     grupo: string;
-    tipo: "texto" | "numero" | "fecha" | "archivo";
+    tipo: "texto" | "numero" | "fecha" | "archivo" | "coleccion";
     maximo: number;
     permiteNulo: boolean;
     editable: boolean;

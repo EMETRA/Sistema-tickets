@@ -521,7 +521,11 @@ export function HrCampaignsWorkspace() {
                                                                             ] =
                                                                                 {
                                                                                     codigo: f.codigo,
-                                                                                    modo: "CONFIRMAR",
+                                                                                    modo:
+                                                                                        f.tipo ===
+                                                                                        "coleccion"
+                                                                                            ? "EDITAR"
+                                                                                            : "CONFIRMAR",
                                                                                     obligatorio: true,
                                                                                 };
                                                                         else

@@ -32,3 +32,13 @@ test('BFF de RRHH conserva identidad, datos y referencia; no permite consultar s
  try{global.fetch=async(url,init)=>{calls.push({url:String(url),init});return Response.json({vinculado:true,datos:{DPI:'0000000000000'}});};assert.equal((await request(false)).status,401);assert.equal(calls.length,0);const result=await request();assert.equal(result.status,200);assert.equal(calls[0].url,'https://tickets.example.invalid/web/platform/hr/me');assert.equal(calls[0].init.headers.get('authorization'),'Bearer ficticio');assert.equal(result.headers.get('cache-control'),'private, no-store');global.fetch=async()=>Response.json({codigo:'NO_DISPONIBLE',referencia:'ref-original'},{status:503});assert.equal((await(await request()).json()).referencia,'ref-original');}
  finally{global.fetch=saved;if(enabled===undefined)delete process.env.TICKETS_PLATFORM_ENABLED;else process.env.TICKETS_PLATFORM_ENABLED=enabled;}
 });
+
+test('las colecciones se presentan con etiquetas y distinguen no declarado de declaración negativa',()=>{
+ const {hrCollection,hrCollectionText,HR_COLLECTIONS}=load(root)('src/platform/hr-extended.ts');
+ assert.equal(hrCollection(null),null);assert.equal(hrCollection('invalido'),null);
+ assert.equal(hrCollectionText('RH_ALERGIAS',null),'Sin declaración registrada');
+ assert.equal(hrCollectionText('RH_ALERGIAS',JSON.stringify({declaracion:'NINGUNO',registros:[]})),'No conozco alergias a medicamentos');
+ const study=JSON.stringify({declaracion:'REGISTRADO',registros:[{nivel:'LICENCIATURA',estado:'CIERRE_PENSUM',carrera:'Ingeniería'}]});
+ assert.match(hrCollectionText('RH_ESTUDIOS',study),/Licenciatura.*Cierre de pénsum.*Ingeniería/);
+ assert.equal(Object.keys(HR_COLLECTIONS).length,3);
+});

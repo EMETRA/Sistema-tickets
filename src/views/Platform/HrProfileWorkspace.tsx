@@ -26,6 +26,8 @@ import {
 } from "@/platform/hr";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
 import local from "./HrWorkspace.module.scss";
+import { HrCollectionView, HrCollectionEditor } from "./HrCollections";
+import { HR_COLLECTIONS } from "@/platform/hr-extended";
 export const hrError = (e: unknown) =>
     (e instanceof Error ? e.message : "No se pudo completar la operación.") +
     (e instanceof PlatformError && e.reference
@@ -69,18 +71,28 @@ export function HrSubmission({
                             return (
                                 <tr key={f.codigo}>
                                     <th scope="row">
-                                        {f.codigo.replace(/_/g, " ")}
+                                        {HR_COLLECTIONS[f.codigo]?.label ||
+                                            f.codigo.replace(/_/g, " ")}
                                     </th>
                                     <td>
-                                        {delivery.original[f.codigo] ??
-                                            "No registrado"}
+                                        <HrCollectionView
+                                            code={f.codigo}
+                                            value={delivery.original[f.codigo]}
+                                        />
                                     </td>
                                     <td>
-                                        {f.modo === "CONFIRMAR"
-                                            ? a?.confirmacion === "CORREGIR"
-                                                ? "Solicita corrección"
-                                                : "Confirma correcto"
-                                            : (a?.valor ?? "Sin dato")}
+                                        {f.modo === "CONFIRMAR" ? (
+                                            a?.confirmacion === "CORREGIR" ? (
+                                                "Solicita corrección"
+                                            ) : (
+                                                "Confirma correcto"
+                                            )
+                                        ) : (
+                                            <HrCollectionView
+                                                code={f.codigo}
+                                                value={a?.valor}
+                                            />
+                                        )}
                                     </td>
                                     <td>{a?.observacion || "—"}</td>
                                 </tr>
@@ -298,13 +310,30 @@ function HrUpdateForm({ id, onSent }: { id: string; onSent: () => void }) {
                                                     ? " *"
                                                     : ""}
                                             </label>
-                                            <p className={styles.muted}>
+                                            <div className={styles.muted}>
                                                 En RRHH:{" "}
-                                                {data.perfil.datos[
-                                                    field.codigo
-                                                ] ?? "No registrado"}
-                                            </p>
-                                            {selection.modo === "EDITAR" ? (
+                                                <HrCollectionView
+                                                    code={field.codigo}
+                                                    value={
+                                                        data.perfil.datos[
+                                                            field.codigo
+                                                        ]
+                                                    }
+                                                />
+                                            </div>
+                                            {selection.modo === "EDITAR" &&
+                                            field.tipo === "coleccion" ? (
+                                                <HrCollectionEditor
+                                                    code={field.codigo}
+                                                    value={value.valor}
+                                                    disabled={busy || !editable}
+                                                    onChange={(valor) =>
+                                                        answer(field.codigo, {
+                                                            valor,
+                                                        })
+                                                    }
+                                                />
+                                            ) : selection.modo === "EDITAR" ? (
                                                 <input
                                                     id={"hr-" + field.codigo}
                                                     className={styles.control}
@@ -361,7 +390,8 @@ function HrUpdateForm({ id, onSent }: { id: string; onSent: () => void }) {
                                                                             .value as HrAnswer["confirmacion"],
                                                                     observacion:
                                                                         e.target
-                                                                            .value === "CORRECTO"
+                                                                            .value ===
+                                                                        "CORRECTO"
                                                                             ? ""
                                                                             : value.observacion,
                                                                 },
@@ -679,10 +709,18 @@ export function HrProfileWorkspace({ campaignId }: { campaignId?: string }) {
                                                                 {f.etiqueta}
                                                             </dt>
                                                             <dd>
-                                                                {profile.datos[
-                                                                    f.codigo
-                                                                ] ??
-                                                                    "No registrado"}
+                                                                <HrCollectionView
+                                                                    code={
+                                                                        f.codigo
+                                                                    }
+                                                                    value={
+                                                                        profile
+                                                                            .datos[
+                                                                            f
+                                                                                .codigo
+                                                                        ]
+                                                                    }
+                                                                />
                                                             </dd>
                                                         </div>
                                                     ))}

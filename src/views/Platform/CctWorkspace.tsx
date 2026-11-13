@@ -1,4 +1,5 @@
 "use client";
+import { CctAgentAssignments } from "./CctAgentAssignments";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -1058,6 +1059,16 @@ function Directory({ kind }: { kind: "vehiculos" | "pilotos" | "agentes" }) {
                         </Button>
                     </div>
                     <CctData row={selected} />
+                    {kind === "agentes" && (
+                        <CctAgentAssignments
+                            key={
+                                (selected.TIPO_AGENTE || "sin-tipo") +
+                                "-" +
+                                selected.CHAPA
+                            }
+                            agente={selected}
+                        />
+                    )}
                     {detail &&
                         Object.entries(detail).map(([k, v]) =>
                             Array.isArray(v) ? (

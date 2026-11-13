@@ -919,7 +919,7 @@ function Directory({ kind }: { kind: "vehiculos" | "pilotos" | "agentes" }) {
                               encodeURIComponent(row.CODIGO_PILOTO!)
                         : "/cct/agentes/" +
                               encodeURIComponent(
-                                  row.TIPO_AGENTE || "SIN_TIPO",
+                                  row.TIPO_AGENTE || "sin-tipo",
                               ) +
                               "/" +
                               encodeURIComponent(row.CHAPA!),

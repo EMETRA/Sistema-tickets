@@ -270,7 +270,7 @@ Antes de una escritura se revisan disponibilidad/estado y datos obligatorios; un
 
 El BFF permite el segmento cct sobre el origen fijo configurado por GRAPHQL_ENDPOINT y conserva Bearer, confirmación, errores y respuestas privadas. Solo la ruta binaria de reporte está añadida al cliente; no abrir cualquier respuesta HTML/binaria como si fuera una consulta. El Panel requiere su flag de plataforma habitual; los flags CCT, SQL y reglas se configuran en api-tickets.
 
-Persistencia y propietarios: [manual API](https://github.com/EMETRA/api-tickets/blob/4289a5de34de1f269d63d2f5b0c67ac4197510f2/manual-t%C3%A9cnico.md#cct). Tablas de negocio y trigger permanecen en Oracle; tablas propias de operador/control y recibos/auditoría las administra el API. El Panel no guarda datos corporativos como fuente oficial.
+Persistencia y propietarios: [manual API](https://github.com/EMETRA/api-tickets/blob/f74ac37a48e307ccc518034bbf5b6a46d44f1466/manual-t%C3%A9cnico.md#cct). Tablas de negocio y trigger permanecen en Oracle; tablas propias de operador/control y recibos/auditoría las administra el API. El Panel no guarda datos corporativos como fuente oficial.
 
 ### Preparación y pruebas
 

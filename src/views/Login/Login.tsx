@@ -17,6 +17,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { apiFetch } from "@/api/graphql/client";
 import styles from "./Login.module.scss";
 import { useRouter } from "next/dist/client/components/navigation";
+import { ActivarCuenta } from "./ActivarCuenta";
 import type { UsuarioPerfil } from "@/api/graphql/home/types";
 
 const Login: React.FC = () => {
@@ -26,6 +27,8 @@ const Login: React.FC = () => {
     const [email, setEmail] = useState("");
     const [clave, setClave] = useState("");
     const [error, setError] = useState<string | null>(null);
+    const [activando, setActivando] = useState(false);
+    const [activada, setActivada] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const submittingRef = useRef(false);
     const busy = loading || submitting;
@@ -71,6 +74,7 @@ const Login: React.FC = () => {
         submittingRef.current = true;
         setSubmitting(true);
         setError(null);
+        setActivada(false);
 
         try {
             // if (!captchaToken) {
@@ -85,6 +89,11 @@ const Login: React.FC = () => {
                 return;
             }
 
+            if (response.requiereActivacion) {
+                setActivando(true);
+                return;
+            }
+            if (!response.token) throw new Error("No se recibió token de autenticación.");
             const userInfo = await fetchUserInfo(response.token);
 
             if (!userInfo) {
@@ -116,6 +125,14 @@ const Login: React.FC = () => {
         }
     };
 
+    if (activando) return (
+        <ActivarCuenta correo={email} claveTemporal={clave} salir={(completado) => {
+            setClave("");
+            setActivando(false);
+            setActivada(completado);
+        }} />
+    );
+
     return (
         <AccessLayout>
             <div className={styles.formContainer}>
@@ -126,6 +143,9 @@ const Login: React.FC = () => {
                             Tu perfil y tus permisos se cargan después de validar tu cuenta.
                         </Text>
                     </div>
+                    {activada && <p role="status" className={styles.activationSuccess}>
+                        Tu cuenta está activa. Inicia sesión con la nueva contraseña.
+                    </p>}
                     <div className={styles.formFieldsContainer}>
                         <FormField htmlFor="email" label="Usuario" required>
                             <Input

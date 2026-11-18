@@ -15,7 +15,8 @@ export interface LoginInput {
  * Respuesta de login (desde el backend)
  */
 export interface LoginResponse {
-  token: string;
+  token: string | null;
+  requiereActivacion?: boolean | null;
   refresh_token?: string;
   expires_in?: number;
 }

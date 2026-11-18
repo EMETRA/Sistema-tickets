@@ -154,6 +154,7 @@ export function PayrollWorkspace() {
                 const r = await platformFetch<{
                     procesado: boolean;
                     estado?: string;
+                    codigo?: string;
                     referencia?: string;
                 }>("/boletas/jobs/" + id + "/send-next", {
                     method: "POST",
@@ -182,6 +183,10 @@ export function PayrollWorkspace() {
                                 " boleta(s). Revisa el buzón destinatario; la aceptación no confirma la entrega final.",
                         );
                     break;
+                }
+                if (r.codigo === "CORREO_PERSONAL_CAMBIO") {
+                    setDeliveryMessage("Se omitió una boleta con el correo personal desactualizado. El lote continúa.");
+                    continue;
                 }
                 if (r.estado !== "ACEPTADO_SMTP") {
                     setDeliveryError(
@@ -320,6 +325,9 @@ export function PayrollWorkspace() {
             );
         }
     }
+    const actualizarCorreo = status?.items.some(
+        (i) => i.id === reconciliation?.envio && i.error === "CORREO_PERSONAL_CAMBIO",
+    );
     async function reconcile() {
         if (!reconciliation) return;
         const { envio, resultado, evidencia } = reconciliation;
@@ -331,7 +339,7 @@ export function PayrollWorkspace() {
                 "POST",
                 { envio, resultado, evidencia },
                 true,
-                "Conciliar resultado de boleta " + envio,
+                (actualizarCorreo ? "Actualizar correo personal de boleta " : "Conciliar resultado de boleta ") + envio,
             );
             setStatus(await platformFetch<Status>("/boletas/jobs/" + job));
             setReconciliation(null);
@@ -689,7 +697,9 @@ export function PayrollWorkspace() {
                                                 {i.estado.replaceAll("_", " ")}
                                             </td>
                                             <td>
-                                                {i.error || "—"}
+                                                {i.error === "CORREO_PERSONAL_CAMBIO"
+                                                    ? "Requiere actualizar el correo personal"
+                                                    : i.error || "—"}
                                                 {data?.actor.admin &&
                                                     [
                                                         "EN_ENVIO",
@@ -707,15 +717,14 @@ export function PayrollWorkspace() {
                                                                 setReconciliation(
                                                                     {
                                                                         envio: i.id,
-                                                                        resultado:
-                                                                            "",
+                                                                        resultado: i.error === "CORREO_PERSONAL_CAMBIO" ? "NO_ENVIADO" : "",
                                                                         evidencia:
                                                                             "",
                                                                     },
                                                                 )
                                                             }
                                                         >
-                                                            Conciliar envío
+                                                            {i.error === "CORREO_PERSONAL_CAMBIO" ? "Actualizar correo personal" : "Conciliar envío"}
                                                         </Button>
                                                     )}
                                             </td>
@@ -735,13 +744,13 @@ export function PayrollWorkspace() {
                         void reconcile();
                     }}
                 >
-                    <h3>Conciliar resultado del envío</h3>
+                    <h3>{actualizarCorreo ? "Actualizar correo personal" : "Conciliar resultado del envío"}</h3>
                     <p>
-                        Revisa primero el buzón o el proveedor. Solo «No
-                        enviado» habilita otro intento. La decisión requiere
-                        doble confirmación y queda en trazabilidad.
+                        {actualizarCorreo
+                            ? "La boleta está sin enviar. Confirma el correo personal con RRHH para actualizar el destinatario del lote."
+                            : "Revisa primero el buzón o el proveedor. Confirma «No enviado» para habilitar otro intento."}
                     </p>
-                    <label className={styles.field}>
+                    {!actualizarCorreo && <label className={styles.field}>
                         Resultado verificado
                         <select
                             aria-label="Resultado verificado"
@@ -763,7 +772,7 @@ export function PayrollWorkspace() {
                                 Confirmado: no fue enviado
                             </option>
                         </select>
-                    </label>
+                    </label>}
                     <label className={styles.field}>
                         Evidencia de la revisión
                         <textarea

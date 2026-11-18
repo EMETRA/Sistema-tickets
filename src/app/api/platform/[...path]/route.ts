@@ -43,6 +43,7 @@ async function proxy(
             "inventory",
             "boletas",
             "vivi-reports",
+            "worker-notifications",
             "vivi-pmt",
             "cct",
             "transit-reprints",
@@ -55,6 +56,10 @@ async function proxy(
         );
     if (path.length > 6 || path.some((x) => !/^[-a-zA-Z0-9]+$/.test(x)))
         return Response.json({ message: "Ruta inválida" }, { status: 400 });
+    if (path[0] === "worker-notifications" &&
+        (request.method !== "GET" || path.length !== 2 ||
+            !["summary", "results", "pending", "fine"].includes(path[1])))
+        return Response.json({ message: "Ruta no disponible" }, { status: 404 });
     const authorization = request.headers.get("authorization");
     if (!authorization || !/^Bearer \S+$/.test(authorization))
         return Response.json(

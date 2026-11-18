@@ -1,3 +1,4 @@
+import { WorkerNotificationsWorkspace } from "@/views/Platform/WorkerNotificationsWorkspace";
 import { ViviPmtWorkspace } from "@/views/Platform/ViviPmtWorkspace";
 import {
     CctConsultas,
@@ -33,6 +34,7 @@ export const APP_REGISTRY: Record<string, ComponentType> = {
     "rh-boletas": PayrollWorkspace,
     "rh-datos": HrCampaignsWorkspace,
     "vivi-reportes": ViviReportsWorkspace,
+    "worker-notificaciones": WorkerNotificationsWorkspace,
     "pmt-avisame": ViviPmtWorkspace,
     "cct-consultas": CctConsultas,
     "cct-cepos": CctFormularios,

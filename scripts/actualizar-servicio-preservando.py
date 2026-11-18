@@ -64,18 +64,23 @@ def restaurar_redes(contenedor, originales, actuales):
 
 
 def main(argv):
-    if not argv or len(argv) > 3 or len(set(argv[1:])) != len(argv[1:]) or any(flag not in ('--comprobar', '--habilitar-incidencias') for flag in argv[1:]):
-        raise RuntimeError('Uso: actualizar-servicio-preservando.py CONTENEDOR [--comprobar] [--habilitar-incidencias]')
+    if not argv or len(argv) > 4 or len(set(argv[1:])) != len(argv[1:]) or any(flag not in ('--comprobar', '--habilitar-incidencias', '--compose-unico') for flag in argv[1:]):
+        raise RuntimeError('Uso: actualizar-servicio-preservando.py CONTENEDOR [--comprobar] [--habilitar-incidencias] [--compose-unico]')
     contenedor = argv[0]
     habilitar_incidencias = '--habilitar-incidencias' in argv
+    unico = '--compose-unico' in argv
     labels = inspeccionar(contenedor, '.Config.Labels')
     directorio = labels.get('com.docker.compose.project.working_dir', '')
     servicio = labels.get('com.docker.compose.service', '')
     proyecto = labels.get('com.docker.compose.project', '')
     archivos = labels.get('com.docker.compose.project.config_files', '').split(',')
-    if not directorio or os.path.realpath(directorio) != os.path.realpath(os.getcwd()) or not servicio or not proyecto or any(not os.path.isfile(a) for a in archivos):
+    if not directorio or os.path.realpath(directorio) != os.path.realpath(os.getcwd()) or not servicio or not proyecto:
         raise RuntimeError('El directorio/servicio o alguno de sus Compose no corresponde al despliegue; no se recrea.')
-    if habilitar_incidencias:
+    if unico:
+        archivos = [os.path.realpath('docker-compose.yml')]
+    if any(not os.path.isfile(a) for a in archivos):
+        raise RuntimeError('Un Compose anterior ya no existe. Revisa .env y usa --compose-unico.')
+    if habilitar_incidencias and not unico:
         override = os.path.realpath('docker-compose.incidencias.yml')
         if servicio != 'sistema-tickets-web' or not os.path.isfile(override):
             raise RuntimeError('El servicio o el Compose de incidencias no corresponde; no se recrea.')
@@ -84,10 +89,12 @@ def main(argv):
     compose = ['docker', 'compose', '-p', proyecto]
     for archivo in archivos:
         compose += ['-f', archivo]
+    if servicio == 'panel' and os.path.basename(archivos[0]) == 'docker-compose.yml':
+        compose += ['--profile', 'qa']
     montajes = inspeccionar(contenedor, '.Mounts')
     redes = inspeccionar(contenedor, '.NetworkSettings.Networks')
     config = json.loads(ejecutar(compose + ['config', '--format', 'json']))
-    previstos = validar_montajes(config, servicio, montajes, habilitar_incidencias)
+    previstos = validar_montajes(config, servicio, montajes, habilitar_incidencias or unico)
     if '--comprobar' in argv:
         print('CONFIGURACION_Y_MONTAJES_OK; no se modifico el servicio')
         return

@@ -136,7 +136,6 @@ export const TicketCreationPanel: React.FC<TicketCreationPanelProps> = ({
                 </section>
                 <section className={styles.filesSection} aria-labelledby="ticket-files-title">
                     <Title variant="mid" tag="h2" id="ticket-files-title">Archivos adjuntos</Title>
-                    <p className={styles.help}>Los archivos se enviarán al crear la solicitud.</p>
                     <FileDropzone subtitle="PDF, documentos de Office e imágenes. Se enviarán al guardar." accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.ppt,.pptx,.jpg,.jpeg,.png,.gif" onFiles={loading ? () => {} : handleFiles} rejectedFiles={rejectedFiles} />
                     {uploadedFiles.length > 0 && <div className={styles.filesList}>
                         {uploadedFiles.map(file => <FileItem key={file.id} name={file.name}
@@ -153,10 +152,8 @@ export const TicketCreationPanel: React.FC<TicketCreationPanelProps> = ({
                         <div><dt>Asunto</dt><dd>{subject.trim() || "Sin asunto"}</dd></div>
                         <div><dt>Archivos</dt><dd>{uploadedFiles.length} {uploadedFiles.length === 1 ? "adjunto" : "adjuntos"}</dd></div>
                     </dl>
-                    <p className={styles.summaryHint}>Consulta el estado de tu solicitud desde Mis tickets.</p>
                 </aside>
                 <FormActions align="right" className={styles.formActions}>
-                    <p>La solicitud se creará al confirmar.</p>
                     <Button type="button" variant="outlined" color="cancel" onClick={handleCancel}
                         state={loading ? "disabled" : "default"}>Cancelar</Button>
                     <Button type="submit" variant="contained" color="default" icon="plus-solid"

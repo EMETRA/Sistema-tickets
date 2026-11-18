@@ -407,3 +407,7 @@ table.wideTable {
         margin-top: 8px;
     }
 }
+
+.formDialog { width: min(880px, calc(100vw - 32px)); }
+.dialogBody { padding: var(--tickets-panel-padding); }
+.dialogBody h2, .dialogBody h3 { margin-bottom: 0; }

@@ -250,3 +250,7 @@
         overflow-wrap: anywhere;
     }
 }
+
+.campaignDialog {
+    width: min(960px, calc(100vw - 32px));
+}

@@ -5,7 +5,7 @@ import {
 } from "@/api/graphql/juzgado";
 import styles from "./JUZ01Detail.module.scss";
 import { ArchivoJuzgadoError } from "@/api/graphql/juzgado-archivo";
-type Archivo = { id: string; name: string; size: string; mime: string };
+type Archivo = { id: string; name: string; size: string; mime: string; capturadaEn?: string | null };
 export function EvidenciasCaso({ archivos }: { archivos: Archivo[] }) {
   const [seleccion, setSeleccion] = useState<{
     url: string;
@@ -92,9 +92,11 @@ export function EvidenciasCaso({ archivos }: { archivos: Archivo[] }) {
                     ? `${(Number(a.size) / 1024 / 1024).toFixed(1)} MB`
                     : "Tamaño no disponible"}
                 </p>
+                {!!a.capturadaEn &&
+                  <p>{new Date(a.capturadaEn).toLocaleString("es-GT", { timeZone: "America/Guatemala" })}</p>}
               </div>
               <div className={styles.fileActions}>
-                {/^(image\/(jpeg|png)|video\/mp4)$/.test(a.mime) && (
+                {/^(image\/(jpeg|png)|video\/(mp4|quicktime))$/.test(a.mime) && (
                   <button
                     type="button"
                     onClick={() => void abrir(a)}
@@ -110,7 +112,7 @@ export function EvidenciasCaso({ archivos }: { archivos: Archivo[] }) {
                     void descargarArchivoJuzgado(
                       "evidencias",
                       a.id,
-                      `evidencia-${a.id}.${a.mime.startsWith("video/") ? "mp4" : a.mime === "image/png" ? "png" : a.mime === "application/pdf" ? "pdf" : "jpg"}`,
+                      `evidencia-${a.id}.${a.mime === "video/quicktime" ? "mov" : a.mime.startsWith("video/") ? "mp4" : a.mime === "image/png" ? "png" : a.mime === "application/pdf" ? "pdf" : "jpg"}`,
                     ).catch((error) =>
                       setError(
                         error instanceof ArchivoJuzgadoError

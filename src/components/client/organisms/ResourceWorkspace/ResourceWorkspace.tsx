@@ -117,11 +117,8 @@ export function ResourceWorkspace({
             <div className={styles.toolbar}>
                 <div>
                     <h2>{def.title}</h2>
-                    {!hideDescription && (
-                        <p className={styles.muted}>
-                            {copy?.description ||
-                                "Registros disponibles dentro de tu alcance autorizado."}
-                        </p>
+                    {!hideDescription && copy?.description && (
+                        <p className={styles.muted}>{copy.description}</p>
                     )}
                 </div>
                 <div className={styles.actions}>
@@ -141,19 +138,16 @@ export function ResourceWorkspace({
                     {message}
                 </p>
             )}
-            <div className={styles.listPanel}>
+            <div className={styles.listPanel} aria-busy={loading && !!def.actions.LEER}>
                 {def.actions.LEER && (
-                    <label className={styles.search}>
-                        Buscar registro
-                        <input
-                            className={styles.control}
-                            value={query}
-                            onChange={(e) => {
-                                setQuery(e.target.value);
-                                setOffset(0);
-                            }}
-                        />
-                    </label>
+                    <div className={styles.toolbar}>
+                        <input className={styles.control + " " + styles.search} type="search"
+                            aria-label="Buscar registro" placeholder="Buscar registro" value={query}
+                            onChange={(e) => { setQuery(e.target.value); setOffset(0); }} />
+                        {!loading && !error && <p className={styles.muted} role="status">
+                            {result.total} {result.total === 1 ? "registro" : "registros"}
+                        </p>}
+                    </div>
                 )}
                 {error ? (
                     <div role="alert" className={styles.error}>
@@ -182,7 +176,7 @@ export function ResourceWorkspace({
                                                 <th>Actualizado</th>
                                             </>
                                         )}
-                                        {!copy && <th>Acción</th>}
+
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -237,18 +231,6 @@ export function ResourceWorkspace({
                                                     </td>
                                                 </>
                                             )}
-                                            {!copy && (
-                                                <td>
-                                                    <button
-                                                        className={styles.link}
-                                                        onClick={() =>
-                                                            setSelected(row)
-                                                        }
-                                                    >
-                                                        Ver detalle
-                                                    </button>
-                                                </td>
-                                            )}
                                         </tr>
                                     ))}
                                 </tbody>
@@ -271,8 +253,7 @@ export function ResourceWorkspace({
                         </div>
                         <div className={styles.toolbar}>
                             <p className={styles.muted}>
-                                {result.total} registros · Página{" "}
-                                {Math.floor(offset / 25) + 1}
+                                Página {Math.floor(offset / 25) + 1} de {Math.max(1, Math.ceil(result.total / 25))}
                             </p>
                             <div className={styles.actions}>
                                 <Button

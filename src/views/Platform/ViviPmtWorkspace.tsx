@@ -1,5 +1,8 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { PopOver } from "@/components/client/atoms/PopOver";
+import { AnalisisEvidencias } from "@/views/JUZ01Detail/AnalisisEvidencias";
+import type { AnalisisEvidencias as Analisis } from "@/api/graphql/juzgado";
 import { Button } from "@/components/client/atoms/Button";
 import { usePlatform } from "@/platform/context";
 import {
@@ -18,6 +21,7 @@ type Caso = {
     ESTADO: string;
     VERSION: number;
     FECHA_HECHO: string;
+    PROCEDIMIENTO?: string;
     REGISTRADA_EN: string;
     REFERENCIA_LUGAR: string;
     LATITUD: number;
@@ -34,11 +38,12 @@ type Caso = {
     REGLA_CONFIRMADA?: number;
     publicacionEvidencias?: { estado: string; codigo?: string | null };
 };
-type Archivo = { ID: string; MIME: string; BYTES: string; ESTADO: string };
+type Archivo = { ID: string; MIME: string; BYTES: string; ESTADO: string; CAPTURADA_EN?: string | null };
 type Detail = {
     caso: Caso;
     evidencias: Archivo[];
     reglas: { REGLA: number; NOMBRE: string }[];
+    analisis?: Analisis | null;
 };
 type Config = {
     acciones: { revisar: boolean; imponer: boolean };
@@ -111,6 +116,7 @@ function Evidencia({
                 {archivo.MIME.startsWith("video/") ? "Video" : "Fotografía"}{" "}
                 {archivo.ID}
             </strong>
+            {archivo.CAPTURADA_EN && <p className={styles.muted}>{fecha(archivo.CAPTURADA_EN)}</p>}
             {error ? (
                 <div role="alert">
                     <p>{error}</p>
@@ -269,20 +275,16 @@ export function ViviPmtWorkspace() {
             if (!controller.signal.aborted) setBusy(false);
         }
     }
+    const [decisionOpen, setDecisionOpen] = useState(false);
+    const decisionFlight = useRef(false);
+
     async function change(
         action: "reservar" | "liberar" | "decidir",
         decision?: "IMPONER" | "DESCARTAR",
     ) {
-        if (!active || busy || !data) return;
-        if (
-            decision &&
-            !window.confirm(
-                decision === "IMPONER"
-                    ? "¿Confirmas la infracción y la placa? Se emitirá una multa y entrará al proceso de notificación."
-                    : "¿Confirmas descartar este reporte con el fundamento indicado?",
-            )
-        )
-            return;
+        if (!active || busy || !data || decisionFlight.current) return;
+        decisionFlight.current = true;
+        if (decision) setDecisionOpen(false);
         setBusy(true);
         setError("");
         setMessage("");
@@ -328,6 +330,7 @@ export function ViviPmtWorkspace() {
             setError(errorText(e));
             setUncertain(true);
         } finally {
+            decisionFlight.current = false;
             setBusy(false);
         }
     }
@@ -346,7 +349,7 @@ export function ViviPmtWorkspace() {
         <div className={styles.page}>
             <div className={styles.toolbar}>
                 <div>
-                    <h2>Bandeja de reportes</h2>
+                    <h2>{active ? "Revisión del reporte" : "Bandeja de reportes"}</h2>
                     <p className={styles.muted}>
                         Revisa el lugar, la placa y las evidencias antes de
                         decidir si corresponde imponer una multa.
@@ -552,7 +555,7 @@ export function ViviPmtWorkspace() {
                         </div>
                         <dl className={local.facts}>
                             <div>
-                                <dt>Fecha del hecho declarada</dt>
+                                <dt>{active.PROCEDIMIENTO === "REVISION_PMT_V2" ? "Fecha de captura" : "Fecha declarada"}</dt>
                                 <dd>{fecha(active.FECHA_HECHO)}</dd>
                             </div>
                             <div>
@@ -570,7 +573,7 @@ export function ViviPmtWorkspace() {
                                 </dd>
                             </div>
                             <div>
-                                <dt>Lugar declarado</dt>
+                                <dt>{active.PROCEDIMIENTO === "REVISION_PMT_V2" ? "Ubicación de captura" : "Lugar declarado"}</dt>
                                 <dd>
                                     {active.REFERENCIA_LUGAR}
                                     <br />
@@ -586,10 +589,7 @@ export function ViviPmtWorkspace() {
                             </div>
                         </dl>
                         {active.OBSERVACIONES && <p>{active.OBSERVACIONES}</p>}
-                        <p className={styles.muted}>
-                            La fecha y ubicación fueron indicadas por el
-                            ciudadano. No provienen del GPS de las evidencias.
-                        </p>
+
                         {["PENDIENTE", "EN_REVISION"].includes(active.ESTADO) &&
                             config?.acciones.revisar && (
                                 <div className={styles.actions}>
@@ -654,6 +654,7 @@ export function ViviPmtWorkspace() {
                             </p>
                         )}
                     </section>
+                    <div className={local.reviewColumns}>
                     <section className={styles.listPanel}>
                         <h3>Evidencias del reporte</h3>
                         <div className={local.evidences}>
@@ -681,9 +682,21 @@ export function ViviPmtWorkspace() {
                             ))}
                         </div>
                     </section>
+                        <AnalisisEvidencias analisis={detail?.analisis} autoridad="agente" />
+                    </div>
                     {["PENDIENTE", "EN_REVISION"].includes(active.ESTADO) &&
                         config?.acciones.revisar && (
-                            <section className={styles.listPanel}>
+                            <>
+                                <div className={local.decisionBar}>
+                                    <p>{checked.length} de {detail?.evidencias.length || 0} evidencias revisadas</p>
+                                    <Button state={mine && reviewed && !busy && !uncertain ? "default" : "disabled"}
+                                        onClick={() => setDecisionOpen(true)}>
+                                        Registrar decisión
+                                    </Button>
+                                </div>
+                                <PopOver isOpen={decisionOpen} onClose={() => setDecisionOpen(false)}
+                                    ariaLabel="Decisión del agente" className={local.decisionDialog}>
+                                <section className={local.decisionContent}>
                                 <h3>Decisión del agente</h3>
                                 {config.permiteCorrecciones && (
                                     <>
@@ -759,9 +772,7 @@ export function ViviPmtWorkspace() {
                                     />
                                 </label>
                                 <p className={styles.muted}>
-                                    Confirma cada evidencia y escribe al menos
-                                    10 caracteres. La multa se notificará por el
-                                    procedimiento de multas nuevas.
+                                    Escribe un fundamento de al menos 10 caracteres. Imponer multa registra la remisión y programa su notificación.
                                 </p>
                                 {!config.emisionConfigurada && (
                                     <p className={styles.error}>
@@ -799,10 +810,13 @@ export function ViviPmtWorkspace() {
                                             void change("decidir", "DESCARTAR")
                                         }
                                     >
-                                        Descartar reporte
+                                        Archivar reporte
                                     </Button>
+                                    <Button variant="outlined" onClick={() => setDecisionOpen(false)}>Cancelar</Button>
                                 </div>
-                            </section>
+                                </section>
+                                </PopOver>
+                            </>
                         )}
                 </>
             )}

@@ -58,8 +58,10 @@ const fecha = (v: string | null) =>
     : "No registrada";
 export function AnalisisEvidencias({
   analisis,
+  autoridad = "juez",
 }: {
   analisis: Analisis | null | undefined;
+  autoridad?: "juez" | "agente";
 }) {
   return (
     <section
@@ -82,12 +84,12 @@ export function AnalisisEvidencias({
       </div>
       <p className={styles.analysisNotice}>
         Este análisis automático apoya la revisión de las evidencias. La
-        valoración del caso corresponde al juez.
+        valoración del caso corresponde al {autoridad}.
       </p>
       {!analisis?.disponible ? (
         <p className={styles.emptyState}>
           {analisis?.estado === "ERROR_CONSULTA"
-            ? "No se pudo consultar el análisis. Puedes actualizar el caso; la denuncia y la defensa continúan disponibles."
+            ? "No se pudo consultar el análisis. Puedes actualizar el caso para reintentar."
             : "No hay un análisis automático registrado para este caso."}
         </p>
       ) : (
@@ -96,8 +98,8 @@ export function AnalisisEvidencias({
             <p className={styles.historyNotice}>
               El aviso continuó con las observaciones de la IA, sin aprobación
               automática de las evidencias. La incertidumbre no acredita una
-              infracción. El caso llega a valoración judicial si el propietario
-              presenta defensa.
+              infracción. En el procedimiento anterior, el caso llega a
+              valoración judicial si el propietario presenta defensa.
             </p>
           )}
           {analisis.modo === "OBSERVAR" && (
@@ -111,6 +113,14 @@ export function AnalisisEvidencias({
               Análisis histórico: se muestran los criterios de la versión
               aplicada. Los campos no evaluados no implican cumplimiento.
             </p>
+          )}
+          {!!analisis.intentos && (
+            <div className={styles.analysisNotice}>
+              <p>Análisis realizados {analisis.intentos} de 3</p>
+              {analisis.intentosPrevios?.map((intento) => (
+                <p key={intento.numero}>Análisis {intento.numero} · {etiqueta(intento.estado)}</p>
+              ))}
+            </div>
           )}
           <dl className={styles.analysisMeta}>
             <div>

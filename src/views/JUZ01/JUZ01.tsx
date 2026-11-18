@@ -80,22 +80,22 @@ export default function JUZ01() {
                     </span>
                     <div>
                         <h2>Buscar un caso</h2>
-                        <p>Usa los primeros 3 o 6 caracteres, o pega el código completo.</p>
+                        <p>Consulta por número de multa, placa o código de caso.</p>
                     </div>
                 </header>
                 <div className={styles.searchControls}>
-                    <FormField label="Código de caso" htmlFor="caseNumber" required className={styles.field}>
+                    <FormField label="Número de multa, placa o caso" htmlFor="caseNumber" required className={styles.field}>
                         <Input
                             ref={input}
                             id="caseNumber"
                             type="text"
                             value={caseNumber}
-                            maxLength={64}
+                            maxLength={36}
                             autoComplete="off"
                             autoCapitalize="characters"
                             spellCheck={false}
                             onChange={(e) => changeCode(e.target.value)}
-                            placeholder="Primeros 3 o 6 caracteres o código completo"
+                            placeholder="V-40, P-123BCD o código de caso"
                             state={loading ? "disabled" : fieldError ? "error" : "default"}
                             aria-invalid={!!fieldError}
                             aria-describedby={fieldError ? "codigoCasoAyuda codigoCasoError" : "codigoCasoAyuda"}
@@ -114,11 +114,11 @@ export default function JUZ01() {
                     )}
                 </div>
                 <p id="codigoCasoAyuda" className={styles.help}>
-                    El código está en el correo o documento del caso y puede incluir letras y números. Mínimo 3 caracteres.
+                    Puedes escribir el código completo o sus primeros tres caracteres.
                 </p>
                 {fieldError && <p id="codigoCasoError" className={styles.fieldError} role="alert">{fieldError}</p>}
                 {error && <div className={styles.error} role="alert"><strong>No se pudo completar la búsqueda</strong><p>{error}</p></div>}
-                {loading && <p role="status" className={styles.help}>Buscando coincidencias del código…</p>}
+                {loading && <p role="status" className={styles.help}>Buscando casos…</p>}
             </form>
             {!!searchedCode && (
                 <section className={styles.results} aria-labelledby="casos-titulo">
@@ -143,6 +143,7 @@ export default function JUZ01() {
                             <thead><tr>
                                 <th scope="col">Placa</th>
                                 <th scope="col">Código del caso</th>
+                                <th scope="col">Multa</th>
                                 <th scope="col">Estado</th>
                                 <th scope="col">Registrado</th>
                                 <th scope="col"><span className={styles.srOnly}>Acción</span></th>
@@ -153,6 +154,7 @@ export default function JUZ01() {
                                     <td data-label="Código del caso" className={styles.caseCode}>
                                         <code>{item.codigoCaso.toUpperCase().startsWith(searchedCode.toUpperCase()) ? <><mark>{item.codigoCaso.slice(0, searchedCode.length)}</mark>{item.codigoCaso.slice(searchedCode.length)}</> : item.codigoCaso}</code>
                                     </td>
+                                    <td data-label="Multa">{item.remision || "—"}</td>
                                     <td data-label="Estado"><span className={styles.status}>{estadoCasoJuzgado(item.estado)}</span></td>
                                     <td data-label="Registrado" className={styles.date}>{displayDate(item.registradaEn)}</td>
                                     <td className={styles.open}>

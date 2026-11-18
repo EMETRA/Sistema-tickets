@@ -4,9 +4,9 @@ export const JUZ01Schema = z.object({
     caseNumber: z
         .string()
         .trim()
-        .regex(/^[A-Za-z0-9_-]{3,36}$/, {
+        .regex(/^(?:[A-Za-z0-9_ -]{3,36}|[1-9]\d?)$/, {
             message:
-        "Escribe al menos los primeros 3 caracteres o el código completo del caso (hasta 36).",
+        "Escribe el número de multa, la placa o al menos 3 caracteres del caso.",
         }),
 });
 

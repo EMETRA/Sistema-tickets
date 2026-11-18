@@ -67,3 +67,30 @@
         justify-self: start;
     }
 }
+
+.reviewColumns {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    align-items: start;
+    gap: 16px;
+}
+.decisionBar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 13px;
+    color: var(--tickets-text-secondary);
+}
+.decisionDialog { width: min(720px, calc(100vw - 32px)); }
+.decisionContent {
+    display: grid;
+    min-width: 0;
+    gap: 14px;
+    padding: 20px;
+    color: var(--tickets-text);
+}
+@media (max-width: 900px) {
+    .reviewColumns { grid-template-columns: minmax(0, 1fr); }
+}

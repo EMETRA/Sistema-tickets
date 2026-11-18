@@ -6,17 +6,23 @@ export type CoincidenciaJuzgado = {
   placa: string;
   estado: string;
   registradaEn: string;
+  remision?: string | null;
 };
 export async function buscarCasosJuzgado(
     prefijo: string,
 ): Promise<CoincidenciaJuzgado[]> {
-    const data = await graphqlRequestClient<{
-    viviJuzgadoBuscar: CoincidenciaJuzgado[];
-  }>(
-      "query BuscarCasos($prefijo: String!) { viviJuzgadoBuscar(prefijo:$prefijo) { codigoCaso usoPlaca placa estado registradaEn } }",
-      { variables: { prefijo } },
-  );
-    return data.viviJuzgadoBuscar;
+    const opciones = { variables: { prefijo } };
+    const query = `query BuscarCasos($prefijo: String!) {
+      viviJuzgadoBuscar(prefijo:$prefijo) { codigoCaso usoPlaca placa estado registradaEn remision }
+    }`;
+    try {
+        return (await graphqlRequestClient<{ viviJuzgadoBuscar: CoincidenciaJuzgado[] }>(query, opciones)).viviJuzgadoBuscar;
+    } catch (error) {
+        if (!contratoAnterior(error, /^Cannot query field "remision" on type "ViviJuzgadoCoincidencia"\./)) throw error;
+        return (await graphqlRequestClient<{ viviJuzgadoBuscar: CoincidenciaJuzgado[] }>(
+            query.replace(" registradaEn remision", " registradaEn"), opciones,
+        )).viviJuzgadoBuscar;
+    }
 }
 
 export type EvidenciaJuzgado = {
@@ -25,6 +31,7 @@ export type EvidenciaJuzgado = {
   mime: string;
   tamanoBytes: string;
   estado: string;
+  capturadaEn?: string | null;
 };
 export type DocumentoJuzgado = {
   id: string;
@@ -83,6 +90,8 @@ export type AnalisisEvidencias = {
   criterioMotivo?: string | null;
   verificacionMotivo?: string | null;
   archivos: AnalisisArchivo[];
+  intentos?: number | null;
+  intentosPrevios?: { numero: number; estado: string }[] | null;
 };
 export type DetalleJuzgado = {
   codigoCaso: string;
@@ -96,6 +105,24 @@ export type DetalleJuzgado = {
     observaciones: string | null;
     estado: string;
     registradaEn: string;
+    procedimiento?: string | null;
+    fechaHecho?: string | null;
+    lugar?: string | null;
+    latitud?: string | null;
+    longitud?: string | null;
+    multa?: {
+      ciudad: string;
+      serie: string;
+      numero: string;
+      placa: string;
+      fecha: string | null;
+      lugar: string | null;
+      regla: string | null;
+      monto: string | null;
+      agente: string | null;
+      fundamento: string | null;
+      fechaPago: string | null;
+    } | null;
     evidenciasDenuncia: EvidenciaJuzgado[];
     analisisEvidencias?: AnalisisEvidencias | null;
     defensa: {
@@ -196,43 +223,40 @@ export const DETALLE_JUZGADO_ANALISIS = DETALLE_JUZGADO.replace(
     "indicioMarca ubicacionVehiculo verificacionBanqueta { version ubicacionInicial limiteAcera ruedaDelantera ruedaTrasera estructuraSobreAcera }",
 );
 
-function contratoAnalisisAnterior(error: unknown): boolean {
-    const errors = (
-    error as {
-      graphQLErrors?: { message?: string; extensions?: { code?: string } }[];
-    }
-    )?.graphQLErrors;
-    return (
-        Array.isArray(errors) &&
-    errors.length > 0 &&
-    errors.every(
-        (e) =>
-            e.extensions?.code === "GRAPHQL_VALIDATION_FAILED" &&
-        (/^Cannot query field "(continuoConObservaciones|criterioMotivo|verificacionMotivo)" on type "ViviJuzgadoAnalisis"\./.test(
-            e.message || "",
-        ) ||
-          /^Cannot query field "(ubicacionVehiculo|verificacionBanqueta)" on type "ViviJuzgadoAnalisisArchivo"\./.test(
-              e.message || "",
-          )),
-    )
+export const DETALLE_JUZGADO_PMT = DETALLE_JUZGADO_ANALISIS.replace(
+    "caso { id codigoCaso usoPlaca placa regla observaciones estado registradaEn",
+    `caso { id codigoCaso usoPlaca placa regla observaciones estado registradaEn
+      procedimiento fechaHecho lugar latitud longitud
+      multa { ciudad serie numero placa fecha lugar regla monto agente fundamento fechaPago }`,
+).replace(
+    "analisisEvidencias { disponible",
+    "analisisEvidencias { intentos intentosPrevios { numero estado } disponible",
+).replace(
+    "evidenciasDenuncia { id origen mime tamanoBytes estado }",
+    "evidenciasDenuncia { id origen mime tamanoBytes estado capturadaEn }",
+);
+
+function contratoAnterior(error: unknown, campos: RegExp): boolean {
+    const errors = (error as {
+        graphQLErrors?: { message?: string; extensions?: { code?: string } }[];
+    })?.graphQLErrors;
+    return !!errors?.length && errors.every(
+        (e) => e.extensions?.code === "GRAPHQL_VALIDATION_FAILED" && campos.test(e.message || ""),
     );
 }
-export async function consultarCasoJuzgado(
-    codigoCaso: string,
-): Promise<DetalleJuzgado> {
-    const options = { variables: { codigoCaso } };
+
+export async function consultarCasoJuzgado(codigoCaso: string): Promise<DetalleJuzgado> {
+    const opciones = { variables: { codigoCaso } };
+    const leer = (query: string) => graphqlRequestClient<{ viviJuzgadoDetalle: DetalleJuzgado }>(query, opciones);
     let data: { viviJuzgadoDetalle: DetalleJuzgado };
+    const camposPmt = '^Cannot query field "(?:(?:procedimiento|fechaHecho|lugar|latitud|longitud|multa)" on type "ViviJuzgadoCaso|(?:intentos|intentosPrevios)" on type "ViviJuzgadoAnalisis|capturadaEn" on type "ViviJuzgadoEvidencia)"';
+    const camposIa = '^Cannot query field "(continuoConObservaciones|criterioMotivo|verificacionMotivo|ubicacionVehiculo|verificacionBanqueta)" on type "ViviJuzgadoAnalisis(?:Archivo)?"';
     try {
-        data = await graphqlRequestClient<{ viviJuzgadoDetalle: DetalleJuzgado }>(
-            DETALLE_JUZGADO_ANALISIS,
-            options,
-        );
+        data = await leer(DETALLE_JUZGADO_PMT);
     } catch (error) {
-        if (!contratoAnalisisAnterior(error)) throw error;
-        data = await graphqlRequestClient<{ viviJuzgadoDetalle: DetalleJuzgado }>(
-            DETALLE_JUZGADO,
-            options,
-        );
+        if (!contratoAnterior(error, new RegExp(camposPmt + '|' + camposIa))) throw error;
+        data = await leer(contratoAnterior(error, new RegExp(camposPmt))
+            ? DETALLE_JUZGADO_ANALISIS : DETALLE_JUZGADO);
     }
     if (data?.viviJuzgadoDetalle?.codigoCaso !== codigoCaso)
         throw new Error("No se recibió el caso solicitado");

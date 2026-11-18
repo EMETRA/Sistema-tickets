@@ -11,6 +11,7 @@ export const PopOver = ({
     position = "center",
     withOverlay = true,
     className,
+    ariaLabel = "Ventana de la aplicación",
 }: PopOverProps) => {
     const ref = useRef<HTMLDialogElement>(null);
     useEffect(() => {
@@ -28,7 +29,7 @@ export const PopOver = ({
     return (
         <dialog
             ref={ref}
-            aria-label="Ventana de la aplicación"
+            aria-label={ariaLabel}
             className={classNames(styles.popoverContent, styles[position], className)}
             onCancel={(event) => {
                 event.preventDefault();

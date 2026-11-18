@@ -58,6 +58,12 @@ async function main(){
   await page.getByText('Fundamento registrado de prueba').waitFor();
   assert.equal(await page.getByRole('button',{name:/Resolver|Registrar recepción|Imponer/}).count(),0);
   await shots('juzgado-consulta');
+  await page.goto('http://127.0.0.1:3793/aplicaciones');
+  const acceso=page.getByRole('button',{name:'Ingresar a Aplicaciones PMT',exact:true});
+  await acceso.waitFor();
+  await shots('catalogo-aplicaciones');
+  await acceso.click();
+  await page.waitForURL('**/home/pmt/formularios');
   assert.deepEqual(errors,[]);assert.ok(calls.filter(c=>c.p.startsWith('/platform/vivi-pmt')).every(c=>c.auth==='Bearer token-ficticio'));console.log('VIVI_PMT_BROWSER_OK: autorización previa, cola, evidencia privada, reserva, fundamento, multa, recuperación sin duplicar y consulta judicial de lectura; 1440/1024/390; '+dir);
  }catch(e){if(page){await page.screenshot({path:path.join(dir,'fallo.png'),fullPage:true}).catch(()=>{});console.error((await page.locator('body').innerText()).slice(-3500));}throw e;}finally{await browser?.close();next.kill('SIGTERM');backend.close();}
 }

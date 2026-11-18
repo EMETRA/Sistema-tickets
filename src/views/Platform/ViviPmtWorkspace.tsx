@@ -137,7 +137,7 @@ function Evidencia({
                     onLoadedMetadata={() => setReady(true)}
                     onError={() => {
                         setReady(false);
-                        setError("No se pudo reproducir el video.");
+                        setError("No se pudo reproducir el video. Puedes descargarlo para revisarlo.");
                     }}
                 />
             ) : (
@@ -151,6 +151,13 @@ function Evidencia({
                             setError("No se pudo mostrar la fotografía.");
                         }}
                     />
+                </a>
+            )}
+            {url && archivo.MIME.startsWith("video/") && (
+                <a href={url} className={styles.link}
+                    download={`evidencia-${archivo.ID}.${archivo.MIME === "video/quicktime" ? "mov" : "mp4"}`}
+                    onClick={() => setReady(true)}>
+                    Descargar video
                 </a>
             )}
             <label>

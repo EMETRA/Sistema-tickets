@@ -13,6 +13,7 @@ export const LOGIN_MUTATION = `
   mutation Login($input: LoginInput!) {
     login(input: $input) {
       token
+      requiereActivacion
       refresh_token
       expires_in
     }

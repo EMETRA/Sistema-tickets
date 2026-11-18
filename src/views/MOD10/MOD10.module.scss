@@ -9,14 +9,14 @@
     width: min(100%, 1120px);
     min-width: 0;
     align-self: flex-start;
-    padding: clamp(18px, 2.3vw, 30px);
+    padding: var(--tickets-panel-padding);
     border: 1px solid var(--tickets-border);
     border-radius: var(--tickets-radius);
     background: var(--tickets-surface);
     box-shadow: var(--tickets-shadow);
     display: flex;
     flex-direction: column;
-    gap: 30px;
+    gap: 18px;
 }
 
 .fieldsRow {

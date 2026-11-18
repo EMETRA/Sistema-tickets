@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { PopOver } from "@/components/client/atoms/PopOver";
 import { Button } from "@/components/client/atoms/Button";
 import { usePlatform } from "@/platform/context";
 import { platformCommand, platformFetch } from "@/platform/client";
@@ -205,7 +206,9 @@ function CreateCepo({
         }
     }
     return (
-        <section className={styles.card} aria-label="Registrar nuevo cepo">
+        <PopOver isOpen onClose={() => { if (!flight.current) onCancel(); }}
+            ariaLabel="Registrar nuevo cepo" className={local.formDialog}>
+        <section className={local.dialogBody} aria-label="Registrar nuevo cepo">
             <div className={styles.toolbar}>
                 <h2>Registrar nuevo aviso de cepo</h2>
                 <Button
@@ -213,7 +216,7 @@ function CreateCepo({
                     state={busy ? "disabled" : "default"}
                     onClick={onCancel}
                 >
-                    Volver a consultar cepos
+                    Cerrar formulario
                 </Button>
             </div>
             <p className={local.hint}>
@@ -541,6 +544,7 @@ function CreateCepo({
                 </p>
             )}
         </section>
+        </PopOver>
     );
 }
 function CepoAction({
@@ -879,20 +883,14 @@ export function CctCepos({ bootstrap }: { bootstrap: CctBootstrap }) {
         DANIO: "Registrar daño",
         ROBO: "Registrar robo",
     };
-    if (create)
-        return (
-            <CreateCepo
-                admin={admin}
-                onCancel={() => setCreate(false)}
+    return (
+        <>
+            {create && <CreateCepo admin={admin} onCancel={() => setCreate(false)}
                 onDone={(id) => {
                     setCreate(false);
                     setMessage("Aviso " + id + " registrado.");
                     void open(id);
-                }}
-            />
-        );
-    return (
-        <>
+                }} />}
             <section className={styles.card} aria-label="Gestión de cepos">
                 <div className={styles.toolbar}>
                     <div>

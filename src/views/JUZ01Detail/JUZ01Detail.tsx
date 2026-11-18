@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import classNames from "classnames";
 import { AnalisisEvidencias } from "./AnalisisEvidencias";
+import { ConsultaMultaPmt } from "./ConsultaMultaPmt";
 import { EvidenciasCaso } from "./EvidenciasCaso";
 import { Title } from "@/components/client/atoms/Title";
 import { Text } from "@/components/client/atoms/Text";
@@ -305,6 +306,10 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
                 </Button>
             </div>
         );
+    }
+
+    if (detalle?.caso.multa) {
+        return <ConsultaMultaPmt caso={detalle.caso} onBack={() => router.back()} />;
     }
 
     return (

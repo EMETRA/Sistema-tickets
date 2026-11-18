@@ -1,7 +1,7 @@
 .page {
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: 16px;
   min-width: 0;
   color: var(--tickets-text);
 }
@@ -16,7 +16,7 @@
   padding: var(--tickets-panel-padding);
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 14px;
   min-width: 0;
   > .tableRegion {
     border: 0;
@@ -68,13 +68,13 @@
   background: var(--tickets-surface);
   border: 1px solid var(--tickets-border);
   border-radius: var(--tickets-radius);
-  padding: clamp(18px, 2vw, 28px);
+  padding: var(--tickets-panel-padding);
   min-width: 0;
   box-shadow: var(--tickets-shadow);
   h2 {
-    font-size: 18px;
-    line-height: 1.5;
-    margin-bottom: 14px;
+    font-size: 17px;
+    line-height: 1.42;
+    margin-bottom: 10px;
   }
   h3 {
     font-size: 15px;
@@ -173,10 +173,10 @@
   }
   td,
   th {
-    padding: 15px 16px;
-    border-bottom: 1px solid #edf0f7;
-    vertical-align: top;
-    line-height: 1.7;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--tickets-divider);
+    vertical-align: middle;
+    line-height: 1.5;
   }
   td {
     overflow-wrap: anywhere;
@@ -228,17 +228,20 @@
   justify-content: space-between;
   gap: 16px;
   background: #fff;
-  padding: 20px 26px;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 14px 20px;
   border-bottom: 1px solid var(--tickets-border);
   h2 {
     font-size: 20px;
   }
 }
 .dialogBody {
-  padding: 24px;
+  padding: var(--tickets-panel-padding);
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 14px;
 }
 .split {
   display: grid;

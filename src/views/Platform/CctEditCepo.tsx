@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { PopOver } from "@/components/client/atoms/PopOver";
 import { Button } from "@/components/client/atoms/Button";
 import { platformCommand } from "@/platform/client";
 import { cctCivilNow, type CctCepo } from "@/platform/cct";
@@ -66,7 +67,9 @@ export function CctEditCepo({
         }
     }
     return (
-        <section className={local.review} aria-label="Editar colocación">
+        <PopOver isOpen onClose={() => { if (!flight.current) onCancel(); }}
+            ariaLabel="Editar colocación" className={local.formDialog}>
+        <section className={local.dialogBody} aria-label="Editar colocación">
             <div className={styles.toolbar}>
                 <h3>Editar colocación · Aviso {d.AVISO}</h3>
                 <Button
@@ -182,5 +185,6 @@ export function CctEditCepo({
                 </p>
             )}
         </section>
+        </PopOver>
     );
 }

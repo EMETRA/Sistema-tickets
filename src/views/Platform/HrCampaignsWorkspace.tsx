@@ -6,6 +6,7 @@ import {
     useState,
     type FormEvent,
 } from "react";
+import { PopOver } from "@/components/client/atoms/PopOver";
 import { Button } from "@/components/client/atoms/Button";
 import { usePlatform } from "@/platform/context";
 import { useModuleActions } from "@/components/client/organisms/ModuleAccessGate/ModuleAccessGate";
@@ -266,14 +267,14 @@ export function HrCampaignsWorkspace() {
                     {actions.INSERTAR && (
                         <Button
                             state={busy ? "disabled" : "default"}
-                            onClick={() => setCreating((v) => !v)}
+                            onClick={() => setCreating(true)}
                         >
-                            {creating ? "Cerrar formulario" : "Nueva campaña"}
+                            Nueva campaña
                         </Button>
                     )}
                 </div>
             </div>
-            {error && (
+            {error && !creating && (
                 <div role="alert" className={styles.error}>
                     {error}
                     <p>
@@ -294,12 +295,15 @@ export function HrCampaignsWorkspace() {
                     {message}
                 </p>
             )}
-            {creating && (
-                <section
-                    className={styles.card}
-                    aria-label="Configurar campaña"
-                >
-                    <h3>Nueva campaña obligatoria</h3>
+            <PopOver isOpen={creating} onClose={() => { if (!busy) setCreating(false); }}
+                ariaLabel="Configurar campaña" className={local.campaignDialog}>
+                <section className={styles.dialogBody}>
+                    <div className={styles.toolbar}>
+                        <h3>Nueva campaña obligatoria</h3>
+                        <Button variant="outlined" state={busy ? "disabled" : "default"}
+                            onClick={() => setCreating(false)}>Cerrar</Button>
+                    </div>
+                    {error && <p role="alert" className={styles.error}>{error}</p>}
                     <form onSubmit={create}>
                         <fieldset disabled={busy} className={local.fieldset}>
                             <div className={local.formGrid}>
@@ -667,7 +671,7 @@ export function HrCampaignsWorkspace() {
                         </fieldset>
                     </form>
                 </section>
-            )}
+            </PopOver>
             <section className={styles.card} aria-label="Campañas publicadas">
                 <h3>Campañas publicadas</h3>
                 {!list && !error && <p role="status">Consultando campañas…</p>}

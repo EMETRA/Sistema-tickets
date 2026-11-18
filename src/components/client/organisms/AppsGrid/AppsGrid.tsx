@@ -6,7 +6,7 @@ import classNames from "classnames";
 export const AppsGrid = ({
     title,
     apps,
-    description = "Accesos disponibles según tu perfil.",
+    description,
     showHeading = true,
     className,
 }: AppsGridProps) => (

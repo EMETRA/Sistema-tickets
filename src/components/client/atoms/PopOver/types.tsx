@@ -5,6 +5,7 @@ export type PopOverPosition =
 
 export interface PopOverProps {
     /** Estado de visibilidad controlado desde el padre */
+    ariaLabel?: string;
     isOpen: boolean;
     /** Función para cerrar el PopOver */
     onClose: () => void;

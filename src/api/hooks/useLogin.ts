@@ -80,12 +80,22 @@ export function useLogin() {
         };
 
         try {
-            const response = await graphqlRequestClient<{ login: LoginResponse }>(
-                LOGIN_MUTATION,
-                { variables: { input } }
-            );
+            const variables = { input };
+            const request = (query: string) =>
+                graphqlRequestClient<{ login: LoginResponse }>(query, { variables });
+            let response: { login: LoginResponse };
+            try {
+                response = await request(LOGIN_MUTATION);
+            } catch (error) {
+                const errors = (error as { graphQLErrors?: { message?: string; extensions?: { code?: string } }[] }).graphQLErrors;
+                if (!errors?.length || !errors.every(item =>
+                    item.extensions?.code === "GRAPHQL_VALIDATION_FAILED" &&
+                    item.message?.includes('Cannot query field "requiereActivacion" on type "AuthPayload"')))
+                    throw error;
+                response = await request(LOGIN_MUTATION.replace("requiereActivacion", ""));
+            }
 
-            if (!response?.login?.token) {
+            if (!response?.login?.token && response?.login?.requiereActivacion !== true) {
                 setState({ loading: false, error: 'No se recibió token de autenticación', success: false });
                 return null;
             }

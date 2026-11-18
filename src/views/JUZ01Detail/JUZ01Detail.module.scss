@@ -787,3 +787,29 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
+
+.pmtHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  p { color: var(--tickets-text-secondary); font-size: 13px; overflow-wrap: anywhere; }
+}
+.pmtColumns {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 16px;
+}
+.pmtRail { display: grid; min-width: 0; gap: 16px; }
+.pmtFacts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 155px), 1fr));
+  gap: 12px;
+  dt { font-size: 12px; color: var(--tickets-text-secondary); margin-bottom: 3px; }
+  dd { margin: 0; font-size: 14px; overflow-wrap: anywhere; }
+}
+@media (max-width: 900px) {
+  .pmtColumns { grid-template-columns: minmax(0, 1fr); }
+}

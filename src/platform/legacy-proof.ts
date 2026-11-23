@@ -4,6 +4,7 @@ import { platformFetch } from "./client";
 import { getPlatformRuntime } from "./runtime";
 const pending = new Map<string, string>();
 function canonical(value: unknown): string {
+    if (value instanceof Date) return JSON.stringify(value.toISOString());
     if (Array.isArray(value)) return "[" + value.map(canonical).join(",") + "]";
     if (value && typeof value === "object")
         return (
@@ -57,7 +58,12 @@ export async function legacyProof(
     try {
         remembered = sessionStorage.getItem("tk-legacy-" + key);
     } catch {}
-    const requestId = pending.get(key) || remembered || crypto.randomUUID();
+    // El PDF se reconstruye por ID de resolución y el servicio reutiliza su fila.
+    // Cada clic debe poder obtener una revisión nueva, aunque el intento anterior
+    // quedara INCIERTO en la auditoría. Las demás mutaciones conservan su identidad.
+    const documentRetry = /^\/legacy\/vivi\/juzgado\/resoluciones\/[1-9]\d{0,18}\/documento\/generar$/.test(path);
+    const requestId = documentRetry ? crypto.randomUUID()
+        : pending.get(key) || remembered || crypto.randomUUID();
     pending.set(key, requestId);
     try {
         sessionStorage.setItem("tk-legacy-" + key, requestId);
@@ -117,9 +123,25 @@ export async function graphqlProof(
         )
     )
         return {};
+    const uploads = new Set(
+        (operation.variableDefinitions || [])
+            .filter((def) => {
+                let type = def.type;
+                while (type.kind !== Kind.NAMED_TYPE) type = type.type;
+                return type.name.value === "Upload";
+            })
+            .map((def) => def.variable.name.value),
+    );
     const args = Object.fromEntries(
         (field.arguments || [])
-            .filter((a) => a.name.value !== "files")
+            .filter(
+                (a) =>
+                    a.name.value !== "files" &&
+                    !(
+                        a.value.kind === Kind.VARIABLE &&
+                        uploads.has(a.value.name.value)
+                    ),
+            )
             .map((a) => [a.name.value, valueFromASTUntyped(a.value, variables)])
             .filter(([, v]) => v !== undefined),
     );

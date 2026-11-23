@@ -11,11 +11,13 @@ export interface PageMetadata {
 
 // Metadata única de cada página del menú de sistema
 export const PAGES_CONFIG: Record<string, PageMetadata> = {
+    mi_perfil: {path:"/mi-perfil",label:"Mi perfil",title:"Mi perfil",iconName:"user-solid"},
+    notificaciones: {path:"/notificaciones",label:"Notificaciones",title:"Notificaciones",iconName:"bell-regular"},
     ayuda: {path:"/ayuda",label:"Ayuda",title:"Ayuda",iconName:"circle-exclamation-solid"},
     aplicaciones: {
         path: "/aplicaciones",
         label: "Aplicaciones",
-        title: "Aplicaciones",
+        title: "Aplicaciones y secciones",
         iconName: "table-cells-large-solid",
     },
     home: {
@@ -26,8 +28,8 @@ export const PAGES_CONFIG: Record<string, PageMetadata> = {
     },
     equipo: {
         path: "/equipo",
-        label: "Equipo",
-        title: "Gestión de Personal",
+        label: "Mi equipo",
+        title: "Personal del equipo",
         iconName: "people-group-solid",
     },
     usuarios: {
@@ -75,7 +77,7 @@ export const PAGES_CONFIG: Record<string, PageMetadata> = {
     mis_tickets: {
         path: "/mis-tickets",
         label: "Mis tickets",
-        title: "Mis tickets creados",
+        title: "Mis tickets",
         iconName: "ticket-solid",
     },
     crear_ticket: {

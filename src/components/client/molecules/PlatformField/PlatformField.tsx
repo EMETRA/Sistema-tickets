@@ -19,6 +19,7 @@ export function PlatformField({
         [query, setQuery] = useState(""),
         [options, setOptions] = useState<Option[]>([]),
         [error, setError] = useState("");
+    const selectedReference = field.type === "ref" ? String(value || "") : "";
     const permissionCode = ["leer", "insertar", "editar", "eliminar"].includes(
         field.key,
     );
@@ -89,6 +90,7 @@ export function PlatformField({
         field.key,
         field.lookupPath,
         query,
+        selectedReference,
     ]);
     let control: React.ReactNode;
     if (field.type === "boolean")

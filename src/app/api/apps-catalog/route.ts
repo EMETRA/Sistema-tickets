@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { randomUUID } from "node:crypto";
+import { queuePanelIncident } from '@/observability/server-incidents';
 import {
     AppsCatalogError,
     getAppsCatalog,
@@ -15,7 +16,7 @@ export async function GET() {
         );
     } catch (error) {
         const status = error instanceof AppsCatalogError ? error.status : 503;
-        const referencia = randomUUID();
+        const referencia = status >= 500 ? await queuePanelIncident('AppsCatalog',error,randomUUID()) : randomUUID();
         console.warn(
             JSON.stringify({
                 codigo: "CATALOGO_APLICACIONES_FALLIDO",

@@ -13,23 +13,13 @@ import { useReporteSemanalStore } from "@/store/useSaveWeeklyReportStore";
 
 const GRID = "minmax(0, 1fr) minmax(0, 2fr)";
 
-// // TODO: replace with real data from mutation response
-// const DUMMY_REPORT = {
-//     id: 704,
-//     proyecto: "Migración de procesos",
-//     cargo: "Programador",
-//     avanceGeneral: "35.00%",
-//     indicadorProductividad: "100.00%",
-//     estado: "verde" as const,
-//     situacion: "",
-// };
-
 const SaveMOD01: React.FC = () => {
     const router = useRouter();
 
     const { lastResult, lastInput } = useReporteSemanalStore();
 
-    console.log("Last saved report result:", lastResult);
+    if (!lastResult?.success || !lastInput) return <div className={styles.card}><h2>No hay un reporte guardado en esta sesión</h2><p>Registra un reporte o consulta los existentes para ver su resultado.</p><Button onClick={() => router.push("/home/informatica/reportes/mod01")}>Nuevo reporte</Button><Button variant="outlined" onClick={() => router.push("/home/informatica/reportes/exportmod01")}>Consultar reportes</Button></div>;
+    const state = lastResult.reporte.estadoProyecto?.toLowerCase();
 
     const rows: { label: string; content: React.ReactNode }[] = [
         {
@@ -54,10 +44,10 @@ const SaveMOD01: React.FC = () => {
         },
         {
             label: "Estado del proyecto",
-            content: <StatusChip variant={"verde"} /> },
+            content: state === "verde" || state === "amarillo" || state === "rojo" ? <StatusChip variant={state} /> : <Text>{lastResult.reporte.estadoProyecto || "Sin estado informado"}</Text> },
         {
             label: "Observaciones",
-            content: <Text variant="muted">{"El proyecto presenta avance conforme a lo planificado, cumplimiento adecuado de tareas y fechas, sin bloqueos críticos reportados."}</Text>
+            content: <Text variant="muted">{lastInput.observaciones || "Sin observaciones"}</Text>
         },
     ];
 

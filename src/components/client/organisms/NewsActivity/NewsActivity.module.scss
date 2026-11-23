@@ -1,0 +1,47 @@
+.card {
+    padding: 20px 24px;
+    background: #fff;
+    border: 1px solid #e0e6f0;
+    border-radius: 16px;
+    color: #263b56;
+    h2 {
+        margin: 0 0 18px;
+        font-size: 16px;
+    }
+}
+.details,
+.compact {
+    margin: 0;
+    display: grid;
+    gap: 14px;
+    font-size: 13px;
+    line-height: 1.5;
+    dt {
+        color: #627590;
+        font-size: 12px;
+        margin-bottom: 3px;
+    }
+    dd {
+        margin: 0;
+        overflow-wrap: anywhere;
+    }
+    dd span {
+        display: block;
+        font-weight: 600;
+        color: #263b56;
+    }
+    time {
+        display: block;
+        font-size: 11px;
+        color: #627590;
+        margin-top: 2px;
+    }
+}
+.details {
+    grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+}
+.compact {
+    min-width: 180px;
+    max-width: 260px;
+    gap: 10px;
+}

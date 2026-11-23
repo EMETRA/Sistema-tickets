@@ -19,7 +19,9 @@ export function Applications() {
         );
     return (
         <AppsGrid
-            title="Aplicaciones del panel"
+            title="Aplicaciones autorizadas"
+            showHeading={false}
+            description=""
             apps={getMainApps(catalog || {}).map((app) => ({
                 icon: resolveIconFile(app.iconName),
                 iconLabel: app.label,

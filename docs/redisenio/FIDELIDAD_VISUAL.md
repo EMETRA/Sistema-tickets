@@ -46,6 +46,31 @@ lienzo. Las reglas de composición propias del inicio están en
 `AgendaPreview` son organismos reutilizables. `HomeWorkspace` adapta los datos
 al perfil, sin incluir valores de ejemplo en el producto.
 
+## Tickets y aplicaciones (P07/P08, P10 y P12/P13)
+
+- «Mis tickets» reúne búsqueda por código/asunto/persona, filtros de estado y
+  asignación, actualización y paginación en una tarjeta blanca. Las columnas son
+  código, asunto, creador, estado, responsable y fecha. La paginación de diez filas
+  organiza el conjunto autorizado recibido; no sustituye los filtros del API.
+- Código y asunto abren `/mis-tickets/[ticketId]`, una página enlazable con
+  conversación, historial y archivos. El borrador se conserva al cambiar de
+  pestaña o fallar el envío. Las pestañas admiten flechas, Inicio y Fin. La
+  información lateral procede del ticket y las descargas usan sus enlaces reales.
+- El historial conserva fecha, actor, acción y valores anteriores/nuevos. Los
+  actores conocidos muestran su nombre; los restantes conservan su ID, sin
+  inventar identidades. Los errores permiten reintentar cada consulta.
+- La vista rápida del inicio y de asignación comparte el mismo organismo. Se
+  mantienen el alcance de lectura del API, las confirmaciones administrativas,
+  la cancelación con opción de deshacer y las acciones existentes por rol.
+- «Aplicaciones y secciones» utiliza tarjetas blancas uniformes, iconos azules
+  sobre superficie tenue y «Ingresar» al pie. Conserva el catálogo autorizado y
+  sus rutas de secciones/módulos; no añade accesos por apariencia. `WorkspaceIcon`
+  incluye los contornos de Jurídico (`gavel-solid`) y Comunicación
+  (`file-lines-regular`) de P07; los otros iconos conservan el registro existente.
+
+El ajuste es del frontend: no requiere SQL, variables ni cambios adicionales en
+las APIs. Las capturas de validación usan datos ficticios del laboratorio.
+
 ## Verificación
 
 ```bash
@@ -55,6 +80,8 @@ pnpm exec next build --webpack
 node scripts/verificar-cobertura-redisenio.cjs
 node test/integracion/redisenio-browser.cjs
 node test/integracion/plataforma-browser.cjs
+node test/integracion/tickets-aplicaciones-browser.cjs
+node test/integracion/aplicaciones-fuentes-browser.cjs
 ```
 
 El recorrido de fidelidad requiere iniciar el laboratorio local en otra terminal:
@@ -76,6 +103,15 @@ y únicamente acepta una dirección de loopback del laboratorio.
 El recorrido general comprueba los 16 módulos y la navegación, las dos
 confirmaciones y la conservación del formulario. Incluye una regresión del
 panel de rendimiento del técnico para verificar su fondo blanco.
+
+`tickets-aplicaciones-browser.cjs` comprueba búsqueda, filtros, paginación,
+enlace directo y regreso al listado, pestañas por teclado, lectura del historial,
+vista rápida del inicio, adjuntos, conservación del comentario ante un error y
+reintento tras un envío fallido antes de guardar,
+aislamiento de tickets ajenos y navegación de aplicaciones a módulos. Guarda
+capturas de escritorio, tableta y móvil en `QA_SCREENSHOT_DIR` y verifica que no
+haya desbordamiento del documento. La tabla puede desplazarse horizontalmente
+en pantallas estrechas. Requiere compilar primero y Chromium local.
 
 ## Despliegue
 

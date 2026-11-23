@@ -10,6 +10,8 @@ export const protectedRoutes = [
     "/equipo",
     "/config",
     "/usuarios",
+    "/mi-perfil",
+    "/notificaciones",
 ];
 
 export const publicRoutes = ["/"];

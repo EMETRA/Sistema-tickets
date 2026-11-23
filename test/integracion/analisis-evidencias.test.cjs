@@ -75,7 +75,7 @@ test('si el API aun carece del contrato ampliado consulta una vez el anterior, s
   const { api, llamadas } = cliente([errorCampo('continuoConObservaciones'), { viviJuzgadoDetalle: { codigoCaso: 'QA-CASO' } }]);
   await api.consultarCasoJuzgado('QA-CASO');
   assert.equal(llamadas.length, 2);
-  assert.equal(llamadas[0].query, api.DETALLE_JUZGADO_ANALISIS);
+  assert.equal(llamadas[0].query, api.DETALLE_JUZGADO_PMT);
   assert.equal(llamadas[1].query, api.DETALLE_JUZGADO);
   assert.deepEqual(llamadas[0].options, llamadas[1].options);
 });

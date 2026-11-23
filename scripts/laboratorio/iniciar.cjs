@@ -31,7 +31,7 @@ async function start(options = {}) {
     await listen(check, p);
     await new Promise((resolve) => check.close(resolve));
   }
-  const lab = await createLab(file);
+  const lab = await createLab(file, { graphql: options.graphql, incidentToken:options.incidentToken, incident:options.incident });
   await listen(lab.server, apiPort);
   const nonce = randomUUID(),
     apiBase = "http://127.0.0.1:" + apiPort;
@@ -61,6 +61,8 @@ async function start(options = {}) {
         AUTH_RECOVERY_BASE_URL: apiBase,
         AUTH_API_URL: apiBase,
         TICKETS_PLATFORM_ENABLED: "true",
+        TICKETS_PANEL_ERROR_TOKEN: options.incidentToken || '',
+        TICKETS_ERROR_QUEUE_DIR: path.join(path.dirname(file),'incidents-pending'),
         NEXT_TELEMETRY_DISABLED: "1",
       },
       stdio: ["ignore", "pipe", "pipe"],
@@ -147,6 +149,7 @@ async function start(options = {}) {
       }
       if (
         url.pathname.startsWith("/api/") &&
+        !(typeof options.graphql === "function" && /^\/api\/MOD(?:01|04|05|06|07|08)\//.test(url.pathname)) &&
         !/^\/api\/(platform(?:\/|$)|graphql$|apps-catalog$|ticket(?:\/|$)|tickets(?:\/|$)|ticket-(?:categories|priorities|statuses|tag-catalog|tags|comments)(?:\/|$)|perfil-equipo$)/.test(
           url.pathname,
         )

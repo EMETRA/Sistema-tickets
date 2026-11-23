@@ -1,21 +1,22 @@
+import { WorkerNotificationsWorkspace } from "@/views/Platform/WorkerNotificationsWorkspace";
+import { ViviPmtWorkspace } from "@/views/Platform/ViviPmtWorkspace";
 import {
-    ProjectsBridge,
-    CollaboratorsBridge,
-} from "@/views/Platform/LegacyModuleBridge";
-import MOD13 from "@/views/MOD13";
+    CctConsultas,
+    CctFormularios,
+    CctReportes,
+} from "@/views/Platform/CctWorkspace";
+import { TransitReprintsWorkspace } from "@/views/Platform/TransitReprintsWorkspace";
+import { ViviReportsWorkspace } from "@/views/Platform/ViviReportsWorkspace";
+import { PayrollWorkspace } from "@/views/Platform/PayrollWorkspace";
+import { HrCampaignsWorkspace } from "@/views/Platform/HrCampaignsWorkspace";
 import type { ComponentType } from "react";
 import ConsultaVehiculos from "@/views/ConsultaVehiculos";
 
-import ExportMOD01 from "@/views/ExportMOD01";
-import MOD01 from "@/views/MOD01";
 import MOD04 from "@/views/MOD04";
 import MOD05 from "@/views/MOD05";
-import MOD06 from "@/views/MOD06";
 import MOD07 from "@/views/MOD07";
 import MOD08 from "@/views/MOD08";
 import MOD10 from "@/views/MOD10";
-import PROC01 from "@/views/PROC01/PROC01";
-import SaveMOD01 from "@/views/SaveMOD01/ExportMOD01";
 
 import COM03 from "@/views/COM03";
 import JUZ01 from "@/views/JUZ01";
@@ -26,24 +27,24 @@ import CasilleroUserRequests from "@/views/CasilleroUserRequests";
  * La clave debe coincidir con el `id` del módulo en apps-catalog.
  */
 export const APP_REGISTRY: Record<string, ComponentType> = {
-    proc01: PROC01,
-    mod01: MOD01,
     mod04: MOD04,
     mod05: MOD05,
-    mod06: MOD06,
     mod07: MOD07,
     mod08: MOD08,
     mod10: MOD10,
-    mod13: MOD13,
+    "rh-boletas": PayrollWorkspace,
+    "rh-datos": HrCampaignsWorkspace,
+    "vivi-reportes": ViviReportsWorkspace,
+    "worker-notificaciones": WorkerNotificationsWorkspace,
+    "pmt-avisame": ViviPmtWorkspace,
+    "cct-consultas": CctConsultas,
+    "cct-cepos": CctFormularios,
+    "cct-reportes": CctReportes,
     // COM-03: la clave es el id del módulo en la ruta /home/comunicacion/contenido/noticias
     noticias: COM03,
-    "dashboard-proyectos": ProjectsBridge,
-    "dashboard-colaboradores": CollaboratorsBridge,
-    exportmod01: ExportMOD01,
-    "save-mod01": SaveMOD01,
     "consulta-vehiculos": ConsultaVehiculos,
     juz01: JUZ01,
-    "casillero-user-requests": CasilleroUserRequests,
+    juz02: TransitReprintsWorkspace,
 };
 
 export function getAppComponent(moduleId: string): ComponentType | null {

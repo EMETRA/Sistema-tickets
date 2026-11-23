@@ -20,6 +20,7 @@ export interface Ticket {
    * ID único del ticket
    */
   id: string;
+  code?: string;
 
   /**
    * Usuario que creó el ticket
@@ -78,6 +79,8 @@ export interface TicketsTablePanelProps {
    * Callback cuando se exporta la tabla
    */
   onExport?: () => void;
+  onRefresh?: () => void;
+  onOpenTicket?: (ticketId: string) => void;
 
   /**
    * Indica si la tabla está en estado de carga

@@ -1,62 +1,31 @@
 "use client";
-
-import React from "react";
 import classNames from "classnames";
 import { AppCardProps } from "./types";
+import { WorkspaceIcon } from "../../atoms/WorkspaceIcon/WorkspaceIcon";
 import styles from "./AppCard.module.scss";
-import { AppIcon } from "../AppIcon";
-// import { IconButton } from "../../atoms/IconButton";
-import { Text } from "../../atoms/Text";
-import { Button } from "../../atoms/Button";
 
 export const AppCard = ({
     icon,
     iconLabel,
     title,
-    // bookmarked = false,
-    // onBookmarkClick,
+    description,
     onButtonClick,
-    iconColor,
     className,
-}: AppCardProps) => {
-    return (
-        <div className={classNames(styles.AppCard, className)}>
-            <div className={styles.header}>
-                {/* <IconButton
-                    icon={bookmarked ? 'bookmark-solid-full' : 'bookmark-regular'}
-                    size={20}
-                    onClick={onBookmarkClick}
-                    squared_borded
-                    className={classNames(styles.bookmarkButton, {
-                        [styles.bookmarked]: bookmarked,
-                    })}
-                    iconColor={bookmarked ? "#0070f3" : "#666666"}
-                /> */}
-            </div>
-
-            <div className={styles.content}>
-                <AppIcon icon={icon} label={iconLabel} size={24} color={iconColor} />
-                <Text variant="body" className={styles.title}>
-                    {title}
-                </Text>
-            </div>
-
-            <div className={styles.divider} />
-
-            <div className={styles.footer}>
-                <Button
-                    variant="text"
-                    color="cancel"
-                    icon="arrow-right-solid"
-                    onClick={onButtonClick}
-                    className={styles.button}
-                    fullWidth
-                >
-                    Ingresar
-                </Button>
-            </div>
-        </div>
-    );
-};
-
+}: AppCardProps) => (
+    <article className={classNames(styles.AppCard, className)}>
+        <button type="button" className={styles.entry} onClick={onButtonClick}
+            aria-label={"Ingresar a " + (title || iconLabel)}>
+            <span className={styles.icon} aria-hidden="true">
+                <WorkspaceIcon name={icon} size={20} />
+            </span>
+            <span className={styles.content}>
+                <span className={styles.title}>{title}</span>
+                {description && <span className={styles.description}>{description}</span>}
+            </span>
+            <span className={styles.arrow} aria-hidden="true">
+                <WorkspaceIcon name="arrow-right-solid" size={16} />
+            </span>
+        </button>
+    </article>
+);
 export default AppCard;

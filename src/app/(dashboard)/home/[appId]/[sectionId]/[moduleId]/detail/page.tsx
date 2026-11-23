@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import { getModule } from "@/config/apps-catalog";
 import { requireAppCatalog } from "@/config/require-app-catalog";
 import JUZ01Detail from "@/views/JUZ01Detail/JUZ01Detail";
+import { ModuleAccessGate } from '@/components/client/organisms/ModuleAccessGate/ModuleAccessGate';
 
 type PageProps = {
     params: Promise<{ appId: string; sectionId: string; moduleId: string }>;
@@ -22,5 +23,5 @@ export default async function ModuleDetailPage({ params, searchParams }: PagePro
 
     if (typeof caseNumber !== "string" || caseNumber.trim() === "") return notFound();
 
-    return <JUZ01Detail caseNumber={caseNumber} />;
+    return <ModuleAccessGate moduleId={moduleId}><JUZ01Detail caseNumber={caseNumber} /></ModuleAccessGate>;
 }

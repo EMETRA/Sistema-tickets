@@ -110,10 +110,10 @@ test("las etiquetas horarias y ámbitos respetan Guatemala y la privacidad del r
   for (const scope of ["EQUIPO", "EMPRESA", "PRIVADA"])
     assert.equal(c.activityScope({ visibilidad: scope }), scope);
 });
-test("administración tiene enlaces directos para los cinco catálogos y para solicitudes", () => {
+test("administración reúne funciones corporativas, los cinco catálogos y solicitudes", () => {
   assert.deepEqual(
     access.accessNavigation(true).map((item) => item.id),
-    ["users", "profiles", "roles", "modules", "permissions", "requests"],
+    ["corporate", "users", "profiles", "roles", "modules", "permissions", "requests"],
   );
   assert.equal(
     access.accessNavigation(true).find((item) => item.id === "profiles").href,
@@ -130,7 +130,7 @@ test("solicitudes de un usuario no administrador no muestran enlaces de administ
   ]);
 });
 test("un enlace directo válido conserva la pestaña y los valores desconocidos caen en Usuarios", () => {
-  for (const tab of ["users", "profiles", "roles", "modules", "permissions"])
+  for (const tab of ["corporate", "users", "profiles", "roles", "modules", "permissions"])
     assert.equal(access.accessTab(tab), tab);
   assert.equal(access.accessTab(null), "users");
   assert.equal(access.accessTab("requests"), "users");

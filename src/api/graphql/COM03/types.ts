@@ -10,10 +10,10 @@
  */
 
 export enum EstadoNoticia {
-  PROGRAMADA = 'PROGRAMADA',
-  PUBLICADA = 'PUBLICADA',
-  BORRADOR = 'BORRADOR',
-  ARCHIVADA = 'ARCHIVADA',
+  PROGRAMADA = "PROGRAMADA",
+  PUBLICADA = "PUBLICADA",
+  BORRADOR = "BORRADOR",
+  ARCHIVADA = "ARCHIVADA",
 }
 
 /**
@@ -21,32 +21,41 @@ export enum EstadoNoticia {
  * TODO [COM03-BACKEND]: confirmar los valores reales que devuelve VIVI y mapearlos aquí.
  */
 export enum EstadoNotificacion {
-  ENVIADO = 'ENVIADO',
-  PENDIENTE = 'PENDIENTE',
-  ERROR = 'ERROR',
-  PARCIAL = 'PARCIAL',
-  INCIERTA = 'INCIERTA',
-  SIN_DESTINATARIOS = 'SIN_DESTINATARIOS',
-  SIN_PUBLICACION = 'SIN_PUBLICACION',
-  NO_DISPONIBLE = 'NO_DISPONIBLE',
+  ENVIADO = "ENVIADO",
+  PENDIENTE = "PENDIENTE",
+  ERROR = "ERROR",
+  PARCIAL = "PARCIAL",
+  INCIERTA = "INCIERTA",
+  SIN_DESTINATARIOS = "SIN_DESTINATARIOS",
+  SIN_PUBLICACION = "SIN_PUBLICACION",
+  NO_DISPONIBLE = "NO_DISPONIBLE",
 }
 
 /** TB_NOTICIA.VISIBILIDAD */
 export enum VisibilidadNoticia {
-  PUBLICA = 'publica',
-  PRIVADA = 'privada',
+  PUBLICA = "publica",
+  PRIVADA = "privada",
 }
 
 /** TB_RECURSO.tipo */
 export enum TipoRecurso {
-  IMAGEN = 'imagen',
-  VIDEO = 'video',
-  ARCHIVO = 'archivo',
-  EXTERNO = 'externo',
+  IMAGEN = "imagen",
+  VIDEO = "video",
+  ARCHIVO = "archivo",
+  EXTERNO = "externo",
+}
+
+/** Responsables del registro CMS; el autor editorial es independiente. */
+export interface ActividadEditorialNoticia {
+  creadoPor: { id: number; nombre: string | null } | null;
+  actualizadoPor: { id: number; nombre: string | null } | null;
+  creadoEn: string | null;
+  actualizadoEn: string | null;
 }
 
 /** Noticia del listado (TB_NOTICIA). No incluye la notificación push: esa viene de VIVI. */
 export interface NoticiaListItem {
+  actividadEditorial?: ActividadEditorialNoticia;
   estadoNotificacion?: EstadoNotificacion | null;
   id: string;
   titulo: string;
@@ -69,7 +78,10 @@ export interface NoticiaListItem {
  * Permisos de noticias (PERMISOS_PANEL.md, sección 2). LEER: ver listado y detalle; EDITAR: crear,
  * guardar borrador, archivar y restaurar; PUBLICAR: publicar o programar (junto con EDITAR).
  */
-export type PermisoNoticia = 'VIVI_NOTICIAS_LEER' | 'VIVI_NOTICIAS_EDITAR' | 'VIVI_NOTICIAS_PUBLICAR';
+export type PermisoNoticia =
+  | "VIVI_NOTICIAS_LEER"
+  | "VIVI_NOTICIAS_EDITAR"
+  | "VIVI_NOTICIAS_PUBLICAR";
 
 export interface GetPermisosNoticiasResponse {
   usuario: { permisos: string[] | null } | null;
@@ -160,6 +172,10 @@ export interface SeccionNoticia {
  * (TB_NOTICIA_RECURSO: principal, galeria, adjunto, og).
  */
 export interface NoticiaDetalle {
+  actividadEditorial?: ActividadEditorialNoticia;
+  ubicacion?: string | null;
+  latitud?: number | null;
+  longitud?: number | null;
   autores?: { id: number; nombre: string; rol: string; orden: number }[];
   categoriaIdsAdicionales?: string[];
   id: string;
@@ -198,9 +214,9 @@ export interface GetNoticiaResponse {
  * y qué textos se muestran (confirmación, carga, resultado).
  */
 export enum AccionNoticia {
-  BORRADOR = 'BORRADOR',
-  PUBLICAR = 'PUBLICAR',
-  PROGRAMAR = 'PROGRAMAR',
+  BORRADOR = "BORRADOR",
+  PUBLICAR = "PUBLICAR",
+  PROGRAMAR = "PROGRAMAR",
 }
 
 /**
@@ -208,8 +224,12 @@ export enum AccionNoticia {
  * Van en minúsculas. TODO [COM03-BACKEND]: `EstadoNoticia` (mayúsculas) se alinea a estos
  * valores cuando se conecten las lecturas del listado (pendiente con backend, #1).
  */
-export type EstadoNoticiaCms = 'borrador' | 'programada' | 'publicada' | 'archivada';
-export type VisibilidadNoticiaCms = 'publica' | 'privada';
+export type EstadoNoticiaCms =
+  | "borrador"
+  | "programada"
+  | "publicada"
+  | "archivada";
+export type VisibilidadNoticiaCms = "publica" | "privada";
 
 /**
  * `SeccionNoticiaCmsInput` (README, sección 3). Si el input trae `secciones`, reemplaza todas
@@ -237,6 +257,9 @@ export interface SeccionNoticiaCmsInput {
  *   - `autores: [{ autorId, rol?, orden? }]`: falta cómo obtener el catálogo de autores.
  */
 export interface GuardarNoticiaCmsInput {
+  ubicacion?: string | null;
+  latitud?: number | null;
+  longitud?: number | null;
   autores?: { autorId: number; rol?: string; orden?: number }[];
   /** 1 a 64 caracteres. La genera el front por intento de guardado (ver NewsFormView). */
   claveIdempotente: string;
@@ -281,7 +304,7 @@ export interface GuardarNoticiaCmsVariables {
 }
 
 /** `guardada` = borrador, privada o programada; `publicada` = ya salió al outbox (README). */
-export type ResultadoGuardarNoticiaCms = 'guardada' | 'publicada';
+export type ResultadoGuardarNoticiaCms = "guardada" | "publicada";
 
 export interface PublicacionNoticiaCms {
   idNoticia: number;
@@ -320,11 +343,11 @@ export interface GuardarNoticiaCmsResponse {
  */
 export type CodigoErrorNoticiaCms =
   /** 409: ese slug ya existe en ese idioma. */
-  | 'SLUG_IDIOMA_CONFLICT'
+  | "SLUG_IDIOMA_CONFLICT"
   /** 409: misma claveIdempotente con contenido distinto. */
-  | 'IDEMPOTENCY_CONFLICT'
+  | "IDEMPOTENCY_CONFLICT"
   /** 404: la noticia a actualizar no existe. */
-  | 'NEWS_NOT_FOUND';
+  | "NEWS_NOT_FOUND";
 
 // ============================================
 // LECTURAS DEL EDITOR (REST de api-tickets hacia el CMS existente de api-portal)

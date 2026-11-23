@@ -1,0 +1,39 @@
+{
+  "ciudad": 1,
+  "serie": "N",
+  "numero": "1234567",
+  "fecha": "12/09/2026 06:37:00",
+  "tipoPlaca": "P",
+  "placa": "000AAA",
+  "marca": "MARCA EJEMPLO",
+  "color": "GRIS",
+  "modelo": "2020",
+  "chasis": "",
+  "vin": "",
+  "nombres": "CONDUCTOR",
+  "apellidos": "DE PRUEBA",
+  "tipoLicencia": "B",
+  "licencia": "0000000",
+  "lugar": "BOULEVARD DE EJEMPLO, ZONA 1",
+  "observaciones": "",
+  "chapa": "0001",
+  "agente": "AGENTE DE EJEMPLO",
+  "saldoActual": 200,
+  "montoOriginal": 200,
+  "reglas": [
+    {
+      "regla": "1",
+      "articulo": "181",
+      "numeral": "03.",
+      "descripcion": "Infracción ficticia",
+      "monto": 200,
+      "descuento1": 25,
+      "descuento2": 25,
+      "total1": 150,
+      "total2": 150
+    }
+  ],
+  "fechaDescuento1": "14/09/2026",
+  "fechaDescuento2": "22/09/2026",
+  "consultaUrl": "https://consulta.muniguate.com/emetra/despliega.php?tplaca=P&nplaca=000AAA"
+}

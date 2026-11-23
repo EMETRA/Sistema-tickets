@@ -11,14 +11,14 @@
   --tickets-text-muted: #7b8ba2;
   --tickets-border: #dfe5f2;
   --tickets-divider: #e9eef7;
-  --tickets-panel-padding: clamp(18px, 2vw, 28px);
+  --tickets-panel-padding: clamp(14px, 1.55vw, 21px);
   --tickets-success: #177849;
   --tickets-danger: #ba3544;
   --tickets-warning: #80540d;
-  --tickets-radius: 14px;
+  --tickets-radius: 12px;
   --tickets-control-radius: 9px;
   --tickets-shadow: 0 2px 8px #20396308;
   --tickets-focus: 0 0 0 3px #4361ee25;
   --tickets-sidebar: 228px;
-  --tickets-page-padding: clamp(18px, 2.2vw, 32px);
+  --tickets-page-padding: clamp(15px, 2vw, 28px);
 }

@@ -13,12 +13,14 @@ import { Icon } from "../../atoms/Icon";
 import { SearchField } from "../../molecules/SearchField";
 import type { NewsFilter, NewsTablePanelProps } from "./types";
 import styles from "./NewsTablePanel.module.scss";
+import NewsActivity from "../NewsActivity/NewsActivity";
 
 type ColumnKey =
   | "titulo"
   | "estado"
   | "notificacion"
   | "autor"
+  | "responsables"
   | "fecha"
   | "acciones";
 
@@ -27,7 +29,8 @@ const COLUMNS: { key: ColumnKey; label: string }[] = [
   { key: "titulo", label: "Título" },
   { key: "estado", label: "Estado" },
   { key: "notificacion", label: "Notificación" },
-  { key: "autor", label: "Autor" },
+  { key: "autor", label: "Autor editorial" },
+  { key: "responsables", label: "Registro y edición" },
   { key: "fecha", label: "Fecha" },
   { key: "acciones", label: "Acciones" },
 ];
@@ -192,6 +195,8 @@ const NewsTablePanel: React.FC<NewsTablePanelProps> = ({
         return renderNotification(noticia);
       case "autor":
         return <span className={styles.text}>{noticia.autor}</span>;
+      case "responsables":
+        return <NewsActivity compact activity={noticia.actividadEditorial} />;
       case "fecha":
         return (
           <span className={styles.text}>{formatFecha(noticia.fecha)}</span>

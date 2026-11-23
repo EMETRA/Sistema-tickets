@@ -187,8 +187,10 @@ test("asignación por Secretaría, primera atención y resolución por Técnico"
       .estado,
     3,
   );
+  assert.equal((await command('/platform/tickets/1/resolve',{version:3},{id:4})).status,409);
+  assert.equal((await command('/platform/tickets/1/tags',{version:3,tagIds:[1,2]},{id:4})).status,200);
   assert.equal(
-    (await command("/platform/tickets/1/resolve", { version: 3 }, { id: 4 }))
+    (await command("/platform/tickets/1/resolve", { version: 4 }, { id: 4 }))
       .data.estado,
     5,
   );

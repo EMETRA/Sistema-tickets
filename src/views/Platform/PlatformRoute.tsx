@@ -8,8 +8,10 @@ import { SearchWorkspace } from "./SearchWorkspace";
 import { CalendarWorkspace } from "./CalendarWorkspace";
 import { MetricsWorkspace } from "./MetricsWorkspace";
 import { AssignmentsWorkspace } from "./AssignmentsWorkspace";
+import { AssetsWorkspace } from "./AssetsWorkspace";
 import { NetworkWorkspace } from "./NetworkWorkspace";
 import { AccessWorkspace } from "./AccessWorkspace";
+import { OrganizationWorkspace } from "./OrganizationWorkspace";
 import { SystemsWorkspace } from "./SystemsWorkspace";
 import { MonitoringWorkspace } from "./MonitoringWorkspace";
 import { AuditWorkspace } from "./AuditWorkspace";
@@ -50,6 +52,8 @@ export function PlatformRoute({ section }: { section: string }) {
             </p>
         );
     switch (section) {
+        case "organizacion":
+            return <Suspense fallback={<p role="status">Cargando personal y equipos…</p>}><OrganizationWorkspace /></Suspense>;
         case "busqueda":
             return <SearchWorkspace />;
         case "calendario":
@@ -58,8 +62,10 @@ export function PlatformRoute({ section }: { section: string }) {
             return <MetricsWorkspace />;
         case "asignacion":
             return <AssignmentsWorkspace />;
+        case "inventario":
+            return <Suspense fallback={<p role="status">Cargando activos…</p>}><AssetsWorkspace /></Suspense>;
         case "red":
-            return <NetworkWorkspace />;
+            return <Suspense fallback={<p role="status">Cargando red…</p>}><NetworkWorkspace /></Suspense>;
         case "accesos":
             return (
                 <Suspense

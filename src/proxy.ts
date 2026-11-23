@@ -7,6 +7,7 @@ import {
 } from "@/config/protected-routes";
 import { getSessionFromRequest } from "@/auth/session";
 import { canAccessPath } from "@/config/route-access";
+import { legacyApplicationDestination } from "@/config/apps-catalog";
 
 function isInternalPath(pathname: string) {
     return (
@@ -17,7 +18,9 @@ function isInternalPath(pathname: string) {
 }
 
 function matchRoute(pathname: string, routes: string[]) {
-    return routes.some((route) => pathname === route || pathname.startsWith(`${route}/`));
+    return routes.some(
+        (route) => pathname === route || pathname.startsWith(`${route}/`),
+    );
 }
 
 export function proxy(request: NextRequest) {
@@ -43,6 +46,14 @@ export function proxy(request: NextRequest) {
 
     if ((isProtectedRoute || isSessionOnlyRoute) && !session) {
         return NextResponse.redirect(new URL("/login", request.url));
+    }
+
+    const destination = legacyApplicationDestination(pathname);
+    if (session && destination) {
+        const target = new URL(destination, request.url);
+        if (destination.startsWith("/home/juzgado/"))
+            target.search = request.nextUrl.search;
+        return NextResponse.redirect(target);
     }
 
     if (isNologRoute && session) {

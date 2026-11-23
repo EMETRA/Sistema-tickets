@@ -1,4 +1,4 @@
-import type { AppsCatalog } from "@/config/apps-catalog";
+import { publicAppsCatalog, type AppsCatalog } from "@/config/apps-catalog";
 import { AUTH_COOKIE_NAME } from "@/auth/constants";
 import { APPS_CATALOG_DUMMY } from "./appsCatalog.dummy";
 import { getGraphqlEndpoint } from "@/api/config/env";
@@ -16,7 +16,7 @@ export class AppsCatalogError extends Error {
 
 export async function getAppsCatalog(): Promise<AppsCatalog> {
     if (process.env.TICKETS_PLATFORM_ENABLED !== "true")
-        return APPS_CATALOG_DUMMY;
+        return publicAppsCatalog(APPS_CATALOG_DUMMY);
     const incoming = await headers();
     // Una navegación RSC lleva cookie; el BFF recibe Authorization. El API valida
     // el token en ambos casos. Una cabecera inválida nunca se sustituye por otra identidad.
@@ -46,15 +46,15 @@ export async function getAppsCatalog(): Promise<AppsCatalog> {
                 response.status === 401
                     ? 401
                     : response.status === 403
-                        ? 403
-                        : 503,
+                      ? 403
+                      : 503,
             );
         if (!response.headers.get("content-type")?.includes("application/json"))
             throw new AppsCatalogError(502);
         const catalog = await response.json();
         if (!catalog || typeof catalog !== "object" || Array.isArray(catalog))
             throw new AppsCatalogError(502);
-        return catalog;
+        return publicAppsCatalog(catalog);
     } catch (error) {
         if (error instanceof AppsCatalogError) throw error;
         throw new AppsCatalogError(503);

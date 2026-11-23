@@ -18,6 +18,13 @@ body {
   overflow-x: hidden;
 }
 
+/* El espacio usa el scroll de main; evita un segundo scroll exterior y su vacío. */
+html:has([data-workspace-shell]),
+body:has([data-workspace-shell]) {
+  height: 100%;
+  overflow: hidden;
+}
+
 body {
   color: var(--foreground);
   background: var(--background);

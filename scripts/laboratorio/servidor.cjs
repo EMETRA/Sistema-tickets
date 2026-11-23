@@ -3,6 +3,7 @@ const http = require("node:http");
 const { randomUUID, createHash } = require("node:crypto");
 const { parse, getOperationAST, valueFromASTUntyped } = require("graphql");
 const { State, definitions, clone, now } = require("./estado.cjs");
+const ticketLabels = require('./ticket-labels.cjs');
 const fail = (status, message) => {
   throw Object.assign(new Error(message), { status });
 };
@@ -293,7 +294,7 @@ function requestPlan(s, r) {
     copiaIndependiente: !!d.copiarUsuarioId,
   };
 }
-async function createLab(file) {
+async function createLab(file, options = {}) {
   const state = await new State(file).open(),
     sessions = new Map(),
     failures = [];
@@ -372,7 +373,18 @@ async function createLab(file) {
       parts = p.split("/").filter(Boolean),
       q = url.searchParams;
     if (p === "/bootstrap") return bootstrap(s, a);
+    if (p === "/organization/people") {
+      if (!a.admin) fail(403, "Solo Informática consulta el directorio institucional.");
+      return {empresa:97,personal:s.users.map(u=>({empresa:97,empleado:9000000+u.id,nombre:u.nombre,puesto:u.rol,unidadCodigo:u.equipoId===s.ids.it?1:2,unidad:u.equipoId===s.ids.it?'Informática ficticia':'Contabilidad ficticia',sinUnidad:false,cuentasHabilitadas:1,usuariosIds:[u.id]}))};
+    }
     if (p === "/catalog") return s.applicationCatalog || {}; // Catálogo ficticio explícito de los recorridos; sin trámites externos.
+    if (parts[0] === 'module-access') {
+      const id = parts[1], custom = s.moduleAccess?.[a.id]?.[id];
+      if (custom) return { moduloId:id, ...custom };
+      const visible = Object.values(s.applicationCatalog || {}).some(app => Object.values(app.sections || {}).some(section => (section.modules || []).some(module => module.id===id)));
+      const actions = { LEER:!!(a.admin || visible), INSERTAR:!!a.admin, EDITAR:!!a.admin, ELIMINAR:!!a.admin };
+      return { moduloId:id, allowed:actions.LEER && (!['proc01','mod01','mod10'].includes(id) || actions.INSERTAR), actions };
+    }
     if (p === "/people")
       return s.users
         .filter(
@@ -697,6 +709,7 @@ async function createLab(file) {
       });
     }
     if (parts[0] === "tickets") {
+      if(p==='/tickets/reports/labels') return ticketLabels.report(s,a,q);
       if (parts.length === 1) {
         const scope = q.get("scope") || "creados";
         if (scope === "cola" && !a.admin && a.mode !== "ASIGNACION")
@@ -748,6 +761,18 @@ async function createLab(file) {
           .map((u) => ({ id: u.id, nombre: u.nombre }));
       }
       if (parts.length === 2) return { ...t, id: t.id, estado: t.estadoId };
+      if(parts[2]==='tags') {
+        if(req.method==='GET')return {id:t.id,version:t.version,puedeEditar:ticketLabels.canEdit(a,t),etiquetas:ticketLabels.labels(t).map(tag=>({...tag,id:Number(tag.id)}))};
+        return command(s,a,req,p,body,proof=>{
+          verifyVersion(t,body);
+          if(!ticketLabels.canEdit(a,t))fail(403,'Solo el responsable o el administrador puede clasificar un ticket abierto y asignado.');
+          if(!Array.isArray(body.tagIds)||body.tagIds.length>10||new Set(body.tagIds).size!==body.tagIds.length||body.tagIds.some(id=>!ticketLabels.catalog.some(tag=>Number(tag.id)===id)))fail(400,'Etiquetas inválidas.');
+          const before=ticketLabels.labels(t);t.tagIds=[...body.tagIds];t.version++;const after=ticketLabels.labels(t);
+          s.ticketHistory.push({id:randomUUID(),ticketId:t.id,usuarioId:a.id,accion:'ETIQUETAS',valorAnterior:before.map(x=>x.nombre).join(', ')||'Sin etiquetas',valorNuevo:after.map(x=>x.nombre).join(', ')||'Sin etiquetas',tag:after.map(x=>x.nombre).join(', '),fecha:now()});
+          audit(s,a,'tickets',String(t.id),'ETIQUETAS',{etiquetas:before},{etiquetas:after},body,proof);
+          return {id:t.id,version:t.version,etiquetas:after.map(tag=>({...tag,id:Number(tag.id)}))};
+        });
+      }
       return command(s, a, req, p, body, (proof) => {
         verifyVersion(t, body);
         const before = clone(t),
@@ -768,6 +793,12 @@ async function createLab(file) {
         } else if (action === "start" || action === "resolve") {
           if (!a.admin && t.usuarioAsignadoId !== a.id)
             fail(403, "El ticket corresponde a otro responsable.");
+          if((action==='start'&&t.estadoId!==2)||(action==='resolve'&&t.estadoId!==3))fail(409,'El estado no permite esta acción.');
+          if(action==='resolve'){
+            const tags=ticketLabels.labels(t);
+            if(!t.usuarioAsignadoId||!tags.length)fail(409,'Asigna al menos una etiqueta antes de resolver el ticket.');
+            t.clasificacionCierre={clasificacionVersion:1,usuarioAsignadoId:t.usuarioAsignadoId,etiquetas:tags.map(tag=>({...tag,id:Number(tag.id)}))};t.fechaCierre=now();
+          }
           t.estadoId = action === "start" ? 3 : 5;
           t.atendidoEn ??= now();
         } else if (action === "cancel") {
@@ -1067,6 +1098,10 @@ async function createLab(file) {
     );
   }
   function graphql(s, a, req, raw) {
+    // Límite de servicios sustituible para recorridos de contratos de módulos.
+    // Solo existe en este laboratorio de loopback; no forma parte del Panel.
+    const custom = options.graphql?.({ state: s, actor: a, request: req, ...raw });
+    if (custom !== undefined) return custom;
     const op = getOperationAST(parse(raw.query || ""));
     if (!op) fail(400, "Consulta inválida.");
     const fields = op.selectionSet.selections;
@@ -1111,8 +1146,8 @@ async function createLab(file) {
             nombre,
             esFinal: i >= 3 ? 1 : 0,
           })),
-        ticketTagCatalog: () => [],
-        ticketTags: () => [],
+        ticketTagCatalog: () => ticketLabels.catalog,
+        ticketTags: () => ticketLabels.labels(s.tickets.find(t=>t.id===Number(args.ticketId))||{}),
         ticketAttachments: () => [],
         ticketComments: () =>
           s.comments.filter((r) => r.ticketId === Number(args.ticketId)),
@@ -1272,7 +1307,7 @@ async function createLab(file) {
       const id = sessions.get(
           (req.headers.authorization || "").replace(/^Bearer\s+/i, ""),
         ),
-        a = actor(state.data, id);
+        a = actor(state.data, typeof options.incident === 'function' && url.pathname === '/platform/integrations/panel-errors' && options.incidentToken && req.headers.authorization === 'Bearer '+options.incidentToken ? 1 : id);
       const injected = failures.find(
         (f) => f.restantes > 0 && url.pathname.startsWith(f.ruta),
       );
@@ -1317,6 +1352,7 @@ async function createLab(file) {
         }
       } else if (buffer.length) body = JSON.parse(buffer.toString("utf8"));
       const fn = (s) =>
+        typeof options.incident === 'function' && ['/platform/integrations/panel-errors','/platform/client-errors'].includes(url.pathname) ? options.incident(s,body,url.pathname) :
         url.pathname === "/graphql"
           ? graphql(s, a, req, body)
           : dispatch(s, a, req, url, body, upload);

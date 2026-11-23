@@ -1,7 +1,8 @@
 import { NextRequest } from "next/server";
 import { randomUUID } from "node:crypto";
 import { getGraphqlEndpoint } from "@/api/config/env";
-import { codigosArchivo } from "@/api/graphql/juzgado-archivo";
+import { codigosArchivo, referenciaArchivo } from "@/api/graphql/juzgado-archivo";
+import { queuePanelIncident } from "@/observability/server-incidents";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 const privateHeaders = {
@@ -30,12 +31,17 @@ async function proxy(
             { error: "Sesión requerida" },
             { status: 401, headers: privateHeaders },
         );
-    const failure = (status: number, codigo: string) => {
-        const referencia = randomUUID();
+    const failure = async (status: number, codigo: string, backendRef?: unknown, cause?: unknown) => {
+        const upstream = referenciaArchivo(backendRef);
+        const referencia = upstream || (status >= 500
+            ? await queuePanelIncident(`JUZ01.${method}.${path[0]}`, cause || {
+                response: { status, errors: [{ extensions: { code: "SERVICE_UNAVAILABLE" } }] },
+            }) : randomUUID());
         console.error(
             JSON.stringify({
                 evento: "PANEL_ARCHIVO_ERROR",
                 recurso: path[0],
+                metodo: method,
                 http: status,
                 codigo,
                 referencia,
@@ -74,15 +80,21 @@ async function proxy(
             signal: AbortSignal.timeout(60000),
         });
         if (!response.ok) {
-            const body = await response.json().catch(() => ({}));
+            const raw = await response.json().catch(() => null);
+            const body = raw && typeof raw === "object" ? raw : {};
             return failure(
                 response.status,
                 (codigosArchivo as readonly string[]).includes(body.codigo)
                     ? body.codigo
                     : "ARCHIVO_HTTP_ERROR",
+                body.referencia,
             );
         }
         const type = response.headers.get("content-type") || "";
+        if (method === "POST" && !/^application\/json(?:;|$)/i.test(type)) {
+            await response.body?.cancel();
+            return failure(502, "ARCHIVO_RESPUESTA_INVALIDA");
+        }
         if (
             method === "GET" &&
       !/^(image\/(jpeg|png)|video\/mp4|application\/(pdf|octet-stream))(;|$)/i.test(
@@ -116,6 +128,8 @@ async function proxy(
         ].includes(code)
                 ? code
                 : "ARCHIVO_SERVICIO_NO_DISPONIBLE",
+            undefined,
+            error,
         );
     }
 }

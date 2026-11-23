@@ -77,6 +77,16 @@ export function WorkspaceIcon({
                 <path d="M14 2v7h6M8 13h8m-8 4h8" />
             </>
         ),
+        "gavel-solid": (
+            <path d="m9 3 9 9-3 3L6 6Zm-4 4 3-3M14 16l4-4M11 11l-8 8M14 21h8m-7-4h6v4h-6Z" fill={fill} />
+        ),
+        "file-lines-regular": (
+            <>
+                <rect x="3" y="3" width="18" height="18" rx="2" fill={fill} />
+                <rect x="6" y="6" width="5" height="5" rx=".5" fill="white" />
+                <path d="M14 7h4m-4 4h4M6 15h12M6 18h8" />
+            </>
+        ),
         "check-solid": <path d="m4 12 5 5L21 5" />,
         "bell-regular": (
             <>

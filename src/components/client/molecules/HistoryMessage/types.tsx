@@ -21,4 +21,6 @@ export interface HistoryItem {
 export interface HistoryMessageProps {
     ticketId: string;
     className?: string;
+    variant?: "timeline" | "table";
+    actorNames?: Record<number, string>;
 }

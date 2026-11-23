@@ -1,9 +1,11 @@
 "use client";
 
 import { usePlatform } from "@/platform/context";
-import { homeNavigation, PLATFORM_SECTIONS } from "@/platform/navigation";
+import { PLATFORM_SECTIONS, platformSections } from "@/platform/navigation";
 import { usePathname, useRouter } from "next/navigation";
+import { Button } from "../../atoms/Button";
 import { SideBarNavigation } from "../../organisms/SideBarNavigation";
+import { HrMandatoryNotice } from "@/platform/hr-notifications";
 import { TopBar } from "../../organisms/TopBar";
 import { PAGES_CONFIG, getMenuByRole } from "@/config/navigation";
 import { canAccessPath } from "@/config/route-access";
@@ -24,6 +26,9 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { ApplicationLoadError } from "../../organisms/ApplicationLoadError/ApplicationLoadError";
 import { PageHeading } from "../../molecules/PageHeading/PageHeading";
 import { AdministrativeConfirmation } from "../../organisms/AdministrativeConfirmation/AdministrativeConfirmation";
+import { useWorkspaceView } from "@/platform/presentation-context";
+import { WORKSPACE_VIEWS, workspaceViewNavigation } from "@/platform/presentation";
+import { WorkspaceViewSwitcher } from "../../organisms/WorkspaceViewSwitcher/WorkspaceViewSwitcher";
 
 export const SystemLayout = ({
     children,
@@ -34,12 +39,21 @@ export const SystemLayout = ({
 }) => {
     const pathname = usePathname();
     const router = useRouter();
+    useEffect(() => {
+        document.getElementById("main-content")?.scrollTo({ top: 0, left: 0 });
+    }, [pathname]);
     const getRole = useAuthStore((state) => state.getRole);
     const user = useAuthStore((state) => state.user);
     const isHydrated = useAuthStore((state) => state.isHydrated);
     const token = useAuthStore((state) => state.token);
     const logout = useAuthStore((state) => state.logout);
     const [menuOpen, setMenuOpen] = useState(false);
+    const [viewDialogOpen, setViewDialogOpen] = useState(false);
+    const workspaceView = useWorkspaceView();
+    const closeViewDialog = () => {
+        setViewDialogOpen(false);
+        requestAnimationFrame(() => document.querySelector<HTMLButtonElement>('[aria-label="Menú de usuario"]')?.focus());
+    };
     useEffect(() => {
         const close = (event: KeyboardEvent) => {
             if (event.key === "Escape") setMenuOpen(false);
@@ -88,6 +102,7 @@ export const SystemLayout = ({
         .filter(
             (page) =>
                 page.path !== "/tickets-creation" &&
+                !(page.path === "/equipo" && platform.data && platformSections(platform.data).some(s=>s.id === "organizacion")) &&
                 (!platform.data ||
                     !["/tickets", "/config", "/usuarios"].includes(page.path)),
         )
@@ -96,10 +111,10 @@ export const SystemLayout = ({
             label: page.label,
             iconName: page.iconName,
         }));
-    const workspaceNavigation = platform.data ? homeNavigation(platform.data) : null;
+    const workspaceNavigation = platform.data ? workspaceViewNavigation(platform.data, workspaceView.mode) : null;
     const secondaryItems = workspaceNavigation ? [
         ...workspaceNavigation.secondary,
-        ...navItems.filter(item=>!workspaceNavigation.primary.some(p=>p.path===item.path)
+        ...navItems.filter(item=>!workspaceView.active && !workspaceNavigation.primary.some(p=>p.path===item.path)
             && !workspaceNavigation.secondary.some(p=>p.path===item.path)),
     ] : [];
     const sections = appId && catalog ? getSections(appId, catalog) : [];
@@ -118,6 +133,8 @@ export const SystemLayout = ({
 
     const activePage = (() => {
         if (!pathname) return PAGES_CONFIG.home;
+        if (/^\/mis-tickets\/[^/]+$/.test(pathname))
+            return { title: "Detalle del ticket", iconName: "ticket-solid" };
         const workspace = PLATFORM_SECTIONS.find(
             (s) => pathname === "/espacio/" + s.id,
         );
@@ -173,7 +190,10 @@ export const SystemLayout = ({
     return (
         <RoleProvider role={currentRole}>
             <AdministrativeConfirmation />
-            <div className={classNames(styles.layout, className)}>
+            {workspaceView.canChangeView && <WorkspaceViewSwitcher key={workspaceView.mode + String(viewDialogOpen)}
+                open={viewDialogOpen} mode={workspaceView.mode} onClose={closeViewDialog}
+                onApply={workspaceView.setMode} />}
+            <div data-workspace-shell className={classNames(styles.layout, className)}>
                 <a href="#main-content" className={styles.skipLink}>
                     Ir al contenido
                 </a>
@@ -198,20 +218,17 @@ export const SystemLayout = ({
 
                 <div className={styles.container}>
                     <TopBar
+                        onChangeView={workspaceView.canChangeView ? () => setViewDialogOpen(true) : undefined}
                         applications={applicationLinks}
-                        profilePath={
-                            user?.id_usuario
-                                ? `/equipo/${encodeURIComponent(user.id_usuario)}`
-                                : undefined
-                        }
+                        profilePath="/mi-perfil"
                         createTicketPath={
                             canAccessPath(currentRole, "/tickets-creation")
                                 ? "/tickets-creation"
                                 : undefined
                         }
-                        notificationsPath="/mis-tickets"
+                        notificationsPath="/notificaciones"
                         settingsPath={
-                            platform.data
+                            workspaceView.active ? undefined : platform.data
                                 ? platform.data.actor.admin
                                     ? "/espacio/accesos"
                                     : undefined
@@ -226,7 +243,7 @@ export const SystemLayout = ({
                         iconName={activePage.iconName}
                         userName={user?.nombre || "Usuario"}
                         userRole={
-                            user?.rol?.trim() ||
+                            (workspaceView.active ? WORKSPACE_VIEWS.find((view) => view.id === workspaceView.mode)?.label : undefined) || user?.rol?.trim() ||
                             currentRole.charAt(0).toUpperCase() +
                                 currentRole.slice(1).toLowerCase()
                         }
@@ -234,6 +251,14 @@ export const SystemLayout = ({
                         userStatus="online"
                     />
 
+                    {workspaceView.active && <div className={styles.presentation} role="status">
+                        <div><strong>Vista de presentación: {WORKSPACE_VIEWS.find((view) => view.id === workspaceView.mode)?.label}</strong>
+                            <span>Los datos y permisos corresponden a tu cuenta.</span></div>
+                        <div><Link href="/home">Ver inicio de esta vista</Link>
+                            <button type="button" onClick={() => workspaceView.setMode("ACTUAL")}>Volver a mi vista</button></div>
+                    </div>}
+
+                    <HrMandatoryNotice />
                     <main
                         id="main-content"
                         tabIndex={-1}
@@ -249,7 +274,8 @@ export const SystemLayout = ({
                                 <Link href={`/home/${appContext.appId}`}>
                                     {catalog[appContext.appId]?.meta.label}
                                 </Link>
-                                {appContext.sectionId && (
+                                {appContext.sectionId && (!appContext.moduleId ||
+                                    catalog[appContext.appId]?.sections[appContext.sectionId]?.meta.label.trim().toLocaleLowerCase() !== activePage.title.trim().toLocaleLowerCase()) && (
                                     <>
                                         <span aria-hidden="true">/</span>
                                         <Link
@@ -283,8 +309,11 @@ export const SystemLayout = ({
                                     !appContext && pathname !== "/home",
                             })}
                         >
-                            {!appContext && pathname !== "/home" && (
-                                <PageHeading title={activePage.title} />
+                            {!appContext && pathname !== "/home" && !/^\/mis-tickets\/[^/]+$/.test(pathname || "") && (
+                                <PageHeading title={activePage.title}
+                                    description={pathname === "/mis-tickets" ? "Solicitudes relacionadas con tu cuenta." : pathname === "/tickets" ? "Consulta y organiza los tickets dentro de tu alcance." : pathname === "/aplicaciones" ? "Accesos disponibles según tu perfil." : undefined}
+                                    actions={["/mis-tickets", "/tickets"].includes(pathname || "") && canAccessPath(currentRole, "/tickets-creation") ? <Button onClick={() => router.push("/tickets-creation")}>+ Crear ticket</Button> : undefined}
+                                />
                             )}
                             <div
                                 className={

@@ -15,6 +15,7 @@ export const UserMenu = ({
     status,
     className,
     profilePath,
+    onChangeView,
 }: UserMenuProps) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const logout = useAuthStore((state) => state.logout);
@@ -67,6 +68,8 @@ export const UserMenu = ({
                 />
                 {isMenuOpen && (
                     <ul className={styles.menu}>
+                        {onChangeView && <li><button type="button" className={styles.menuItem}
+                            onClick={() => { setIsMenuOpen(false); onChangeView(); }}>Cambiar vista</button></li>}
                         {profilePath && (
                             <li>
                                 <Link

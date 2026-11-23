@@ -1,3 +1,4 @@
+import { falloModulo } from "@/api/graphql/module-response";
 /**
  * Route Handler: GET /api/MOD08/reporteAnuladosResultados
  * 
@@ -166,7 +167,7 @@ export async function GET(request: NextRequest) {
             tipoReporte: tipoReporte as TipoReporteAnulado,
         };
 
-        const response = await graphqlRequest<{data: GetReporteAnuladosResultadosResponse}>(
+        const response = await graphqlRequest<GetReporteAnuladosResultadosResponse>(
             GET_REPORTE_ANULADOS_RESULTADOS_QUERY,
             { 
                 variables: { input },
@@ -175,32 +176,9 @@ export async function GET(request: NextRequest) {
 
         return NextResponse.json(
             {
-                data: response.data.reporteAnuladosResultados,
+                data: response.reporteAnuladosResultados,
             },
             { status: 200 },
         );
-    } catch (error) {
-        const message = error instanceof Error ? error.message : 'Error desconocido';
-        const timestamp = new Date().toISOString();
-
-        if (message.includes('401') || message.includes('Unauthorized')) {
-            return NextResponse.json(
-                {
-                    error: 'No autorizado',
-                    message: 'Sesión expirada, credenciales inválidas o permisos insuficientes',
-                    timestamp,
-                },
-                { status: 401 },
-            );
-        }
-
-        return NextResponse.json(
-            {
-                error: 'Error al obtener resultados del reporte',
-                message,
-                timestamp,
-            },
-            { status: 500 },
-        );
-    }
+    } catch (error) { return falloModulo(error, "MOD08/reporteAnuladosResultados"); }
 }

@@ -39,6 +39,7 @@ export type PlatformContextData = {
     teams: { id: string; nombre: string }[];
     memberships: { equipoId: string; funcion: string }[];
     capabilities: {
+        corporateAccess?: boolean;
         assign: boolean;
         attend: boolean;
         audit: boolean;
@@ -48,6 +49,7 @@ export type PlatformContextData = {
     timezone: string;
 };
 export type PlatformRecord = {
+    labels?: Record<string,string>;
     id: string;
     nombre: string;
     equipoId: string | null;

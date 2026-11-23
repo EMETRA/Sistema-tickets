@@ -30,11 +30,14 @@ const labels: Record<string, string> = {
     createModule: "Crear un módulo",
     createRol: "Crear un rol",
     updateRol: "Actualizar un rol",
+    guardarFuncionesPorUsuario: "Guardar las funciones de un usuario en una aplicación",
+    copiarFuncionesPorUsuario: "Agregar al destino los permisos del usuario origen en todas sus aplicaciones",
     assignPermission: "Modificar permisos",
     saveWeeklyReport: "Guardar un reporte semanal",
     sendEmailNotification: "Enviar una notificación",
     addTagToTicket: "Agregar una etiqueta al ticket",
     removeTagFromTicket: "Quitar una etiqueta del ticket",
+    sendTicketMessage: "Enviar un comentario al ticket",
 };
 
 export function describeGraphqlChange(

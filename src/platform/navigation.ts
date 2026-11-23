@@ -8,8 +8,8 @@ export const PLATFORM_SECTIONS = [
     { id: "asignacion", label: "Bandeja de tickets", iconName: "ticket-solid" },
     { id: "calendario", label: "Calendario", iconName: "calendar-week-solid" },
     { id: "metricas", label: "Métricas", iconName: "chart-pie-solid" },
-    { id: "inventario", label: "Activos y visitas", iconName: "desktop-solid" },
-    { id: "red", label: "Cableado y red", iconName: "network-wired-solid" },
+    { id: "inventario", label: "Activos y mantenimiento", iconName: "desktop-solid" },
+    { id: "red", label: "Red y cableado", iconName: "network-wired-solid" },
     { id: "sistemas", label: "Aplicaciones y sistemas", iconName: "window" },
     {
         id: "infraestructura",
@@ -23,7 +23,7 @@ export const PLATFORM_SECTIONS = [
     },
     {
         id: "organizacion",
-        label: "Equipos y responsables",
+        label: "Personal y equipos",
         iconName: "people-group-solid",
     },
     {
@@ -41,7 +41,8 @@ export function platformSections(data: PlatformContextData) {
     return PLATFORM_SECTIONS.filter((s) => {
         if (["calendario", "metricas", "asignacion", "busqueda"].includes(s.id))
             return true;
-        if (s.id === "accesos") return data.actor.admin;
+        if (s.id === "accesos")
+            return data.actor.admin || data.capabilities.corporateAccess;
         if (s.id === "auditoria") return data.capabilities.audit;
         if (s.id === "solicitudes") return !!data.definitions.solicitudes;
         return Object.values(data.definitions).some((d) => d.group === s.id);
@@ -96,8 +97,8 @@ export function homeNavigation(data: PlatformContextData) {
                 home,
                 ...section("asignacion", "Mis asignados"),
                 ...calendar,
-                ...section("inventario", "Equipos"),
-                ...section("red", "Sedes y cableado"),
+                ...section("inventario"),
+                ...section("red"),
                 apps,
                 ...metrics,
             ]

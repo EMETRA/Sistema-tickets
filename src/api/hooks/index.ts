@@ -69,7 +69,6 @@ export { useCreateModule } from './useCreateModule';
 // Tickets hooks - Details, Comments, History, Attachments, Tags, Messages
 export { useGetTicketById } from './useGetTicketById';
 export { useGetTicketsByUserId } from './useGetTicketsByUserId';
-export { useGetTicketComments } from './useGetTicketComments';
 export { useGetTicketHistory } from './useGetTicketHistory';
 export { useGetTicketAttachments } from './useGetTicketAttachments';
 export { useGetTicketTags } from './useGetTicketTags';
@@ -79,7 +78,6 @@ export { useGetTicketMessages } from './useGetTicketMessages';
 export { useCreateTicket } from './useCreateTicket';
 export { useUpdateTicket } from './useUpdateTicket';
 export { useDeleteTicket } from './useDeleteTicket';
-export { useAddTicketComment } from './useAddTicketComment';
 export { useSendTicketMessage } from './useSendTicketMessage';
 
 // Tickets hooks - Mutations - Tags

@@ -1,4 +1,5 @@
 export const ACCESS_TABS = [
+    { id: "corporate", label: "Funciones corporativas", description: "Consulta y gestiona las funciones de los sistemas corporativos autorizados." },
     {
         id: "users",
         label: "Usuarios",

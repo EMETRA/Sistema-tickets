@@ -1,77 +1,36 @@
-@use "../../../../theme/colors.scss" as *;
-
 .AppCard {
-  border: 1px solid var(--tickets-border);
-  border-radius: 10px;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  background-color: #ffffff;
-  position: relative;
-
-  width: 280px;
-  min-width: 280px;
-  max-width: 280px;
-  height: fit-content;
-
-  &:hover {
-    transition: box-shadow 0.3s ease;
-    box-shadow: 0 5px 16px #20396312;
-  }
-}
-
-.header {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  z-index: 1;
-}
-
-.bookmarkButton {
-  // Color por defecto será manejado por el Icon
-
-  &.bookmarked {
-    --icon-color: #ffb703;
-  }
-}
-
-.content {
-  display: flex;
-  flex-direction: column;
-  align-items: start;
-  padding: 0 0 18px;
-  gap: 8px;
-}
-
-.title {
-  text-align: start;
-  color: var(--tickets-text);
-  font-size: 16px;
-  font-weight: 700;
-  font-family: var(--font-montserrat), sans-serif;
-}
-
-.divider {
-  width: 100%;
-  height: 1px;
-  background-color: var(--tickets-divider);
-  margin-top: auto;
-}
-
-.footer {
-  display: flex;
-  justify-content: flex-start;
-}
-
-.button.button {
-  color: var(--tickets-primary);
-  justify-content: space-between;
-  padding: 15px 0 0;
-}
-.AppCard {
-  border-color: var(--tickets-border);
-  border-radius: var(--tickets-radius);
-  box-shadow: var(--tickets-shadow);
   min-width: 0;
-  background: var(--tickets-surface);
+  height: 100%;
 }
+.entry {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  height: 100%;
+  min-height: 62px;
+  padding: 11px 14px;
+  background: var(--tickets-surface);
+  color: var(--tickets-text);
+  border: 1px solid var(--tickets-border);
+  border-radius: var(--tickets-radius);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  &:hover { border-color: #bac7ee; background: var(--tickets-surface-subtle); }
+  &:focus-visible { outline: 2px solid var(--tickets-primary); outline-offset: 2px; }
+}
+.icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  background: var(--tickets-primary-soft);
+  color: var(--tickets-primary);
+}
+.content { display: grid; gap: 3px; min-width: 0; overflow-wrap: anywhere; }
+.title { font-size: 14px; font-weight: 650; line-height: 1.42; }
+.description { color: var(--tickets-text-secondary); font-size: 12px; line-height: 1.45; }
+.arrow { color: var(--tickets-primary); }

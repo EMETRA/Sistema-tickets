@@ -64,8 +64,8 @@ function checkName(item: { estado: string; resultado: string | null }) {
         )[item.resultado || ""] || "Finalizada sin resultado informado"
     );
 }
-export function RepositoryStatus() {
-    const [id, setId] = useState<unknown>(""),
+export function RepositoryStatus({ initialId = "" }: { initialId?: string }) {
+    const [id, setId] = useState<unknown>(initialId),
         [snapshot, setSnapshot] = useState<Snapshot | null>(null),
         [revision, setRevision] = useState(0),
         [loading, setLoading] = useState(false),

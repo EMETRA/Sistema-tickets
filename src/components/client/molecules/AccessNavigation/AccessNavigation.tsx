@@ -4,9 +4,11 @@ import styles from "./AccessNavigation.module.scss";
 export function AccessNavigation({
     active,
     admin,
+    corporate = false,
 }: {
     active: string;
     admin: boolean;
+    corporate?: boolean;
 }) {
     return (
         <nav className={styles.navigation} aria-label="Personas y accesos">
@@ -19,6 +21,7 @@ export function AccessNavigation({
                     {item.label}
                 </Link>
             ))}
+            {!admin && corporate && <Link href="/espacio/accesos?tab=corporate" aria-current={active === "corporate" ? "page" : undefined}>Funciones corporativas</Link>}
         </nav>
     );
 }

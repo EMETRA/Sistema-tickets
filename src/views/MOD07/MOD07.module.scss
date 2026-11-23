@@ -7,7 +7,7 @@
 
 .panelLayout {
     display: grid;
-    grid-template-columns: 280px 1fr;
+    grid-template-columns: minmax(185px, 245px) minmax(0, 1fr);
     height: max(560px, calc(100dvh - 260px));
     min-width: 0;
     border: 2px solid #e5e5e5;

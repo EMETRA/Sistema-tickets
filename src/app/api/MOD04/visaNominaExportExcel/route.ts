@@ -1,3 +1,4 @@
+import { falloModulo } from "@/api/graphql/module-response";
 import { NextRequest, NextResponse } from 'next/server';
 import { graphqlRequest } from '@/api/graphql/client';
 import { GET_VISA_NOMINA_EXPORT_EXCEL_QUERY } from '@/api/graphql/MOD04';
@@ -34,34 +35,11 @@ export async function GET(request: NextRequest) {
             unidadPresupuestaria: String(searchParams.get('unidadPresupuestaria') ?? ''),
         };
 
-        const response = await graphqlRequest<{ data: GetVisaNominaExportExcelResponse }>(
+        const response = await graphqlRequest<GetVisaNominaExportExcelResponse>(
             GET_VISA_NOMINA_EXPORT_EXCEL_QUERY,
             { variables: { input } },
         );
 
-        return NextResponse.json({ data: response.data.visaNominaExportExcel }, { status: 200 });
-    } catch (error: unknown) {
-        const message = error instanceof Error ? error.message : String(error);
-        const timestamp = new Date().toISOString();
-
-        if (message.includes('401') || message.includes('Unauthorized')) {
-            return NextResponse.json(
-                {
-                    error: 'No autorizado',
-                    message: 'Sesión expirada o credenciales inválidas',
-                    timestamp,
-                },
-                { status: 401 },
-            );
-        }
-
-        return NextResponse.json(
-            {
-                error: 'Error al exportar VISA Nómina',
-                message,
-                timestamp,
-            },
-            { status: 500 },
-        );
-    }
+        return NextResponse.json({ data: response.visaNominaExportExcel }, { status: 200 });
+    } catch (error: unknown) { return falloModulo(error, "MOD04/visaNominaExportExcel"); }
 }

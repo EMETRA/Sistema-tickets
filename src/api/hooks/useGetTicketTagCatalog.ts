@@ -6,7 +6,7 @@ import type { TicketTag } from '@/api/graphql/tickets';
 
 export function useGetTicketTagCatalog() {
     const [data, setData] = useState<TicketTag[]>([]);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
 
     const refetch = useCallback(async () => {

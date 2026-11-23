@@ -19,4 +19,5 @@ export interface TopBarProps {
   menuOpen?: boolean;
   unit?: string;
   profilePath?: string;
+  onChangeView?: () => void;
 }

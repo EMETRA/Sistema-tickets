@@ -4,6 +4,11 @@ import { Button } from "@/components/client/atoms/Button";
 import { usePlatform } from "@/platform/context";
 import { platformFetch } from "@/platform/client";
 import type { PageResult, PlatformRecord } from "@/platform/types";
+import {
+    RESOURCE_PRESENTATION,
+    resourceDefinition,
+    resourceValue,
+} from "@/platform/resources";
 import { RecordEditor } from "./RecordEditor";
 import { RecordDetail, displayDate } from "./RecordDetail";
 import styles from "../../templates/PlatformPage/PlatformPage.module.scss";
@@ -11,17 +16,24 @@ export function ResourceWorkspace({
     group,
     initialType,
     types,
+    hideTabs = false,
+    hideDescription = false,
+    scopeEquipoId,
+    extraActions,
 }: {
     group: string;
     initialType?: string;
     types?: string[];
+    hideTabs?: boolean;
+    hideDescription?: boolean;
+    scopeEquipoId?: string;
+    extraActions?: React.ReactNode;
 }) {
-    const { data } = usePlatform(),
-        options = Object.entries(data!.definitions).filter(
-            ([id, def]) =>
-                def.group === group && (!types || types.includes(id)),
-        ),
-        [type, setType] = useState(initialType || options[0]?.[0] || ""),
+    const { data } = usePlatform();
+    const options = Object.entries(data!.definitions).filter(
+        ([id, d]) => d.group === group && (!types || types.includes(id)),
+    );
+    const [type, setType] = useState(initialType || options[0]?.[0] || ""),
         [query, setQuery] = useState(""),
         [offset, setOffset] = useState(0),
         [result, setResult] = useState<PageResult<PlatformRecord>>({
@@ -30,7 +42,7 @@ export function ResourceWorkspace({
             offset: 0,
             limit: 25,
         }),
-        [loading, setLoading] = useState(false),
+        [loading, setLoading] = useState(true),
         [error, setError] = useState(""),
         [revision, setRevision] = useState(0),
         [selected, setSelected] = useState<PlatformRecord | null>(null),
@@ -38,24 +50,29 @@ export function ResourceWorkspace({
             undefined,
         ),
         [message, setMessage] = useState("");
-    const def = data!.definitions[type];
-    const refresh = useCallback(() => setRevision((r) => r + 1), []);
+    const rawDef = data!.definitions[type],
+        def = rawDef ? resourceDefinition(type, rawDef) : null,
+        copy = RESOURCE_PRESENTATION[type];
+    const refresh = useCallback(() => setRevision((v) => v + 1), []);
     useEffect(() => {
         if (!def?.actions.LEER) return;
         const controller = new AbortController();
         const timer = setTimeout(() => {
             setLoading(true);
             setError("");
+            const params = new URLSearchParams({
+                limit: "25",
+                offset: String(offset),
+                q: query,
+            });
+            if (scopeEquipoId) params.set("equipoId", scopeEquipoId);
             platformFetch<PageResult<PlatformRecord>>(
-                "/records/" +
-                    type +
-                    "?limit=25&offset=" +
-                    offset +
-                    "&q=" +
-                    encodeURIComponent(query),
+                `/records/${type}?${params}`,
                 { signal: controller.signal },
             )
-                .then(setResult)
+                .then((r) => {
+                    if (!controller.signal.aborted) setResult(r);
+                })
                 .catch((e) => {
                     if (!controller.signal.aborted) setError(e.message);
                 })
@@ -67,47 +84,47 @@ export function ResourceWorkspace({
             clearTimeout(timer);
             controller.abort();
         };
-    }, [type, def?.actions.LEER, query, offset, revision]);
+    }, [type, def?.actions.LEER, query, offset, revision, scopeEquipoId]);
     if (!def)
         return (
-            <p className={styles.muted}>
-                No tienes módulos disponibles en esta sección.
+            <p className={styles.card}>
+                No tienes registros disponibles en esta sección.
             </p>
         );
     return (
-        <section className={styles.page}>
-            <nav className={styles.tabs} aria-label="Módulos de la sección">
-                {options.map(([id, d]) => (
-                    <button
-                        key={id}
-                        aria-current={type === id ? "page" : undefined}
-                        onClick={() => {
-                            setType(id);
-                            setOffset(0);
-                            setQuery("");
-                            setResult({
-                                items: [],
-                                total: 0,
-                                offset: 0,
-                                limit: 25,
-                            });
-                        }}
-                    >
-                        {d.title}
-                    </button>
-                ))}
-            </nav>
+        <section className={styles.page} aria-label={def.title}>
+            {!hideTabs && options.length > 1 && (
+                <nav
+                    className={styles.tabs}
+                    aria-label="Registros de la sección"
+                >
+                    {options.map(([id, d]) => (
+                        <button
+                            key={id}
+                            aria-current={type === id ? "page" : undefined}
+                            onClick={() => {
+                                setType(id);
+                                setOffset(0);
+                                setQuery("");
+                                setSelected(null);
+                            }}
+                        >
+                            {resourceDefinition(id, d).title}
+                        </button>
+                    ))}
+                </nav>
+            )}
             <div className={styles.toolbar}>
                 <div>
                     <h2>{def.title}</h2>
-                    <p className={styles.muted}>
-                        Consulta los registros y su historial dentro de tu
-                        alcance autorizado.
-                    </p>
+                    {!hideDescription && copy?.description && (
+                        <p className={styles.muted}>{copy.description}</p>
+                    )}
                 </div>
                 <div className={styles.actions}>
+                    {extraActions}
                     <Button variant="outlined" onClick={refresh}>
-                        Actualizar
+                        Actualizar registros
                     </Button>
                     {def.actions.INSERTAR && (
                         <Button onClick={() => setEditing(null)}>
@@ -121,31 +138,26 @@ export function ResourceWorkspace({
                     {message}
                 </p>
             )}
-            <div className={styles.listPanel}>
+            <div className={styles.listPanel} aria-busy={loading && !!def.actions.LEER}>
                 {def.actions.LEER && (
-                    <label className={styles.search}>
-                        <span className={styles.muted}>Buscar por nombre</span>
-                        <input
-                            className={styles.control}
-                            value={query}
-                            onChange={(e) => {
-                                setQuery(e.target.value);
-                                setOffset(0);
-                            }}
-                        />
-                    </label>
+                    <div className={styles.toolbar}>
+                        <input className={styles.control + " " + styles.search} type="search"
+                            aria-label="Buscar registro" placeholder="Buscar registro" value={query}
+                            onChange={(e) => { setQuery(e.target.value); setOffset(0); }} />
+                        {!loading && !error && <p className={styles.muted} role="status">
+                            {result.total} {result.total === 1 ? "registro" : "registros"}
+                        </p>}
+                    </div>
                 )}
                 {error ? (
                     <div role="alert" className={styles.error}>
                         {error}{" "}
                         <button className={styles.link} onClick={refresh}>
-                            Reintentar
+                            Reintentar registros
                         </button>
                     </div>
-                ) : loading ? (
-                    <p role="status" className={styles.muted}>
-                        Cargando registros…
-                    </p>
+                ) : loading && def.actions.LEER ? (
+                    <p role="status">Cargando registros…</p>
                 ) : def.actions.LEER ? (
                     <>
                         <div className={styles.tableRegion}>
@@ -153,10 +165,18 @@ export function ResourceWorkspace({
                                 <thead>
                                     <tr>
                                         <th>Nombre</th>
-                                        <th>Estado</th>
-                                        <th>Equipo</th>
-                                        <th>Actualizado</th>
-                                        <th>Acción</th>
+                                        {copy ? (
+                                            copy.columns.map((c) => (
+                                                <th key={c.key}>{c.label}</th>
+                                            ))
+                                        ) : (
+                                            <>
+                                                <th>Estado</th>
+                                                <th>Equipo</th>
+                                                <th>Actualizado</th>
+                                            </>
+                                        )}
+
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -165,54 +185,86 @@ export function ResourceWorkspace({
                                             <td>
                                                 <button
                                                     className={styles.link}
-                                                    onClick={() => setSelected(row)}
+                                                    onClick={() =>
+                                                        setSelected(row)
+                                                    }
                                                 >
                                                     {row.nombre}
                                                 </button>
                                             </td>
-                                            <td>
-                                                <span className={styles.chip}>
-                                                    {row.estado.replaceAll(
-                                                        "_",
-                                                        " ",
-                                                    )}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                {data!.teams.find(
-                                                    (t) => t.id === row.equipoId,
-                                                )?.nombre ||
-                                                    "Administración institucional"}
-                                            </td>
-                                            <td>
-                                                {displayDate(row.actualizadoEn)}
-                                            </td>
-                                            <td>
-                                                <button
-                                                    className={styles.link}
-                                                    onClick={() => setSelected(row)}
-                                                >
-                                                    Ver ficha
-                                                </button>
-                                            </td>
+                                            {copy ? (
+                                                copy.columns.map((c) => (
+                                                    <td key={c.key}>
+                                                        {resourceValue(
+                                                            row,
+                                                            c.key,
+                                                            data!.teams,
+                                                        )}
+                                                    </td>
+                                                ))
+                                            ) : (
+                                                <>
+                                                    <td>
+                                                        <span
+                                                            className={
+                                                                styles.chip
+                                                            }
+                                                        >
+                                                            {row.estado.replaceAll(
+                                                                "_",
+                                                                " ",
+                                                            )}
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        {data!.teams.find(
+                                                            (t) =>
+                                                                t.id ===
+                                                                row.equipoId,
+                                                        )?.nombre ||
+                                                            "Administración institucional"}
+                                                    </td>
+                                                    <td>
+                                                        {displayDate(
+                                                            row.actualizadoEn,
+                                                        )}
+                                                    </td>
+                                                </>
+                                            )}
                                         </tr>
                                     ))}
                                 </tbody>
                             </table>
                             {!result.items.length && (
-                                <p className={styles.card}>
-                                    No hay registros para esta consulta.
-                                </p>
+                                <div className={styles.card}>
+                                    <p>
+                                        No hay registros que coincidan con esta
+                                        consulta.
+                                    </p>
+                                    {def.actions.INSERTAR && (
+                                        <p className={styles.muted}>
+                                            Usa Registrar{" "}
+                                            {def.singular.toLowerCase()} para
+                                            añadir el primero.
+                                        </p>
+                                    )}
+                                </div>
                             )}
                         </div>
                         <div className={styles.toolbar}>
-                            <p className={styles.muted}>{result.total} registros</p>
+                            <p className={styles.muted}>
+                                Página {Math.floor(offset / 25) + 1} de {Math.max(1, Math.ceil(result.total / 25))}
+                            </p>
                             <div className={styles.actions}>
                                 <Button
                                     variant="outlined"
-                                    state={offset ? "default" : "disabled"}
+                                    state={
+                                        offset && !loading
+                                            ? "default"
+                                            : "disabled"
+                                    }
                                     onClick={() =>
-                                        setOffset(Math.max(0, offset - 25))
+                                        setOffset((v) => Math.max(0, v - 25))
                                     }
                                 >
                                     Anterior
@@ -220,11 +272,11 @@ export function ResourceWorkspace({
                                 <Button
                                     variant="outlined"
                                     state={
-                                        offset + 25 < result.total
+                                        offset + 25 < result.total && !loading
                                             ? "default"
                                             : "disabled"
                                     }
-                                    onClick={() => setOffset(offset + 25)}
+                                    onClick={() => setOffset((v) => v + 25)}
                                 >
                                     Siguiente
                                 </Button>
@@ -242,6 +294,7 @@ export function ResourceWorkspace({
                     key={editing?.id || "new-" + type}
                     type={type}
                     record={editing || undefined}
+                    initialTeamId={scopeEquipoId}
                     onClose={() => setEditing(undefined)}
                     onSaved={() => {
                         setEditing(undefined);

@@ -6,9 +6,11 @@ import { HomeWorkspace } from "@/views/Platform/HomeWorkspace";
 import AdminHome from "@/views/Home/Admin";
 import TechHome from "@/views/Home/Tech";
 import UserHome from "@/views/Home/User";
+import { useWorkspaceView } from "@/platform/presentation-context";
 
 export default function HomePage() {
     const platform = usePlatform();
+    const view = useWorkspaceView();
     const role = useAuthStore((state) => state.getRole());
 
     const views: Partial<Record<string, React.ReactNode>> = {
@@ -18,7 +20,7 @@ export default function HomePage() {
         USUARIO: <UserHome />,
     };
 
-    if (platform.data) return <HomeWorkspace />;
+    if (platform.data) return <HomeWorkspace key={view.mode + platform.data.actor.id} />;
     if (platform.loading || (!platform.disabled && !platform.error))
         return <p role="status">Cargando tu espacio de trabajo…</p>;
     if (platform.error) return <p role="alert">{platform.error}</p>;

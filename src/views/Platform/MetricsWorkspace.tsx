@@ -1,12 +1,18 @@
 "use client";
 import { guatemalaDay } from "@/platform/dates";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/client/atoms/Button";
 import { MetricCard } from "@/components/client/molecules/MetricCard";
 import { usePlatform } from "@/platform/context";
 import { platformFetch } from "@/platform/client";
 import { displayDate } from "@/components/client/organisms/ResourceWorkspace/RecordDetail";
+import { TicketTagReport } from "./TicketTagReport";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
+import {
+    metricsQuery,
+    metricOperation,
+    type MetricsSelection,
+} from "@/platform/metrics";
 type Metrics = {
     desde: string;
     hasta: string;
@@ -26,6 +32,7 @@ type Metrics = {
     registros: {
         id: string;
         aplicacionId: string;
+        aplicacionNombre?: string;
         usuarioId: number;
         operacion: string;
         recurso: string;
@@ -47,41 +54,68 @@ export function MetricsWorkspace() {
         [loading, setLoading] = useState(false),
         [error, setError] = useState(""),
         [offset, setOffset] = useState(0);
-    async function load(page = 0) {
-        setLoading(true);
-        setError("");
+    const request = useRef<AbortController | null>(null);
+    const [section,setSection] = useState<'activity'|'labels'>('activity');
+    const [applied, setApplied] = useState<MetricsSelection | null>(null);
+    async function load(
+        page = 0,
+        selection: MetricsSelection = { from, to, team },
+    ) {
+        let path: string;
         try {
-            const start = new Date(from + "T00:00:00-06:00"),
-                end = new Date(to + "T00:00:00-06:00");
-            end.setUTCDate(end.getUTCDate() + 1);
-            const result = await platformFetch<Metrics>(
-                "/metrics?desde=" +
-                    encodeURIComponent(start.toISOString()) +
-                    "&hasta=" +
-                    encodeURIComponent(end.toISOString()) +
-                    (team ? "&equipoId=" + team : "") +
-                    "&offset=" +
-                    page,
-            );
-            setMetrics(result);
-            setOffset(page);
+            path = metricsQuery(selection, page);
         } catch (e) {
             setError(
                 e instanceof Error
                     ? e.message
-                    : "No se pudieron cargar las métricas.",
+                    : "Selecciona un periodo válido.",
             );
+            return;
+        }
+        request.current?.abort();
+        const controller = new AbortController();
+        request.current = controller;
+        setLoading(true);
+        setError("");
+        try {
+            const result = await platformFetch<Metrics>(path, {
+                signal: AbortSignal.any([
+                    controller.signal,
+                    AbortSignal.timeout(45000),
+                ]),
+            });
+            if (
+                !result.tickets ||
+                !Array.isArray(result.aplicaciones) ||
+                !Array.isArray(result.registros)
+            )
+                throw Error("No se pudo interpretar el reporte de métricas.");
+            if (controller.signal.aborted) return;
+            setMetrics(result);
+            setApplied(selection);
+            setOffset(page);
+        } catch (e) {
+            if (!controller.signal.aborted)
+                setError(
+                    e instanceof Error
+                        ? e.message
+                        : "No se pudieron cargar las métricas.",
+                );
         } finally {
-            setLoading(false);
+            if (!controller.signal.aborted) setLoading(false);
         }
     }
     useEffect(() => {
         // La consulta inicial toma el periodo por defecto; los cambios se aplican al pulsar Consultar.
         void load();
+        return () => request.current?.abort();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+    const sections = data?.actor.admin && <nav className={styles.actions} aria-label="Secciones de métricas"><Button variant={section==='activity' ? 'contained' : 'outlined'} aria-pressed={section==='activity'} onClick={()=>setSection('activity')}>Atención y actividad</Button><Button variant={section==='labels' ? 'contained' : 'outlined'} aria-pressed={section==='labels'} onClick={()=>setSection('labels')}>Por técnico y etiqueta</Button></nav>;
+    if(section==='labels' && data?.actor.admin) return <section className={styles.page}>{sections}<TicketTagReport/></section>;
     return (
         <section className={styles.page}>
+            {sections}
             <div>
                 <h2>Métricas de atención y actividad</h2>
                 <p className={styles.muted}>
@@ -104,6 +138,7 @@ export function MetricsWorkspace() {
                             className={styles.control}
                             type="date"
                             required
+                            max={to}
                             value={from}
                             onChange={(e) => setFrom(e.target.value)}
                         />
@@ -114,6 +149,7 @@ export function MetricsWorkspace() {
                             className={styles.control}
                             type="date"
                             required
+                            min={from}
                             value={to}
                             onChange={(e) => setTo(e.target.value)}
                         />
@@ -150,9 +186,26 @@ export function MetricsWorkspace() {
                     Consultar
                 </Button>
             </form>
+            {loading && (
+                <p role="status" className={styles.muted}>
+                    Consultando métricas…
+                </p>
+            )}
             {error && (
                 <p role="alert" className={styles.error}>
                     {error}
+                    {metrics &&
+                        " Se conservan los resultados de la última consulta."}
+                </p>
+            )}
+            {metrics && applied && (
+                <p className={styles.muted}>
+                    Resultados del {applied.from} al {applied.to} ·{" "}
+                    {applied.team
+                        ? data?.teams.find((t) => t.id === applied.team)
+                              ?.nombre || "Equipo seleccionado"
+                        : "Mis métricas"}
+                    .
                 </p>
             )}
             {metrics && (
@@ -186,7 +239,7 @@ export function MetricsWorkspace() {
                             {metrics.aplicaciones.map((item) => (
                                 <MetricCard
                                     key={item.aplicacionId + item.operacion}
-                                    label={item.operacion.replaceAll("_", " ")}
+                                    label={metricOperation(item.operacion)}
                                     value={item.cantidad}
                                     caption={
                                         item.aplicacionNombre ||
@@ -197,19 +250,22 @@ export function MetricsWorkspace() {
                         </div>
                         {!metrics.aplicaciones.length && (
                             <p className={styles.muted}>
-                                No hay operaciones de aplicaciones registradas
-                                en este periodo. Cada aplicación debe tener
-                                conectada su fuente de eventos.
+                                No hay operaciones confirmadas en este periodo y
+                                alcance. Puedes cambiar los filtros o volver a
+                                consultar después de completar una operación.
                             </p>
                         )}
                     </section>
                     <section>
-                        <h3 id="actividad">Registros que forman los indicadores</h3>
+                        <h3 id="actividad">
+                            Registros que forman los indicadores
+                        </h3>
                         <div className={styles.tableRegion}>
                             <table className={styles.table}>
                                 <thead>
                                     <tr>
                                         <th>Fecha</th>
+                                        <th>Aplicación</th>
                                         <th>Operación</th>
                                         <th>Referencia</th>
                                         <th>Cantidad</th>
@@ -220,15 +276,26 @@ export function MetricsWorkspace() {
                                         <tr key={item.id}>
                                             <td>{displayDate(item.fecha)}</td>
                                             <td>
-                                                {item.operacion.replaceAll(
-                                                    "_",
-                                                    " ",
+                                                {item.aplicacionNombre ||
+                                                    "Aplicación autorizada"}
+                                            </td>
+                                            <td>
+                                                {metricOperation(
+                                                    item.operacion,
                                                 )}
                                             </td>
                                             <td>{item.recurso}</td>
                                             <td>{item.cantidad}</td>
                                         </tr>
                                     ))}
+                                    {!metrics.registros.length && (
+                                        <tr>
+                                            <td colSpan={5}>
+                                                No hay operaciones registradas
+                                                para esta consulta.
+                                            </td>
+                                        </tr>
+                                    )}
                                 </tbody>
                             </table>
                         </div>
@@ -244,7 +311,13 @@ export function MetricsWorkspace() {
                                     variant="outlined"
                                     state={offset ? "default" : "disabled"}
                                     onClick={() =>
-                                        void load(Math.max(0, offset - 100))
+                                        void load(
+                                            Math.max(
+                                                0,
+                                                offset - metrics.limiteDetalle,
+                                            ),
+                                            applied || undefined,
+                                        )
                                     }
                                 >
                                     Anterior
@@ -252,12 +325,17 @@ export function MetricsWorkspace() {
                                 <Button
                                     variant="outlined"
                                     state={
-                                        offset + 100 <
+                                        offset + metrics.limiteDetalle <
                                         (metrics.totalRegistros ?? 0)
                                             ? "default"
                                             : "disabled"
                                     }
-                                    onClick={() => void load(offset + 100)}
+                                    onClick={() =>
+                                        void load(
+                                            offset + metrics.limiteDetalle,
+                                            applied || undefined,
+                                        )
+                                    }
                                 >
                                     Siguiente
                                 </Button>

@@ -23,13 +23,22 @@ No configurar el navegador para llamar directamente al dominio del backend.
 corepack pnpm install --frozen-lockfile
 corepack pnpm typecheck
 corepack pnpm test:integracion
-docker compose -p vivi-panel-front -f docker-compose.qa.yml up -d --build
+docker compose -p vivi-panel-front --profile qa up -d --build panel
 ```
 
-Este Compose independiente publica **4011**, evitando los puertos 3000/3002
-que ya usan otras APIs. En la computadora, abrir `http://IP_DEL_SERVIDOR:4011`.
+El servicio `panel` del perfil QA publica **4011**. En la computadora, abrir `http://IP_DEL_SERVIDOR:4011`.
 Si se usa el dominio del Panel, el proxy del dominio debe apuntar a este
-contenedor. No combinar este archivo con el Compose de producción.
+contenedor. Mantén el nombre de proyecto `vivi-panel-front` para QA y selecciona el servicio `panel`.
+
+Para cambiar un despliegue anterior al archivo único, desde su checkout ejecuta primero
+`python3 scripts/actualizar-servicio-preservando.py panel-vivi-qa --compose-unico --comprobar`.
+Repite sin `--comprobar` al aplicar. En el despliegue habitual usa su contenedor
+`sistema-tickets-web`. El volumen existente `tickets-incidencias` conserva su nombre de proyecto.
+
+Las variables de compilación `NEXT_PUBLIC_*` siguen en `.env`. La configuración
+privada de ejecución puede ir en `.env.tickets`, que se carga después de `.env`
+y queda fuera de la imagen. En QA, el destino interno de GraphQL se controla con
+`QA_GRAPHQL_ENDPOINT` en `.env`.
 
 ## Prueba con la sesión real
 

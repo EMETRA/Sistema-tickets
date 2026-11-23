@@ -1,3 +1,4 @@
+import { falloModulo } from "@/api/graphql/module-response";
 /**
  * Route Handler: GET /api/MOD07/manualesDisponibles
  *
@@ -45,7 +46,7 @@ export async function GET(request: NextRequest) {
             categoria: categoria ? (categoria as CategoriaManual) : null,
         };
 
-        const response = await graphqlRequest<{ data: GetManualesDisponiblesResponse }>(
+        const response = await graphqlRequest<GetManualesDisponiblesResponse>(
             GET_MANUALES_DISPONIBLES_QUERY,
             {
                 variables: {
@@ -56,32 +57,9 @@ export async function GET(request: NextRequest) {
 
         return NextResponse.json(
             {
-                data: response.data.manualesDisponibles,
+                data: response.manualesDisponibles,
             },
             { status: 200 },
         );
-    } catch (error) {
-        const message = error instanceof Error ? error.message : 'Error desconocido';
-        const timestamp = new Date().toISOString();
-
-        if (message.includes('401') || message.includes('Unauthorized')) {
-            return NextResponse.json(
-                {
-                    error: 'No autorizado',
-                    message: 'Sesión expirada o credenciales inválidas',
-                    timestamp,
-                },
-                { status: 401 },
-            );
-        }
-
-        return NextResponse.json(
-            {
-                error: 'Error al obtener manuales disponibles',
-                message,
-                timestamp,
-            },
-            { status: 500 },
-        );
-    }
+    } catch (error) { return falloModulo(error, "MOD07/manualesDisponibles"); }
 }

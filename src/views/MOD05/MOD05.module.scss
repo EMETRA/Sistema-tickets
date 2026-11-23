@@ -28,7 +28,7 @@
   width: 100%;
   display: flex;
   justify-content: space-between;
-  gap: 40px;
+  gap: 20px;
 }
 
 .fieldsSelection {
@@ -57,7 +57,7 @@
   max-width: 100%;
   align-self: flex-start;
   align-items: stretch;
-  padding: clamp(18px, 2.3vw, 30px);
+  padding: var(--tickets-panel-padding);
   border: 1px solid var(--tickets-border);
   border-radius: var(--tickets-radius);
   background: var(--tickets-surface);

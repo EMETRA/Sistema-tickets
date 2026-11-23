@@ -23,3 +23,39 @@ test('el cliente rechaza HTML con HTTP 200 fuera de descargas y no lo presenta c
 });
 
 test('las fechas del negocio conservan el día de Guatemala cerca de medianoche UTC',()=>{const{guatemalaDay}=loader(root)('src/platform/dates.ts');assert.equal(guatemalaDay(new Date('2026-11-01T04:30:00Z')),'2026-10-31');});
+test('las fuentes usan el proxy autenticado del API y conservan las denegaciones',async()=>{
+ const old=process.env.TICKETS_PLATFORM_ENABLED,original=global.fetch;process.env.TICKETS_PLATFORM_ENABLED='true';let calls=[];
+ try{
+  global.fetch=async(url,init)=>{calls.push({url:String(url),init});return Response.json({message:'Solo Informática puede vincular nuevas fuentes'},{status:403});};
+  const route=loader(root,{'@/api/config/env':{getGraphqlEndpoint:()=> 'https://tickets.example.invalid/web/graphql'}})('src/app/api/platform/[...path]/route.ts');
+  for(const kind of ['github','oracle']){
+   const address='https://panel.example.invalid/api/platform/sources/'+kind+'?q=EMETRA';
+   const ctx={params:Promise.resolve({path:['sources',kind]})};
+   assert.equal((await route.GET(new NextRequest(address),ctx)).status,401);
+   const result=await route.GET(new NextRequest(address,{headers:{Authorization:'Bearer ficticio'}}),ctx);
+   assert.equal(result.status,403);assert.equal(result.headers.get('cache-control'),'private, no-store');
+   assert.equal(calls.at(-1).url,'https://tickets.example.invalid/web/platform/sources/'+kind+'?q=EMETRA');
+   assert.equal(calls.at(-1).init.headers.get('Authorization'),'Bearer ficticio');
+   assert.equal(calls.at(-1).init.redirect,'error');
+  }
+  assert.equal(calls.length,2);
+ }finally{global.fetch=original;if(old===undefined)delete process.env.TICKETS_PLATFORM_ENABLED;else process.env.TICKETS_PLATFORM_ENABLED=old;}
+});
+
+test('el proxy de inventario conserva filtros y denegaciones sin caché ni rutas alternativas',async()=>{
+ const previous=process.env.TICKETS_PLATFORM_ENABLED,original=global.fetch;
+ process.env.TICKETS_PLATFORM_ENABLED='true';let calls=[];
+ try{
+  global.fetch=async(url,init)=>{calls.push({url:String(url),init});return Response.json({items:[],codigo:'CUENTA_SIN_VINCULO_EMPLEADO'});};
+  const route=loader(root,{'@/api/config/env':{getGraphqlEndpoint:()=> 'https://tickets.example.invalid/web/graphql'}})('src/app/api/platform/[...path]/route.ts');
+  for(const query of ['offset=0','usuarioId=7&offset=50','equipoId=2ccebf7f-0814-4684-8b80-cfaa4dccf710&numero=456']){
+   const result=await route.GET(new NextRequest('https://panel.example.invalid/api/platform/inventory/activos?'+query,{headers:{Authorization:'Bearer ficticio'}}),{params:Promise.resolve({path:['inventory','activos']})});
+   assert.equal(result.status,200);assert.equal(result.headers.get('cache-control'),'private, no-store');
+   assert.equal(calls.at(-1).url,'https://tickets.example.invalid/web/platform/inventory/activos?'+query);
+   assert.equal(calls.at(-1).init.headers.get('Authorization'),'Bearer ficticio');
+  }
+  global.fetch=async()=>Response.json({message:'Sin permiso'},{status:403});
+  const denied=await route.GET(new NextRequest('https://panel.example.invalid/api/platform/inventory/activos',{headers:{Authorization:'Bearer ficticio'}}),{params:Promise.resolve({path:['inventory','activos']})});
+  assert.equal(denied.status,403);
+ }finally{global.fetch=original;if(previous===undefined)delete process.env.TICKETS_PLATFORM_ENABLED;else process.env.TICKETS_PLATFORM_ENABLED=previous;}
+});

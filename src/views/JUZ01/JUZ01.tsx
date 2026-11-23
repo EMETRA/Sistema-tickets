@@ -1,114 +1,171 @@
 "use client";
 
-import React, { useState } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
-import { z } from 'zod';
-import { Title } from '../../components/client/atoms/Title';
-import { FormField } from '../../components/client/molecules/FormField';
-import { Input } from "../../components/client/atoms/Input";
-import { Button } from '../../components/client/atoms/Button';
-import { Text } from '../../components/client/atoms/Text';
-import { JUZ01Schema } from './JUZ01.schema';
+import { useEffect, useRef, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { z } from "zod";
+import { FormField } from "@/components/client/molecules/FormField";
+import { Input } from "@/components/client/atoms/Input";
+import { Button } from "@/components/client/atoms/Button";
+import { displayDate } from "@/components/client/organisms/ResourceWorkspace/RecordDetail";
+import { estadoCasoJuzgado } from "@/api/graphql/juzgado-vista";
+import {
+    buscarCasosJuzgado,
+    mensajeJuzgado,
+    type CoincidenciaJuzgado,
+} from "@/api/graphql/juzgado";
+import { JUZ01Schema } from "./JUZ01.schema";
+import styles from "./JUZ01.module.scss";
 
-import styles from './JUZ01.module.scss';
-import { consultarCasoJuzgado, mensajeJuzgado } from '@/api/graphql/juzgado';
-import { useRef } from 'react';
-
-const JUZ01: React.FC = () => {
-    const router = useRouter();
-    const pathname = usePathname();
-    const [caseNumber, setCaseNumber] = useState('');
+export default function JUZ01() {
+    const router = useRouter(), pathname = usePathname();
+    const [caseNumber, setCaseNumber] = useState("");
+    const [matches, setMatches] = useState<CoincidenciaJuzgado[]>([]);
     const [fieldError, setFieldError] = useState<string | null>(null);
-    const [message, setMessage] = useState<string | null>(null);
-    const enCurso = useRef(false);
+    const [searchedCode, setSearchedCode] = useState("");
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<{ message: string } | null>(null);
+    const [error, setError] = useState("");
+    const enCurso = useRef(false);
+    const input = useRef<HTMLInputElement>(null);
+    const resultsTitle = useRef<HTMLHeadingElement>(null);
 
-    const handleExecute = async () => {
+    useEffect(() => {
+        if (searchedCode) resultsTitle.current?.focus();
+    }, [searchedCode]);
+
+    const changeCode = (value: string) => {
+        setCaseNumber(value);
+        setMatches([]);
+        setSearchedCode("");
+        setError("");
+        setFieldError(null);
+    };
+    const search = async () => {
         if (enCurso.current) return;
-        setError(null); setMessage(null);
-
         const parsed = JUZ01Schema.safeParse({ caseNumber });
         if (!parsed.success) {
-            const message = z.flattenError(parsed.error).fieldErrors.caseNumber?.[0]
-                ?? 'El código de caso es requerido';
-            setFieldError(message);
+            setFieldError(z.flattenError(parsed.error).fieldErrors.caseNumber?.[0] || "Revisa el código del caso");
+            input.current?.focus();
             return;
         }
-
         setFieldError(null);
+        setError("");
+        setMatches([]);
+        setSearchedCode("");
         setCaseNumber(parsed.data.caseNumber);
-        setLoading(true); enCurso.current = true;
-
+        setLoading(true);
+        enCurso.current = true;
         try {
-            const result = await consultarCasoJuzgado(parsed.data.caseNumber);
-            if (!result) {
-                setMessage('Sin resultados');
-                return;
-            }
-            router.push(`${pathname}/detail?caseNumber=${encodeURIComponent(result.codigoCaso)}`);
-        } catch (err) {
-            setError({
-                message: mensajeJuzgado(err),
-            });
+            setMatches(await buscarCasosJuzgado(parsed.data.caseNumber));
+            setSearchedCode(parsed.data.caseNumber);
+        } catch (e) {
+            setError(mensajeJuzgado(e, "busqueda"));
         } finally {
-            setLoading(false); enCurso.current = false;
+            setLoading(false);
+            enCurso.current = false;
         }
     };
 
     return (
-        <div className={styles.mainContainer}>
-            <div className={styles.formContainer}>
-                <Title variant="mid" tag="h3" className={styles.title}>Parámetros de consulta</Title>
-
-                {/* Numero de caso */}
-                <FormField label="Código de caso" htmlFor="caseNumber" required className={styles.fieldCaseNumber}>
-                    <Input
-                        id="caseNumber"
-                        type="text"
-                        value={caseNumber}
-                        onChange={(e) => {
-                            setCaseNumber(e.target.value);
-                            if (fieldError) setFieldError(null);
-                        }}
-                        placeholder="Ejemplo: QA-E0910D-PDF_P"
-                        state={loading ? "disabled" : fieldError ? "error" : "default"}
-                        errorMessage={fieldError ?? undefined}
-                        aria-describedby="codigoCasoAyuda"
-                        required
-                    />
-                </FormField>
-
-                <p id="codigoCasoAyuda">Usa el código de denuncia que aparece en el correo o en el PDF del trámite.</p>
-
-                <Button
-                    variant="contained"
-                    color="default"
-                    onClick={handleExecute}
-                    className={styles.executeButton}
-                    state={loading ? "disabled" : "default"}
-                >
-                    {loading ? 'Consultando caso...' : 'Consultar caso'}
-                </Button>
-
-                {error && (
-                    <Text variant="caption" className={styles.errorText}>
-                        Error: {error.message}
-                    </Text>
-                )}
-
-                {message && (
-                    <Text variant="body" className={styles.messageText}>
-                        {message}
-                    </Text>
-                )}
-
-                <Text variant="caption" className={styles.footerText}>
-                    Dirección de Informática · Municipalidad de Guatemala
-                </Text>
-            </div>
-        </div>
-    )
+        <section className={styles.page}>
+            <form className={styles.searchPanel} noValidate onSubmit={(e) => {
+                e.preventDefault();
+                void search();
+            }} aria-busy={loading}>
+                <header className={styles.searchHeading}>
+                    <span className={styles.searchIcon} aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
+                            <circle cx="10.5" cy="10.5" r="6.5" />
+                            <path d="m16 16 4 4" />
+                        </svg>
+                    </span>
+                    <div>
+                        <h2>Buscar un caso</h2>
+                        <p>Consulta por número de multa, placa o código de caso.</p>
+                    </div>
+                </header>
+                <div className={styles.searchControls}>
+                    <FormField label="Número de multa, placa o caso" htmlFor="caseNumber" required className={styles.field}>
+                        <Input
+                            ref={input}
+                            id="caseNumber"
+                            type="text"
+                            value={caseNumber}
+                            maxLength={36}
+                            autoComplete="off"
+                            autoCapitalize="characters"
+                            spellCheck={false}
+                            onChange={(e) => changeCode(e.target.value)}
+                            placeholder="V-40, P-123BCD o código de caso"
+                            state={loading ? "disabled" : fieldError ? "error" : "default"}
+                            aria-invalid={!!fieldError}
+                            aria-describedby={fieldError ? "codigoCasoAyuda codigoCasoError" : "codigoCasoAyuda"}
+                            className={styles.codeInput}
+                            required
+                        />
+                    </FormField>
+                    <Button className={styles.searchButton} type="submit" state={loading ? "loading" : "default"} loadingText="Buscando…">
+                        Consultar caso
+                    </Button>
+                    {!!caseNumber && (
+                        <Button className={styles.clearButton} type="button" variant="outlined" state={loading ? "disabled" : "default"} onClick={() => {
+                            changeCode("");
+                            input.current?.focus();
+                        }}>Limpiar</Button>
+                    )}
+                </div>
+                <p id="codigoCasoAyuda" className={styles.help}>
+                    Puedes escribir el código completo o sus primeros tres caracteres.
+                </p>
+                {fieldError && <p id="codigoCasoError" className={styles.fieldError} role="alert">{fieldError}</p>}
+                {error && <div className={styles.error} role="alert"><strong>No se pudo completar la búsqueda</strong><p>{error}</p></div>}
+                {loading && <p role="status" className={styles.help}>Buscando casos…</p>}
+            </form>
+            {!!searchedCode && (
+                <section className={styles.results} aria-labelledby="casos-titulo">
+                    <header className={styles.resultsHeader}>
+                        <div>
+                            <div className={styles.resultsTitle}>
+                                <h2 id="casos-titulo" tabIndex={-1} ref={resultsTitle}>Resultados de la búsqueda</h2>
+                                <span className={styles.count}>{matches.length}</span>
+                            </div>
+                            <p role="status">{matches.length === 1 ? "1 caso encontrado" : `${matches.length} casos encontrados`} para <code>{searchedCode}</code></p>
+                        </div>
+                        {!!matches.length && <p className={styles.help}>Comprueba la placa antes de abrir el expediente.</p>}
+                    </header>
+                    {!matches.length ? (
+                        <div className={styles.empty}>
+                            <h3>No encontramos coincidencias</h3>
+                            <p>Comprueba que escribiste el inicio del código. Puedes probar con sus primeros 6 caracteres o pegarlo completo.</p>
+                        </div>
+                    ) : (
+                        <table className={styles.table}>
+                            <caption className={styles.srOnly}>Casos encontrados, con placa, código, estado y fecha de registro</caption>
+                            <thead><tr>
+                                <th scope="col">Placa</th>
+                                <th scope="col">Código del caso</th>
+                                <th scope="col">Multa</th>
+                                <th scope="col">Estado</th>
+                                <th scope="col">Registrado</th>
+                                <th scope="col"><span className={styles.srOnly}>Acción</span></th>
+                            </tr></thead>
+                            <tbody>{matches.map((item) => (
+                                <tr key={item.codigoCaso}>
+                                    <td data-label="Placa"><strong className={styles.plate}>{item.placa ? [item.usoPlaca, item.placa].filter(Boolean).join(" - ") : "Sin placa registrada"}</strong></td>
+                                    <td data-label="Código del caso" className={styles.caseCode}>
+                                        <code>{item.codigoCaso.toUpperCase().startsWith(searchedCode.toUpperCase()) ? <><mark>{item.codigoCaso.slice(0, searchedCode.length)}</mark>{item.codigoCaso.slice(searchedCode.length)}</> : item.codigoCaso}</code>
+                                    </td>
+                                    <td data-label="Multa">{item.remision || "—"}</td>
+                                    <td data-label="Estado"><span className={styles.status}>{estadoCasoJuzgado(item.estado)}</span></td>
+                                    <td data-label="Registrado" className={styles.date}>{displayDate(item.registradaEn)}</td>
+                                    <td className={styles.open}>
+                                        <Button variant="outlined" aria-label={`Abrir caso ${item.codigoCaso}`} onClick={() => router.push(`${pathname}/detail?caseNumber=${encodeURIComponent(item.codigoCaso)}`)}>Ver caso <span aria-hidden="true">→</span></Button>
+                                    </td>
+                                </tr>
+                            ))}</tbody>
+                        </table>
+                    )}
+                </section>
+            )}
+        </section>
+    );
 }
-
-export default JUZ01;

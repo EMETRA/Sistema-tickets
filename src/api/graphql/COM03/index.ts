@@ -2,9 +2,7 @@
  * Exportaciones de queries y types para COM03 - Comunicación / Noticias
  */
 
-export { GET_NOTICIAS_QUERY } from "./getNoticias";
 export { GET_NOTICIA_QUERY } from "./getNoticia";
-export { GET_CATEGORIAS_NOTICIA_QUERY, GET_ETIQUETAS_NOTICIA_QUERY } from "./getCatalogos";
 export { GET_PERMISOS_NOTICIAS_QUERY } from "./getPermisos";
 export { PERMISOS_SIMULADOS } from "./permisos.dummy";
 export { GUARDAR_NOTICIA_CMS_MUTATION } from "./mutations";

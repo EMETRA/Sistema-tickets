@@ -1,0 +1,10 @@
+{
+    "$descripcion": "Diferencias conocidas entre el esquema guardado del API (src/schema.gql) y su código. Cada entrada debe explicar por qué y quitarse cuando el API regenere el esquema.",
+    "excepciones": [
+        {
+            "operacion": "BuscarCasos",
+            "mensaje": "Cannot query field \"remision\" on type \"ViviJuzgadoCoincidencia\".",
+            "motivo": "El campo existe en el código de QA (src/vivi-juzgado/vivi-juzgado.types.ts, commit 82e64a8), pero src/schema.gql no se regeneró."
+        }
+    ]
+}

@@ -39,6 +39,41 @@ jobs:
       - name: Pruebas de integración
         run: pnpm test:integracion
 
+  contrato:
+    name: Contrato con api-tickets
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # Rama del API que corresponde: QA para Dev, main para main.
+    env:
+      API_REF: ${{ (github.base_ref || github.ref_name) == 'main' && 'main' || 'QA' }}
+      TIENE_TOKEN: ${{ secrets.API_TICKETS_TOKEN != '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Aviso si falta el token
+        if: env.TIENE_TOKEN != 'true'
+        run: echo "::notice::Configura el secreto API_TICKETS_TOKEN (lectura de EMETRA/api-tickets) para verificar el contrato."
+      - uses: actions/checkout@v4
+        if: env.TIENE_TOKEN == 'true'
+        with:
+          repository: EMETRA/api-tickets
+          ref: ${{ env.API_REF }}
+          token: ${{ secrets.API_TICKETS_TOKEN }}
+          path: api-tickets
+      - uses: pnpm/action-setup@v4
+        if: env.TIENE_TOKEN == 'true'
+      - uses: actions/setup-node@v4
+        if: env.TIENE_TOKEN == 'true'
+        with:
+          node-version: 20
+          cache: pnpm
+      - if: env.TIENE_TOKEN == 'true'
+        run: pnpm install --frozen-lockfile
+      - name: Definiciones, rutas REST y operaciones GraphQL
+        if: env.TIENE_TOKEN == 'true'
+        run: pnpm contrato
+        env:
+          API_TICKETS_DIR: api-tickets
+
   storybook:
     name: Storybook compila
     runs-on: ubuntu-latest

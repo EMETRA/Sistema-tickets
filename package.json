@@ -18,7 +18,8 @@
     "tokens": "node scripts/tokens/generar.cjs",
     "tokens:check": "node scripts/tokens/generar.cjs --check",
     "e2e": "playwright test",
-    "e2e:instalar": "playwright install --with-deps chromium"
+    "e2e:instalar": "playwright install --with-deps chromium",
+    "contrato": "node scripts/sincronizar-definiciones.cjs ${API_TICKETS_DIR:-../../apis/api-tickets} --check && node scripts/contrato-api.cjs ${API_TICKETS_DIR:-../../apis/api-tickets} && node scripts/contrato-graphql.cjs ${API_TICKETS_DIR:-../../apis/api-tickets}"
   },
   "dependencies": {
     "@hookform/resolvers": "^5",

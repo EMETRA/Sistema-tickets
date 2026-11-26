@@ -26,3 +26,17 @@ Para que Git ignore el commit de formato en `git blame`:
 ```bash
 git config blame.ignoreRevsFile .git-blame-ignore-revs
 ```
+
+## Contrato con api-tickets
+
+`pnpm contrato` compara el panel con el API (por defecto `../../apis/api-tickets`; otra ruta con
+`API_TICKETS_DIR=...`). Usa la rama que corresponde: **QA** para `Dev`, **main** para `main`.
+
+- `scripts/sincronizar-definiciones.cjs <api> [--check]`: definiciones de recursos → fixture del
+  laboratorio y las pruebas (`test/fixtures/platform-definitions.json`).
+- `scripts/contrato-api.cjs <api>`: cada ruta `/platform/...` que llama el panel existe en el API.
+- `scripts/contrato-graphql.cjs <api>`: cada consulta y mutación GraphQL valida contra `src/schema.gql`.
+  Diferencias conocidas del API, con su motivo, en `scripts/contrato-graphql.excepciones.json`.
+
+En CI corre si el repositorio tiene el secreto `API_TICKETS_TOKEN` (lectura de `EMETRA/api-tickets`).
+El laboratorio valida los registros con las mismas reglas que `platform.validation.ts` del API.

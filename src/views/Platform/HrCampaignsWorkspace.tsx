@@ -114,6 +114,10 @@ export function HrCampaignsWorkspace() {
     async function create(event: FormEvent) {
         event.preventDefault();
         await perform(async () => {
+            // Mismas reglas de periodo que el API: el cierre va después de la apertura y de ahora.
+            const closes = Date.parse(hrLocalIso(end));
+            if (closes <= (now ? Date.now() : Date.parse(hrLocalIso(start))) || closes <= Date.now())
+                throw Error("El cierre debe ser posterior a la apertura y al momento actual.");
             const key = JSON.stringify({
                 name,
                 description,

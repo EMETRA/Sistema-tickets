@@ -59,3 +59,30 @@ test("los nombres no aceptan solo espacios", () => {
     assert.equal(r.success, false);
     assert.equal(r.error.issues[0].message, "Completa «Nombre».");
 });
+
+test("recuperación y colocación CCT aplican las reglas del API", () => {
+    const { recoveryPassword, recoveryCode } = load("src/auth/recovery-rules.ts");
+    assert.equal(recoveryCode.safeParse("12345").success, false);
+    assert.equal(recoveryCode.safeParse("123456").success, true);
+    assert.equal(recoveryPassword.safeParse("Clave2026!").success, true);
+    assert.match(recoveryPassword.safeParse("clave2026!").error.issues[0].message, /mayúscula/);
+    assert.match(recoveryPassword.safeParse("Clave 2026!").error.issues[0].message, /sin espacios/);
+
+    const { cctEditSchema } = load("src/platform/cct.ts");
+    const base = {
+        crucero: "12",
+        tipoAgente: "1",
+        agente: "4521",
+        delegacion: "3",
+        motivo: "7",
+        cepoFisico: "88",
+        fecha: "2026-01-10T08:30",
+        observaciones: "",
+    };
+    assert.equal(cctEditSchema.safeParse(base).success, true);
+    const errores = (datos) =>
+        Object.fromEntries(cctEditSchema.safeParse({ ...base, ...datos }).error.issues.map((i) => [i.path[0], i.message]));
+    assert.match(errores({ agente: "0452" }).agente, /sin ceros al inicio/);
+    assert.match(errores({ fecha: "2999-01-01T00:00" }).fecha, /posterior a la hora actual/);
+    assert.match(errores({ observaciones: "x".repeat(301) }).observaciones, /hasta 300/);
+});

@@ -1,3 +1,5 @@
+import { z } from "zod";
+import { mensajes } from "@/platform/forms";
 export type CctRow = Record<string, string | null>;
 export type CctPage = {
     items: CctRow[];
@@ -175,3 +177,39 @@ export async function cctPdfBlob(blob: Blob) {
         throw new Error("No se recibió un PDF válido. Conserva los filtros y reintenta.");
     return blob;
 }
+
+/** Reglas de `cct/contract.ts` del API (id, civil, text) para los formularios de colocación. */
+const CCT_ID = /^[1-9][0-9]{0,17}$/;
+const CONTROL = /[\u0000-\u0008\u000b\u000c\u000e-\u001f]/;
+export const cctId = (label: string) =>
+    z
+        .string()
+        .trim()
+        .min(1, mensajes.requerido(label))
+        .regex(CCT_ID, `«${label}» lleva solo números, sin ceros al inicio (hasta 18 dígitos).`);
+export const cctFecha = (label: string) =>
+    z
+        .string()
+        .min(1, mensajes.requerido(label))
+        .regex(/^\d{4}-\d\d-\d\dT\d\d:\d\d$/, `Revisa «${label}».`)
+        .refine((v) => Number(v.slice(0, 4)) >= 1900, `Revisa «${label}».`)
+        .refine(
+            (v) => v <= cctCivilNow(),
+            `«${label}» no puede ser posterior a la hora actual de Guatemala.`,
+        );
+export const cctTexto = (label: string, max: number) =>
+    z
+        .string()
+        .max(max, mensajes.maximo(label, max))
+        .refine((v) => !CONTROL.test(v), `«${label}» tiene caracteres no permitidos.`);
+export const cctEditSchema = z.object({
+    crucero: cctId("Crucero"),
+    tipoAgente: cctId("Tipo de agente"),
+    agente: cctId("Chapa del agente"),
+    delegacion: cctId("Delegación"),
+    motivo: cctId("Motivo"),
+    cepoFisico: cctId("Número de cepo físico"),
+    fecha: cctFecha("Fecha de colocación"),
+    observaciones: cctTexto("Observaciones", 300),
+});
+export type CctEditValues = z.infer<typeof cctEditSchema>;

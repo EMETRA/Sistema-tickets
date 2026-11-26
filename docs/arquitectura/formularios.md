@@ -24,7 +24,14 @@ useEffect(() => { if (initialData) reset(initialData); }, [initialData, reset]);
 - `useWatch` en lugar de `watch` (compatible con el compilador de React).
 - `handleSubmit` evita el envío nativo del formulario (antes `ModulesForm` y `PermissionsForm` recargaban la página).
 
-Migrados: `ModulesForm`, `PermissionsForm`, `RolesForm`.
+Migrados: `ModulesForm`, `PermissionsForm`, `RolesForm`, creación de ticket (`TicketCreationPanel`),
+roles de acceso (`AccessWorkspace`), inicio de sesión, activación de cuenta, recuperación de contraseña,
+edición de colocación CCT (`CctEditCepo`) y notificaciones por correo (`MOD10`). Noticias (`NewsForm`) y
+juzgado (`JUZ01`) ya validaban con zod.
+
+Cuando el servidor del front también valida (recuperación), las reglas viven en un solo módulo
+(`src/auth/recovery-rules.ts`) que usan el formulario y la ruta, para que ambos acepten lo mismo.
+Las reglas de colocación CCT (`cctEditSchema` en `src/platform/cct.ts`) copian `cct/contract.ts` del API.
 
 ## Editor genérico de registros → esquema dinámico
 
@@ -43,8 +50,12 @@ muestra el mensaje debajo de cada campo (`PlatformField error=…`), enfocando e
 
 Pruebas: `test/integracion/formularios.test.cjs`.
 
-## Pendientes
+## Qué queda fuera
 
-Formularios que aún validan a mano y conviene migrar al tocarlos: creación de ticket
-(`features/tickets/components/TicketCreationPanel`), noticias (`features/comunicacion/components/NewsForm`),
-formularios de módulos heredados (`views/MOD*`, `views/JUZ01`) y RRHH (`HrUpdateForm`).
+- **Filtros y búsquedas** (reportes, colas, bandejas): son campos de consulta sin reglas de negocio; se
+  quedan con estado local y se aplican al enviar.
+- **Formularios con estructura propia**: la campaña de RRHH (`HrCampaignsWorkspace`) arma una matriz de
+  campos solicitados; valida textos con `maxLength`/`required` nativos y el periodo antes de enviar
+  (cierre posterior a la apertura y a ahora, como el API). La actualización de datos de RRHH
+  (`HrUpdateForm`) deriva su borrador de la consulta y valida cada campo con los límites que envía el
+  API (`maximo`, `obligatorio`, `permiteNulo`).

@@ -234,7 +234,7 @@ function AccessCatalog({ tab }: { tab: AccessTab }) {
             {tab === "modules" ? (
                 <ResourceWorkspace group="accesos" types={["modulos"]} />
             ) : tab === "users" ? (
-                <div className={undefined}>
+                <div>
                     <section className={styles.card}>
                         {
                             <div className={access.sectionHead}>

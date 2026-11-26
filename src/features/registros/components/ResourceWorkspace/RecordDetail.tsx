@@ -318,7 +318,7 @@ export function RecordDetail({
                     </section>
                 ) : (
                     <>
-                        <section className={undefined}>
+                        <section>
                             {type === "incidencias" && automatic && (
                                 <div>
                                     <h3>Detectada automáticamente</h3>

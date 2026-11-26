@@ -8,3 +8,9 @@
   display: grid;
   gap: 16px;
 }
+
+.error {
+  margin: -8px 0 12px;
+  font-size: 13px;
+  color: var(--tickets-danger);
+}

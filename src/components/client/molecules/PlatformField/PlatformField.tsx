@@ -11,11 +11,14 @@ export function PlatformField({
     value,
     onChange,
     disabled,
+    error: fieldError,
 }: {
     field: Field;
     value: unknown;
     onChange: (value: unknown) => void;
     disabled?: boolean;
+    /** Mensaje de validación del formulario (se muestra debajo del campo). */
+    error?: string;
 }) {
     const id = useId(),
         [query, setQuery] = useState(""),
@@ -248,6 +251,7 @@ export function PlatformField({
     }
     return (
         <div
+            data-field={field.key}
             className={styles.field}
             style={field.type === "list" && !access ? { gridColumn: "1 / -1" } : undefined}
         >
@@ -257,6 +261,11 @@ export function PlatformField({
                 {field.type === "datetime" && " · Guatemala"}
             </label>
             {control}
+            {fieldError && (
+                <span role="alert" className={styles.error}>
+                    {fieldError}
+                </span>
+            )}
         </div>
     );
 }

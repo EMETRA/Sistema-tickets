@@ -1,4 +1,7 @@
 "use client";
+import { z } from "zod";
+import { esquemaDatos, texto } from "@/platform/forms";
+import type { Field } from "@/platform/types";
 import { useQueryClient } from "@tanstack/react-query";
 import { platformKey } from "@/platform/query";
 import { useEffect, useRef, useState } from "react";
@@ -15,6 +18,20 @@ import sheet from "./RecordSheet.module.scss";
 import { statusLabel } from "@/helpers/statusTone";
 import { WorkspaceIcon } from "@/components/client/atoms/WorkspaceIcon/WorkspaceIcon";
 import { PLATFORM_SECTIONS } from "@/platform/navigation";
+/** Valida nombre y datos con zod; devuelve { campo: mensaje } (vacío si todo está bien). */
+function validateRecord(values: { nombre: string; datos: Record<string, unknown> }, fields: Field[]) {
+    const result = z
+        .object({ nombre: texto("Nombre", { requerido: true, max: 200 }), datos: esquemaDatos(fields) })
+        .safeParse(values);
+    if (result.success) return {};
+    const problems: Record<string, string> = {};
+    for (const issue of result.error.issues) {
+        const key = issue.path[0] === "datos" ? String(issue.path[1]) : String(issue.path[0]);
+        problems[key] ??= issue.message;
+    }
+    return problems;
+}
+
 export function RecordEditor({
     type,
     record,
@@ -59,7 +76,9 @@ export function RecordEditor({
             },
         ),
         [busy, setBusy] = useState(false),
-        [error, setError] = useState("");
+        [error, setError] = useState(""),
+        // Mensajes por campo (validación zod con las mismas reglas que el API).
+        [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
     useEffect(() => {
         dialog.current?.showModal();
     }, []);
@@ -71,6 +90,7 @@ export function RecordEditor({
     const fromHr = ["equipos", "miembros"].includes(type) && !!record?.datos._rrhh;
     async function changeField(key: string, value: unknown) {
         setDatos((p) => ({ ...p, [key]: value }));
+        if (fieldErrors[key]) setFieldErrors(({ [key]: _omit, ...rest }) => rest);
         if (type === "dispositivos" && key === "activoId" && value) {
             try {
                 const asset = await platformFetch<PlatformRecord>("/records/activos/" + value);
@@ -90,6 +110,16 @@ export function RecordEditor({
     async function save(event: React.SubmitEvent<HTMLFormElement>) {
         event.preventDefault();
         if (busyRef.current) return;
+        const problems = validateRecord({ nombre, datos }, fields);
+        setFieldErrors(problems);
+        const firstInvalid = Object.keys(problems)[0];
+        if (firstInvalid) {
+            setError("Revisa los campos marcados antes de guardar.");
+            dialog.current
+                ?.querySelector<HTMLElement>(`[data-field="${firstInvalid}"] :is(input, select, textarea)`)
+                ?.focus();
+            return;
+        }
         busyRef.current = true;
         setBusy(true);
         setError("");
@@ -198,19 +228,29 @@ export function RecordEditor({
                 </p>
             )}
             <form onSubmit={save} className={sheet.form}>
-                <div className={undefined}>
-                    <section className={undefined}>
+                <div>
+                    <section>
                         <div className={sheet.formBody}>
-                            <label className={styles.field}>
+                            <label className={styles.field} data-field="nombre">
                                 Nombre *
                                 <input
                                     className={styles.control}
                                     value={nombre}
-                                    onChange={(e) => setNombre(e.target.value)}
+                                    onChange={(e) => {
+                                        setNombre(e.target.value);
+                                        if (fieldErrors.nombre)
+                                            setFieldErrors(({ nombre: _omit, ...rest }) => rest);
+                                    }}
                                     maxLength={200}
                                     required
                                     disabled={busy}
+                                    aria-invalid={!!fieldErrors.nombre}
                                 />
+                                {fieldErrors.nombre && (
+                                    <span role="alert" className={styles.error}>
+                                        {fieldErrors.nombre}
+                                    </span>
+                                )}
                             </label>
                             {!["equipos", "modulos"].includes(type) && (
                                 <label className={styles.field}>
@@ -255,12 +295,13 @@ export function RecordEditor({
                                                 field.key === "usuarioId")
                                         }
                                         onChange={(value) => void changeField(field.key, value)}
+                                        error={fieldErrors[field.key]}
                                     />
                                 ),
                             )}
                             {type === "actividades" && (
                                 <label className={styles.field}>
-                                    {"¿Quién puede verla?"}
+                                    ¿Quién puede verla?
                                     <select
                                         className={styles.control}
                                         value={visibilidad}

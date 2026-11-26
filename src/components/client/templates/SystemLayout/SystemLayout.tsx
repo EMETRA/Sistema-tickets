@@ -4,7 +4,7 @@ import { CreateTicketDialog } from "@/components/client/organisms/CreateTicketDi
 import { CommandPalette, type PaletteItem } from "@/components/client/organisms/CommandPalette";
 import { PanelSidebar, type PanelLink } from "@/components/client/organisms/PanelSidebar";
 import { useCommandPalette } from "@/store/useCommandPalette";
-import { rememberModule, useProposalDesign } from "@/platform/proposal";
+import { rememberModule } from "@/platform/recents";
 import { areaAccent, areaName } from "@/config/app-areas";
 import { spaceMeta } from "@/platform/spaces";
 import { useAccessibilitySync, useThemeSync } from "@/platform/theme";
@@ -15,7 +15,6 @@ import { usePlatform } from "@/platform/context";
 import { PLATFORM_SECTIONS, platformSections } from "@/platform/navigation";
 import { usePathname, useRouter } from "next/navigation";
 import { Button } from "../../atoms/Button";
-import { SideBarNavigation } from "../../organisms/SideBarNavigation";
 import { HrMandatoryNotice } from "@/platform/hr-notifications";
 import { TopBar } from "../../organisms/TopBar";
 import { PAGES_CONFIG, getMenuByRole } from "@/config/navigation";
@@ -23,7 +22,6 @@ import { canAccessPath } from "@/config/route-access";
 import { canAccessAppPath } from "@/config/apps-access";
 import {
     resolveAppPath,
-    getSections,
     getAppPathMeta,
     buildSectionPath,
     buildModulePath,
@@ -128,17 +126,6 @@ export const SystemLayout = ({
             iconName: page.iconName,
         }));
     const workspaceNavigation = platform.data ? workspaceViewNavigation(platform.data, workspaceView.mode) : null;
-    const secondaryItems = workspaceNavigation ? [
-        ...workspaceNavigation.secondary,
-        ...navItems.filter(item=>!workspaceView.active && !workspaceNavigation.primary.some(p=>p.path===item.path)
-            && !workspaceNavigation.secondary.some(p=>p.path===item.path)),
-    ] : [];
-    const sections = appId && catalog ? getSections(appId, catalog) : [];
-    const sectionItems = sections.map((section) => ({
-        path: buildSectionPath(appId!, section.id),
-        label: section.label,
-        iconName: section.iconName,
-    }));
     const applicationLinks = catalog
         ? Object.values(catalog).map((app) => ({
             id: app.meta.id,
@@ -147,8 +134,7 @@ export const SystemLayout = ({
         }))
         : [];
 
-    // ── Propuesta «Panel institucional» (activable desde el laboratorio) ──
-    const proposal = useProposalDesign() && !!platform.data;
+    // ── Navegación del Panel institucional ──
     const showPalette = useCommandPalette((s) => s.show);
     const workspaceLinks = workspaceNavigation
         ? [...workspaceNavigation.primary, ...workspaceNavigation.secondary]
@@ -166,12 +152,17 @@ export const SystemLayout = ({
         { path: "/mis-tickets", label: "Mis solicitudes", iconName: "ticket-solid" },
         ...pick("/espacio/calendario"),
     ];
-    const panelTools: PanelLink[] = workspaceLinks.filter(
-        (l) =>
-            l.path.startsWith("/espacio/") &&
-            !panelPrimary.some((p) => p.path === l.path) &&
-            l.path !== "/espacio/calendario",
-    );
+    const panelTools: PanelLink[] = platform.data
+        ? workspaceLinks.filter(
+            (l) =>
+                l.path.startsWith("/espacio/") &&
+                !panelPrimary.some((p) => p.path === l.path) &&
+                l.path !== "/espacio/calendario",
+        )
+        : // Sin espacio de trabajo (deshabilitado o con error): las páginas del perfil.
+        platform.loading
+            ? []
+            : navItems.filter((item) => !["/home", "/mis-tickets", "/aplicaciones"].includes(item.path));
     const panelApps = catalog
         ? Object.values(catalog).map((app) => ({
             id: app.meta.id,
@@ -266,7 +257,7 @@ export const SystemLayout = ({
     })();
 
     // Encabezado de espacio de la propuesta (solo pantallas con propósito conocido).
-    const proposalSpace = proposal && pathname ? spaceMeta(pathname, staff) : null;
+    const proposalSpace = pathname ? spaceMeta(pathname, staff) : null;
     const proposalTitle =
         pathname === "/espacio/asignacion"
             ? platform.data?.capabilities.assign
@@ -303,16 +294,15 @@ export const SystemLayout = ({
     return (
         <RoleProvider role={currentRole}>
             <AdministrativeConfirmation />
-            <GuidedTourHost autoStart={proposal} />
+            <GuidedTourHost autoStart />
             {workspaceView.canChangeView && <WorkspaceViewSwitcher key={workspaceView.mode + String(viewDialogOpen)}
                 open={viewDialogOpen} mode={workspaceView.mode} onClose={closeViewDialog}
                 onApply={workspaceView.setMode} />}
-            <div data-workspace-shell data-proposal={proposal || undefined} className={classNames(styles.layout, className)}>
+            <div data-workspace-shell className={classNames(styles.layout, className)}>
                 <a href="#main-content" className={styles.skipLink}>
                     Ir al contenido
                 </a>
-                {proposal ? (
-                    <PanelSidebar
+                <PanelSidebar
                         primary={panelPrimary}
                         apps={panelApps}
                         tools={panelTools}
@@ -322,26 +312,6 @@ export const SystemLayout = ({
                         onClose={() => setMenuOpen(false)}
                         onLogout={logout}
                     />
-                ) : (
-                    <SideBarNavigation
-                        items={workspaceNavigation?.primary || navItems}
-                        secondaryItems={secondaryItems}
-                        helpPath="/ayuda"
-                        sectionItems={sectionItems}
-                        applicationLabel={
-                            appId && catalog
-                                ? catalog[appId]?.meta.label
-                                : undefined
-                        }
-                        open={menuOpen}
-                        onClose={() => setMenuOpen(false)}
-                        onLogout={logout}
-                        activePath={pathname ? pathname : "/home"}
-                        onNavigate={(path) => router.push(path)}
-                        logoIcon={appId ? "house-solid" : "ticket-solid"}
-                        className={styles.sidebar}
-                    />
-                )}
 
                 <div className={styles.container}>
                     <TopBar
@@ -351,7 +321,7 @@ export const SystemLayout = ({
                         createTicketPath={
                             canCreateTicket ? "/tickets-creation" : undefined
                         }
-                        onSearch={proposal ? showPalette : undefined}
+                        onSearch={showPalette}
                         onCreateTicket={
                             pathname === "/tickets-creation"
                                 ? undefined
@@ -396,9 +366,7 @@ export const SystemLayout = ({
                                 <Link href="/home">Inicio</Link>
                                 <span aria-hidden="true">/</span>
                                 <Link href={`/home/${appContext.appId}`}>
-                                    {proposal
-                                        ? areaName(catalog[appContext.appId]?.meta.title || "")
-                                        : catalog[appContext.appId]?.meta.label}
+                                    {areaName(catalog[appContext.appId]?.meta.title || "")}
                                 </Link>
                                 {appContext.sectionId && (!appContext.moduleId ||
                                     catalog[appContext.appId]?.sections[appContext.sectionId]?.meta.label.trim().toLocaleLowerCase() !== activePage.title.trim().toLocaleLowerCase()) && (
@@ -414,7 +382,7 @@ export const SystemLayout = ({
                                                 catalog[appContext.appId]
                                                     ?.sections[
                                                         appContext.sectionId
-                                                    ]?.meta[proposal ? "title" : "label"]
+                                                    ]?.meta.title
                                             }
                                         </Link>
                                     </>
@@ -464,7 +432,7 @@ export const SystemLayout = ({
                 </div>
             </div>
             {canCreateTicket && <CreateTicketDialog />}
-            {proposal && <CommandPalette items={paletteItems} ticketScope={ticketScope} />}
+            <CommandPalette items={paletteItems} ticketScope={ticketScope} />
         </RoleProvider>
     );
 };

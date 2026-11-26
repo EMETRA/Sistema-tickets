@@ -5,7 +5,6 @@ import { Button } from "@/components/client/atoms/Button";
 import { PeriodFilter, formatPeriod } from "@/components/client/molecules/PeriodFilter";
 import local from "./MetricsWorkspace.module.scss";
 import { OperationsSummary } from "@/components/client/organisms/OperationsSummary";
-import { useProposalDesign } from "@/platform/proposal";
 import { usePlatform } from "@/platform/context";
 import { platformFetch } from "@/platform/client";
 import { displayDate } from "@/components/client/organisms/ResourceWorkspace/RecordDetail";
@@ -47,14 +46,13 @@ type Metrics = {
     limiteDetalle: number;
 };
 export function MetricsWorkspace() {
-    const proposalDefault = useProposalDesign();
     const { data } = usePlatform(),
         [selection, setSelection] = useState<MetricsSelection>({
             from: guatemalaDay(new Date(Date.now() - 30 * 86400000)),
             to: guatemalaDay(),
             // Propuesta: administración abre con su equipo de Informática, no con «Mis métricas».
             team:
-                proposalDefault && data?.capabilities.teamMetrics && data.actor.admin
+                data?.capabilities.teamMetrics && data.actor.admin
                     ? data.defaultTicketTeamId || ""
                     : "",
         }),
@@ -300,7 +298,7 @@ export function MetricsWorkspace() {
                             </p>
                         )}
                     </section>
-                    {proposalDefault && applied && <OperationsSummary from={applied.from} to={applied.to} />}
+                    {applied && <OperationsSummary from={applied.from} to={applied.to} />}
                     <section className={local.panel + " " + local.wide} aria-labelledby="actividad">
                         <header className={local.panelHeader + " " + local.panelHeaderRow}>
                             <div>

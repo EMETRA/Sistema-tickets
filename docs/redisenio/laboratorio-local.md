@@ -53,9 +53,8 @@ En **Cambiar perfil / controles**:
 
 - **Catálogo de aplicaciones institucionales**: carga (o vacía) el catálogo de ejemplo con Informática, RRHH, Recaudación, Financiero, Jurídico, Juzgado y Comunicación para recorrer el apartado de Aplicaciones. Los módulos que dependen de servicios de la oficina siguen mostrando su error explícito.
 - **Datos de ejemplo de Informática**: simula Activos Fijos (8 bienes ficticios, con y sin ficha técnica) y agrega fichas, mantenimientos vencidos y próximos, ubicaciones, movimientos, una red de 8 dispositivos con enlaces de fibra, UTP e inactivos, un portafolio de 5 sistemas con repositorios, despliegues (correctos, fallidos y revertidos), incidentes y esquemas, una agenda de Informática alrededor de hoy y 10 empleados de RRHH adicionales (sin cuenta o sin unidad), para recorrer **Activos y mantenimiento**, **Red y cableado**, **Aplicaciones y sistemas**, **Servidores**, **Calendario** y **Personal y equipos**. Se retiran con el mismo control sin tocar el resto de los datos.
-- **Diseño del panel**: alterna entre el diseño actual y la propuesta. También se alterna desde la franja amarilla (**Diseño: actual ⇄ ver propuesta**). Es una cookie local del laboratorio (`panel_propuesta`); sin ella el Panel muestra el diseño actual.
 
-La propuesta reorganiza la navegación por espacios (Mi trabajo, Aplicaciones, Informática), agrega el buscador global (**⌘K**, **Ctrl+K** o **/**), un Inicio tipo lanzador por rol, la portada de cada área y el directorio de aplicaciones.
+El panel organiza la navegación por espacios (Mi trabajo, Aplicaciones, Informática), agrega el buscador global (**⌘K**, **Ctrl+K** o **/**), un Inicio tipo lanzador por rol, la portada de cada área y el directorio de aplicaciones.
 
 ## Datos, reinicios y fallos simulados
 

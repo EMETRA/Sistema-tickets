@@ -5,7 +5,7 @@ import { Icon } from "@/components/client/atoms/Icon";
 import { WorkspaceIcon } from "@/components/client/atoms/WorkspaceIcon/WorkspaceIcon";
 import { TicketDetail } from "@/components/client/organisms/TicketDetail";
 import { platformFetch } from "@/platform/client";
-import { readRecents } from "@/platform/proposal";
+import { readRecents } from "@/platform/recents";
 import { useCommandPalette } from "@/store/useCommandPalette";
 import styles from "./CommandPalette.module.scss";
 

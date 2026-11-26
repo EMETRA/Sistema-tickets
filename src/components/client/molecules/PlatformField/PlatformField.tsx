@@ -1,6 +1,5 @@
 "use client";
 import { statusLabel } from "@/helpers/statusTone";
-import { useProposalDesign } from "@/platform/proposal";
 import { useEffect, useId, useState } from "react";
 import { platformFetch } from "@/platform/client";
 import type { Field, PageResult, PlatformRecord } from "@/platform/types";
@@ -18,7 +17,6 @@ export function PlatformField({
     onChange: (value: unknown) => void;
     disabled?: boolean;
 }) {
-    const proposal = useProposalDesign();
     const id = useId(),
         [query, setQuery] = useState(""),
         [options, setOptions] = useState<Option[]>([]),
@@ -33,7 +31,7 @@ export function PlatformField({
         (field.type === "list" && ["roles", "permisos"].includes(field.key));
     useEffect(() => {
         if (!access && !["ref", "user", "list"].includes(field.type)) return;
-        if (proposal && field.type === "list" && !access) return;
+        if (field.type === "list" && !access) return;
         const controller = new AbortController();
         const timer = setTimeout(() => {
             setError("");
@@ -96,7 +94,6 @@ export function PlatformField({
         field.lookupPath,
         query,
         selectedReference,
-        proposal,
     ]);
     let control: React.ReactNode;
     if (field.type === "boolean")
@@ -135,12 +132,12 @@ export function PlatformField({
                 <option value="">Seleccionar…</option>
                 {field.options?.map((option) => (
                     <option key={option} value={option}>
-                        {proposal ? statusLabel(option) : option.replaceAll("_", " ")}
+                        {statusLabel(option)}
                     </option>
                 ))}
             </select>
         );
-    else if (proposal && field.type === "list" && !access)
+    else if (field.type === "list" && !access)
         control = (
             <PeoplePicker
                 id={id}
@@ -277,7 +274,7 @@ export function PlatformField({
         );
     }
     return (
-        <div className={styles.field} style={proposal && field.type === "list" && !access ? { gridColumn: "1 / -1" } : undefined}>
+        <div className={styles.field} style={field.type === "list" && !access ? { gridColumn: "1 / -1" } : undefined}>
             <label htmlFor={id}>
                 {field.label}
                 {field.required && <span aria-label="obligatorio"> *</span>}

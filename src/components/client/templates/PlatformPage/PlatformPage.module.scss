@@ -710,12 +710,12 @@
 }
 
 // Propuesta: base visual común para las ventanas que no usan la ficha de registro.
-:global([data-proposal]) .dialog {
+.dialog {
   background: var(--tickets-surface);
   border-radius: 16px;
   box-shadow: 0 24px 70px #132a4d40;
 }
-:global([data-proposal]) .dialogHeader {
+.dialogHeader {
   padding: 18px 22px 14px;
   background: linear-gradient(110deg, var(--tickets-surface), var(--tickets-surface-subtle));
   h2 {
@@ -723,6 +723,6 @@
     letter-spacing: -0.3px;
   }
 }
-:global([data-proposal]) .dialogBody {
+.dialogBody {
   padding: 16px 22px 22px;
 }

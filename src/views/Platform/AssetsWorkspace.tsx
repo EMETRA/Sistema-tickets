@@ -1,7 +1,6 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
-import { useProposalDesign } from "@/platform/proposal";
 import { AssetsOverview, MaintenanceBoard } from "@/components/client/organisms/AssetsPanel";
 import { usePlatform } from "@/platform/context";
 import { InventoryWorkspace } from "@/components/client/organisms/ResourceWorkspace/InventoryWorkspace";
@@ -51,7 +50,6 @@ const sections: (WorkspaceTab & { type: string })[] = [
 ];
 export function AssetsWorkspace() {
     const { data } = usePlatform();
-    const proposal = useProposalDesign();
     const [tableMode, setTableMode] = useState(false);
     const [revision, setRevision] = useState(0);
     const tabs = sections.filter(
@@ -72,7 +70,7 @@ export function AssetsWorkspace() {
     const type = sections.find((t) => t.id === current.id)!.type;
     return (
         <section className={`${styles.page} ${styles.workspace}`}>
-            {proposal && (
+            {(
                 <AssetsOverview
                     revision={revision}
                     onSelect={(id) => {
@@ -114,7 +112,6 @@ export function AssetsWorkspace() {
                         </p>
                     ) : (
                         <InventoryWorkspace
-                            proposal={proposal}
                             onSaved={() => setRevision((v) => v + 1)}
                             key={[empleado, usuarioId, equipoId].join(":")}
                             type="activos"
@@ -124,7 +121,7 @@ export function AssetsWorkspace() {
                         />
                     )}
                 </>
-            ) : proposal && current.id === "mantenimientos" && !tableMode ? (
+            ) : current.id === "mantenimientos" && !tableMode ? (
                 <MaintenanceBoard
                     onShowTable={() => setTableMode(true)}
                     onChanged={() => setRevision((v) => v + 1)}

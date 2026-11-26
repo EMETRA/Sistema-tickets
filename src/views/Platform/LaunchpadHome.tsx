@@ -6,7 +6,7 @@ import { TicketDetail } from "@/components/client/organisms/TicketDetail";
 import { usePlatform } from "@/platform/context";
 import { platformFetch } from "@/platform/client";
 import { guatemalaDay } from "@/platform/dates";
-import { readRecents, type RecentModule } from "@/platform/proposal";
+import { readRecents, type RecentModule } from "@/platform/recents";
 import { ServerFleet } from "@/components/client/organisms/ServerFleet";
 import type { PageResult, PlatformRecord } from "@/platform/types";
 import { useAppsCatalogContext } from "@/context/AppsCatalogContext";

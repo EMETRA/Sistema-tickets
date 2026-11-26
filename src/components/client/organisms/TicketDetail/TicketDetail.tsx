@@ -26,7 +26,6 @@ import { TicketDetailProps } from "./types";
 import { MarkdownViewer } from "../../atoms/MarkdownViewer";
 import { TicketClassification } from "./TicketClassification";
 import { usePlatform } from '@/platform/context';
-import { useProposalDesign } from "@/platform/proposal";
 import { WorkspaceIcon } from "../../atoms/WorkspaceIcon/WorkspaceIcon";
 
 const TicketDetailContent: React.FC<TicketDetailProps> = ({
@@ -37,7 +36,6 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
     presentation = "dialog",
     returnHref = "/mis-tickets",
 }) => {
-    const proposal = useProposalDesign();
     const [tab, setTab] = useState("conversacion");
     const [actionError, setActionError] = useState("");
     const [viewedFile, setViewedFile] = useState<ViewedFile | null>(null);
@@ -186,7 +184,7 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
         </>
     );
     const content = (
-        <div className={proposal ? `${styles.ticketDetailContainer} ${styles.proposal}` : styles.ticketDetailContainer}>
+        <div className={`${styles.ticketDetailContainer} ${styles.proposal}`}>
             {presentation === "page" && (
                 <nav className={styles.breadcrumb} aria-label="Ruta del ticket">
                     <Link href={returnHref}>Tickets</Link>
@@ -194,7 +192,7 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
                     <span>{ticketCode}</span>
                 </nav>
             )}
-            {proposal && (
+            {(
                 <header className={styles.sheetHead}>
                     <span className={styles.sheetIcon} aria-hidden="true">
                         <WorkspaceIcon name="ticket-solid" size={20} />
@@ -226,7 +224,7 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
                     </button>
                 </header>
             )}
-            <header className={styles.header} hidden={proposal}>
+            <header className={styles.header} hidden>
                 <div className={styles.headerInfo}>
                     {presentation === "page" ? (
                         <h1>
@@ -332,7 +330,7 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
                                     }}
                                 >
                                     {item.label}
-                                    {proposal && item.id === "archivos" && ticketAttachments.length > 0 && (
+                                    {item.id === "archivos" && ticketAttachments.length > 0 && (
                                         <span className={styles.tabCount}>{ticketAttachments.length}</span>
                                     )}
                                 </button>
@@ -385,7 +383,7 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
                             {files}
                         </div>
                     </section>
-                    {proposal ? (
+                    {(
                         <aside className={styles.sidePanel} aria-label="Información del ticket">
                             <dl className={styles.sideFacts}>
                                 <div>
@@ -412,108 +410,10 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
                                 <TicketClassification catalogReady={!catalogLoading&&!catalogError} onCatalogChanged={refetchCatalog} ticketId={ticketId} catalog={tagCatalog} editable={canManageTags && !catalogError && !catalogLoading} admin={Boolean(platform?.actor.admin)} onDirtyChange={setTagDirty} onBusyChange={setTagBusy} onCountChange={setTagCount} onSaved={async()=>{setActionError("");setHistoryRevision(value=>value+1);}} />
                             </section>
                         </aside>
-                    ) : (
-                    <aside
-                        className={styles.sidebar}
-                        aria-label="Información del ticket"
-                    >
-                        <section className={styles.card}>
-                            <h2>Información del ticket</h2>
-                            <dl className={styles.metadata}>
-                                <div>
-                                    <dt>Estado</dt>
-                                    <dd>{ticketData.estadoNombre}</dd>
-                                </div>
-                                <div>
-                                    <dt>Asignado a</dt>
-                                    <dd>
-                                        {ticketData.asignado?.nombre ||
-                                            ticketData.usuarioAsignadoNombre ||
-                                            "Sin asignar"}
-                                    </dd>
-                                </div>
-                                <div>
-                                    <dt>Creado por</dt>
-                                    <dd>
-                                        {ticketData.creador?.nombre ||
-                                            ticketData.usuarioCreadorNombre}
-                                    </dd>
-                                </div>
-                                <div>
-                                    <dt>Prioridad</dt>
-                                    <dd>{ticketData.prioridadNombre}</dd>
-                                </div>
-                            </dl>
-                            <p className={styles.created}>
-                                Creado: {displayDate(ticketData.fechaCreacion)}
-                            </p>
-                        </section>
-                        <section
-                            className={styles.card}
-                            aria-label="Adjuntos del ticket"
-                        >
-                            <h2>Archivos</h2>
-                            {files}
-                        </section>
-                        <section className={styles.card} aria-label="Clasificación del trabajo">
-                            <h2>Clasificación del trabajo</h2>
-                            {catalogLoading && <p role="status">Cargando catálogo de etiquetas…</p>}
-                            {catalogError && <div role="alert"><p>No se pudo cargar el catálogo de etiquetas.</p><Button variant="outlined" onClick={()=>void refetchCatalog()}>Reintentar catálogo</Button></div>}
-                            <TicketClassification catalogReady={!catalogLoading&&!catalogError} onCatalogChanged={refetchCatalog} ticketId={ticketId} catalog={tagCatalog} editable={canManageTags && !catalogError && !catalogLoading} admin={Boolean(platform?.actor.admin)} onDirtyChange={setTagDirty} onBusyChange={setTagBusy} onCountChange={setTagCount} onSaved={async()=>{setActionError("");setHistoryRevision(value=>value+1);}} />
-                        </section>
-                        {(canStart || canResolve || canCancel) && (
-                            <section className={styles.card}>
-                                <h2>Gestión del ticket</h2>
-                                {canResolve && (tagCount === null || tagCount === 0 || tagDirty) && <p className={styles.muted}>Guarda al menos una etiqueta de trabajo antes de resolver el ticket.</p>}
-                                <div className={styles.ticketActions}>
-                                    {canCancel && (
-                                        <Button
-                                            color="danger"
-                                            onClick={handleOnTicketCancel}
-                                            fullWidth
-                                            state={
-                                                isUpdating
-                                                    ? "loading"
-                                                    : "default"
-                                            }
-                                        >
-                                            Cancelar ticket
-                                        </Button>
-                                    )}
-                                    {canStart ? (
-                                        <Button
-                                            onClick={handleOnTicketProcess}
-                                            fullWidth
-                                            state={
-                                                isUpdating ? "loading" : tagDirty || tagBusy ? "disabled" : "default"
-                                            }
-                                        >
-                                            Iniciar atención
-                                        </Button>
-                                    ) : canResolve ? (
-                                        <Button
-                                            onClick={handleOnTicketFinish}
-                                            fullWidth
-                                            state={
-                                                isUpdating ? "loading" : tagCount === null || tagCount === 0 || tagDirty || tagBusy ? "disabled" : "default"
-                                            }
-                                        >
-                                            Resolver ticket
-                                        </Button>
-                                    ) : (
-                                        <p className={styles.muted}>
-                                            No hay acciones disponibles para
-                                            este estado.
-                                        </p>
-                                    )}
-                                </div>
-                            </section>
-                        )}
-                    </aside>
                     )}
                 </div>
             )}
-            {proposal && ticketData && (actions || needsTags) && (
+            {ticketData && (actions || needsTags) && (
                 <footer className={styles.sheetFoot}>
                     <p>{needsTags ? "Guarda al menos una etiqueta de trabajo antes de resolver el ticket." : "Los cambios de estado quedan en el historial del ticket."}</p>
                     <div className={styles.sheetActions}>{actions}</div>
@@ -528,7 +428,7 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
             isOpen={isOpen}
             onClose={onClose}
             position="center"
-            className={proposal ? `${styles.popOver} ${styles.popOverProposal}` : styles.popOver}
+            className={`${styles.popOver} ${styles.popOverProposal}`}
         >
             {content}
         </PopOver>

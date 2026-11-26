@@ -4,7 +4,6 @@ import { usePlatform } from "@/platform/context";
 import { platformFetch } from "@/platform/client";
 import type { PlatformRecord } from "@/platform/types";
 import {
-    InventoryCatalog,
     inventoryInitial,
     type InventoryItem,
 } from "./InventoryPicker";
@@ -18,15 +17,12 @@ export function InventoryWorkspace({
     usuarioId,
     empleado,
     onSaved,
-    proposal = false,
 }: {
     type?: string;
     equipoId?: string;
     usuarioId?: string;
     empleado?: number;
     onSaved?: ()=>void;
-    /** Propuesta «Panel institucional»: buscador principal y estado de ficha. */
-    proposal?: boolean;
 }) {
     const { data } = usePlatform();
     const [item, setItem] = useState<InventoryItem | null>(null),
@@ -62,7 +58,7 @@ export function InventoryWorkspace({
                     {error}
                 </p>
             )}
-            {proposal ? (
+            {(
                 <AssetInventory
                     key={revision}
                     type={type}
@@ -80,24 +76,6 @@ export function InventoryWorkspace({
                     }
                     onOpen={(id) => void open(id)}
                 />
-            ) : (
-            <InventoryCatalog
-                key={revision}
-                type={type}
-                equipoId={equipoId}
-                usuarioId={usuarioId}
-                empleado={empleado}
-                onSelect={
-                    def.actions.INSERTAR
-                        ? (i) => {
-                              setItem(i);
-                              setRecord(null);
-                              setEditing(true);
-                          }
-                        : undefined
-                }
-                onOpen={(id) => void open(id)}
-            />
             )}
             {editing && (
                 <RecordEditor

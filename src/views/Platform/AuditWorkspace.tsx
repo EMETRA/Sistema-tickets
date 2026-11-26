@@ -1,13 +1,11 @@
 "use client";
-import { statusLabel, statusTone } from "@/helpers/statusTone";
+import { statusLabel } from "@/helpers/statusTone";
 import { startTransition, useEffect, useState } from "react";
 import { Button } from "@/components/client/atoms/Button";
 import { platformFetch } from "@/platform/client";
-import { displayDate } from "@/components/client/organisms/ResourceWorkspace/RecordDetail";
 import type { PageResult } from "@/platform/types";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
 import { AuditFeed } from "./AuditFeed";
-import { useProposalDesign } from "@/platform/proposal";
 type Audit = {
     id: string;
     actor: string;
@@ -23,7 +21,6 @@ type Audit = {
     confirmadoEn: string | null;
 };
 export function AuditWorkspace() {
-    const proposal = useProposalDesign();
     const [result, setResult] = useState<PageResult<Audit>>({
             items: [],
             total: 0,
@@ -110,103 +107,8 @@ export function AuditWorkspace() {
                 </p>
             ) : loading ? (
                 <p role="status">Consultando trazabilidad…</p>
-            ) : proposal ? (
-                <AuditFeed items={result.items} />
             ) : (
-                <div className={styles.tableRegion}>
-                    <table className={styles.table}>
-                        <thead>
-                            <tr>
-                                <th>Fecha y actor</th>
-                                <th>Acción y recurso</th>
-                                <th>Resultado</th>
-                                <th>Revisión</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {result.items.map((r) => (
-                                <tr
-                                    key={r.id}
-                                    className={
-                                        statusTone(r.resultado) === "danger"
-                                            ? styles.rowAlert
-                                            : undefined
-                                    }
-                                >
-                                    <td>
-                                        <strong>{r.actor}</strong>
-                                        <br />
-                                        <small className={styles.muted}>
-                                            {displayDate(r.fecha)}
-                                        </small>
-                                    </td>
-                                    <td>
-                                        <strong>{statusLabel(r.accion)}</strong>{" "}
-                                        · {r.tipo}
-                                        <br />
-                                        <small className={styles.muted}>
-                                            {r.registroId}
-                                        </small>
-                                        <details className={styles.inlineDetails}>
-                                            <summary>Antes y después</summary>
-                                            <div className={styles.grid}>
-                                                <pre className={styles.log}>
-                                                    {JSON.stringify(
-                                                        r.antes,
-                                                        null,
-                                                        2,
-                                                    )}
-                                                </pre>
-                                                <pre className={styles.log}>
-                                                    {JSON.stringify(
-                                                        r.despues,
-                                                        null,
-                                                        2,
-                                                    )}
-                                                </pre>
-                                            </div>
-                                            <small>
-                                                Solicitud: {r.solicitudId}
-                                            </small>
-                                        </details>
-                                    </td>
-                                    <td>
-                                        <span
-                                            className={styles.chip}
-                                            data-tone={statusTone(r.resultado)}
-                                        >
-                                            {statusLabel(r.resultado)}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        {r.revisadoEn && r.confirmadoEn ? (
-                                            <>
-                                                <span>
-                                                    Primera:{" "}
-                                                    {displayDate(r.revisadoEn)}
-                                                </span>
-                                                <br />
-                                                <span>
-                                                    Segunda:{" "}
-                                                    {displayDate(
-                                                        r.confirmadoEn,
-                                                    )}
-                                                </span>
-                                            </>
-                                        ) : (
-                                            "No corresponde doble confirmación"
-                                        )}
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                    {!result.items.length && (
-                        <p className={styles.card}>
-                            No hay movimientos con estos filtros.
-                        </p>
-                    )}
-                </div>
+                <AuditFeed items={result.items} />
             )}
             <div className={styles.toolbar}>
                 <p className={styles.muted}>

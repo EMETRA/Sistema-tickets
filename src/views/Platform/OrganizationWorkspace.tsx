@@ -1,11 +1,9 @@
 "use client";
 import { startTransition, useEffect, useState } from "react";
-import { Button } from "@/components/client/atoms/Button";
 import { usePlatform } from "@/platform/context";
 import { platformFetch } from "@/platform/client";
 import { ResourceWorkspace } from "@/components/client/organisms/ResourceWorkspace/ResourceWorkspace";
 import {
-    OrganizationPeople,
     type OrganizationPerson,
 } from "@/components/client/organisms/OrganizationPeople/OrganizationPeople";
 import { OrganizationSync } from "./OrganizationSync";
@@ -16,9 +14,7 @@ import {
 } from "./WorkspaceNavigation";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
 import { PeopleDirectoryView, TeamsBoard } from "@/components/client/organisms/PeoplePanel";
-import { useProposalDesign } from "@/platform/proposal";
 function PeopleDirectory() {
-    const proposal = useProposalDesign();
     const [people, setPeople] = useState<OrganizationPerson[] | null>(null),
         [error, setError] = useState(""),
         [revision, setRevision] = useState(0);
@@ -40,8 +36,7 @@ function PeopleDirectory() {
             });
         return () => controller.abort();
     }, [revision]);
-    if (proposal)
-        return error ? (
+    return error ? (
             <p role="alert" className={styles.error}>
                 {error}
             </p>
@@ -52,30 +47,6 @@ function PeopleDirectory() {
                 Consultando el personal de RRHH…
             </p>
         );
-    return (
-        <section className={styles.listPanel}>
-            <div className={styles.toolbar}>
-                <div>
-                    <h2>Personal de RRHH</h2>
-                </div>
-                <Button
-                    variant="outlined"
-                    onClick={() => setRevision((v) => v + 1)}
-                >
-                    Actualizar personal
-                </Button>
-            </div>
-            {error ? (
-                <p role="alert" className={styles.error}>
-                    {error}
-                </p>
-            ) : people ? (
-                <OrganizationPeople people={people} />
-            ) : (
-                <p role="status">Consultando el personal de RRHH…</p>
-            )}
-        </section>
-    );
 }
 function Responsibilities() {
     const { data } = usePlatform();
@@ -112,7 +83,6 @@ function Responsibilities() {
 }
 export function OrganizationWorkspace() {
     const { data } = usePlatform();
-    const proposal = useProposalDesign();
     const [revision, setRevision] = useState(0);
     const [teamsTable, setTeamsTable] = useState(false);
     const tabs: WorkspaceTab[] = [];
@@ -164,7 +134,7 @@ export function OrganizationWorkspace() {
                             />
                         </details>
                     )}
-                    {proposal && !teamsTable ? (
+                    {!teamsTable ? (
                         <TeamsBoard revision={revision} onShowTable={() => setTeamsTable(true)} />
                     ) : (
                     <ResourceWorkspace

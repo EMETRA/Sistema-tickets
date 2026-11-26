@@ -10,10 +10,6 @@ const { once } = require("node:events");
 const { createLab } = require("./servidor.cjs");
 const { page, sessionPage, banner } = require("./interfaz.cjs");
 const root = path.resolve(__dirname, "../..");
-// Interruptor del laboratorio para comparar el diseño actual con la propuesta.
-const PROPOSAL_COOKIE = "panel_propuesta";
-const proposalActive = (req) =>
-  /(?:^|;\s*)panel_propuesta=1(?:;|$)/.test(req.headers.cookie || "");
 function exampleCatalog() {
   const load = require(path.join(root, "test/integracion/load-ts.cjs"))(root);
   return load("src/api/graphql/home/appsCatalog.dummy.ts").APPS_CATALOG_DUMMY;
@@ -97,21 +93,9 @@ async function start(options = {}) {
         };
       if (url.pathname.startsWith("/__laboratorio")) {
         const extras = () => ({
-          propuesta: proposalActive(req),
           catalogo: Object.keys(lab.state.data.applicationCatalog || {}).length > 0,
           activos: !!lab.state.data.assetExample,
         });
-        if (url.pathname === "/__laboratorio/propuesta" && req.method === "GET") {
-          const next = proposalActive(req) ? "0" : "1";
-          const back = url.searchParams.get("volver") || "/home";
-          const location = /^\/(?!\/)[^\s]*$/.test(back) ? back : "/home";
-          res.writeHead(303, {
-            Location: location,
-            "Set-Cookie": `${PROPOSAL_COOKIE}=${next}; Path=/; SameSite=Lax`,
-            "Cache-Control": "no-store",
-          });
-          return res.end();
-        }
         if (req.method === "POST") {
           // La página de controles usa Referrer-Policy: no-referrer, por lo que
           // algunos navegadores envían Origin "null"; el nonce sigue protegiendo.
@@ -247,7 +231,7 @@ async function start(options = {}) {
             response.on("data", (b) => chunks.push(b));
             response.on("end", () => {
               let value = Buffer.concat(chunks).toString("utf8");
-              value = value.replace("</body>", banner(proposalActive(req)) + "</body>");
+              value = value.replace("</body>", banner() + "</body>");
               delete headers["content-length"];
               delete headers["content-encoding"];
               res.writeHead(response.statusCode, headers);

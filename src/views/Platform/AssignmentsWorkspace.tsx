@@ -10,7 +10,6 @@ import type { PageResult } from "@/platform/types";
 import { displayDate } from "@/components/client/organisms/ResourceWorkspace/RecordDetail";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
 import queue from "./QueueSummary.module.scss";
-import { useProposalDesign } from "@/platform/proposal";
 type Ticket = {
     id: number;
     codigo: string;
@@ -60,7 +59,6 @@ export function AssignmentsWorkspace() {
         [busy, setBusy] = useState(false),
         [detail, setDetail] = useState<Ticket | null>(null),
         [message, setMessage] = useState("");
-    const proposal = useProposalDesign();
     const [counts, setCounts] = useState<{
         sinAsignar?: number;
         sinPrimeraAtencion?: number;
@@ -69,7 +67,7 @@ export function AssignmentsWorkspace() {
     } | null>(null);
     // Propuesta: los indicadores de la cola funcionan como filtros.
     useEffect(() => {
-        if (!proposal || !data!.capabilities.assign) return;
+        if (!data!.capabilities.assign) return;
         const controller = new AbortController();
         const opts = { signal: controller.signal };
         // Los contadores de la cola usan la misma fuente que la bandeja, así siempre cuadran.
@@ -87,7 +85,7 @@ export function AssignmentsWorkspace() {
             .catch(() => undefined);
         return () => controller.abort();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [proposal, revision]);
+    }, [revision]);
     useEffect(() => {
         const controller = new AbortController();
         setLoading(true);
@@ -145,7 +143,7 @@ export function AssignmentsWorkspace() {
         <section className={styles.page}>
             <div className={styles.toolbar}>
                 <p className={styles.muted}>
-                    {proposal ? "" : "Asignaciones, primera atención e historial de seguimiento."}
+                    {""}
                 </p>
                 <Button
                     variant="outlined"
@@ -154,7 +152,7 @@ export function AssignmentsWorkspace() {
                     Actualizar
                 </Button>
             </div>
-            {proposal && data!.capabilities.assign && (
+            {data!.capabilities.assign && (
                 <div className={queue.strip} role="group" aria-label="Indicadores de la cola">
                     {[
                         { id: "sin-asignar", label: "Sin asignar", value: counts?.sinAsignar, tone: "neutral", hint: "Esperan responsable" },
@@ -221,7 +219,7 @@ export function AssignmentsWorkspace() {
                         Mis solicitudes
                     </button>
                 </nav>
-                {scope === "cola" && !proposal && (
+                {false && (
                     <div className={styles.toolbar}>
                     <label className={styles.field}>
                         Mostrar

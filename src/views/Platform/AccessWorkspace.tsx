@@ -18,7 +18,6 @@ import { PlatformField } from "@/components/client/molecules/PlatformField/Platf
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
 import access from "./AccessWorkspace.module.scss";
 import { PopOver } from "@/components/client/atoms/PopOver";
-import { useProposalDesign } from "@/platform/proposal";
 type Named = { id: number; nombre: string; descripcion: string };
 type Catalog = {
     version: number;
@@ -49,11 +48,10 @@ export function AccessWorkspace() {
     return <AccessCatalog key={tab} tab={tab} />;
 }
 function AccessCatalog({ tab }: { tab: AccessTab }) {
-    const proposal = useProposalDesign();
     const [copyOpen, setCopyOpen] = useState(false);
     // Propuesta: «Copiar accesos» es una tarea ocasional; se abre bajo demanda.
     const wrapCopy = (panel: React.ReactNode) =>
-        proposal ? (
+        (
             <PopOver
                 isOpen={copyOpen}
                 onClose={() => setCopyOpen(false)}
@@ -70,8 +68,6 @@ function AccessCatalog({ tab }: { tab: AccessTab }) {
                 </button>
                 {panel}
             </PopOver>
-        ) : (
-            panel
         );
     const { data: context, refresh } = usePlatform(),
         [catalog, setCatalog] = useState<Catalog | null>(null),
@@ -264,17 +260,15 @@ function AccessCatalog({ tab }: { tab: AccessTab }) {
             {tab === "modules" ? (
                 <ResourceWorkspace group="accesos" types={["modulos"]} />
             ) : tab === "users" ? (
-                <div className={proposal ? undefined : styles.split}>
+                <div className={undefined}>
                     <section className={styles.card}>
-                        {proposal ? (
+                        {(
                             <div className={access.sectionHead}>
                                 <h2>Accesos del colaborador</h2>
                                 <Button variant="outlined" onClick={() => setCopyOpen(true)}>
                                     Copiar accesos de otro colaborador
                                 </Button>
                             </div>
-                        ) : (
-                            <h2>Accesos del colaborador</h2>
                         )}
                         <PlatformField
                             field={{

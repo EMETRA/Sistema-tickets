@@ -1,22 +1,4 @@
 "use client";
-import { useSyncExternalStore } from "react";
-
-/**
- * Propuesta «Panel institucional». Se activa desde el laboratorio local
- * (cookie panel_propuesta=1) para compararla con el diseño actual sin
- * alterar el comportamiento por defecto.
- */
-const read = () =>
-    typeof document !== "undefined" &&
-    /(?:^|;\s*)panel_propuesta=1(?:;|$)/.test(document.cookie);
-
-export function useProposalDesign() {
-    return useSyncExternalStore(
-        () => () => {},
-        read,
-        () => false,
-    );
-}
 
 /** Módulos de aplicaciones visitados recientemente (solo en este navegador). */
 export type RecentModule = { path: string; title: string; area: string; at: number };

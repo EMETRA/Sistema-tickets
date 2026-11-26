@@ -4,12 +4,10 @@ import { ResourceWorkspace } from "@/components/client/organisms/ResourceWorkspa
 import { ServerMonitor } from "@/components/client/organisms/ServerMonitor/ServerMonitor";
 import { ServerFleet } from "@/components/client/organisms/ServerFleet";
 import { usePlatform } from "@/platform/context";
-import { useProposalDesign } from "@/platform/proposal";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
 
 export function MonitoringWorkspace() {
   const { data } = usePlatform();
-  const proposal = useProposalDesign();
   const [tab, setTab] = useState("salud");
   const [server, setServer] = useState("");
   const [revision, setRevision] = useState(0);
@@ -29,7 +27,7 @@ export function MonitoringWorkspace() {
           Servidores y contenedores
         </button>
       </nav>
-      {proposal ? (
+      {(
         <div hidden={tab !== "salud"} className={styles.page}>
           {/* Propuesta: la flota primero; el detalle se abre al elegir un servidor. */}
           <ServerFleet
@@ -55,13 +53,6 @@ export function MonitoringWorkspace() {
               Actualizar la flota
             </button>
           </p>
-        </div>
-      ) : (
-        <div hidden={tab !== "salud"}>
-          <ServerMonitor
-            active={tab === "salud"}
-            canReadLogs={data?.capabilities.logs === true}
-          />
         </div>
       )}
       {tab === "catalogo" && <ResourceWorkspace group="infraestructura" />}

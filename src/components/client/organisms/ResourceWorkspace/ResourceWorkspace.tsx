@@ -11,7 +11,6 @@ import {
     resourceValue,
 } from "@/platform/resources";
 import { RecordEditor } from "./RecordEditor";
-import { useProposalDesign } from "@/platform/proposal";
 import { RecordDetail, displayDate } from "./RecordDetail";
 import styles from "../../templates/PlatformPage/PlatformPage.module.scss";
 // Filtros rápidos por estado (el API acepta ?estado=).
@@ -42,7 +41,6 @@ export function ResourceWorkspace({
     extraActions?: React.ReactNode;
 }) {
     const { data } = usePlatform();
-    const proposal = useProposalDesign();
     const options = Object.entries(data!.definitions).filter(
         ([id, d]) => d.group === group && (!types || types.includes(id)),
     );
@@ -65,16 +63,16 @@ export function ResourceWorkspace({
         [message, setMessage] = useState(""),
         // Propuesta: las solicitudes abren en «Pendientes», la pregunta diaria.
         [estado, setEstado] = useState(
-            proposal && type === "solicitudes" ? "PENDIENTE" : "",
+            type === "solicitudes" ? "PENDIENTE" : "",
         );
-    const stateFilters = proposal ? STATE_FILTERS[type] : undefined;
+    const stateFilters = STATE_FILTERS[type];
     const rawDef = data!.definitions[type],
         def = rawDef ? resourceDefinition(type, rawDef) : null,
         copy = RESOURCE_PRESENTATION[type];
     const refresh = useCallback(() => setRevision((v) => v + 1), []);
     // Propuesta: las listas no traen nombres de personas ni de referencias; se resuelven aquí.
     const [refNames, setRefNames] = useState<Record<string, string>>({});
-    const refFields = proposal && copy && def
+    const refFields = copy && def
         ? copy.columns
               .map((c) => def.fields.find((f) => f.key === c.key))
               .filter((f): f is NonNullable<typeof f> => !!f && (f.type === "user" || (f.type === "ref" && !!f.resource)))
@@ -264,8 +262,7 @@ export function ResourceWorkspace({
                                                         ) : (
                                                             (refFields.some((f) => f.key === c.key) &&
                                                                 refNames[String(row.datos[c.key])]) ||
-                                                            (proposal &&
-                                                                def.fields.find((f) => f.key === c.key)?.type === "select" &&
+                                                            (def.fields.find((f) => f.key === c.key)?.type === "select" &&
                                                                 !!row.datos[c.key] &&
                                                                 statusLabel(String(row.datos[c.key]))) ||
                                                             resourceValue(

@@ -1,4 +1,8 @@
 "use client";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { texto } from "@/platform/forms";
 import { queryErrorMessage, usePlatformQuery } from "@/platform/query";
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
@@ -16,6 +20,12 @@ import styles from "@/components/client/templates/PlatformPage/PlatformPage.modu
 import access from "./AccessWorkspace.module.scss";
 import { PopOver } from "@/components/client/atoms/PopOver";
 type Named = { id: number; nombre: string; descripcion: string };
+// Mismas reglas que el API (platform.rbac.ts): nombre ≤ 100, descripción ≤ 255 (vacía = nombre).
+const accessSchema = z.object({
+    nombre: texto("Nombre", { requerido: true, max: 100 }),
+    descripcion: texto("Descripción", { max: 255 }),
+});
+type AccessValues = z.infer<typeof accessSchema>;
 type Catalog = {
     version: number;
     profiles: Named[];
@@ -82,8 +92,10 @@ function AccessCatalog({ tab }: { tab: AccessTab }) {
         [target, setTarget] = useState<unknown>(""),
         [source, setSource] = useState<unknown>(""),
         [busy, setBusy] = useState(false),
-        [nombre, setNombre] = useState(""),
-        [descripcion, setDescripcion] = useState("");
+        accessForm = useForm<AccessValues>({
+            resolver: zodResolver(accessSchema),
+            defaultValues: { nombre: "", descripcion: "" },
+        });
     const dialog = useRef<HTMLDialogElement>(null),
         [related, setRelated] = useState<number[]>([]);
     const catalogQuery = usePlatformQuery<Catalog>("/rbac", { revision });
@@ -122,8 +134,7 @@ function AccessCatalog({ tab }: { tab: AccessTab }) {
         if (editing !== undefined) dialog.current?.showModal();
     }, [editing]);
     function edit(row: Named | null) {
-        setNombre(row?.nombre || "");
-        setDescripcion(row?.descripcion || "");
+        accessForm.reset({ nombre: row?.nombre || "", descripcion: row?.descripcion || "" });
         setRelated(
             tab === "profiles"
                 ? catalog!.profileRoles.filter((x) => x.perfilId === row?.id).map((x) => x.rolId)
@@ -407,43 +418,54 @@ function AccessCatalog({ tab }: { tab: AccessTab }) {
                         {error && <p className={styles.error}>{error}</p>}
                         <form
                             className={styles.formGrid}
-                            onSubmit={(e) => {
-                                e.preventDefault();
-                                void command(
+                            noValidate
+                            onSubmit={accessForm.handleSubmit(({ nombre, descripcion }) =>
+                                command(
                                     tab,
                                     {
                                         ...(editing ? { id: editing.id } : {}),
                                         nombre,
-                                        descripcion,
+                                        // Sin descripción, el API usa el nombre.
+                                        descripcion: descripcion || nombre,
                                     },
                                     "Guardar " + nombre,
-                                );
-                            }}
+                                ),
+                            )}
                         >
                             <label className={styles.field}>
                                 Nombre
                                 <input
                                     className={styles.control}
-                                    value={nombre}
-                                    disabled={
+                                    {...accessForm.register("nombre")}
+                                    // Solo lectura (no disabled): los permisos del sistema conservan su nombre al enviar.
+                                    readOnly={
                                         !!editing &&
                                         tab === "permissions" &&
                                         /^(TICKETS_|VIVI_)/.test(editing.nombre)
                                     }
-                                    onChange={(e) => setNombre(e.target.value)}
                                     maxLength={100}
-                                    required
+                                    aria-invalid={!!accessForm.formState.errors.nombre}
                                 />
+                                {accessForm.formState.errors.nombre && (
+                                    <span role="alert" className={styles.error}>
+                                        {accessForm.formState.errors.nombre.message}
+                                    </span>
+                                )}
                             </label>
                             <label className={styles.field}>
                                 Descripción
                                 <input
                                     className={styles.control}
-                                    value={descripcion}
-                                    onChange={(e) => setDescripcion(e.target.value)}
+                                    {...accessForm.register("descripcion")}
                                     maxLength={255}
-                                    required
+                                    placeholder="Opcional: si la dejas vacía se usa el nombre"
+                                    aria-invalid={!!accessForm.formState.errors.descripcion}
                                 />
+                                {accessForm.formState.errors.descripcion && (
+                                    <span role="alert" className={styles.error}>
+                                        {accessForm.formState.errors.descripcion.message}
+                                    </span>
+                                )}
                             </label>
                             <Button type="submit" state={busy ? "loading" : "default"}>
                                 Guardar datos

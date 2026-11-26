@@ -1,11 +1,11 @@
 "use client";
 import { usePlatformQuery } from "@/platform/query";
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent, useMemo } from "react";
 import { Button } from "@/components/client/atoms/Button";
 import { InventoryCatalog } from "@/features/registros/components/ResourceWorkspace/InventoryPicker";
 import { useAuthStore } from "@/store/useAuthStore";
-import { platformCommand, platformFetch, PlatformError } from "@/platform/client";
+import { platformCommand, PlatformError } from "@/platform/client";
 import {
     HR_STATES,
     hrDate,
@@ -99,39 +99,28 @@ export function HrSubmission({ data }: { data: Pick<HrReview, "campana" | "entre
     );
 }
 function HrUpdateForm({ id, onSent }: { id: string; onSent: () => void }) {
-    const [data, setData] = useState<HrMine | null>(null),
-        [answers, setAnswers] = useState<Record<string, HrAnswer>>({}),
+    // Solo lo que la persona cambió; el borrador completo se arma con los datos oficiales (hrDraft).
+    const [edits, setEdits] = useState<Record<string, HrAnswer>>({}),
         [note, setNote] = useState(""),
-        [error, setError] = useState(""),
+        [actionError, setError] = useState(""),
         [message, setMessage] = useState(""),
         [busy, setBusy] = useState(false);
     const active = useRef(true),
-        flight = useRef(false),
-        request = useRef<AbortController | null>(null);
-    const load = useCallback(async () => {
-        request.current?.abort();
-        const controller = new AbortController();
-        request.current = controller;
+        flight = useRef(false);
+    const campaign = usePlatformQuery<HrMine>("/hr/me/campaigns/" + encodeURIComponent(id));
+    const data = campaign.data ?? null;
+    const answers = useMemo(() => (data ? hrDraft(data, edits) : {}), [data, edits]);
+    const error = actionError || (campaign.error ? hrError(campaign.error) : "");
+    const load = async () => {
         setError("");
-        try {
-            const r = await platformFetch<HrMine>("/hr/me/campaigns/" + encodeURIComponent(id), {
-                signal: AbortSignal.any([controller.signal, AbortSignal.timeout(45000)]),
-            });
-            if (controller.signal.aborted) return;
-            setData(r);
-            setAnswers((prior) => hrDraft(r, prior));
-        } catch (e) {
-            if (!controller.signal.aborted) setError(hrError(e));
-        }
-    }, [id]);
+        await campaign.refetch();
+    };
     useEffect(() => {
         active.current = true;
-        void load();
         return () => {
             active.current = false;
-            request.current?.abort();
         };
-    }, [load]);
+    }, []);
     async function submit(event: FormEvent) {
         event.preventDefault();
         if (!data || flight.current) return;
@@ -172,9 +161,9 @@ function HrUpdateForm({ id, onSent }: { id: string; onSent: () => void }) {
         editable =
             open && Boolean(data?.perfil.vinculado) && ["PENDIENTE", "DEVUELTA"].includes(data?.estado || "");
     function answer(code: string, value: HrAnswer) {
-        setAnswers((prior) => ({
+        setEdits((prior) => ({
             ...prior,
-            [code]: { ...prior[code], ...value },
+            [code]: { ...answers[code], ...prior[code], ...value },
         }));
     }
     return (

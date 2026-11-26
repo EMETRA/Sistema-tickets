@@ -1,17 +1,10 @@
 import "server-only";
 import { z } from "zod";
+import { recoveryCode, recoveryEmail, recoveryPassword } from "./recovery-rules";
 
-const requestSchema = z.object({ correo: z.string().email().max(254) }).strict();
-const passwordSchema = z
-    .object({
-        OTP: z.string().regex(/^\d{6}$/),
-        clave: z
-            .string()
-            .min(8)
-            .max(128)
-            .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&ñáéíóú])[A-Za-z\d@$!%*?&ñáéíóú]{8,}$/),
-    })
-    .strict();
+// Mismas reglas que el formulario (auth/recovery-rules.ts).
+const requestSchema = z.object({ correo: recoveryEmail }).strict();
+const passwordSchema = z.object({ OTP: recoveryCode, clave: recoveryPassword }).strict();
 
 export async function recoveryRequest(request: Request, method: "POST" | "PUT") {
     const unavailable =

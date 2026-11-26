@@ -42,12 +42,7 @@ export function AuditWorkspace() {
             setError("");
         });
         platformFetch<PageResult<Audit>>(
-            "/audit?offset=" +
-                offset +
-                "&tipo=" +
-                encodeURIComponent(type) +
-                "&resultado=" +
-                outcome,
+            "/audit?offset=" + offset + "&tipo=" + encodeURIComponent(type) + "&resultado=" + outcome,
             { signal: c.signal },
         )
             .then(setResult)
@@ -94,10 +89,7 @@ export function AuditWorkspace() {
                         </select>
                     </label>
                 </div>
-                <Button
-                    variant="outlined"
-                    onClick={() => setRevision((n) => n + 1)}
-                >
+                <Button variant="outlined" onClick={() => setRevision((n) => n + 1)}>
                     Actualizar
                 </Button>
             </div>
@@ -111,9 +103,7 @@ export function AuditWorkspace() {
                 <AuditFeed items={result.items} />
             )}
             <div className={styles.toolbar}>
-                <p className={styles.muted}>
-                    {result.total} movimientos · Historial de solo lectura
-                </p>
+                <p className={styles.muted}>{result.total} movimientos · Historial de solo lectura</p>
                 <div className={styles.actions}>
                     <Button
                         variant="outlined"
@@ -124,9 +114,7 @@ export function AuditWorkspace() {
                     </Button>
                     <Button
                         variant="outlined"
-                        state={
-                            offset + 50 < result.total ? "default" : "disabled"
-                        }
+                        state={offset + 50 < result.total ? "default" : "disabled"}
                         onClick={() => setOffset(offset + 50)}
                     >
                         Siguiente

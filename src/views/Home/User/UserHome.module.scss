@@ -25,7 +25,8 @@
 .appsContainer {
   min-width: 0;
   padding: 24px;
-  border: 1px solid #e1e7f0; border: 1px solid light-dark(#e1e7f0, #2a3449);
+  border: 1px solid #e1e7f0;
+  border: 1px solid light-dark(#e1e7f0, #2a3449);
   border-radius: 16px;
   background: var(--tickets-surface);
 }
@@ -43,16 +44,20 @@
 }
 .errorPanel {
   background: var(--tickets-surface);
-  border: 1px solid #dfe6f2; border: 1px solid light-dark(#dfe6f2, #2a3449);
+  border: 1px solid #dfe6f2;
+  border: 1px solid light-dark(#dfe6f2, #2a3449);
   border-radius: 14px;
   padding: 24px;
-  color: #61718a; color: light-dark(#61718a, #e5eaf5);
+  color: #61718a;
+  color: light-dark(#61718a, #e5eaf5);
   button {
     padding: 9px 14px;
-    border: 1px solid #cdd8ef; border: 1px solid light-dark(#cdd8ef, #2a3449);
+    border: 1px solid #cdd8ef;
+    border: 1px solid light-dark(#cdd8ef, #2a3449);
     border-radius: 8px;
     background: var(--tickets-surface);
-    color: #3656af; color: light-dark(#3656af, #9aace0);
+    color: #3656af;
+    color: light-dark(#3656af, #9aace0);
     cursor: pointer;
   }
 }

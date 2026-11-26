@@ -88,9 +88,7 @@ export const TechView: Story = {
 // Admin role — same editing rights as tech
 export const AdminView: Story = {
     render: () => {
-        const [labels, setLabels] = useState<LabelOption[]>([
-            { value: "bug", label: "Bug", variant: "bug" },
-        ]);
+        const [labels, setLabels] = useState<LabelOption[]>([{ value: "bug", label: "Bug", variant: "bug" }]);
 
         return (
             <TicketHistory

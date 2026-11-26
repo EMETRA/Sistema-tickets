@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { graphqlRequest } from "@/api/graphql/client";
-import {
-    GET_TECHNICIAN_EVENTS_QUERY,
-    type GetTechnicianEventsResponse,
-} from "@/api/graphql/technician";
+import { GET_TECHNICIAN_EVENTS_QUERY, type GetTechnicianEventsResponse } from "@/api/graphql/technician";
 
 /**
  * GET /api/technician-events
@@ -25,30 +22,26 @@ export async function GET(_request: NextRequest) {
         const fecha_inicio = searchParams.get("fecha_inicio") || undefined;
         const fecha_fin = searchParams.get("fecha_fin") || undefined;
 
-        const result = await graphqlRequest<Record<string, unknown>>(
-            GET_TECHNICIAN_EVENTS_QUERY,
-            {
-                variables: {
-                    fecha_inicio,
-                    fecha_fin,
-                }
-            }
-        );
+        const result = await graphqlRequest<Record<string, unknown>>(GET_TECHNICIAN_EVENTS_QUERY, {
+            variables: {
+                fecha_inicio,
+                fecha_fin,
+            },
+        });
 
         const typedResult = result as unknown as GetTechnicianEventsResponse;
 
         return NextResponse.json(typedResult);
     } catch (error) {
         const message = error instanceof Error ? error.message : "Error desconocido";
-        const statusCode =
-            error instanceof Error && error.message.includes("401") ? 401 : 500;
+        const statusCode = error instanceof Error && error.message.includes("401") ? 401 : 500;
 
         return NextResponse.json(
             {
                 error: message,
                 timestamp: new Date().toISOString(),
             },
-            { status: statusCode }
+            { status: statusCode },
         );
     }
 }

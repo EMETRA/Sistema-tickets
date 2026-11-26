@@ -21,18 +21,10 @@ export const TicketsResolvePanel: React.FC<TicketsResolvePanelProps> = ({
 }) => {
     return (
         <div className={classNames(styles.TicketsResolvePanel, className)}>
-            <TableHeader 
-                iconName="ranking-star-solid" 
-                label="Tickets Resueltos" 
-                className={styles.header}
-            />
-      
+            <TableHeader iconName="ranking-star-solid" label="Tickets Resueltos" className={styles.header} />
+
             <div className={styles.chartContainer}>
-                <DonutChart 
-                    data={data} 
-                    size={size} 
-                    strokeWidth={strokeWidth}
-                />
+                <DonutChart data={data} size={size} strokeWidth={strokeWidth} />
             </div>
         </div>
     );

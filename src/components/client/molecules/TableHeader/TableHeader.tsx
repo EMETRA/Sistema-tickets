@@ -13,19 +13,10 @@ import styles from "./TableHeader.module.scss";
  * @param {TableHeaderProps} props - Las propiedades del componente
  * @returns {JSX.Element} El componente TableHeader renderizado
  */
-export const TableHeader: React.FC<TableHeaderProps> = ({
-    iconName,
-    label,
-    className,
-}) => {
+export const TableHeader: React.FC<TableHeaderProps> = ({ iconName, label, className }) => {
     return (
         <div className={classNames(styles.TableHeader, className)}>
-            <Icon 
-                name={iconName} 
-                variant="status"
-                size={32}
-                className={styles.icon}
-            />
+            <Icon name={iconName} variant="status" size={32} className={styles.icon} />
             <Title variant="mid" tag="h2" className={styles.title}>
                 {label}
             </Title>

@@ -24,11 +24,24 @@ export type PaletteItem = {
 };
 
 type TicketRow = { id: number; codigo: string; titulo: string; estadoNombre?: string; estado?: number };
-const STATE: Record<number, string> = { 1: "Sin asignar", 2: "Asignado", 3: "En atención", 4: "Cancelado", 5: "Resuelto" };
-const ORDER: PaletteItem["group"][] = ["Recientes", "Acciones", "Tickets", "Ir a", "Aplicaciones", "Módulos", "Informática"];
+const STATE: Record<number, string> = {
+    1: "Sin asignar",
+    2: "Asignado",
+    3: "En atención",
+    4: "Cancelado",
+    5: "Resuelto",
+};
+const ORDER: PaletteItem["group"][] = [
+    "Recientes",
+    "Acciones",
+    "Tickets",
+    "Ir a",
+    "Aplicaciones",
+    "Módulos",
+    "Informática",
+];
 
-const normalize = (value: string) =>
-    value.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+const normalize = (value: string) => value.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 
 function score(item: PaletteItem, terms: string[]) {
     const label = normalize(item.label);
@@ -45,13 +58,7 @@ function score(item: PaletteItem, terms: string[]) {
 }
 
 /** Buscador global: ⌘K / Ctrl+K o la tecla «/» fuera de un campo de texto. */
-export function CommandPalette({
-    items,
-    ticketScope,
-}: {
-    items: PaletteItem[];
-    ticketScope?: string;
-}) {
+export function CommandPalette({ items, ticketScope }: { items: PaletteItem[]; ticketScope?: string }) {
     const router = useRouter();
     const { open, hide, toggle } = useCommandPalette();
     const [query, setQuery] = useState("");
@@ -92,7 +99,9 @@ export function CommandPalette({
     useEffect(() => {
         if (!open || !ticketScope) return;
         const controller = new AbortController();
-        platformFetch<{ items: TicketRow[] }>(`/tickets?scope=${ticketScope}&limit=50`, { signal: controller.signal })
+        platformFetch<{ items: TicketRow[] }>(`/tickets?scope=${ticketScope}&limit=50`, {
+            signal: controller.signal,
+        })
             .then((r) => !controller.signal.aborted && setTickets(r.items || []))
             .catch(() => undefined);
         return () => controller.abort();
@@ -136,12 +145,17 @@ export function CommandPalette({
             }, []);
     }, [items, query, tickets, open]);
 
-    const groups = ORDER.map((group) => ({ group, entries: results.filter((r) => r.group === group) })).filter((g) => g.entries.length);
+    const groups = ORDER.map((group) => ({
+        group,
+        entries: results.filter((r) => r.group === group),
+    })).filter((g) => g.entries.length);
     const flat = groups.flatMap((g) => g.entries);
     const current = Math.min(active, Math.max(0, flat.length - 1));
 
     useEffect(() => {
-        list.current?.querySelector<HTMLElement>(`[data-index="${current}"]`)?.scrollIntoView({ block: "nearest" });
+        list.current
+            ?.querySelector<HTMLElement>(`[data-index="${current}"]`)
+            ?.scrollIntoView({ block: "nearest" });
     }, [current]);
 
     const close = () => {
@@ -172,9 +186,20 @@ export function CommandPalette({
                 }}
             >
                 <div className={styles.searchRow}>
-                    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" className={styles.searchIcon}>
+                    <svg
+                        viewBox="0 0 24 24"
+                        width="18"
+                        height="18"
+                        aria-hidden="true"
+                        className={styles.searchIcon}
+                    >
                         <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" strokeWidth="2" />
-                        <path d="m20 20-3.5-3.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                        <path
+                            d="m20 20-3.5-3.5"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                        />
                     </svg>
                     <input
                         ref={input}
@@ -207,7 +232,9 @@ export function CommandPalette({
                 <ul ref={list} id="palette-results" role="listbox" className={styles.results}>
                     {groups.map(({ group, entries }) => (
                         <li key={group} role="presentation">
-                            <span className={styles.groupLabel} role="presentation">{group}</span>
+                            <span className={styles.groupLabel} role="presentation">
+                                {group}
+                            </span>
                             <ul role="group" aria-label={group}>
                                 {entries.map((item) => {
                                     index += 1;
@@ -225,17 +252,28 @@ export function CommandPalette({
                                         >
                                             <span
                                                 className={styles.optionIcon}
-                                                style={item.accent ? ({ "--accent": item.accent } as React.CSSProperties) : undefined}
+                                                style={
+                                                    item.accent
+                                                        ? ({ "--accent": item.accent } as React.CSSProperties)
+                                                        : undefined
+                                                }
                                             >
                                                 {item.catalogIcon && item.icon ? (
                                                     <Icon name={item.icon} size={15} color="currentColor" />
                                                 ) : (
-                                                    <WorkspaceIcon name={item.icon || "table-cells-large-solid"} size={17} />
+                                                    <WorkspaceIcon
+                                                        name={item.icon || "table-cells-large-solid"}
+                                                        size={17}
+                                                    />
                                                 )}
                                             </span>
                                             <span className={styles.optionLabel}>{item.label}</span>
-                                            {item.hint && <span className={styles.optionHint}>{item.hint}</span>}
-                                            <span className={styles.enter} aria-hidden="true">↵</span>
+                                            {item.hint && (
+                                                <span className={styles.optionHint}>{item.hint}</span>
+                                            )}
+                                            <span className={styles.enter} aria-hidden="true">
+                                                ↵
+                                            </span>
                                         </li>
                                     );
                                 })}
@@ -244,15 +282,26 @@ export function CommandPalette({
                     ))}
                     {!flat.length && (
                         <li className={styles.empty} role="presentation">
-                            Sin resultados para «{query}». Prueba con el nombre de un área, un módulo o el código de un ticket.
+                            Sin resultados para «{query}». Prueba con el nombre de un área, un módulo o el
+                            código de un ticket.
                         </li>
                     )}
                 </ul>
                 <footer className={styles.footer}>
-                    <span><kbd>↑</kbd><kbd>↓</kbd> navegar</span>
-                    <span><kbd>↵</kbd> abrir</span>
-                    <span><kbd>esc</kbd> cerrar</span>
-                    <span className={styles.footerHint}>Ábrelo desde cualquier pantalla con <kbd>⌘</kbd><kbd>K</kbd> o <kbd>/</kbd></span>
+                    <span>
+                        <kbd>↑</kbd>
+                        <kbd>↓</kbd> navegar
+                    </span>
+                    <span>
+                        <kbd>↵</kbd> abrir
+                    </span>
+                    <span>
+                        <kbd>esc</kbd> cerrar
+                    </span>
+                    <span className={styles.footerHint}>
+                        Ábrelo desde cualquier pantalla con <kbd>⌘</kbd>
+                        <kbd>K</kbd> o <kbd>/</kbd>
+                    </span>
                 </footer>
             </dialog>
             <TicketDetail isOpen={!!ticketId} ticketId={ticketId || ""} onClose={() => setTicketId(null)} />

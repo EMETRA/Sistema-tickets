@@ -6,25 +6,12 @@ import styles from "./FileViewer.module.scss";
 import { OfficePreview, type OfficeDocument } from "./OfficePreview";
 export type ViewedFile = { id: string; name: string };
 type Preview = { url: string; mime: string; text?: string };
-function FilePreview({
-    preview,
-    name,
-    onError,
-}: {
-    preview: Preview;
-    name: string;
-    onError: () => void;
-}) {
-    if (
-        ["image/png", "image/jpeg", "image/gif", "image/webp"].includes(
-            preview.mime,
-        )
-    ) {
+function FilePreview({ preview, name, onError }: { preview: Preview; name: string; onError: () => void }) {
+    if (["image/png", "image/jpeg", "image/gif", "image/webp"].includes(preview.mime)) {
         // eslint-disable-next-line @next/next/no-img-element
         return <img src={preview.url} alt={name} onError={onError} />;
     }
-    if (preview.mime === "application/pdf")
-        return <iframe src={preview.url} title={"PDF: " + name} />;
+    if (preview.mime === "application/pdf") return <iframe src={preview.url} title={"PDF: " + name} />;
     if (preview.text !== undefined) return <pre>{preview.text}</pre>;
     return (
         <div className={styles.empty}>
@@ -66,10 +53,9 @@ export function FileViewer({
         setOffice(null);
         setOfficeError("");
         setOfficeLoading(false);
-        platformFetch<Blob>(
-            `/tickets/${encodeURIComponent(ticketId)}/files/${encodeURIComponent(file.id)}`,
-            { signal: controller.signal },
-        )
+        platformFetch<Blob>(`/tickets/${encodeURIComponent(ticketId)}/files/${encodeURIComponent(file.id)}`, {
+            signal: controller.signal,
+        })
             .then(async (blob) => {
                 if (controller.signal.aborted) return;
                 const mime = blob.type.split(";")[0];
@@ -99,11 +85,7 @@ export function FileViewer({
                                     ? failure.message
                                     : "No se pudo preparar la vista previa. Puedes descargar el original o reintentar.",
                             );
-                            setReference(
-                                failure instanceof PlatformError
-                                    ? failure.reference
-                                    : undefined,
-                            );
+                            setReference(failure instanceof PlatformError ? failure.reference : undefined);
                         }
                     } finally {
                         if (!controller.signal.aborted) setOfficeLoading(false);
@@ -113,19 +95,13 @@ export function FileViewer({
             .catch((failure: unknown) => {
                 if (!controller.signal.aborted) {
                     setError(
-                        failure instanceof PlatformError &&
-                            failure.status === 404
+                        failure instanceof PlatformError && failure.status === 404
                             ? "El archivo no está disponible. Solicita que lo revisen y reintenta."
-                            : failure instanceof PlatformError &&
-                                failure.status === 403
-                                ? "No tienes acceso a este archivo del ticket."
-                                : "No se pudo abrir el archivo. Revisa tu acceso al ticket o reintenta.",
+                            : failure instanceof PlatformError && failure.status === 403
+                              ? "No tienes acceso a este archivo del ticket."
+                              : "No se pudo abrir el archivo. Revisa tu acceso al ticket o reintenta.",
                     );
-                    setReference(
-                        failure instanceof PlatformError
-                            ? failure.reference
-                            : undefined,
-                    );
+                    setReference(failure instanceof PlatformError ? failure.reference : undefined);
                 }
             })
             .finally(() => {
@@ -165,19 +141,11 @@ export function FileViewer({
                 </div>
                 <div className={styles.actions}>
                     {preview && (
-                        <a
-                            href={preview.url}
-                            download={file.name}
-                            className={styles.download}
-                        >
+                        <a href={preview.url} download={file.name} className={styles.download}>
                             Descargar archivo
                         </a>
                     )}
-                    <Button
-                        variant="outlined"
-                        onClick={close}
-                        aria-label="Cerrar visor de archivos"
-                    >
+                    <Button variant="outlined" onClick={close} aria-label="Cerrar visor de archivos">
                         Cerrar
                     </Button>
                 </div>
@@ -197,37 +165,25 @@ export function FileViewer({
                         </Button>
                     </div>
                 )}
-                {!loading && !error && officeLoading && (
-                    <p role="status">Preparando vista previa…</p>
-                )}
+                {!loading && !error && officeLoading && <p role="status">Preparando vista previa…</p>}
                 {!loading && !error && officeError && (
                     <div role="alert">
                         <p>{officeError}</p>
                         {reference && <p>Referencia: {reference}</p>}
-                        <p>
-                            El original está disponible en «Descargar archivo».
-                        </p>
+                        <p>El original está disponible en «Descargar archivo».</p>
                         <Button variant="outlined" onClick={retry}>
                             Reintentar vista previa
                         </Button>
                     </div>
                 )}
                 {!loading && !error && office && (
-                    <OfficePreview
-                        key={file.id + ":" + revision}
-                        document={office}
-                        name={file.name}
-                    />
+                    <OfficePreview key={file.id + ":" + revision} document={office} name={file.name} />
                 )}
                 {!loading && !error && !officeFile && preview && (
                     <FilePreview
                         preview={preview}
                         name={file.name}
-                        onError={() =>
-                            setError(
-                                "No se pudo mostrar la imagen. Reintenta abrir el archivo.",
-                            )
-                        }
+                        onError={() => setError("No se pudo mostrar la imagen. Reintenta abrir el archivo.")}
                     />
                 )}
             </section>

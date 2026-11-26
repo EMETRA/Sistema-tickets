@@ -1,42 +1,50 @@
 .mainContainer {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
 }
 
 .form {
-    width: min(100%, 1120px);
-    min-width: 0;
-    align-self: flex-start;
-    padding: var(--tickets-panel-padding);
-    border: 1px solid var(--tickets-border);
-    border-radius: var(--tickets-radius);
-    background: var(--tickets-surface);
-    box-shadow: var(--tickets-shadow);
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
+  width: min(100%, 1120px);
+  min-width: 0;
+  align-self: flex-start;
+  padding: var(--tickets-panel-padding);
+  border: 1px solid var(--tickets-border);
+  border-radius: var(--tickets-radius);
+  background: var(--tickets-surface);
+  box-shadow: var(--tickets-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
 }
 
 .fieldsRow {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .fieldsColumn {
-    width: 100%;
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 20px;
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
 }
 
 .filesSection {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-@media (max-width: 1000px) { .fieldsColumn { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 650px) { .fieldsColumn { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 1000px) {
+  .fieldsColumn {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 650px) {
+  .fieldsColumn {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

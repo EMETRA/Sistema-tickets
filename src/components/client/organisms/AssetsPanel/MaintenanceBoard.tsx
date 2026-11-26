@@ -17,7 +17,13 @@ const TYPE: Record<string, [string, string]> = {
 };
 
 /** Propuesta: mantenimientos como tablero de lo que vence, lo que viene y lo hecho. */
-export function MaintenanceBoard({ onShowTable, onChanged }: { onShowTable: () => void; onChanged?: () => void }) {
+export function MaintenanceBoard({
+    onShowTable,
+    onChanged,
+}: {
+    onShowTable: () => void;
+    onChanged?: () => void;
+}) {
     const { data } = usePlatform();
     const [rows, setRows] = useState<PlatformRecord[] | null>(null);
     // Las listas no traen nombres de referencias; se resuelven con fichas y ubicaciones.
@@ -32,7 +38,9 @@ export function MaintenanceBoard({ onShowTable, onChanged }: { onShowTable: () =
         const c = new AbortController();
         const opts = { signal: c.signal };
         const lookup = (type: string) =>
-            platformFetch<PageResult<PlatformRecord>>(`/records/${type}?limit=100`, opts).then((r) => r.items).catch(() => []);
+            platformFetch<PageResult<PlatformRecord>>(`/records/${type}?limit=100`, opts)
+                .then((r) => r.items)
+                .catch(() => []);
         Promise.all([
             platformFetch<PageResult<PlatformRecord>>("/records/intervenciones?limit=100", opts),
             lookup("activos"),
@@ -43,20 +51,36 @@ export function MaintenanceBoard({ onShowTable, onChanged }: { onShowTable: () =
                 setNames(Object.fromEntries([...activos, ...sitios].map((x) => [x.id, x.nombre])));
                 setRows(r.items);
             })
-            .catch((e) => !c.signal.aborted && setError(e instanceof Error ? e.message : "No se pudieron cargar los mantenimientos."));
+            .catch(
+                (e) =>
+                    !c.signal.aborted &&
+                    setError(e instanceof Error ? e.message : "No se pudieron cargar los mantenimientos."),
+            );
         return () => c.abort();
     }, [revision]);
 
     const latest = latestByAsset(rows || []).map((r) => ({ r, due: daysFromToday(r.datos.proximaRevision) }));
     const overdue = latest.filter((x) => x.due !== null && x.due < 0).sort((a, b) => a.due! - b.due!);
-    const upcoming = latest.filter((x) => x.due !== null && x.due >= 0 && x.due <= 30).sort((a, b) => a.due! - b.due!);
-    const recent = [...(rows || [])].sort((a, b) => String(b.datos.fecha).localeCompare(String(a.datos.fecha))).slice(0, 6);
+    const upcoming = latest
+        .filter((x) => x.due !== null && x.due >= 0 && x.due <= 30)
+        .sort((a, b) => a.due! - b.due!);
+    const recent = [...(rows || [])]
+        .sort((a, b) => String(b.datos.fecha).localeCompare(String(a.datos.fecha)))
+        .slice(0, 6);
 
     const card = (r: PlatformRecord, note: string, tone?: string) => {
-        const [label, typeTone] = TYPE[String(r.datos.tipo)] || [String(r.datos.tipo || "Registro"), "neutral"];
+        const [label, typeTone] = TYPE[String(r.datos.tipo)] || [
+            String(r.datos.tipo || "Registro"),
+            "neutral",
+        ];
         return (
             <li key={r.id}>
-                <button type="button" className={styles.workCard} data-tone={tone} onClick={() => setSelected(r)}>
+                <button
+                    type="button"
+                    className={styles.workCard}
+                    data-tone={tone}
+                    onClick={() => setSelected(r)}
+                >
                     <span className={styles.workTop}>
                         <span className={common.chip} data-tone={typeTone}>
                             {label}
@@ -66,9 +90,13 @@ export function MaintenanceBoard({ onShowTable, onChanged }: { onShowTable: () =
                         </span>
                     </span>
                     <strong>{r.nombre}</strong>
-                    <small>{names[String(r.datos.activoId)] || r.labels?.activoId || "Bien sin ficha vinculada"}</small>
+                    <small>
+                        {names[String(r.datos.activoId)] || r.labels?.activoId || "Bien sin ficha vinculada"}
+                    </small>
                     {(names[String(r.datos.instalacionId)] || r.labels?.instalacionId) && (
-                        <small className={styles.who}>{names[String(r.datos.instalacionId)] || r.labels?.instalacionId}</small>
+                        <small className={styles.who}>
+                            {names[String(r.datos.instalacionId)] || r.labels?.instalacionId}
+                        </small>
                     )}
                 </button>
             </li>
@@ -101,8 +129,12 @@ export function MaintenanceBoard({ onShowTable, onChanged }: { onShowTable: () =
                             Revisión vencida <span>{overdue.length}</span>
                         </h3>
                         <ul>
-                            {overdue.map(({ r, due }) => card(r, `Venció ${relativeDays(due).toLowerCase()}`, "danger"))}
-                            {!overdue.length && <li className={styles.laneEmpty}>Ningún bien con revisión vencida.</li>}
+                            {overdue.map(({ r, due }) =>
+                                card(r, `Venció ${relativeDays(due).toLowerCase()}`, "danger"),
+                            )}
+                            {!overdue.length && (
+                                <li className={styles.laneEmpty}>Ningún bien con revisión vencida.</li>
+                            )}
                         </ul>
                     </div>
                     <div className={styles.lane} data-tone="warning">
@@ -111,7 +143,9 @@ export function MaintenanceBoard({ onShowTable, onChanged }: { onShowTable: () =
                         </h3>
                         <ul>
                             {upcoming.map(({ r, due }) => card(r, relativeDays(due), "warning"))}
-                            {!upcoming.length && <li className={styles.laneEmpty}>Sin revisiones en los próximos 30 días.</li>}
+                            {!upcoming.length && (
+                                <li className={styles.laneEmpty}>Sin revisiones en los próximos 30 días.</li>
+                            )}
                         </ul>
                     </div>
                     <div className={styles.lane} data-tone="neutral">
@@ -120,7 +154,11 @@ export function MaintenanceBoard({ onShowTable, onChanged }: { onShowTable: () =
                         </h3>
                         <ul>
                             {recent.map((r) => card(r, displayDate(String(r.datos.fecha)).split(",")[0]))}
-                            {!recent.length && <li className={styles.laneEmpty}>Todavía no hay mantenimientos registrados.</li>}
+                            {!recent.length && (
+                                <li className={styles.laneEmpty}>
+                                    Todavía no hay mantenimientos registrados.
+                                </li>
+                            )}
                         </ul>
                     </div>
                 </div>

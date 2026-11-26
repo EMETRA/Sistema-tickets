@@ -203,13 +203,7 @@ export const Interactive: Story = {
             alert(`Se exportarían ${tickets.length} tickets`);
         };
 
-        return (
-            <TicketsTablePanel
-                tickets={tickets}
-                onDelete={handleDelete}
-                onExport={handleExport}
-            />
-        );
+        return <TicketsTablePanel tickets={tickets} onDelete={handleDelete} onExport={handleExport} />;
     },
 };
 

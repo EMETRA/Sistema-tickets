@@ -1,4 +1,32 @@
-.pageContainer { display: flex; flex-direction: column; gap: 20px; width: 100%; min-width: 0; }
-.formWrapper { width: 100%; min-width: 0; max-width: none; }
-.successMessage { padding: 15px 18px; border-radius: 10px; color: #177849; color: light-dark(#177849, #90eabe); border: 1px solid #b8dfca; background: #e5f5eb; background: light-dark(#e5f5eb, #12342f); font-size: 13px; }
-.errorMessage { padding: 15px 18px; border-radius: 10px; color: #a73740; color: light-dark(#a73740, #de9ba1); border: 1px solid #e7b5bc; border: 1px solid light-dark(#e7b5bc, #2a3449); background: var(--tickets-danger-soft); font-size: 13px; }
+.pageContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  min-width: 0;
+}
+.formWrapper {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+}
+.successMessage {
+  padding: 15px 18px;
+  border-radius: 10px;
+  color: #177849;
+  color: light-dark(#177849, #90eabe);
+  border: 1px solid #b8dfca;
+  background: #e5f5eb;
+  background: light-dark(#e5f5eb, #12342f);
+  font-size: 13px;
+}
+.errorMessage {
+  padding: 15px 18px;
+  border-radius: 10px;
+  color: #a73740;
+  color: light-dark(#a73740, #de9ba1);
+  border: 1px solid #e7b5bc;
+  border: 1px solid light-dark(#e7b5bc, #2a3449);
+  background: var(--tickets-danger-soft);
+  font-size: 13px;
+}

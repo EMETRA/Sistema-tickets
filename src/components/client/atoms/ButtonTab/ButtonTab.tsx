@@ -19,9 +19,13 @@ export const ButtonTab: React.FC<ButtonTabProps> = ({
 
     return (
         <div
-            className={classNames(styles.group, {
-                [styles.disabled]: disabled,
-            }, className)}
+            className={classNames(
+                styles.group,
+                {
+                    [styles.disabled]: disabled,
+                },
+                className,
+            )}
         >
             {options.map((option) => {
                 const selected = option.value === value;

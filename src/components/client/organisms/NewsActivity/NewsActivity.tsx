@@ -33,15 +33,10 @@ export default function NewsActivity({
                     <dt>{label}</dt>
                     <dd>
                         <span>
-                            {actor?.nombre?.trim() ||
-                                (actor
-                                    ? `Usuario #${actor.id}`
-                                    : "Sin registro")}
+                            {actor?.nombre?.trim() || (actor ? `Usuario #${actor.id}` : "Sin registro")}
                         </span>
                         {date && Number.isFinite(Date.parse(date)) && (
-                            <time dateTime={date}>
-                                {dateFormatter.format(new Date(date))}
-                            </time>
+                            <time dateTime={date}>{dateFormatter.format(new Date(date))}</time>
                         )}
                     </dd>
                 </div>

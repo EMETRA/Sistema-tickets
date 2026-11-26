@@ -51,9 +51,33 @@ export function MeetingPlaceField({
                         />
                         <span className={styles.glyph} aria-hidden="true">
                             {key === "VIRTUAL" ? (
-                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="6" width="13" height="12" rx="2.5" /><path d="m16 10.5 5-3v9l-5-3" /></svg>
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    width="18"
+                                    height="18"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="1.8"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                >
+                                    <rect x="3" y="6" width="13" height="12" rx="2.5" />
+                                    <path d="m16 10.5 5-3v9l-5-3" />
+                                </svg>
                             ) : (
-                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21Z" /><circle cx="12" cy="9.5" r="2.5" /></svg>
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    width="18"
+                                    height="18"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="1.8"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                >
+                                    <path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21Z" />
+                                    <circle cx="12" cy="9.5" r="2.5" />
+                                </svg>
                             )}
                         </span>
                         <span>
@@ -82,13 +106,19 @@ export function MeetingPlaceField({
                             onChange={(e) => {
                                 const v = e.target.value;
                                 e.target.setCustomValidity(
-                                    v && !isValidMeetingUrl(v) ? "Pega el enlace completo, empieza con https://" : "",
+                                    v && !isValidMeetingUrl(v)
+                                        ? "Pega el enlace completo, empieza con https://"
+                                        : "",
                                 );
                                 setLink(v);
                                 emit(mode, v, room);
                             }}
                         />
-                        <small id={id + "-enlace-ayuda"} className={styles.hint} data-ok={provider ? true : undefined}>
+                        <small
+                            id={id + "-enlace-ayuda"}
+                            className={styles.hint}
+                            data-ok={provider ? true : undefined}
+                        >
                             {provider
                                 ? `✓ Enlace de ${provider}. Los participantes verán el botón «Unirse a la reunión».`
                                 : "Copia el enlace desde la invitación de Teams, Meet o Zoom y pégalo aquí."}

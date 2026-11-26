@@ -36,11 +36,7 @@ export function TicketTagReport() {
         try {
             path = ticketReportQuery(filters, offset);
         } catch (failure) {
-            setError(
-                failure instanceof Error
-                    ? failure.message
-                    : "Revisa los filtros.",
-            );
+            setError(failure instanceof Error ? failure.message : "Revisa los filtros.");
             return;
         }
         request.current?.abort();
@@ -51,10 +47,7 @@ export function TicketTagReport() {
         setReference(undefined);
         try {
             const report = await platformFetch<TicketLabelReport>(path, {
-                signal: AbortSignal.any([
-                    controller.signal,
-                    AbortSignal.timeout(45000),
-                ]),
+                signal: AbortSignal.any([controller.signal, AbortSignal.timeout(45000)]),
             });
             if (
                 !report.resumen ||
@@ -72,16 +65,8 @@ export function TicketTagReport() {
             if (offset === 0) setGroupPage(0);
         } catch (failure) {
             if (!controller.signal.aborted) {
-                setError(
-                    failure instanceof Error
-                        ? failure.message
-                        : "No se pudo consultar el reporte.",
-                );
-                setReference(
-                    failure instanceof PlatformError
-                        ? failure.reference
-                        : undefined,
-                );
+                setError(failure instanceof Error ? failure.message : "No se pudo consultar el reporte.");
+                setReference(failure instanceof PlatformError ? failure.reference : undefined);
             }
         } finally {
             if (!controller.signal.aborted) setLoading(false);
@@ -113,25 +98,18 @@ export function TicketTagReport() {
         void load(0, next);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-    const applyPeriod = useCallback(
-        (from: string, to: string) => apply({ from, to }),
-        [apply],
-    );
+    const applyPeriod = useCallback((from: string, to: string) => apply({ from, to }), [apply]);
     return (
         <div className={local.report}>
             <div>
                 <h2 className={local.title}>Tickets resueltos por técnico y etiqueta</h2>
                 <p className={styles.muted}>
-                    Cuenta los tickets resueltos por su fecha de cierre, con la
-                    clasificación guardada en ese momento.
+                    Cuenta los tickets resueltos por su fecha de cierre, con la clasificación guardada en ese
+                    momento.
                 </p>
             </div>
             <div className={mx.filters} role="search" aria-label="Filtros del reporte">
-                <PeriodFilter
-                    from={selection.from}
-                    to={selection.to}
-                    onChange={applyPeriod}
-                />
+                <PeriodFilter from={selection.from} to={selection.to} onChange={applyPeriod} />
                 <label className={mx.scope}>
                     <span>Técnico</span>
                     <select
@@ -143,11 +121,7 @@ export function TicketTagReport() {
                         {selection.tecnicoId &&
                             !result?.opciones.tecnicos.some(
                                 (item) => String(item.id) === selection.tecnicoId,
-                            ) && (
-                                <option value={selection.tecnicoId}>
-                                    Técnico #{selection.tecnicoId}
-                                </option>
-                            )}
+                            ) && <option value={selection.tecnicoId}>Técnico #{selection.tecnicoId}</option>}
                         {result?.opciones.tecnicos.map((item) => (
                             <option key={item.id} value={String(item.id)}>
                                 {item.nombre}
@@ -188,9 +162,7 @@ export function TicketTagReport() {
                 <div role="alert" className={styles.error}>
                     <p>
                         {error}
-                        {result
-                            ? " Se conservan los resultados de la última consulta."
-                            : ""}
+                        {result ? " Se conservan los resultados de la última consulta." : ""}
                     </p>
                     {reference && <p>Referencia: {reference}</p>}
                 </div>
@@ -228,18 +200,13 @@ export function TicketTagReport() {
                             <div>
                                 <h3>Resumen por técnico y etiqueta</h3>
                                 <p className={styles.muted}>
-                                    Un ticket con varias etiquetas cuenta en
-                                    cada una. El total general cuenta tickets
-                                    únicos.
+                                    Un ticket con varias etiquetas cuenta en cada una. El total general cuenta
+                                    tickets únicos.
                                 </p>
                             </div>
                             <Button
                                 variant="outlined"
-                                state={
-                                    loading || !result.grupos.length
-                                        ? "disabled"
-                                        : "default"
-                                }
+                                state={loading || !result.grupos.length ? "disabled" : "default"}
                                 onClick={exportCsv}
                             >
                                 Descargar resumen CSV
@@ -247,39 +214,31 @@ export function TicketTagReport() {
                         </div>
                         {result.resumen.sinClasificacionHistorica > 0 && (
                             <p className={styles.muted}>
-                                Los cierres anteriores sin clasificación
-                                guardada se identifican como «Sin clasificación
-                                histórica».
+                                Los cierres anteriores sin clasificación guardada se identifican como «Sin
+                                clasificación histórica».
                             </p>
                         )}
                         {!result.grupos.length ? (
                             <p className={local.empty}>
-                                No hay tickets resueltos para los filtros
-                                aplicados.
+                                No hay tickets resueltos para los filtros aplicados.
                             </p>
                         ) : (
                             <>
                                 <div className={styles.tableRegion}>
                                     <table className={styles.table}>
                                         <caption className={local.srOnly}>
-                                            Tickets resueltos agrupados por
-                                            técnico y etiqueta
+                                            Tickets resueltos agrupados por técnico y etiqueta
                                         </caption>
                                         <thead>
                                             <tr>
                                                 <th scope="col">Técnico</th>
                                                 <th scope="col">Etiqueta</th>
-                                                <th scope="col">
-                                                    Tickets resueltos
-                                                </th>
+                                                <th scope="col">Tickets resueltos</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {result.grupos
-                                                .slice(
-                                                    groupPage * 50,
-                                                    (groupPage + 1) * 50,
-                                                )
+                                                .slice(groupPage * 50, (groupPage + 1) * 50)
                                                 .map((item, index) => (
                                                     <tr key={index}>
                                                         <td>{item.tecnico}</td>
@@ -291,43 +250,26 @@ export function TicketTagReport() {
                                     </table>
                                 </div>
                                 {result.grupos.length > 50 && (
-                                    <nav
-                                        aria-label="Páginas del resumen"
-                                        className={styles.toolbar}
-                                    >
+                                    <nav aria-label="Páginas del resumen" className={styles.toolbar}>
                                         <span>
-                                            {result.grupos.length} combinaciones
-                                            · Página {groupPage + 1}
+                                            {result.grupos.length} combinaciones · Página {groupPage + 1}
                                         </span>
                                         <div className={styles.actions}>
                                             <Button
                                                 variant="outlined"
-                                                state={
-                                                    groupPage === 0
-                                                        ? "disabled"
-                                                        : "default"
-                                                }
-                                                onClick={() =>
-                                                    setGroupPage(
-                                                        (value) => value - 1,
-                                                    )
-                                                }
+                                                state={groupPage === 0 ? "disabled" : "default"}
+                                                onClick={() => setGroupPage((value) => value - 1)}
                                             >
                                                 Resumen anterior
                                             </Button>
                                             <Button
                                                 variant="outlined"
                                                 state={
-                                                    (groupPage + 1) * 50 >=
-                                                    result.grupos.length
+                                                    (groupPage + 1) * 50 >= result.grupos.length
                                                         ? "disabled"
                                                         : "default"
                                                 }
-                                                onClick={() =>
-                                                    setGroupPage(
-                                                        (value) => value + 1,
-                                                    )
-                                                }
+                                                onClick={() => setGroupPage((value) => value + 1)}
                                             >
                                                 Resumen siguiente
                                             </Button>
@@ -340,9 +282,7 @@ export function TicketTagReport() {
                     <section className={mx.panel}>
                         <h3>Tickets que forman el reporte</h3>
                         {!result.items.length ? (
-                            <p className={local.empty}>
-                                No hay tickets en esta página.
-                            </p>
+                            <p className={local.empty}>No hay tickets en esta página.</p>
                         ) : (
                             <div className={styles.tableRegion}>
                                 <table className={styles.table}>
@@ -350,9 +290,7 @@ export function TicketTagReport() {
                                         <tr>
                                             <th scope="col">Ticket</th>
                                             <th scope="col">Técnico</th>
-                                            <th scope="col">
-                                                Etiquetas al cierre
-                                            </th>
+                                            <th scope="col">Etiquetas al cierre</th>
                                             <th scope="col">Resuelto</th>
                                         </tr>
                                     </thead>
@@ -367,52 +305,31 @@ export function TicketTagReport() {
                                                         title="Abrir ficha en otra pestaña"
                                                     >
                                                         {item.codigo?.trim() &&
-                                                        !/^(null|undefined)$/i.test(
-                                                            item.codigo.trim(),
-                                                        )
+                                                        !/^(null|undefined)$/i.test(item.codigo.trim())
                                                             ? item.codigo
-                                                            : "#" +
-                                                              item.id}{" "}
+                                                            : "#" + item.id}{" "}
                                                         · {item.titulo}
                                                     </Link>
                                                 </td>
                                                 <td>{item.tecnico}</td>
                                                 <td>{item.etiquetas}</td>
-                                                <td>
-                                                    {displayDate(
-                                                        item.resueltoEn,
-                                                    )}
-                                                </td>
+                                                <td>{displayDate(item.resueltoEn)}</td>
                                             </tr>
                                         ))}
                                     </tbody>
                                 </table>
                             </div>
                         )}
-                        <nav
-                            aria-label="Páginas de tickets del reporte"
-                            className={styles.toolbar}
-                        >
+                        <nav aria-label="Páginas de tickets del reporte" className={styles.toolbar}>
                             <p className={styles.muted}>
-                                {result.total} tickets · Hasta {result.limit}{" "}
-                                por página
+                                {result.total} tickets · Hasta {result.limit} por página
                             </p>
                             <div className={styles.actions}>
                                 <Button
                                     variant="outlined"
-                                    state={
-                                        loading || result.offset === 0
-                                            ? "disabled"
-                                            : "default"
-                                    }
+                                    state={loading || result.offset === 0 ? "disabled" : "default"}
                                     onClick={() =>
-                                        void load(
-                                            Math.max(
-                                                0,
-                                                result.offset - result.limit,
-                                            ),
-                                            applied,
-                                        )
+                                        void load(Math.max(0, result.offset - result.limit), applied)
                                     }
                                 >
                                     Tickets anteriores
@@ -420,18 +337,11 @@ export function TicketTagReport() {
                                 <Button
                                     variant="outlined"
                                     state={
-                                        loading ||
-                                        result.offset + result.limit >=
-                                            result.total
+                                        loading || result.offset + result.limit >= result.total
                                             ? "disabled"
                                             : "default"
                                     }
-                                    onClick={() =>
-                                        void load(
-                                            result.offset + result.limit,
-                                            applied,
-                                        )
-                                    }
+                                    onClick={() => void load(result.offset + result.limit, applied)}
                                 >
                                     Tickets siguientes
                                 </Button>

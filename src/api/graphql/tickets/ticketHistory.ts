@@ -25,4 +25,4 @@ export const GET_TICKET_HISTORY_QUERY = `
   }
 `;
 
-export type { GetTicketHistoryResponse } from './types';
+export type { GetTicketHistoryResponse } from "./types";

@@ -85,18 +85,24 @@ devDependencies:
   eslint-config-next:
     specifier: 16.1.6
     version: 16.1.6(@typescript-eslint/parser@8.56.0)(eslint@9.39.2)(typescript@5.9.3)
+  eslint-config-prettier:
+    specifier: '10'
+    version: 10.1.8(eslint@9.39.2)
   eslint-plugin-storybook:
     specifier: ^10.2.8
     version: 10.2.8(eslint@9.39.2)(storybook@10.2.8)(typescript@5.9.3)
   playwright:
     specifier: ^1.53.2
     version: 1.64.0
+  prettier:
+    specifier: '3'
+    version: 3.10.1
   sass-embedded:
     specifier: ^1.97.3
     version: 1.97.3
   storybook:
     specifier: ^10.2.8
-    version: 10.2.8(@testing-library/dom@10.4.1)(react-dom@19.2.3)(react@19.2.3)
+    version: 10.2.8(@testing-library/dom@10.4.1)(prettier@3.10.1)(react-dom@19.2.3)(react@19.2.3)
   typescript:
     specifier: ^5
     version: 5.9.3
@@ -1394,7 +1400,7 @@ packages:
       vite: ^5.0.0 || ^6.0.0 || ^7.0.0
     dependencies:
       '@storybook/csf-plugin': 10.2.8(storybook@10.2.8)(vite@7.3.1)
-      storybook: 10.2.8(@testing-library/dom@10.4.1)(react-dom@19.2.3)(react@19.2.3)
+      storybook: 10.2.8(@testing-library/dom@10.4.1)(prettier@3.10.1)(react-dom@19.2.3)(react@19.2.3)
       ts-dedent: 2.2.0
       vite: 7.3.1(@types/node@20.19.33)(sass-embedded@1.97.3)(sass@1.98.0)
     transitivePeerDependencies:
@@ -1421,7 +1427,7 @@ packages:
       webpack:
         optional: true
     dependencies:
-      storybook: 10.2.8(@testing-library/dom@10.4.1)(react-dom@19.2.3)(react@19.2.3)
+      storybook: 10.2.8(@testing-library/dom@10.4.1)(prettier@3.10.1)(react-dom@19.2.3)(react@19.2.3)
       unplugin: 2.3.11
       vite: 7.3.1(@types/node@20.19.33)(sass-embedded@1.97.3)(sass@1.98.0)
     dev: true
@@ -1459,7 +1465,7 @@ packages:
       next: 16.1.6(@babel/core@7.29.0)(react-dom@19.2.3)(react@19.2.3)(sass@1.98.0)
       react: 19.2.3
       react-dom: 19.2.3(react@19.2.3)
-      storybook: 10.2.8(@testing-library/dom@10.4.1)(react-dom@19.2.3)(react@19.2.3)
+      storybook: 10.2.8(@testing-library/dom@10.4.1)(prettier@3.10.1)(react-dom@19.2.3)(react@19.2.3)
       styled-jsx: 5.1.6(@babel/core@7.29.0)(react@19.2.3)
       typescript: 5.9.3
       vite: 7.3.1(@types/node@20.19.33)(sass-embedded@1.97.3)(sass@1.98.0)
@@ -1482,7 +1488,7 @@ packages:
     dependencies:
       react: 19.2.3
       react-dom: 19.2.3(react@19.2.3)
-      storybook: 10.2.8(@testing-library/dom@10.4.1)(react-dom@19.2.3)(react@19.2.3)
+      storybook: 10.2.8(@testing-library/dom@10.4.1)(prettier@3.10.1)(react-dom@19.2.3)(react@19.2.3)
     dev: true
 
   /@storybook/react-vite@10.2.8(react-dom@19.2.3)(react@19.2.3)(storybook@10.2.8)(typescript@5.9.3)(vite@7.3.1):
@@ -1503,7 +1509,7 @@ packages:
       react-docgen: 8.0.2
       react-dom: 19.2.3(react@19.2.3)
       resolve: 1.22.11
-      storybook: 10.2.8(@testing-library/dom@10.4.1)(react-dom@19.2.3)(react@19.2.3)
+      storybook: 10.2.8(@testing-library/dom@10.4.1)(prettier@3.10.1)(react-dom@19.2.3)(react@19.2.3)
       tsconfig-paths: 4.2.0
       vite: 7.3.1(@types/node@20.19.33)(sass-embedded@1.97.3)(sass@1.98.0)
     transitivePeerDependencies:
@@ -1530,7 +1536,7 @@ packages:
       react: 19.2.3
       react-docgen: 8.0.2
       react-dom: 19.2.3(react@19.2.3)
-      storybook: 10.2.8(@testing-library/dom@10.4.1)(react-dom@19.2.3)(react@19.2.3)
+      storybook: 10.2.8(@testing-library/dom@10.4.1)(prettier@3.10.1)(react-dom@19.2.3)(react@19.2.3)
       typescript: 5.9.3
     transitivePeerDependencies:
       - supports-color
@@ -3182,6 +3188,15 @@ packages:
       - supports-color
     dev: true
 
+  /eslint-config-prettier@10.1.8(eslint@9.39.2):
+    resolution: {integrity: sha512-82GZUjRS0p/jganf6q1rEO25VSoHH0hKPCTrgillPjdI/3bgBhAE1QzHrHTizjpRvy6pGAvKjDJtk2pF9NDq8w==}
+    hasBin: true
+    peerDependencies:
+      eslint: '>=7.0.0'
+    dependencies:
+      eslint: 9.39.2
+    dev: true
+
   /eslint-import-resolver-node@0.3.9:
     resolution: {integrity: sha512-WFj2isz22JahUv+B788TlO3N6zL3nNJGU8CcZbPZvVEkBPaJdCV4vy5wyghty5ROFbCRnm132v8BScu5/1BQ8g==}
     dependencies:
@@ -3360,7 +3375,7 @@ packages:
     dependencies:
       '@typescript-eslint/utils': 8.56.0(eslint@9.39.2)(typescript@5.9.3)
       eslint: 9.39.2
-      storybook: 10.2.8(@testing-library/dom@10.4.1)(react-dom@19.2.3)(react@19.2.3)
+      storybook: 10.2.8(@testing-library/dom@10.4.1)(prettier@3.10.1)(react-dom@19.2.3)(react@19.2.3)
     transitivePeerDependencies:
       - supports-color
       - typescript
@@ -4566,6 +4581,12 @@ packages:
     engines: {node: '>= 0.8.0'}
     dev: true
 
+  /prettier@3.10.1:
+    resolution: {integrity: sha512-70vp3ZUYoPlFbF9uiTdXHUUCGEIp7d4+6p+8DYbkm2jP7x/3i/paXVF6dopSI3zd/CEitrZN1rc4i85xWmmXlg==}
+    engines: {node: '>=14'}
+    hasBin: true
+    dev: true
+
   /pretty-format@27.5.1:
     resolution: {integrity: sha512-Qb1gy5OrP5+zDf2Bvnzdl3jsTf1qXVMazbvCoKhtKqVs4/YK4ozX4gKQJJVyNe+cajNPn0KoC0MC3FUmaHWEmQ==}
     engines: {node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0}
@@ -5399,7 +5420,7 @@ packages:
       internal-slot: 1.1.0
     dev: true
 
-  /storybook@10.2.8(@testing-library/dom@10.4.1)(react-dom@19.2.3)(react@19.2.3):
+  /storybook@10.2.8(@testing-library/dom@10.4.1)(prettier@3.10.1)(react-dom@19.2.3)(react@19.2.3):
     resolution: {integrity: sha512-885uSIn8NQw2ZG7vy84K45lHCOSyz1DVsDV8pHiHQj3J0riCuWLNeO50lK9z98zE8kjhgTtxAAkMTy5nkmNRKQ==}
     hasBin: true
     peerDependencies:
@@ -5416,6 +5437,7 @@ packages:
       '@vitest/spy': 3.2.4
       esbuild: 0.27.3
       open: 10.2.0
+      prettier: 3.10.1
       recast: 0.23.11
       semver: 7.7.4
       use-sync-external-store: 1.6.0(react@19.2.3)
@@ -5841,7 +5863,7 @@ packages:
       magic-string: 0.30.21
       module-alias: 2.3.4
       next: 16.1.6(@babel/core@7.29.0)(react-dom@19.2.3)(react@19.2.3)(sass@1.98.0)
-      storybook: 10.2.8(@testing-library/dom@10.4.1)(react-dom@19.2.3)(react@19.2.3)
+      storybook: 10.2.8(@testing-library/dom@10.4.1)(prettier@3.10.1)(react-dom@19.2.3)(react@19.2.3)
       ts-dedent: 2.2.0
       vite: 7.3.1(@types/node@20.19.33)(sass-embedded@1.97.3)(sass@1.98.0)
       vite-tsconfig-paths: 5.1.4(typescript@5.9.3)(vite@7.3.1)

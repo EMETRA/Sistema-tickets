@@ -47,7 +47,11 @@ const YouTubePreview: React.FC<YouTubePreviewProps> = ({ youtubeId, interactive,
     }
 
     if (!interactive) {
-        return <div className={rootClass}><PlayBadge /></div>;
+        return (
+            <div className={rootClass}>
+                <PlayBadge />
+            </div>
+        );
     }
 
     return (
@@ -126,7 +130,9 @@ const NewsPreview: React.FC<NewsPreviewProps> = ({
 
     return (
         <div className={classNames(styles.NewsPreview, className)}>
-            <Title variant="mid" tag="h1" className={styles.heading}>Vista previa</Title>
+            <Title variant="mid" tag="h1" className={styles.heading}>
+                Vista previa
+            </Title>
 
             <div className={styles.notice}>
                 <LabelChip label="Vista previa" className={styles.noticeBadge} />
@@ -193,7 +199,7 @@ const NewsPreview: React.FC<NewsPreviewProps> = ({
                                 placeholder="Imagen de esta sección"
                                 className={classNames(
                                     styles.sectionMedia,
-                                    section.imagen.youtubeId && styles.sectionVideo
+                                    section.imagen.youtubeId && styles.sectionVideo,
                                 )}
                             />
                         )}
@@ -230,7 +236,12 @@ const NewsPreview: React.FC<NewsPreviewProps> = ({
                     Volver a editar
                 </Button>
                 {canPublish && (
-                    <Button type="button" rounded onClick={onPublish} state={disabled ? "disabled" : "default"}>
+                    <Button
+                        type="button"
+                        rounded
+                        onClick={onPublish}
+                        state={disabled ? "disabled" : "default"}
+                    >
                         Publicar
                     </Button>
                 )}

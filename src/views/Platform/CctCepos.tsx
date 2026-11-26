@@ -113,10 +113,7 @@ function CreateCepo({
             const r = await platformFetch<Record<string, string>>(
                 "/cct/vehiculos/sat?" +
                     cctQuery({
-                        uso:
-                            plate.tipoPlaca.length === 1
-                                ? plate.tipoPlaca + "0"
-                                : plate.tipoPlaca,
+                        uso: plate.tipoPlaca.length === 1 ? plate.tipoPlaca + "0" : plate.tipoPlaca,
                         placa: plate.placa,
                     }),
             );
@@ -206,344 +203,303 @@ function CreateCepo({
         }
     }
     return (
-        <PopOver isOpen onClose={() => { if (!flight.current) onCancel(); }}
-            ariaLabel="Registrar nuevo cepo" className={local.formDialog}>
-        <section className={local.dialogBody} aria-label="Registrar nuevo cepo">
-            <div className={styles.toolbar}>
-                <h2>Registrar nuevo aviso de cepo</h2>
-                <Button
-                    variant="outlined"
-                    state={busy ? "disabled" : "default"}
-                    onClick={onCancel}
-                >
-                    Cerrar formulario
-                </Button>
-            </div>
-            <p className={local.hint}>
-                Primero identifica el vehículo. Después completa la colocación y
-                revisa los datos.
-            </p>
-            <form
-                onSubmit={(e) => {
-                    e.preventDefault();
-                    void lookup();
-                }}
-            >
-                <div className={local.form}>
-                    {[
-                        ["tipoPlaca", "Tipo de placa"],
-                        ["placa", "Placa"],
-                    ].map(([key, label]) => (
-                        <div key={key}>
-                            <label htmlFor={"cct-new-" + key}>{label} *</label>
-                            <input
-                                id={"cct-new-" + key}
-                                className={styles.control}
-                                required
-                                maxLength={key === "tipoPlaca" ? 3 : 20}
-                                value={plate[key as keyof typeof plate]}
-                                disabled={busy}
-                                onChange={(e) => {
-                                    setPlate((p) => ({
-                                        ...p,
-                                        [key]: e.target.value.toUpperCase(),
-                                    }));
-                                    setMatches(null);
-                                    setVehicle(null);
-                                    setAccepted(false);
-                                    setRegister(false);
-                                }}
-                            />
-                        </div>
-                    ))}
-                </div>
-                <Button
-                    type="submit"
-                    variant="outlined"
-                    state={busy ? "disabled" : "default"}
-                >
-                    Buscar vehículo
-                </Button>
-            </form>
-            {matches && (
-                <section>
-                    <h3>Selecciona el vehículo</h3>
-                    {matches.map((row) => (
-                        <label
-                            className={local.vehicle}
-                            key={row.TIPO_VEHICULO + ":" + row.VEHICULO}
-                        >
-                            <input
-                                type="radio"
-                                name="cct-vehicle"
-                                checked={vehicle === row}
-                                onChange={() => {
-                                    setVehicle(row);
-                                    setAccepted(false);
-                                    setRegister(false);
-                                }}
-                            />
-                            {row.TPLACA} {row.NPLACA} · {row.MARCA} ·{" "}
-                            {row.MODELO}
-                            <small>
-                                Color: {row.COLOR} · Tipo {row.TIPO_VEHICULO} ·
-                                Referencia {row.VEHICULO}
-                            </small>
-                        </label>
-                    ))}
-                    {!matches.length && (
-                        <>
-                            <p className={local.empty}>
-                                No hay un vehículo registrado con esta placa.
-                            </p>
-                            <Button
-                                variant="outlined"
-                                onClick={() => {
-                                    setRegister(true);
-                                    setAccepted(false);
-                                }}
-                            >
-                                Registrar vehículo no encontrado
-                            </Button>
-                        </>
-                    )}
-                </section>
-            )}
-            {register && (
-                <section className={local.review}>
-                    <h3>Registrar vehículo</h3>
-                    <Button
-                        variant="outlined"
-                        state={busy ? "disabled" : "default"}
-                        onClick={() => void sat()}
-                    >
-                        Consultar datos SAT
+        <PopOver
+            isOpen
+            onClose={() => {
+                if (!flight.current) onCancel();
+            }}
+            ariaLabel="Registrar nuevo cepo"
+            className={local.formDialog}
+        >
+            <section className={local.dialogBody} aria-label="Registrar nuevo cepo">
+                <div className={styles.toolbar}>
+                    <h2>Registrar nuevo aviso de cepo</h2>
+                    <Button variant="outlined" state={busy ? "disabled" : "default"} onClick={onCancel}>
+                        Cerrar formulario
                     </Button>
-                    <form onSubmit={saveVehicle}>
+                </div>
+                <p className={local.hint}>
+                    Primero identifica el vehículo. Después completa la colocación y revisa los datos.
+                </p>
+                <form
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        void lookup();
+                    }}
+                >
+                    <div className={local.form}>
+                        {[
+                            ["tipoPlaca", "Tipo de placa"],
+                            ["placa", "Placa"],
+                        ].map(([key, label]) => (
+                            <div key={key}>
+                                <label htmlFor={"cct-new-" + key}>{label} *</label>
+                                <input
+                                    id={"cct-new-" + key}
+                                    className={styles.control}
+                                    required
+                                    maxLength={key === "tipoPlaca" ? 3 : 20}
+                                    value={plate[key as keyof typeof plate]}
+                                    disabled={busy}
+                                    onChange={(e) => {
+                                        setPlate((p) => ({
+                                            ...p,
+                                            [key]: e.target.value.toUpperCase(),
+                                        }));
+                                        setMatches(null);
+                                        setVehicle(null);
+                                        setAccepted(false);
+                                        setRegister(false);
+                                    }}
+                                />
+                            </div>
+                        ))}
+                    </div>
+                    <Button type="submit" variant="outlined" state={busy ? "disabled" : "default"}>
+                        Buscar vehículo
+                    </Button>
+                </form>
+                {matches && (
+                    <section>
+                        <h3>Selecciona el vehículo</h3>
+                        {matches.map((row) => (
+                            <label className={local.vehicle} key={row.TIPO_VEHICULO + ":" + row.VEHICULO}>
+                                <input
+                                    type="radio"
+                                    name="cct-vehicle"
+                                    checked={vehicle === row}
+                                    onChange={() => {
+                                        setVehicle(row);
+                                        setAccepted(false);
+                                        setRegister(false);
+                                    }}
+                                />
+                                {row.TPLACA} {row.NPLACA} · {row.MARCA} · {row.MODELO}
+                                <small>
+                                    Color: {row.COLOR} · Tipo {row.TIPO_VEHICULO} · Referencia {row.VEHICULO}
+                                </small>
+                            </label>
+                        ))}
+                        {!matches.length && (
+                            <>
+                                <p className={local.empty}>No hay un vehículo registrado con esta placa.</p>
+                                <Button
+                                    variant="outlined"
+                                    onClick={() => {
+                                        setRegister(true);
+                                        setAccepted(false);
+                                    }}
+                                >
+                                    Registrar vehículo no encontrado
+                                </Button>
+                            </>
+                        )}
+                    </section>
+                )}
+                {register && (
+                    <section className={local.review}>
+                        <h3>Registrar vehículo</h3>
+                        <Button
+                            variant="outlined"
+                            state={busy ? "disabled" : "default"}
+                            onClick={() => void sat()}
+                        >
+                            Consultar datos SAT
+                        </Button>
+                        <form onSubmit={saveVehicle}>
+                            <div className={local.form}>
+                                <CctPicker
+                                    kind="tipos"
+                                    label="Tipo de vehículo"
+                                    value={car.tipoVehiculo}
+                                    onChange={(v) => setCar((c) => ({ ...c, tipoVehiculo: v }))}
+                                    disabled={busy}
+                                />
+                                {[
+                                    ["marca", "Marca", 30],
+                                    ["color", "Color", 100],
+                                    ["modelo", "Modelo", 4],
+                                    ["chassis", "Chasis", 30],
+                                    ["vin", "VIN", 30],
+                                ].map(([key, label, max]) => (
+                                    <div key={key}>
+                                        <label htmlFor={"cct-car-" + key}>
+                                            {label}
+                                            {["marca", "color", "modelo"].includes(String(key)) ? " *" : ""}
+                                        </label>
+                                        <input
+                                            id={"cct-car-" + key}
+                                            className={styles.control}
+                                            maxLength={Number(max)}
+                                            required={["marca", "color", "modelo"].includes(String(key))}
+                                            value={car[String(key)] || ""}
+                                            disabled={busy}
+                                            onChange={(e) =>
+                                                setCar((c) => ({
+                                                    ...c,
+                                                    [String(key)]: e.target.value,
+                                                }))
+                                            }
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                            <label className={local.check}>
+                                <input
+                                    type="checkbox"
+                                    required
+                                    checked={accepted}
+                                    onChange={(e) => setAccepted(e.target.checked)}
+                                    disabled={busy}
+                                />
+                                Revisé la placa, el tipo y los datos del vehículo.
+                            </label>
+                            <Button type="submit" state={busy || !accepted ? "disabled" : "default"}>
+                                Registrar vehículo revisado
+                            </Button>
+                        </form>
+                    </section>
+                )}
+                {vehicle && !register && (
+                    <form onSubmit={create}>
+                        <h3>Datos de colocación</h3>
                         <div className={local.form}>
+                            <div>
+                                <label htmlFor="cct-new-aviso">Número de aviso físico *</label>
+                                <input
+                                    id="cct-new-aviso"
+                                    className={styles.control}
+                                    inputMode="numeric"
+                                    pattern="[0-9]{1,18}"
+                                    maxLength={18}
+                                    disabled={busy}
+                                    required
+                                    value={form.aviso}
+                                    onChange={(e) =>
+                                        setForm((f) => ({
+                                            ...f,
+                                            aviso: e.target.value,
+                                        }))
+                                    }
+                                    aria-describedby="cct-new-aviso-help"
+                                />
+                                <p id="cct-new-aviso-help" className={local.hint}>
+                                    Ingresa el número del documento entregado por el agente. Si ya está
+                                    registrado, se solicitará revisar ese aviso.
+                                </p>
+                            </div>
                             <CctPicker
-                                kind="tipos"
-                                label="Tipo de vehículo"
-                                value={car.tipoVehiculo}
-                                onChange={(v) =>
-                                    setCar((c) => ({ ...c, tipoVehiculo: v }))
-                                }
+                                kind="cruceros"
+                                label="Crucero"
+                                value={form.crucero}
+                                onChange={(v) => setForm((f) => ({ ...f, crucero: v }))}
+                                disabled={busy}
+                            />
+                            <CctPicker
+                                kind="motivos"
+                                label="Motivo"
+                                value={form.motivo}
+                                onChange={(v) => setForm((f) => ({ ...f, motivo: v }))}
+                                disabled={busy}
+                            />
+                            <CctPicker
+                                kind="delegaciones"
+                                label="Delegación"
+                                value={form.delegacion}
+                                onChange={(v) => setForm((f) => ({ ...f, delegacion: v }))}
+                                disabled={busy}
+                            />
+                            <CctPicker
+                                kind="agentes"
+                                label="Tipo de agente"
+                                value={form.tipoAgente}
+                                onChange={(v) => setForm((f) => ({ ...f, tipoAgente: v }))}
                                 disabled={busy}
                             />
                             {[
-                                ["marca", "Marca", 30],
-                                ["color", "Color", 100],
-                                ["modelo", "Modelo", 4],
-                                ["chassis", "Chasis", 30],
-                                ["vin", "VIN", 30],
-                            ].map(([key, label, max]) => (
+                                ["agente", "Chapa del agente"],
+                                ["cepoFisico", "Número de cepo físico"],
+                            ].map(([key, label]) => (
                                 <div key={key}>
-                                    <label htmlFor={"cct-car-" + key}>
-                                        {label}
-                                        {["marca", "color", "modelo"].includes(
-                                            String(key),
-                                        )
-                                            ? " *"
-                                            : ""}
-                                    </label>
+                                    <label htmlFor={"cct-new-" + key}>{label} *</label>
                                     <input
-                                        id={"cct-car-" + key}
+                                        id={"cct-new-" + key}
                                         className={styles.control}
-                                        maxLength={Number(max)}
-                                        required={[
-                                            "marca",
-                                            "color",
-                                            "modelo",
-                                        ].includes(String(key))}
-                                        value={car[String(key)] || ""}
+                                        required
+                                        maxLength={18}
+                                        inputMode="numeric"
+                                        value={form[key]}
                                         disabled={busy}
                                         onChange={(e) =>
-                                            setCar((c) => ({
-                                                ...c,
-                                                [String(key)]: e.target.value,
+                                            setForm((f) => ({
+                                                ...f,
+                                                [key]: e.target.value,
                                             }))
                                         }
                                     />
                                 </div>
                             ))}
-                        </div>
-                        <label className={local.check}>
-                            <input
-                                type="checkbox"
-                                required
-                                checked={accepted}
-                                onChange={(e) => setAccepted(e.target.checked)}
-                                disabled={busy}
-                            />
-                            Revisé la placa, el tipo y los datos del vehículo.
-                        </label>
-                        <Button
-                            type="submit"
-                            state={busy || !accepted ? "disabled" : "default"}
-                        >
-                            Registrar vehículo revisado
-                        </Button>
-                    </form>
-                </section>
-            )}
-            {vehicle && !register && (
-                <form onSubmit={create}>
-                    <h3>Datos de colocación</h3>
-                    <div className={local.form}>
-                        <div>
-                            <label htmlFor="cct-new-aviso">
-                                Número de aviso físico *
-                            </label>
-                            <input
-                                id="cct-new-aviso"
-                                className={styles.control}
-                                inputMode="numeric"
-                                pattern="[0-9]{1,18}"
-                                maxLength={18}
-                                disabled={busy}
-                                required
-                                value={form.aviso}
-                                onChange={(e) =>
-                                    setForm((f) => ({
-                                        ...f,
-                                        aviso: e.target.value,
-                                    }))
-                                }
-                                aria-describedby="cct-new-aviso-help"
-                            />
-                            <p id="cct-new-aviso-help" className={local.hint}>
-                                Ingresa el número del documento entregado por el
-                                agente. Si ya está registrado, se solicitará
-                                revisar ese aviso.
-                            </p>
-                        </div>
-                        <CctPicker
-                            kind="cruceros"
-                            label="Crucero"
-                            value={form.crucero}
-                            onChange={(v) =>
-                                setForm((f) => ({ ...f, crucero: v }))
-                            }
-                            disabled={busy}
-                        />
-                        <CctPicker
-                            kind="motivos"
-                            label="Motivo"
-                            value={form.motivo}
-                            onChange={(v) =>
-                                setForm((f) => ({ ...f, motivo: v }))
-                            }
-                            disabled={busy}
-                        />
-                        <CctPicker
-                            kind="delegaciones"
-                            label="Delegación"
-                            value={form.delegacion}
-                            onChange={(v) =>
-                                setForm((f) => ({ ...f, delegacion: v }))
-                            }
-                            disabled={busy}
-                        />
-                        <CctPicker
-                            kind="agentes"
-                            label="Tipo de agente"
-                            value={form.tipoAgente}
-                            onChange={(v) =>
-                                setForm((f) => ({ ...f, tipoAgente: v }))
-                            }
-                            disabled={busy}
-                        />
-                        {[
-                            ["agente", "Chapa del agente"],
-                            ["cepoFisico", "Número de cepo físico"],
-                        ].map(([key, label]) => (
-                            <div key={key}>
-                                <label htmlFor={"cct-new-" + key}>
-                                    {label} *
-                                </label>
+                            <div>
+                                <label htmlFor="cct-colocado-fecha">Fecha y hora de colocación *</label>
                                 <input
-                                    id={"cct-new-" + key}
+                                    id="cct-colocado-fecha"
                                     className={styles.control}
+                                    type="datetime-local"
                                     required
-                                    maxLength={18}
-                                    inputMode="numeric"
-                                    value={form[key]}
+                                    value={form.fecha}
+                                    max={cctCivilNow()}
+                                    onChange={(e) =>
+                                        setForm((f) => ({
+                                            ...f,
+                                            fecha: e.target.value,
+                                        }))
+                                    }
+                                    disabled={busy}
+                                />
+                            </div>
+                            <div>
+                                <label htmlFor="cct-new-note">Observaciones</label>
+                                <textarea
+                                    id="cct-new-note"
+                                    className={styles.control}
+                                    value={form.observaciones}
+                                    maxLength={300}
                                     disabled={busy}
                                     onChange={(e) =>
                                         setForm((f) => ({
                                             ...f,
-                                            [key]: e.target.value,
+                                            observaciones: e.target.value,
                                         }))
                                     }
                                 />
                             </div>
-                        ))}
-                        <div>
-                            <label htmlFor="cct-colocado-fecha">
-                                Fecha y hora de colocación *
-                            </label>
+                        </div>
+                        <label className={local.check}>
                             <input
-                                id="cct-colocado-fecha"
-                                className={styles.control}
-                                type="datetime-local"
+                                type="checkbox"
+                                checked={accepted}
                                 required
-                                value={form.fecha}
-                                max={cctCivilNow()}
-                                onChange={(e) =>
-                                    setForm((f) => ({
-                                        ...f,
-                                        fecha: e.target.value,
-                                    }))
-                                }
                                 disabled={busy}
+                                onChange={(e) => setAccepted(e.target.checked)}
                             />
-                        </div>
-                        <div>
-                            <label htmlFor="cct-new-note">Observaciones</label>
-                            <textarea
-                                id="cct-new-note"
-                                className={styles.control}
-                                value={form.observaciones}
-                                maxLength={300}
-                                disabled={busy}
-                                onChange={(e) =>
-                                    setForm((f) => ({
-                                        ...f,
-                                        observaciones: e.target.value,
-                                    }))
-                                }
-                            />
-                        </div>
-                    </div>
-                    <label className={local.check}>
-                        <input
-                            type="checkbox"
-                            checked={accepted}
-                            required
-                            disabled={busy}
-                            onChange={(e) => setAccepted(e.target.checked)}
-                        />
-                        Revisé el vehículo y los datos de colocación del aviso.
-                    </label>
-                    <Button
-                        type="submit"
-                        state={busy || !accepted ? "disabled" : "default"}
-                    >
-                        {busy ? "Registrando…" : "Registrar aviso revisado"}
-                    </Button>
-                </form>
-            )}
-            {error && (
-                <p className={styles.error} role="alert">
-                    {error} Conservamos los datos para reintentar.
-                </p>
-            )}
-            {message && (
-                <p className={local.success} role="status">
-                    {message}
-                </p>
-            )}
-        </section>
+                            Revisé el vehículo y los datos de colocación del aviso.
+                        </label>
+                        <Button type="submit" state={busy || !accepted ? "disabled" : "default"}>
+                            {busy ? "Registrando…" : "Registrar aviso revisado"}
+                        </Button>
+                    </form>
+                )}
+                {error && (
+                    <p className={styles.error} role="alert">
+                        {error} Conservamos los datos para reintentar.
+                    </p>
+                )}
+                {message && (
+                    <p className={local.success} role="status">
+                        {message}
+                    </p>
+                )}
+            </section>
         </PopOver>
     );
 }
@@ -641,8 +597,8 @@ function CepoAction({
             {["DANIO", "ROBO"].includes(action) && (
                 <p>
                     Se registrará el incidente y una remisión de Q{" "}
-                    {detail.tarifas?.[action as "DANIO" | "ROBO"]} conforme a la
-                    regla {detail.tarifas?.regla}.
+                    {detail.tarifas?.[action as "DANIO" | "ROBO"]} conforme a la regla {detail.tarifas?.regla}
+                    .
                 </p>
             )}
             <form onSubmit={submit}>
@@ -650,9 +606,7 @@ function CepoAction({
                     {action === "PAGO" ? (
                         <>
                             <div>
-                                <label htmlFor="cct-payment-origin">
-                                    Origen de pago *
-                                </label>
+                                <label htmlFor="cct-payment-origin">Origen de pago *</label>
                                 <select
                                     id="cct-payment-origin"
                                     className={styles.control}
@@ -666,9 +620,7 @@ function CepoAction({
                                         }))
                                     }
                                 >
-                                    <option value="">
-                                        Selecciona el origen
-                                    </option>
+                                    <option value="">Selecciona el origen</option>
                                     {originNames.map((label, i) => (
                                         <option key={i} value={i + 1}>
                                             {i + 1} · {label}
@@ -677,9 +629,7 @@ function CepoAction({
                                 </select>
                             </div>
                             <div>
-                                <label htmlFor="cct-payment-receipt">
-                                    Número de boleta de pago *
-                                </label>
+                                <label htmlFor="cct-payment-receipt">Número de boleta de pago *</label>
                                 <input
                                     id="cct-payment-receipt"
                                     className={styles.control}
@@ -703,15 +653,11 @@ function CepoAction({
                                 kind="agentes"
                                 label="Tipo de agente que libera"
                                 value={values.tipoAgente}
-                                onChange={(v) =>
-                                    setValues((p) => ({ ...p, tipoAgente: v }))
-                                }
+                                onChange={(v) => setValues((p) => ({ ...p, tipoAgente: v }))}
                                 disabled={busy}
                             />
                             <div>
-                                <label htmlFor="cct-release-agent">
-                                    Chapa del agente que libera *
-                                </label>
+                                <label htmlFor="cct-release-agent">Chapa del agente que libera *</label>
                                 <input
                                     id="cct-release-agent"
                                     className={styles.control}
@@ -728,9 +674,7 @@ function CepoAction({
                                 />
                             </div>
                             <div>
-                                <label htmlFor="cct-release-date">
-                                    Fecha y hora de liberación *
-                                </label>
+                                <label htmlFor="cct-release-date">Fecha y hora de liberación *</label>
                                 <input
                                     id="cct-release-date"
                                     className={styles.control}
@@ -782,17 +726,13 @@ function CepoAction({
                     />
                     Revisé el aviso y los datos de esta operación.
                 </label>
-                <Button
-                    type="submit"
-                    state={busy || !accepted ? "disabled" : "default"}
-                >
+                <Button type="submit" state={busy || !accepted ? "disabled" : "default"}>
                     {busy ? "Registrando…" : label}
                 </Button>
             </form>
             {error && (
                 <p className={styles.error} role="alert">
-                    {error} Conservamos los datos. Consulta el estado del aviso
-                    antes de cambiar la solicitud.
+                    {error} Conservamos los datos. Consulta el estado del aviso antes de cambiar la solicitud.
                 </p>
             )}
         </section>
@@ -866,10 +806,9 @@ export function CctCepos({ bootstrap }: { bootstrap: CctBootstrap }) {
         setError("");
         setAction("");
         try {
-            const d = await platformFetch<CctCepo>(
-                "/cct/cepos/" + encodeURIComponent(id),
-                { signal: ctl.signal },
-            );
+            const d = await platformFetch<CctCepo>("/cct/cepos/" + encodeURIComponent(id), {
+                signal: ctl.signal,
+            });
             if (!ctl.signal.aborted) setDetail(d);
         } catch (e) {
             if (!ctl.signal.aborted) setError(cctError(e));
@@ -885,27 +824,28 @@ export function CctCepos({ bootstrap }: { bootstrap: CctBootstrap }) {
     };
     return (
         <>
-            {create && <CreateCepo admin={admin} onCancel={() => setCreate(false)}
-                onDone={(id) => {
-                    setCreate(false);
-                    setMessage("Aviso " + id + " registrado.");
-                    void open(id);
-                }} />}
+            {create && (
+                <CreateCepo
+                    admin={admin}
+                    onCancel={() => setCreate(false)}
+                    onDone={(id) => {
+                        setCreate(false);
+                        setMessage("Aviso " + id + " registrado.");
+                        void open(id);
+                    }}
+                />
+            )}
             <section className={styles.card} aria-label="Gestión de cepos">
                 <div className={styles.toolbar}>
                     <div>
                         <h2>Cepos</h2>
                         <p className={local.hint}>
-                            Busca una colocación para revisar su ficha,
-                            registrar una actuación o corregir sus datos.
+                            Busca una colocación para revisar su ficha, registrar una actuación o corregir sus
+                            datos.
                         </p>
                     </div>
                     <Button
-                        state={
-                            bootstrap.disponibilidad.crear.habilitado
-                                ? "default"
-                                : "disabled"
-                        }
+                        state={bootstrap.disponibilidad.crear.habilitado ? "default" : "disabled"}
                         onClick={() => {
                             setCreate(true);
                             setMessage("");
@@ -918,31 +858,13 @@ export function CctCepos({ bootstrap }: { bootstrap: CctBootstrap }) {
                 <div id="cct-ingreso-disponibilidad">
                     {!bootstrap.disponibilidad.crear.habilitado && (
                         <details className={local.availability}>
-                            <summary>
-                                Registro pendiente de habilitación · Ver
-                                requisitos
-                            </summary>
-                            <ul
-                                className={local.readiness}
-                                aria-label="Disponibilidad del registro de cepos"
-                            >
+                            <summary>Registro pendiente de habilitación · Ver requisitos</summary>
+                            <ul className={local.readiness} aria-label="Disponibilidad del registro de cepos">
                                 {[
-                                    [
-                                        bootstrap.acciones.crear,
-                                        "Permiso para registrar cepos",
-                                    ],
-                                    [
-                                        bootstrap.operador,
-                                        "Operador vinculado a tu cuenta",
-                                    ],
-                                    [
-                                        bootstrap.escrituras,
-                                        "Registro de operaciones habilitado",
-                                    ],
-                                    [
-                                        bootstrap.numeracionLista,
-                                        "Corte al nuevo CCT confirmado",
-                                    ],
+                                    [bootstrap.acciones.crear, "Permiso para registrar cepos"],
+                                    [bootstrap.operador, "Operador vinculado a tu cuenta"],
+                                    [bootstrap.escrituras, "Registro de operaciones habilitado"],
+                                    [bootstrap.numeracionLista, "Corte al nuevo CCT confirmado"],
                                 ].map(([ready, label]) => (
                                     <li key={String(label)}>
                                         {ready ? "✓" : "Pendiente:"} {label}
@@ -982,9 +904,7 @@ export function CctCepos({ bootstrap }: { bootstrap: CctBootstrap }) {
                                 ]
                         ).map(([key, label]) => (
                             <div key={key}>
-                                <label htmlFor={"cct-cepo-" + key}>
-                                    {label} *
-                                </label>
+                                <label htmlFor={"cct-cepo-" + key}>{label} *</label>
                                 <input
                                     id={"cct-cepo-" + key}
                                     className={styles.control}
@@ -1015,10 +935,7 @@ export function CctCepos({ bootstrap }: { bootstrap: CctBootstrap }) {
                 <p className={styles.error} role="alert">
                     {error}
                     {detailId && (
-                        <Button
-                            variant="outlined"
-                            onClick={() => void open(detailId)}
-                        >
+                        <Button variant="outlined" onClick={() => void open(detailId)}>
                             Actualizar ficha
                         </Button>
                     )}
@@ -1043,8 +960,7 @@ export function CctCepos({ bootstrap }: { bootstrap: CctBootstrap }) {
                     <div className={styles.toolbar}>
                         <h2>
                             Aviso {detail.datos.AVISO} ·{" "}
-                            {CCT_STATES[detail.datos.ESTATUS || ""] ||
-                                detail.datos.ESTATUS}
+                            {CCT_STATES[detail.datos.ESTATUS || ""] || detail.datos.ESTATUS}
                         </h2>
                         <Button
                             variant="outlined"
@@ -1060,8 +976,7 @@ export function CctCepos({ bootstrap }: { bootstrap: CctBootstrap }) {
                         <CctData row={detail.vehiculo} />
                     ) : (
                         <p className={styles.error}>
-                            La referencia de vehículo requiere revisión. El
-                            aviso conserva su historial.
+                            La referencia de vehículo requiere revisión. El aviso conserva su historial.
                         </p>
                     )}
                     <div className={local.buttons}>
@@ -1071,10 +986,7 @@ export function CctCepos({ bootstrap }: { bootstrap: CctBootstrap }) {
                                 <Button
                                     variant="outlined"
                                     state={
-                                        bootstrap.disponibilidad.editar
-                                            ?.habilitado
-                                            ? "default"
-                                            : "disabled"
+                                        bootstrap.disponibilidad.editar?.habilitado ? "default" : "disabled"
                                     }
                                     onClick={() => setAction("EDITAR")}
                                 >
@@ -1094,16 +1006,13 @@ export function CctCepos({ bootstrap }: { bootstrap: CctBootstrap }) {
                                             : key === "LIBERAR"
                                               ? "liberar"
                                               : "incidencia",
-                                    allowed =
-                                        bootstrap.disponibilidad[capability];
+                                    allowed = bootstrap.disponibilidad[capability];
                                 return bootstrap.acciones[capability] ? (
                                     <div key={key}>
-                                        {capability === "incidencia" &&
-                                        detail.vehiculoPendiente ? (
+                                        {capability === "incidencia" && detail.vehiculoPendiente ? (
                                             <p className={local.hint}>
-                                                Para generar la multa debe
-                                                revisarse primero la referencia
-                                                del vehículo.
+                                                Para generar la multa debe revisarse primero la referencia del
+                                                vehículo.
                                             </p>
                                         ) : allowed.habilitado ? (
                                             <Button
@@ -1139,9 +1048,7 @@ export function CctCepos({ bootstrap }: { bootstrap: CctBootstrap }) {
                     ) : (
                         action && (
                             <CepoAction
-                                key={
-                                    detail.datos.AVISO + action + detail.version
-                                }
+                                key={detail.datos.AVISO + action + detail.version}
                                 detail={detail}
                                 action={action}
                                 admin={admin}

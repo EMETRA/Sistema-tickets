@@ -37,9 +37,20 @@ export const SinAcceso: Story = {
     },
 };
 export const Vacio: Story = {
-    args: { tone: "empty", title: "Aún no hay noticias", description: "Cuando publiques una, aparecerá aquí.", helpTopic: undefined, actions: undefined },
+    args: {
+        tone: "empty",
+        title: "Aún no hay noticias",
+        description: "Cuando publiques una, aparecerá aquí.",
+        helpTopic: undefined,
+        actions: undefined,
+    },
 };
 export const Exito: Story = {
-    args: { tone: "success", title: "Noticia publicada", description: "Ya está visible para todo el personal.", helpTopic: undefined },
+    args: {
+        tone: "success",
+        title: "Noticia publicada",
+        description: "Ya está visible para todo el personal.",
+        helpTopic: undefined,
+    },
 };
 export const Compacto: Story = { args: { compact: true } };

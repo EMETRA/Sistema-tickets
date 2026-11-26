@@ -31,10 +31,7 @@ const MediaGrid = ({ items, columns = 1 }: MediaGridProps) => {
 
     return (
         <>
-            <div
-                className={styles.grid}
-                style={{ "--columns": columns } as React.CSSProperties}
-            >
+            <div className={styles.grid} style={{ "--columns": columns } as React.CSSProperties}>
                 {items.map((item, index) => {
                     if (item.type === "image") {
                         const { type, ...imageProps } = item;
@@ -43,10 +40,12 @@ const MediaGrid = ({ items, columns = 1 }: MediaGridProps) => {
                                 key={`image-${index}`}
                                 type="button"
                                 className={styles.imageButton}
-                                onClick={() => setPreview({
-                                    src: resolveSrc(imageProps.src),
-                                    alt: imageProps.alt,
-                                })}
+                                onClick={() =>
+                                    setPreview({
+                                        src: resolveSrc(imageProps.src),
+                                        alt: imageProps.alt,
+                                    })
+                                }
                             >
                                 <Image {...imageProps} />
                             </button>
@@ -59,10 +58,7 @@ const MediaGrid = ({ items, columns = 1 }: MediaGridProps) => {
                     }
                 })}
             </div>
-            <div
-                className={styles.grid}
-                style={{ "--columns": columns } as React.CSSProperties}
-            >
+            <div className={styles.grid} style={{ "--columns": columns } as React.CSSProperties}>
                 {items.map((item, index) => {
                     if (item.type === "file") {
                         const { type, ...fileProps } = item;

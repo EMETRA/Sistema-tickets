@@ -1,31 +1,31 @@
 "use client";
 
-import React, { useState } from 'react';
-import { Title } from '../../components/client/atoms/Title';
-import { FormField } from '../../components/client/molecules/FormField';
-import { Checkbox } from '../../components/client/atoms/Checkbox';
+import React, { useState } from "react";
+import { Title } from "../../components/client/atoms/Title";
+import { FormField } from "../../components/client/molecules/FormField";
+import { Checkbox } from "../../components/client/atoms/Checkbox";
 import { Input } from "../../components/client/atoms/Input";
-import { Select } from '../../components/client/atoms/Select';
-import { Button } from '../../components/client/atoms/Button';
-import { Text } from '../../components/client/atoms/Text';
+import { Select } from "../../components/client/atoms/Select";
+import { Button } from "../../components/client/atoms/Button";
+import { Text } from "../../components/client/atoms/Text";
 
-import { PopUp } from '@/components/client/molecules/PopUp';
+import { PopUp } from "@/components/client/molecules/PopUp";
 
-import styles from './MOD05.module.scss';
+import styles from "./MOD05.module.scss";
 
 import {
     useGetReporteRhEstatusOpciones,
     useGetReporteRhCamposDisponibles,
     useGetReporteRhExportExcel,
-} from '@/api/hooks';
+} from "@/api/hooks";
 
 const MOD05: React.FC = () => {
-    const [status, setStatus] = useState<string>('');
-    const [startDate, setStartDate] = useState<string>('');
-    const [endDate, setEndDate] = useState<string>('');
+    const [status, setStatus] = useState<string>("");
+    const [startDate, setStartDate] = useState<string>("");
+    const [endDate, setEndDate] = useState<string>("");
     const [selectedFields, setSelectedFields] = useState<Set<string>>(new Set());
 
-    const [validation, setValidation] = useState('');
+    const [validation, setValidation] = useState("");
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
     // Hooks para obtener datos del servidor
@@ -43,14 +43,10 @@ const MOD05: React.FC = () => {
         refetch: refetchCampos,
     } = useGetReporteRhCamposDisponibles();
 
-    const {
-        loading: exportLoading,
-        error: exportError,
-        exportar,
-    } = useGetReporteRhExportExcel();
+    const { loading: exportLoading, error: exportError, exportar } = useGetReporteRhExportExcel();
 
     const handleFieldToggle = (value: string) => {
-        setSelectedFields(prevState => {
+        setSelectedFields((prevState) => {
             const newSet = new Set(prevState);
             if (newSet.has(value)) {
                 newSet.delete(value);
@@ -63,24 +59,24 @@ const MOD05: React.FC = () => {
 
     const handleExecute = async () => {
         if (exportLoading) return;
-        setValidation('');
+        setValidation("");
         if (!status) {
-            setValidation('Por favor, selecciona un estatus antes de ejecutar el proceso.');
+            setValidation("Por favor, selecciona un estatus antes de ejecutar el proceso.");
             return;
         }
 
         if (Boolean(startDate) !== Boolean(endDate)) {
-            setValidation('Por favor, completa ambas fechas antes de ejecutar el proceso.');
+            setValidation("Por favor, completa ambas fechas antes de ejecutar el proceso.");
             return;
         }
 
         if (selectedFields.size === 0) {
-            setValidation('Por favor, selecciona al menos un campo para mostrar.');
+            setValidation("Por favor, selecciona al menos un campo para mostrar.");
             return;
         }
 
         if (new Date(startDate) > new Date(endDate)) {
-            setValidation('La fecha de inicio no puede ser posterior a la fecha de fin.');
+            setValidation("La fecha de inicio no puede ser posterior a la fecha de fin.");
             return;
         }
 
@@ -101,12 +97,19 @@ const MOD05: React.FC = () => {
     return (
         <div className={styles.mainContainer}>
             <div className={styles.formContainer}>
-
-                <Title variant="mid" tag="h3" className={styles.title}>Filtros del reporte</Title>
+                <Title variant="mid" tag="h3" className={styles.title}>
+                    Filtros del reporte
+                </Title>
                 {validation && <p role="alert">{validation}</p>}
-                {(errorEstatus || errorCampos) && <p role="alert">No se pudieron cargar los catálogos. <button onClick={() => void Promise.all([refetchEstatus(), refetchCampos()])}>Reintentar catálogos</button></p>}
+                {(errorEstatus || errorCampos) && (
+                    <p role="alert">
+                        No se pudieron cargar los catálogos.{" "}
+                        <button onClick={() => void Promise.all([refetchEstatus(), refetchCampos()])}>
+                            Reintentar catálogos
+                        </button>
+                    </p>
+                )}
                 <div className={styles.completedTasksFilters}>
-
                     {/* Estatus */}
                     <FormField label="Estatus" htmlFor="status" required className={styles.fieldStatus}>
                         {errorEstatus && (
@@ -129,7 +132,11 @@ const MOD05: React.FC = () => {
                     </FormField>
 
                     {/* Fecha ingreso desde */}
-                    <FormField label="Fecha ingreso desde (opcional)" htmlFor="startDate" className={styles.fieldStartDate}>
+                    <FormField
+                        label="Fecha ingreso desde (opcional)"
+                        htmlFor="startDate"
+                        className={styles.fieldStartDate}
+                    >
                         <Input
                             id="startDate"
                             type="date"
@@ -140,7 +147,11 @@ const MOD05: React.FC = () => {
                     </FormField>
 
                     {/* Fecha ingreso hasta */}
-                    <FormField label="Fecha ingreso hasta (opcional)" htmlFor="endDate" className={styles.fieldEndDate}>
+                    <FormField
+                        label="Fecha ingreso hasta (opcional)"
+                        htmlFor="endDate"
+                        className={styles.fieldEndDate}
+                    >
                         <Input
                             id="endDate"
                             type="date"
@@ -151,7 +162,9 @@ const MOD05: React.FC = () => {
                     </FormField>
                 </div>
 
-                <Title variant="mid" tag="h3" className={styles.title}>Seleccione los campos a mostrar</Title>
+                <Title variant="mid" tag="h3" className={styles.title}>
+                    Seleccione los campos a mostrar
+                </Title>
                 {errorCampos && (
                     <Text variant="caption" className={styles.errorText}>
                         No se pudo cargar el catálogo de campos.
@@ -177,7 +190,7 @@ const MOD05: React.FC = () => {
                     className={styles.executeButton}
                     state={exportLoading ? "loading" : "default"}
                 >
-                    {exportLoading ? 'Generando Excel...' : 'Generar Excel'}
+                    {exportLoading ? "Generando Excel..." : "Generar Excel"}
                 </Button>
 
                 {exportError && (

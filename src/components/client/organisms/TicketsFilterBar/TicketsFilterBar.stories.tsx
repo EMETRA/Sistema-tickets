@@ -170,9 +170,22 @@ export const Interactive = {
                     onMemberSelect={handleMemberSelect}
                 />
                 <div style={{ marginTop: "20px", padding: "10px", background: "#f5f5f5" }}>
-                    <p>Filtro seleccionado: <strong>{selectedFilter}</strong></p>
-                    <p>Miembro seleccionado: <strong>{selectedMemberId ? sampleMembers.find(m => m.id === selectedMemberId)?.name : "Ninguno"}</strong></p>
-                    {lastAction && <p>Última acción: <strong>{lastAction}</strong></p>}
+                    <p>
+                        Filtro seleccionado: <strong>{selectedFilter}</strong>
+                    </p>
+                    <p>
+                        Miembro seleccionado:{" "}
+                        <strong>
+                            {selectedMemberId
+                                ? sampleMembers.find((m) => m.id === selectedMemberId)?.name
+                                : "Ninguno"}
+                        </strong>
+                    </p>
+                    {lastAction && (
+                        <p>
+                            Última acción: <strong>{lastAction}</strong>
+                        </p>
+                    )}
                 </div>
             </div>
         );

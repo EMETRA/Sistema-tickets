@@ -19,9 +19,8 @@ const PermissionsTable: React.FC<PermissionsTableProps> = ({
     onSubmit,
     onEdit,
     onDelete,
-    className
+    className,
 }) => {
-
     const [view, setView] = useState<PermissionsView>("table");
     const [selectedPermission, setSelectedPermission] = useState<Permissions | null>(null);
     const [modalOpen, setModalOpen] = useState(false);
@@ -29,7 +28,7 @@ const PermissionsTable: React.FC<PermissionsTableProps> = ({
 
     if (view === "create") {
         return (
-            <PermissionsForm 
+            <PermissionsForm
                 modules={modules}
                 onCancel={() => setView("table")}
                 onSubmit={(data) => {
@@ -37,61 +36,53 @@ const PermissionsTable: React.FC<PermissionsTableProps> = ({
                     setView("table");
                 }}
             />
-        )
+        );
     }
 
     if (view === "edit") {
         return (
-            <PermissionsForm 
+            <PermissionsForm
                 modules={modules}
                 initialData={selectedPermission}
                 onCancel={() => setView("table")}
                 onSubmit={(data) => {
-
                     if (!selectedPermission) return;
 
                     const payload = {
                         ...selectedPermission,
-                        ...data
+                        ...data,
                     };
 
                     onEdit?.(payload);
 
                     setView("table");
-
                 }}
             />
-        )
+        );
     }
 
     return (
         <div className={classNames(styles.PermissionTable, className)}>
-
             <div className={styles.header}>
-                <TableHeader 
-                    iconName="user-lock-solid"
-                    label="Permisos del sistema"
-                />
+                <TableHeader iconName="user-lock-solid" label="Permisos del sistema" />
 
-                <Button onClick={() => setView("create")}>
-                    Nuevo
-                </Button>
+                <Button onClick={() => setView("create")}>Nuevo</Button>
             </div>
 
             <div className={styles.table}>
-                <TableRow 
+                <TableRow
                     isHeader
                     gridTemplate={GRID}
                     cells={[
                         { icon: "hashtag-solid", label: "Código" },
                         { icon: "clipboard-solid", label: "Nombre del permiso" },
                         { icon: "spinner-solid", label: "Estado" },
-                        { icon: "gears-solid", label: "", align: "center" }
+                        { icon: "gears-solid", label: "", align: "center" },
                     ]}
                 />
 
                 {permissions.map((perm) => (
-                    <TableRow 
+                    <TableRow
                         key={perm.id}
                         id={perm.id}
                         gridTemplate={GRID}
@@ -100,24 +91,22 @@ const PermissionsTable: React.FC<PermissionsTableProps> = ({
                             { content: <Text>{perm.id}</Text> },
                             { content: <Text>{perm.name}</Text> },
                             {
-                                content: (
-                                    <TicketStateChip label={perm.status} state="asignado" />
-                                ),
-                                align: "center"
+                                content: <TicketStateChip label={perm.status} state="asignado" />,
+                                align: "center",
                             },
                             {
                                 content: (
                                     <div>
-                                        <IconButton 
-                                            icon="file-pen-solid" 
+                                        <IconButton
+                                            icon="file-pen-solid"
                                             iconColor="#8A8A8A"
                                             onClick={() => {
                                                 setSelectedPermission(perm);
                                                 setView("edit");
                                             }}
                                         />
-                                        <IconButton 
-                                            icon="trash-solid" 
+                                        <IconButton
+                                            icon="trash-solid"
                                             iconColor="#8A8A8A"
                                             onClick={() => {
                                                 setModalOpen(true);
@@ -126,13 +115,13 @@ const PermissionsTable: React.FC<PermissionsTableProps> = ({
                                         />
                                     </div>
                                 ),
-                                align: "center"
-                            }
+                                align: "center",
+                            },
                         ]}
                     />
                 ))}
 
-                <ModalContent 
+                <ModalContent
                     isOpen={modalOpen}
                     onClose={() => setModalOpen(false)}
                     onConfirm={() => {
@@ -142,9 +131,7 @@ const PermissionsTable: React.FC<PermissionsTableProps> = ({
                     title="¿Estas seguro de querer eliminar este permiso?"
                     description="Esta acción no se podrá revertir"
                 />
-
             </div>
-
         </div>
     );
 };

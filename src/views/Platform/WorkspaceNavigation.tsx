@@ -8,7 +8,7 @@ export function useWorkspaceTab(tabs: WorkspaceTab[]) {
         router = useRouter();
     const current = tabs.find((t) => t.id === query.get("view")) || tabs[0];
     function select(id: string) {
-        if(id === current?.id) return;
+        if (id === current?.id) return;
         const next = new URLSearchParams(query);
         next.set("view", id);
         router.push(pathname + "?" + next.toString(), { scroll: false });
@@ -32,9 +32,7 @@ export function WorkspaceNavigation({
                 {tabs.map((tab) => (
                     <button
                         key={tab.id}
-                        aria-current={
-                            current?.id === tab.id ? "page" : undefined
-                        }
+                        aria-current={current?.id === tab.id ? "page" : undefined}
                         onClick={() => onSelect(tab.id)}
                     >
                         {tab.label}

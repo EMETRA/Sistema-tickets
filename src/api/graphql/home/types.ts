@@ -6,60 +6,59 @@
  * Usuario actual - Retornado por query usuario
  */
 export interface UsuarioPerfil {
-  id_usuario: string;
-  nombre: string;
-  email: string;
-  rol?: string | null;
-  perfil?: { id: number; nombre: string; descripcion?: string | null } | null;
-  roles?: { id: number; nombre: string; descripcion?: string | null }[];
-  departamento?: string;
-  direccion?: string | null;
-  puesto?: string | null;
-  permisos?: string[];
-  avatar?: string;
+    id_usuario: string;
+    nombre: string;
+    email: string;
+    rol?: string | null;
+    perfil?: { id: number; nombre: string; descripcion?: string | null } | null;
+    roles?: { id: number; nombre: string; descripcion?: string | null }[];
+    departamento?: string;
+    direccion?: string | null;
+    puesto?: string | null;
+    permisos?: string[];
+    avatar?: string;
 }
 
 /**
  * Departamento/Equipo del usuario - Retornado por query perfilequipo
  */
 export interface DepartamentoPerfil {
-  id_departamento: string;
-  nombre: string;
+    id_departamento: string;
+    nombre: string;
 }
 
 /**
  * Estadísticas de tickets del usuario
  */
 export interface TicketStats {
-  ingresados: number;
-  asignados: number;
-  resueltos: number;
-  cerrados: number;
+    ingresados: number;
+    asignados: number;
+    resueltos: number;
+    cerrados: number;
 }
 
 /**
  * Estadísticas de vacaciones del usuario
  */
 export interface VacationStats {
-  dias_disponibles: number;
-  dias_usados: number;
+    dias_disponibles: number;
+    dias_usados: number;
 }
 
 /**
  * Punto de datos para gráfico mensual de tickets
  */
 export interface MonthlyTicketsPoint {
-  mes: string;
-  tickets: number;
+    mes: string;
+    tickets: number;
 }
 
 /**
  * Estadísticas personalizadas del usuario
  */
 export interface MyStats {
-  tickets: TicketStats;
-  vacaciones: VacationStats;
-  zonas_a_cargo: string[];
-  grafico_mensual: MonthlyTicketsPoint[];
+    tickets: TicketStats;
+    vacaciones: VacationStats;
+    zonas_a_cargo: string[];
+    grafico_mensual: MonthlyTicketsPoint[];
 }
-

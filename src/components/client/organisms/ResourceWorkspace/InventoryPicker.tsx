@@ -24,8 +24,7 @@ export function inventoryClass(description: string, network: boolean) {
     if (/SWITCH/.test(s)) return "SWITCH";
     if (/ROUTER/.test(s)) return "ROUTER";
     if (/ACCESS.?POINT|PUNTO DE ACCESO/.test(s)) return "ACCESS_POINT";
-    if (network)
-        return /COMPUTADOR|CPU|LAPTOP|PORTATIL/.test(s) ? "EQUIPO" : undefined;
+    if (network) return /COMPUTADOR|CPU|LAPTOP|PORTATIL/.test(s) ? "EQUIPO" : undefined;
     if (/LAPTOP|PORTATIL/.test(s)) return "PORTATIL";
     if (/COMPUTADOR|CPU/.test(s)) return "COMPUTADORA";
     if (/IMPRESORA/.test(s)) return "IMPRESORA";
@@ -97,12 +96,8 @@ export function InventoryCatalog({
                 if (!controller.signal.aborted) {
                     setDenied(e instanceof PlatformError && e.status === 403);
                     setError(
-                        (e instanceof Error
-                            ? e.message
-                            : "No se pudo consultar Activos Fijos.") +
-                            (e instanceof PlatformError && e.reference
-                                ? ` Referencia: ${e.reference}`
-                                : ""),
+                        (e instanceof Error ? e.message : "No se pudo consultar Activos Fijos.") +
+                            (e instanceof PlatformError && e.reference ? ` Referencia: ${e.reference}` : ""),
                     );
                 }
             })
@@ -114,7 +109,11 @@ export function InventoryCatalog({
     function search(e?: { preventDefault(): void }) {
         e?.preventDefault();
         setFilters(
-            new URLSearchParams(Object.entries({ empleado, tarjeta, numero, q }).filter(([,value])=>value.trim()).map(([key,value])=>[key,value.trim()])).toString(),
+            new URLSearchParams(
+                Object.entries({ empleado, tarjeta, numero, q })
+                    .filter(([, value]) => value.trim())
+                    .map(([key, value]) => [key, value.trim()]),
+            ).toString(),
         );
         setOffset(0);
         setRevision((v) => v + 1);
@@ -126,8 +125,7 @@ export function InventoryCatalog({
                 <div>
                     <h3>{title}</h3>
                     <p className={styles.muted}>
-                        Origen: Activos Fijos. La ficha técnica se completa en
-                        Tickets.
+                        Origen: Activos Fijos. La ficha técnica se completa en Tickets.
                     </p>
                 </div>
                 <Button
@@ -216,36 +214,23 @@ export function InventoryCatalog({
                                     <th>Inventario / descripción</th>
                                     <th>Asignación institucional</th>
                                     <th>Serie / modelo</th>
-                                    {(onSelect || onOpen) && (
-                                        <th>Ficha técnica</th>
-                                    )}
+                                    {(onSelect || onOpen) && <th>Ficha técnica</th>}
                                 </tr>
                             </thead>
                             <tbody>
                                 {result.items.map((i, index) => (
-                                    <tr
-                                        key={`${i.referencia}:${i.tarjeta}:${i.empleado}:${index}`}
-                                    >
+                                    <tr key={`${i.referencia}:${i.tarjeta}:${i.empleado}:${index}`}>
                                         <td>
-                                            <strong>
-                                                {i.numeroInventario}
-                                            </strong>
-                                            <p>
-                                                {i.descripcion ||
-                                                    "Descripción pendiente en Activos Fijos"}
-                                            </p>
+                                            <strong>{i.numeroInventario}</strong>
+                                            <p>{i.descripcion || "Descripción pendiente en Activos Fijos"}</p>
                                             {!i.fichaCompleta && (
-                                                <small>
-                                                    Ficha del bien incompleta en
-                                                    origen
-                                                </small>
+                                                <small>Ficha del bien incompleta en origen</small>
                                             )}
                                         </td>
                                         <td>
                                             Tarjeta {i.tarjeta}
                                             <p>
-                                                {i.nombreEmpleado || "Empleado"}{" "}
-                                                · {i.empleado}
+                                                {i.nombreEmpleado || "Empleado"} · {i.empleado}
                                             </p>
                                         </td>
                                         <td>
@@ -258,31 +243,23 @@ export function InventoryCatalog({
                                                     <button
                                                         type="button"
                                                         className={styles.link}
-                                                        onClick={() =>
-                                                            onOpen(i.fichaId!)
-                                                        }
+                                                        onClick={() => onOpen(i.fichaId!)}
                                                     >
                                                         Ver ficha
                                                     </button>
-                                                ) : onSelect &&
-                                                  i.fichaCompleta ? (
+                                                ) : onSelect && i.fichaCompleta ? (
                                                     <button
                                                         type="button"
                                                         className={styles.link}
                                                         aria-label={
-                                                            "Crear ficha técnica " +
-                                                            i.numeroInventario
+                                                            "Crear ficha técnica " + i.numeroInventario
                                                         }
-                                                        onClick={() =>
-                                                            onSelect(i)
-                                                        }
+                                                        onClick={() => onSelect(i)}
                                                     >
                                                         + Crear ficha técnica
                                                     </button>
                                                 ) : (
-                                                    <span className={styles.muted}>
-                                                        Solo consulta
-                                                    </span>
+                                                    <span className={styles.muted}>Solo consulta</span>
                                                 )}
                                             </td>
                                         )}
@@ -293,35 +270,28 @@ export function InventoryCatalog({
                     </div>
                     {!result.items.length && (
                         <p role="status">
-                            No se encontraron bienes vigentes con estos filtros.
-                            Revisa el código de empleado y la tarjeta en Activos
-                            Fijos.
+                            No se encontraron bienes vigentes con estos filtros. Revisa el código de empleado
+                            y la tarjeta en Activos Fijos.
                         </p>
                     )}
                     <div className={styles.toolbar}>
                         <p className={styles.muted}>
-                            {result.items.length} asignaciones en esta página ·
-                            Página {Math.floor(offset / 50) + 1}
+                            {result.items.length} asignaciones en esta página · Página{" "}
+                            {Math.floor(offset / 50) + 1}
                         </p>
                         <div className={styles.actions}>
                             <Button
                                 type="button"
                                 variant="outlined"
                                 state={busy || !offset ? "disabled" : "default"}
-                                onClick={() =>
-                                    setOffset((v) => Math.max(0, v - 50))
-                                }
+                                onClick={() => setOffset((v) => Math.max(0, v - 50))}
                             >
                                 Bienes anteriores
                             </Button>
                             <Button
                                 type="button"
                                 variant="outlined"
-                                state={
-                                    busy || !result.hayMas
-                                        ? "disabled"
-                                        : "default"
-                                }
+                                state={busy || !result.hayMas ? "disabled" : "default"}
                                 onClick={() => setOffset((v) => v + 50)}
                             >
                                 Bienes siguientes

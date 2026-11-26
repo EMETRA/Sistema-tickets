@@ -19,10 +19,8 @@ export const LabelChipGroup = ({
     const containerRef = useRef<HTMLDivElement>(null);
 
     const unselectedOptions = useMemo(
-        () => availableOptions.filter(
-            (opt) => !labels.some((l) => l.value === opt.value)
-        ),
-        [availableOptions, labels]
+        () => availableOptions.filter((opt) => !labels.some((l) => l.value === opt.value)),
+        [availableOptions, labels],
     );
 
     useEffect(() => {
@@ -66,13 +64,12 @@ export const LabelChipGroup = ({
     }
 
     return (
-        <div
-            ref={containerRef}
-            className={classNames(styles.container, className)}
-        >
+        <div ref={containerRef} className={classNames(styles.container, className)}>
             <div
                 className={classNames(styles.inputBox, { [styles.inputBoxOpen]: isOpen })}
-                onClick={() => { if (unselectedOptions.length > 0) setIsOpen((prev) => !prev); }}
+                onClick={() => {
+                    if (unselectedOptions.length > 0) setIsOpen((prev) => !prev);
+                }}
                 role="button"
                 aria-haspopup="listbox"
                 aria-expanded={isOpen}
@@ -101,11 +98,7 @@ export const LabelChipGroup = ({
             </div>
 
             {isOpen && unselectedOptions.length > 0 && (
-                <ul
-                    className={styles.dropdown}
-                    role="listbox"
-                    aria-label="Opciones de etiqueta"
-                >
+                <ul className={styles.dropdown} role="listbox" aria-label="Opciones de etiqueta">
                     {unselectedOptions.map((opt) => (
                         <li
                             key={opt.value}
@@ -134,4 +127,4 @@ export const LabelChipGroup = ({
     );
 };
 
-export default LabelChipGroup;  
+export default LabelChipGroup;

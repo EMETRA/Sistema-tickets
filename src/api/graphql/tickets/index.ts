@@ -1,26 +1,25 @@
 // ========================================
 // QUERIES - Lista y Detalles
 // ========================================
-export { GET_TICKETS_QUERY } from './getTickets';
-export { GET_TICKET_BY_ID_QUERY } from './ticketById';
-export { GET_TICKETS_BY_USER_ID_QUERY } from './getTicketsByUserId';
+export { GET_TICKETS_QUERY } from "./getTickets";
+export { GET_TICKET_BY_ID_QUERY } from "./ticketById";
+export { GET_TICKETS_BY_USER_ID_QUERY } from "./getTicketsByUserId";
 
 // ========================================
 // QUERIES - Comentarios, Historial, Adjuntos, Tags, Mensajes
 // ========================================
-export { GET_TICKET_HISTORY_QUERY } from './ticketHistory';
-export { GET_TICKET_ATTACHMENTS_QUERY } from './ticketAttachments';
-export { GET_TICKET_TAGS_QUERY } from './ticketTags';
-export { GET_TICKET_MESSAGES_QUERY } from './ticketMessages';
+export { GET_TICKET_HISTORY_QUERY } from "./ticketHistory";
+export { GET_TICKET_ATTACHMENTS_QUERY } from "./ticketAttachments";
+export { GET_TICKET_TAGS_QUERY } from "./ticketTags";
+export { GET_TICKET_MESSAGES_QUERY } from "./ticketMessages";
 
 // ========================================
 // QUERIES - Catálogos (Categories, Priorities, Statuses, Tags)
 // ========================================
-export { GET_TICKET_CATEGORIES_QUERY } from './ticketCategories';
-export { GET_TICKET_PRIORITIES_QUERY } from './ticketPriorities';
-export { GET_TICKET_STATUSES_QUERY } from './ticketStatuses';
-export { GET_TICKET_TAG_CATALOG_QUERY } from './ticketTagCatalog';
-
+export { GET_TICKET_CATEGORIES_QUERY } from "./ticketCategories";
+export { GET_TICKET_PRIORITIES_QUERY } from "./ticketPriorities";
+export { GET_TICKET_STATUSES_QUERY } from "./ticketStatuses";
+export { GET_TICKET_TAG_CATALOG_QUERY } from "./ticketTagCatalog";
 
 // ========================================
 // TYPES - All types centralized (DRY)
@@ -58,14 +57,14 @@ export type {
     TicketEstado,
     GetTicketStatusesResponse,
     GetTicketTagCatalogResponse,
-} from './types';
+} from "./types";
 
 // ========================================
 // MUTATIONS - Create, Update, Delete
 // ========================================
-export { CREATE_TICKET_MUTATION } from './createTicket';
-export { UPDATE_TICKET_MUTATION } from './updateTicket';
-export { DELETE_TICKET_MUTATION } from './deleteTicket';
-export { ADD_TAG_TO_TICKET_MUTATION } from './addTagToTicket';
-export { CREATE_TICKET_TAG_MUTATION } from './createTicketTag';
-export { REMOVE_TAG_FROM_TICKET_MUTATION } from './removeTagFromTicket';
+export { CREATE_TICKET_MUTATION } from "./createTicket";
+export { UPDATE_TICKET_MUTATION } from "./updateTicket";
+export { DELETE_TICKET_MUTATION } from "./deleteTicket";
+export { ADD_TAG_TO_TICKET_MUTATION } from "./addTagToTicket";
+export { CREATE_TICKET_TAG_MUTATION } from "./createTicketTag";
+export { REMOVE_TAG_FROM_TICKET_MUTATION } from "./removeTagFromTicket";

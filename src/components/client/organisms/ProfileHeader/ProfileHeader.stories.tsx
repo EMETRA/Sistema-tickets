@@ -13,14 +13,14 @@ export const Default = () => {
     const [view, setView] = useState("perfil");
 
     return (
-        <ProfileHeader 
+        <ProfileHeader
             bannerSrc="/images/city.png"
             initials="G"
             name="Gildder Alberto Caceres Urizar"
             role="Administrador"
             switchOptions={[
                 { label: "Perfil", value: "perfil" },
-                { label: "Mantenimiento", value: "mantenimiento" }
+                { label: "Mantenimiento", value: "mantenimiento" },
             ]}
             switchValue={view}
             onSwitchChange={setView}

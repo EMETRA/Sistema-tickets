@@ -23,24 +23,13 @@ export const TicketCard: React.FC<TicketCardProps> = (props) => {
         <div className={classNames(styles.TicketCard, className)}>
             <div className={styles.Header}>
                 <h3 className={styles.Label}>{label}</h3>
-                <div 
-                    className={styles.IconContainer}
-                    style={{ backgroundColor: color }}
-                >
-                    <Icon 
-                        name={iconName} 
-                        size={30}
-                        variant="status"
-                        className={styles.Icon}
-                    />
+                <div className={styles.IconContainer} style={{ backgroundColor: color }}>
+                    <Icon name={iconName} size={30} variant="status" className={styles.Icon} />
                 </div>
             </div>
-      
+
             <div className={styles.Content}>
-                <p 
-                    className={styles.Value}
-                    style={{ color }}
-                >
+                <p className={styles.Value} style={{ color }}>
                     {value.toLocaleString()}
                 </p>
                 <p className={styles.SubLabel}>Tickets</p>

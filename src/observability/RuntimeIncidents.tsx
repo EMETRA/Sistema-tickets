@@ -6,14 +6,25 @@ const CODES = ["JS_RUNTIME_ERROR", "JS_REJECTION", "REACT_RENDER_ERROR"];
 type Event = { referencia: string; codigo: string; operacion: string };
 function pending(): Event[] {
     try {
-        const data: unknown = JSON.parse(localStorage.getItem(KEY) || '[]');
+        const data: unknown = JSON.parse(localStorage.getItem(KEY) || "[]");
         if (!Array.isArray(data)) return [];
-        return data.filter((value: unknown): value is Event => {
-            if (!value || typeof value !== 'object') return false;
-            const event = value as Record<string, unknown>;
-            return typeof event.codigo === 'string' && CODES.includes(event.codigo) && typeof event.referencia === 'string' && /^[a-f0-9-]{36}$/.test(event.referencia) && typeof event.operacion === 'string' && /^(home|mis-tickets|aplicaciones|espacio|mod04|mod05|mod06)$/.test(event.operacion);
-        }).slice(-50);
-    } catch { return []; }
+        return data
+            .filter((value: unknown): value is Event => {
+                if (!value || typeof value !== "object") return false;
+                const event = value as Record<string, unknown>;
+                return (
+                    typeof event.codigo === "string" &&
+                    CODES.includes(event.codigo) &&
+                    typeof event.referencia === "string" &&
+                    /^[a-f0-9-]{36}$/.test(event.referencia) &&
+                    typeof event.operacion === "string" &&
+                    /^(home|mis-tickets|aplicaciones|espacio|mod04|mod05|mod06)$/.test(event.operacion)
+                );
+            })
+            .slice(-50);
+    } catch {
+        return [];
+    }
 }
 
 let flushing = false;
@@ -37,9 +48,7 @@ async function flush() {
             if (!result.encolada) break;
             localStorage.setItem(
                 KEY,
-                JSON.stringify(
-                    pending().filter((e) => e.referencia !== event.referencia),
-                ),
+                JSON.stringify(pending().filter((e) => e.referencia !== event.referencia)),
             );
         }
     } catch {
@@ -54,24 +63,14 @@ export function reportRuntimeIncident(codigo: string) {
     const moduleId = path.match(/\/(mod04|mod05|mod06)(?:\/|$)/)?.[1];
     const root = path.split("/")[1];
     const operacion =
-        moduleId ||
-        (["home", "mis-tickets", "aplicaciones", "espacio"].includes(root)
-            ? root
-            : "home");
+        moduleId || (["home", "mis-tickets", "aplicaciones", "espacio"].includes(root) ? root : "home");
     try {
         const events = pending();
-        if (
-            !events.some(
-                (e) => e.codigo === codigo && e.operacion === operacion,
-            )
-        )
+        if (!events.some((e) => e.codigo === codigo && e.operacion === operacion))
             localStorage.setItem(
                 KEY,
                 JSON.stringify(
-                    [
-                        ...events,
-                        { referencia: crypto.randomUUID(), codigo, operacion },
-                    ].slice(-50),
+                    [...events, { referencia: crypto.randomUUID(), codigo, operacion }].slice(-50),
                 ),
             );
     } catch {

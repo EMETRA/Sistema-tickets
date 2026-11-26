@@ -18,11 +18,7 @@ export const ReportTable: React.FC<ReportTableProps> = ({
     return (
         <article className={classNames(styles.ReportTable, className)}>
             <div className={styles.header}>
-                <TableHeader
-                    iconName={iconName}
-                    label={title}
-                    className={styles.headerTitle}
-                />
+                <TableHeader iconName={iconName} label={title} className={styles.headerTitle} />
             </div>
 
             <div className={styles.chartContainer}>

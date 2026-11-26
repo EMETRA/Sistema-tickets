@@ -5,11 +5,7 @@ import { Button } from "@/components/client/atoms/Button";
 import { usePlatform } from "@/platform/context";
 import { platformFetch } from "@/platform/client";
 import type { PageResult, PlatformRecord } from "@/platform/types";
-import {
-    RESOURCE_PRESENTATION,
-    resourceDefinition,
-    resourceValue,
-} from "@/platform/resources";
+import { RESOURCE_PRESENTATION, resourceDefinition, resourceValue } from "@/platform/resources";
 import { RecordEditor } from "./RecordEditor";
 import { RecordDetail, displayDate } from "./RecordDetail";
 import styles from "../../templates/PlatformPage/PlatformPage.module.scss";
@@ -57,14 +53,10 @@ export function ResourceWorkspace({
         [error, setError] = useState(""),
         [revision, setRevision] = useState(0),
         [selected, setSelected] = useState<PlatformRecord | null>(null),
-        [editing, setEditing] = useState<PlatformRecord | null | undefined>(
-            undefined,
-        ),
+        [editing, setEditing] = useState<PlatformRecord | null | undefined>(undefined),
         [message, setMessage] = useState(""),
         // Propuesta: las solicitudes abren en «Pendientes», la pregunta diaria.
-        [estado, setEstado] = useState(
-            type === "solicitudes" ? "PENDIENTE" : "",
-        );
+        [estado, setEstado] = useState(type === "solicitudes" ? "PENDIENTE" : "");
     const stateFilters = STATE_FILTERS[type];
     const rawDef = data!.definitions[type],
         def = rawDef ? resourceDefinition(type, rawDef) : null,
@@ -72,19 +64,29 @@ export function ResourceWorkspace({
     const refresh = useCallback(() => setRevision((v) => v + 1), []);
     // Propuesta: las listas no traen nombres de personas ni de referencias; se resuelven aquí.
     const [refNames, setRefNames] = useState<Record<string, string>>({});
-    const refFields = copy && def
-        ? copy.columns
-              .map((c) => def.fields.find((f) => f.key === c.key))
-              .filter((f): f is NonNullable<typeof f> => !!f && (f.type === "user" || (f.type === "ref" && !!f.resource)))
-        : [];
+    const refFields =
+        copy && def
+            ? copy.columns
+                  .map((c) => def.fields.find((f) => f.key === c.key))
+                  .filter(
+                      (f): f is NonNullable<typeof f> =>
+                          !!f && (f.type === "user" || (f.type === "ref" && !!f.resource)),
+                  )
+            : [];
     const refKey = refFields.map((f) => f.key + ":" + (f.resource || f.type)).join(",");
     useEffect(() => {
         if (!refKey) return;
         const controller = new AbortController();
-        const sources = [...new Set(refFields.map((f) => (f.type === "user" ? "/people?q=" : `/records/${f.resource}?limit=100`)))];
+        const sources = [
+            ...new Set(
+                refFields.map((f) => (f.type === "user" ? "/people?q=" : `/records/${f.resource}?limit=100`)),
+            ),
+        ];
         Promise.all(
             sources.map((path) =>
-                platformFetch<PageResult<PlatformRecord> | { id: number | string; nombre: string }[]>(path, { signal: controller.signal })
+                platformFetch<PageResult<PlatformRecord> | { id: number | string; nombre: string }[]>(path, {
+                    signal: controller.signal,
+                })
                     .then((r) => (Array.isArray(r) ? r : r.items))
                     .catch(() => []),
             ),
@@ -108,10 +110,9 @@ export function ResourceWorkspace({
             });
             if (scopeEquipoId) params.set("equipoId", scopeEquipoId);
             if (estado && STATE_FILTERS[type]) params.set("estado", estado);
-            platformFetch<PageResult<PlatformRecord>>(
-                `/records/${type}?${params}`,
-                { signal: controller.signal },
-            )
+            platformFetch<PageResult<PlatformRecord>>(`/records/${type}?${params}`, {
+                signal: controller.signal,
+            })
                 .then((r) => {
                     if (!controller.signal.aborted) setResult(r);
                 })
@@ -127,19 +128,11 @@ export function ResourceWorkspace({
             controller.abort();
         };
     }, [type, def?.actions.LEER, query, offset, revision, scopeEquipoId, estado]);
-    if (!def)
-        return (
-            <p className={styles.card}>
-                No tienes registros disponibles en esta sección.
-            </p>
-        );
+    if (!def) return <p className={styles.card}>No tienes registros disponibles en esta sección.</p>;
     return (
         <section className={styles.page} aria-label={def.title}>
             {!hideTabs && options.length > 1 && (
-                <nav
-                    className={styles.tabs}
-                    aria-label="Registros de la sección"
-                >
+                <nav className={styles.tabs} aria-label="Registros de la sección">
                     {options.map(([id, d]) => (
                         <button
                             key={id}
@@ -183,9 +176,17 @@ export function ResourceWorkspace({
             <div className={styles.listPanel} aria-busy={loading && !!def.actions.LEER}>
                 {def.actions.LEER && (
                     <div className={styles.toolbar}>
-                        <input className={styles.control + " " + styles.search} type="search"
-                            aria-label="Buscar registro" placeholder="Buscar registro" value={query}
-                            onChange={(e) => { setQuery(e.target.value); setOffset(0); }} />
+                        <input
+                            className={styles.control + " " + styles.search}
+                            type="search"
+                            aria-label="Buscar registro"
+                            placeholder="Buscar registro"
+                            value={query}
+                            onChange={(e) => {
+                                setQuery(e.target.value);
+                                setOffset(0);
+                            }}
+                        />
                         {stateFilters && (
                             <div className={styles.stateFilters} role="group" aria-label="Filtrar por estado">
                                 {stateFilters.map(([value, label]) => (
@@ -194,16 +195,21 @@ export function ResourceWorkspace({
                                         type="button"
                                         aria-pressed={estado === value}
                                         data-tone={value ? statusTone(value) : undefined}
-                                        onClick={() => { setEstado(value); setOffset(0); }}
+                                        onClick={() => {
+                                            setEstado(value);
+                                            setOffset(0);
+                                        }}
                                     >
                                         {label}
                                     </button>
                                 ))}
                             </div>
                         )}
-                        {!loading && !error && <p className={styles.muted} role="status">
-                            {result.total} {result.total === 1 ? "registro" : "registros"}
-                        </p>}
+                        {!loading && !error && (
+                            <p className={styles.muted} role="status">
+                                {result.total} {result.total === 1 ? "registro" : "registros"}
+                            </p>
+                        )}
                     </div>
                 )}
                 {error ? (
@@ -223,9 +229,7 @@ export function ResourceWorkspace({
                                     <tr>
                                         <th>Nombre</th>
                                         {copy ? (
-                                            copy.columns.map((c) => (
-                                                <th key={c.key}>{c.label}</th>
-                                            ))
+                                            copy.columns.map((c) => <th key={c.key}>{c.label}</th>)
                                         ) : (
                                             <>
                                                 <th>Estado</th>
@@ -233,7 +237,6 @@ export function ResourceWorkspace({
                                                 <th>Actualizado</th>
                                             </>
                                         )}
-
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -242,9 +245,7 @@ export function ResourceWorkspace({
                                             <td>
                                                 <button
                                                     className={styles.link}
-                                                    onClick={() =>
-                                                        setSelected(row)
-                                                    }
+                                                    onClick={() => setSelected(row)}
                                                 >
                                                     {row.nombre}
                                                 </button>
@@ -262,14 +263,11 @@ export function ResourceWorkspace({
                                                         ) : (
                                                             (refFields.some((f) => f.key === c.key) &&
                                                                 refNames[String(row.datos[c.key])]) ||
-                                                            (def.fields.find((f) => f.key === c.key)?.type === "select" &&
+                                                            (def.fields.find((f) => f.key === c.key)?.type ===
+                                                                "select" &&
                                                                 !!row.datos[c.key] &&
                                                                 statusLabel(String(row.datos[c.key]))) ||
-                                                            resourceValue(
-                                                                row,
-                                                                c.key,
-                                                                data!.teams,
-                                                            )
+                                                            resourceValue(row, c.key, data!.teams)
                                                         )}
                                                     </td>
                                                 ))
@@ -277,31 +275,17 @@ export function ResourceWorkspace({
                                                 <>
                                                     <td>
                                                         <span
-                                                            className={
-                                                                styles.chip
-                                                            }
-                                                            data-tone={statusTone(
-                                                                row.estado,
-                                                            )}
+                                                            className={styles.chip}
+                                                            data-tone={statusTone(row.estado)}
                                                         >
-                                                            {statusLabel(
-                                                                row.estado,
-                                                            )}
+                                                            {statusLabel(row.estado)}
                                                         </span>
                                                     </td>
                                                     <td>
-                                                        {data!.teams.find(
-                                                            (t) =>
-                                                                t.id ===
-                                                                row.equipoId,
-                                                        )?.nombre ||
-                                                            "Administración institucional"}
+                                                        {data!.teams.find((t) => t.id === row.equipoId)
+                                                            ?.nombre || "Administración institucional"}
                                                     </td>
-                                                    <td>
-                                                        {displayDate(
-                                                            row.actualizadoEn,
-                                                        )}
-                                                    </td>
+                                                    <td>{displayDate(row.actualizadoEn)}</td>
                                                 </>
                                             )}
                                         </tr>
@@ -310,15 +294,10 @@ export function ResourceWorkspace({
                             </table>
                             {!result.items.length && (
                                 <div className={styles.card}>
-                                    <p>
-                                        No hay registros que coincidan con esta
-                                        consulta.
-                                    </p>
+                                    <p>No hay registros que coincidan con esta consulta.</p>
                                     {def.actions.INSERTAR && (
                                         <p className={styles.muted}>
-                                            Usa Registrar{" "}
-                                            {def.singular.toLowerCase()} para
-                                            añadir el primero.
+                                            Usa Registrar {def.singular.toLowerCase()} para añadir el primero.
                                         </p>
                                     )}
                                 </div>
@@ -326,29 +305,20 @@ export function ResourceWorkspace({
                         </div>
                         <div className={styles.toolbar}>
                             <p className={styles.muted}>
-                                Página {Math.floor(offset / 25) + 1} de {Math.max(1, Math.ceil(result.total / 25))}
+                                Página {Math.floor(offset / 25) + 1} de{" "}
+                                {Math.max(1, Math.ceil(result.total / 25))}
                             </p>
                             <div className={styles.actions}>
                                 <Button
                                     variant="outlined"
-                                    state={
-                                        offset && !loading
-                                            ? "default"
-                                            : "disabled"
-                                    }
-                                    onClick={() =>
-                                        setOffset((v) => Math.max(0, v - 25))
-                                    }
+                                    state={offset && !loading ? "default" : "disabled"}
+                                    onClick={() => setOffset((v) => Math.max(0, v - 25))}
                                 >
                                     Anterior
                                 </Button>
                                 <Button
                                     variant="outlined"
-                                    state={
-                                        offset + 25 < result.total && !loading
-                                            ? "default"
-                                            : "disabled"
-                                    }
+                                    state={offset + 25 < result.total && !loading ? "default" : "disabled"}
                                     onClick={() => setOffset((v) => v + 25)}
                                 >
                                     Siguiente
@@ -357,9 +327,7 @@ export function ResourceWorkspace({
                         </div>
                     </>
                 ) : (
-                    <p className={styles.muted}>
-                        Puedes registrar información en este módulo.
-                    </p>
+                    <p className={styles.muted}>Puedes registrar información en este módulo.</p>
                 )}
             </div>
             {editing !== undefined && (

@@ -1,16 +1,18 @@
 export const ACCESS_TABS = [
-    { id: "corporate", label: "Funciones corporativas", description: "Consulta y gestiona las funciones de los sistemas corporativos autorizados." },
+    {
+        id: "corporate",
+        label: "Funciones corporativas",
+        description: "Consulta y gestiona las funciones de los sistemas corporativos autorizados.",
+    },
     {
         id: "users",
         label: "Usuarios",
-        description:
-            "Asigna un perfil base y sus excepciones o copia los accesos de otro colaborador.",
+        description: "Asigna un perfil base y sus excepciones o copia los accesos de otro colaborador.",
     },
     {
         id: "profiles",
         label: "Perfiles",
-        description:
-            "Agrupa los roles que corresponden a una función dentro de la institución.",
+        description: "Agrupa los roles que corresponden a una función dentro de la institución.",
     },
     {
         id: "roles",

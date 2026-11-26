@@ -44,8 +44,8 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<{ message: string } | null>(null); // Error al cargar el caso
     const [errorSendResolution, setErrorSendResolution] = useState<{
-    message: string;
-  } | null>(null); // Error al enviar la resolución
+        message: string;
+    } | null>(null); // Error al enviar la resolución
     const router = useRouter();
 
     const [showConfirmReceiptModal, setShowConfirmReceiptModal] = useState(false);
@@ -72,23 +72,21 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
     const enCurso = useRef(false);
     const recepcionPendiente = useRef<RecepcionInput | null>(null);
     const resolucionPendiente = useRef<{
-    decision: "ACOGIDA" | "NO_ACOGIDA";
-    input: ResolucionInput;
-  } | null>(null);
+        decision: "ACOGIDA" | "NO_ACOGIDA";
+        input: ResolucionInput;
+    } | null>(null);
     const gestionPendiente = useRef<GestionInput | null>(null);
     const puedeConsultar = permisos.includes("VIVI_JUZGADO_CONSULTAR");
     const puedeRecibir =
-    !!detalle &&
-    !detalle.expediente &&
-    ["REGISTRADA", "PENDIENTE_CORREO", "NOTIFICADA", "DEFENSA_WEB"].includes(
-        detalle.estadoCaso,
-    ) &&
-    permisos.includes("VIVI_JUZGADO_RECIBIR");
+        !!detalle &&
+        !detalle.expediente &&
+        ["REGISTRADA", "PENDIENTE_CORREO", "NOTIFICADA", "DEFENSA_WEB"].includes(detalle.estadoCaso) &&
+        permisos.includes("VIVI_JUZGADO_RECIBIR");
     const puedeResolver =
-    detalle?.estadoCaso === "EN_JUZGADO" &&
-    !!detalle.expediente &&
-    ["RECIBIDO", "EN_REVISION"].includes(detalle.expediente.estado) &&
-    permisos.includes("VIVI_JUZGADO_RESOLVER");
+        detalle?.estadoCaso === "EN_JUZGADO" &&
+        !!detalle.expediente &&
+        ["RECIBIDO", "EN_REVISION"].includes(detalle.expediente.estado) &&
+        permisos.includes("VIVI_JUZGADO_RESOLVER");
 
     async function recargar() {
         const data = await consultarCasoJuzgado(caseNumber);
@@ -143,9 +141,13 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
             .then((disponibles) => {
                 if (activo) {
                     setSedes(disponibles);
-                    setSede((actual) => disponibles.some((item) => item.codigo === actual)
-                        ? actual
-                        : disponibles.length === 1 ? disponibles[0].codigo : "");
+                    setSede((actual) =>
+                        disponibles.some((item) => item.codigo === actual)
+                            ? actual
+                            : disponibles.length === 1
+                              ? disponibles[0].codigo
+                              : "",
+                    );
                 }
             })
             .catch((e) => {
@@ -241,10 +243,7 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
         const pendiente = resolucionPendiente.current;
         void ejecutar(
             async () => {
-                const resultado = await resolverCasoJuzgado(
-                    pendiente.decision,
-                    pendiente.input,
-                );
+                const resultado = await resolverCasoJuzgado(pendiente.decision, pendiente.input);
                 if (resultado.estadoDocumento === "ERROR_REINTENTABLE")
                     setAviso(
                         "La resolución fue confirmada. El PDF está pendiente por un error recuperable; reintenta solo el documento.",
@@ -286,9 +285,7 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
             <div className={classNames(styles.mainContainer, styles.error)}>
                 <Text variant="body">{error.message}</Text>
                 {puedeConsultar && (
-                    <Button onClick={() => setConsultaVersion((v) => v + 1)}>
-                        Reintentar consulta
-                    </Button>
+                    <Button onClick={() => setConsultaVersion((v) => v + 1)}>Reintentar consulta</Button>
                 )}
                 <Button variant="contained" onClick={() => router.back()}>
                     Volver
@@ -316,11 +313,7 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
         <div className={styles.mainContainer}>
             <header className={styles.caseHero}>
                 <div className={styles.heroTop}>
-                    <button
-                        type="button"
-                        onClick={() => router.back()}
-                        className={styles.backLink}
-                    >
+                    <button type="button" onClick={() => router.back()} className={styles.backLink}>
                         ← Volver a casos
                     </button>
                     <span>Juzgado de tránsito · Avísame</span>
@@ -331,9 +324,7 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
                         <h1>{currentCase.placa}</h1>
                         <p>{currentCase.title}</p>
                     </div>
-                    <div className={styles.statusPill}>
-                        {estadoCasoJuzgado(currentCase.status)}
-                    </div>
+                    <div className={styles.statusPill}>{estadoCasoJuzgado(currentCase.status)}</div>
                 </div>
                 <dl className={styles.caseMeta}>
                     <div>
@@ -360,11 +351,7 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
 
             <div className={styles.reviewGrid}>
                 <div className={styles.evidenceColumn}>
-                    <section
-                        id="denuncia"
-                        className={styles.sectionCard}
-                        aria-labelledby="titulo-denuncia"
-                    >
+                    <section id="denuncia" className={styles.sectionCard} aria-labelledby="titulo-denuncia">
                         <div className={styles.sectionHeading}>
                             <div>
                                 <span className={styles.eyebrow}>Hecho reportado</span>
@@ -374,38 +361,26 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
                                 {currentCase.denuncia.evidencias.length} archivos
                             </span>
                         </div>
-                        <p className={styles.description}>
-                            {currentCase.denuncia.descripción}
-                        </p>
+                        <p className={styles.description}>{currentCase.denuncia.descripción}</p>
                         <EvidenciasCaso archivos={currentCase.denuncia.evidencias} />
                     </section>
-                    <section
-                        id="defensa"
-                        className={styles.sectionCard}
-                        aria-labelledby="titulo-defensa"
-                    >
+                    <section id="defensa" className={styles.sectionCard} aria-labelledby="titulo-defensa">
                         <div className={styles.sectionHeading}>
                             <div>
-                                <span className={styles.eyebrow}>
-                                    Versión de la persona notificada
-                                </span>
+                                <span className={styles.eyebrow}>Versión de la persona notificada</span>
                                 <h2 id="titulo-defensa">Defensa presentada</h2>
                             </div>
                         </div>
                         {currentCase.defensa ? (
                             <>
-                                <p className={styles.defenseAuthor}>
-                                    {currentCase.defensa.nombreDeclarado}
-                                </p>
-                                <p className={styles.description}>
-                                    {currentCase.defensa.argumentos}
-                                </p>
+                                <p className={styles.defenseAuthor}>{currentCase.defensa.nombreDeclarado}</p>
+                                <p className={styles.description}>{currentCase.defensa.argumentos}</p>
                                 <EvidenciasCaso archivos={currentCase.defensa.evidencias} />
                             </>
                         ) : (
                             <p className={styles.emptyState}>
-                                No hay una defensa web registrada. La recepción de papelería
-                                física se consulta en el expediente.
+                                No hay una defensa web registrada. La recepción de papelería física se
+                                consulta en el expediente.
                             </p>
                         )}
                     </section>
@@ -414,27 +389,36 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
                     <AnalisisEvidencias analisis={detalle?.caso.analisisEvidencias} />
                 </div>
             </div>
-            <section id="gestion-expediente" className={styles.workflowSection} aria-labelledby="titulo-gestion">
+            <section
+                id="gestion-expediente"
+                className={styles.workflowSection}
+                aria-labelledby="titulo-gestion"
+            >
                 <header className={styles.workflowToolbar}>
                     <div>
                         <span className={styles.eyebrow}>Gestión del expediente</span>
                         <h2 id="titulo-gestion">Recepción y resolución</h2>
                     </div>
-                    <Button type="button" variant="outlined" state={busy ? "disabled" : "default"} onClick={() => void actualizarEstado()}>
+                    <Button
+                        type="button"
+                        variant="outlined"
+                        state={busy ? "disabled" : "default"}
+                        onClick={() => void actualizarEstado()}
+                    >
                         {busy ? "Actualizando…" : "Actualizar estado"}
                     </Button>
                 </header>
-                {aviso && <div className={styles.workflowNotice} role="alert">{aviso}</div>}
+                {aviso && (
+                    <div className={styles.workflowNotice} role="alert">
+                        {aviso}
+                    </div>
+                )}
                 <div className={styles.workflowGrid}>
                     {detalle?.expediente && (
-                        <section
-                            className={styles.juzgadoInfo}
-                            aria-label="Datos del juzgado"
-                        >
+                        <section className={styles.juzgadoInfo} aria-label="Datos del juzgado">
                             <Title variant="mid">Juzgado receptor</Title>
                             <Text variant="body">
-                                {detalle.expediente.nombreJuzgado} ·{" "}
-                                {detalle.expediente.codigoJuzgado}
+                                {detalle.expediente.nombreJuzgado} · {detalle.expediente.codigoJuzgado}
                             </Text>
                             <Text variant="body">
                                 <strong>Dirección:</strong>{" "}
@@ -465,13 +449,18 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
                             <div className={styles.sectionHeading}>
                                 <div>
                                     <span className={styles.eyebrow}>Acción pendiente</span>
-                                    <h2>{puedeRecibir ? "Recepción de papelería" : "Resolución del expediente"}</h2>
+                                    <h2>
+                                        {puedeRecibir
+                                            ? "Recepción de papelería"
+                                            : "Resolución del expediente"}
+                                    </h2>
                                 </div>
                             </div>
                             {puedeRecibir ? (
                                 <>
                                     <p className={styles.sectionDescription}>
-                                        Registra la entrega física de la papelería para abrir el expediente y continuar su revisión.
+                                        Registra la entrega física de la papelería para abrir el expediente y
+                                        continuar su revisión.
                                     </p>
                                     {cargandoSedes ? (
                                         <div role="status" className={styles.catalogNotice}>
@@ -482,28 +471,52 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
                                         <div role="alert" className={styles.catalogNotice} data-state="error">
                                             <h3>No se pudo cargar el catálogo de juzgados</h3>
                                             <p>{errorSedes}</p>
-                                            <Button type="button" variant="outlined" onClick={() => setCatalogoVersion((v) => v + 1)}>
+                                            <Button
+                                                type="button"
+                                                variant="outlined"
+                                                onClick={() => setCatalogoVersion((v) => v + 1)}
+                                            >
                                                 Reintentar juzgados
                                             </Button>
                                         </div>
                                     ) : !sedes.length ? (
-                                        <div role="status" className={styles.catalogNotice} data-state="empty">
+                                        <div
+                                            role="status"
+                                            className={styles.catalogNotice}
+                                            data-state="empty"
+                                        >
                                             <h3>La recepción está pendiente de configuración</h3>
-                                            <p>No hay juzgados activos configurados. Solicita que se habilite un juzgado para registrar la recepción.</p>
-                                            <p>Puedes continuar revisando las evidencias y el estado del caso.</p>
-                                            <Button type="button" variant="outlined" onClick={() => setCatalogoVersion((v) => v + 1)}>
+                                            <p>
+                                                No hay juzgados activos configurados. Solicita que se habilite
+                                                un juzgado para registrar la recepción.
+                                            </p>
+                                            <p>
+                                                Puedes continuar revisando las evidencias y el estado del
+                                                caso.
+                                            </p>
+                                            <Button
+                                                type="button"
+                                                variant="outlined"
+                                                onClick={() => setCatalogoVersion((v) => v + 1)}
+                                            >
                                                 Actualizar juzgados
                                             </Button>
                                         </div>
                                     ) : (
-                                        <form className={classNames(styles.resolveCaseForm, styles.receiptForm)} onSubmit={(event) => {
-                                            event.preventDefault();
-                                            if (!busy && sedeElegida) setShowConfirmReceiptModal(true);
-                                        }}>
+                                        <form
+                                            className={classNames(styles.resolveCaseForm, styles.receiptForm)}
+                                            onSubmit={(event) => {
+                                                event.preventDefault();
+                                                if (!busy && sedeElegida) setShowConfirmReceiptModal(true);
+                                            }}
+                                        >
                                             <FormField label="Juzgado receptor" htmlFor="juzgado" required>
                                                 <Select
                                                     id="juzgado"
-                                                    options={sedes.map((s) => ({ value: s.codigo, label: s.nombre }))}
+                                                    options={sedes.map((s) => ({
+                                                        value: s.codigo,
+                                                        label: s.nombre,
+                                                    }))}
                                                     placeholder="Selecciona un juzgado"
                                                     value={sede}
                                                     onChange={(event) => setSede(event.target.value)}
@@ -511,7 +524,10 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
                                                     required
                                                 />
                                             </FormField>
-                                            <FormField label="Referencia interna del expediente (opcional)" htmlFor="numeroInterno">
+                                            <FormField
+                                                label="Referencia interna del expediente (opcional)"
+                                                htmlFor="numeroInterno"
+                                            >
                                                 <Input
                                                     id="numeroInterno"
                                                     aria-describedby="numeroInternoAyuda"
@@ -522,16 +538,32 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
                                                     disabled={busy || !!recepcionPendiente.current}
                                                 />
                                                 <p id="numeroInternoAyuda" className={styles.ayuda}>
-                                                    Referencia del expediente físico. Puedes dejarla vacía si aún no se ha asignado.
+                                                    Referencia del expediente físico. Puedes dejarla vacía si
+                                                    aún no se ha asignado.
                                                 </p>
                                             </FormField>
                                             {sedeElegida && (
-                                                <dl className={classNames(styles.courtPreview, styles.formWide)}>
-                                                    <div><dt>Dirección</dt><dd>{sedeElegida.direccion || "No registrada"}</dd></div>
-                                                    <div><dt>Horario de atención</dt><dd>{sedeElegida.horario || "No registrado"}</dd></div>
+                                                <dl
+                                                    className={classNames(
+                                                        styles.courtPreview,
+                                                        styles.formWide,
+                                                    )}
+                                                >
+                                                    <div>
+                                                        <dt>Dirección</dt>
+                                                        <dd>{sedeElegida.direccion || "No registrada"}</dd>
+                                                    </div>
+                                                    <div>
+                                                        <dt>Horario de atención</dt>
+                                                        <dd>{sedeElegida.horario || "No registrado"}</dd>
+                                                    </div>
                                                 </dl>
                                             )}
-                                            <FormField className={styles.formWide} label="Observación (opcional)" htmlFor="observacion">
+                                            <FormField
+                                                className={styles.formWide}
+                                                label="Observación (opcional)"
+                                                htmlFor="observacion"
+                                            >
                                                 <TextArea
                                                     id="observacion"
                                                     value={observacion}
@@ -541,8 +573,15 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
                                                 />
                                             </FormField>
                                             <div className={classNames(styles.formFooter, styles.formWide)}>
-                                                <p className={styles.ayuda}>Revisa los datos. Se solicitará confirmación antes de guardar.</p>
-                                                <Button type="submit" variant="contained" state={busy || !sedeElegida ? "disabled" : "default"}>
+                                                <p className={styles.ayuda}>
+                                                    Revisa los datos. Se solicitará confirmación antes de
+                                                    guardar.
+                                                </p>
+                                                <Button
+                                                    type="submit"
+                                                    variant="contained"
+                                                    state={busy || !sedeElegida ? "disabled" : "default"}
+                                                >
                                                     Confirmar recepción de papelería
                                                 </Button>
                                             </div>
@@ -569,16 +608,11 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
                             >
                                 {currentCase.resolucion ? (
                                     <>
-                                        <Title variant="mid">
-                                            Resolución - {currentCase.resolucion?.id}
-                                        </Title>
+                                        <Title variant="mid">Resolución - {currentCase.resolucion?.id}</Title>
                                         <Text variant="caption">{currentCase.resolucion?.fecha}</Text>
-                                        <Text variant="body">
-                                            {currentCase.resolucion?.comentario}
-                                        </Text>
+                                        <Text variant="body">{currentCase.resolucion?.comentario}</Text>
                                         <Text variant="caption">
-                                            Plantilla: {currentCase.resolucion.plantilla} (borrador
-                                            técnico)
+                                            Plantilla: {currentCase.resolucion.plantilla} (borrador técnico)
                                         </Text>
                                         {currentCase.resolucion.file ? (
                                             <File
@@ -587,8 +621,8 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
                                                 onClick={() => {
                                                     void descargarArchivoJuzgado(
                                                         "documentos",
-                          currentCase.resolucion!.file!.id,
-                          currentCase.resolucion!.file!.name,
+                                                        currentCase.resolucion!.file!.id,
+                                                        currentCase.resolucion!.file!.name,
                                                     ).catch(falloArchivo);
                                                 }}
                                                 download
@@ -603,7 +637,10 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
                                                         state={busy ? "disabled" : "default"}
                                                         onClick={() => {
                                                             void ejecutar(
-                                                                () => generarDocumentoJuzgado(currentCase.resolucion!.id),
+                                                                () =>
+                                                                    generarDocumentoJuzgado(
+                                                                        currentCase.resolucion!.id,
+                                                                    ),
                                                                 undefined,
                                                                 "documento",
                                                             );
@@ -617,10 +654,16 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
                                     </>
                                 ) : (
                                     <>
-                                        <h2>{detalle?.expediente ? "Pendiente de resolución" : "Pendiente de recepción"}</h2>
-                                        <p className={styles.sectionDescription}>{detalle?.expediente
-                                            ? "El expediente está disponible para su revisión por la autoridad autorizada."
-                                            : "La papelería aún no tiene una recepción registrada en un juzgado."}</p>
+                                        <h2>
+                                            {detalle?.expediente
+                                                ? "Pendiente de resolución"
+                                                : "Pendiente de recepción"}
+                                        </h2>
+                                        <p className={styles.sectionDescription}>
+                                            {detalle?.expediente
+                                                ? "El expediente está disponible para su revisión por la autoridad autorizada."
+                                                : "La papelería aún no tiene una recepción registrada en un juzgado."}
+                                        </p>
                                     </>
                                 )}
                                 {currentCase.multa && (
@@ -655,8 +698,8 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
                                             </div>
                                         </div>
                                         <Text variant="body">
-                                            El importe y la disponibilidad de pago se consultan en el
-                                            sistema institucional.
+                                            El importe y la disponibilidad de pago se consultan en el sistema
+                                            institucional.
                                         </Text>
                                     </div>
                                 )}
@@ -664,9 +707,7 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
                         )
                     )}
                     {puedeResolver && (
-                        <div
-                            className={classNames(styles.sectionCard, styles.resolveCaseForm)}
-                        >
+                        <div className={classNames(styles.sectionCard, styles.resolveCaseForm)}>
                             <Title variant="mid">Registrar actuación</Title>
                             <Select
                                 options={[
@@ -686,10 +727,7 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
                                 disabled={busy || !!gestionPendiente.current}
                                 aria-label="Observación de la actuación"
                             />
-                            <Button
-                                onClick={handleGestion}
-                                state={busy ? "disabled" : "default"}
-                            >
+                            <Button onClick={handleGestion} state={busy ? "disabled" : "default"}>
                                 Registrar actuación
                             </Button>
                         </div>
@@ -708,8 +746,7 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
                                     ]}
                                     value={resolveCaseValue}
                                     onChange={(value) => {
-                                        if (!resolucionPendiente.current && !busy)
-                                            setResolveCaseValue(value);
+                                        if (!resolucionPendiente.current && !busy) setResolveCaseValue(value);
                                     }}
                                 />
                                 <FormField
@@ -739,27 +776,23 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
                                     className={styles.executeButton}
                                     state={busy || isSendingResolution ? "disabled" : "default"}
                                 >
-                                    {isSendingResolution
-                                        ? "Enviando resolución..."
-                                        : "Enviar resolución"}
+                                    {isSendingResolution ? "Enviando resolución..." : "Enviar resolución"}
                                 </Button>
                             </div>
                         </section>
                     )}
                 </div>
             </section>
-            <section
-                id="actuaciones"
-                className={styles.sectionCard}
-                aria-labelledby="titulo-actuaciones"
-            >
+            <section id="actuaciones" className={styles.sectionCard} aria-labelledby="titulo-actuaciones">
                 <div className={styles.sectionHeading}>
                     <div>
                         <span className={styles.eyebrow}>Seguimiento del expediente</span>
                         <h2 id="titulo-actuaciones">Bitácora de actuaciones</h2>
                     </div>
                     <span className={styles.countBadge}>
-                        {currentCase.logs.length === 1 ? "1 actuación" : `${currentCase.logs.length} actuaciones`}
+                        {currentCase.logs.length === 1
+                            ? "1 actuación"
+                            : `${currentCase.logs.length} actuaciones`}
                     </span>
                 </div>
                 {!currentCase.logs.length ? (
@@ -772,26 +805,35 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
                         </span>
                         <div>
                             <h3>Aún no hay actuaciones registradas</h3>
-                            <p>Las revisiones, entregas de documentos e incidencias aparecerán aquí cuando se registren en el expediente.</p>
+                            <p>
+                                Las revisiones, entregas de documentos e incidencias aparecerán aquí cuando se
+                                registren en el expediente.
+                            </p>
                         </div>
                     </div>
                 ) : (
                     <table className={styles.historyTable}>
                         <caption className={styles.srOnly}>Actuaciones registradas en el expediente</caption>
-                        <thead><tr>
-                            <th scope="col">Actuación</th>
-                            <th scope="col">Fecha</th>
-                            <th scope="col">Registrada por</th>
-                            <th scope="col">Observación</th>
-                        </tr></thead>
-                        <tbody>{currentCase.logs.map((log, index) => (
-                            <tr key={index}>
-                                <td data-label="Actuación"><strong>{log.action.replaceAll("_", " ")}</strong></td>
-                                <td data-label="Fecha">{log.date}</td>
-                                <td data-label="Registrada por">{log.userName}</td>
-                                <td data-label="Observación">{log.note}</td>
+                        <thead>
+                            <tr>
+                                <th scope="col">Actuación</th>
+                                <th scope="col">Fecha</th>
+                                <th scope="col">Registrada por</th>
+                                <th scope="col">Observación</th>
                             </tr>
-                        ))}</tbody>
+                        </thead>
+                        <tbody>
+                            {currentCase.logs.map((log, index) => (
+                                <tr key={index}>
+                                    <td data-label="Actuación">
+                                        <strong>{log.action.replaceAll("_", " ")}</strong>
+                                    </td>
+                                    <td data-label="Fecha">{log.date}</td>
+                                    <td data-label="Registrada por">{log.userName}</td>
+                                    <td data-label="Observación">{log.note}</td>
+                                </tr>
+                            ))}
+                        </tbody>
                     </table>
                 )}
             </section>
@@ -847,7 +889,7 @@ const JUZ01Detail: React.FC<JUZ01DetailProps> = ({ caseNumber }) => {
                 title="Error al enviar la resolución"
                 description={
                     errorSendResolution?.message ??
-          "Ocurrió un error al enviar la resolución. Por favor, inténtelo nuevamente."
+                    "Ocurrió un error al enviar la resolución. Por favor, inténtelo nuevamente."
                 }
                 actions={[
                     {

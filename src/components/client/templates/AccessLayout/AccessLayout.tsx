@@ -5,10 +5,7 @@ import styles from "./AccessLayout.module.scss";
 export function AccessLayout({ children }: { children: React.ReactNode }) {
     return (
         <main className={styles.layout}>
-            <section
-                className={styles.introduction}
-                aria-label="Sistema Tickets EMETRA"
-            >
+            <section className={styles.introduction} aria-label="Sistema Tickets EMETRA">
                 <Link href="/login" className={styles.brand}>
                     <strong>EMETRA</strong>
                     <span>SISTEMA TICKETS</span>
@@ -17,8 +14,8 @@ export function AccessLayout({ children }: { children: React.ReactNode }) {
                     <span className={styles.eyebrow}>Tu espacio de trabajo</span>
                     <h1>Tus solicitudes, aplicaciones y actividades en un lugar.</h1>
                     <p>
-                        Accede con tu cuenta institucional. Verás los servicios y tareas que
-                        correspondan a tus permisos.
+                        Accede con tu cuenta institucional. Verás los servicios y tareas que correspondan a
+                        tus permisos.
                     </p>
                     <ul>
                         {[
@@ -33,9 +30,7 @@ export function AccessLayout({ children }: { children: React.ReactNode }) {
                         ))}
                     </ul>
                 </div>
-                <p className={styles.footer}>
-                    Dirección de Informática · Municipalidad de Guatemala
-                </p>
+                <p className={styles.footer}>Dirección de Informática · Municipalidad de Guatemala</p>
             </section>
             <section className={styles.formRegion} aria-label="Acceso institucional">
                 <div className={styles.formContent}>{children}</div>

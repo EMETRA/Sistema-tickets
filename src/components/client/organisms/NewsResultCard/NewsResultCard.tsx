@@ -47,8 +47,14 @@ const NewsResultCard: React.FC<NewsResultCardProps> = ({
                         {badge}
                     </span>
                 )}
-                {note && <Text variant="caption" className={styles.note}>{note}</Text>}
-                {reference && typeof reference !== "string" && <div className={styles.reference}>{reference}</div>}
+                {note && (
+                    <Text variant="caption" className={styles.note}>
+                        {note}
+                    </Text>
+                )}
+                {reference && typeof reference !== "string" && (
+                    <div className={styles.reference}>{reference}</div>
+                )}
             </div>
         </StateNotice>
     );

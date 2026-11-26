@@ -15,8 +15,17 @@
   border: 1px solid color-mix(in srgb, var(--accent) 22%, var(--tickets-border));
   border-radius: 18px;
   background:
-    radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--accent) 22%, transparent) 1px, transparent 1.6px) right / 18px 18px no-repeat,
-    linear-gradient(110deg, var(--tickets-surface) 0%, color-mix(in srgb, var(--accent) 7%, var(--tickets-surface)) 100%);
+    radial-gradient(
+        circle at 1px 1px,
+        color-mix(in srgb, var(--accent) 22%, transparent) 1px,
+        transparent 1.6px
+      )
+      right / 18px 18px no-repeat,
+    linear-gradient(
+      110deg,
+      var(--tickets-surface) 0%,
+      color-mix(in srgb, var(--accent) 7%, var(--tickets-surface)) 100%
+    );
   h1 {
     font-size: clamp(24px, calc(2.2vw / var(--vp-zoom, 1)), 30px);
     letter-spacing: -0.5px;
@@ -102,7 +111,10 @@
   box-shadow: var(--tickets-shadow);
   color: inherit;
   text-decoration: none;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
   &:hover {
     border-color: color-mix(in srgb, var(--accent) 40%, var(--tickets-border));
     box-shadow: 0 8px 22px #1a2b4a14;
@@ -150,7 +162,9 @@
 }
 .arrow {
   color: var(--tickets-text-muted);
-  transition: transform 0.15s ease, color 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    color 0.15s ease;
 }
 .empty {
   padding: 24px 0;

@@ -17,8 +17,7 @@ import { meetingLink, meetingPlace } from "@/platform/meeting";
 export function displayDate(value: unknown) {
     if (!value) return "No disponible";
     const text = String(value);
-    if (/^\d{4}-\d\d-\d\d$/.test(text))
-        return text.split("-").reverse().join("/");
+    if (/^\d{4}-\d\d-\d\d$/.test(text)) return text.split("-").reverse().join("/");
     const d = new Date(text);
     return Number.isFinite(+d)
         ? new Intl.DateTimeFormat("es-GT", {
@@ -29,12 +28,9 @@ export function displayDate(value: unknown) {
         : text;
 }
 function display(value: unknown) {
-    if (value === null || value === undefined || value === "")
-        return "No disponible";
+    if (value === null || value === undefined || value === "") return "No disponible";
     if (typeof value === "boolean") return value ? "Sí" : "No";
-    return Array.isArray(value)
-        ? value.join(", ")
-        : String(value).replaceAll("_", " ");
+    return Array.isArray(value) ? value.join(", ") : String(value).replaceAll("_", " ");
 }
 type RequestPreview = {
     accessVersion: number;
@@ -83,12 +79,10 @@ export function RecordDetail({
         [busy, setBusy] = useState(false),
         [decision, setDecision] = useState("APROBAR"),
         [observacion, setObservacion] = useState("");
-    const readOnly =
-        type === "actividades" &&
-        current.visibilidad === "EMPRESA" &&
-        !data!.actor.admin;
+    const readOnly = type === "actividades" && current.visibilidad === "EMPRESA" && !data!.actor.admin;
     const employment = current.datos._rrhh as { unidad?: string; puesto?: string } | undefined;
-    const automatic = current.datos._automatico as { cantidad?: number; primeraVez?: string; ultimaVez?: string } | undefined;
+    const automatic = current.datos._automatico as
+        { cantidad?: number; primeraVez?: string; ultimaVez?: string } | undefined;
     useEffect(() => {
         dialog.current?.showModal();
         const controller = new AbortController();
@@ -104,12 +98,9 @@ export function RecordDetail({
     useEffect(() => {
         if (tab !== "history") return;
         const controller = new AbortController();
-        platformFetch<Change[]>(
-            "/records/" + type + "/" + record.id + "/history",
-            {
-                signal: controller.signal,
-            },
-        )
+        platformFetch<Change[]>("/records/" + type + "/" + record.id + "/history", {
+            signal: controller.signal,
+        })
             .then(setHistory)
             .catch((e) => {
                 if (!controller.signal.aborted) setError(e.message);
@@ -118,12 +109,7 @@ export function RecordDetail({
     }, [type, record.id, tab]);
     const [preview, setPreview] = useState<RequestPreview | null>(null);
     useEffect(() => {
-        if (
-            type !== "solicitudes" ||
-            !data!.actor.admin ||
-            current.estado !== "PENDIENTE"
-        )
-            return;
+        if (type !== "solicitudes" || !data!.actor.admin || current.estado !== "PENDIENTE") return;
         const controller = new AbortController();
         platformFetch<RequestPreview>("/requests/" + current.id + "/preview", {
             signal: controller.signal,
@@ -148,11 +134,7 @@ export function RecordDetail({
             onChanged();
             onClose();
         } catch (e) {
-            setError(
-                e instanceof Error
-                    ? e.message
-                    : "No se pudo retirar el registro.",
-            );
+            setError(e instanceof Error ? e.message : "No se pudo retirar el registro.");
         } finally {
             setBusy(false);
         }
@@ -177,11 +159,7 @@ export function RecordDetail({
             setCurrent(updated);
             onChanged();
         } catch (e) {
-            setError(
-                e instanceof Error
-                    ? e.message
-                    : "No se pudo resolver la solicitud.",
-            );
+            setError(e instanceof Error ? e.message : "No se pudo resolver la solicitud.");
         } finally {
             setBusy(false);
         }
@@ -197,17 +175,11 @@ export function RecordDetail({
                 true,
                 "Crear la cuenta aprobada de " + current.nombre,
             );
-            setCurrent(
-                await platformFetch<PlatformRecord>(
-                    "/records/" + type + "/" + current.id,
-                ),
-            );
+            setCurrent(await platformFetch<PlatformRecord>("/records/" + type + "/" + current.id));
             onChanged();
         } catch (e) {
             setError(
-                e instanceof Error
-                    ? e.message
-                    : "No se pudo crear la cuenta; la aprobación se conserva.",
+                e instanceof Error ? e.message : "No se pudo crear la cuenta; la aprobación se conserva.",
             );
         } finally {
             setBusy(false);
@@ -247,7 +219,7 @@ export function RecordDetail({
                 if (!busy) onClose();
             }}
         >
-            {(
+            {
                 <header className={sheet.head}>
                     <span className={sheet.icon} aria-hidden="true">
                         <WorkspaceIcon name={sectionIcon} size={20} />
@@ -264,25 +236,25 @@ export function RecordDetail({
                             {teamName} · Actualizado {displayDate(current.actualizadoEn)}
                         </p>
                     </div>
-                    <button type="button" className={sheet.close} onClick={onClose} disabled={busy} aria-label="Cerrar ficha">
+                    <button
+                        type="button"
+                        className={sheet.close}
+                        onClick={onClose}
+                        disabled={busy}
+                        aria-label="Cerrar ficha"
+                    >
                         ×
                     </button>
                 </header>
-            )}
+            }
             <div className={sheet.body}>
                 <div className={styles.toolbar} hidden>
-                    <span
-                        className={styles.chip}
-                        data-tone={statusTone(current.estado)}
-                    >
+                    <span className={styles.chip} data-tone={statusTone(current.estado)}>
                         {statusLabel(current.estado)}
                     </span>
                     <div className={styles.actions}>
                         {!readOnly && def.actions.EDITAR && (
-                            <Button
-                                variant="outlined"
-                                onClick={() => onEdit(current)}
-                            >
+                            <Button variant="outlined" onClick={() => onEdit(current)}>
                                 Editar
                             </Button>
                         )}
@@ -297,11 +269,19 @@ export function RecordDetail({
                         )}
                     </div>
                 </div>
-                {["equipos","miembros"].includes(type) && data?.definitions.activos?.actions.LEER && <Link className={styles.link} href={"/espacio/inventario?view=inventario&"+(type==="equipos" ? "equipoId="+current.id : "usuarioId="+current.usuarioId)}>Ver bienes asignados en el inventario</Link>}
+                {["equipos", "miembros"].includes(type) && data?.definitions.activos?.actions.LEER && (
+                    <Link
+                        className={styles.link}
+                        href={
+                            "/espacio/inventario?view=inventario&" +
+                            (type === "equipos" ? "equipoId=" + current.id : "usuarioId=" + current.usuarioId)
+                        }
+                    >
+                        Ver bienes asignados en el inventario
+                    </Link>
+                )}
                 {readOnly && (
-                    <p className={styles.muted}>
-                        Este registro está disponible solo para consulta.
-                    </p>
+                    <p className={styles.muted}>Este registro está disponible solo para consulta.</p>
                 )}
                 <nav className={styles.tabs} aria-label="Detalle del registro">
                     {[
@@ -324,11 +304,7 @@ export function RecordDetail({
                     </p>
                 )}
                 {tab === "files" ? (
-                    <RecordFiles
-                        type={type}
-                        record={current}
-                        readOnly={readOnly}
-                    />
+                    <RecordFiles type={type} record={current} readOnly={readOnly} />
                 ) : tab === "history" ? (
                     <section className={styles.card}>
                         <h3>Historial de cambios</h3>
@@ -336,16 +312,13 @@ export function RecordDetail({
                             {history.map((item) => (
                                 <li key={item.id}>
                                     <strong>
-                                        {item.accion.replaceAll("_", " ")} ·{" "}
-                                        {item.resultado}
+                                        {item.accion.replaceAll("_", " ")} · {item.resultado}
                                     </strong>
                                     <p className={styles.muted}>
                                         {item.actor} · {displayDate(item.fecha)}
                                     </p>
                                     <details>
-                                        <summary>
-                                            Ver cambios registrados
-                                        </summary>
+                                        <summary>Ver cambios registrados</summary>
                                         <div className={styles.grid}>
                                             {[
                                                 ["Antes", item.antes],
@@ -354,11 +327,7 @@ export function RecordDetail({
                                                 <div key={String(name)}>
                                                     <h4>{String(name)}</h4>
                                                     <pre className={styles.log}>
-                                                        {JSON.stringify(
-                                                            value,
-                                                            null,
-                                                            2,
-                                                        )}
+                                                        {JSON.stringify(value, null, 2)}
                                                     </pre>
                                                 </div>
                                             ))}
@@ -368,82 +337,131 @@ export function RecordDetail({
                             ))}
                         </ul>
                         {!history.length && (
-                            <p className={styles.muted}>
-                                No hay movimientos adicionales registrados.
-                            </p>
+                            <p className={styles.muted}>No hay movimientos adicionales registrados.</p>
                         )}
                     </section>
                 ) : (
                     <>
                         <section className={undefined}>
-                            {type === 'incidencias' && automatic && <div><h3>Detectada automáticamente</h3><p>Ocurrencias: {automatic.cantidad} · Primera detección: {displayDate(automatic.primeraVez)} · Última detección: {displayDate(automatic.ultimaVez)}</p></div>}
-                            {employment && <div className={styles.card}><h3>Datos de RRHH</h3><p className={styles.muted}>Unidad institucional: {type === "equipos" ? current.nombre : data!.teams.find(t => t.id === current.equipoId)?.nombre || "Consulta la ficha del equipo"}. El puesto se actualiza al generar equipos desde RRHH.</p>{employment.puesto && <p><strong>Puesto: </strong>{employment.puesto}</p>}</div>}
-                            {["activos","dispositivos"].includes(type) && !!current.datos._inventario && <section className={styles.card}><h3>Asignación institucional</h3><p>Tarjeta: {String((current.datos._inventario as {tarjeta?:string}).tarjeta||'')}</p><p>Empleado: {String((current.datos._inventario as {nombreEmpleado?:string}).nombreEmpleado||'')} · {String((current.datos._inventario as {empleado?:number}).empleado||'')}</p><p className={styles.muted}>La tarjeta se consulta en el inventario institucional. El responsable técnico de esta ficha se gestiona por separado.</p></section>}
+                            {type === "incidencias" && automatic && (
+                                <div>
+                                    <h3>Detectada automáticamente</h3>
+                                    <p>
+                                        Ocurrencias: {automatic.cantidad} · Primera detección:{" "}
+                                        {displayDate(automatic.primeraVez)} · Última detección:{" "}
+                                        {displayDate(automatic.ultimaVez)}
+                                    </p>
+                                </div>
+                            )}
+                            {employment && (
+                                <div className={styles.card}>
+                                    <h3>Datos de RRHH</h3>
+                                    <p className={styles.muted}>
+                                        Unidad institucional:{" "}
+                                        {type === "equipos"
+                                            ? current.nombre
+                                            : data!.teams.find((t) => t.id === current.equipoId)?.nombre ||
+                                              "Consulta la ficha del equipo"}
+                                        . El puesto se actualiza al generar equipos desde RRHH.
+                                    </p>
+                                    {employment.puesto && (
+                                        <p>
+                                            <strong>Puesto: </strong>
+                                            {employment.puesto}
+                                        </p>
+                                    )}
+                                </div>
+                            )}
+                            {["activos", "dispositivos"].includes(type) && !!current.datos._inventario && (
+                                <section className={styles.card}>
+                                    <h3>Asignación institucional</h3>
+                                    <p>
+                                        Tarjeta:{" "}
+                                        {String(
+                                            (current.datos._inventario as { tarjeta?: string }).tarjeta || "",
+                                        )}
+                                    </p>
+                                    <p>
+                                        Empleado:{" "}
+                                        {String(
+                                            (current.datos._inventario as { nombreEmpleado?: string })
+                                                .nombreEmpleado || "",
+                                        )}{" "}
+                                        ·{" "}
+                                        {String(
+                                            (current.datos._inventario as { empleado?: number }).empleado ||
+                                                "",
+                                        )}
+                                    </p>
+                                    <p className={styles.muted}>
+                                        La tarjeta se consulta en el inventario institucional. El responsable
+                                        técnico de esta ficha se gestiona por separado.
+                                    </p>
+                                </section>
+                            )}
                             {["activos", "dispositivos"].includes(type) &&
                                 !current.datos.inventarioReferencia && (
                                     <p className={sheet.callout} data-tone="warning">
-                                        Este registro aún no está vinculado a una tarjeta de responsabilidad institucional.
+                                        Este registro aún no está vinculado a una tarjeta de responsabilidad
+                                        institucional.
                                     </p>
                                 )}
                             {type === "actividades" && <MeetingCard activity={current} />}
-                            {(
+                            {
                                 <dl className={sheet.facts}>
                                     {def.fields
                                         .filter((f) => !["x", "y", "planoX", "planoY"].includes(f.key))
                                         .map((field) => {
                                             const value = factValue(field);
                                             return (
-                                                <div key={field.key} className={field.type === "textarea" || field.type === "list" ? sheet.wide : undefined}>
+                                                <div
+                                                    key={field.key}
+                                                    className={
+                                                        field.type === "textarea" || field.type === "list"
+                                                            ? sheet.wide
+                                                            : undefined
+                                                    }
+                                                >
                                                     <dt>{field.label}</dt>
-                                                    <dd className={value === null ? sheet.empty : undefined}>{value ?? "—"}</dd>
+                                                    <dd className={value === null ? sheet.empty : undefined}>
+                                                        {value ?? "—"}
+                                                    </dd>
                                                 </div>
                                             );
                                         })}
                                 </dl>
-                            )}
+                            }
                         </section>
                         {type === "solicitudes" && (
                             <section className={styles.card}>
                                 <h3>Seguimiento de la solicitud</h3>
                                 {preview && (
                                     <section>
-                                        <h4>
-                                            Impacto de aprobar los accesos
-                                            solicitados
-                                        </h4>
+                                        <h4>Impacto de aprobar los accesos solicitados</h4>
                                         <p className={styles.muted}>
-                                            {preview.agregar.length} permisos se
-                                            agregan · {preview.retirar.length}{" "}
-                                            se retiran.
+                                            {preview.agregar.length} permisos se agregan ·{" "}
+                                            {preview.retirar.length} se retiran.
                                             {preview.copiaIndependiente
                                                 ? " La copia quedará independiente de cambios futuros del origen."
                                                 : ""}
                                         </p>
                                         <details>
-                                            <summary>
-                                                Ver permisos afectados
-                                            </summary>
+                                            <summary>Ver permisos afectados</summary>
                                             {preview.agregar.map((p) => (
-                                                <p key={"a" + p.id}>
-                                                    Agregar: {p.nombre}
-                                                </p>
+                                                <p key={"a" + p.id}>Agregar: {p.nombre}</p>
                                             ))}
                                             {preview.retirar.map((p) => (
-                                                <p key={"r" + p.id}>
-                                                    Retirar: {p.nombre}
-                                                </p>
+                                                <p key={"r" + p.id}>Retirar: {p.nombre}</p>
                                             ))}
                                         </details>
                                     </section>
                                 )}
                                 {current.invitacion && (
                                     <p className={styles.muted}>
-                                        Invitación por correo:{" "}
-                                        {current.invitacion.estado}.{" "}
+                                        Invitación por correo: {current.invitacion.estado}.{" "}
                                         {current.invitacion.estado === "ENVIADA"
                                             ? "El servidor de correo aceptó el envío; esto no confirma lectura del destinatario."
-                                            : current.invitacion.estado ===
-                                                "INCIERTO"
+                                            : current.invitacion.estado === "INCIERTO"
                                               ? "El resultado requiere comprobación antes de reenviar."
                                               : "La cuenta ya existe; el envío de invitación se procesa por separado."}
                                     </p>
@@ -452,103 +470,93 @@ export function RecordDetail({
                                     <p>{String(current.datos.observacion)}</p>
                                 )}
                                 {Boolean(current.datos.usuarioCreadoId) && (
-                                    <p>
-                                        Cuenta creada · Usuario{" "}
-                                        {String(current.datos.usuarioCreadoId)}
-                                    </p>
+                                    <p>Cuenta creada · Usuario {String(current.datos.usuarioCreadoId)}</p>
                                 )}
-                                {data!.actor.admin &&
-                                    current.estado === "PENDIENTE" && (
-                                        <div className={styles.page}>
-                                            <label className={styles.field}>
-                                                Decisión
-                                                <select
-                                                    className={styles.control}
-                                                    value={decision}
-                                                    onChange={(e) =>
-                                                        setDecision(
-                                                            e.target.value,
-                                                        )
-                                                    }
-                                                >
-                                                    <option value="APROBAR">
-                                                        Aprobar y aplicar los
-                                                        accesos solicitados
-                                                    </option>
-                                                    <option value="RECHAZAR">
-                                                        Rechazar
-                                                    </option>
-                                                </select>
-                                            </label>
-                                            <label className={styles.field}>
-                                                Fundamento
-                                                <textarea
-                                                    className={styles.control}
-                                                    value={observacion}
-                                                    onChange={(e) =>
-                                                        setObservacion(
-                                                            e.target.value,
-                                                        )
-                                                    }
-                                                    minLength={5}
-                                                    maxLength={2000}
-                                                />
-                                            </label>
-                                            <Button
-                                                onClick={() => void decide()}
-                                                state={
-                                                    busy
-                                                        ? "loading"
-                                                        : observacion.trim()
-                                                                .length < 5
-                                                          ? "disabled"
-                                                          : "default"
-                                                }
+                                {data!.actor.admin && current.estado === "PENDIENTE" && (
+                                    <div className={styles.page}>
+                                        <label className={styles.field}>
+                                            Decisión
+                                            <select
+                                                className={styles.control}
+                                                value={decision}
+                                                onChange={(e) => setDecision(e.target.value)}
                                             >
-                                                Confirmar decisión
-                                            </Button>
-                                        </div>
-                                    )}
-                                {data!.actor.admin &&
-                                    current.estado ===
-                                        "APROBADA_PENDIENTE_CUENTA" && (
-                                        <>
-                                            <p className={styles.muted}>
-                                                La aprobación está registrada.
-                                                La creación de cuenta verificará
-                                                los datos del empleado en RRHH.
-                                            </p>
-                                            <Button
-                                                onClick={() => void provision()}
-                                                state={
-                                                    busy ? "loading" : "default"
-                                                }
-                                            >
-                                                Crear cuenta aprobada
-                                            </Button>
-                                        </>
-                                    )}
+                                                <option value="APROBAR">
+                                                    Aprobar y aplicar los accesos solicitados
+                                                </option>
+                                                <option value="RECHAZAR">Rechazar</option>
+                                            </select>
+                                        </label>
+                                        <label className={styles.field}>
+                                            Fundamento
+                                            <textarea
+                                                className={styles.control}
+                                                value={observacion}
+                                                onChange={(e) => setObservacion(e.target.value)}
+                                                minLength={5}
+                                                maxLength={2000}
+                                            />
+                                        </label>
+                                        <Button
+                                            onClick={() => void decide()}
+                                            state={
+                                                busy
+                                                    ? "loading"
+                                                    : observacion.trim().length < 5
+                                                      ? "disabled"
+                                                      : "default"
+                                            }
+                                        >
+                                            Confirmar decisión
+                                        </Button>
+                                    </div>
+                                )}
+                                {data!.actor.admin && current.estado === "APROBADA_PENDIENTE_CUENTA" && (
+                                    <>
+                                        <p className={styles.muted}>
+                                            La aprobación está registrada. La creación de cuenta verificará
+                                            los datos del empleado en RRHH.
+                                        </p>
+                                        <Button
+                                            onClick={() => void provision()}
+                                            state={busy ? "loading" : "default"}
+                                        >
+                                            Crear cuenta aprobada
+                                        </Button>
+                                    </>
+                                )}
                             </section>
                         )}
                     </>
                 )}
             </div>
-            {(
+            {
                 <footer className={sheet.foot}>
                     {!readOnly && def.actions.ELIMINAR && !current.datos._rrhh && (
-                        <button type="button" className={sheet.danger} onClick={() => void remove()} disabled={busy}>
+                        <button
+                            type="button"
+                            className={sheet.danger}
+                            onClick={() => void remove()}
+                            disabled={busy}
+                        >
                             Retirar registro
                         </button>
                     )}
-                    <p>{readOnly ? "Disponible solo para consulta." : "Los cambios quedan en el historial con fecha y responsable."}</p>
+                    <p>
+                        {readOnly
+                            ? "Disponible solo para consulta."
+                            : "Los cambios quedan en el historial con fecha y responsable."}
+                    </p>
                     <div className={sheet.footActions}>
                         <Button variant="outlined" onClick={onClose} state={busy ? "disabled" : "default"}>
                             Cerrar
                         </Button>
-                        {!readOnly && def.actions.EDITAR && <Button onClick={() => onEdit(current)}>Editar</Button>}
+                        {!readOnly && def.actions.EDITAR && (
+                            <Button onClick={() => onEdit(current)}>Editar</Button>
+                        )}
                     </div>
                 </footer>
-            )}
+            }
         </dialog>
     );
 }

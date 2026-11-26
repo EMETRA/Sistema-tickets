@@ -68,8 +68,7 @@ export const MOD10 = () => {
             <header>
                 <h2>Preparación y destinatario</h2>
                 <p className={styles.muted}>
-                    Prepara el PDF y revisa el destinatario antes de autorizar
-                    el envío.
+                    Prepara el PDF y revisa el destinatario antes de autorizar el envío.
                 </p>
             </header>
             {error && (
@@ -112,9 +111,8 @@ export const MOD10 = () => {
                 >
                     {destination?.modoPrueba && (
                         <p role="status">
-                            Prueba controlada: todos los documentos se enviarán
-                            únicamente a {destination.correoDestino}. Los
-                            destinatarios habituales se conservan.
+                            Prueba controlada: todos los documentos se enviarán únicamente a{" "}
+                            {destination.correoDestino}. Los destinatarios habituales se conservan.
                         </p>
                     )}
                     <div className={styles.formGrid}>
@@ -137,57 +135,27 @@ export const MOD10 = () => {
                         </label>
                         <label className={styles.field}>
                             Fecha del documento
-                            <input
-                                className={styles.control}
-                                name="fecha"
-                                type="date"
-                                required
-                            />
+                            <input className={styles.control} name="fecha" type="date" required />
                         </label>
                         <label className={styles.field}>
                             Emitido por
-                            <input
-                                className={styles.control}
-                                name="emitido"
-                                maxLength={250}
-                                required
-                            />
+                            <input className={styles.control} name="emitido" maxLength={250} required />
                         </label>
                         <label className={styles.field}>
                             Número de expediente
-                            <input
-                                className={styles.control}
-                                name="expediente"
-                                maxLength={100}
-                                required
-                            />
+                            <input className={styles.control} name="expediente" maxLength={100} required />
                         </label>
                         <label className={styles.field}>
                             Número de folios
-                            <input
-                                className={styles.control}
-                                name="folios"
-                                type="number"
-                                min="1"
-                                required
-                            />
+                            <input className={styles.control} name="folios" type="number" min="1" required />
                         </label>
                         <label className={styles.field}>
                             Nombre
-                            <input
-                                className={styles.control}
-                                name="nombre"
-                                maxLength={300}
-                                required
-                            />
+                            <input className={styles.control} name="nombre" maxLength={300} required />
                         </label>
                         <label className={styles.field}>
                             Referencia
-                            <textarea
-                                className={styles.control}
-                                name="referencia"
-                                required
-                            />
+                            <textarea className={styles.control} name="referencia" required />
                         </label>
                         <label className={styles.field}>
                             Documento PDF
@@ -199,14 +167,9 @@ export const MOD10 = () => {
                                     const f = e.target.files?.[0];
                                     if (
                                         f &&
-                                        (f.size > 10 * 1024 * 1024 ||
-                                            !f.name
-                                                .toLowerCase()
-                                                .endsWith(".pdf"))
+                                        (f.size > 10 * 1024 * 1024 || !f.name.toLowerCase().endsWith(".pdf"))
                                     ) {
-                                        setError(
-                                            "Selecciona un PDF de hasta 10 MB.",
-                                        );
+                                        setError("Selecciona un PDF de hasta 10 MB.");
                                         setFile(null);
                                         e.target.value = "";
                                     } else setFile(f || null);
@@ -216,14 +179,9 @@ export const MOD10 = () => {
                     </div>
                     <p>
                         Destinatario efectivo:{" "}
-                        <strong>
-                            {destination?.correoDestino || "Selecciona un área"}
-                        </strong>
+                        <strong>{destination?.correoDestino || "Selecciona un área"}</strong>
                     </p>
-                    <Button
-                        type="submit"
-                        state={file && destination ? "default" : "disabled"}
-                    >
+                    <Button type="submit" state={file && destination ? "default" : "disabled"}>
                         Revisar documento
                     </Button>
                 </form>
@@ -237,23 +195,19 @@ export const MOD10 = () => {
             >
                 <div className={styles.dialogHeader}>
                     <h2>
-                        {destination?.modoPrueba
-                            ? "Confirmar prueba de correo"
-                            : "Confirmar notificación"}
+                        {destination?.modoPrueba ? "Confirmar prueba de correo" : "Confirmar notificación"}
                     </h2>
                 </div>
                 <div className={styles.dialogBody}>
                     <p>
-                        Destinatario:{" "}
-                        <strong>{destination?.correoDestino}</strong>
+                        Destinatario: <strong>{destination?.correoDestino}</strong>
                     </p>
                     <p>
-                        Expediente: {input?.numeroExpediente} · Archivo:{" "}
-                        {file?.name}
+                        Expediente: {input?.numeroExpediente} · Archivo: {file?.name}
                     </p>
                     <p>
-                        El envío queda registrado en el historial. Revisa que el
-                        documento corresponda al expediente.
+                        El envío queda registrado en el historial. Revisa que el documento corresponda al
+                        expediente.
                     </p>
                     {error && (
                         <p role="alert" className={styles.error}>
@@ -267,13 +221,8 @@ export const MOD10 = () => {
                     >
                         Volver al documento
                     </Button>
-                    <Button
-                        state={loading ? "loading" : "default"}
-                        onClick={() => void send()}
-                    >
-                        {destination?.modoPrueba
-                            ? "Enviar prueba"
-                            : "Enviar notificación"}
+                    <Button state={loading ? "loading" : "default"} onClick={() => void send()}>
+                        {destination?.modoPrueba ? "Enviar prueba" : "Enviar notificación"}
                     </Button>
                 </div>
             </dialog>

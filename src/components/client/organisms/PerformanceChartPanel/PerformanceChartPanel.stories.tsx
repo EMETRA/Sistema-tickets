@@ -264,7 +264,10 @@ export const SecondaryInteractive = {
         const handleParentChange = (newParent: string) => {
             setParentFilter(newParent);
             // Resetear el hijo al primero disponible
-            const childOptions = filterConfig.childOptionsByParent as Record<string, Array<{ label: string; value: string }>>;
+            const childOptions = filterConfig.childOptionsByParent as Record<
+                string,
+                Array<{ label: string; value: string }>
+            >;
             const firstChild = childOptions[newParent]?.[0]?.value || "";
             setChildFilter(firstChild);
         };
@@ -281,8 +284,12 @@ export const SecondaryInteractive = {
                     onChildFilterChange={setChildFilter}
                 />
                 <div style={{ marginTop: "20px", padding: "10px", background: "#f5f5f5" }}>
-                    <p>Filtro padre: <strong>{parentFilter}</strong></p>
-                    <p>Filtro hijo: <strong>{childFilter}</strong></p>
+                    <p>
+                        Filtro padre: <strong>{parentFilter}</strong>
+                    </p>
+                    <p>
+                        Filtro hijo: <strong>{childFilter}</strong>
+                    </p>
                 </div>
             </div>
         );

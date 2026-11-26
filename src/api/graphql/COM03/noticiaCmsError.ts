@@ -1,9 +1,9 @@
-import type { CodigoErrorNoticiaCms } from './types';
+import type { CodigoErrorNoticiaCms } from "./types";
 
 const CODIGOS: readonly CodigoErrorNoticiaCms[] = [
-    'SLUG_IDIOMA_CONFLICT',
-    'IDEMPOTENCY_CONFLICT',
-    'NEWS_NOT_FOUND',
+    "SLUG_IDIOMA_CONFLICT",
+    "IDEMPOTENCY_CONFLICT",
+    "NEWS_NOT_FOUND",
 ];
 
 /** Permisos del README ("Noticias CMS", sección 2), p. ej. VIVI_NOTICIAS_PUBLICAR. */
@@ -23,24 +23,23 @@ export class NoticiaCmsError extends Error {
     readonly permisoFaltante: string | null;
 
     constructor(codigo: CodigoErrorNoticiaCms | null, statusCode: number | null, mensajes: string[] = []) {
-        super(mensajes[0] ?? codigo ?? 'Error al guardar la noticia');
-        this.name = 'NoticiaCmsError';
+        super(mensajes[0] ?? codigo ?? "Error al guardar la noticia");
+        this.name = "NoticiaCmsError";
         this.codigo = codigo;
         this.statusCode = statusCode;
         this.mensajes = mensajes;
-        this.permisoFaltante = statusCode === 403
-            ? mensajes.map((m) => PERMISO.exec(m)?.[0]).find(Boolean) ?? null
-            : null;
+        this.permisoFaltante =
+            statusCode === 403 ? (mensajes.map((m) => PERMISO.exec(m)?.[0]).find(Boolean) ?? null) : null;
     }
 }
 
 type Registro = Record<string, unknown>;
-const esRegistro = (value: unknown): value is Registro => typeof value === 'object' && value !== null;
+const esRegistro = (value: unknown): value is Registro => typeof value === "object" && value !== null;
 
 /** `message` del cuerpo de error: texto o arreglo de textos. */
 const aTextos = (value: unknown): string[] => {
-    if (typeof value === 'string') return [value];
-    if (Array.isArray(value)) return value.filter((m): m is string => typeof m === 'string');
+    if (typeof value === "string") return [value];
+    if (Array.isArray(value)) return value.filter((m): m is string => typeof m === "string");
     return [];
 };
 
@@ -73,10 +72,14 @@ export function toNoticiaCmsError(error: unknown): NoticiaCmsError {
     if (error instanceof NoticiaCmsError) return error;
 
     const mensajeError = error instanceof Error ? error.message : String(error);
-    if (esRegistro(error) && typeof error.statusCode === 'number') {
+    if (esRegistro(error) && typeof error.statusCode === "number") {
         const body = esRegistro(error.body) ? error.body : {};
         const mensajes = aTextos(body.message);
-        return new NoticiaCmsError(buscarCodigo([...aTextos(body.error), ...mensajes]), error.statusCode, mensajes.length ? mensajes : [mensajeError]);
+        return new NoticiaCmsError(
+            buscarCodigo([...aTextos(body.error), ...mensajes]),
+            error.statusCode,
+            mensajes.length ? mensajes : [mensajeError],
+        );
     }
     const graphQLErrors = esRegistro(error) && Array.isArray(error.graphQLErrors) ? error.graphQLErrors : [];
     const primero = esRegistro(graphQLErrors[0]) ? graphQLErrors[0] : null;
@@ -84,19 +87,22 @@ export function toNoticiaCmsError(error: unknown): NoticiaCmsError {
 
     // graphqlRequestClient lanza Error('Unauthorized') cuando la respuesta HTTP es 401.
     if (!extensions) {
-        return new NoticiaCmsError(null, mensajeError === 'Unauthorized' ? 401 : null, [mensajeError]);
+        return new NoticiaCmsError(null, mensajeError === "Unauthorized" ? 401 : null, [mensajeError]);
     }
 
     const cuerpo = esRegistro(extensions.originalError)
         ? extensions.originalError
-        : esRegistro(extensions.response) ? extensions.response : extensions;
+        : esRegistro(extensions.response)
+          ? extensions.response
+          : extensions;
 
-    const codigoApollo = typeof extensions.code === 'string' ? extensions.code : '';
-    const statusCode = typeof cuerpo.statusCode === 'number'
-        ? cuerpo.statusCode
-        : typeof extensions.statusCode === 'number'
-            ? extensions.statusCode
-            : ESTADO_POR_CODIGO_APOLLO[codigoApollo] ?? null;
+    const codigoApollo = typeof extensions.code === "string" ? extensions.code : "";
+    const statusCode =
+        typeof cuerpo.statusCode === "number"
+            ? cuerpo.statusCode
+            : typeof extensions.statusCode === "number"
+              ? extensions.statusCode
+              : (ESTADO_POR_CODIGO_APOLLO[codigoApollo] ?? null);
     const mensajes = aTextos(cuerpo.message);
     const textos = [
         ...aTextos(cuerpo.error),

@@ -23,7 +23,11 @@ export const SEVERITY: Record<string, [string, string, number]> = {
     BAJA: ["Baja", "neutral", 1],
 };
 export const ENVIRONMENTS = ["PRODUCCION", "QA", "DESARROLLO"] as const;
-export const ENV_LABEL: Record<string, string> = { PRODUCCION: "Producción", QA: "QA", DESARROLLO: "Desarrollo" };
+export const ENV_LABEL: Record<string, string> = {
+    PRODUCCION: "Producción",
+    QA: "QA",
+    DESARROLLO: "Desarrollo",
+};
 export const RESULT: Record<string, [string, string]> = {
     CORRECTO: ["Correcto", "success"],
     FALLIDO: ["Fallido", "danger"],
@@ -49,7 +53,9 @@ export function usePortfolio(revision: number) {
                 .then((r) => r.items)
                 .catch(() => [] as PlatformRecord[]);
         Promise.all([
-            platformFetch<PageResult<PlatformRecord>>("/records/aplicaciones?limit=100", opts).then((r) => r.items),
+            platformFetch<PageResult<PlatformRecord>>("/records/aplicaciones?limit=100", opts).then(
+                (r) => r.items,
+            ),
             list("repositorios"),
             list("despliegues"),
             list("incidencias"),
@@ -63,13 +69,19 @@ export function usePortfolio(revision: number) {
                     serverRows
                         .filter((s) => used.has(s.id))
                         .map(async (s) => {
-                            const snap = await platformFetch<ServerSnapshot>("/monitor/" + s.id, opts).catch(() => null);
+                            const snap = await platformFetch<ServerSnapshot>("/monitor/" + s.id, opts).catch(
+                                () => null,
+                            );
                             servers[s.id] = { name: s.nombre, health: serverHealth(snap) };
                         }),
                 );
                 if (!c.signal.aborted) setData({ apps, repos, deploys, incidents, schemas, servers });
             })
-            .catch((e) => !c.signal.aborted && setError(e instanceof Error ? e.message : "No se pudo cargar el portafolio."));
+            .catch(
+                (e) =>
+                    !c.signal.aborted &&
+                    setError(e instanceof Error ? e.message : "No se pudo cargar el portafolio."),
+            );
         return () => c.abort();
     }, [revision]);
     return { data, error };

@@ -2,11 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/client/atoms/Button";
-import {
-    downloadPlatform,
-    platformCommand,
-    platformFetch,
-} from "@/platform/client";
+import { downloadPlatform, platformCommand, platformFetch } from "@/platform/client";
 import { usePlatform } from "@/platform/context";
 import type { PlatformRecord } from "@/platform/types";
 import styles from "../../templates/PlatformPage/PlatformPage.module.scss";
@@ -36,12 +32,9 @@ export function RecordFiles({
         [preview, setPreview] = useState<string | null>(null);
     useEffect(() => {
         const controller = new AbortController();
-        platformFetch<FileInfo[]>(
-            "/records/" + type + "/" + record.id + "/files",
-            {
-                signal: controller.signal,
-            },
-        )
+        platformFetch<FileInfo[]>("/records/" + type + "/" + record.id + "/files", {
+            signal: controller.signal,
+        })
             .then(setFiles)
             .catch((e) => {
                 if (!controller.signal.aborted) setError(e.message);
@@ -58,14 +51,9 @@ export function RecordFiles({
         setLoading(true);
         setError("");
         try {
-            if (file.size > 20 * 1024 * 1024)
-                throw Error("El archivo debe pesar como máximo 20 MB.");
+            if (file.size > 20 * 1024 * 1024) throw Error("El archivo debe pesar como máximo 20 MB.");
             const buffer = await file.arrayBuffer(),
-                hash = Array.from(
-                    new Uint8Array(
-                        await crypto.subtle.digest("SHA-256", buffer),
-                    ),
-                )
+                hash = Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", buffer)))
                     .map((x) => x.toString(16).padStart(2, "0"))
                     .join("");
             const form = new FormData();
@@ -77,10 +65,7 @@ export function RecordFiles({
                     version: record.version,
                     data: {
                         nombre: file.name,
-                        mime:
-                            file.type === "image/jpg"
-                                ? "image/jpeg"
-                                : file.type,
+                        mime: file.type === "image/jpg" ? "image/jpeg" : file.type,
                         bytes: file.size,
                         hash,
                     },
@@ -91,11 +76,7 @@ export function RecordFiles({
             );
             setRevision((r) => r + 1);
         } catch (e) {
-            setError(
-                e instanceof Error
-                    ? e.message
-                    : "No se pudo adjuntar el archivo.",
-            );
+            setError(e instanceof Error ? e.message : "No se pudo adjuntar el archivo.");
         } finally {
             setLoading(false);
             if (input.current) input.current.value = "";
@@ -107,43 +88,37 @@ export function RecordFiles({
             const blob = await platformFetch<Blob>("/files/" + file.id);
             setPreview(URL.createObjectURL(blob));
         } catch (e) {
-            setError(
-                e instanceof Error ? e.message : "No se pudo abrir la imagen.",
-            );
+            setError(e instanceof Error ? e.message : "No se pudo abrir la imagen.");
         }
     }
     return (
         <section className={styles.card}>
             <div className={styles.toolbar}>
                 <h3>Documentos y planos</h3>
-                {!readOnly &&
-                    (def.actions.EDITAR ||
-                        (def.immutable && def.actions.INSERTAR)) && (
-                        <>
-                            <Button
-                                type="button"
-                                variant="outlined"
-                                state={loading ? "loading" : "default"}
-                                onClick={() => input.current?.click()}
-                            >
-                                Adjuntar archivo
-                            </Button>
-                            <input
-                                ref={input}
-                                type="file"
-                                accept="image/jpeg,image/png,application/pdf"
-                                hidden
-                                onChange={(e) => {
-                                    if (e.target.files?.[0])
-                                        void upload(e.target.files[0]);
-                                }}
-                            />
-                        </>
-                    )}
+                {!readOnly && (def.actions.EDITAR || (def.immutable && def.actions.INSERTAR)) && (
+                    <>
+                        <Button
+                            type="button"
+                            variant="outlined"
+                            state={loading ? "loading" : "default"}
+                            onClick={() => input.current?.click()}
+                        >
+                            Adjuntar archivo
+                        </Button>
+                        <input
+                            ref={input}
+                            type="file"
+                            accept="image/jpeg,image/png,application/pdf"
+                            hidden
+                            onChange={(e) => {
+                                if (e.target.files?.[0]) void upload(e.target.files[0]);
+                            }}
+                        />
+                    </>
+                )}
             </div>
             <p className={styles.muted}>
-                PDF, JPEG o PNG · Hasta 20 MB por archivo. El acceso conserva
-                los permisos del registro.
+                PDF, JPEG o PNG · Hasta 20 MB por archivo. El acceso conserva los permisos del registro.
             </p>
             {error && (
                 <p role="alert" className={styles.error}>
@@ -154,25 +129,19 @@ export function RecordFiles({
                 {files.map((file) => (
                     <li key={file.id}>
                         <strong>{file.nombre}</strong>
-                        <p className={styles.muted}>
-                            {Math.round(file.bytes / 1024)} KB
-                        </p>
+                        <p className={styles.muted}>{Math.round(file.bytes / 1024)} KB</p>
                         <div className={styles.actions}>
                             {file.mime.startsWith("image/") && (
-                                <button
-                                    className={styles.link}
-                                    onClick={() => void show(file)}
-                                >
+                                <button className={styles.link} onClick={() => void show(file)}>
                                     Ver imagen
                                 </button>
                             )}
                             <button
                                 className={styles.link}
                                 onClick={() =>
-                                    void downloadPlatform(
-                                        "/files/" + file.id,
-                                        file.nombre,
-                                    ).catch((e) => setError(e.message))
+                                    void downloadPlatform("/files/" + file.id, file.nombre).catch((e) =>
+                                        setError(e.message),
+                                    )
                                 }
                             >
                                 Descargar
@@ -181,11 +150,7 @@ export function RecordFiles({
                     </li>
                 ))}
             </ul>
-            {!files.length && (
-                <p className={styles.muted}>
-                    Todavía no hay archivos adjuntos.
-                </p>
-            )}
+            {!files.length && <p className={styles.muted}>Todavía no hay archivos adjuntos.</p>}
             {preview && (
                 <div>
                     <Button variant="outlined" onClick={() => setPreview(null)}>

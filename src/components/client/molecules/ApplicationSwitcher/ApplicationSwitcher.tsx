@@ -5,15 +5,11 @@ import { Icon } from "../../atoms/Icon";
 import styles from "./ApplicationSwitcher.module.scss";
 
 export interface ApplicationLink {
-  id: string;
-  title: string;
-  href: string;
+    id: string;
+    title: string;
+    href: string;
 }
-export function ApplicationSwitcher({
-    applications,
-}: {
-  applications: ApplicationLink[];
-}) {
+export function ApplicationSwitcher({ applications }: { applications: ApplicationLink[] }) {
     const [search, setSearch] = useState("");
     const [open, setOpen] = useState(false);
     const root = useRef<HTMLDivElement>(null);
@@ -26,9 +22,7 @@ export function ApplicationSwitcher({
         return () => document.removeEventListener("pointerdown", close);
     }, []);
     const results = applications.filter((app) =>
-        app.title
-            .toLocaleLowerCase("es")
-            .includes(search.trim().toLocaleLowerCase("es")),
+        app.title.toLocaleLowerCase("es").includes(search.trim().toLocaleLowerCase("es")),
     );
     return (
         <div

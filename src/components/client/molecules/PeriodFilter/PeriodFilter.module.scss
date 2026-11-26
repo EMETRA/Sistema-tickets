@@ -29,7 +29,9 @@
     color: var(--tickets-text-secondary);
     cursor: pointer;
     white-space: nowrap;
-    transition: background-color 0.15s ease, color 0.15s ease;
+    transition:
+      background-color 0.15s ease,
+      color 0.15s ease;
     &:hover:not(:disabled):not([aria-pressed="true"]) {
       color: var(--tickets-text);
       background: color-mix(in srgb, var(--tickets-surface) 85%, transparent);

@@ -103,6 +103,3 @@ export const ValorPequeño: Story = {
         iconName: "ticket",
     },
 };
-
-
-

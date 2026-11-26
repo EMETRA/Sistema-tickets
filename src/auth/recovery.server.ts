@@ -1,9 +1,7 @@
 import "server-only";
 import { z } from "zod";
 
-const requestSchema = z
-    .object({ correo: z.string().email().max(254) })
-    .strict();
+const requestSchema = z.object({ correo: z.string().email().max(254) }).strict();
 const passwordSchema = z
     .object({
         OTP: z.string().regex(/^\d{6}$/),
@@ -11,18 +9,13 @@ const passwordSchema = z
             .string()
             .min(8)
             .max(128)
-            .regex(
-                /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&ñáéíóú])[A-Za-z\d@$!%*?&ñáéíóú]{8,}$/,
-            ),
+            .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&ñáéíóú])[A-Za-z\d@$!%*?&ñáéíóú]{8,}$/),
     })
     .strict();
 
-export async function recoveryRequest(
-    request: Request,
-    method: "POST" | "PUT",
-) {
+export async function recoveryRequest(request: Request, method: "POST" | "PUT") {
     const unavailable =
-    "La recuperación no está disponible. Contacta a Informática para restablecer tu acceso.";
+        "La recuperación no está disponible. Contacta a Informática para restablecer tu acceso.";
     const response = (body: object, status: number) =>
         Response.json(body, {
             status,
@@ -53,16 +46,14 @@ export async function recoveryRequest(
     } catch {
         return response({ message: "La solicitud no es válida." }, 400);
     }
-    const validated = (
-        method === "POST" ? requestSchema : passwordSchema
-    ).safeParse(body);
+    const validated = (method === "POST" ? requestSchema : passwordSchema).safeParse(body);
     if (!validated.success)
         return response(
             {
                 message:
-          method === "POST"
-              ? "Revisa el correo electrónico."
-              : "Revisa el código y los requisitos de la contraseña.",
+                    method === "POST"
+                        ? "Revisa el correo electrónico."
+                        : "Revisa el código y los requisitos de la contraseña.",
             },
             400,
         );
@@ -72,17 +63,14 @@ export async function recoveryRequest(
         const url = new URL(base.endsWith("/") ? base : base + "/");
         if (
             !["https:", "http:"].includes(url.protocol) ||
-      url.username ||
-      url.password ||
-      url.search ||
-      url.hash
+            url.username ||
+            url.password ||
+            url.search ||
+            url.hash
         )
             return response({ message: unavailable }, 503);
         const upstream = await fetch(
-            new URL(
-                method === "POST" ? "send-recovery-email" : "recover-password",
-                url,
-            ),
+            new URL(method === "POST" ? "send-recovery-email" : "recover-password", url),
             {
                 method,
                 headers: { "Content-Type": "application/json" },
@@ -93,14 +81,10 @@ export async function recoveryRequest(
             },
         );
         await upstream.body?.cancel();
-        if (
-            method === "POST" &&
-      (upstream.ok || [400, 401, 403, 404].includes(upstream.status))
-        )
+        if (method === "POST" && (upstream.ok || [400, 401, 403, 404].includes(upstream.status)))
             return response(
                 {
-                    message:
-            "Si la cuenta puede recuperarse, recibirás un código en tu correo.",
+                    message: "Si la cuenta puede recuperarse, recibirás un código en tu correo.",
                 },
                 200,
             );
@@ -115,7 +99,7 @@ export async function recoveryRequest(
             return response(
                 {
                     message:
-            "Has realizado varias solicitudes. Espera unos minutos antes de intentar nuevamente.",
+                        "Has realizado varias solicitudes. Espera unos minutos antes de intentar nuevamente.",
                 },
                 429,
             );
@@ -123,7 +107,7 @@ export async function recoveryRequest(
             return response(
                 {
                     message:
-            "No se pudo validar el código o la contraseña. Revisa los datos o solicita otro código.",
+                        "No se pudo validar el código o la contraseña. Revisa los datos o solicita otro código.",
                 },
                 400,
             );

@@ -6,7 +6,8 @@
   gap: 20px;
   padding: 24px 28px;
   background: var(--tickets-surface);
-  border: 1px solid #dfe6f2; border: 1px solid light-dark(#dfe6f2, #2a3449);
+  border: 1px solid #dfe6f2;
+  border: 1px solid light-dark(#dfe6f2, #2a3449);
   border-radius: 16px;
   border-left: 4px solid #4361ee;
 }
@@ -14,18 +15,21 @@
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: #607497; color: light-dark(#607497, #aeb9cb);
+  color: #607497;
+  color: light-dark(#607497, #aeb9cb);
   font-weight: 700;
 }
 .title {
   margin: 6px 0;
-  color: #243953; color: light-dark(#243953, #a3bad7);
+  color: #243953;
+  color: light-dark(#243953, #a3bad7);
   font-size: clamp(24px, calc(2.2vw / var(--vp-zoom, 1)), 32px);
 }
 .subtitle {
   margin: 0;
   font-size: 14px;
-  color: #61718a; color: light-dark(#61718a, #e5eaf5);
+  color: #61718a;
+  color: light-dark(#61718a, #e5eaf5);
   line-height: 1.6;
 }
 .headerActions {
@@ -40,7 +44,8 @@
   flex-wrap: wrap;
   gap: 10px;
   font-size: 12px;
-  color: #65778f; color: light-dark(#65778f, #e5eaf5);
+  color: #65778f;
+  color: light-dark(#65778f, #e5eaf5);
   padding: 0 4px;
 }
 .pagination {
@@ -53,9 +58,11 @@
 }
 .warningText.warningText {
   margin: 0;
-  color: #8d641c; color: light-dark(#8d641c, #e9c990);
+  color: #8d641c;
+  color: light-dark(#8d641c, #e9c990);
 }
 .errorText.errorText {
   margin: 0;
-  color: #a73143; color: light-dark(#a73143, #e198a4);
+  color: #a73143;
+  color: light-dark(#a73143, #e198a4);
 }

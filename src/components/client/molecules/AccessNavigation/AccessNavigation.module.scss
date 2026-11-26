@@ -1,43 +1,45 @@
 // Mismo patrón que las pestañas de PlatformPage: subrayado, sin cajas.
 .navigation {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px 22px;
-    border-bottom: 1px solid var(--tickets-border);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 22px;
+  border-bottom: 1px solid var(--tickets-border);
+  a {
+    display: block;
+    padding: 10px 1px 12px;
+    margin-bottom: -1px;
+    color: var(--tickets-text-secondary);
+    border-bottom: 2px solid transparent;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.5;
+    white-space: nowrap;
+    transition:
+      color 0.15s ease,
+      border-color 0.15s ease;
+    &:hover {
+      color: var(--tickets-text);
+      border-bottom-color: var(--tickets-border-strong, #cdd6e6);
+    }
+    &[aria-current="page"] {
+      color: var(--tickets-primary);
+      font-weight: 600;
+      border-bottom-color: var(--tickets-primary);
+    }
+    &:focus-visible {
+      outline: 2px solid var(--tickets-primary);
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
+  }
+  @media (max-width: 767px) {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 18px;
+    scrollbar-width: none;
     a {
-        display: block;
-        padding: 10px 1px 12px;
-        margin-bottom: -1px;
-        color: var(--tickets-text-secondary);
-        border-bottom: 2px solid transparent;
-        text-decoration: none;
-        font-size: 13px;
-        font-weight: 500;
-        line-height: 1.5;
-        white-space: nowrap;
-        transition: color 0.15s ease, border-color 0.15s ease;
-        &:hover {
-            color: var(--tickets-text);
-            border-bottom-color: var(--tickets-border-strong, #cdd6e6);
-        }
-        &[aria-current="page"] {
-            color: var(--tickets-primary);
-            font-weight: 600;
-            border-bottom-color: var(--tickets-primary);
-        }
-        &:focus-visible {
-            outline: 2px solid var(--tickets-primary);
-            outline-offset: 2px;
-            border-radius: 4px;
-        }
+      font-size: 12px;
     }
-    @media (max-width: 767px) {
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        gap: 18px;
-        scrollbar-width: none;
-        a {
-            font-size: 12px;
-        }
-    }
+  }
 }

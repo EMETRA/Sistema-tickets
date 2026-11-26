@@ -25,7 +25,9 @@ export const TicketsFilterBar: React.FC<TicketsFilterBarProps> = ({
 }) => {
     const { getRole } = useAuthStore();
 
-    const filterByRole = (options: TicketsFilterBarProps["filterOptions"]): TicketsFilterBarProps["filterOptions"] => {
+    const filterByRole = (
+        options: TicketsFilterBarProps["filterOptions"],
+    ): TicketsFilterBarProps["filterOptions"] => {
         const role = getRole();
 
         if (role === "ADMINISTRADOR") {
@@ -33,11 +35,18 @@ export const TicketsFilterBar: React.FC<TicketsFilterBarProps> = ({
         }
 
         if (role === "TECNICO" || role === "DESARROLLADOR") {
-            return options?.filter(option => option.value === "asignado" || option.value === "completado" || option.value === "cancelado") ?? [];
+            return (
+                options?.filter(
+                    (option) =>
+                        option.value === "asignado" ||
+                        option.value === "completado" ||
+                        option.value === "cancelado",
+                ) ?? []
+            );
         }
 
-        return options?.filter(option => option.value === "cancelado") ?? [];
-    }
+        return options?.filter((option) => option.value === "cancelado") ?? [];
+    };
 
     return (
         <div className={classNames(styles.TicketsFilterBar, className)}>

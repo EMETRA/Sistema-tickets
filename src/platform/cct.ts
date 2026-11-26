@@ -19,10 +19,7 @@ export type CctBootstrap = {
     operador: boolean;
     escrituras: boolean;
     numeracionLista: boolean;
-    disponibilidad: Record<
-        string,
-        { habilitado: boolean; motivo: string | null }
-    >;
+    disponibilidad: Record<string, { habilitado: boolean; motivo: string | null }>;
 };
 export type CctCepo = {
     datos: CctRow;
@@ -174,12 +171,7 @@ export const CCT_REPORT_DATE_LABELS: Record<string, string> = {
     LIBERACION: "Fecha de liberación",
 };
 export async function cctPdfBlob(blob: Blob) {
-    if (
-        !blob.type.includes("application/pdf") ||
-        (await blob.slice(0, 5).text()) !== "%PDF-"
-    )
-        throw new Error(
-            "No se recibió un PDF válido. Conserva los filtros y reintenta.",
-        );
+    if (!blob.type.includes("application/pdf") || (await blob.slice(0, 5).text()) !== "%PDF-")
+        throw new Error("No se recibió un PDF válido. Conserva los filtros y reintenta.");
     return blob;
 }

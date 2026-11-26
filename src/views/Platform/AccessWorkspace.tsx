@@ -3,11 +3,7 @@ import { startTransition, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { AccessNavigation } from "@/components/client/molecules/AccessNavigation/AccessNavigation";
 import { AccessChoices as Multi } from "@/components/client/molecules/AccessChoices/AccessChoices";
-import {
-    ACCESS_TABS,
-    accessTab,
-    type AccessTab,
-} from "@/platform/access-navigation";
+import { ACCESS_TABS, accessTab, type AccessTab } from "@/platform/access-navigation";
 import { Button } from "@/components/client/atoms/Button";
 import { usePlatform } from "@/platform/context";
 import { platformCommand, platformFetch } from "@/platform/client";
@@ -43,32 +39,39 @@ export function AccessWorkspace() {
     const params = useSearchParams();
     const { data } = usePlatform();
     const tab = accessTab(params.get("tab"));
-    if (tab === "corporate") return <section className={styles.page}><AccessNavigation active="corporate" admin={!!data?.actor.admin} corporate /><ModuleAccessGate moduleId="mod06"><MOD06 /></ModuleAccessGate></section>;
+    if (tab === "corporate")
+        return (
+            <section className={styles.page}>
+                <AccessNavigation active="corporate" admin={!!data?.actor.admin} corporate />
+                <ModuleAccessGate moduleId="mod06">
+                    <MOD06 />
+                </ModuleAccessGate>
+            </section>
+        );
     if (!data?.actor.admin) return <p role="alert">No tienes permiso para administrar estos accesos.</p>;
     return <AccessCatalog key={tab} tab={tab} />;
 }
 function AccessCatalog({ tab }: { tab: AccessTab }) {
     const [copyOpen, setCopyOpen] = useState(false);
     // Propuesta: «Copiar accesos» es una tarea ocasional; se abre bajo demanda.
-    const wrapCopy = (panel: React.ReactNode) =>
-        (
-            <PopOver
-                isOpen={copyOpen}
-                onClose={() => setCopyOpen(false)}
-                ariaLabel="Copiar accesos"
-                className={access.copyDialog}
+    const wrapCopy = (panel: React.ReactNode) => (
+        <PopOver
+            isOpen={copyOpen}
+            onClose={() => setCopyOpen(false)}
+            ariaLabel="Copiar accesos"
+            className={access.copyDialog}
+        >
+            <button
+                type="button"
+                className={access.close}
+                onClick={() => setCopyOpen(false)}
+                aria-label="Cerrar copia de accesos"
             >
-                <button
-                    type="button"
-                    className={access.close}
-                    onClick={() => setCopyOpen(false)}
-                    aria-label="Cerrar copia de accesos"
-                >
-                    ×
-                </button>
-                {panel}
-            </PopOver>
-        );
+                ×
+            </button>
+            {panel}
+        </PopOver>
+    );
     const { data: context, refresh } = usePlatform(),
         [catalog, setCatalog] = useState<Catalog | null>(null),
         [query, setQuery] = useState(""),
@@ -156,22 +159,14 @@ function AccessCatalog({ tab }: { tab: AccessTab }) {
         setDescripcion(row?.descripcion || "");
         setRelated(
             tab === "profiles"
-                ? catalog!.profileRoles
-                      .filter((x) => x.perfilId === row?.id)
-                      .map((x) => x.rolId)
+                ? catalog!.profileRoles.filter((x) => x.perfilId === row?.id).map((x) => x.rolId)
                 : tab === "roles"
-                  ? catalog!.rolePermissions
-                        .filter((x) => x.rolId === row?.id)
-                        .map((x) => x.permisoId)
+                  ? catalog!.rolePermissions.filter((x) => x.rolId === row?.id).map((x) => x.permisoId)
                   : [],
         );
         setEditing(row);
     }
-    async function command(
-        action: string,
-        payload: Record<string, unknown>,
-        label: string,
-    ) {
+    async function command(action: string, payload: Record<string, unknown>, label: string) {
         if (!catalog || busy) return;
         setBusy(true);
         setError("");
@@ -183,18 +178,12 @@ function AccessCatalog({ tab }: { tab: AccessTab }) {
                 true,
                 label,
             );
-            setMessage(
-                "Los accesos se actualizaron. Se aplicarán con la siguiente validación de sesión.",
-            );
+            setMessage("Los accesos se actualizaron. Se aplicarán con la siguiente validación de sesión.");
             setRevision((n) => n + 1);
             setEditing(undefined);
             await refresh();
         } catch (e) {
-            setError(
-                e instanceof Error
-                    ? e.message
-                    : "No se pudieron actualizar los accesos.",
-            );
+            setError(e instanceof Error ? e.message : "No se pudieron actualizar los accesos.");
         } finally {
             setBusy(false);
         }
@@ -207,9 +196,7 @@ function AccessCatalog({ tab }: { tab: AccessTab }) {
                     {error ? (
                         <p role="alert" className={styles.error}>
                             {error}
-                            <button onClick={() => setRevision((n) => n + 1)}>
-                                Reintentar
-                            </button>
+                            <button onClick={() => setRevision((n) => n + 1)}>Reintentar</button>
                         </p>
                     ) : (
                         <p role="status">Consultando el catálogo de accesos…</p>
@@ -218,11 +205,7 @@ function AccessCatalog({ tab }: { tab: AccessTab }) {
             </section>
         );
     const named =
-        tab === "profiles"
-            ? catalog.profiles
-            : tab === "roles"
-              ? catalog.roles
-              : catalog.permissions;
+        tab === "profiles" ? catalog.profiles : tab === "roles" ? catalog.roles : catalog.permissions;
     const filtered = named.filter((row) =>
         (row.nombre + " " + (row.descripcion || ""))
             .toLocaleLowerCase("es-GT")
@@ -233,19 +216,10 @@ function AccessCatalog({ tab }: { tab: AccessTab }) {
             <AccessNavigation active={tab} admin={!!context?.actor.admin} />
             <div className={styles.toolbar}>
                 <div>
-                    <h2>
-                        {ACCESS_TABS.find((item) => item.id === tab)?.label}
-                    </h2>
-                    <p className={styles.muted}>
-                        {
-                            ACCESS_TABS.find((item) => item.id === tab)
-                                ?.description
-                        }
-                    </p>
+                    <h2>{ACCESS_TABS.find((item) => item.id === tab)?.label}</h2>
+                    <p className={styles.muted}>{ACCESS_TABS.find((item) => item.id === tab)?.description}</p>
                 </div>
-                <span className={styles.chip}>
-                    Perfil → Roles → Permisos de módulos
-                </span>
+                <span className={styles.chip}>Perfil → Roles → Permisos de módulos</span>
             </div>
             {error && (
                 <p role="alert" className={styles.error}>
@@ -262,14 +236,14 @@ function AccessCatalog({ tab }: { tab: AccessTab }) {
             ) : tab === "users" ? (
                 <div className={undefined}>
                     <section className={styles.card}>
-                        {(
+                        {
                             <div className={access.sectionHead}>
                                 <h2>Accesos del colaborador</h2>
                                 <Button variant="outlined" onClick={() => setCopyOpen(true)}>
                                     Copiar accesos de otro colaborador
                                 </Button>
                             </div>
-                        )}
+                        }
                         <PlatformField
                             field={{
                                 key: "usuarioDestinoId",
@@ -286,13 +260,9 @@ function AccessCatalog({ tab }: { tab: AccessTab }) {
                                     <select
                                         className={styles.control}
                                         value={profile}
-                                        onChange={(e) =>
-                                            setProfile(e.target.value)
-                                        }
+                                        onChange={(e) => setProfile(e.target.value)}
                                     >
-                                        <option value="">
-                                            Sin perfil · permisos individuales
-                                        </option>
+                                        <option value="">Sin perfil · permisos individuales</option>
                                         {catalog.profiles.map((o) => (
                                             <option key={o.id} value={o.id}>
                                                 {o.nombre}
@@ -319,9 +289,7 @@ function AccessCatalog({ tab }: { tab: AccessTab }) {
                                             "user-access",
                                             {
                                                 usuarioId: Number(target),
-                                                perfilId: profile
-                                                    ? Number(profile)
-                                                    : null,
+                                                perfilId: profile ? Number(profile) : null,
                                                 roles,
                                                 permisos: permissions,
                                             },
@@ -340,65 +308,60 @@ function AccessCatalog({ tab }: { tab: AccessTab }) {
                             </div>
                         )}
                     </section>
-                    {wrapCopy(<aside className={styles.card}>
-                        <h2>Copiar accesos</h2>
-                        <p className={styles.muted}>
-                            Crea una copia independiente de los permisos
-                            efectivos del origen. Los cambios futuros del origen
-                            no modificarán esta copia. Reemplaza el perfil y los
-                            extras del destino.
-                        </p>
-                        <PlatformField
-                            field={{
-                                key: "copiarUsuarioId",
-                                label: "Colaborador de origen",
-                                type: "user",
-                            }}
-                            value={source}
-                            onChange={setSource}
-                        />
-                        {preview && (
-                            <>
-                                <h3>Impacto en el destino</h3>
-                                <p className={styles.muted}>
-                                    {preview.agregar.length} permisos se agregan
-                                    · {preview.retirar.length} se retiran.
-                                </p>
-                                <details>
-                                    <summary>Ver detalle de cambios</summary>
-                                    <h4>Agregar</h4>
-                                    {preview.agregar.map((p) => (
-                                        <p key={p.id}>{p.nombre}</p>
-                                    ))}
-                                    <h4>Retirar</h4>
-                                    {preview.retirar.map((p) => (
-                                        <p key={p.id}>{p.nombre}</p>
-                                    ))}
-                                </details>
-                                <Button
-                                    state={
-                                        busy
-                                            ? "loading"
-                                            : source === target
-                                              ? "disabled"
-                                              : "default"
-                                    }
-                                    onClick={() =>
-                                        void command(
-                                            "user-access",
-                                            {
-                                                usuarioId: Number(target),
-                                                copiarUsuarioId: Number(source),
-                                            },
-                                            "Reemplazar accesos mediante copia independiente",
-                                        )
-                                    }
-                                >
-                                    Revisar copia
-                                </Button>
-                            </>
-                        )}
-                    </aside>)}
+                    {wrapCopy(
+                        <aside className={styles.card}>
+                            <h2>Copiar accesos</h2>
+                            <p className={styles.muted}>
+                                Crea una copia independiente de los permisos efectivos del origen. Los cambios
+                                futuros del origen no modificarán esta copia. Reemplaza el perfil y los extras
+                                del destino.
+                            </p>
+                            <PlatformField
+                                field={{
+                                    key: "copiarUsuarioId",
+                                    label: "Colaborador de origen",
+                                    type: "user",
+                                }}
+                                value={source}
+                                onChange={setSource}
+                            />
+                            {preview && (
+                                <>
+                                    <h3>Impacto en el destino</h3>
+                                    <p className={styles.muted}>
+                                        {preview.agregar.length} permisos se agregan ·{" "}
+                                        {preview.retirar.length} se retiran.
+                                    </p>
+                                    <details>
+                                        <summary>Ver detalle de cambios</summary>
+                                        <h4>Agregar</h4>
+                                        {preview.agregar.map((p) => (
+                                            <p key={p.id}>{p.nombre}</p>
+                                        ))}
+                                        <h4>Retirar</h4>
+                                        {preview.retirar.map((p) => (
+                                            <p key={p.id}>{p.nombre}</p>
+                                        ))}
+                                    </details>
+                                    <Button
+                                        state={busy ? "loading" : source === target ? "disabled" : "default"}
+                                        onClick={() =>
+                                            void command(
+                                                "user-access",
+                                                {
+                                                    usuarioId: Number(target),
+                                                    copiarUsuarioId: Number(source),
+                                                },
+                                                "Reemplazar accesos mediante copia independiente",
+                                            )
+                                        }
+                                    >
+                                        Revisar copia
+                                    </Button>
+                                </>
+                            )}
+                        </aside>,
+                    )}
                 </div>
             ) : (
                 <>
@@ -412,12 +375,7 @@ function AccessCatalog({ tab }: { tab: AccessTab }) {
                             />
                         </label>
                         <Button onClick={() => edit(null)}>
-                            Crear{" "}
-                            {tab === "profiles"
-                                ? "perfil"
-                                : tab === "roles"
-                                  ? "rol"
-                                  : "permiso"}
+                            Crear {tab === "profiles" ? "perfil" : tab === "roles" ? "rol" : "permiso"}
                         </Button>
                     </div>
                     <div className={styles.tableRegion}>
@@ -435,10 +393,7 @@ function AccessCatalog({ tab }: { tab: AccessTab }) {
                                         <td>{o.nombre}</td>
                                         <td>{o.descripcion}</td>
                                         <td>
-                                            <button
-                                                className={styles.link}
-                                                onClick={() => edit(o)}
-                                            >
+                                            <button className={styles.link} onClick={() => edit(o)}>
                                                 Editar y ver relaciones
                                             </button>
                                         </td>
@@ -471,11 +426,7 @@ function AccessCatalog({ tab }: { tab: AccessTab }) {
                     <div className={styles.dialogHeader}>
                         <h2 id="access-editor-title">
                             {editing ? "Editar" : "Crear"}{" "}
-                            {tab === "profiles"
-                                ? "perfil"
-                                : tab === "roles"
-                                  ? "rol"
-                                  : "permiso"}
+                            {tab === "profiles" ? "perfil" : tab === "roles" ? "rol" : "permiso"}
                         </h2>
                         <Button
                             variant="outlined"
@@ -522,43 +473,26 @@ function AccessCatalog({ tab }: { tab: AccessTab }) {
                                 <input
                                     className={styles.control}
                                     value={descripcion}
-                                    onChange={(e) =>
-                                        setDescripcion(e.target.value)
-                                    }
+                                    onChange={(e) => setDescripcion(e.target.value)}
                                     maxLength={255}
                                     required
                                 />
                             </label>
-                            <Button
-                                type="submit"
-                                state={busy ? "loading" : "default"}
-                            >
+                            <Button type="submit" state={busy ? "loading" : "default"}>
                                 Guardar datos
                             </Button>
                         </form>
                         {!editing && tab !== "permissions" && (
                             <p className={styles.muted}>
-                                Guarda primero los datos. Luego abre «Editar y
-                                ver relaciones» para asignar{" "}
-                                {tab === "profiles"
-                                    ? "los roles del perfil"
-                                    : "los permisos del rol"}
-                                .
+                                Guarda primero los datos. Luego abre «Editar y ver relaciones» para asignar{" "}
+                                {tab === "profiles" ? "los roles del perfil" : "los permisos del rol"}.
                             </p>
                         )}
                         {editing && tab !== "permissions" && (
                             <>
                                 <Multi
-                                    label={
-                                        tab === "profiles"
-                                            ? "Roles del perfil"
-                                            : "Permisos del rol"
-                                    }
-                                    options={
-                                        tab === "profiles"
-                                            ? catalog.roles
-                                            : catalog.permissions
-                                    }
+                                    label={tab === "profiles" ? "Roles del perfil" : "Permisos del rol"}
+                                    options={tab === "profiles" ? catalog.roles : catalog.permissions}
                                     value={related}
                                     onChange={setRelated}
                                 />
@@ -566,9 +500,7 @@ function AccessCatalog({ tab }: { tab: AccessTab }) {
                                     state={busy ? "loading" : "default"}
                                     onClick={() =>
                                         void command(
-                                            tab === "profiles"
-                                                ? "profile-roles"
-                                                : "role-permissions",
+                                            tab === "profiles" ? "profile-roles" : "role-permissions",
                                             tab === "profiles"
                                                 ? {
                                                       perfilId: editing.id,
@@ -578,8 +510,7 @@ function AccessCatalog({ tab }: { tab: AccessTab }) {
                                                       rolId: editing.id,
                                                       permisos: related,
                                                   },
-                                            "Reemplazar relaciones de " +
-                                                editing.nombre,
+                                            "Reemplazar relaciones de " + editing.nombre,
                                         )
                                     }
                                 >
@@ -595,8 +526,7 @@ function AccessCatalog({ tab }: { tab: AccessTab }) {
                                     void command(
                                         tab,
                                         { id: editing.id, eliminar: true },
-                                        "Eliminar acceso sin asignaciones: " +
-                                            editing.nombre,
+                                        "Eliminar acceso sin asignaciones: " + editing.nombre,
                                     )
                                 }
                             >
@@ -607,8 +537,7 @@ function AccessCatalog({ tab }: { tab: AccessTab }) {
                 </dialog>
             )}
             <p className={styles.muted}>
-                Los cambios de acceso quedan en el historial y requieren doble
-                confirmación.
+                Los cambios de acceso quedan en el historial y requieren doble confirmación.
             </p>
         </section>
     );

@@ -64,6 +64,16 @@
   box-shadow: var(--tickets-shadow);
 }
 
-.completedTasksFilters { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)); gap: 20px; min-width: 0; > * { min-width: 0; } }
+.completedTasksFilters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
+  gap: 20px;
+  min-width: 0;
+  > * {
+    min-width: 0;
+  }
+}
 
-.errorText { overflow-wrap: anywhere; }
+.errorText {
+  overflow-wrap: anywhere;
+}

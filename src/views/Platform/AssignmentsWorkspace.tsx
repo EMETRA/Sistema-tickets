@@ -37,11 +37,7 @@ const STATE_LABEL: Record<number, string> = {
 export function AssignmentsWorkspace() {
     const { data } = usePlatform(),
         [scope, setScope] = useState(
-            data!.capabilities.assign
-                ? "cola"
-                : data!.capabilities.attend
-                  ? "asignados"
-                  : "creados",
+            data!.capabilities.assign ? "cola" : data!.capabilities.attend ? "asignados" : "creados",
         ),
         [filter, setFilter] = useState("sin-asignar"),
         [result, setResult] = useState<PageResult<Ticket>>({
@@ -72,15 +68,25 @@ export function AssignmentsWorkspace() {
         const opts = { signal: controller.signal };
         // Los contadores de la cola usan la misma fuente que la bandeja, así siempre cuadran.
         const total = (estado: string) =>
-            platformFetch<PageResult<Ticket>>(`/tickets?scope=cola&estado=${estado}&limit=1`, opts).then((r) => r.total);
+            platformFetch<PageResult<Ticket>>(`/tickets?scope=cola&estado=${estado}&limit=1`, opts).then(
+                (r) => r.total,
+            );
         Promise.all([
             total("sin-asignar"),
             total("sin-atencion"),
-            platformFetch<{ tickets: { enTrabajo?: number; resueltos?: number } }>("/metrics?inicio=true", opts),
+            platformFetch<{ tickets: { enTrabajo?: number; resueltos?: number } }>(
+                "/metrics?inicio=true",
+                opts,
+            ),
         ])
             .then(([sinAsignar, sinPrimeraAtencion, m]) => {
                 if (!controller.signal.aborted)
-                    setCounts({ sinAsignar, sinPrimeraAtencion, enTrabajo: m.tickets.enTrabajo, resueltos: m.tickets.resueltos });
+                    setCounts({
+                        sinAsignar,
+                        sinPrimeraAtencion,
+                        enTrabajo: m.tickets.enTrabajo,
+                        resueltos: m.tickets.resueltos,
+                    });
             })
             .catch(() => undefined);
         return () => controller.abort();
@@ -91,12 +97,7 @@ export function AssignmentsWorkspace() {
         setLoading(true);
         setError("");
         platformFetch<PageResult<Ticket>>(
-            "/tickets?scope=" +
-                scope +
-                "&estado=" +
-                (scope === "cola" ? filter : "") +
-                "&offset=" +
-                offset,
+            "/tickets?scope=" + scope + "&estado=" + (scope === "cola" ? filter : "") + "&offset=" + offset,
             { signal: controller.signal },
         )
             .then(setResult)
@@ -130,11 +131,7 @@ export function AssignmentsWorkspace() {
             setRevision((n) => n + 1);
             setMessage("El cambio del ticket quedó registrado.");
         } catch (e) {
-            setError(
-                e instanceof Error
-                    ? e.message
-                    : "No se pudo aplicar el cambio.",
-            );
+            setError(e instanceof Error ? e.message : "No se pudo aplicar el cambio.");
         } finally {
             setBusy(false);
         }
@@ -142,22 +139,35 @@ export function AssignmentsWorkspace() {
     return (
         <section className={styles.page}>
             <div className={styles.toolbar}>
-                <p className={styles.muted}>
-                    {""}
-                </p>
-                <Button
-                    variant="outlined"
-                    onClick={() => setRevision((n) => n + 1)}
-                >
+                <p className={styles.muted}>{""}</p>
+                <Button variant="outlined" onClick={() => setRevision((n) => n + 1)}>
                     Actualizar
                 </Button>
             </div>
             {data!.capabilities.assign && (
                 <div className={queue.strip} role="group" aria-label="Indicadores de la cola">
                     {[
-                        { id: "sin-asignar", label: "Sin asignar", value: counts?.sinAsignar, tone: "neutral", hint: "Esperan responsable" },
-                        { id: "sin-atencion", label: "Sin primera atención", value: counts?.sinPrimeraAtencion, tone: (counts?.sinPrimeraAtencion || 0) > 0 ? "danger" : "neutral", hint: "Superaron el umbral del equipo" },
-                        { id: "todos", label: "Todos los activos", value: undefined, tone: "info", hint: "Toda la bandeja" },
+                        {
+                            id: "sin-asignar",
+                            label: "Sin asignar",
+                            value: counts?.sinAsignar,
+                            tone: "neutral",
+                            hint: "Esperan responsable",
+                        },
+                        {
+                            id: "sin-atencion",
+                            label: "Sin primera atención",
+                            value: counts?.sinPrimeraAtencion,
+                            tone: (counts?.sinPrimeraAtencion || 0) > 0 ? "danger" : "neutral",
+                            hint: "Superaron el umbral del equipo",
+                        },
+                        {
+                            id: "todos",
+                            label: "Todos los activos",
+                            value: undefined,
+                            tone: "info",
+                            hint: "Toda la bandeja",
+                        },
                     ].map((tile) => (
                         <button
                             key={tile.id}
@@ -198,9 +208,7 @@ export function AssignmentsWorkspace() {
                     )}
                     {data!.capabilities.attend && (
                         <button
-                            aria-current={
-                                scope === "asignados" ? "page" : undefined
-                            }
+                            aria-current={scope === "asignados" ? "page" : undefined}
                             onClick={() => {
                                 setScope("asignados");
                                 setOffset(0);
@@ -221,23 +229,21 @@ export function AssignmentsWorkspace() {
                 </nav>
                 {false && (
                     <div className={styles.toolbar}>
-                    <label className={styles.field}>
-                        Mostrar
-                        <select
-                            className={styles.control}
-                            value={filter}
-                            onChange={(e) => {
-                                setFilter(e.target.value);
-                                setOffset(0);
-                            }}
-                        >
-                            <option value="sin-asignar">Sin asignar</option>
-                            <option value="sin-atencion">
-                                Asignados sin primera atención
-                            </option>
-                            <option value="todos">Todos</option>
-                        </select>
-                    </label>
+                        <label className={styles.field}>
+                            Mostrar
+                            <select
+                                className={styles.control}
+                                value={filter}
+                                onChange={(e) => {
+                                    setFilter(e.target.value);
+                                    setOffset(0);
+                                }}
+                            >
+                                <option value="sin-asignar">Sin asignar</option>
+                                <option value="sin-atencion">Asignados sin primera atención</option>
+                                <option value="todos">Todos</option>
+                            </select>
+                        </label>
                     </div>
                 )}
                 {message && (
@@ -258,8 +264,7 @@ export function AssignmentsWorkspace() {
                             field={{
                                 key: "usuarioId",
                                 label: "Responsable",
-                                lookupPath:
-                                    "/tickets/" + assigning.id + "/assignees",
+                                lookupPath: "/tickets/" + assigning.id + "/assignees",
                                 type: "user",
                                 required: true,
                             }}
@@ -277,9 +282,7 @@ export function AssignmentsWorkspace() {
                             </Button>
                             <Button
                                 onClick={() => void act(assigning, "assign")}
-                                state={
-                                    busy ? "loading" : user ? "default" : "disabled"
-                                }
+                                state={busy ? "loading" : user ? "default" : "disabled"}
                             >
                                 Asignar ticket
                             </Button>
@@ -304,17 +307,10 @@ export function AssignmentsWorkspace() {
                             </thead>
                             <tbody>
                                 {result.items.map((row) => (
-                                    <tr
-                                        key={row.id}
-                                        className={row.alerta ? styles.rowAlert : undefined}
-                                    >
+                                    <tr key={row.id} className={row.alerta ? styles.rowAlert : undefined}>
                                         <td>
-                                            <button
-                                                className={styles.link}
-                                                onClick={() => setDetail(row)}
-                                            >
-                                                {row.codigo || "#" + row.id} ·{" "}
-                                                {row.titulo}
+                                            <button className={styles.link} onClick={() => setDetail(row)}>
+                                                {row.codigo || "#" + row.id} · {row.titulo}
                                             </button>
                                             <div>
                                                 <span
@@ -330,15 +326,12 @@ export function AssignmentsWorkspace() {
                                         <td>
                                             {row.alerta ? (
                                                 <span className={styles.flag}>
-                                                    Sin primera atención · Umbral{" "}
-                                                    {row.minutosAlerta} min
+                                                    Sin primera atención · Umbral {row.minutosAlerta} min
                                                 </span>
                                             ) : row.atendidoEn ? (
-                                                "Atendido: " +
-                                                displayDate(row.atendidoEn)
+                                                "Atendido: " + displayDate(row.atendidoEn)
                                             ) : row.asignadoEn ? (
-                                                "Asignado: " +
-                                                displayDate(row.asignadoEn)
+                                                "Asignado: " + displayDate(row.asignadoEn)
                                             ) : row.asignado ? (
                                                 "Asignación histórica sin fecha confirmada"
                                             ) : (
@@ -347,55 +340,35 @@ export function AssignmentsWorkspace() {
                                         </td>
                                         <td>
                                             <div className={styles.actions}>
-                                                {scope === "cola" &&
-                                                    ![4, 5].includes(
-                                                        row.estado,
-                                                    ) && (
-                                                        <button
-                                                            className={styles.link}
-                                                            onClick={() => {
-                                                                setAssigning(row);
-                                                                setUser(
-                                                                    row.asignadoId ||
-                                                                        "",
-                                                                );
-                                                            }}
-                                                        >
-                                                            Asignar
-                                                        </button>
-                                                    )}
-                                                {row.asignadoId ===
-                                                    data!.actor.id &&
-                                                    row.estado === 2 && (
-                                                        <button
-                                                            className={styles.link}
-                                                            disabled={busy}
-                                                            onClick={() =>
-                                                                void act(
-                                                                    row,
-                                                                    "start",
-                                                                )
-                                                            }
-                                                        >
-                                                            Iniciar atención
-                                                        </button>
-                                                    )}
-                                                {row.asignadoId ===
-                                                    data!.actor.id &&
-                                                    row.estado === 3 && (
-                                                        <button
-                                                            className={styles.link}
-                                                            disabled={busy}
-                                                            onClick={() =>
-                                                                void act(
-                                                                    row,
-                                                                    "resolve",
-                                                                )
-                                                            }
-                                                        >
-                                                            Resolver
-                                                        </button>
-                                                    )}
+                                                {scope === "cola" && ![4, 5].includes(row.estado) && (
+                                                    <button
+                                                        className={styles.link}
+                                                        onClick={() => {
+                                                            setAssigning(row);
+                                                            setUser(row.asignadoId || "");
+                                                        }}
+                                                    >
+                                                        Asignar
+                                                    </button>
+                                                )}
+                                                {row.asignadoId === data!.actor.id && row.estado === 2 && (
+                                                    <button
+                                                        className={styles.link}
+                                                        disabled={busy}
+                                                        onClick={() => void act(row, "start")}
+                                                    >
+                                                        Iniciar atención
+                                                    </button>
+                                                )}
+                                                {row.asignadoId === data!.actor.id && row.estado === 3 && (
+                                                    <button
+                                                        className={styles.link}
+                                                        disabled={busy}
+                                                        onClick={() => void act(row, "resolve")}
+                                                    >
+                                                        Resolver
+                                                    </button>
+                                                )}
                                             </div>
                                         </td>
                                     </tr>
@@ -403,9 +376,7 @@ export function AssignmentsWorkspace() {
                             </tbody>
                         </table>
                         {!result.items.length && (
-                            <p className={styles.card}>
-                                No hay tickets en esta bandeja.
-                            </p>
+                            <p className={styles.card}>No hay tickets en esta bandeja.</p>
                         )}
                     </div>
                 )}
@@ -421,9 +392,7 @@ export function AssignmentsWorkspace() {
                         </Button>
                         <Button
                             variant="outlined"
-                            state={
-                                offset + 50 < result.total ? "default" : "disabled"
-                            }
+                            state={offset + 50 < result.total ? "default" : "disabled"}
                             onClick={() => setOffset(offset + 50)}
                         >
                             Siguiente

@@ -9,8 +9,8 @@ export type PeopleSearch = (query: string, signal: AbortSignal) => Promise<Perso
 
 const apiSearch =
     (lookupPath: string): PeopleSearch =>
-        (query, signal) =>
-            platformFetch<Person[]>(lookupPath + "?q=" + encodeURIComponent(query), { signal });
+    (query, signal) =>
+        platformFetch<Person[]>(lookupPath + "?q=" + encodeURIComponent(query), { signal });
 
 const cache = new Map<number, string>();
 
@@ -41,7 +41,15 @@ export function usePeopleNames(ids: number[], lookupPath = "/people", search?: P
     return (id: number) => cache.get(id);
 }
 
-export function PersonChip({ name, onRemove, disabled }: { name: string; onRemove?: () => void; disabled?: boolean }) {
+export function PersonChip({
+    name,
+    onRemove,
+    disabled,
+}: {
+    name: string;
+    onRemove?: () => void;
+    disabled?: boolean;
+}) {
     return (
         <span className={styles.chip}>
             <span className={styles.avatar} aria-hidden="true">
@@ -101,7 +109,8 @@ export function PeoplePicker({
                     setError("");
                 })
                 .catch((e) => {
-                    if (!controller.signal.aborted) setError(e instanceof Error ? e.message : "No se pudo buscar personas.");
+                    if (!controller.signal.aborted)
+                        setError(e instanceof Error ? e.message : "No se pudo buscar personas.");
                 });
         }, 200);
         return () => {
@@ -144,7 +153,9 @@ export function PeoplePicker({
                     aria-expanded={open && available.length > 0}
                     aria-controls={listId}
                     aria-autocomplete="list"
-                    aria-activedescendant={open && available[active] ? `${listId}-${available[active].id}` : undefined}
+                    aria-activedescendant={
+                        open && available[active] ? `${listId}-${available[active].id}` : undefined
+                    }
                     className={styles.input}
                     placeholder="Escribe un nombre para agregar…"
                     value={query}
@@ -178,7 +189,12 @@ export function PeoplePicker({
                     }}
                 />
                 {open && (
-                    <ul id={listId} role="listbox" className={styles.options} aria-label={"Personas para " + label}>
+                    <ul
+                        id={listId}
+                        role="listbox"
+                        className={styles.options}
+                        aria-label={"Personas para " + label}
+                    >
                         {available.map((p, i) => (
                             <li
                                 key={p.id}
@@ -198,7 +214,10 @@ export function PeoplePicker({
                         ))}
                         {!available.length && (
                             <li className={styles.none} role="presentation">
-                                {error || (query ? "No hay coincidencias con «" + query + "»." : "No hay más personas disponibles.")}
+                                {error ||
+                                    (query
+                                        ? "No hay coincidencias con «" + query + "»."
+                                        : "No hay más personas disponibles.")}
                             </li>
                         )}
                     </ul>

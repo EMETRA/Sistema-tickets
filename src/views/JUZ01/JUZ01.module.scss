@@ -70,7 +70,8 @@
 }
 .fieldError {
   margin: 0;
-  color: #ac2945; color: light-dark(#ac2945, #e594a5);
+  color: #ac2945;
+  color: light-dark(#ac2945, #e594a5);
   font-size: 13px;
   line-height: 1.6;
 }
@@ -84,8 +85,10 @@
   margin: 0;
   padding: 14px;
   border-radius: 8px;
-  background: #fff2f4; background: light-dark(#fff2f4, #37192b);
-  color: #ac2945; color: light-dark(#ac2945, #e594a5);
+  background: #fff2f4;
+  background: light-dark(#fff2f4, #37192b);
+  color: #ac2945;
+  color: light-dark(#ac2945, #e594a5);
   font-size: 13px;
   p {
     margin: 5px 0 0;
@@ -121,7 +124,9 @@
     margin: 0;
   }
   // El título recibe foco de lectura; no es un control interactivo.
-  h2:focus { outline: none; }
+  h2:focus {
+    outline: none;
+  }
 }
 .count {
   padding: 4px 8px;
@@ -157,8 +162,10 @@
     overflow-wrap: anywhere;
     line-height: 1.7;
     mark {
-      background: #e7ecff; background: light-dark(#e7ecff, #122150);
-      color: #273f91; color: light-dark(#273f91, #97a8e3);
+      background: #e7ecff;
+      background: light-dark(#e7ecff, #122150);
+      color: #273f91;
+      color: light-dark(#273f91, #97a8e3);
       font-weight: 700;
       border-radius: 3px;
       padding: 2px 0;

@@ -27,9 +27,25 @@ export function MeetingCard({ activity }: { activity: PlatformRecord }) {
     const end = Date.parse(String(activity.datos.fin || ""));
     const finished = Number.isFinite(end) && end < Date.now();
     return (
-        <section className={styles.meeting} aria-label="Reunión virtual" data-finished={finished || undefined}>
+        <section
+            className={styles.meeting}
+            aria-label="Reunión virtual"
+            data-finished={finished || undefined}
+        >
             <span className={styles.glyph} aria-hidden="true">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="6" width="13" height="12" rx="2.5" /><path d="m16 10.5 5-3v9l-5-3" /></svg>
+                <svg
+                    viewBox="0 0 24 24"
+                    width="20"
+                    height="20"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                >
+                    <rect x="3" y="6" width="13" height="12" rx="2.5" />
+                    <path d="m16 10.5 5-3v9l-5-3" />
+                </svg>
             </span>
             <div className={styles.meetingText}>
                 <strong>{finished ? "La reunión ya terminó" : "Reunión virtual"}</strong>

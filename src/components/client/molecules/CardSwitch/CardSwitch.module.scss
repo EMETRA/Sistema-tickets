@@ -1,21 +1,22 @@
 .cardSwitch {
-    background-color: var(--tickets-surface);
-    border-radius: 12px;
-    padding: 16px;
-    display: flex;
-    flex-wrap: wrap; // Por si hay demasiadas opciones y necesitan bajar de línea
-    gap: 12px;
-    width: fit-content;
+  background-color: var(--tickets-surface);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-wrap: wrap; // Por si hay demasiadas opciones y necesitan bajar de línea
+  gap: 12px;
+  width: fit-content;
 
-    &.fullWidth {
-        width: 100%;
-        justify-content: stretch;
-    }
+  &.fullWidth {
+    width: 100%;
+    justify-content: stretch;
+  }
 }
 
 .switchButton {
-    min-width: 120px;
-    flex: 1;     height: 44px;
-    font-weight: 600;
-    white-space: nowrap;
+  min-width: 120px;
+  flex: 1;
+  height: 44px;
+  font-weight: 600;
+  white-space: nowrap;
 }

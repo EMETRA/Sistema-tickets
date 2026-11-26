@@ -1,11 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/client/atoms/Button";
-import {
-    platformCommand,
-    platformFetch,
-    PlatformError,
-} from "@/platform/client";
+import { platformCommand, platformFetch, PlatformError } from "@/platform/client";
 import { AdministrativeChangeCancelled } from "@/api/administrative-confirmation";
 import { TagInput } from "@/components/client/molecules/TagInput/TagInput";
 import styles from "./TicketClassification.module.scss";
@@ -80,11 +76,7 @@ export function TicketClassification({
                             ? failure.message
                             : "No se pudieron consultar las etiquetas.",
                     );
-                    setReference(
-                        failure instanceof PlatformError
-                            ? failure.reference
-                            : undefined,
-                    );
+                    setReference(failure instanceof PlatformError ? failure.reference : undefined);
                 }
             })
             .finally(() => {
@@ -94,16 +86,10 @@ export function TicketClassification({
     }, [ticketId, revision, onDirtyChange, onCountChange]);
     const savedTags = applied?.etiquetas || [];
     const same = (ids: string[]) =>
-        ids.length === savedTags.length &&
-        savedTags.every((tag) => ids.includes(tag.id));
+        ids.length === savedTags.length && savedTags.every((tag) => ids.includes(tag.id));
     const dirty = !same(selected);
     const options = [
-        ...new Map(
-            [...savedTags, ...createdTags, ...catalog].map((tag) => [
-                tag.id,
-                tag,
-            ]),
-        ).values(),
+        ...new Map([...savedTags, ...createdTags, ...catalog].map((tag) => [tag.id, tag])).values(),
     ];
     const fold = (value: string) =>
         value
@@ -167,11 +153,7 @@ export function TicketClassification({
                         ? failure.message
                         : "No se pudieron guardar las etiquetas. Conservamos tu selección para reintentar.",
                 );
-                setReference(
-                    failure instanceof PlatformError
-                        ? failure.reference
-                        : undefined,
-                );
+                setReference(failure instanceof PlatformError ? failure.reference : undefined);
             }
         } finally {
             setBusy(false);
@@ -196,25 +178,17 @@ export function TicketClassification({
                 "POST",
                 initial ? {} : { nombre: name, color: "#4763E4" },
                 true,
-                initial
-                    ? "Crear etiquetas iniciales de trabajo"
-                    : "Crear etiqueta " + name,
+                initial ? "Crear etiquetas iniciales de trabajo" : "Crear etiqueta " + name,
             );
             if (!initial) {
-                const tag = result.etiquetas.find(
-                    (t) => fold(t.nombre.trim()) === fold(name.trim()),
-                );
+                const tag = result.etiquetas.find((t) => fold(t.nombre.trim()) === fold(name.trim()));
                 if (!tag)
                     throw new Error(
                         "La etiqueta se creó pero no pudo seleccionarse. Actualiza el catálogo antes de continuar.",
                     );
                 const created = { ...tag, id: String(tag.id) };
-                setCreatedTags((previous) => [
-                    ...previous.filter((t) => t.id !== created.id),
-                    created,
-                ]);
-                if (!selected.includes(created.id))
-                    select([...selected, created.id]);
+                setCreatedTags((previous) => [...previous.filter((t) => t.id !== created.id), created]);
+                if (!selected.includes(created.id)) select([...selected, created.id]);
             }
             await onCatalogChanged?.();
             setCatalogMessage(
@@ -225,16 +199,8 @@ export function TicketClassification({
             return true;
         } catch (failure) {
             if (!(failure instanceof AdministrativeChangeCancelled)) {
-                setError(
-                    failure instanceof Error
-                        ? failure.message
-                        : "No se pudo actualizar el catálogo",
-                );
-                setReference(
-                    failure instanceof PlatformError
-                        ? failure.reference
-                        : undefined,
-                );
+                setError(failure instanceof Error ? failure.message : "No se pudo actualizar el catálogo");
+                setReference(failure instanceof PlatformError ? failure.reference : undefined);
             }
             return false;
         } finally {
@@ -247,9 +213,8 @@ export function TicketClassification({
             {admin && catalogReady && !catalog.length && (
                 <section aria-label="Administrar catálogo de etiquetas">
                     <p>
-                        El catálogo está vacío. Puedes cargar Mantenimiento,
-                        Reporte, Formulario, Instalación, Limpieza y
-                        Diagnóstico.
+                        El catálogo está vacío. Puedes cargar Mantenimiento, Reporte, Formulario, Instalación,
+                        Limpieza y Diagnóstico.
                     </p>
                     <Button
                         type="button"
@@ -269,14 +234,9 @@ export function TicketClassification({
                 </p>
             )}
             {!(applied && editable && applied.puedeEditar) && (
-                <div
-                    className={styles.applied}
-                    aria-label="Etiquetas guardadas"
-                >
+                <div className={styles.applied} aria-label="Etiquetas guardadas">
                     {savedTags.length ? (
-                        savedTags.map((tag) => (
-                            <span key={tag.id}>{tag.nombre}</span>
-                        ))
+                        savedTags.map((tag) => <span key={tag.id}>{tag.nombre}</span>)
                     ) : (
                         <p>Sin etiquetas guardadas.</p>
                     )}
@@ -287,10 +247,7 @@ export function TicketClassification({
                 <div role="alert">
                     <p>{error}</p>
                     {reference && <p>Referencia: {reference}</p>}
-                    <Button
-                        variant="outlined"
-                        onClick={() => setRevision((value) => value + 1)}
-                    >
+                    <Button variant="outlined" onClick={() => setRevision((value) => value + 1)}>
                         Reintentar etiquetas
                     </Button>
                 </div>
@@ -303,19 +260,15 @@ export function TicketClassification({
                     }}
                 >
                     <p>
-                        Clasifica el trabajo realizado. Guarda al menos una
-                        etiqueta antes de resolver el ticket.
+                        Clasifica el trabajo realizado. Guarda al menos una etiqueta antes de resolver el
+                        ticket.
                     </p>
                     <TagInput
                         options={options}
                         value={selected}
                         onChange={select}
                         disabled={busy || !catalogReady}
-                        onCreate={
-                            admin && catalogReady
-                                ? (name) => manageCatalog(false, name)
-                                : undefined
-                        }
+                        onCreate={admin && catalogReady ? (name) => manageCatalog(false, name) : undefined}
                     />
                     <p className={styles.count}>
                         {selected.length} de 10 seleccionadas
@@ -330,24 +283,20 @@ export function TicketClassification({
                                 type="button"
                                 variant="outlined"
                                 state={busy ? "disabled" : "default"}
-                                onClick={() =>
-                                    setRevision((value) => value + 1)
-                                }
+                                onClick={() => setRevision((value) => value + 1)}
                             >
                                 Actualizar etiquetas guardadas
                             </Button>
                             <p>
-                                Actualizar recupera la clasificación del
-                                servidor y descarta la selección pendiente.
+                                Actualizar recupera la clasificación del servidor y descarta la selección
+                                pendiente.
                             </p>
                         </div>
                     )}
                     <Button
                         type="submit"
                         fullWidth
-                        state={
-                            busy ? "loading" : !dirty ? "disabled" : "default"
-                        }
+                        state={busy ? "loading" : !dirty ? "disabled" : "default"}
                     >
                         Guardar etiquetas
                     </Button>
@@ -356,8 +305,8 @@ export function TicketClassification({
                 !loading &&
                 applied && (
                     <p>
-                        Las etiquetas se gestionan por el responsable después de
-                        la asignación, mientras el ticket está abierto.
+                        Las etiquetas se gestionan por el responsable después de la asignación, mientras el
+                        ticket está abierto.
                     </p>
                 )
             )}

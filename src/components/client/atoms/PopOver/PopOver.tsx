@@ -40,9 +40,9 @@ export const PopOver = ({
                 const box = event.currentTarget.getBoundingClientRect();
                 if (
                     event.clientX < box.left ||
-          event.clientX > box.right ||
-          event.clientY < box.top ||
-          event.clientY > box.bottom
+                    event.clientX > box.right ||
+                    event.clientY < box.top ||
+                    event.clientY > box.bottom
                 )
                     onClose();
             }}

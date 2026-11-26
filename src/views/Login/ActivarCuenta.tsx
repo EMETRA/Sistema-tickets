@@ -15,8 +15,14 @@ const CONFIRMAR = `mutation ConfirmarActivacionEmpleado($input: ConfirmarActivac
     confirmarActivacionEmpleado(input: $input)
 }`;
 
-export function ActivarCuenta({ correo, claveTemporal, salir }: {
-    correo: string; claveTemporal: string; salir: (completado: boolean) => void;
+export function ActivarCuenta({
+    correo,
+    claveTemporal,
+    salir,
+}: {
+    correo: string;
+    claveTemporal: string;
+    salir: (completado: boolean) => void;
 }) {
     const [token, setToken] = useState("");
     const [otp, setOtp] = useState("");
@@ -29,7 +35,7 @@ export function ActivarCuenta({ correo, claveTemporal, salir }: {
 
     useEffect(() => {
         if (!espera) return;
-        const timer = setTimeout(() => setEspera(segundos => Math.max(0, segundos - 1)), 1000);
+        const timer = setTimeout(() => setEspera((segundos) => Math.max(0, segundos - 1)), 1000);
         return () => clearTimeout(timer);
     }, [espera]);
 
@@ -75,41 +81,92 @@ export function ActivarCuenta({ correo, claveTemporal, salir }: {
         });
     }
 
-    return <AccessLayout>
-        <div className={styles.formContainer}>
-            <form onSubmit={confirmar} className={styles.activationForm}>
-                <header className={styles.headerContainer}>
-                    <h2>Activa tu cuenta</h2>
-                    <p className={styles.headerText}>Confirma el correo <strong>{correo}</strong> y crea una contraseña nueva.</p>
-                </header>
-                {token && <div className={styles.formFieldsContainer}>
-                    <FormField label="Código de seis dígitos" htmlFor="activacion-codigo" required>
-                        <Input id="activacion-codigo" autoComplete="one-time-code" inputMode="numeric"
-                            required maxLength={6} pattern="[0-9]{6}" value={otp}
-                            onChange={e => setOtp(e.target.value.replace(/[^0-9]/g, ""))} disabled={ocupado} />
-                    </FormField>
-                    <FormField label="Nueva contraseña" htmlFor="activacion-clave" required>
-                        <Input id="activacion-clave" type="password" autoComplete="new-password" required
-                            minLength={10} maxLength={72} value={clave} onChange={e => setClave(e.target.value)} disabled={ocupado} />
-                    </FormField>
-                    <FormField label="Confirma la contraseña" htmlFor="activacion-confirmar" required>
-                        <Input id="activacion-confirmar" type="password" autoComplete="new-password" required
-                            minLength={10} maxLength={72} value={confirmacion} onChange={e => setConfirmacion(e.target.value)} disabled={ocupado} />
-                    </FormField>
-                    <p className={styles.headerText}>El código vence en 10 minutos. Usa al menos 10 caracteres.</p>
-                </div>}
-                {error && <p role="alert" className={styles.errorText}>{error}</p>}
-                <div className={styles.activationActions}>
-                    {token && <Button type="submit" state={ocupado ? "disabled" : "default"}>Activar cuenta</Button>}
-                    <Button type="button" variant={token ? "outlined" : "contained"} onClick={solicitar}
-                        state={ocupado || espera > 0 ? "disabled" : "default"}>
-                        {espera ? `Reenviar en ${espera} s` : token ? "Reenviar código" : "Enviar código"}
-                    </Button>
-                    <Button type="button" variant="text" state={ocupado ? "disabled" : "default"} onClick={() => salir(false)}>
-                        Volver
-                    </Button>
-                </div>
-            </form>
-        </div>
-    </AccessLayout>;
+    return (
+        <AccessLayout>
+            <div className={styles.formContainer}>
+                <form onSubmit={confirmar} className={styles.activationForm}>
+                    <header className={styles.headerContainer}>
+                        <h2>Activa tu cuenta</h2>
+                        <p className={styles.headerText}>
+                            Confirma el correo <strong>{correo}</strong> y crea una contraseña nueva.
+                        </p>
+                    </header>
+                    {token && (
+                        <div className={styles.formFieldsContainer}>
+                            <FormField label="Código de seis dígitos" htmlFor="activacion-codigo" required>
+                                <Input
+                                    id="activacion-codigo"
+                                    autoComplete="one-time-code"
+                                    inputMode="numeric"
+                                    required
+                                    maxLength={6}
+                                    pattern="[0-9]{6}"
+                                    value={otp}
+                                    onChange={(e) => setOtp(e.target.value.replace(/[^0-9]/g, ""))}
+                                    disabled={ocupado}
+                                />
+                            </FormField>
+                            <FormField label="Nueva contraseña" htmlFor="activacion-clave" required>
+                                <Input
+                                    id="activacion-clave"
+                                    type="password"
+                                    autoComplete="new-password"
+                                    required
+                                    minLength={10}
+                                    maxLength={72}
+                                    value={clave}
+                                    onChange={(e) => setClave(e.target.value)}
+                                    disabled={ocupado}
+                                />
+                            </FormField>
+                            <FormField label="Confirma la contraseña" htmlFor="activacion-confirmar" required>
+                                <Input
+                                    id="activacion-confirmar"
+                                    type="password"
+                                    autoComplete="new-password"
+                                    required
+                                    minLength={10}
+                                    maxLength={72}
+                                    value={confirmacion}
+                                    onChange={(e) => setConfirmacion(e.target.value)}
+                                    disabled={ocupado}
+                                />
+                            </FormField>
+                            <p className={styles.headerText}>
+                                El código vence en 10 minutos. Usa al menos 10 caracteres.
+                            </p>
+                        </div>
+                    )}
+                    {error && (
+                        <p role="alert" className={styles.errorText}>
+                            {error}
+                        </p>
+                    )}
+                    <div className={styles.activationActions}>
+                        {token && (
+                            <Button type="submit" state={ocupado ? "disabled" : "default"}>
+                                Activar cuenta
+                            </Button>
+                        )}
+                        <Button
+                            type="button"
+                            variant={token ? "outlined" : "contained"}
+                            onClick={solicitar}
+                            state={ocupado || espera > 0 ? "disabled" : "default"}
+                        >
+                            {espera ? `Reenviar en ${espera} s` : token ? "Reenviar código" : "Enviar código"}
+                        </Button>
+                        <Button
+                            type="button"
+                            variant="text"
+                            state={ocupado ? "disabled" : "default"}
+                            onClick={() => salir(false)}
+                        >
+                            Volver
+                        </Button>
+                    </div>
+                </form>
+            </div>
+        </AccessLayout>
+    );
 }

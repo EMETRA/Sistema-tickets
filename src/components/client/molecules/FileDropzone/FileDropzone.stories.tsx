@@ -4,7 +4,7 @@ import { FileDropzone } from "./";
 const meta = {
     title: "Molecules/FileDropzone",
     component: FileDropzone,
-    tags: ["autodocs"]
+    tags: ["autodocs"],
 } satisfies Meta<typeof FileDropzone>;
 
 export default meta;
@@ -12,6 +12,6 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
     args: {
-        onFiles: (files) => alert(files.length)
-    }
-}
+        onFiles: (files) => alert(files.length),
+    },
+};

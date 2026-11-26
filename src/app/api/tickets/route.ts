@@ -1,10 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { graphqlRequest } from '@/api/graphql/client';
-import {
-    GET_TICKETS_QUERY,
-    type GetTicketsResponse,
-    type TicketFilterInput,
-} from '@/api/graphql/tickets';
+import { NextRequest, NextResponse } from "next/server";
+import { graphqlRequest } from "@/api/graphql/client";
+import { GET_TICKETS_QUERY, type GetTicketsResponse, type TicketFilterInput } from "@/api/graphql/tickets";
 
 /**
  * GET /api/tickets
@@ -28,19 +24,19 @@ export async function GET(request: NextRequest) {
 
         // Campos que deben ser convertidos a números
         const numericFields = new Set([
-            'estadoId',
-            'usuarioAsignadoId',
-            'usuarioCreadorId',
-            'categoriaId',
-            'prioridadId',
+            "estadoId",
+            "usuarioAsignadoId",
+            "usuarioCreadorId",
+            "categoriaId",
+            "prioridadId",
         ]);
 
         const filterKeys: (keyof TicketFilterInput)[] = [
-            'categoriaId',
-            'estadoId',
-            'prioridadId',
-            'usuarioAsignadoId',
-            'usuarioCreadorId',
+            "categoriaId",
+            "estadoId",
+            "prioridadId",
+            "usuarioAsignadoId",
+            "usuarioCreadorId",
         ];
 
         for (const key of filterKeys) {
@@ -57,29 +53,25 @@ export async function GET(request: NextRequest) {
             }
         }
 
-        const result = await graphqlRequest<Record<string, unknown>>(
-            GET_TICKETS_QUERY,
-            {
-                variables: {
-                    filters: Object.keys(filters).length > 0 ? filters : undefined,
-                },
-            }
-        );
+        const result = await graphqlRequest<Record<string, unknown>>(GET_TICKETS_QUERY, {
+            variables: {
+                filters: Object.keys(filters).length > 0 ? filters : undefined,
+            },
+        });
 
         const typedResult = result as unknown as GetTicketsResponse;
 
         return NextResponse.json(typedResult);
     } catch (error) {
-        const message = error instanceof Error ? error.message : 'Error desconocido';
-        const statusCode =
-            error instanceof Error && error.message.includes('401') ? 401 : 500;
+        const message = error instanceof Error ? error.message : "Error desconocido";
+        const statusCode = error instanceof Error && error.message.includes("401") ? 401 : 500;
 
         return NextResponse.json(
             {
                 error: message,
                 timestamp: new Date().toISOString(),
             },
-            { status: statusCode }
+            { status: statusCode },
         );
     }
 }

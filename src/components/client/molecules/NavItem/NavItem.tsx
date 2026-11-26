@@ -4,25 +4,14 @@ import { WorkspaceIcon } from "../../atoms/WorkspaceIcon/WorkspaceIcon";
 import styles from "./NavItem.module.scss";
 import classNames from "classnames";
 
-export const NavItem = ({
-    iconName,
-    label,
-    active = false,
-    onClick,
-    href,
-    className,
-}: NavItemProps) => {
+export const NavItem = ({ iconName, label, active = false, onClick, href, className }: NavItemProps) => {
     const content = (
         <>
             <WorkspaceIcon name={iconName} size={20} />
             <span className={styles.label}>{label}</span>
         </>
     );
-    const classes = classNames(
-        styles.navItem,
-        { [styles.active]: active },
-        className,
-    );
+    const classes = classNames(styles.navItem, { [styles.active]: active }, className);
     return href ? (
         <Link
             href={href}

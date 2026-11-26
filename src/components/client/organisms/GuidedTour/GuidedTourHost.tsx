@@ -30,5 +30,11 @@ export function GuidedTourHost({ autoStart }: { autoStart: boolean }) {
         const timer = setTimeout(startTour, 900);
         return () => clearTimeout(timer);
     }, [autoStart, pathname]);
-    return <GuidedTour steps={steps} open={open} onClose={(done) => closeTour(done ? "completado" : "omitido")} />;
+    return (
+        <GuidedTour
+            steps={steps}
+            open={open}
+            onClose={(done) => closeTour(done ? "completado" : "omitido")}
+        />
+    );
 }

@@ -5,28 +5,28 @@ import { ClientError } from "graphql-request";
  * Tipos de error que podemos identificar
  */
 export enum ErrorType {
-  AUTH_ERROR = "AUTH_ERROR",
-  FORBIDDEN_ERROR = "FORBIDDEN_ERROR",
-  NOT_FOUND_ERROR = "NOT_FOUND_ERROR",
-  VALIDATION_ERROR = "VALIDATION_ERROR",
-  NETWORK_ERROR = "NETWORK_ERROR",
-  TIMEOUT_ERROR = "TIMEOUT_ERROR",
-  GRAPHQL_ERROR = "GRAPHQL_ERROR",
-  UNKNOWN_ERROR = "UNKNOWN_ERROR",
+    AUTH_ERROR = "AUTH_ERROR",
+    FORBIDDEN_ERROR = "FORBIDDEN_ERROR",
+    NOT_FOUND_ERROR = "NOT_FOUND_ERROR",
+    VALIDATION_ERROR = "VALIDATION_ERROR",
+    NETWORK_ERROR = "NETWORK_ERROR",
+    TIMEOUT_ERROR = "TIMEOUT_ERROR",
+    GRAPHQL_ERROR = "GRAPHQL_ERROR",
+    UNKNOWN_ERROR = "UNKNOWN_ERROR",
 }
 
 /**
  * Interfaz para información detallada del error
  */
 export interface ErrorInfo {
-  type: ErrorType;
-  message: string;
-  statusCode?: number;
-  originalError?: unknown;
-  graphQLErrors?: Array<{
+    type: ErrorType;
     message: string;
-    extensions?: Record<string, unknown>;
-  }>;
+    statusCode?: number;
+    originalError?: unknown;
+    graphQLErrors?: Array<{
+        message: string;
+        extensions?: Record<string, unknown>;
+    }>;
 }
 
 /**
@@ -36,9 +36,9 @@ export class AppError extends Error {
     type: ErrorType;
     statusCode?: number;
     graphQLErrors?: Array<{
-    message: string;
-    extensions?: Record<string, unknown>;
-  }>;
+        message: string;
+        extensions?: Record<string, unknown>;
+    }>;
     originalError?: unknown;
 
     constructor(info: ErrorInfo) {
@@ -62,23 +62,21 @@ export class AppError extends Error {
  */
 export class ErrorHandler {
     /**
-   * Verificar si el error es un ClientError de graphql-request
-   */
+     * Verificar si el error es un ClientError de graphql-request
+     */
     private static isClientError(error: unknown): error is ClientError {
         return error instanceof ClientError;
     }
 
     /**
-   * Extraer los errores GraphQL del ClientError
-   */
+     * Extraer los errores GraphQL del ClientError
+     */
     private static extractGraphQLErrors(
         error: ClientError,
-    ):
-    | Array<{ message: string; extensions?: Record<string, unknown> }>
-    | undefined {
-    // graphql-request v7 puede poner los errores en dos lugares:
-    // 1. error.response.data.errors (cuando hay respuesta parcial)
-    // 2. error.response.errors (cuando no hay datos)
+    ): Array<{ message: string; extensions?: Record<string, unknown> }> | undefined {
+        // graphql-request v7 puede poner los errores en dos lugares:
+        // 1. error.response.data.errors (cuando hay respuesta parcial)
+        // 2. error.response.errors (cuando no hay datos)
         try {
             let errors: unknown[] | undefined;
 
@@ -105,8 +103,7 @@ export class ErrorHandler {
                     const errObj = err as Record<string, unknown>;
                     return {
                         message: (errObj.message as string) || "Error desconocido",
-                        extensions:
-              (errObj.extensions as Record<string, unknown>) || undefined,
+                        extensions: (errObj.extensions as Record<string, unknown>) || undefined,
                     };
                 }
                 return { message: "Error desconocido" };
@@ -117,13 +114,13 @@ export class ErrorHandler {
     }
 
     /**
-   * Obtener el código del error GraphQL (si está disponible)
-   */
+     * Obtener el código del error GraphQL (si está disponible)
+     */
     private static getGraphQLErrorCode(
         graphQLErrors?: Array<{
-      message: string;
-      extensions?: Record<string, unknown>;
-    }>,
+            message: string;
+            extensions?: Record<string, unknown>;
+        }>,
     ): string | undefined {
         if (!graphQLErrors || graphQLErrors.length === 0) return undefined;
         const firstError = graphQLErrors[0];
@@ -134,21 +131,20 @@ export class ErrorHandler {
     }
 
     /**
-   * Extraer statusCode de originalError en extensions (usado por NestJS/Apollo)
-   */
+     * Extraer statusCode de originalError en extensions (usado por NestJS/Apollo)
+     */
     private static getStatusCodeFromExtensions(
         graphQLErrors?: Array<{
-      message: string;
-      extensions?: Record<string, unknown>;
-    }>,
+            message: string;
+            extensions?: Record<string, unknown>;
+        }>,
     ): number | undefined {
         if (!graphQLErrors || graphQLErrors.length === 0) return undefined;
         const firstError = graphQLErrors[0];
         if (firstError.extensions && typeof firstError.extensions === "object") {
             const originalError = firstError.extensions.originalError;
             if (originalError && typeof originalError === "object") {
-                const statusCode = (originalError as Record<string, unknown>)
-                    .statusCode;
+                const statusCode = (originalError as Record<string, unknown>).statusCode;
                 if (typeof statusCode === "number") {
                     return statusCode;
                 }
@@ -158,24 +154,19 @@ export class ErrorHandler {
     }
 
     /**
-   * Determinar el tipo de error basado en el código HTTP y contexto
-   */
+     * Determinar el tipo de error basado en el código HTTP y contexto
+     */
     private static determineErrorType(error: unknown): ErrorType {
-    // Browser fetch errors preserve GraphQL metadata without being ClientError.
+        // Browser fetch errors preserve GraphQL metadata without being ClientError.
         const browserErrors =
-      error && typeof error === "object"
-          ? (error as { graphQLErrors?: { extensions?: { code?: string } }[] })
-              .graphQLErrors
-          : undefined;
+            error && typeof error === "object"
+                ? (error as { graphQLErrors?: { extensions?: { code?: string } }[] }).graphQLErrors
+                : undefined;
         if (Array.isArray(browserErrors) && browserErrors.length) {
             const code = browserErrors[0]?.extensions?.code;
             if (code === "UNAUTHENTICATED") return ErrorType.AUTH_ERROR;
             if (code === "FORBIDDEN") return ErrorType.FORBIDDEN_ERROR;
-            if (
-                ["VALIDATION_ERROR", "BAD_REQUEST", "BAD_USER_INPUT"].includes(
-                    code || "",
-                )
-            )
+            if (["VALIDATION_ERROR", "BAD_REQUEST", "BAD_USER_INPUT"].includes(code || ""))
                 return ErrorType.VALIDATION_ERROR;
             return ErrorType.GRAPHQL_ERROR;
         }
@@ -198,8 +189,8 @@ export class ErrorHandler {
             }
             if (
                 errorCode === "VALIDATION_ERROR" ||
-        errorCode === "BAD_REQUEST" ||
-        errorCode === "BAD_USER_INPUT"
+                errorCode === "BAD_REQUEST" ||
+                errorCode === "BAD_USER_INPUT"
             ) {
                 return ErrorType.VALIDATION_ERROR;
             }
@@ -237,10 +228,7 @@ export class ErrorHandler {
 
         // Error de red normal
         if (error instanceof TypeError) {
-            if (
-                error.message.includes("fetch") ||
-        error.message.includes("network")
-            ) {
+            if (error.message.includes("fetch") || error.message.includes("network")) {
                 return ErrorType.NETWORK_ERROR;
             }
         }
@@ -254,16 +242,13 @@ export class ErrorHandler {
     }
 
     /**
-   * Obtener mensaje de error humanizado
-   *
-   * @param error El error capturado
-   * @returns Un mensaje amigable para mostrar al usuario
-   */
+     * Obtener mensaje de error humanizado
+     *
+     * @param error El error capturado
+     * @returns Un mensaje amigable para mostrar al usuario
+     */
     static getUserMessage(error: unknown): string {
-        if (
-            error instanceof Error &&
-      error.name === "AdministrativeChangeCancelled"
-        )
+        if (error instanceof Error && error.name === "AdministrativeChangeCancelled")
             return "Operación cancelada. No se aplicaron cambios.";
         const type = this.determineErrorType(error);
 
@@ -284,51 +269,42 @@ export class ErrorHandler {
 
         // Mensajes por tipo de error
         switch (type) {
-        case ErrorType.AUTH_ERROR:
-            return ERROR_MESSAGES.UNAUTHORIZED || "Las credenciales son inválidas.";
+            case ErrorType.AUTH_ERROR:
+                return ERROR_MESSAGES.UNAUTHORIZED || "Las credenciales son inválidas.";
 
-        case ErrorType.FORBIDDEN_ERROR:
-            return "No tienes permiso para acceder a este recurso.";
+            case ErrorType.FORBIDDEN_ERROR:
+                return "No tienes permiso para acceder a este recurso.";
 
-        case ErrorType.NOT_FOUND_ERROR:
-            return ERROR_MESSAGES.NOT_FOUND || "El recurso no fue encontrado.";
+            case ErrorType.NOT_FOUND_ERROR:
+                return ERROR_MESSAGES.NOT_FOUND || "El recurso no fue encontrado.";
 
-        case ErrorType.VALIDATION_ERROR:
-            return (
-                ERROR_MESSAGES.FORBIDDEN || "Los datos proporcionados no son válidos."
-            );
+            case ErrorType.VALIDATION_ERROR:
+                return ERROR_MESSAGES.FORBIDDEN || "Los datos proporcionados no son válidos.";
 
-        case ErrorType.TIMEOUT_ERROR:
-            return "La solicitud tardó demasiado tiempo. Intenta nuevamente.";
+            case ErrorType.TIMEOUT_ERROR:
+                return "La solicitud tardó demasiado tiempo. Intenta nuevamente.";
 
-        case ErrorType.NETWORK_ERROR:
-            return (
-                ERROR_MESSAGES.NETWORK_ERROR ||
-          "No se puede conectar con el servidor."
-            );
+            case ErrorType.NETWORK_ERROR:
+                return ERROR_MESSAGES.NETWORK_ERROR || "No se puede conectar con el servidor.";
 
-        case ErrorType.GRAPHQL_ERROR:
-            return ERROR_MESSAGES.SERVER_ERROR || "Error al procesar tu solicitud.";
+            case ErrorType.GRAPHQL_ERROR:
+                return ERROR_MESSAGES.SERVER_ERROR || "Error al procesar tu solicitud.";
 
-        case ErrorType.UNKNOWN_ERROR:
-        default:
-            if (error instanceof Error) {
-                return (
-                    error.message ||
-            ERROR_MESSAGES.UNKNOWN_ERROR ||
-            "Ocurrió un error inesperado."
-                );
-            }
-            return ERROR_MESSAGES.UNKNOWN_ERROR || "Ocurrió un error inesperado.";
+            case ErrorType.UNKNOWN_ERROR:
+            default:
+                if (error instanceof Error) {
+                    return error.message || ERROR_MESSAGES.UNKNOWN_ERROR || "Ocurrió un error inesperado.";
+                }
+                return ERROR_MESSAGES.UNKNOWN_ERROR || "Ocurrió un error inesperado.";
         }
     }
 
     /**
-   * Identificar y normalizar el error
-   *
-   * @param error El error capturado
-   * @returns Información normalizada del error
-   */
+     * Identificar y normalizar el error
+     *
+     * @param error El error capturado
+     * @returns Información normalizada del error
+     */
     static parseError(error: unknown): ErrorInfo {
         const type = this.determineErrorType(error);
         const message = this.getUserMessage(error);
@@ -347,8 +323,7 @@ export class ErrorHandler {
                 info.statusCode = error.response.status;
             } else {
                 // Si no hay status HTTP, intentar extraer desde extensions.originalError.statusCode
-                const statusFromExtensions =
-          this.getStatusCodeFromExtensions(graphQLErrors);
+                const statusFromExtensions = this.getStatusCodeFromExtensions(graphQLErrors);
                 if (statusFromExtensions) {
                     info.statusCode = statusFromExtensions;
                 }
@@ -361,51 +336,49 @@ export class ErrorHandler {
     }
 
     /**
-   * Verificar si es error de autenticación
-   */
+     * Verificar si es error de autenticación
+     */
     static isAuthError(error: unknown): boolean {
         return this.determineErrorType(error) === ErrorType.AUTH_ERROR;
     }
 
     /**
-   * Verificar si es error de validación
-   */
+     * Verificar si es error de validación
+     */
     static isValidationError(error: unknown): boolean {
         return this.determineErrorType(error) === ErrorType.VALIDATION_ERROR;
     }
 
     /**
-   * Verificar si es error de red
-   */
+     * Verificar si es error de red
+     */
     static isNetworkError(error: unknown): boolean {
         return this.determineErrorType(error) === ErrorType.NETWORK_ERROR;
     }
 
     /**
-   * Verificar si es error de timeout
-   */
+     * Verificar si es error de timeout
+     */
     static isTimeoutError(error: unknown): boolean {
         return this.determineErrorType(error) === ErrorType.TIMEOUT_ERROR;
     }
 
     /**
-   * Verificar si es error GraphQL
-   */
+     * Verificar si es error GraphQL
+     */
     static isGraphQLError(error: unknown): boolean {
         return this.determineErrorType(error) === ErrorType.GRAPHQL_ERROR;
     }
 
     /**
-   * Loguear error detallado (solo en desarrollo)
-   */
+     * Loguear error detallado (solo en desarrollo)
+     */
     static log(error: unknown, context: string = ""): void {
-    // No loguear en servidor
+        // No loguear en servidor
         if (typeof window === "undefined") return;
 
         // Solo en desarrollo
-        const isDev =
-      process.env.NEXT_PUBLIC_ENV === "development" ||
-      process.env.NODE_ENV === "development";
+        const isDev = process.env.NEXT_PUBLIC_ENV === "development" || process.env.NODE_ENV === "development";
         if (!isDev) return;
 
         const errorInfo = this.parseError(error);
@@ -424,8 +397,8 @@ export class ErrorHandler {
     }
 
     /**
-   * Crear un AppError normalizado
-   */
+     * Crear un AppError normalizado
+     */
     static createAppError(
         type: ErrorType,
         message: string,

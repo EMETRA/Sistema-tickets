@@ -34,10 +34,7 @@ export const PerformanceChartPanel: React.FC<PerformanceChartPanelProps> = (prop
         return (
             <div className={classNames(styles.PerformanceChartPanel, styles.primary, className)}>
                 <div className={styles.header}>
-                    <TableHeader
-                        iconName="magnifying-glass-chart-solid"
-                        label="Reporte de rendimiento"
-                    />
+                    <TableHeader iconName="magnifying-glass-chart-solid" label="Reporte de rendimiento" />
                     <ToggleButton
                         variant="primary"
                         options={PRIMARY_FILTER_OPTIONS}
@@ -47,12 +44,7 @@ export const PerformanceChartPanel: React.FC<PerformanceChartPanelProps> = (prop
                 </div>
 
                 <div className={styles.chartContainer}>
-                    <BarChart
-                        data={data}
-                        width={width}
-                        height={height}
-                        colorScheme="green-gradient"
-                    />
+                    <BarChart data={data} width={width} height={height} colorScheme="green-gradient" />
                 </div>
             </div>
         );
@@ -95,12 +87,7 @@ export const PerformanceChartPanel: React.FC<PerformanceChartPanelProps> = (prop
                 </div>
 
                 <div className={styles.chartContainer}>
-                    <BarChart
-                        data={data}
-                        width={width}
-                        height={height}
-                        colorScheme="green-gradient"
-                    />
+                    <BarChart data={data} width={width} height={height} colorScheme="green-gradient" />
                 </div>
             </div>
         </div>

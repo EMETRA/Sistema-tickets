@@ -34,7 +34,6 @@ export const metadata: Metadata = {
     description: "Portal administrativo para la gestión de tickets del departamento de informática de EMETRA",
 };
 
-
 export default function RootLayout({
     children,
 }: Readonly<{
@@ -46,9 +45,7 @@ export default function RootLayout({
                 {/* Aplica el tema guardado antes del primer pintado. */}
                 <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
             </head>
-            <body className={montserrat.variable}>
-                {children}
-            </body>
+            <body className={montserrat.variable}>{children}</body>
         </html>
     );
 }

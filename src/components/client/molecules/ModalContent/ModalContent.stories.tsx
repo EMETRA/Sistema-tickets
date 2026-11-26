@@ -16,8 +16,8 @@ export const InteractiveExample = () => {
     return (
         <>
             <Button onClick={() => setOpen(true)}>Abrir modal</Button>
-            
-            <ModalContent 
+
+            <ModalContent
                 isOpen={open}
                 onClose={() => setOpen(false)}
                 onConfirm={() => {

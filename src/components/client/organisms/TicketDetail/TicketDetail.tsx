@@ -14,18 +14,14 @@ import { HistoryMessage } from "@/components/client/molecules/HistoryMessage";
 
 import { useAuthStore } from "@/store/useAuthStore";
 
-import {
-    useGetTicketById,
-    useGetTicketTagCatalog,
-    useUpdateTicket,
-} from "@/api/hooks";
+import { useGetTicketById, useGetTicketTagCatalog, useUpdateTicket } from "@/api/hooks";
 import { useGetTicketAttachments } from "@/api/hooks";
 
 import styles from "./TicketDetail.module.scss";
 import { TicketDetailProps } from "./types";
 import { MarkdownViewer } from "../../atoms/MarkdownViewer";
 import { TicketClassification } from "./TicketClassification";
-import { usePlatform } from '@/platform/context';
+import { usePlatform } from "@/platform/context";
 import { WorkspaceIcon } from "../../atoms/WorkspaceIcon/WorkspaceIcon";
 
 const TicketDetailContent: React.FC<TicketDetailProps> = ({
@@ -41,7 +37,7 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
     const [viewedFile, setViewedFile] = useState<ViewedFile | null>(null);
     const tabsId = useId();
     const role = useAuthStore((state) => state.getRole());
-    const {data: platform} = usePlatform();
+    const { data: platform } = usePlatform();
     const { updateTicket, loading: isUpdating } = useUpdateTicket();
     const {
         data: ticketData,
@@ -55,12 +51,18 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
         error: attachmentsError,
         refetch: refetchAttachments,
     } = useGetTicketAttachments(ticketId);
-    const { data: tagCatalog, error: catalogError, loading: catalogLoading, refetch: refetchCatalog } = useGetTicketTagCatalog();
-    const [tagCount,setTagCount] = useState<number|null>(null), [tagDirty,setTagDirty] = useState(false), [tagBusy,setTagBusy] = useState(false), [historyRevision,setHistoryRevision] = useState(0);
+    const {
+        data: tagCatalog,
+        error: catalogError,
+        loading: catalogLoading,
+        refetch: refetchCatalog,
+    } = useGetTicketTagCatalog();
+    const [tagCount, setTagCount] = useState<number | null>(null),
+        [tagDirty, setTagDirty] = useState(false),
+        [tagBusy, setTagBusy] = useState(false),
+        [historyRevision, setHistoryRevision] = useState(0);
 
-    const handleOnTicketCancel = async (
-        e: React.MouseEvent<HTMLButtonElement>,
-    ) => {
+    const handleOnTicketCancel = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
         setActionError("");
         try {
@@ -76,9 +78,7 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
         }
     };
 
-    const handleOnTicketProcess = async (
-        e: React.MouseEvent<HTMLButtonElement>,
-    ) => {
+    const handleOnTicketProcess = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
         setActionError("");
         try {
@@ -94,9 +94,7 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
         }
     };
 
-    const handleOnTicketFinish = async (
-        e: React.MouseEvent<HTMLButtonElement>,
-    ) => {
+    const handleOnTicketFinish = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
         setActionError("");
         try {
@@ -113,16 +111,22 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
     };
 
     const code = ticketData?.codigo?.trim();
-    const ticketCode = code && !/^(null|undefined)$/i.test(code) ? code : '#' + ticketId;
+    const ticketCode = code && !/^(null|undefined)$/i.test(code) ? code : "#" + ticketId;
     const ticketState = ticketData?.estadoNombre?.toLowerCase();
     const stateId = Number(ticketData?.estadoId);
     const canAttend = platform
-        ? platform.actor.admin || (platform.capabilities.attend && Number(ticketData?.usuarioAsignadoId) === platform.actor.id)
+        ? platform.actor.admin ||
+          (platform.capabilities.attend && Number(ticketData?.usuarioAsignadoId) === platform.actor.id)
         : role !== "USUARIO";
-    const canManageTags = Boolean(platform && [2,3].includes(stateId) && ticketData?.usuarioAsignadoId && canAttend);
-    const canCancel = [1, 2, 3].includes(stateId) && (platform
-        ? platform.actor.admin || (Number(ticketData?.usuarioCreadorId) === platform.actor.id && !ticketData?.usuarioAsignadoId)
-        : !["asignado"].includes(ticketState || ""));
+    const canManageTags = Boolean(
+        platform && [2, 3].includes(stateId) && ticketData?.usuarioAsignadoId && canAttend,
+    );
+    const canCancel =
+        [1, 2, 3].includes(stateId) &&
+        (platform
+            ? platform.actor.admin ||
+              (Number(ticketData?.usuarioCreadorId) === platform.actor.id && !ticketData?.usuarioAsignadoId)
+            : !["asignado"].includes(ticketState || ""));
     const canStart = stateId === 2 && canAttend;
     const canResolve = stateId === 3 && canAttend;
 
@@ -139,9 +143,7 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
             ) : attachmentsError ? (
                 <div role="alert" className={styles.error}>
                     No se pudieron cargar los archivos.{" "}
-                    <button onClick={() => void refetchAttachments()}>
-                        Reintentar archivos
-                    </button>
+                    <button onClick={() => void refetchAttachments()}>Reintentar archivos</button>
                 </div>
             ) : ticketAttachments.length ? (
                 <div className={styles.files}>
@@ -167,17 +169,28 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
     const actions = (canStart || canResolve || canCancel) && (
         <>
             {canCancel && (
-                <Button color="danger" variant="outlined" onClick={handleOnTicketCancel} state={isUpdating ? "loading" : "default"}>
+                <Button
+                    color="danger"
+                    variant="outlined"
+                    onClick={handleOnTicketCancel}
+                    state={isUpdating ? "loading" : "default"}
+                >
                     Cancelar ticket
                 </Button>
             )}
             {canStart && (
-                <Button onClick={handleOnTicketProcess} state={isUpdating ? "loading" : tagDirty || tagBusy ? "disabled" : "default"}>
+                <Button
+                    onClick={handleOnTicketProcess}
+                    state={isUpdating ? "loading" : tagDirty || tagBusy ? "disabled" : "default"}
+                >
                     Iniciar atención
                 </Button>
             )}
             {canResolve && (
-                <Button onClick={handleOnTicketFinish} state={isUpdating ? "loading" : needsTags || tagBusy ? "disabled" : "default"}>
+                <Button
+                    onClick={handleOnTicketFinish}
+                    state={isUpdating ? "loading" : needsTags || tagBusy ? "disabled" : "default"}
+                >
                     Resolver ticket
                 </Button>
             )}
@@ -192,7 +205,7 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
                     <span>{ticketCode}</span>
                 </nav>
             )}
-            {(
+            {
                 <header className={styles.sheetHead}>
                     <span className={styles.sheetIcon} aria-hidden="true">
                         <WorkspaceIcon name="ticket-solid" size={20} />
@@ -206,11 +219,14 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
                         {presentation === "page" ? (
                             <h1>{ticketData ? ticketData.titulo : `Ticket #${ticketId}`}</h1>
                         ) : (
-                            <h2>{ticketData ? `${ticketCode} · ${ticketData.titulo}` : `Ticket #${ticketId}`}</h2>
+                            <h2>
+                                {ticketData ? `${ticketCode} · ${ticketData.titulo}` : `Ticket #${ticketId}`}
+                            </h2>
                         )}
                         {ticketData && (
                             <p className={styles.sheetSub}>
-                                Solicitado por {ticketData.creador?.nombre || ticketData.usuarioCreadorNombre} · {displayDate(ticketData.fechaCreacion)}
+                                Solicitado por {ticketData.creador?.nombre || ticketData.usuarioCreadorNombre}{" "}
+                                · {displayDate(ticketData.fechaCreacion)}
                             </p>
                         )}
                     </div>
@@ -218,39 +234,27 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
                         type="button"
                         className={styles.sheetClose}
                         onClick={onClose}
-                        aria-label={presentation === "page" ? "Volver al listado de tickets" : "Cerrar detalle del ticket"}
+                        aria-label={
+                            presentation === "page"
+                                ? "Volver al listado de tickets"
+                                : "Cerrar detalle del ticket"
+                        }
                     >
                         ×
                     </button>
                 </header>
-            )}
+            }
             <header className={styles.header} hidden>
                 <div className={styles.headerInfo}>
                     {presentation === "page" ? (
-                        <h1>
-                            {ticketData
-                                ? `${ticketCode} · ${ticketData.titulo}`
-                                : `Ticket #${ticketId}`}
-                        </h1>
+                        <h1>{ticketData ? `${ticketCode} · ${ticketData.titulo}` : `Ticket #${ticketId}`}</h1>
                     ) : (
-                        <h2>
-                            {ticketData
-                                ? `${ticketCode} · ${ticketData.titulo}`
-                                : `Ticket #${ticketId}`}
-                        </h2>
+                        <h2>{ticketData ? `${ticketCode} · ${ticketData.titulo}` : `Ticket #${ticketId}`}</h2>
                     )}
-                    <p className={styles.muted}>
-                        {ticketData?.categoriaNombre ||
-                            "Detalle de la solicitud"}
-                    </p>
+                    <p className={styles.muted}>{ticketData?.categoriaNombre || "Detalle de la solicitud"}</p>
                 </div>
                 <div className={styles.headerActions}>
-                    {ticketData && (
-                        <TicketStateChip
-                            state={state}
-                            label={ticketData.estadoNombre}
-                        />
-                    )}
+                    {ticketData && <TicketStateChip state={state} label={ticketData.estadoNombre} />}
                     <Button
                         variant="outlined"
                         onClick={onClose}
@@ -260,13 +264,18 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
                                 : "Cerrar detalle del ticket"
                         }
                     >
-                        {presentation === "page"
-                            ? "Volver al listado"
-                            : "Cerrar"}
+                        {presentation === "page" ? "Volver al listado" : "Cerrar"}
                     </Button>
                 </div>
             </header>
-            {viewedFile && <FileViewer key={viewedFile.id} ticketId={ticketId} file={viewedFile} onClose={() => setViewedFile(null)} />}
+            {viewedFile && (
+                <FileViewer
+                    key={viewedFile.id}
+                    ticketId={ticketId}
+                    file={viewedFile}
+                    onClose={() => setViewedFile(null)}
+                />
+            )}
             {actionError && (
                 <p className={styles.error} role="alert">
                     {actionError} <button onClick={() => void refetchTicket()}>Actualizar detalle</button>
@@ -279,25 +288,14 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
             ) : ticketError ? (
                 <div role="alert" className={styles.error}>
                     No fue posible consultar este ticket.{" "}
-                    <button onClick={() => void refetchTicket()}>
-                        Reintentar ticket
-                    </button>
+                    <button onClick={() => void refetchTicket()}>Reintentar ticket</button>
                 </div>
             ) : !ticketData ? (
-                <div className={styles.card}>
-                    No se encontraron detalles para este ticket.
-                </div>
+                <div className={styles.card}>No se encontraron detalles para este ticket.</div>
             ) : (
                 <div className={styles.content}>
-                    <section
-                        className={styles.mainPanel}
-                        aria-label="Seguimiento del ticket"
-                    >
-                        <div
-                            className={styles.tabs}
-                            role="tablist"
-                            aria-label="Vistas del ticket"
-                        >
+                    <section className={styles.mainPanel} aria-label="Seguimiento del ticket">
+                        <div className={styles.tabs} role="tablist" aria-label="Vistas del ticket">
                             {tabs.map((item, index) => (
                                 <button
                                     key={item.id}
@@ -312,21 +310,16 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
                                             event.key === "ArrowRight"
                                                 ? (index + 1) % tabs.length
                                                 : event.key === "ArrowLeft"
-                                                    ? (index + tabs.length - 1) %
-                                                    tabs.length
-                                                    : event.key === "Home"
-                                                        ? 0
-                                                        : event.key === "End"
-                                                            ? tabs.length - 1
-                                                            : -1;
+                                                  ? (index + tabs.length - 1) % tabs.length
+                                                  : event.key === "Home"
+                                                    ? 0
+                                                    : event.key === "End"
+                                                      ? tabs.length - 1
+                                                      : -1;
                                         if (next < 0) return;
                                         event.preventDefault();
                                         setTab(tabs[next].id);
-                                        document
-                                            .getElementById(
-                                                tabsId + "-" + tabs[next].id,
-                                            )
-                                            ?.focus();
+                                        document.getElementById(tabsId + "-" + tabs[next].id)?.focus();
                                     }}
                                 >
                                     {item.label}
@@ -344,9 +337,7 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
                         >
                             <div className={styles.description}>
                                 <h3>Descripción de la solicitud</h3>
-                                <MarkdownViewer
-                                    content={ticketData.descripcion}
-                                />
+                                <MarkdownViewer content={ticketData.descripcion} />
                             </div>
                             <Chat ticketId={ticketId} classname={styles.chat} onOpenFile={setViewedFile} />
                         </div>
@@ -356,18 +347,17 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
                             aria-labelledby={tabsId + "-historial"}
                             hidden={tab !== "historial"}
                         >
-                            <HistoryMessage key={historyRevision}
+                            <HistoryMessage
+                                key={historyRevision}
                                 ticketId={ticketId}
                                 variant="table"
                                 actorNames={{
                                     [ticketData.usuarioCreadorId]:
-                                        ticketData.creador?.nombre ||
-                                        ticketData.usuarioCreadorNombre,
+                                        ticketData.creador?.nombre || ticketData.usuarioCreadorNombre,
                                     ...(ticketData.asignado && ticketData.usuarioAsignadoId
                                         ? {
-                                            [ticketData.usuarioAsignadoId]:
-                                                  ticketData.asignado.nombre,
-                                        }
+                                              [ticketData.usuarioAsignadoId]: ticketData.asignado.nombre,
+                                          }
                                         : {}),
                                 }}
                             />
@@ -383,12 +373,16 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
                             {files}
                         </div>
                     </section>
-                    {(
+                    {
                         <aside className={styles.sidePanel} aria-label="Información del ticket">
                             <dl className={styles.sideFacts}>
                                 <div>
                                     <dt>Asignado a</dt>
-                                    <dd>{ticketData.asignado?.nombre || ticketData.usuarioAsignadoNombre || "Sin asignar"}</dd>
+                                    <dd>
+                                        {ticketData.asignado?.nombre ||
+                                            ticketData.usuarioAsignadoNombre ||
+                                            "Sin asignar"}
+                                    </dd>
                                 </div>
                                 <div>
                                     <dt>Prioridad</dt>
@@ -406,16 +400,41 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
                             <section className={styles.sideSection} aria-label="Clasificación del trabajo">
                                 <h3>Clasificación del trabajo</h3>
                                 {catalogLoading && <p role="status">Cargando catálogo de etiquetas…</p>}
-                                {catalogError && <div role="alert"><p>No se pudo cargar el catálogo de etiquetas.</p><Button variant="outlined" onClick={()=>void refetchCatalog()}>Reintentar catálogo</Button></div>}
-                                <TicketClassification catalogReady={!catalogLoading&&!catalogError} onCatalogChanged={refetchCatalog} ticketId={ticketId} catalog={tagCatalog} editable={canManageTags && !catalogError && !catalogLoading} admin={Boolean(platform?.actor.admin)} onDirtyChange={setTagDirty} onBusyChange={setTagBusy} onCountChange={setTagCount} onSaved={async()=>{setActionError("");setHistoryRevision(value=>value+1);}} />
+                                {catalogError && (
+                                    <div role="alert">
+                                        <p>No se pudo cargar el catálogo de etiquetas.</p>
+                                        <Button variant="outlined" onClick={() => void refetchCatalog()}>
+                                            Reintentar catálogo
+                                        </Button>
+                                    </div>
+                                )}
+                                <TicketClassification
+                                    catalogReady={!catalogLoading && !catalogError}
+                                    onCatalogChanged={refetchCatalog}
+                                    ticketId={ticketId}
+                                    catalog={tagCatalog}
+                                    editable={canManageTags && !catalogError && !catalogLoading}
+                                    admin={Boolean(platform?.actor.admin)}
+                                    onDirtyChange={setTagDirty}
+                                    onBusyChange={setTagBusy}
+                                    onCountChange={setTagCount}
+                                    onSaved={async () => {
+                                        setActionError("");
+                                        setHistoryRevision((value) => value + 1);
+                                    }}
+                                />
                             </section>
                         </aside>
-                    )}
+                    }
                 </div>
             )}
             {ticketData && (actions || needsTags) && (
                 <footer className={styles.sheetFoot}>
-                    <p>{needsTags ? "Guarda al menos una etiqueta de trabajo antes de resolver el ticket." : "Los cambios de estado quedan en el historial del ticket."}</p>
+                    <p>
+                        {needsTags
+                            ? "Guarda al menos una etiqueta de trabajo antes de resolver el ticket."
+                            : "Los cambios de estado quedan en el historial del ticket."}
+                    </p>
                     <div className={styles.sheetActions}>{actions}</div>
                 </footer>
             )}

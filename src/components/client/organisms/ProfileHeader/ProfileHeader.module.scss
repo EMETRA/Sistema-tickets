@@ -1,80 +1,81 @@
 .headerContainer {
-    width: 100%;
-    background-color: var(--tickets-surface);
-    border-bottom: 1px solid var(--tickets-border);
-    overflow: hidden;
+  width: 100%;
+  background-color: var(--tickets-surface);
+  border-bottom: 1px solid var(--tickets-border);
+  overflow: hidden;
 }
 
 .bannerWrapper {
-    width: 100%;
-    height: 200px;
-    position: relative;
-    overflow: hidden;
+  width: 100%;
+  height: 200px;
+  position: relative;
+  overflow: hidden;
 
-    .bannerImage {
-        object-fit: cover;
-        width: 100%;
-        height: 100%;
-    }
+  .bannerImage {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+  }
 }
 
 .contentWrapper {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 10px 20px 40px;
-    margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 10px 20px 40px;
+  margin: 0 auto;
 }
 
 .profileInfo {
-    display: flex;
-    align-items: flex-end;
-    gap: 1%;
-    flex-grow: 1;
-    min-width: 0;
+  display: flex;
+  align-items: flex-end;
+  gap: 1%;
+  flex-grow: 1;
+  min-width: 0;
 }
 
 .avatarOverlap {
-    margin-top: -60px; 
-    border-width: 2px !important;
-    border-color: #FFFFFF !important;
-    background-color: var(--tickets-surface);
+  margin-top: -60px;
+  border-width: 2px !important;
+  border-color: #ffffff !important;
+  background-color: var(--tickets-surface);
 }
 
 .textGroup {
-    // background-color: #ff0000;
-    padding-bottom: 8px;
-    flex-grow: 1;
-    min-width: 0;
+  // background-color: #ff0000;
+  padding-bottom: 8px;
+  flex-grow: 1;
+  min-width: 0;
 
-    .userName {
-        font-size: 24px;
-        font-weight: 700;
-        color: #333333; color: light-dark(#333333, #e5eaf5);
-        margin: 0;
-    }
+  .userName {
+    font-size: 24px;
+    font-weight: 700;
+    color: #333333;
+    color: light-dark(#333333, #e5eaf5);
+    margin: 0;
+  }
 
-    .userRole {
-        color: #999999;
-        font-size: 14px;
-        margin: 0;
-    }
+  .userRole {
+    color: #999999;
+    font-size: 14px;
+    margin: 0;
+  }
 }
 
 .actions {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 @media (max-width: 768px) {
-    .contentWrapper {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-    }
-    
-    .profileInfo {
-        flex-direction: column;
-        align-items: center;
-    }
+  .contentWrapper {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .profileInfo {
+    flex-direction: column;
+    align-items: center;
+  }
 }

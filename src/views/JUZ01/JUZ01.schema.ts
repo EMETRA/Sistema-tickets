@@ -5,8 +5,7 @@ export const JUZ01Schema = z.object({
         .string()
         .trim()
         .regex(/^(?:[A-Za-z0-9_ -]{3,36}|[1-9]\d?)$/, {
-            message:
-        "Escribe el número de multa, la placa o al menos 3 caracteres del caso.",
+            message: "Escribe el número de multa, la placa o al menos 3 caracteres del caso.",
         }),
 });
 

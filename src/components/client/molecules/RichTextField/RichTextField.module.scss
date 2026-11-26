@@ -1,70 +1,91 @@
 .RichTextField {
-    display: flex;
-    flex-direction: column;
-    border: 1px solid var(--tickets-border, #dfe5f2);
-    background: var(--tickets-surface);
-    transition: all 0.2s ease-in-out;
-    border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--tickets-border, #dfe5f2);
+  background: var(--tickets-surface);
+  transition: all 0.2s ease-in-out;
+  border-radius: 10px;
 }
 
 .toolbar {
-    display: flex;
-    padding: 8px;
-    gap: 4px;
-    background: var(--tickets-surface-subtle);
-    border-bottom: 1px solid var(--tickets-border, #dfe5f2);
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
+  display: flex;
+  padding: 8px;
+  gap: 4px;
+  background: var(--tickets-surface-subtle);
+  border-bottom: 1px solid var(--tickets-border, #dfe5f2);
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
 }
 
 .toolBtn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    border: none;
-    background: transparent;
-    border-radius: 4px;
-    cursor: pointer;
-    color: var(--tickets-text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  color: var(--tickets-text-secondary);
 
-    &:hover {
-        background: var(--tickets-neutral-soft);
-    }
+  &:hover {
+    background: var(--tickets-neutral-soft);
+  }
 
-    &.active {
-        background: var(--tickets-primary, #4361ee);
-        color: #ffffff;
-    }
+  &.active {
+    background: var(--tickets-primary, #4361ee);
+    color: #ffffff;
+  }
 }
 
 // Todo el recuadro recibe el clic, no solo la primera línea.
 .editorContainer {
+  display: flex;
+  flex-direction: column;
+  min-height: 150px;
+  cursor: text;
+  > div {
+    flex: 1;
     display: flex;
     flex-direction: column;
-    min-height: 150px;
-    cursor: text;
-    > div {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-    }
+  }
 }
 
 .editorContent {
-    flex: 1;
-    padding: 12px;
-    outline: none;
-    font-size: 0.85rem;
-    line-height: 1.5;
-    
-    p { margin: 0; }
-    strong { font-weight: bold; }
-    em { font-style: italic; }
-    u { text-decoration: underline; }
-    s { text-decoration: line-through; }
-    ul { padding-left: 20px; list-style-type: disc; }
+  flex: 1;
+  padding: 12px;
+  outline: none;
+  font-size: 0.85rem;
+  line-height: 1.5;
+
+  p {
+    margin: 0;
+  }
+  strong {
+    font-weight: bold;
+  }
+  em {
+    font-style: italic;
+  }
+  u {
+    text-decoration: underline;
+  }
+  s {
+    text-decoration: line-through;
+  }
+  ul {
+    padding-left: 20px;
+    list-style-type: disc;
+  }
 }
-.toolbarControls { border: 0; padding: 0; margin: 0; min-width: 0; }
-.RichTextField:focus-within { border-color: var(--tickets-primary, #4361ee); box-shadow: 0 0 0 3px #4361ee18; }
+.toolbarControls {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.RichTextField:focus-within {
+  border-color: var(--tickets-primary, #4361ee);
+  box-shadow: 0 0 0 3px #4361ee18;
+}

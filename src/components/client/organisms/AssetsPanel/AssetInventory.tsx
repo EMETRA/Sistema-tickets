@@ -98,7 +98,12 @@ export function AssetInventory({
                     <span className={common.srOnly}>Buscar bienes</span>
                     <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
                         <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" strokeWidth="2" />
-                        <path d="m20 20-3.5-3.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                        <path
+                            d="m20 20-3.5-3.5"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                        />
                     </svg>
                     <input
                         type="search"
@@ -161,7 +166,8 @@ export function AssetInventory({
                             onClick={() => setExtra((e) => ({ ...e, [key]: "" }))}
                             aria-label={`Quitar filtro ${FILTERS.find(([k]) => k === key)?.[1]} ${value}`}
                         >
-                            {FILTERS.find(([k]) => k === key)?.[1]}: <strong>{value}</strong> <span aria-hidden="true">×</span>
+                            {FILTERS.find(([k]) => k === key)?.[1]}: <strong>{value}</strong>{" "}
+                            <span aria-hidden="true">×</span>
                         </button>
                     ))}
                 </div>
@@ -180,7 +186,9 @@ export function AssetInventory({
                         </span>
                         <span data-tone="success">{withFicha} con ficha técnica</span>
                         <span data-tone="warning">{pending} sin ficha</span>
-                        {incomplete > 0 && <span data-tone="neutral">{incomplete} incompletos en origen</span>}
+                        {incomplete > 0 && (
+                            <span data-tone="neutral">{incomplete} incompletos en origen</span>
+                        )}
                     </p>
                     <ul className={styles.assetList}>
                         {items.map((i, index) => {
@@ -188,12 +196,18 @@ export function AssetInventory({
                             return (
                                 <li key={`${i.referencia}:${i.tarjeta}:${i.empleado}:${index}`}>
                                     <span className={styles.assetIcon} aria-hidden="true">
-                                        <WorkspaceIcon name={ICONS[clase || ""] || "desktop-solid"} size={18} />
+                                        <WorkspaceIcon
+                                            name={ICONS[clase || ""] || "desktop-solid"}
+                                            size={18}
+                                        />
                                     </span>
                                     <div className={styles.assetMain}>
-                                        <strong>{i.descripcion || "Descripción pendiente en Activos Fijos"}</strong>
+                                        <strong>
+                                            {i.descripcion || "Descripción pendiente en Activos Fijos"}
+                                        </strong>
                                         <small>
-                                            <b>{i.numeroInventario}</b> · Serie {i.serie || "—"} · {i.modelo || "Sin modelo"}
+                                            <b>{i.numeroInventario}</b> · Serie {i.serie || "—"} ·{" "}
+                                            {i.modelo || "Sin modelo"}
                                         </small>
                                     </div>
                                     <div className={styles.assetOwner}>
@@ -209,7 +223,11 @@ export function AssetInventory({
                                                     Con ficha
                                                 </span>
                                                 {onOpen && (
-                                                    <button type="button" className={common.link} onClick={() => onOpen(i.fichaId!)}>
+                                                    <button
+                                                        type="button"
+                                                        className={common.link}
+                                                        onClick={() => onOpen(i.fichaId!)}
+                                                    >
                                                         Ver ficha
                                                     </button>
                                                 )}
@@ -223,7 +241,9 @@ export function AssetInventory({
                                                     <button
                                                         type="button"
                                                         className={common.link}
-                                                        aria-label={"Crear ficha técnica " + i.numeroInventario}
+                                                        aria-label={
+                                                            "Crear ficha técnica " + i.numeroInventario
+                                                        }
                                                         onClick={() => onSelect(i)}
                                                     >
                                                         + Crear ficha
@@ -231,7 +251,11 @@ export function AssetInventory({
                                                 )}
                                             </>
                                         ) : (
-                                            <span className={common.chip} data-tone="neutral" title="Completa los datos del bien en Activos Fijos">
+                                            <span
+                                                className={common.chip}
+                                                data-tone="neutral"
+                                                title="Completa los datos del bien en Activos Fijos"
+                                            >
                                                 Incompleto en origen
                                             </span>
                                         )}
@@ -247,11 +271,21 @@ export function AssetInventory({
                     )}
                     {(offset > 0 || result.hayMas) && (
                         <div className={styles.pager}>
-                            <button type="button" className={styles.ghost} disabled={busy || !offset} onClick={() => setOffset((v) => Math.max(0, v - 50))}>
+                            <button
+                                type="button"
+                                className={styles.ghost}
+                                disabled={busy || !offset}
+                                onClick={() => setOffset((v) => Math.max(0, v - 50))}
+                            >
                                 ← Anteriores
                             </button>
                             <span>Página {Math.floor(offset / 50) + 1}</span>
-                            <button type="button" className={styles.ghost} disabled={busy || !result.hayMas} onClick={() => setOffset((v) => v + 50)}>
+                            <button
+                                type="button"
+                                className={styles.ghost}
+                                disabled={busy || !result.hayMas}
+                                onClick={() => setOffset((v) => v + 50)}
+                            >
                                 Siguientes →
                             </button>
                         </div>

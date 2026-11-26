@@ -9,13 +9,11 @@ export const MaintenanceRecordPanel = ({
     lastMaintenance,
     nextMaintenance,
     observations,
-    className
+    className,
 }: MaintenanceRecordPanelProps) => {
     return (
         <div className={classNames(styles.card, className)}>
-            <Title className={styles.title}>
-                Registros de Mantenimiento
-            </Title>
+            <Title className={styles.title}>Registros de Mantenimiento</Title>
 
             <div className={styles.records}>
                 <div className={styles.row}>

@@ -1,35 +1,37 @@
 .mainContainer {
-    padding: 1.5rem;
-    display: flex;
-    flex-direction: column;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
 }
 
 .card {
-    background: var(--tickets-surface);
-    border: 2px solid #e5e5e5; border: 2px solid light-dark(#e5e5e5, #2a3449);
-    border-radius: 12px;
-    padding: 2rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
+  background: var(--tickets-surface);
+  border: 2px solid #e5e5e5;
+  border: 2px solid light-dark(#e5e5e5, #2a3449);
+  border-radius: 12px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
 .title {
-    margin: 0;
+  margin: 0;
 }
 
 .tableContainer {
-    border: 2px solid #e5e5e5; border: 2px solid light-dark(#e5e5e5, #2a3449);
-    border-radius: 8px;
-    overflow: hidden;
+  border: 2px solid #e5e5e5;
+  border: 2px solid light-dark(#e5e5e5, #2a3449);
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 .rowLabel {
-    font-weight: 500;
+  font-weight: 500;
 }
 
 .formActions {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
 }

@@ -82,7 +82,8 @@
   font-size: 0.6875rem;
   font-weight: 600;
   background-color: $amarillo-10;
-  color: #8a6100; color: light-dark(#8a6100, #eed18b);
+  color: #8a6100;
+  color: light-dark(#8a6100, #eed18b);
 }
 
 // ============================================
@@ -153,7 +154,8 @@
   margin: 0;
   font-size: 0.8125rem;
   line-height: 1.4;
-  color: #8a6100; color: light-dark(#8a6100, #eed18b);
+  color: #8a6100;
+  color: light-dark(#8a6100, #eed18b);
 }
 
 // ============================================
@@ -216,13 +218,15 @@
 }
 .card {
   min-width: 0;
-  border: 1px solid #e0e6f0; border: 1px solid light-dark(#e0e6f0, #2a3449);
+  border: 1px solid #e0e6f0;
+  border: 1px solid light-dark(#e0e6f0, #2a3449);
   border-radius: 16px;
   padding: 24px;
   gap: 8px;
 }
 .cardTitle {
-  color: #2e435f; color: light-dark(#2e435f, #a6b9d4);
+  color: #2e435f;
+  color: light-dark(#2e435f, #a6b9d4);
 }
 .row {
   min-width: 0;
@@ -236,7 +240,8 @@
   z-index: 2;
   background: var(--tickets-surface);
   padding: 16px 20px;
-  border: 1px solid #e0e6f0; border: 1px solid light-dark(#e0e6f0, #2a3449);
+  border: 1px solid #e0e6f0;
+  border: 1px solid light-dark(#e0e6f0, #2a3449);
   border-radius: 12px;
   gap: 12px;
   flex-wrap: wrap;

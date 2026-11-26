@@ -3,9 +3,9 @@
  */
 
 // Queries
-export { GET_REPORTE_ANULADOS_TIPOS_QUERY } from './getReporteAnuladosTipos';
-export { GET_REPORTE_ANULADOS_RESULTADOS_QUERY } from './getReporteAnuladosResultados';
-export { GET_REPORTE_ANULADOS_EXCEL_QUERY } from './getReporteAnuladosExcel';
+export { GET_REPORTE_ANULADOS_TIPOS_QUERY } from "./getReporteAnuladosTipos";
+export { GET_REPORTE_ANULADOS_RESULTADOS_QUERY } from "./getReporteAnuladosResultados";
+export { GET_REPORTE_ANULADOS_EXCEL_QUERY } from "./getReporteAnuladosExcel";
 
 // Types
 export type {
@@ -19,6 +19,6 @@ export type {
     GetReporteAnuladosResultadosResponse,
     ReporteAnuladosExcelExport,
     GetReporteAnuladosExcelResponse,
-} from './types';
+} from "./types";
 
-export { TipoReporteAnulado as TipoReporteAnuladoEnum} from './types';
+export { TipoReporteAnulado as TipoReporteAnuladoEnum } from "./types";

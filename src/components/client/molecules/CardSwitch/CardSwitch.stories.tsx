@@ -8,7 +8,7 @@ const meta: Meta<typeof CardSwitch> = {
     tags: ["autodocs"],
     decorators: [
         (Story) => (
-            <div style={{ padding: '2rem', display: 'flex', justifyContent: 'center' }}>
+            <div style={{ padding: "2rem", display: "flex", justifyContent: "center" }}>
                 <Story />
             </div>
         ),
@@ -22,15 +22,15 @@ type Story = StoryObj<typeof meta>;
 const CardSwitchWithState = (args: React.ComponentProps<typeof CardSwitch>) => {
     // Inicializamos con el valor que venga en los args o el primero de la lista
     const [selected, setSelected] = useState(args.value || args.options[0].value);
-    
+
     return (
-        <CardSwitch 
-            {...args} 
-            value={selected} 
+        <CardSwitch
+            {...args}
+            value={selected}
             onChange={(val) => {
                 setSelected(val);
                 args.onChange(val);
-            }} 
+            }}
         />
     );
 };

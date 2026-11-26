@@ -159,7 +159,11 @@ function TourDialog({ steps, onClose }: { steps: TourStep[]; onClose: (completed
                     </p>
                     <div className={styles.dots} aria-hidden="true">
                         {available.map((s, i) => (
-                            <span key={s.id} data-done={i < index || undefined} data-current={i === index || undefined} />
+                            <span
+                                key={s.id}
+                                data-done={i < index || undefined}
+                                data-current={i === index || undefined}
+                            />
                         ))}
                     </div>
                     <div className={styles.actions}>
@@ -170,7 +174,11 @@ function TourDialog({ steps, onClose }: { steps: TourStep[]; onClose: (completed
                         )}
                         <span className={styles.spacer} />
                         {index > 0 && (
-                            <button type="button" className={styles.secondary} onClick={() => setIndex((i) => i - 1)}>
+                            <button
+                                type="button"
+                                className={styles.secondary}
+                                onClick={() => setIndex((i) => i - 1)}
+                            >
                                 Anterior
                             </button>
                         )}

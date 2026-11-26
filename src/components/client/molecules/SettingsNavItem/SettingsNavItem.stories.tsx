@@ -8,13 +8,15 @@ const meta: Meta<typeof SettingsNavItem> = {
     tags: ["autodocs"],
     decorators: [
         (Story) => (
-            <div style={{ 
-                width: '350px', 
-                padding: '16px',
-                backgroundColor: '#FFFFFF',
-                border: '1px solid #EEEEEE',
-                borderRadius: '8px'
-            }}>
+            <div
+                style={{
+                    width: "350px",
+                    padding: "16px",
+                    backgroundColor: "#FFFFFF",
+                    border: "1px solid #EEEEEE",
+                    borderRadius: "8px",
+                }}
+            >
                 <Story />
             </div>
         ),
@@ -43,7 +45,7 @@ export const InteractiveMenu: Story = {
         ];
 
         return (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
                 {menuItems.map((item) => (
                     <SettingsNavItem
                         key={item.label}
@@ -55,5 +57,5 @@ export const InteractiveMenu: Story = {
                 ))}
             </div>
         );
-    }
+    },
 };

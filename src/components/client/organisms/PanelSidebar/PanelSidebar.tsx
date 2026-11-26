@@ -78,9 +78,7 @@ export function PanelSidebar({
         ...tools.map((t) => t.path),
         catalogPath,
     ];
-    const active = allPaths
-        .filter((p) => isActive(activePath, p))
-        .sort((a, b) => b.length - a.length)[0];
+    const active = allPaths.filter((p) => isActive(activePath, p)).sort((a, b) => b.length - a.length)[0];
     const toolsOpen = !collapsed.tools || tools.some((t) => t.path === active);
     const appsOpen = !collapsed.apps || apps.some((a) => activePath.startsWith(a.path));
 
@@ -104,7 +102,12 @@ export function PanelSidebar({
     return (
         <>
             {open && (
-                <button type="button" className={styles.backdrop} onClick={onClose} aria-label="Cerrar menú" />
+                <button
+                    type="button"
+                    className={styles.backdrop}
+                    onClick={onClose}
+                    aria-label="Cerrar menú"
+                />
             )}
             <aside
                 id="system-navigation"
@@ -112,7 +115,9 @@ export function PanelSidebar({
                 className={classNames(styles.sidebar, { [styles.open]: open })}
             >
                 <Link href="/home" className={styles.brand} onClick={onClose}>
-                    <span className={styles.mark} aria-hidden="true">E</span>
+                    <span className={styles.mark} aria-hidden="true">
+                        E
+                    </span>
                     <span>
                         <strong>EMETRA</strong>
                         <small>Panel institucional</small>
@@ -122,16 +127,27 @@ export function PanelSidebar({
                     <button type="button" className={styles.search} onClick={onSearch}>
                         <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
                             <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" strokeWidth="2" />
-                            <path d="m20 20-3.5-3.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                            <path
+                                d="m20 20-3.5-3.5"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                            />
                         </svg>
                         <span>Buscar o ir a…</span>
                         <kbd>⌘K</kbd>
                     </button>
                 )}
                 <nav className={styles.nav} aria-label="Menú principal">
-                    <div className={styles.group} data-tour="nav-principal">{primary.map((item) => link(item))}</div>
+                    <div className={styles.group} data-tour="nav-principal">
+                        {primary.map((item) => link(item))}
+                    </div>
 
-                    <section className={styles.group} aria-labelledby="grupo-aplicaciones" data-tour="nav-aplicaciones">
+                    <section
+                        className={styles.group}
+                        aria-labelledby="grupo-aplicaciones"
+                        data-tour="nav-aplicaciones"
+                    >
                         <button
                             type="button"
                             id="grupo-aplicaciones"
@@ -153,7 +169,9 @@ export function PanelSidebar({
                                                 onClick={onClose}
                                                 title={app.label}
                                                 aria-current={active === app.path ? "page" : undefined}
-                                                className={classNames(styles.item, styles.compact, { [styles.inside]: inside })}
+                                                className={classNames(styles.item, styles.compact, {
+                                                    [styles.inside]: inside,
+                                                })}
                                                 style={{ "--accent": app.accent } as React.CSSProperties}
                                             >
                                                 <span className={styles.appIcon}>
@@ -168,7 +186,9 @@ export function PanelSidebar({
                                                             key={section.path}
                                                             href={section.path}
                                                             onClick={onClose}
-                                                            aria-current={active === section.path ? "page" : undefined}
+                                                            aria-current={
+                                                                active === section.path ? "page" : undefined
+                                                            }
                                                             className={styles.section}
                                                         >
                                                             {section.label}
@@ -197,7 +217,11 @@ export function PanelSidebar({
                     </section>
 
                     {tools.length > 0 && (
-                        <section className={styles.group} aria-labelledby="grupo-herramientas" data-tour="nav-herramientas">
+                        <section
+                            className={styles.group}
+                            aria-labelledby="grupo-herramientas"
+                            data-tour="nav-herramientas"
+                        >
                             <button
                                 type="button"
                                 id="grupo-herramientas"
@@ -209,7 +233,9 @@ export function PanelSidebar({
                                 <span className={styles.chevron} aria-hidden="true" />
                             </button>
                             {toolsOpen && (
-                                <div className={styles.groupBody}>{tools.map((item) => link(item, true))}</div>
+                                <div className={styles.groupBody}>
+                                    {tools.map((item) => link(item, true))}
+                                </div>
                             )}
                         </section>
                     )}

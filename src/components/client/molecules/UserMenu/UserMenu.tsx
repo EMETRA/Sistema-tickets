@@ -69,8 +69,20 @@ export const UserMenu = ({
                 />
                 {isMenuOpen && (
                     <ul className={styles.menu}>
-                        {onChangeView && <li><button type="button" className={styles.menuItem}
-                            onClick={() => { setIsMenuOpen(false); onChangeView(); }}>Cambiar vista</button></li>}
+                        {onChangeView && (
+                            <li>
+                                <button
+                                    type="button"
+                                    className={styles.menuItem}
+                                    onClick={() => {
+                                        setIsMenuOpen(false);
+                                        onChangeView();
+                                    }}
+                                >
+                                    Cambiar vista
+                                </button>
+                            </li>
+                        )}
                         {profilePath && (
                             <li>
                                 <Link

@@ -51,12 +51,12 @@ export function fitFilesInLimit(
  */
 export function sizeLimitMessage(tooLarge: File[], usedBytes: number, maxBytes: number): string {
     const restante = maxBytes - usedBytes;
-    const quien = tooLarge.length === 1
-        ? `"${tooLarge[0].name}" supera`
-        : `${tooLarge.length} imágenes superan`;
-    const disponible = restante > 0
-        ? `Quedan ${formatFileSize(restante)} disponibles.`
-        : "Ya no queda espacio: quita alguna imagen para agregar otra.";
+    const quien =
+        tooLarge.length === 1 ? `"${tooLarge[0].name}" supera` : `${tooLarge.length} imágenes superan`;
+    const disponible =
+        restante > 0
+            ? `Quedan ${formatFileSize(restante)} disponibles.`
+            : "Ya no queda espacio: quita alguna imagen para agregar otra.";
     return `${quien} el límite de ${formatLimit(maxBytes)} entre todas las imágenes de la noticia. ${disponible}`;
 }
 
@@ -89,18 +89,23 @@ export function fileDescription(file: NewsFormFile): string {
  * El input nativo filtra al seleccionar, pero no al arrastrar; por eso se valida aquí.
  */
 export function filterAcceptedFiles(files: File[], accept: string): { accepted: File[]; rejected: string[] } {
-    const patterns = accept.split(",").map((pattern) => pattern.trim().toLowerCase()).filter(Boolean);
+    const patterns = accept
+        .split(",")
+        .map((pattern) => pattern.trim().toLowerCase())
+        .filter(Boolean);
     const accepted: File[] = [];
     const rejected: string[] = [];
 
     files.forEach((file) => {
         const type = file.type.toLowerCase();
         const name = file.name.toLowerCase();
-        const isAccepted = patterns.length === 0 || patterns.some((pattern) => {
-            if (pattern.endsWith("/*")) return type.startsWith(pattern.slice(0, -1));
-            if (pattern.startsWith(".")) return name.endsWith(pattern);
-            return type === pattern;
-        });
+        const isAccepted =
+            patterns.length === 0 ||
+            patterns.some((pattern) => {
+                if (pattern.endsWith("/*")) return type.startsWith(pattern.slice(0, -1));
+                if (pattern.startsWith(".")) return name.endsWith(pattern);
+                return type === pattern;
+            });
 
         if (isAccepted) accepted.push(file);
         else rejected.push(file.name);

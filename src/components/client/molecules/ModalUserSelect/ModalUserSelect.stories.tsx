@@ -39,23 +39,29 @@ export const InteractiveExample = () => {
     };
 
     return (
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: "20px", padding: "20px" }}>
+        <div
+            style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-start",
+                gap: "20px",
+                padding: "20px",
+            }}
+        >
             <Button onClick={() => setOpen(true)}>Asignar usuario</Button>
 
             {assignedUser ? (
                 <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
                     <Text variant="caption">Usuario asignado:</Text>
-                    <Text variant="body"><strong>{assignedUser.userInfo.userName}</strong> — {assignedUser.workstation}</Text>
+                    <Text variant="body">
+                        <strong>{assignedUser.userInfo.userName}</strong> — {assignedUser.workstation}
+                    </Text>
                 </div>
             ) : (
                 <Text variant="caption">Sin usuario asignado</Text>
             )}
 
-            <ModalUserSelect
-                isOpen={open}
-                onClose={() => setOpen(false)}
-                onConfirm={handleConfirm}
-            />
+            <ModalUserSelect isOpen={open} onClose={() => setOpen(false)} onConfirm={handleConfirm} />
         </div>
     );
 };

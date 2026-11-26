@@ -35,14 +35,31 @@ export function DeviceInspector({
                     {Object.values(MEDIUM).map((m) => (
                         <li key={m.label}>
                             <svg width="28" height="8" aria-hidden="true">
-                                <line x1="0" y1="4" x2="28" y2="4" stroke={m.color} strokeWidth="3" strokeDasharray={m.dash} strokeLinecap="round" />
+                                <line
+                                    x1="0"
+                                    y1="4"
+                                    x2="28"
+                                    y2="4"
+                                    stroke={m.color}
+                                    strokeWidth="3"
+                                    strokeDasharray={m.dash}
+                                    strokeLinecap="round"
+                                />
                             </svg>
                             {m.label}
                         </li>
                     ))}
                     <li>
                         <svg width="28" height="8" aria-hidden="true">
-                            <line x1="0" y1="4" x2="28" y2="4" stroke="#a3aab8" strokeWidth="3" strokeDasharray="6 5" />
+                            <line
+                                x1="0"
+                                y1="4"
+                                x2="28"
+                                y2="4"
+                                stroke="#a3aab8"
+                                strokeWidth="3"
+                                strokeDasharray="6 5"
+                            />
                         </svg>
                         Inactivo
                     </li>
@@ -57,8 +74,15 @@ export function DeviceInspector({
         .filter((e) => e.datos.origenId === device.id || e.datos.destinoId === device.id)
         .map((e) => {
             const mine = e.datos.origenId === device.id;
-            const other = graph.dispositivos.find((d) => d.id === (mine ? e.datos.destinoId : e.datos.origenId));
-            return { e, port: Number(mine ? e.datos.puertoOrigen : e.datos.puertoDestino), otherPort: Number(mine ? e.datos.puertoDestino : e.datos.puertoOrigen), other };
+            const other = graph.dispositivos.find(
+                (d) => d.id === (mine ? e.datos.destinoId : e.datos.origenId),
+            );
+            return {
+                e,
+                port: Number(mine ? e.datos.puertoOrigen : e.datos.puertoDestino),
+                otherPort: Number(mine ? e.datos.puertoDestino : e.datos.puertoOrigen),
+                other,
+            };
         })
         .sort((a, b) => a.port - b.port);
     const revision = daysFromToday(device.datos.ultimaRevision);
@@ -67,13 +91,21 @@ export function DeviceInspector({
             <header className={styles.inspectorHead}>
                 <span className={styles.glyph} data-class={clase} aria-hidden="true">
                     <svg viewBox="0 0 20 20" width="20" height="20">
-                        <path d={classGlyph(clase)} fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                        <path
+                            d={classGlyph(clase)}
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.6"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                        />
                     </svg>
                 </span>
                 <div>
                     <h3>{device.nombre}</h3>
                     <p>
-                        {CLASS_LABEL[clase] || clase} · Inventario {String(device.datos.numeroInventario || "—")}
+                        {CLASS_LABEL[clase] || clase} · Inventario{" "}
+                        {String(device.datos.numeroInventario || "—")}
                         {device.datos.direccion ? ` · ${String(device.datos.direccion)}` : ""}
                     </p>
                 </div>
@@ -91,7 +123,10 @@ export function DeviceInspector({
                 </div>
             </dl>
             <div className={styles.meter} aria-hidden="true">
-                <span style={{ width: pct + "%" }} data-level={pct > 85 ? "high" : pct > 65 ? "mid" : "low"} />
+                <span
+                    style={{ width: pct + "%" }}
+                    data-level={pct > 85 ? "high" : pct > 65 ? "mid" : "low"}
+                />
             </div>
             {total > 0 && (
                 <>
@@ -106,9 +141,19 @@ export function DeviceInspector({
                                 <button
                                     key={port}
                                     type="button"
-                                    data-state={link ? (link.e.estado === "INACTIVO" ? "inactive" : "used") : "free"}
-                                    style={link ? ({ "--medium": edgeStyle(link.e).color } as React.CSSProperties) : undefined}
-                                    title={link ? `Puerto ${port} → ${link.other?.nombre || "otra ubicación"} · puerto ${link.otherPort}` : `Puerto ${port} libre`}
+                                    data-state={
+                                        link ? (link.e.estado === "INACTIVO" ? "inactive" : "used") : "free"
+                                    }
+                                    style={
+                                        link
+                                            ? ({ "--medium": edgeStyle(link.e).color } as React.CSSProperties)
+                                            : undefined
+                                    }
+                                    title={
+                                        link
+                                            ? `Puerto ${port} → ${link.other?.nombre || "otra ubicación"} · puerto ${link.otherPort}`
+                                            : `Puerto ${port} libre`
+                                    }
                                     disabled={!link && !canLink}
                                     onClick={() => onPort(port, link?.e)}
                                 >
@@ -128,7 +173,16 @@ export function DeviceInspector({
                             <button type="button" onClick={() => onPort(port, e)}>
                                 <span className={styles.portBadge}>{port}</span>
                                 <svg width="22" height="8" aria-hidden="true">
-                                    <line x1="0" y1="4" x2="22" y2="4" stroke={st.color} strokeWidth="3" strokeDasharray={st.dash} strokeLinecap="round" />
+                                    <line
+                                        x1="0"
+                                        y1="4"
+                                        x2="22"
+                                        y2="4"
+                                        stroke={st.color}
+                                        strokeWidth="3"
+                                        strokeDasharray={st.dash}
+                                        strokeLinecap="round"
+                                    />
                                 </svg>
                                 <span className={styles.linkText}>
                                     {other?.nombre || "Otra ubicación"}

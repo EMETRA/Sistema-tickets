@@ -13,16 +13,20 @@ import { TextAreaProps } from "./types";
  */
 const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
     ({ className, state = "default", errorMessage, ...props }, ref) => {
-    // Referencia interna al textarea
+        // Referencia interna al textarea
         const textareaRef = useRef<HTMLTextAreaElement>(null);
 
         // Combina la referencia interna con la referencia pasada
         useImperativeHandle(ref, () => textareaRef.current as HTMLTextAreaElement, []);
 
         // Construir las clases CSS dinámicamente usando classnames
-        const textareaClasses = classNames(styles.TextArea, {
-            [styles.TextAreaError]: state === "error",
-        }, className);
+        const textareaClasses = classNames(
+            styles.TextArea,
+            {
+                [styles.TextAreaError]: state === "error",
+            },
+            className,
+        );
 
         return (
             <>
@@ -37,7 +41,7 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
                 )}
             </>
         );
-    }
+    },
 );
 
 TextArea.displayName = "TextArea";

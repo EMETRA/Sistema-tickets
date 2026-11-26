@@ -2,13 +2,7 @@ import type { ReactNode } from "react";
 import { Icon } from "../Icon";
 
 /** Iconos de navegación de la propuesta: contorno legible y acento tenue. */
-export function WorkspaceIcon({
-    name,
-    size = 22,
-}: {
-    name: string;
-    size?: number;
-}) {
+export function WorkspaceIcon({ name, size = 22 }: { name: string; size?: number }) {
     const fill = "var(--workspace-icon-accent, #e7edff)";
     const shapes: Record<string, ReactNode> = {
         "house-solid": (
@@ -19,10 +13,7 @@ export function WorkspaceIcon({
         ),
         "ticket-solid": (
             <>
-                <path
-                    d="M2 5h20v5a2 2 0 0 0 0 4v5H2v-5a2 2 0 0 0 0-4Z"
-                    fill={fill}
-                />
+                <path d="M2 5h20v5a2 2 0 0 0 0 4v5H2v-5a2 2 0 0 0 0-4Z" fill={fill} />
                 <path d="M15 6v3m0 2v2m0 2v3" />
             </>
         ),
@@ -40,15 +31,7 @@ export function WorkspaceIcon({
                     [3, 14],
                     [14, 14],
                 ].map(([x, y]) => (
-                    <rect
-                        key={x + ":" + y}
-                        x={x}
-                        y={y}
-                        width="7"
-                        height="7"
-                        rx="1"
-                        fill={fill}
-                    />
+                    <rect key={x + ":" + y} x={x} y={y} width="7" height="7" rx="1" fill={fill} />
                 ))}
             </>
         ),
@@ -59,15 +42,7 @@ export function WorkspaceIcon({
                     [10, 8, 13],
                     [17, 3, 18],
                 ].map(([x, y, h]) => (
-                    <rect
-                        key={x}
-                        x={x}
-                        y={y}
-                        width="4"
-                        height={h}
-                        rx="1"
-                        fill={fill}
-                    />
+                    <rect key={x} x={x} y={y} width="4" height={h} rx="1" fill={fill} />
                 ))}
             </>
         ),
@@ -100,12 +75,9 @@ export function WorkspaceIcon({
                 <path d="M12 11v6m0-11h.01" />
             </>
         ),
-        "right-from-bracket-solid": (
-            <path d="M11 3H3v18h8M11 12h11m-4-4 4 4-4 4" />
-        ),
+        "right-from-bracket-solid": <path d="M11 3H3v18h8M11 12h11m-4-4 4 4-4 4" />,
     };
-    if (!shapes[name])
-        return <Icon name={name} size={size} color="currentColor" />;
+    if (!shapes[name]) return <Icon name={name} size={size} color="currentColor" />;
     return (
         <svg
             width={size}

@@ -22,9 +22,7 @@ export function PlatformField({
         [options, setOptions] = useState<Option[]>([]),
         [error, setError] = useState("");
     const selectedReference = field.type === "ref" ? String(value || "") : "";
-    const permissionCode = ["leer", "insertar", "editar", "eliminar"].includes(
-        field.key,
-    );
+    const permissionCode = ["leer", "insertar", "editar", "eliminar"].includes(field.key);
     const access =
         permissionCode ||
         field.key === "perfilId" ||
@@ -38,13 +36,8 @@ export function PlatformField({
             const path = access
                 ? "/access-options"
                 : field.type === "user" || field.type === "list"
-                  ? (field.lookupPath || "/people") +
-                    "?q=" +
-                    encodeURIComponent(query)
-                  : "/records/" +
-                    field.resource +
-                    "?limit=50&q=" +
-                    encodeURIComponent(query);
+                  ? (field.lookupPath || "/people") + "?q=" + encodeURIComponent(query)
+                  : "/records/" + field.resource + "?limit=50&q=" + encodeURIComponent(query);
             platformFetch<
                 | PageResult<PlatformRecord>
                 | Option[]
@@ -72,9 +65,7 @@ export function PlatformField({
                         );
                     } else
                         setOptions(
-                            Array.isArray(result)
-                                ? result
-                                : (result as PageResult<PlatformRecord>).items,
+                            Array.isArray(result) ? result : (result as PageResult<PlatformRecord>).items,
                         );
                 })
                 .catch((e) => {
@@ -176,11 +167,8 @@ export function PlatformField({
                     onChange={(e) =>
                         onChange(
                             field.type === "list"
-                                ? Array.from(e.target.selectedOptions, (o) =>
-                                      Number(o.value),
-                                  )
-                                : field.type === "user" ||
-                                    field.key === "perfilId"
+                                ? Array.from(e.target.selectedOptions, (o) => Number(o.value))
+                                : field.type === "user" || field.key === "perfilId"
                                   ? e.target.value
                                       ? Number(e.target.value)
                                       : ""
@@ -188,26 +176,14 @@ export function PlatformField({
                         )
                     }
                 >
-                    {field.type !== "list" && (
-                        <option value="">Seleccionar…</option>
-                    )}
+                    {field.type !== "list" && <option value="">Seleccionar…</option>}
                     {!!value &&
                         field.type !== "list" &&
-                        !options.some(
-                            (o) => String(o.id) === String(value),
-                        ) && (
-                            <option value={String(value)}>
-                                Selección actual
-                            </option>
+                        !options.some((o) => String(o.id) === String(value)) && (
+                            <option value={String(value)}>Selección actual</option>
                         )}
                     {options
-                        .filter(
-                            (o) =>
-                                !query ||
-                                o.nombre
-                                    .toLowerCase()
-                                    .includes(query.toLowerCase()),
-                        )
+                        .filter((o) => !query || o.nombre.toLowerCase().includes(query.toLowerCase()))
                         .map((option) => (
                             <option key={option.id} value={option.id}>
                                 {option.nombre}
@@ -216,8 +192,8 @@ export function PlatformField({
                 </select>
                 {field.type === "list" && (
                     <small className={styles.muted}>
-                        Puedes seleccionar varias opciones con Ctrl o Cmd. Las
-                        selecciones se muestran resaltadas.
+                        Puedes seleccionar varias opciones con Ctrl o Cmd. Las selecciones se muestran
+                        resaltadas.
                     </small>
                 )}
                 {error && (
@@ -241,8 +217,7 @@ export function PlatformField({
         let display = String(value ?? "");
         if (date && display) {
             const d = new Date(display);
-            if (Number.isFinite(+d))
-                display = new Date(+d - 6 * 3600000).toISOString().slice(0, 16);
+            if (Number.isFinite(+d)) display = new Date(+d - 6 * 3600000).toISOString().slice(0, 16);
         }
         control = (
             <input
@@ -259,9 +234,7 @@ export function PlatformField({
                     onChange(
                         date
                             ? e.target.value
-                                ? new Date(
-                                      e.target.value + ":00-06:00",
-                                  ).toISOString()
+                                ? new Date(e.target.value + ":00-06:00").toISOString()
                                 : ""
                             : field.type === "number"
                               ? e.target.value === ""
@@ -274,7 +247,10 @@ export function PlatformField({
         );
     }
     return (
-        <div className={styles.field} style={field.type === "list" && !access ? { gridColumn: "1 / -1" } : undefined}>
+        <div
+            className={styles.field}
+            style={field.type === "list" && !access ? { gridColumn: "1 / -1" } : undefined}
+        >
             <label htmlFor={id}>
                 {field.label}
                 {field.required && <span aria-label="obligatorio"> *</span>}

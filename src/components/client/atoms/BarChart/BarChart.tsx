@@ -53,14 +53,7 @@ const CustomXAxisTick = ({ x, y, payload }: { x?: number; y?: number; payload?: 
 
     return (
         <g transform={`translate(${x},${y})`}>
-            <text
-                x={0}
-                y={0}
-                dy={16}
-                textAnchor="middle"
-                fill="#262626"
-                fontSize={12}
-            >
+            <text x={0} y={0} dy={16} textAnchor="middle" fill="#262626" fontSize={12}>
                 <title>{label}</title>
                 {truncated}
             </text>
@@ -134,11 +127,11 @@ export const BarChart: React.FC<BarChartProps> = ({
             <ResponsiveContainer width={width} height={height}>
                 <RechartsBarChart
                     data={barsWithColors}
-                    margin={{ 
-                        top: 20, 
-                        right: 20, 
-                        bottom: verticalLabels ? 0 : 50, 
-                        left: 20 
+                    margin={{
+                        top: 20,
+                        right: 20,
+                        bottom: verticalLabels ? 0 : 50,
+                        left: 20,
                     }}
                 >
                     <CartesianGrid
@@ -171,15 +164,11 @@ export const BarChart: React.FC<BarChartProps> = ({
                         }}
                         labelStyle={{ color: "white", fontSize: 11, fontWeight: 400 }}
                         itemStyle={{ color: "white", fontSize: 14, fontWeight: 600 }}
-                        formatter={(value: number | undefined) => 
+                        formatter={(value: number | undefined) =>
                             value !== undefined ? value.toLocaleString() : ""
                         }
                     />
-                    <Bar
-                        dataKey="value"
-                        shape={customShape}
-                        animationDuration={300}
-                    />
+                    <Bar dataKey="value" shape={customShape} animationDuration={300} />
                 </RechartsBarChart>
             </ResponsiveContainer>
         </div>

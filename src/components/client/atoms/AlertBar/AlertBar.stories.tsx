@@ -6,11 +6,17 @@ const meta: Meta<typeof AlertBar> = {
     component: AlertBar,
     tags: ["autodocs"],
     // Decorador para darle un ancho fijo en Storybook se vea como en la página
-    decorators: [(Story) => <div style={{ width: '300px', padding: '20px' }}><Story /></div>],
+    decorators: [
+        (Story) => (
+            <div style={{ width: "300px", padding: "20px" }}>
+                <Story />
+            </div>
+        ),
+    ],
     argTypes: {
-        color: { control: 'color' },
-        duration: { control: { type: 'number', min: 0.5, max: 60, step: 0.5 } }
-    }
+        color: { control: "color" },
+        duration: { control: { type: "number", min: 0.5, max: 60, step: 0.5 } },
+    },
 };
 
 export default meta;

@@ -73,7 +73,10 @@ export function AppsDirectory({ catalog }: { catalog: AppsCatalog }) {
                         <div className={styles.sections}>
                             {sections.map((s) => (
                                 <div key={s.meta.id}>
-                                    <Link href={buildSectionPath(app.meta.id, s.meta.id)} className={styles.sectionName}>
+                                    <Link
+                                        href={buildSectionPath(app.meta.id, s.meta.id)}
+                                        className={styles.sectionName}
+                                    >
                                         {s.meta.title}
                                     </Link>
                                     <ul>

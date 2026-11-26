@@ -19,20 +19,14 @@ import { useRouter } from "next/navigation";
 
 const UserHome: React.FC = () => {
     const router = useRouter();
-    const departamento = useAuthStore(
-        (state) => state.user?.departamento ?? null,
-    );
+    const departamento = useAuthStore((state) => state.user?.departamento ?? null);
     const {
         catalog,
         loading: catalogLoading,
         error: catalogError,
         refetch: refetchCatalog,
     } = useAppsCatalogContext();
-    const {
-        data: userData,
-        loading: loadingUser,
-        refetch: refetchUser,
-    } = useGetUser();
+    const { data: userData, loading: loadingUser, refetch: refetchUser } = useGetUser();
     const {
         data: statsData,
         loading: loadingStats,
@@ -60,17 +54,17 @@ const UserHome: React.FC = () => {
 
     const user = userData
         ? {
-            name: userData.nombre,
-            role: userData.rol || "USUARIO",
-            departamento: userData.departamento || departamento,
-        }
+              name: userData.nombre,
+              role: userData.rol || "USUARIO",
+              departamento: userData.departamento || departamento,
+          }
         : { name: "", role: "", departamento: departamento };
 
     const reportData =
-    statsData?.grafico_mensual?.map((point) => ({
-        label: point.mes,
-        value: point.tickets,
-    })) || [];
+        statsData?.grafico_mensual?.map((point) => ({
+            label: point.mes,
+            value: point.tickets,
+        })) || [];
 
     const mainApps = useMemo(() => {
         if (!catalog) return [];
@@ -79,12 +73,12 @@ const UserHome: React.FC = () => {
 
     const eventItems: EventItemProps[] = myActivityData
         ? myActivityData.map((activity) => ({
-            type: "movement",
-            userName: user.name || "Usuario",
-            avatarInitials: user.name ? user.name.charAt(0) : "U",
-            label: activity.descripcion,
-            date: activity.fecha ? new Date(activity.fecha) : new Date(),
-        }))
+              type: "movement",
+              userName: user.name || "Usuario",
+              avatarInitials: user.name ? user.name.charAt(0) : "U",
+              label: activity.descripcion,
+              date: activity.fecha ? new Date(activity.fecha) : new Date(),
+          }))
         : [];
 
     const handleAppClick = (appId: string) => {
@@ -146,11 +140,7 @@ const UserHome: React.FC = () => {
                             </button>
                         </div>
                     ) : (
-                        <InfoPanel
-                            type="my-activity"
-                            items={eventItems}
-                            className={styles.infoPanel}
-                        />
+                        <InfoPanel type="my-activity" items={eventItems} className={styles.infoPanel} />
                     )}
                     {loadingStats ? (
                         <HomeState loading message="Cargando reporte de tickets..." />

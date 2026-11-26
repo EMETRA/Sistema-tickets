@@ -30,14 +30,25 @@ function Field({ initial }: { initial: string }) {
 }
 
 export const Presencial: Story = { render: () => <Field initial="Sala de Informática" /> };
-export const Virtual: Story = { render: () => <Field initial="https://teams.microsoft.com/l/meetup-join/ejemplo" /> };
-export const Mixta: Story = { render: () => <Field initial="Sala de juntas · https://meet.google.com/abc-defg-hij" /> };
+export const Virtual: Story = {
+    render: () => <Field initial="https://teams.microsoft.com/l/meetup-join/ejemplo" />,
+};
+export const Mixta: Story = {
+    render: () => <Field initial="Sala de juntas · https://meet.google.com/abc-defg-hij" />,
+};
 
 const activity = (lugar: string, fin: string) =>
     ({ id: "1", nombre: "Reunión con Financiero", datos: { lugar, fin } }) as unknown as PlatformRecord;
 
 export const TarjetaUnirse: Story = {
-    render: () => <MeetingCard activity={activity("Sala de juntas · https://meet.google.com/abc-defg-hij", "2099-01-01T00:00:00Z")} />,
+    render: () => (
+        <MeetingCard
+            activity={activity(
+                "Sala de juntas · https://meet.google.com/abc-defg-hij",
+                "2099-01-01T00:00:00Z",
+            )}
+        />
+    ),
 };
 export const TarjetaTerminada: Story = {
     render: () => <MeetingCard activity={activity("https://zoom.us/j/123", "2020-01-01T00:00:00Z")} />,

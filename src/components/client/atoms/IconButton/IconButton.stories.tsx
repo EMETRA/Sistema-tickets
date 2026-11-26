@@ -11,7 +11,17 @@ const meta = {
     argTypes: {
         icon: {
             control: "select",
-            options: ["home", "users", "ticket", "settings", "bell-regular", "user-lock-solid", "eye", "eye-off", "file"],
+            options: [
+                "home",
+                "users",
+                "ticket",
+                "settings",
+                "bell-regular",
+                "user-lock-solid",
+                "eye",
+                "eye-off",
+                "file",
+            ],
             description: "Nombre del icono a mostrar (debe coincidir con el SVG en /public/svgs)",
         },
         size: {

@@ -29,19 +29,12 @@ function wordDocument(html: string) {
     return `<!doctype html><html lang="es"><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'"><meta name="viewport" content="width=device-width, initial-scale=1"><style>body{margin:0;padding:32px;box-sizing:border-box;background:white;color:#24395a;font:15px/1.7 system-ui,sans-serif;overflow-wrap:anywhere}h1,h2,h3{line-height:1.35}table{border-collapse:collapse;display:block;max-width:100%;overflow:auto}td,th{border:1px solid #dce3f1;padding:8px;min-width:40px}img{max-width:100%;height:auto}blockquote{margin-left:0;border-left:3px solid #dce3f1;padding-left:16px}@media(max-width:600px){body{padding:16px}}</style></head><body>${html || "<p>El documento no contiene texto visible.</p>"}</body></html>`;
 }
 
-export function OfficePreview({
-    document,
-    name,
-}: {
-    document: OfficeDocument;
-    name: string;
-}) {
+export function OfficePreview({ document, name }: { document: OfficeDocument; name: string }) {
     const [selected, setSelected] = useState(0),
         [page, setPage] = useState(0);
     const tabs = useRef<HTMLDivElement>(null),
         id = useId();
-    const sheet =
-        document.kind === "spreadsheet" ? document.sheets[selected] : undefined;
+    const sheet = document.kind === "spreadsheet" ? document.sheets[selected] : undefined;
     const pageSize = 50,
         start = page * pageSize;
     return (
@@ -86,20 +79,18 @@ export function OfficePreview({
                                         event.key === "ArrowRight"
                                             ? (index + 1) % count
                                             : event.key === "ArrowLeft"
-                                                ? (index + count - 1) % count
-                                                : event.key === "Home"
-                                                    ? 0
-                                                    : event.key === "End"
-                                                        ? count - 1
-                                                        : undefined;
+                                              ? (index + count - 1) % count
+                                              : event.key === "Home"
+                                                ? 0
+                                                : event.key === "End"
+                                                  ? count - 1
+                                                  : undefined;
                                     if (next === undefined) return;
                                     event.preventDefault();
                                     setSelected(next);
                                     setPage(0);
                                     tabs.current
-                                        ?.querySelectorAll<HTMLButtonElement>(
-                                            "button",
-                                        )
+                                        ?.querySelectorAll<HTMLButtonElement>("button")
                                         [next]?.focus();
                                 }}
                             >
@@ -116,37 +107,28 @@ export function OfficePreview({
                     >
                         {sheet.rows.length ? (
                             <table>
-                                <caption className={styles.srOnly}>
-                                    {sheet.name} — valores guardados
-                                </caption>
+                                <caption className={styles.srOnly}>{sheet.name} — valores guardados</caption>
                                 <thead>
                                     <tr>
                                         <th scope="col" aria-label="Fila">
                                             #
                                         </th>
-                                        {Array.from(
-                                            { length: sheet.rows[0].length },
-                                            (_, index) => (
-                                                <th scope="col" key={index}>
-                                                    {columnName(index)}
-                                                </th>
-                                            ),
-                                        )}
+                                        {Array.from({ length: sheet.rows[0].length }, (_, index) => (
+                                            <th scope="col" key={index}>
+                                                {columnName(index)}
+                                            </th>
+                                        ))}
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {sheet.rows
-                                        .slice(start, start + pageSize)
-                                        .map((row, index) => (
-                                            <tr key={start + index}>
-                                                <th scope="row">
-                                                    {start + index + 1}
-                                                </th>
-                                                {row.map((cell, col) => (
-                                                    <td key={col}>{cell}</td>
-                                                ))}
-                                            </tr>
-                                        ))}
+                                    {sheet.rows.slice(start, start + pageSize).map((row, index) => (
+                                        <tr key={start + index}>
+                                            <th scope="row">{start + index + 1}</th>
+                                            {row.map((cell, col) => (
+                                                <td key={col}>{cell}</td>
+                                            ))}
+                                        </tr>
+                                    ))}
                                 </tbody>
                             </table>
                         ) : (
@@ -174,11 +156,7 @@ export function OfficePreview({
                             </Button>
                             <Button
                                 variant="outlined"
-                                state={
-                                    start + pageSize >= sheet.rows.length
-                                        ? "disabled"
-                                        : "default"
-                                }
+                                state={start + pageSize >= sheet.rows.length ? "disabled" : "default"}
                                 onClick={() => setPage((value) => value + 1)}
                             >
                                 Filas siguientes

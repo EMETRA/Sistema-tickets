@@ -5,11 +5,7 @@ import { AnalisisEvidencias } from "@/views/JUZ01Detail/AnalisisEvidencias";
 import type { AnalisisEvidencias as Analisis } from "@/api/graphql/juzgado";
 import { Button } from "@/components/client/atoms/Button";
 import { usePlatform } from "@/platform/context";
-import {
-    platformCommand,
-    platformFetch,
-    PlatformError,
-} from "@/platform/client";
+import { platformCommand, platformFetch, PlatformError } from "@/platform/client";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
 import local from "./ViviPmtWorkspace.module.scss";
 type Caso = {
@@ -68,9 +64,7 @@ const fecha = (value?: string) =>
         : "—";
 const errorText = (e: unknown) =>
     (e instanceof Error ? e.message : "No se pudo consultar el reporte.") +
-    (e instanceof PlatformError && e.reference
-        ? " Referencia: " + e.reference
-        : "");
+    (e instanceof PlatformError && e.reference ? " Referencia: " + e.reference : "");
 function Evidencia({
     archivo,
     caso,
@@ -93,10 +87,7 @@ function Evidencia({
         setError("");
         setReady(false);
         onCheck(false);
-        platformFetch<Blob>(
-            `/vivi-pmt/casos/${caso}/evidencias/${archivo.ID}`,
-            { signal: controller.signal },
-        )
+        platformFetch<Blob>(`/vivi-pmt/casos/${caso}/evidencias/${archivo.ID}`, { signal: controller.signal })
             .then((blob) => {
                 if (controller.signal.aborted) return;
                 objectUrl = URL.createObjectURL(blob);
@@ -113,17 +104,13 @@ function Evidencia({
     return (
         <article className={local.evidence}>
             <strong>
-                {archivo.MIME.startsWith("video/") ? "Video" : "Fotografía"}{" "}
-                {archivo.ID}
+                {archivo.MIME.startsWith("video/") ? "Video" : "Fotografía"} {archivo.ID}
             </strong>
             {archivo.CAPTURADA_EN && <p className={styles.muted}>{fecha(archivo.CAPTURADA_EN)}</p>}
             {error ? (
                 <div role="alert">
                     <p>{error}</p>
-                    <Button
-                        variant="outlined"
-                        onClick={() => setAttempt((x) => x + 1)}
-                    >
+                    <Button variant="outlined" onClick={() => setAttempt((x) => x + 1)}>
                         Reintentar evidencia
                     </Button>
                 </div>
@@ -154,9 +141,12 @@ function Evidencia({
                 </a>
             )}
             {url && archivo.MIME.startsWith("video/") && (
-                <a href={url} className={styles.link}
+                <a
+                    href={url}
+                    className={styles.link}
                     download={`evidencia-${archivo.ID}.${archivo.MIME === "video/quicktime" ? "mov" : "mp4"}`}
-                    onClick={() => setReady(true)}>
+                    onClick={() => setReady(true)}
+                >
                     Descargar video
                 </a>
             )}
@@ -195,10 +185,7 @@ export function ViviPmtWorkspace() {
     const [clock, setClock] = useState(Date.now());
     const request = useRef<AbortController | null>(null);
     const active = detail?.caso;
-    const mine =
-        !!active?.mia &&
-        !!active.RESERVADA_HASTA &&
-        Date.parse(active.RESERVADA_HASTA) > clock;
+    const mine = !!active?.mia && !!active.RESERVADA_HASTA && Date.parse(active.RESERVADA_HASTA) > clock;
     async function load(offset = 0, targetEstado = estado) {
         request.current?.abort();
         const controller = new AbortController();
@@ -208,9 +195,7 @@ export function ViviPmtWorkspace() {
         setList(null);
         try {
             if (q.trim() && q.trim().length < 3)
-                throw Error(
-                    "Escribe al menos tres caracteres del código o la placa completa.",
-                );
+                throw Error("Escribe al menos tres caracteres del código o la placa completa.");
             const cfg = await platformFetch<Config>("/vivi-pmt/bootstrap", {
                 signal: controller.signal,
             });
@@ -259,11 +244,7 @@ export function ViviPmtWorkspace() {
             const next = await platformFetch<Detail>(`/vivi-pmt/casos/${id}`, {
                 signal: controller.signal,
             });
-            if (
-                !next?.caso ||
-                !Array.isArray(next.evidencias) ||
-                !Array.isArray(next.reglas)
-            )
+            if (!next?.caso || !Array.isArray(next.evidencias) || !Array.isArray(next.reglas))
                 throw Error("La respuesta del expediente no es válida.");
             if (controller.signal.aborted) return;
             setDetail(next);
@@ -285,10 +266,7 @@ export function ViviPmtWorkspace() {
     const [decisionOpen, setDecisionOpen] = useState(false);
     const decisionFlight = useRef(false);
 
-    async function change(
-        action: "reservar" | "liberar" | "decidir",
-        decision?: "IMPONER" | "DESCARTAR",
-    ) {
+    async function change(action: "reservar" | "liberar" | "decidir", decision?: "IMPONER" | "DESCARTAR") {
         if (!active || busy || !data || decisionFlight.current) return;
         decisionFlight.current = true;
         if (decision) setDecisionOpen(false);
@@ -304,9 +282,7 @@ export function ViviPmtWorkspace() {
                     decision,
                     fundamento,
                     evidenciasRevisadas: checked,
-                    ...(config?.permiteCorrecciones
-                        ? { usoPlaca: uso, placa, regla: Number(regla) }
-                        : {}),
+                    ...(config?.permiteCorrecciones ? { usoPlaca: uso, placa, regla: Number(regla) } : {}),
                 });
             const row = await platformCommand<Caso>(
                 `/vivi-pmt/casos/${active.ID}/${action}`,
@@ -319,9 +295,7 @@ export function ViviPmtWorkspace() {
                       ? "Descartar reporte Avísame"
                       : "Actualizar reserva de revisión",
             );
-            setDetail((previous) =>
-                previous ? { ...previous, caso: row } : null,
-            );
+            setDetail((previous) => (previous ? { ...previous, caso: row } : null));
             setUncertain(false);
             setClock(Date.now());
             setMessage(
@@ -343,23 +317,16 @@ export function ViviPmtWorkspace() {
     }
     const reviewed =
         !!detail?.evidencias.length &&
-        detail.evidencias.every(
-            (f) => checked.includes(f.ID) && f.ESTADO === "DISPONIBLE",
-        );
-    const canDecide =
-        mine &&
-        reviewed &&
-        fundamento.trim().length >= 10 &&
-        !busy &&
-        !uncertain;
+        detail.evidencias.every((f) => checked.includes(f.ID) && f.ESTADO === "DISPONIBLE");
+    const canDecide = mine && reviewed && fundamento.trim().length >= 10 && !busy && !uncertain;
     return (
         <div className={styles.page}>
             <div className={styles.toolbar}>
                 <div>
                     <h2>{active ? "Revisión del reporte" : "Bandeja de reportes"}</h2>
                     <p className={styles.muted}>
-                        Revisa el lugar, la placa y las evidencias antes de
-                        decidir si corresponde imponer una multa.
+                        Revisa el lugar, la placa y las evidencias antes de decidir si corresponde imponer una
+                        multa.
                     </p>
                 </div>
                 {active && (
@@ -382,8 +349,7 @@ export function ViviPmtWorkspace() {
                     {error}
                     {uncertain && (
                         <p>
-                            Consulta el estado del caso antes de repetir la
-                            acción. Se conserva tu fundamento.
+                            Consulta el estado del caso antes de repetir la acción. Se conserva tu fundamento.
                         </p>
                     )}
                 </div>
@@ -394,10 +360,7 @@ export function ViviPmtWorkspace() {
                 </div>
             )}
             {!active ? (
-                <section
-                    className={styles.listPanel}
-                    aria-label="Cola de reportes"
-                >
+                <section className={styles.listPanel} aria-label="Cola de reportes">
                     <form
                         className={local.filters}
                         onSubmit={(e) => {
@@ -433,10 +396,7 @@ export function ViviPmtWorkspace() {
                                 maxLength={40}
                             />
                         </label>
-                        <Button
-                            type="submit"
-                            state={busy ? "disabled" : "default"}
-                        >
+                        <Button type="submit" state={busy ? "disabled" : "default"}>
                             Consultar reportes
                         </Button>
                     </form>
@@ -465,24 +425,16 @@ export function ViviPmtWorkspace() {
                                             <tr key={row.ID}>
                                                 <td>
                                                     <strong>
-                                                        {row.USO_PLACA} ·{" "}
-                                                        {row.PLACA}
+                                                        {row.USO_PLACA} · {row.PLACA}
                                                     </strong>
                                                 </td>
-                                                <td className={local.code}>
-                                                    {row.CODIGO_CASO}
-                                                </td>
-                                                <td>
-                                                    {fecha(row.FECHA_HECHO)}
-                                                </td>
-                                                <td>
-                                                    {fecha(row.REGISTRADA_EN)}
-                                                </td>
+                                                <td className={local.code}>{row.CODIGO_CASO}</td>
+                                                <td>{fecha(row.FECHA_HECHO)}</td>
+                                                <td>{fecha(row.REGISTRADA_EN)}</td>
                                                 <td>
                                                     {row.mia
                                                         ? "Tu reserva"
-                                                        : row.ESTADO ===
-                                                            "EN_REVISION"
+                                                        : row.ESTADO === "EN_REVISION"
                                                           ? Number(row.VIGENTE)
                                                               ? "Reservado por otro agente"
                                                               : "Reserva vencida"
@@ -491,14 +443,8 @@ export function ViviPmtWorkspace() {
                                                 <td>
                                                     <Button
                                                         variant="outlined"
-                                                        state={
-                                                            busy
-                                                                ? "disabled"
-                                                                : "default"
-                                                        }
-                                                        onClick={() =>
-                                                            void open(row.ID)
-                                                        }
+                                                        state={busy ? "disabled" : "default"}
+                                                        onClick={() => void open(row.ID)}
                                                     >
                                                         Abrir reporte
                                                     </Button>
@@ -507,31 +453,19 @@ export function ViviPmtWorkspace() {
                                         ))}
                                     </tbody>
                                 </table>
-                                {!list.items.length && (
-                                    <p>No hay reportes en este estado.</p>
-                                )}
+                                {!list.items.length && <p>No hay reportes en este estado.</p>}
                             </div>
                             <div className={styles.actions}>
                                 <Button
                                     variant="outlined"
-                                    state={
-                                        busy || list.offset === 0
-                                            ? "disabled"
-                                            : "default"
-                                    }
-                                    onClick={() =>
-                                        void load(Math.max(0, list.offset - 30))
-                                    }
+                                    state={busy || list.offset === 0 ? "disabled" : "default"}
+                                    onClick={() => void load(Math.max(0, list.offset - 30))}
                                 >
                                     Anterior
                                 </Button>
                                 <Button
                                     variant="outlined"
-                                    state={
-                                        busy || !list.hasMore
-                                            ? "disabled"
-                                            : "default"
-                                    }
+                                    state={busy || !list.hasMore ? "disabled" : "default"}
                                     onClick={() => void load(list.offset + 30)}
                                 >
                                     Siguiente
@@ -548,9 +482,7 @@ export function ViviPmtWorkspace() {
                                 <h3>
                                     {active.USO_PLACA} · {active.PLACA}
                                 </h3>
-                                <span className={local.code}>
-                                    {active.CODIGO_CASO}
-                                </span>
+                                <span className={local.code}>{active.CODIGO_CASO}</span>
                             </div>
                             <Button
                                 variant="outlined"
@@ -562,7 +494,11 @@ export function ViviPmtWorkspace() {
                         </div>
                         <dl className={local.facts}>
                             <div>
-                                <dt>{active.PROCEDIMIENTO === "REVISION_PMT_V2" ? "Fecha de captura" : "Fecha declarada"}</dt>
+                                <dt>
+                                    {active.PROCEDIMIENTO === "REVISION_PMT_V2"
+                                        ? "Fecha de captura"
+                                        : "Fecha declarada"}
+                                </dt>
                                 <dd>{fecha(active.FECHA_HECHO)}</dd>
                             </div>
                             <div>
@@ -572,15 +508,16 @@ export function ViviPmtWorkspace() {
                             <div>
                                 <dt>Falta reportada</dt>
                                 <dd>
-                                    {detail?.reglas.find(
-                                        (r) =>
-                                            Number(r.REGLA) ===
-                                            Number(active.REGLA),
-                                    )?.NOMBRE || active.REGLA}
+                                    {detail?.reglas.find((r) => Number(r.REGLA) === Number(active.REGLA))
+                                        ?.NOMBRE || active.REGLA}
                                 </dd>
                             </div>
                             <div>
-                                <dt>{active.PROCEDIMIENTO === "REVISION_PMT_V2" ? "Ubicación de captura" : "Lugar declarado"}</dt>
+                                <dt>
+                                    {active.PROCEDIMIENTO === "REVISION_PMT_V2"
+                                        ? "Ubicación de captura"
+                                        : "Lugar declarado"}
+                                </dt>
                                 <dd>
                                     {active.REFERENCIA_LUGAR}
                                     <br />
@@ -597,52 +534,40 @@ export function ViviPmtWorkspace() {
                         </dl>
                         {active.OBSERVACIONES && <p>{active.OBSERVACIONES}</p>}
 
-                        {["PENDIENTE", "EN_REVISION"].includes(active.ESTADO) &&
-                            config?.acciones.revisar && (
-                                <div className={styles.actions}>
+                        {["PENDIENTE", "EN_REVISION"].includes(active.ESTADO) && config?.acciones.revisar && (
+                            <div className={styles.actions}>
+                                <Button
+                                    state={
+                                        busy || (!mine && Number(active.VIGENTE) === 1)
+                                            ? "disabled"
+                                            : "default"
+                                    }
+                                    onClick={() => void change("reservar")}
+                                >
+                                    {mine ? "Renovar reserva" : "Tomar caso para revisión"}
+                                </Button>
+                                {mine && (
                                     <Button
-                                        state={
-                                            busy ||
-                                            (!mine &&
-                                                Number(active.VIGENTE) === 1)
-                                                ? "disabled"
-                                                : "default"
-                                        }
-                                        onClick={() => void change("reservar")}
+                                        variant="outlined"
+                                        state={busy ? "disabled" : "default"}
+                                        onClick={() => void change("liberar")}
                                     >
-                                        {mine
-                                            ? "Renovar reserva"
-                                            : "Tomar caso para revisión"}
+                                        Devolver a pendientes
                                     </Button>
-                                    {mine && (
-                                        <Button
-                                            variant="outlined"
-                                            state={
-                                                busy ? "disabled" : "default"
-                                            }
-                                            onClick={() =>
-                                                void change("liberar")
-                                            }
-                                        >
-                                            Devolver a pendientes
-                                        </Button>
-                                    )}
-                                    <span>
-                                        {mine
-                                            ? "Tu reserva vence: " +
-                                              fecha(active.RESERVADA_HASTA)
-                                            : "Toma el caso para registrar una decisión."}
-                                    </span>
-                                </div>
-                            )}
+                                )}
+                                <span>
+                                    {mine
+                                        ? "Tu reserva vence: " + fecha(active.RESERVADA_HASTA)
+                                        : "Toma el caso para registrar una decisión."}
+                                </span>
+                            </div>
+                        )}
                         {active.NUMERO_REMISION && (
                             <p>
                                 <strong>
-                                    Multa: {active.SERIE_REMISION} ·{" "}
-                                    {active.NUMERO_REMISION}
+                                    Multa: {active.SERIE_REMISION} · {active.NUMERO_REMISION}
                                 </strong>{" "}
-                                · {active.USO_PLACA_CONFIRMADO}{" "}
-                                {active.PLACA_CONFIRMADA}
+                                · {active.USO_PLACA_CONFIRMADO} {active.PLACA_CONFIRMADA}
                             </p>
                         )}
                         {active.NUMERO_REMISION && active.publicacionEvidencias && (
@@ -651,180 +576,161 @@ export function ViviPmtWorkspace() {
                                     ? "Evidencias copiadas al archivo de la remisión."
                                     : active.publicacionEvidencias.estado === "NO_PROGRAMADA"
                                       ? "La multa ya fue emitida, pero no tiene una copia de evidencias programada. Solicita la revisión del registro."
-                                    : "La multa ya fue emitida. La copia de evidencias está pendiente; se reintentará automáticamente sin emitir otra multa."}
+                                      : "La multa ya fue emitida. La copia de evidencias está pendiente; se reintentará automáticamente sin emitir otra multa."}
                             </p>
                         )}
                         {active.FUNDAMENTO && (
                             <p>
-                                <strong>Fundamento registrado:</strong>{" "}
-                                {active.FUNDAMENTO}
+                                <strong>Fundamento registrado:</strong> {active.FUNDAMENTO}
                             </p>
                         )}
                     </section>
                     <div className={local.reviewColumns}>
-                    <section className={styles.listPanel}>
-                        <h3>Evidencias del reporte</h3>
-                        <div className={local.evidences}>
-                            {detail?.evidencias.map((file) => (
-                                <Evidencia
-                                    key={active.ID + "-" + file.ID}
-                                    caso={active.ID}
-                                    archivo={file}
-                                    checked={checked.includes(file.ID)}
-                                    onCheck={(yes) =>
-                                        setChecked((prev) =>
-                                            yes
-                                                ? [
-                                                      ...new Set([
-                                                          ...prev,
-                                                          file.ID,
-                                                      ]),
-                                                  ]
-                                                : prev.filter(
-                                                      (x) => x !== file.ID,
-                                                  ),
-                                        )
-                                    }
-                                />
-                            ))}
-                        </div>
-                    </section>
+                        <section className={styles.listPanel}>
+                            <h3>Evidencias del reporte</h3>
+                            <div className={local.evidences}>
+                                {detail?.evidencias.map((file) => (
+                                    <Evidencia
+                                        key={active.ID + "-" + file.ID}
+                                        caso={active.ID}
+                                        archivo={file}
+                                        checked={checked.includes(file.ID)}
+                                        onCheck={(yes) =>
+                                            setChecked((prev) =>
+                                                yes
+                                                    ? [...new Set([...prev, file.ID])]
+                                                    : prev.filter((x) => x !== file.ID),
+                                            )
+                                        }
+                                    />
+                                ))}
+                            </div>
+                        </section>
                         <AnalisisEvidencias analisis={detail?.analisis} autoridad="agente" />
                     </div>
-                    {["PENDIENTE", "EN_REVISION"].includes(active.ESTADO) &&
-                        config?.acciones.revisar && (
-                            <>
-                                <div className={local.decisionBar}>
-                                    <p>{checked.length} de {detail?.evidencias.length || 0} evidencias revisadas</p>
-                                    <Button state={mine && reviewed && !busy && !uncertain ? "default" : "disabled"}
-                                        onClick={() => setDecisionOpen(true)}>
-                                        Registrar decisión
-                                    </Button>
-                                </div>
-                                <PopOver isOpen={decisionOpen} onClose={() => setDecisionOpen(false)}
-                                    ariaLabel="Decisión del agente" className={local.decisionDialog}>
-                                <section className={local.decisionContent}>
-                                <h3>Decisión del agente</h3>
-                                {config.permiteCorrecciones && (
-                                    <>
-                                        <p className={styles.muted}>
-                                            Verifica los datos para la multa. Se
-                                            conserva la placa y la falta
-                                            originales del reporte.
-                                        </p>
-                                        <div className={local.decisionGrid}>
-                                            <label className={styles.field}>
-                                                Tipo de placa
-                                                <input
-                                                    className={styles.control}
-                                                    value={uso}
-                                                    maxLength={3}
-                                                    disabled={!mine || busy}
-                                                    onChange={(e) =>
-                                                        setUso(
-                                                            e.target.value.toUpperCase(),
-                                                        )
-                                                    }
-                                                />
-                                            </label>
-                                            <label className={styles.field}>
-                                                Placa verificada
-                                                <input
-                                                    className={styles.control}
-                                                    value={placa}
-                                                    maxLength={6}
-                                                    disabled={!mine || busy}
-                                                    onChange={(e) =>
-                                                        setPlaca(
-                                                            e.target.value.toUpperCase(),
-                                                        )
-                                                    }
-                                                />
-                                            </label>
-                                            <label className={styles.field}>
-                                                Infracción verificada
-                                                <select
-                                                    className={styles.control}
-                                                    value={regla}
-                                                    disabled={!mine || busy}
-                                                    onChange={(e) =>
-                                                        setRegla(e.target.value)
-                                                    }
-                                                >
-                                                    {detail?.reglas.map((r) => (
-                                                        <option
-                                                            key={r.REGLA}
-                                                            value={r.REGLA}
-                                                        >
-                                                            {r.NOMBRE}
-                                                        </option>
-                                                    ))}
-                                                </select>
-                                            </label>
-                                        </div>
-                                    </>
-                                )}
-                                <label className={styles.field}>
-                                    Fundamento de la decisión
-                                    <textarea
-                                        className={styles.control}
-                                        rows={4}
-                                        value={fundamento}
-                                        disabled={!mine || busy}
-                                        maxLength={2000}
-                                        onChange={(e) =>
-                                            setFundamento(e.target.value)
-                                        }
-                                        placeholder="Explica por qué corresponde imponer la multa o descartar el reporte."
-                                    />
-                                </label>
-                                <p className={styles.muted}>
-                                    Escribe un fundamento de al menos 10 caracteres. Imponer multa registra la remisión y programa su notificación.
+                    {["PENDIENTE", "EN_REVISION"].includes(active.ESTADO) && config?.acciones.revisar && (
+                        <>
+                            <div className={local.decisionBar}>
+                                <p>
+                                    {checked.length} de {detail?.evidencias.length || 0} evidencias revisadas
                                 </p>
-                                {!config.emisionConfigurada && (
-                                    <p className={styles.error}>
-                                        Falta configurar el emisor legal para
-                                        imponer multas.
+                                <Button
+                                    state={mine && reviewed && !busy && !uncertain ? "default" : "disabled"}
+                                    onClick={() => setDecisionOpen(true)}
+                                >
+                                    Registrar decisión
+                                </Button>
+                            </div>
+                            <PopOver
+                                isOpen={decisionOpen}
+                                onClose={() => setDecisionOpen(false)}
+                                ariaLabel="Decisión del agente"
+                                className={local.decisionDialog}
+                            >
+                                <section className={local.decisionContent}>
+                                    <h3>Decisión del agente</h3>
+                                    {config.permiteCorrecciones && (
+                                        <>
+                                            <p className={styles.muted}>
+                                                Verifica los datos para la multa. Se conserva la placa y la
+                                                falta originales del reporte.
+                                            </p>
+                                            <div className={local.decisionGrid}>
+                                                <label className={styles.field}>
+                                                    Tipo de placa
+                                                    <input
+                                                        className={styles.control}
+                                                        value={uso}
+                                                        maxLength={3}
+                                                        disabled={!mine || busy}
+                                                        onChange={(e) => setUso(e.target.value.toUpperCase())}
+                                                    />
+                                                </label>
+                                                <label className={styles.field}>
+                                                    Placa verificada
+                                                    <input
+                                                        className={styles.control}
+                                                        value={placa}
+                                                        maxLength={6}
+                                                        disabled={!mine || busy}
+                                                        onChange={(e) =>
+                                                            setPlaca(e.target.value.toUpperCase())
+                                                        }
+                                                    />
+                                                </label>
+                                                <label className={styles.field}>
+                                                    Infracción verificada
+                                                    <select
+                                                        className={styles.control}
+                                                        value={regla}
+                                                        disabled={!mine || busy}
+                                                        onChange={(e) => setRegla(e.target.value)}
+                                                    >
+                                                        {detail?.reglas.map((r) => (
+                                                            <option key={r.REGLA} value={r.REGLA}>
+                                                                {r.NOMBRE}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                </label>
+                                            </div>
+                                        </>
+                                    )}
+                                    <label className={styles.field}>
+                                        Fundamento de la decisión
+                                        <textarea
+                                            className={styles.control}
+                                            rows={4}
+                                            value={fundamento}
+                                            disabled={!mine || busy}
+                                            maxLength={2000}
+                                            onChange={(e) => setFundamento(e.target.value)}
+                                            placeholder="Explica por qué corresponde imponer la multa o descartar el reporte."
+                                        />
+                                    </label>
+                                    <p className={styles.muted}>
+                                        Escribe un fundamento de al menos 10 caracteres. Imponer multa
+                                        registra la remisión y programa su notificación.
                                     </p>
-                                )}
-                                {!config.evidenciasConfiguradas && (
-                                    <p className={styles.error}>
-                                        Falta preparar el almacenamiento de evidencias de las remisiones.
-                                    </p>
-                                )}
-                                <div className={styles.actions}>
-                                    <Button
-                                        state={
-                                            !canDecide ||
-                                            !config.acciones.imponer ||
-                                            !config.emisionConfigurada ||
-                                            !config.evidenciasConfiguradas
-                                                ? "disabled"
-                                                : "default"
-                                        }
-                                        onClick={() =>
-                                            void change("decidir", "IMPONER")
-                                        }
-                                    >
-                                        Imponer multa
-                                    </Button>
-                                    <Button
-                                        variant="outlined"
-                                        state={
-                                            !canDecide ? "disabled" : "default"
-                                        }
-                                        onClick={() =>
-                                            void change("decidir", "DESCARTAR")
-                                        }
-                                    >
-                                        Archivar reporte
-                                    </Button>
-                                    <Button variant="outlined" onClick={() => setDecisionOpen(false)}>Cancelar</Button>
-                                </div>
+                                    {!config.emisionConfigurada && (
+                                        <p className={styles.error}>
+                                            Falta configurar el emisor legal para imponer multas.
+                                        </p>
+                                    )}
+                                    {!config.evidenciasConfiguradas && (
+                                        <p className={styles.error}>
+                                            Falta preparar el almacenamiento de evidencias de las remisiones.
+                                        </p>
+                                    )}
+                                    <div className={styles.actions}>
+                                        <Button
+                                            state={
+                                                !canDecide ||
+                                                !config.acciones.imponer ||
+                                                !config.emisionConfigurada ||
+                                                !config.evidenciasConfiguradas
+                                                    ? "disabled"
+                                                    : "default"
+                                            }
+                                            onClick={() => void change("decidir", "IMPONER")}
+                                        >
+                                            Imponer multa
+                                        </Button>
+                                        <Button
+                                            variant="outlined"
+                                            state={!canDecide ? "disabled" : "default"}
+                                            onClick={() => void change("decidir", "DESCARTAR")}
+                                        >
+                                            Archivar reporte
+                                        </Button>
+                                        <Button variant="outlined" onClick={() => setDecisionOpen(false)}>
+                                            Cancelar
+                                        </Button>
+                                    </div>
                                 </section>
-                                </PopOver>
-                            </>
-                        )}
+                            </PopOver>
+                        </>
+                    )}
                 </>
             )}
         </div>

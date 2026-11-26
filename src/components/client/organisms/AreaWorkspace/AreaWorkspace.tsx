@@ -49,7 +49,11 @@ export function AreaWorkspace({ appId, sectionId }: { appId: string; sectionId: 
             <section aria-label={current?.meta.title || "Módulos"}>
                 <div className={styles.modules}>
                     {current?.modules.map((m) => (
-                        <Link key={m.id} href={buildModulePath(appId, sectionId, m.id)} className={styles.module}>
+                        <Link
+                            key={m.id}
+                            href={buildModulePath(appId, sectionId, m.id)}
+                            className={styles.module}
+                        >
                             <span className={styles.moduleIcon}>
                                 <WorkspaceIcon name={m.iconName} size={18} />
                             </span>
@@ -63,12 +67,17 @@ export function AreaWorkspace({ appId, sectionId }: { appId: string; sectionId: 
                         </Link>
                     ))}
                 </div>
-                {!current?.modules.length && <p className={styles.empty}>Esta sección todavía no tiene módulos habilitados.</p>}
+                {!current?.modules.length && (
+                    <p className={styles.empty}>Esta sección todavía no tiene módulos habilitados.</p>
+                )}
             </section>
             <aside className={styles.help}>
                 <div>
                     <strong>¿Algo no funciona en {name}?</strong>
-                    <p>Informática recibe tu reporte con el área ya identificada y le da seguimiento como ticket.</p>
+                    <p>
+                        Informática recibe tu reporte con el área ya identificada y le da seguimiento como
+                        ticket.
+                    </p>
                 </div>
                 <button type="button" onClick={showCreate}>
                     Reportar un problema

@@ -17,12 +17,8 @@ export function useSubmitTicket() {
 
     const submit = useCallback(
         async (data: TicketFormData) => {
-            if (!Number.isSafeInteger(Number(userId)) || Number(userId) <= 0)
-                return null;
-            const usuarioAsignadoId =
-                role === "ADMINISTRADOR" && userId
-                    ? parseInt(userId, 10)
-                    : undefined;
+            if (!Number.isSafeInteger(Number(userId)) || Number(userId) <= 0) return null;
+            const usuarioAsignadoId = role === "ADMINISTRADOR" && userId ? parseInt(userId, 10) : undefined;
             const result = await createTicket(
                 {
                     titulo: data.subject,

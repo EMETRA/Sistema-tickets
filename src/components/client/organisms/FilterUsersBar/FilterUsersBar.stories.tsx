@@ -14,7 +14,7 @@ export const ConCategorias = () => {
     const [cat, setCat] = useState("todos");
 
     return (
-        <FilterUsersBar 
+        <FilterUsersBar
             variant="categories"
             searchValue={search}
             onSearchChange={setSearch}
@@ -24,7 +24,7 @@ export const ConCategorias = () => {
             categories={[
                 { label: "Todos", value: "todos" },
                 { label: "Tecnicos", value: "tecnicos" },
-                { label: "Desarrolladores", value: "desarrolladores" }
+                { label: "Desarrolladores", value: "desarrolladores" },
             ]}
         />
     );
@@ -34,7 +34,7 @@ export const ConBotonFiltrar = () => {
     const [search, setSearch] = useState("");
 
     return (
-        <FilterUsersBar 
+        <FilterUsersBar
             variant="filter-button"
             searchValue={search}
             onSearchChange={setSearch}

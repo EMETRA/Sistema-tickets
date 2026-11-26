@@ -3,10 +3,7 @@
  * acento propio para reconocerlas de un vistazo (siempre junto a su nombre).
  */
 export function areaName(title: string) {
-    return (
-        title.replace(/^aplicaciones\s+(de\s+(la\s+|los\s+|las\s+)?)?/i, "") ||
-        title
-    );
+    return title.replace(/^aplicaciones\s+(de\s+(la\s+|los\s+|las\s+)?)?/i, "") || title;
 }
 
 const ACCENTS: Record<string, string> = {

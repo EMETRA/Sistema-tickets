@@ -6,52 +6,47 @@
  * Variables de entorno tipadas
  */
 export interface EnvironmentConfig {
-  // Backend GraphQL
-  ticketsApiUrl: string;
-  graphqlEndpoint: string;
+    // Backend GraphQL
+    ticketsApiUrl: string;
+    graphqlEndpoint: string;
 
-  // External Auth API
-  authApiUrl: string;
-  authLoginPath: string;
+    // External Auth API
+    authApiUrl: string;
+    authLoginPath: string;
 
-  // Client Configuration
-  graphqlDebug: boolean;
+    // Client Configuration
+    graphqlDebug: boolean;
 
-  // Timeouts (ms)
-  graphqlTimeoutMs: number;
-  fetchTimeoutMs: number;
+    // Timeouts (ms)
+    graphqlTimeoutMs: number;
+    fetchTimeoutMs: number;
 
-  // Environment
-  environment: 'development' | 'staging' | 'production';
-  isDevelopment: boolean;
-  isProduction: boolean;
+    // Environment
+    environment: "development" | "staging" | "production";
+    isDevelopment: boolean;
+    isProduction: boolean;
 }
 
 /**
  * Validar que el valor sea un environment válido
  */
-function isValidEnvironment(
-    value: unknown
-): value is 'development' | 'staging' | 'production' {
-    return (
-        typeof value === 'string' &&
-    ['development', 'staging', 'production'].includes(value)
-    );
+function isValidEnvironment(value: unknown): value is "development" | "staging" | "production" {
+    return typeof value === "string" && ["development", "staging", "production"].includes(value);
 }
 
 /**
  * Cargar y validar configuración de entorno
  */
 export function loadEnvConfig(): EnvironmentConfig {
-    const ticketsApiUrl = process.env.TICKETS_API_URL || process.env.NEXT_PUBLIC_TICKETS_API_URL || '';
+    const ticketsApiUrl = process.env.TICKETS_API_URL || process.env.NEXT_PUBLIC_TICKETS_API_URL || "";
     const graphqlEndpoint = getGraphqlEndpoint();
-    const authApiUrl = process.env.NEXT_PUBLIC_AUTH_API_URL || '';
-    const authLoginPath = process.env.NEXT_PUBLIC_AUTH_LOGIN_PATH || '/login';
-    const graphqlDebug = (process.env.NEXT_PUBLIC_GRAPHQL_DEBUG || 'false').toLowerCase() === 'true';
-    const graphqlTimeoutMs = parseInt(process.env.NEXT_PUBLIC_GRAPHQL_TIMEOUT_MS || '8000', 10);
-    const fetchTimeoutMs = parseInt(process.env.NEXT_PUBLIC_FETCH_TIMEOUT_MS || '10000', 10);
-    const envValue = process.env.NEXT_PUBLIC_ENV || 'development';
-    const environment = isValidEnvironment(envValue) ? envValue : 'development';
+    const authApiUrl = process.env.NEXT_PUBLIC_AUTH_API_URL || "";
+    const authLoginPath = process.env.NEXT_PUBLIC_AUTH_LOGIN_PATH || "/login";
+    const graphqlDebug = (process.env.NEXT_PUBLIC_GRAPHQL_DEBUG || "false").toLowerCase() === "true";
+    const graphqlTimeoutMs = parseInt(process.env.NEXT_PUBLIC_GRAPHQL_TIMEOUT_MS || "8000", 10);
+    const fetchTimeoutMs = parseInt(process.env.NEXT_PUBLIC_FETCH_TIMEOUT_MS || "10000", 10);
+    const envValue = process.env.NEXT_PUBLIC_ENV || "development";
+    const environment = isValidEnvironment(envValue) ? envValue : "development";
 
     return {
         // Backend GraphQL
@@ -71,20 +66,23 @@ export function loadEnvConfig(): EnvironmentConfig {
 
         // Environment
         environment,
-        isDevelopment: environment === 'development',
-        isProduction: environment === 'production',
+        isDevelopment: environment === "development",
+        isProduction: environment === "production",
     };
 }
 
 /** El navegador siempre llama al mismo origen; la URL de Tickets vive en el servidor. */
 export function getGraphqlEndpoint(): string {
-    if (typeof window !== 'undefined') return '/api/graphql';
+    if (typeof window !== "undefined") return "/api/graphql";
     const base = process.env.TICKETS_API_URL || process.env.NEXT_PUBLIC_TICKETS_API_URL;
-    const endpoint = process.env.GRAPHQL_ENDPOINT || process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT ||
-        (base ? `${base.replace(/\/$/, '')}/graphql` : '');
-    if (!endpoint) throw new Error('Configurar GRAPHQL_ENDPOINT en el servidor del Panel');
+    const endpoint =
+        process.env.GRAPHQL_ENDPOINT ||
+        process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT ||
+        (base ? `${base.replace(/\/$/, "")}/graphql` : "");
+    if (!endpoint) throw new Error("Configurar GRAPHQL_ENDPOINT en el servidor del Panel");
     const url = new URL(endpoint);
-    if (!['http:', 'https:'].includes(url.protocol)) throw new Error('GRAPHQL_ENDPOINT debe usar HTTP o HTTPS');
+    if (!["http:", "https:"].includes(url.protocol))
+        throw new Error("GRAPHQL_ENDPOINT debe usar HTTP o HTTPS");
     return url.toString();
 }
 

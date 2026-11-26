@@ -38,10 +38,10 @@ export function HomeState({
     onRetry,
     retryLabel = "Reintentar",
 }: {
-  loading?: boolean;
-  message: string;
-  onRetry?: () => void;
-  retryLabel?: string;
+    loading?: boolean;
+    message: string;
+    onRetry?: () => void;
+    retryLabel?: string;
 }) {
     if (!loading)
         return (

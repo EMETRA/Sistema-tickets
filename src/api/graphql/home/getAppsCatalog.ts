@@ -15,24 +15,17 @@ export class AppsCatalogError extends Error {
 }
 
 export async function getAppsCatalog(): Promise<AppsCatalog> {
-    if (process.env.TICKETS_PLATFORM_ENABLED !== "true")
-        return publicAppsCatalog(APPS_CATALOG_DUMMY);
+    if (process.env.TICKETS_PLATFORM_ENABLED !== "true") return publicAppsCatalog(APPS_CATALOG_DUMMY);
     const incoming = await headers();
     // Una navegación RSC lleva cookie; el BFF recibe Authorization. El API valida
     // el token en ambos casos. Una cabecera inválida nunca se sustituye por otra identidad.
     const explicit = incoming.get("authorization");
-    const cookie =
-        explicit === null
-            ? (await cookies()).get(AUTH_COOKIE_NAME)?.value
-            : undefined;
+    const cookie = explicit === null ? (await cookies()).get(AUTH_COOKIE_NAME)?.value : undefined;
     const authorization = explicit ?? (cookie ? "Bearer " + cookie : "");
-    if (!/^Bearer [^\s]{1,8192}$/.test(authorization))
-        throw new AppsCatalogError(401);
+    if (!/^Bearer [^\s]{1,8192}$/.test(authorization)) throw new AppsCatalogError(401);
     try {
         const upstream = new URL(getGraphqlEndpoint());
-        upstream.pathname =
-            upstream.pathname.replace(/\/graphql\/?$/, "") +
-            "/platform/catalog";
+        upstream.pathname = upstream.pathname.replace(/\/graphql\/?$/, "") + "/platform/catalog";
         upstream.search = "";
         upstream.hash = "";
         const response = await fetch(upstream, {
@@ -42,13 +35,7 @@ export async function getAppsCatalog(): Promise<AppsCatalog> {
             signal: AbortSignal.timeout(15000),
         });
         if (!response.ok)
-            throw new AppsCatalogError(
-                response.status === 401
-                    ? 401
-                    : response.status === 403
-                      ? 403
-                      : 503,
-            );
+            throw new AppsCatalogError(response.status === 401 ? 401 : response.status === 403 ? 403 : 503);
         if (!response.headers.get("content-type")?.includes("application/json"))
             throw new AppsCatalogError(502);
         const catalog = await response.json();

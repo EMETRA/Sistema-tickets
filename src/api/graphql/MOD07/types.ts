@@ -3,57 +3,57 @@
  */
 
 export enum CategoriaManual {
-  EMETRA = 'EMETRA',
-  FINANCIERO = 'FINANCIERO',
-  NORMAS = 'NORMAS',
-  OTROS = 'OTROS',
-  PMT = 'PMT',
-  SIAF = 'SIAF',
-  VEHICULOS = 'VEHICULOS',
+    EMETRA = "EMETRA",
+    FINANCIERO = "FINANCIERO",
+    NORMAS = "NORMAS",
+    OTROS = "OTROS",
+    PMT = "PMT",
+    SIAF = "SIAF",
+    VEHICULOS = "VEHICULOS",
 }
 
 export interface ManualInfo {
-  categoria: CategoriaManual;
-  categoriaEtiqueta: string;
-  etiquetas?: string[];
-  id: number;
-  nombreArchivo: string;
-  orden: number;
-  tamanoBytes: number;
-  titulo: string;
-  urlVisualizacion: string;
-  urlVisualizacionAbsoluta: string;
+    categoria: CategoriaManual;
+    categoriaEtiqueta: string;
+    etiquetas?: string[];
+    id: number;
+    nombreArchivo: string;
+    orden: number;
+    tamanoBytes: number;
+    titulo: string;
+    urlVisualizacion: string;
+    urlVisualizacionAbsoluta: string;
 }
 
 export interface ManualesFilterInput {
-  busqueda?: string | null;
-  categoria?: CategoriaManual | null;
+    busqueda?: string | null;
+    categoria?: CategoriaManual | null;
 }
 
 export interface ManualesPorCategoria {
-  categoria: CategoriaManual;
-  categoriaEtiqueta: string;
-  manuales: ManualInfo[];
+    categoria: CategoriaManual;
+    categoriaEtiqueta: string;
+    manuales: ManualInfo[];
 }
 
 export interface ManualCategoriaResumen {
-  codigo: CategoriaManual;
-  etiqueta: string;
-  total: number;
+    codigo: CategoriaManual;
+    etiqueta: string;
+    total: number;
 }
 
 export interface GetManualesCategoriasResponse {
-  manualesCategorias: ManualCategoriaResumen[];
+    manualesCategorias: ManualCategoriaResumen[];
 }
 
 export interface GetManualesDisponiblesResponse {
-  manualesDisponibles: ManualInfo[];
+    manualesDisponibles: ManualInfo[];
 }
 
 export interface GetManualesAgrupadosResponse {
-  manualesAgrupados: ManualesPorCategoria[];
+    manualesAgrupados: ManualesPorCategoria[];
 }
 
 export interface GetManualResponse {
-  manual: ManualInfo;
+    manual: ManualInfo;
 }

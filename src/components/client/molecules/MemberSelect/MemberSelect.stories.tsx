@@ -142,14 +142,16 @@ export const Interactive = {
                     }}
                     placeholder="Selecciona un miembro del equipo"
                 />
-        
+
                 {lastSelected && (
-                    <div style={{ 
-                        padding: "16px", 
-                        backgroundColor: "#F5F5F5", 
-                        borderRadius: "8px",
-                        fontFamily: "Montserrat, sans-serif"
-                    }}>
+                    <div
+                        style={{
+                            padding: "16px",
+                            backgroundColor: "#F5F5F5",
+                            borderRadius: "8px",
+                            fontFamily: "Montserrat, sans-serif",
+                        }}
+                    >
                         <strong>Último seleccionado:</strong>
                         <div>ID: {lastSelected.id}</div>
                         <div>Nombre: {lastSelected.name}</div>

@@ -69,7 +69,11 @@ export function RecordSearch() {
                         /* sin almacenamiento local */
                     }
                 })
-                .catch((e) => !c.signal.aborted && setError(e instanceof Error ? e.message : "No se pudo consultar la información."))
+                .catch(
+                    (e) =>
+                        !c.signal.aborted &&
+                        setError(e instanceof Error ? e.message : "No se pudo consultar la información."),
+                )
                 .finally(() => !c.signal.aborted && setBusy(false));
         }, 300);
         return () => {
@@ -111,8 +115,9 @@ export function RecordSearch() {
                         </div>
                     )}
                     <p>
-                        Escribe al menos dos letras. Se buscan por nombre los registros que tu perfil puede ver: fichas técnicas,
-                        dispositivos, sistemas, servidores, ubicaciones, equipos, solicitudes y más.
+                        Escribe al menos dos letras. Se buscan por nombre los registros que tu perfil puede
+                        ver: fichas técnicas, dispositivos, sistemas, servidores, ubicaciones, equipos,
+                        solicitudes y más.
                     </p>
                 </div>
             )}
@@ -128,13 +133,20 @@ export function RecordSearch() {
                             Todo <b>{total}</b>
                         </button>
                         {result.grupos.map((g) => (
-                            <button key={g.tipo} type="button" aria-pressed={type === g.tipo} onClick={() => setType(g.tipo)}>
+                            <button
+                                key={g.tipo}
+                                type="button"
+                                aria-pressed={type === g.tipo}
+                                onClick={() => setType(g.tipo)}
+                            >
                                 {g.titulo} <b>{g.total}</b>
                             </button>
                         ))}
                     </div>
                     {groups.map((g) => {
-                        const icon = PLATFORM_SECTIONS.find((s) => s.id === g.grupo)?.iconName || "table-cells-large-solid";
+                        const icon =
+                            PLATFORM_SECTIONS.find((s) => s.id === g.grupo)?.iconName ||
+                            "table-cells-large-solid";
                         return (
                             <section key={g.tipo} className={styles.group} aria-label={g.titulo}>
                                 <header>
@@ -150,19 +162,31 @@ export function RecordSearch() {
                                 <ul>
                                     {g.items.map((item) => (
                                         <li key={item.id}>
-                                            <button type="button" onClick={() => setOpen({ type: g.tipo, record: item })}>
+                                            <button
+                                                type="button"
+                                                onClick={() => setOpen({ type: g.tipo, record: item })}
+                                            >
                                                 <span className={styles.name}>{item.nombre}</span>
-                                                <span className={common.chip} data-tone={statusTone(item.estado)}>
+                                                <span
+                                                    className={common.chip}
+                                                    data-tone={statusTone(item.estado)}
+                                                >
                                                     {statusLabel(item.estado)}
                                                 </span>
-                                                <span className={styles.when}>Actualizado {relativeDays(daysFromToday(item.actualizadoEn)).toLowerCase()}</span>
+                                                <span className={styles.when}>
+                                                    Actualizado{" "}
+                                                    {relativeDays(
+                                                        daysFromToday(item.actualizadoEn),
+                                                    ).toLowerCase()}
+                                                </span>
                                             </button>
                                         </li>
                                     ))}
                                 </ul>
                                 {g.total > result.limitePorGrupo && (
                                     <p className={styles.more}>
-                                        Se muestran {result.limitePorGrupo} de {g.total}. Afina la búsqueda o abre la sección.
+                                        Se muestran {result.limitePorGrupo} de {g.total}. Afina la búsqueda o
+                                        abre la sección.
                                     </p>
                                 )}
                             </section>
@@ -170,7 +194,8 @@ export function RecordSearch() {
                     })}
                     {!result.grupos.length && (
                         <p className={styles.empty}>
-                            Sin coincidencias para «{result.consulta}» dentro de tu alcance. Prueba con otra palabra del nombre.
+                            Sin coincidencias para «{result.consulta}» dentro de tu alcance. Prueba con otra
+                            palabra del nombre.
                         </p>
                     )}
                 </>

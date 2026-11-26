@@ -10,16 +10,14 @@ import { falloModulo } from "@/api/graphql/module-response";
  * }
  */
 
-import { NextResponse } from 'next/server';
-import { graphqlRequest } from '@/api/graphql/client';
-import { GET_MANUALES_CATEGORIAS_QUERY } from '@/api/graphql/MOD07';
-import type { GetManualesCategoriasResponse } from '@/api/graphql/MOD07';
+import { NextResponse } from "next/server";
+import { graphqlRequest } from "@/api/graphql/client";
+import { GET_MANUALES_CATEGORIAS_QUERY } from "@/api/graphql/MOD07";
+import type { GetManualesCategoriasResponse } from "@/api/graphql/MOD07";
 
 export async function GET() {
     try {
-        const response = await graphqlRequest<Record<string, unknown>>(
-            GET_MANUALES_CATEGORIAS_QUERY
-        );
+        const response = await graphqlRequest<Record<string, unknown>>(GET_MANUALES_CATEGORIAS_QUERY);
 
         const typedResponse = response as unknown as GetManualesCategoriasResponse;
 
@@ -29,5 +27,7 @@ export async function GET() {
             },
             { status: 200 },
         );
-    } catch (error) { return falloModulo(error, "MOD07/manualesCategorias"); }
+    } catch (error) {
+        return falloModulo(error, "MOD07/manualesCategorias");
+    }
 }

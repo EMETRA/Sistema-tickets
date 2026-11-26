@@ -39,10 +39,8 @@ export const PLATFORM_SECTIONS = [
 ];
 export function platformSections(data: PlatformContextData) {
     return PLATFORM_SECTIONS.filter((s) => {
-        if (["calendario", "metricas", "asignacion", "busqueda"].includes(s.id))
-            return true;
-        if (s.id === "accesos")
-            return data.actor.admin || data.capabilities.corporateAccess;
+        if (["calendario", "metricas", "asignacion", "busqueda"].includes(s.id)) return true;
+        if (s.id === "accesos") return data.actor.admin || data.capabilities.corporateAccess;
         if (s.id === "auditoria") return data.capabilities.audit;
         if (s.id === "solicitudes") return !!data.definitions.solicitudes;
         return Object.values(data.definitions).some((d) => d.group === s.id);
@@ -76,10 +74,7 @@ export function homeNavigation(data: PlatformContextData) {
         iconName: "table-cells-large-solid",
     };
     const calendar = section("calendario");
-    const metrics = section(
-        "metricas",
-        data.capabilities.teamMetrics ? "Métricas" : "Mis métricas",
-    );
+    const metrics = section("metricas", data.capabilities.teamMetrics ? "Métricas" : "Mis métricas");
     const mode = data.actor.mode;
     const primary = data.actor.admin
         ? [
@@ -113,14 +108,7 @@ export function homeNavigation(data: PlatformContextData) {
                   apps,
               ]
             : mode === "ASIGNACION"
-              ? [
-                    home,
-                    ...section("asignacion", "Asignación"),
-                    mine,
-                    ...calendar,
-                    apps,
-                    ...metrics,
-                ]
+              ? [home, ...section("asignacion", "Asignación"), mine, ...calendar, apps, ...metrics]
               : mode === "JEFATURA"
                 ? [
                       home,

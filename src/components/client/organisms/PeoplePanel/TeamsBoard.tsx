@@ -27,7 +27,13 @@ const initials = (name: string) =>
         .toUpperCase() || "?";
 
 /** Propuesta: los equipos de trabajo como tarjetas con su gente, sus jefaturas y su umbral de atención. */
-export function TeamsBoard({ revision: outer = 0, onShowTable }: { revision?: number; onShowTable: () => void }) {
+export function TeamsBoard({
+    revision: outer = 0,
+    onShowTable,
+}: {
+    revision?: number;
+    onShowTable: () => void;
+}) {
     const { data } = usePlatform();
     const [teams, setTeams] = useState<PlatformRecord[] | null>(null);
     const [members, setMembers] = useState<PlatformRecord[]>([]);
@@ -38,7 +44,9 @@ export function TeamsBoard({ revision: outer = 0, onShowTable }: { revision?: nu
     useEffect(() => {
         const c = new AbortController();
         const list = (type: string) =>
-            platformFetch<PageResult<PlatformRecord>>(`/records/${type}?limit=100`, { signal: c.signal }).then((r) => r.items);
+            platformFetch<PageResult<PlatformRecord>>(`/records/${type}?limit=100`, {
+                signal: c.signal,
+            }).then((r) => r.items);
         Promise.all([list("equipos"), list("miembros").catch(() => [] as PlatformRecord[])])
             .then(([t, m]) => {
                 if (c.signal.aborted) return;
@@ -54,7 +62,8 @@ export function TeamsBoard({ revision: outer = 0, onShowTable }: { revision?: nu
         <section className={styles.teams} aria-label="Equipos de trabajo">
             <div className={styles.bar}>
                 <span className={styles.count}>
-                    {teams.length} {teams.length === 1 ? "equipo" : "equipos"} · {members.length} responsabilidades asignadas
+                    {teams.length} {teams.length === 1 ? "equipo" : "equipos"} · {members.length}{" "}
+                    responsabilidades asignadas
                 </span>
                 <div className={common.actions}>
                     <Button variant="outlined" onClick={onShowTable}>
@@ -75,22 +84,45 @@ export function TeamsBoard({ revision: outer = 0, onShowTable }: { revision?: nu
                         }, {}),
                     ).sort(([a], [b]) => Object.keys(ROLE).indexOf(a) - Object.keys(ROLE).indexOf(b));
                     return (
-                        <button key={t.id} type="button" className={styles.team} onClick={() => setSelected(t)}>
+                        <button
+                            key={t.id}
+                            type="button"
+                            className={styles.team}
+                            onClick={() => setSelected(t)}
+                        >
                             <span className={styles.teamHead}>
                                 <strong>{t.nombre}</strong>
-                                {t.datos.informatica === true && <span className={common.chip} data-tone="info">Atiende tickets</span>}
+                                {t.datos.informatica === true && (
+                                    <span className={common.chip} data-tone="info">
+                                        Atiende tickets
+                                    </span>
+                                )}
                             </span>
                             <span className={styles.teamMeta}>
-                                {t.datos.unidadRh ? `Unidad RRHH ${String(t.datos.unidadRh)}` : "Sin unidad de RRHH vinculada"}
-                                {t.datos.minutosAlerta ? ` · Primera atención en ${String(t.datos.minutosAlerta)} min` : ""}
+                                {t.datos.unidadRh
+                                    ? `Unidad RRHH ${String(t.datos.unidadRh)}`
+                                    : "Sin unidad de RRHH vinculada"}
+                                {t.datos.minutosAlerta
+                                    ? ` · Primera atención en ${String(t.datos.minutosAlerta)} min`
+                                    : ""}
                             </span>
                             <span className={styles.stack} aria-label={`${people.length} personas`}>
                                 {people.slice(0, 6).map((m) => (
-                                    <span key={m.id} className={styles.avatar} data-account title={m.nombre} aria-hidden="true">
+                                    <span
+                                        key={m.id}
+                                        className={styles.avatar}
+                                        data-account
+                                        title={m.nombre}
+                                        aria-hidden="true"
+                                    >
                                         {initials(m.nombre)}
                                     </span>
                                 ))}
-                                {people.length > 6 && <span className={styles.avatar} aria-hidden="true">+{people.length - 6}</span>}
+                                {people.length > 6 && (
+                                    <span className={styles.avatar} aria-hidden="true">
+                                        +{people.length - 6}
+                                    </span>
+                                )}
                                 <em>
                                     {people.length} {people.length === 1 ? "persona" : "personas"}
                                 </em>
@@ -104,7 +136,9 @@ export function TeamsBoard({ revision: outer = 0, onShowTable }: { revision?: nu
                                 {!roles.length && <span>Sin responsabilidades asignadas</span>}
                             </span>
                             <span className={styles.heads}>
-                                {heads.length ? `Jefatura: ${heads.map((h) => h.nombre).join(", ")}` : "Sin jefatura asignada"}
+                                {heads.length
+                                    ? `Jefatura: ${heads.map((h) => h.nombre).join(", ")}`
+                                    : "Sin jefatura asignada"}
                             </span>
                         </button>
                     );

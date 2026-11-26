@@ -22,9 +22,9 @@ export const Horizontal: Story = {
     },
     render: (args) => (
         <div style={{ width: "400px" }}>
-            <p style={{ fontFamily: 'Montserrat' }}>Texto Superior</p>
+            <p style={{ fontFamily: "Montserrat" }}>Texto Superior</p>
             <Divider {...args} />
-            <p style={{ fontFamily: 'Montserrat' }}>Texto Inferior</p>
+            <p style={{ fontFamily: "Montserrat" }}>Texto Inferior</p>
         </div>
     ),
 };
@@ -34,15 +34,17 @@ export const Vertical: Story = {
         orientation: "vertical",
     },
     render: (args) => (
-        <div style={{ 
-            display: "flex", 
-            alignItems: "center", 
-            height: "50px", 
-            fontFamily: 'Montserrat' 
-        }}>
-            <span style={{ fontFamily: 'Montserrat' }} >Sección A</span>
+        <div
+            style={{
+                display: "flex",
+                alignItems: "center",
+                height: "50px",
+                fontFamily: "Montserrat",
+            }}
+        >
+            <span style={{ fontFamily: "Montserrat" }}>Sección A</span>
             <Divider {...args} />
-            <span style={{ fontFamily: 'Montserrat' }} >Sección B</span>
+            <span style={{ fontFamily: "Montserrat" }}>Sección B</span>
         </div>
     ),
 };

@@ -10,11 +10,7 @@ import { platformFetch } from "@/platform/client";
 import { displayDate } from "@/components/client/organisms/ResourceWorkspace/RecordDetail";
 import { TicketTagReport } from "./TicketTagReport";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
-import {
-    metricsQuery,
-    metricOperation,
-    type MetricsSelection,
-} from "@/platform/metrics";
+import { metricsQuery, metricOperation, type MetricsSelection } from "@/platform/metrics";
 type Metrics = {
     desde: string;
     hasta: string;
@@ -51,10 +47,7 @@ export function MetricsWorkspace() {
             from: guatemalaDay(new Date(Date.now() - 30 * 86400000)),
             to: guatemalaDay(),
             // Propuesta: administración abre con su equipo de Informática, no con «Mis métricas».
-            team:
-                data?.capabilities.teamMetrics && data.actor.admin
-                    ? data.defaultTicketTeamId || ""
-                    : "",
+            team: data?.capabilities.teamMetrics && data.actor.admin ? data.defaultTicketTeamId || "" : "",
         }),
         [metrics, setMetrics] = useState<Metrics | null>(null),
         [loading, setLoading] = useState(false),
@@ -62,18 +55,14 @@ export function MetricsWorkspace() {
         [offset, setOffset] = useState(0);
     const request = useRef<AbortController | null>(null);
     const current = useRef(selection);
-    const [section,setSection] = useState<'activity'|'labels'>('activity');
+    const [section, setSection] = useState<"activity" | "labels">("activity");
     const [applied, setApplied] = useState<MetricsSelection | null>(null);
     async function load(page = 0, next: MetricsSelection = selection) {
         let path: string;
         try {
             path = metricsQuery(next, page);
         } catch (e) {
-            setError(
-                e instanceof Error
-                    ? e.message
-                    : "Selecciona un periodo válido.",
-            );
+            setError(e instanceof Error ? e.message : "Selecciona un periodo válido.");
             return;
         }
         request.current?.abort();
@@ -83,16 +72,9 @@ export function MetricsWorkspace() {
         setError("");
         try {
             const result = await platformFetch<Metrics>(path, {
-                signal: AbortSignal.any([
-                    controller.signal,
-                    AbortSignal.timeout(45000),
-                ]),
+                signal: AbortSignal.any([controller.signal, AbortSignal.timeout(45000)]),
             });
-            if (
-                !result.tickets ||
-                !Array.isArray(result.aplicaciones) ||
-                !Array.isArray(result.registros)
-            )
+            if (!result.tickets || !Array.isArray(result.aplicaciones) || !Array.isArray(result.registros))
                 throw Error("No se pudo interpretar el reporte de métricas.");
             if (controller.signal.aborted) return;
             setMetrics(result);
@@ -100,11 +82,7 @@ export function MetricsWorkspace() {
             setOffset(page);
         } catch (e) {
             if (!controller.signal.aborted)
-                setError(
-                    e instanceof Error
-                        ? e.message
-                        : "No se pudieron cargar las métricas.",
-                );
+                setError(e instanceof Error ? e.message : "No se pudieron cargar las métricas.");
         } finally {
             if (!controller.signal.aborted) setLoading(false);
         }
@@ -124,32 +102,39 @@ export function MetricsWorkspace() {
         void load(0, next);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-    const applyPeriod = useCallback(
-        (from: string, to: string) => apply({ from, to }),
-        [apply],
-    );
+    const applyPeriod = useCallback((from: string, to: string) => apply({ from, to }), [apply]);
     const teams = (data?.teams || []).filter(
         (t) =>
             data!.actor.admin ||
-            data!.memberships.some(
-                (m) => m.equipoId === t.id && m.funcion === "JEFATURA",
-            ),
+            data!.memberships.some((m) => m.equipoId === t.id && m.funcion === "JEFATURA"),
     );
     const scopeName = (team: string) =>
-        team
-            ? teams.find((t) => t.id === team)?.nombre || "Equipo seleccionado"
-            : "Mis métricas";
+        team ? teams.find((t) => t.id === team)?.nombre || "Equipo seleccionado" : "Mis métricas";
     const sections = data?.actor.admin && (
         <nav className={styles.tabs} aria-label="Secciones de métricas">
-            <button type="button" aria-current={section === 'activity' ? 'page' : undefined} onClick={() => setSection('activity')}>
+            <button
+                type="button"
+                aria-current={section === "activity" ? "page" : undefined}
+                onClick={() => setSection("activity")}
+            >
                 Atención y actividad
             </button>
-            <button type="button" aria-current={section === 'labels' ? 'page' : undefined} onClick={() => setSection('labels')}>
+            <button
+                type="button"
+                aria-current={section === "labels" ? "page" : undefined}
+                onClick={() => setSection("labels")}
+            >
                 Por técnico y etiqueta
             </button>
         </nav>
     );
-    if(section==='labels' && data?.actor.admin) return <section className={styles.page}>{sections}<TicketTagReport/></section>;
+    if (section === "labels" && data?.actor.admin)
+        return (
+            <section className={styles.page}>
+                {sections}
+                <TicketTagReport />
+            </section>
+        );
     const t = metrics?.tickets;
     const others = t ? Math.max(0, t.total - t.resueltos - t.enTrabajo - t.asignados) : 0;
     const parts = t
@@ -163,25 +148,18 @@ export function MetricsWorkspace() {
     const share = (v: number) => (t && t.total ? Math.round((v / t.total) * 100) : 0);
     const operations = [...(metrics?.aplicaciones || [])].sort((a, b) => b.cantidad - a.cantidad);
     const maxOperation = Math.max(1, ...operations.map((o) => o.cantidad));
-    const totalRecords = metrics ? metrics.totalRegistros ?? metrics.registros.length : 0;
+    const totalRecords = metrics ? (metrics.totalRegistros ?? metrics.registros.length) : 0;
     return (
         <section className={styles.page}>
             {sections}
             {/* Título accesible; visualmente lo cubren el h1 y la pestaña activa. */}
             <h2 className={styles.srOnly}>Métricas de atención y actividad</h2>
             <div className={local.filters} role="search" aria-label="Filtros de métricas">
-                <PeriodFilter
-                    from={selection.from}
-                    to={selection.to}
-                    onChange={applyPeriod}
-                />
+                <PeriodFilter from={selection.from} to={selection.to} onChange={applyPeriod} />
                 {data!.capabilities.teamMetrics && (
                     <label className={local.scope}>
                         <span>Alcance</span>
-                        <select
-                            value={selection.team}
-                            onChange={(e) => apply({ team: e.target.value })}
-                        >
+                        <select value={selection.team} onChange={(e) => apply({ team: e.target.value })}>
                             <option value="">Mis métricas</option>
                             {teams.map((team) => (
                                 <option key={team.id} value={team.id}>
@@ -210,8 +188,7 @@ export function MetricsWorkspace() {
             {error && (
                 <p role="alert" className={styles.error}>
                     {error}
-                    {metrics &&
-                        " Se conservan los resultados de la última consulta."}
+                    {metrics && " Se conservan los resultados de la última consulta."}
                 </p>
             )}
             {metrics && t && (
@@ -229,7 +206,11 @@ export function MetricsWorkspace() {
                             {parts.slice(0, 3).map((part) => (
                                 <div key={part.key}>
                                     <dt>
-                                        <span className={local.swatch} data-part={part.key} aria-hidden="true" />
+                                        <span
+                                            className={local.swatch}
+                                            data-part={part.key}
+                                            aria-hidden="true"
+                                        />
                                         {part.label}
                                     </dt>
                                     <dd>
@@ -246,22 +227,30 @@ export function MetricsWorkspace() {
                                     role="img"
                                     aria-label={
                                         "Distribución: " +
-                                        parts.map((p) => `${p.label} ${p.value} (${share(p.value)}%)`).join(", ")
+                                        parts
+                                            .map((p) => `${p.label} ${p.value} (${share(p.value)}%)`)
+                                            .join(", ")
                                     }
                                 >
-                                    {parts.filter((p) => p.value > 0).map((p) => (
-                                        <span
-                                            key={p.key}
-                                            data-part={p.key}
-                                            style={{ flexGrow: p.value }}
-                                            title={`${p.label}: ${p.value} (${share(p.value)}%)`}
-                                        />
-                                    ))}
+                                    {parts
+                                        .filter((p) => p.value > 0)
+                                        .map((p) => (
+                                            <span
+                                                key={p.key}
+                                                data-part={p.key}
+                                                style={{ flexGrow: p.value }}
+                                                title={`${p.label}: ${p.value} (${share(p.value)}%)`}
+                                            />
+                                        ))}
                                 </div>
                                 <ul className={local.legend}>
                                     {parts.map((p) => (
                                         <li key={p.key}>
-                                            <span className={local.swatch} data-part={p.key} aria-hidden="true" />
+                                            <span
+                                                className={local.swatch}
+                                                data-part={p.key}
+                                                aria-hidden="true"
+                                            />
                                             {p.label} <strong>{p.value}</strong>
                                         </li>
                                     ))}
@@ -272,7 +261,9 @@ export function MetricsWorkspace() {
                     <section className={local.panel} aria-labelledby="metricas-operaciones">
                         <header className={local.panelHeader}>
                             <h3 id="metricas-operaciones">Operaciones en aplicaciones</h3>
-                            <p>Operaciones confirmadas por cada servicio. Las visitas a pantallas no cuentan.</p>
+                            <p>
+                                Operaciones confirmadas por cada servicio. Las visitas a pantallas no cuentan.
+                            </p>
                         </header>
                         {operations.length ? (
                             <ol className={local.ranking}>
@@ -286,7 +277,9 @@ export function MetricsWorkspace() {
                                             <small>{item.aplicacionNombre || "Aplicación autorizada"}</small>
                                         </div>
                                         <div className={local.rankingTrack} aria-hidden="true">
-                                            <span style={{ width: `${(item.cantidad / maxOperation) * 100}%` }} />
+                                            <span
+                                                style={{ width: `${(item.cantidad / maxOperation) * 100}%` }}
+                                            />
                                         </div>
                                         <strong>{item.cantidad}</strong>
                                     </li>
@@ -303,7 +296,10 @@ export function MetricsWorkspace() {
                         <header className={local.panelHeader + " " + local.panelHeaderRow}>
                             <div>
                                 <h3 id="actividad">Registros que forman los indicadores</h3>
-                                <p>{totalRecords} {totalRecords === 1 ? "registro" : "registros"} · páginas de hasta {metrics.limiteDetalle}</p>
+                                <p>
+                                    {totalRecords} {totalRecords === 1 ? "registro" : "registros"} · páginas
+                                    de hasta {metrics.limiteDetalle}
+                                </p>
                             </div>
                         </header>
                         <div className={styles.tableRegion + " " + local.flush}>
@@ -340,20 +336,32 @@ export function MetricsWorkspace() {
                         {totalRecords > metrics.limiteDetalle && (
                             <footer className={local.pager}>
                                 <span>
-                                    {offset + 1}–{Math.min(offset + metrics.limiteDetalle, totalRecords)} de {totalRecords}
+                                    {offset + 1}–{Math.min(offset + metrics.limiteDetalle, totalRecords)} de{" "}
+                                    {totalRecords}
                                 </span>
                                 <div>
                                     <Button
                                         variant="outlined"
                                         state={offset ? "default" : "disabled"}
-                                        onClick={() => void load(Math.max(0, offset - metrics.limiteDetalle), applied || undefined)}
+                                        onClick={() =>
+                                            void load(
+                                                Math.max(0, offset - metrics.limiteDetalle),
+                                                applied || undefined,
+                                            )
+                                        }
                                     >
                                         Anterior
                                     </Button>
                                     <Button
                                         variant="outlined"
-                                        state={offset + metrics.limiteDetalle < totalRecords ? "default" : "disabled"}
-                                        onClick={() => void load(offset + metrics.limiteDetalle, applied || undefined)}
+                                        state={
+                                            offset + metrics.limiteDetalle < totalRecords
+                                                ? "default"
+                                                : "disabled"
+                                        }
+                                        onClick={() =>
+                                            void load(offset + metrics.limiteDetalle, applied || undefined)
+                                        }
                                     >
                                         Siguiente
                                     </Button>

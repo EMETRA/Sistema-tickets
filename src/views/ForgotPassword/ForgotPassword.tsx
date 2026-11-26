@@ -33,26 +33,17 @@ export default function ForgotPassword() {
                 headers: { "Content-Type": "application/json" },
                 signal: AbortSignal.timeout(20000),
                 body: JSON.stringify(
-                    step === "email"
-                        ? { correo: email.trim() }
-                        : { OTP: otp, clave: password },
+                    step === "email" ? { correo: email.trim() } : { OTP: otp, clave: password },
                 ),
             });
             const data = (await response.json()) as { message?: string };
-            if (!response.ok)
-                throw new Error(
-                    data.message || "No se pudo completar la recuperación.",
-                );
+            if (!response.ok) throw new Error(data.message || "No se pudo completar la recuperación.");
             setMessage(data.message || "Solicitud procesada.");
             setStep(step === "email" ? "code" : "done");
             setPassword("");
             setRepeatPassword("");
         } catch (error) {
-            setError(
-                error instanceof Error
-                    ? error.message
-                    : "No se pudo completar la recuperación.",
-            );
+            setError(error instanceof Error ? error.message : "No se pudo completar la recuperación.");
         } finally {
             submitting.current = false;
             setBusy(false);
@@ -62,15 +53,13 @@ export default function ForgotPassword() {
         <AccessLayout>
             <div className={styles.header}>
                 <span>Acceso institucional</span>
-                <h2>
-                    {step === "done" ? "Acceso recuperado" : "Recuperar contraseña"}
-                </h2>
+                <h2>{step === "done" ? "Acceso recuperado" : "Recuperar contraseña"}</h2>
                 <p>
                     {step === "email"
                         ? "Solicita un código para restablecer tu acceso con tu correo institucional."
                         : step === "code"
-                            ? "Escribe el código recibido y una nueva contraseña."
-                            : "Regresa al inicio de sesión para ingresar con tu nueva contraseña."}
+                          ? "Escribe el código recibido y una nueva contraseña."
+                          : "Regresa al inicio de sesión para ingresar con tu nueva contraseña."}
                 </p>
             </div>
             {message && (
@@ -81,11 +70,7 @@ export default function ForgotPassword() {
             {step !== "done" && (
                 <form onSubmit={submit} className={styles.form}>
                     {step === "email" ? (
-                        <FormField
-                            label="Correo institucional"
-                            htmlFor="recovery-email"
-                            required
-                        >
+                        <FormField label="Correo institucional" htmlFor="recovery-email" required>
                             <Input
                                 id="recovery-email"
                                 type="email"
@@ -98,11 +83,7 @@ export default function ForgotPassword() {
                         </FormField>
                     ) : (
                         <>
-                            <FormField
-                                label="Código de recuperación"
-                                htmlFor="recovery-code"
-                                required
-                            >
+                            <FormField label="Código de recuperación" htmlFor="recovery-code" required>
                                 <Input
                                     id="recovery-code"
                                     value={otp}
@@ -115,11 +96,7 @@ export default function ForgotPassword() {
                                     disabled={busy}
                                 />
                             </FormField>
-                            <FormField
-                                label="Nueva contraseña"
-                                htmlFor="recovery-password"
-                                required
-                            >
+                            <FormField label="Nueva contraseña" htmlFor="recovery-password" required>
                                 <Input
                                     id="recovery-password"
                                     type="password"
@@ -133,14 +110,10 @@ export default function ForgotPassword() {
                                 />
                             </FormField>
                             <p className={styles.hint}>
-                                Usa al menos 8 caracteres, mayúsculas, minúsculas, un número y
-                                un símbolo (@$!%*?&amp;ñáéíóú).
+                                Usa al menos 8 caracteres, mayúsculas, minúsculas, un número y un símbolo
+                                (@$!%*?&amp;ñáéíóú).
                             </p>
-                            <FormField
-                                label="Repetir contraseña"
-                                htmlFor="recovery-repeat"
-                                required
-                            >
+                            <FormField label="Repetir contraseña" htmlFor="recovery-repeat" required>
                                 <Input
                                     id="recovery-repeat"
                                     type="password"
@@ -159,9 +132,7 @@ export default function ForgotPassword() {
                         </p>
                     )}
                     <Button fullWidth type="submit" state={busy ? "loading" : "default"}>
-                        {step === "email"
-                            ? "Solicitar recuperación"
-                            : "Actualizar contraseña"}
+                        {step === "email" ? "Solicitar recuperación" : "Actualizar contraseña"}
                     </Button>
                     {step === "code" && (
                         <button

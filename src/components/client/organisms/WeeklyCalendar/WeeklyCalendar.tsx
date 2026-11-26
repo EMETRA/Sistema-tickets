@@ -31,28 +31,13 @@ export function WeeklyCalendar({
         date,
         items: activitiesForDay(records, date),
     }));
-    const { first, last } = activityHours(
-        columns.flatMap((column) => column.items),
-    );
-    const hours = Array.from(
-        { length: last - first },
-        (_, index) => first + index,
-    );
+    const { first, last } = activityHours(columns.flatMap((column) => column.items));
+    const hours = Array.from({ length: last - first }, (_, index) => first + index);
     const height = hours.length * HOUR_HEIGHT;
-    const severalDays = columns.some((column) =>
-        column.items.some((item) => item.multipleDays),
-    );
+    const severalDays = columns.some((column) => column.items.some((item) => item.multipleDays));
     return (
-        <div
-            className={styles.scroll}
-            role="region"
-            aria-label="Calendario semanal"
-            tabIndex={0}
-        >
-            <div
-                className={styles.grid}
-                style={{ "--calendar-days": days.length } as CSSProperties}
-            >
+        <div className={styles.scroll} role="region" aria-label="Calendario semanal" tabIndex={0}>
+            <div className={styles.grid} style={{ "--calendar-days": days.length } as CSSProperties}>
                 <div className={styles.corner}>Hora</div>
                 {columns.map(({ date }) => (
                     <div
@@ -78,10 +63,11 @@ export function WeeklyCalendar({
                                             data-scope={activityScope(record)}
                                             onClick={() => onSelect(record)}
                                         >
-                                            <strong>{meetingLink(record.datos.lugar) && <VideoMark />}{record.nombre}</strong>
-                                            <small>
-                                                Actividad de varios días
-                                            </small>
+                                            <strong>
+                                                {meetingLink(record.datos.lugar) && <VideoMark />}
+                                                {record.nombre}
+                                            </strong>
+                                            <small>Actividad de varios días</small>
                                         </button>
                                     ))}
                             </div>
@@ -121,52 +107,44 @@ export function WeeklyCalendar({
                                     <span>+ Actividad</span>
                                 </button>
                             ))}
-                        {placeActivities(
-                            items.filter((item) => !item.multipleDays),
-                        ).map(({ record, start, end, lane, lanes }) => (
-                            <button
-                                key={record.id}
-                                className={styles.event}
-                                data-scope={activityScope(record)}
-                                data-duration={
-                                    end - start < 40
-                                        ? "brief"
-                                        : end - start < 90
-                                            ? "short"
-                                            : "long"
-                                }
-                                style={{
-                                    top: Math.min(
-                                        (start / 60 - first) * HOUR_HEIGHT,
-                                        height - 28,
-                                    ),
-                                    height: Math.max(
-                                        28,
-                                        ((end - start) / 60) * HOUR_HEIGHT - 3,
-                                    ),
-                                    left: `calc(${(lane / lanes) * 100}% + 4px)`,
-                                    width: `calc(${100 / lanes}% - 8px)`,
-                                }}
-                                aria-label={`${record.nombre} · ${activityTime(record.datos.inicio)}–${activityTime(record.datos.fin)} · ${activityScope(record)}${meetingLink(record.datos.lugar) ? " · reunión virtual" : ""}`}
-                                title={`${record.nombre} · ${activityTime(record.datos.inicio)}–${activityTime(record.datos.fin)} · ${activityScope(record)}`}
-                                onClick={() => onSelect(record)}
-                            >
-                                <strong>{meetingLink(record.datos.lugar) && <VideoMark />}{record.nombre}</strong>
-                                <small>
-                                    {activityTime(record.datos.inicio)}–
-                                    {activityTime(record.datos.fin)}
-                                </small>
-                                <small>
-                                    {record.visibilidad === "EMPRESA"
-                                        ? companyReadOnly
-                                            ? "General · Solo lectura"
-                                            : "General de la empresa"
-                                        : record.visibilidad === "PRIVADA"
-                                            ? "Privada"
-                                            : "De tu equipo"}
-                                </small>
-                            </button>
-                        ))}
+                        {placeActivities(items.filter((item) => !item.multipleDays)).map(
+                            ({ record, start, end, lane, lanes }) => (
+                                <button
+                                    key={record.id}
+                                    className={styles.event}
+                                    data-scope={activityScope(record)}
+                                    data-duration={
+                                        end - start < 40 ? "brief" : end - start < 90 ? "short" : "long"
+                                    }
+                                    style={{
+                                        top: Math.min((start / 60 - first) * HOUR_HEIGHT, height - 28),
+                                        height: Math.max(28, ((end - start) / 60) * HOUR_HEIGHT - 3),
+                                        left: `calc(${(lane / lanes) * 100}% + 4px)`,
+                                        width: `calc(${100 / lanes}% - 8px)`,
+                                    }}
+                                    aria-label={`${record.nombre} · ${activityTime(record.datos.inicio)}–${activityTime(record.datos.fin)} · ${activityScope(record)}${meetingLink(record.datos.lugar) ? " · reunión virtual" : ""}`}
+                                    title={`${record.nombre} · ${activityTime(record.datos.inicio)}–${activityTime(record.datos.fin)} · ${activityScope(record)}`}
+                                    onClick={() => onSelect(record)}
+                                >
+                                    <strong>
+                                        {meetingLink(record.datos.lugar) && <VideoMark />}
+                                        {record.nombre}
+                                    </strong>
+                                    <small>
+                                        {activityTime(record.datos.inicio)}–{activityTime(record.datos.fin)}
+                                    </small>
+                                    <small>
+                                        {record.visibilidad === "EMPRESA"
+                                            ? companyReadOnly
+                                                ? "General · Solo lectura"
+                                                : "General de la empresa"
+                                            : record.visibilidad === "PRIVADA"
+                                              ? "Privada"
+                                              : "De tu equipo"}
+                                    </small>
+                                </button>
+                            ),
+                        )}
                     </div>
                 ))}
             </div>
@@ -176,7 +154,18 @@ export function WeeklyCalendar({
 
 function VideoMark() {
     return (
-        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ marginRight: 4, verticalAlign: "-1px" }}>
+        <svg
+            viewBox="0 0 24 24"
+            width="12"
+            height="12"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+            style={{ marginRight: 4, verticalAlign: "-1px" }}
+        >
             <rect x="3" y="6" width="13" height="12" rx="2.5" />
             <path d="m16 10.5 5-3v9l-5-3" />
         </svg>

@@ -5,11 +5,7 @@ import { AssetsOverview, MaintenanceBoard } from "@/components/client/organisms/
 import { usePlatform } from "@/platform/context";
 import { InventoryWorkspace } from "@/components/client/organisms/ResourceWorkspace/InventoryWorkspace";
 import { ResourceWorkspace } from "@/components/client/organisms/ResourceWorkspace/ResourceWorkspace";
-import {
-    WorkspaceNavigation,
-    useWorkspaceTab,
-    type WorkspaceTab,
-} from "./WorkspaceNavigation";
+import { WorkspaceNavigation, useWorkspaceTab, type WorkspaceTab } from "./WorkspaceNavigation";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
 const sections: (WorkspaceTab & { type: string })[] = [
     {
@@ -30,15 +26,13 @@ const sections: (WorkspaceTab & { type: string })[] = [
         id: "mantenimientos",
         type: "intervenciones",
         label: "Mantenimientos y visitas",
-        description:
-            "Registra una revisión, reparación o visita y consulta el trabajo realizado.",
+        description: "Registra una revisión, reparación o visita y consulta el trabajo realizado.",
     },
     {
         id: "ubicaciones",
         type: "instalaciones",
         label: "Ubicaciones",
-        description:
-            "Un solo catálogo de sedes, edificios y niveles, compartido por activos y red.",
+        description: "Un solo catálogo de sedes, edificios y niveles, compartido por activos y red.",
     },
     {
         id: "movimientos",
@@ -63,14 +57,11 @@ export function AssetsWorkspace() {
     const usuarioId = query.get("usuarioId")?.trim() || undefined;
     const equipoId = query.get("equipoId")?.trim() || undefined;
     const scoped = !!(employeeText || usuarioId || equipoId);
-    if (!current)
-        return (
-            <p className={styles.card}>No tienes acceso a estos registros.</p>
-        );
+    if (!current) return <p className={styles.card}>No tienes acceso a estos registros.</p>;
     const type = sections.find((t) => t.id === current.id)!.type;
     return (
         <section className={`${styles.page} ${styles.workspace}`}>
-            {(
+            {
                 <AssetsOverview
                     revision={revision}
                     onSelect={(id) => {
@@ -78,7 +69,7 @@ export function AssetsWorkspace() {
                         setTableMode(false);
                     }}
                 />
-            )}
+            }
             <WorkspaceNavigation
                 tabs={tabs}
                 current={current}
@@ -96,17 +87,12 @@ export function AssetsWorkspace() {
                                       ? "Bienes del equipo seleccionado"
                                       : "Bienes del colaborador seleccionado"}
                             </p>
-                            <Link
-                                className={styles.link}
-                                href="/espacio/inventario?view=inventario"
-                            >
+                            <Link className={styles.link} href="/espacio/inventario?view=inventario">
                                 Ver inventario completo
                             </Link>
                         </div>
                     )}
-                    {employeeText &&
-                    (!Number.isSafeInteger(empleado) ||
-                        Number(empleado) <= 0) ? (
+                    {employeeText && (!Number.isSafeInteger(empleado) || Number(empleado) <= 0) ? (
                         <p role="alert" className={styles.error}>
                             Revisa el código de empleado del enlace.
                         </p>

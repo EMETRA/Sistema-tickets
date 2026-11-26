@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import React from "react";
 import classNames from "classnames";
@@ -8,7 +8,7 @@ import styles from "./MyPerformanceChart.module.scss";
 import { MyPerformanceChartProps } from "./types";
 
 export const MyPerformanceChart: React.FC<MyPerformanceChartProps> = ({ data, className, width, height }) => {
-    return(
+    return (
         <div className={classNames(styles.MyPerformanceChart, className)}>
             <TableHeader label="Mi Rendimiento" iconName="magnifying-glass-chart-solid" />
             <LineChart
@@ -22,5 +22,5 @@ export const MyPerformanceChart: React.FC<MyPerformanceChartProps> = ({ data, cl
                 className={styles.lineChart}
             />
         </div>
-    )
-}
+    );
+};

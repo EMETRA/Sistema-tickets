@@ -18,4 +18,4 @@ export const GET_TICKET_TAG_CATALOG_QUERY = `
   }
 `;
 
-export type { GetTicketTagCatalogResponse } from './types';
+export type { GetTicketTagCatalogResponse } from "./types";

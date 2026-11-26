@@ -3,10 +3,7 @@ import { useState } from "react";
 import { usePlatform } from "@/platform/context";
 import { platformFetch } from "@/platform/client";
 import type { PlatformRecord } from "@/platform/types";
-import {
-    inventoryInitial,
-    type InventoryItem,
-} from "./InventoryPicker";
+import { inventoryInitial, type InventoryItem } from "./InventoryPicker";
 import { RecordEditor } from "./RecordEditor";
 import { AssetInventory } from "../AssetsPanel/AssetInventory";
 import { RecordDetail } from "./RecordDetail";
@@ -22,7 +19,7 @@ export function InventoryWorkspace({
     equipoId?: string;
     usuarioId?: string;
     empleado?: number;
-    onSaved?: ()=>void;
+    onSaved?: () => void;
 }) {
     const { data } = usePlatform();
     const [item, setItem] = useState<InventoryItem | null>(null),
@@ -32,23 +29,13 @@ export function InventoryWorkspace({
         [error, setError] = useState("");
     const def = data?.definitions[type];
     if (!def?.actions.LEER)
-        return (
-            <p className={styles.muted}>
-                No tienes permiso para consultar el inventario institucional.
-            </p>
-        );
+        return <p className={styles.muted}>No tienes permiso para consultar el inventario institucional.</p>;
     async function open(id: string) {
         setError("");
         try {
-            setRecord(
-                await platformFetch<PlatformRecord>(`/records/${type}/${id}`),
-            );
+            setRecord(await platformFetch<PlatformRecord>(`/records/${type}/${id}`));
         } catch (e) {
-            setError(
-                e instanceof Error
-                    ? e.message
-                    : "No se pudo abrir la ficha técnica.",
-            );
+            setError(e instanceof Error ? e.message : "No se pudo abrir la ficha técnica.");
         }
     }
     return (
@@ -58,7 +45,7 @@ export function InventoryWorkspace({
                     {error}
                 </p>
             )}
-            {(
+            {
                 <AssetInventory
                     key={revision}
                     type={type}
@@ -76,17 +63,14 @@ export function InventoryWorkspace({
                     }
                     onOpen={(id) => void open(id)}
                 />
-            )}
+            }
             {editing && (
                 <RecordEditor
                     type={type}
                     record={record || undefined}
                     initial={item ? inventoryInitial(item, type) : undefined}
                     initialName={
-                        item
-                            ? item.descripcion.slice(0, 200) ||
-                              `Bien ${item.numeroInventario}`
-                            : undefined
+                        item ? item.descripcion.slice(0, 200) || `Bien ${item.numeroInventario}` : undefined
                     }
                     onClose={() => {
                         setEditing(false);

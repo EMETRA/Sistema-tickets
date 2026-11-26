@@ -4,10 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useCreateTicketDialog } from "@/store/useCreateTicketDialog";
 import { TicketsTablePanel } from "@/components/client/organisms/TicketsTablePanel";
 import { Ticket } from "@/components/client/organisms/TicketsTablePanel/types";
-import {
-    useTicketsByRole,
-    useUpdateTicket,
-} from "@/api/hooks";
+import { useTicketsByRole, useUpdateTicket } from "@/api/hooks";
 import styles from "./Tickets.module.scss";
 
 import { ErrorHandler } from "@/api/graphql/errors";
@@ -36,13 +33,13 @@ const Tickets = ({ scope = "role" }: { scope?: "role" | "created" }) => {
             hasRunOnce.current = true;
             refetchTickets();
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // Un ticket creado desde la ventana aparece sin recargar la lista.
     useEffect(() => {
         if (createdVersion) void refetchTickets();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [createdVersion]);
 
     const handleCancelTicket = async (ticketId: string) => {
@@ -58,10 +55,7 @@ const Tickets = ({ scope = "role" }: { scope?: "role" | "created" }) => {
         }
     };
 
-    const handleAssignTicket = async (
-        ticketId: string,
-        userId: string | number,
-    ) => {
+    const handleAssignTicket = async (ticketId: string, userId: string | number) => {
         setActionMessage("");
         setActionError("");
         try {
@@ -89,9 +83,7 @@ const Tickets = ({ scope = "role" }: { scope?: "role" | "created" }) => {
     };
 
     // Derivar estados
-    const error = loadError
-        ? "No fue posible cargar los tickets. Intenta nuevamente."
-        : "";
+    const error = loadError ? "No fue posible cargar los tickets. Intenta nuevamente." : "";
 
     // Función para formatear fecha
     // Si es hoy, retorna solo la hora; si no, retorna fecha y hora
@@ -100,9 +92,9 @@ const Tickets = ({ scope = "role" }: { scope?: "role" | "created" }) => {
         const today = new Date();
 
         const isToday =
-      ticketDate.getDate() === today.getDate() &&
-      ticketDate.getMonth() === today.getMonth() &&
-      ticketDate.getFullYear() === today.getFullYear();
+            ticketDate.getDate() === today.getDate() &&
+            ticketDate.getMonth() === today.getMonth() &&
+            ticketDate.getFullYear() === today.getFullYear();
 
         if (isToday) {
             // Mostrar solo la hora
@@ -124,39 +116,39 @@ const Tickets = ({ scope = "role" }: { scope?: "role" | "created" }) => {
 
     // Mapear tickets del API al tipo esperado por TicketsTablePanel
     const transformedTickets: Ticket[] =
-    ticketsData?.map((ticket) => {
-        return {
-            id: ticket.id,
-            code: ticket.codigo || '#' + ticket.id,
-            user: {
-                id: ticket.usuarioCreadorId,
-                name: ticket.creador.nombre,
-                email: "",
-                department: ticket.creador.department || "Sin departamento",
-                initials:
-            ticket.creador.nombre.charAt(0) +
-            (ticket.creador.nombre.split(" ")[1]?.charAt(0) || ""),
-                avatar: ticket.creador.avatar,
-            },
-            title: ticket.titulo,
-            description: ticket.descripcion,
-            date: formatTicketDate(ticket.fechaCreacion),
-            status: {
-                label: ticket.estadoNombre,
-                state: ticket.estadoNombre.toLowerCase().replaceAll(" ", "_") as ChipState,
-            },
-            assignedTo: ticket.asignado
-                ? {
-                    id: ticket.asignado.id,
-                    name: ticket.asignado.nombre,
+        ticketsData?.map((ticket) => {
+            return {
+                id: ticket.id,
+                code: ticket.codigo || "#" + ticket.id,
+                user: {
+                    id: ticket.usuarioCreadorId,
+                    name: ticket.creador.nombre,
+                    email: "",
+                    department: ticket.creador.department || "Sin departamento",
                     initials:
-                ticket.asignado.nombre.charAt(0) +
-                (ticket.asignado.nombre.split(" ")[1]?.charAt(0) || ""),
-                    avatarSrc: ticket.asignado.avatar || undefined,
-                }
-                : null,
-        };
-    }) || [];
+                        ticket.creador.nombre.charAt(0) +
+                        (ticket.creador.nombre.split(" ")[1]?.charAt(0) || ""),
+                    avatar: ticket.creador.avatar,
+                },
+                title: ticket.titulo,
+                description: ticket.descripcion,
+                date: formatTicketDate(ticket.fechaCreacion),
+                status: {
+                    label: ticket.estadoNombre,
+                    state: ticket.estadoNombre.toLowerCase().replaceAll(" ", "_") as ChipState,
+                },
+                assignedTo: ticket.asignado
+                    ? {
+                          id: ticket.asignado.id,
+                          name: ticket.asignado.nombre,
+                          initials:
+                              ticket.asignado.nombre.charAt(0) +
+                              (ticket.asignado.nombre.split(" ")[1]?.charAt(0) || ""),
+                          avatarSrc: ticket.asignado.avatar || undefined,
+                      }
+                    : null,
+            };
+        }) || [];
 
     const handleExportTickets = () => {
         if (!transformedTickets.length) return;
@@ -184,10 +176,7 @@ const Tickets = ({ scope = "role" }: { scope?: "role" | "created" }) => {
             ticket.assignedTo?.name ?? "Sin asignar",
         ]);
 
-        const csvContent = [
-            headers.join(","),
-            ...rows.map((row) => row.join(",")),
-        ].join("\n");
+        const csvContent = [headers.join(","), ...rows.map((row) => row.join(","))].join("\n");
 
         const blob = new Blob(["\uFEFF" + csvContent], {
             type: "text/csv;charset=utf-8;",
@@ -202,9 +191,24 @@ const Tickets = ({ scope = "role" }: { scope?: "role" | "created" }) => {
 
     return (
         <div className={styles.mainContainer}>
-            {error && <p role="alert" className={styles.error}>{error}<button type="button" onClick={() => void refetchTickets()}>Reintentar</button></p>}
-            {actionMessage && <p role="status" className={styles.success}>{actionMessage}</p>}
-            {actionError && <p role="alert" className={styles.error}>{actionError}</p>}
+            {error && (
+                <p role="alert" className={styles.error}>
+                    {error}
+                    <button type="button" onClick={() => void refetchTickets()}>
+                        Reintentar
+                    </button>
+                </p>
+            )}
+            {actionMessage && (
+                <p role="status" className={styles.success}>
+                    {actionMessage}
+                </p>
+            )}
+            {actionError && (
+                <p role="alert" className={styles.error}>
+                    {actionError}
+                </p>
+            )}
             <TicketsTablePanel
                 tickets={transformedTickets}
                 loading={isLoading || isUpdating}

@@ -19,7 +19,6 @@ const FileDropzone: React.FC<FileDropzoneProps> = ({
     accept,
     hasError = false,
 }) => {
-
     const inputRef = useRef<HTMLInputElement>(null);
     const [isDragging, setIsDragging] = useState(false);
     const isCompact = variant === "compact";
@@ -56,11 +55,15 @@ const FileDropzone: React.FC<FileDropzoneProps> = ({
 
     return (
         <div
-            className={classNames(styles.Dropzone, {
-                [styles.dragging]: isDragging,
-                [styles.compact]: isCompact,
-                [styles.error]: hasError,
-            }, className)}
+            className={classNames(
+                styles.Dropzone,
+                {
+                    [styles.dragging]: isDragging,
+                    [styles.compact]: isCompact,
+                    [styles.error]: hasError,
+                },
+                className,
+            )}
             onDrop={handleDrop}
             onDragOver={handleDragOver}
             onDragEnter={handleDragEnter}
@@ -85,15 +88,16 @@ const FileDropzone: React.FC<FileDropzoneProps> = ({
             />
             <div className={styles.content}>
                 {!isCompact && (
-                    <Icon className={styles.icon} name="file-arrow-up-solid-full" size={32} color="var(--tickets-primary)" />
+                    <Icon
+                        className={styles.icon}
+                        name="file-arrow-up-solid-full"
+                        size={32}
+                        color="var(--tickets-primary)"
+                    />
                 )}
 
-                <p className={styles.title}>
-                    {title}
-                </p>
-                <p className={styles.subtitle}>
-                    {subtitle}
-                </p>
+                <p className={styles.title}>{title}</p>
+                <p className={styles.subtitle}>{subtitle}</p>
 
                 {isCompact && (
                     <Button
@@ -107,17 +111,17 @@ const FileDropzone: React.FC<FileDropzoneProps> = ({
                     </Button>
                 )}
 
-                {rejectedFiles && rejectedFiles.length > 0 && ( // 👈
-                    <p className={styles.rejected}>
-                        {rejectedFiles.length === 1
-                            ? `"${rejectedFiles[0]}" no está permitido`
-                            : `${rejectedFiles.length} archivos no están permitidos: ${rejectedFiles.join(', ')}`
-                        }
-                    </p>
-                )}
+                {rejectedFiles &&
+                    rejectedFiles.length > 0 && ( // 👈
+                        <p className={styles.rejected}>
+                            {rejectedFiles.length === 1
+                                ? `"${rejectedFiles[0]}" no está permitido`
+                                : `${rejectedFiles.length} archivos no están permitidos: ${rejectedFiles.join(", ")}`}
+                        </p>
+                    )}
             </div>
         </div>
-    )
+    );
 };
 
 export default FileDropzone;

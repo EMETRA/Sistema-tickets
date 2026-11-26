@@ -1,8 +1,4 @@
-import {
-    AppsCatalog,
-    resolveAppPath,
-    isKnownAppPath,
-} from "@/config/apps-catalog";
+import { AppsCatalog, resolveAppPath, isKnownAppPath } from "@/config/apps-catalog";
 
 /**
  * Gate de autorización para rutas bajo /home/{appId}/...
@@ -10,10 +6,7 @@ import {
  * Paths fuera de ese contexto → true (los cubre canAccessPath por rol).
  * Sin catálogo, las rutas de app se niegan (fallo cerrado).
  */
-export function canAccessAppPath(
-    pathname: string,
-    catalog?: AppsCatalog | null
-): boolean {
+export function canAccessAppPath(pathname: string, catalog?: AppsCatalog | null): boolean {
     const resolved = resolveAppPath(pathname);
 
     if (!resolved) return true;

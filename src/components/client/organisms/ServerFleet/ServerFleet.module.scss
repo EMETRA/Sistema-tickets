@@ -52,9 +52,12 @@
   text-align: left;
   text-decoration: none;
   cursor: pointer;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
   &:hover {
-    border-color: #b8c5f5; border-color: light-dark(#b8c5f5, #2a3449);
+    border-color: #b8c5f5;
+    border-color: light-dark(#b8c5f5, #2a3449);
     box-shadow: 0 8px 24px #1a2b4a14;
   }
   &:focus-visible {
@@ -64,7 +67,9 @@
 }
 .selected {
   border-color: var(--tickets-primary);
-  box-shadow: 0 0 0 3px #4361ee22, var(--tickets-shadow);
+  box-shadow:
+    0 0 0 3px #4361ee22,
+    var(--tickets-shadow);
 }
 .head {
   display: flex;

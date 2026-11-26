@@ -64,17 +64,25 @@
   text-align: left;
   color: var(--tickets-text);
   cursor: pointer;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
   &[data-alert] {
-    box-shadow: inset 3px 0 0 var(--tickets-danger), var(--tickets-shadow);
+    box-shadow:
+      inset 3px 0 0 var(--tickets-danger),
+      var(--tickets-shadow);
   }
   &:hover {
-    border-color: #b8c5f5; border-color: light-dark(#b8c5f5, #2a3449);
+    border-color: #b8c5f5;
+    border-color: light-dark(#b8c5f5, #2a3449);
     box-shadow: 0 8px 24px #1a2b4a14;
     transform: translateY(-1px);
   }
   &[data-alert]:hover {
-    box-shadow: inset 3px 0 0 var(--tickets-danger), 0 8px 24px #1a2b4a14;
+    box-shadow:
+      inset 3px 0 0 var(--tickets-danger),
+      0 8px 24px #1a2b4a14;
   }
   &:focus-visible {
     outline: 2px solid var(--tickets-primary);

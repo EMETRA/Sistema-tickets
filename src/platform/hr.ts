@@ -71,10 +71,7 @@ export type HrMine = {
     perfil: HrProfile;
     entrega: HrDelivery | null;
 };
-export function hrDraft(
-    data: HrMine,
-    prior: Record<string, HrAnswer> = {},
-): Record<string, HrAnswer> {
+export function hrDraft(data: HrMine, prior: Record<string, HrAnswer> = {}): Record<string, HrAnswer> {
     const returned = data.estado === "DEVUELTA" ? data.entrega?.respuestas : null;
     return Object.fromEntries(
         data.campana.campos.map((field) => {
@@ -84,8 +81,7 @@ export function hrDraft(
                 return [
                     field.codigo,
                     {
-                        observacion:
-                            local?.observacion ?? previous?.observacion ?? "",
+                        observacion: local?.observacion ?? previous?.observacion ?? "",
                     },
                 ];
             const source =
@@ -154,9 +150,7 @@ export function hrLocalIso(value: string) {
     if (
         !/^\d{4}-\d\d-\d\dT\d\d:\d\d$/.test(value) ||
         !Number.isFinite(Date.parse(value + "-06:00")) ||
-        new Date(value.slice(0, 10) + "T00:00:00Z")
-            .toISOString()
-            .slice(0, 10) !== value.slice(0, 10)
+        new Date(value.slice(0, 10) + "T00:00:00Z").toISOString().slice(0, 10) !== value.slice(0, 10)
     )
         throw Error("Revisa la fecha y hora de Guatemala.");
     return new Date(value + "-06:00").toISOString();
@@ -165,16 +159,12 @@ export function hrLocalInput(date: Date) {
     return new Date(date.getTime() - 6 * 3600000).toISOString().slice(0, 16);
 }
 export function hrDeadline(start: Date, period: string) {
-    const result = new Date(
-        start.getTime() - (period === "mes" ? 6 * 3600000 : 0),
-    );
+    const result = new Date(start.getTime() - (period === "mes" ? 6 * 3600000 : 0));
     if (period === "mes") {
         const day = result.getUTCDate();
         result.setUTCDate(1);
         result.setUTCMonth(result.getUTCMonth() + 1);
-        const last = new Date(
-            Date.UTC(result.getUTCFullYear(), result.getUTCMonth() + 1, 0),
-        ).getUTCDate();
+        const last = new Date(Date.UTC(result.getUTCFullYear(), result.getUTCMonth() + 1, 0)).getUTCDate();
         result.setUTCDate(Math.min(day, last));
     } else {
         if (!["1", "3", "7"].includes(period)) throw Error("Periodo inválido.");

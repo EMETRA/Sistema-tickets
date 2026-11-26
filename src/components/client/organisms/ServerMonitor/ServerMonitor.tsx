@@ -26,10 +26,10 @@ function Metric({
     detail,
     percent,
 }: {
-  label: string;
-  value: string;
-  detail: string;
-  percent?: number | null;
+    label: string;
+    value: string;
+    detail: string;
+    percent?: number | null;
 }) {
     return (
         <article className={styles.metric}>
@@ -50,12 +50,12 @@ export function ServerMonitor({
     initialServer = "",
     hidePicker = false,
 }: {
-  active: boolean;
-  canReadLogs: boolean;
-  /** Servidor elegido desde fuera (p. ej. la vista de flota). */
-  initialServer?: string;
-  /** Oculta el selector cuando la elección se hace en otra parte. */
-  hidePicker?: boolean;
+    active: boolean;
+    canReadLogs: boolean;
+    /** Servidor elegido desde fuera (p. ej. la vista de flota). */
+    initialServer?: string;
+    /** Oculta el selector cuando la elección se hace en otra parte. */
+    hidePicker?: boolean;
 }) {
     const [server, setServer] = useState(initialServer);
     const [snapshot, setSnapshot] = useState<ServerSnapshot | null>(null);
@@ -77,10 +77,9 @@ export function ServerMonitor({
             setLoading(true);
             setError("");
         });
-        platformFetch<ServerSnapshot>(
-            "/monitor/" + server + (requestLogs ? "?logs=1" : ""),
-            { signal: controller.signal },
-        )
+        platformFetch<ServerSnapshot>("/monitor/" + server + (requestLogs ? "?logs=1" : ""), {
+            signal: controller.signal,
+        })
             .then((value) => {
                 if (!controller.signal.aborted) {
                     setSnapshot(value);
@@ -98,8 +97,7 @@ export function ServerMonitor({
     useEffect(() => {
         if (!server || !active) return;
         const timer = setInterval(() => {
-            if (document.visibilityState === "visible")
-                setRevision((value) => value + 1);
+            if (document.visibilityState === "visible") setRevision((value) => value + 1);
         }, 60000);
         return () => clearInterval(timer);
     }, [server, active]);
@@ -107,14 +105,9 @@ export function ServerMonitor({
     const visible = containers.filter((c) => matchesContainer(c, query, filter));
     const running = containers.filter((c) => c.estado === "running").length;
     const attention = containers.filter(needsAttention).length;
-    const stopped = containers.filter((c) =>
-        ["exited", "paused", "created"].includes(c.estado),
-    ).length;
+    const stopped = containers.filter((c) => ["exited", "paused", "created"].includes(c.estado)).length;
     const metrics = snapshot?.metricas;
-    const memory = usagePercent(
-        metrics?.memoriaUsadaBytes,
-        metrics?.memoriaTotalBytes,
-    );
+    const memory = usagePercent(metrics?.memoriaUsadaBytes, metrics?.memoriaTotalBytes);
     const disk = usagePercent(metrics?.discoUsadoBytes, metrics?.discoTotalBytes);
     const current = containers.find((c) => c.nombre === selected);
     const stale = snapshot?.estado === "DESACTUALIZADO";
@@ -152,24 +145,18 @@ export function ServerMonitor({
                     <div className={styles.stateLine}>
                         <span
                             className={styles.dot}
-                            data-tone={
-                                !snapshot?.disponible
-                                    ? "neutral"
-                                    : stale
-                                        ? "warning"
-                                        : "success"
-                            }
+                            data-tone={!snapshot?.disponible ? "neutral" : stale ? "warning" : "success"}
                         />
                         <strong>
                             {!server
                                 ? "Elige un servidor"
                                 : !snapshot
-                                    ? "Consultando servidor"
-                                    : !snapshot.disponible
-                                        ? "Sin mediciones"
-                                        : stale
-                                            ? "Mediciones desactualizadas"
-                                            : "Observador conectado"}
+                                  ? "Consultando servidor"
+                                  : !snapshot.disponible
+                                    ? "Sin mediciones"
+                                    : stale
+                                      ? "Mediciones desactualizadas"
+                                      : "Observador conectado"}
                         </strong>
                     </div>
                     <p>
@@ -189,9 +176,7 @@ export function ServerMonitor({
             </section>
             {error && (
                 <div role="alert" className={common.error}>
-                    {error}{" "}
-                    {snapshot &&
-            "Se conserva la última observación; no confirma el estado actual."}
+                    {error} {snapshot && "Se conserva la última observación; no confirma el estado actual."}
                 </div>
             )}
             {loading && (
@@ -201,26 +186,23 @@ export function ServerMonitor({
             )}
             {stale && (
                 <p role="status" className={styles.notice}>
-                    El observador lleva más tiempo del permitido sin reportar. Estas
-                    mediciones no confirman el estado actual del servidor.
+                    El observador lleva más tiempo del permitido sin reportar. Estas mediciones no confirman
+                    el estado actual del servidor.
                 </p>
             )}
             {!server && (
                 <section className={styles.empty}>
                     <WorkspaceIcon name="layer-group-solid" size={36} />
                     <h2>Tu infraestructura, en un solo lugar</h2>
-                    <p>
-                        Selecciona un servidor para revisar sus recursos, contenedores y
-                        logs autorizados.
-                    </p>
+                    <p>Selecciona un servidor para revisar sus recursos, contenedores y logs autorizados.</p>
                 </section>
             )}
             {snapshot && !snapshot.disponible && (
                 <section className={styles.empty}>
                     <h2>Esperando la primera observación</h2>
                     <p>
-                        El servidor está registrado. Comprueba que su observador esté
-                        instalado y programado para enviar mediciones.
+                        El servidor está registrado. Comprueba que su observador esté instalado y programado
+                        para enviar mediciones.
                     </p>
                 </section>
             )}
@@ -268,8 +250,7 @@ export function ServerMonitor({
                     <header className={styles.panelHeader}>
                         <div>
                             <h2>
-                                Contenedores{" "}
-                                <span className={styles.count}>{containers.length}</span>
+                                Contenedores <span className={styles.count}>{containers.length}</span>
                             </h2>
                             <p>Ejecución y salud se muestran por separado.</p>
                         </div>
@@ -286,18 +267,14 @@ export function ServerMonitor({
                     </header>
                     <div className={styles.filters} aria-label="Filtrar contenedores">
                         {(
-              [
-                  ["todos", "Todos", containers.length],
-                  ["running", "En ejecución", running],
-                  ["atencion", "Requieren atención", attention],
-                  ["detenidos", "Detenidos o en pausa", stopped],
-              ] as const
+                            [
+                                ["todos", "Todos", containers.length],
+                                ["running", "En ejecución", running],
+                                ["atencion", "Requieren atención", attention],
+                                ["detenidos", "Detenidos o en pausa", stopped],
+                            ] as const
                         ).map(([key, label, total]) => (
-                            <button
-                                key={key}
-                                aria-pressed={filter === key}
-                                onClick={() => setFilter(key)}
-                            >
+                            <button key={key} aria-pressed={filter === key} onClick={() => setFilter(key)}>
                                 {label} <span>{total}</span>
                             </button>
                         ))}
@@ -330,8 +307,8 @@ export function ServerMonitor({
                                                     ["dead", "restarting"].includes(c.estado)
                                                         ? "danger"
                                                         : c.estado === "running"
-                                                            ? "success"
-                                                            : "neutral"
+                                                          ? "success"
+                                                          : "neutral"
                                                 }
                                             >
                                                 {executionLabel(c.estado)}
@@ -344,8 +321,8 @@ export function ServerMonitor({
                                                     c.salud === "unhealthy"
                                                         ? "danger"
                                                         : c.salud === "healthy"
-                                                            ? "success"
-                                                            : "neutral"
+                                                          ? "success"
+                                                          : "neutral"
                                                 }
                                             >
                                                 <span className={styles.dot} />
@@ -357,9 +334,7 @@ export function ServerMonitor({
                                                 {c.imagen || "Sin imagen informada"}
                                             </span>
                                             {c.version && (
-                                                <small title={c.version}>
-                                                    {c.version.slice(0, 12)}
-                                                </small>
+                                                <small title={c.version}>{c.version.slice(0, 12)}</small>
                                             )}
                                         </td>
                                         {canReadLogs && (
@@ -386,8 +361,8 @@ export function ServerMonitor({
                         </p>
                     )}
                     <footer className={styles.tableFooter}>
-                        {visible.length} de {containers.length} contenedores · Sin
-                        comprobación significa que no se informó un healthcheck.
+                        {visible.length} de {containers.length} contenedores · Sin comprobación significa que
+                        no se informó un healthcheck.
                     </footer>
                 </section>
             )}
@@ -396,10 +371,7 @@ export function ServerMonitor({
                     <header className={styles.panelHeader}>
                         <div>
                             <h2>Logs del contenedor</h2>
-                            <p>
-                                Últimos cinco minutos · Hasta 100 líneas por contenedor ·
-                                Extracto saneado
-                            </p>
+                            <p>Últimos cinco minutos · Hasta 100 líneas por contenedor · Extracto saneado</p>
                         </div>
                         <label className={styles.toggle}>
                             <input
@@ -412,8 +384,8 @@ export function ServerMonitor({
                     </header>
                     {!logs ? (
                         <p className={styles.logHint}>
-                            Activa la consulta o utiliza «Ver logs» en un contenedor. La
-                            lectura debe estar habilitada en el observador del servidor.
+                            Activa la consulta o utiliza «Ver logs» en un contenedor. La lectura debe estar
+                            habilitada en el observador del servidor.
                         </p>
                     ) : (
                         <div className={styles.logBody}>
@@ -433,7 +405,7 @@ export function ServerMonitor({
                                 </select>
                                 <span>
                                     {snapshot.observadoEn &&
-                    "Observación: " + displayDate(snapshot.observadoEn)}
+                                        "Observación: " + displayDate(snapshot.observadoEn)}
                                 </span>
                             </div>
                             {!logsLoaded ? (
@@ -449,19 +421,15 @@ export function ServerMonitor({
                                     {logMessage(current)}
                                 </p>
                             ) : (
-                                <pre
-                                    className={styles.log}
-                                    aria-label={"Logs de " + selected}
-                                    tabIndex={0}
-                                >
+                                <pre className={styles.log} aria-label={"Logs de " + selected} tabIndex={0}>
                                     {current?.logs}
                                 </pre>
                             )}
                         </div>
                     )}
                     <footer className={styles.tableFooter}>
-                        Los extractos corresponden a la última observación recibida. No son
-                        una consola en tiempo real.
+                        Los extractos corresponden a la última observación recibida. No son una consola en
+                        tiempo real.
                     </footer>
                 </section>
             )}

@@ -18,7 +18,12 @@ const Chat: React.FC<ChatProps> = ({ ticketId, classname, onOpenFile }) => {
     const [viewedFile, setViewedFile] = useState<ViewedFile | null>(null);
     const userId = useAuthStore((state) => state.getUserId());
     const messagesContainerRef = useRef<HTMLDivElement>(null);
-    const { data: ticketMessages, loading: isTicketMessagesLoading, error: messagesError, refetch } = useGetTicketMessages(ticketId);
+    const {
+        data: ticketMessages,
+        loading: isTicketMessagesLoading,
+        error: messagesError,
+        refetch,
+    } = useGetTicketMessages(ticketId);
     const { sendMessage, loading: isSending } = useSendTicketMessage();
 
     useEffect(() => {
@@ -26,7 +31,6 @@ const Chat: React.FC<ChatProps> = ({ ticketId, classname, onOpenFile }) => {
             messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
         }
     }, [ticketMessages]);
-
 
     const handleSendMessage = async (message: string, files: File[]) => {
         if (!message.trim()) return;
@@ -38,24 +42,38 @@ const Chat: React.FC<ChatProps> = ({ ticketId, classname, onOpenFile }) => {
                     usuarioId: Number(userId),
                     textoMensaje: message,
                 },
-                files.length > 0 ? files : undefined
+                files.length > 0 ? files : undefined,
             );
             await refetch();
         } catch (err) {
             console.error("Error al enviar mensaje:", err);
             throw err;
         }
-    }
+    };
 
     return (
         <div className={`${styles.chatContainer} ${classname}`}>
-            {viewedFile && <FileViewer key={viewedFile.id} ticketId={ticketId} file={viewedFile} onClose={() => setViewedFile(null)} />}
-            {messagesError && <p role="alert" className={styles.error}>No se pudo cargar la conversación. <button onClick={() => void refetch()}>Reintentar conversación</button></p>}
+            {viewedFile && (
+                <FileViewer
+                    key={viewedFile.id}
+                    ticketId={ticketId}
+                    file={viewedFile}
+                    onClose={() => setViewedFile(null)}
+                />
+            )}
+            {messagesError && (
+                <p role="alert" className={styles.error}>
+                    No se pudo cargar la conversación.{" "}
+                    <button onClick={() => void refetch()}>Reintentar conversación</button>
+                </p>
+            )}
             <div className={styles.messagesContainer} ref={messagesContainerRef}>
                 {isTicketMessagesLoading ? (
                     <p>Cargando mensajes...</p>
                 ) : ticketMessages.length === 0 ? (
-                    !messagesError && <p className={styles.empty}>Todavía no hay comentarios en este ticket.</p>
+                    !messagesError && (
+                        <p className={styles.empty}>Todavía no hay comentarios en este ticket.</p>
+                    )
                 ) : (
                     ticketMessages.map((message, index) => {
                         const name = message.nombre_usuario?.trim() || `Usuario ${message.usuario}`;
@@ -63,27 +81,30 @@ const Chat: React.FC<ChatProps> = ({ ticketId, classname, onOpenFile }) => {
                             <MessageText
                                 key={index}
                                 text={message.textoMensaje}
-                                files={
-                                    message.archivos.map((archivo) => ({
-                                        id: archivo.id,
-                                        name: archivo.nombreArchivo || "Archivo adjunto",
-                                        onClick: () => (onOpenFile || setViewedFile)({ id: archivo.id, name: archivo.nombreArchivo || "Archivo adjunto" })
-                                    }))
-                                }
+                                files={message.archivos.map((archivo) => ({
+                                    id: archivo.id,
+                                    name: archivo.nombreArchivo || "Archivo adjunto",
+                                    onClick: () =>
+                                        (onOpenFile || setViewedFile)({
+                                            id: archivo.id,
+                                            name: archivo.nombreArchivo || "Archivo adjunto",
+                                        }),
+                                }))}
                                 timestamp={message.fechaEnvio}
                                 userName={name}
-                                avatarProps={{ initials: name.charAt(0).toUpperCase() + (name.split(" ")[1]?.charAt(0).toUpperCase() || "") }}
+                                avatarProps={{
+                                    initials:
+                                        name.charAt(0).toUpperCase() +
+                                        (name.split(" ")[1]?.charAt(0).toUpperCase() || ""),
+                                }}
                             />
-                        );})
+                        );
+                    })
                 )}
             </div>
-            <SendMessage
-                onSend={handleSendMessage}
-                className={styles.inputContainer}
-                disabled={isSending}
-            />
+            <SendMessage onSend={handleSendMessage} className={styles.inputContainer} disabled={isSending} />
         </div>
     );
-}
+};
 
 export default Chat;

@@ -5,11 +5,7 @@ import { Button } from "@/components/client/atoms/Button";
 import { useAuthStore } from "@/store/useAuthStore";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
 import { StateNotice } from "@/components/client/molecules/StateNotice";
-export function ApplicationLoadError({
-    onRetry,
-}: {
-    onRetry: () => void | Promise<void>;
-}) {
+export function ApplicationLoadError({ onRetry }: { onRetry: () => void | Promise<void> }) {
     const [busy, setBusy] = useState(false);
     async function retry() {
         setBusy(true);

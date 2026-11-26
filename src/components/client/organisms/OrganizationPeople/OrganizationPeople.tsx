@@ -20,11 +20,7 @@ const searchText = (value: string) =>
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "")
         .toLowerCase();
-export function OrganizationPeople({
-    people,
-}: {
-    people: OrganizationPerson[];
-}) {
+export function OrganizationPeople({ people }: { people: OrganizationPerson[] }) {
     const { data } = usePlatform();
     const [query, setQuery] = useState(""),
         [filter, setFilter] = useState("TODOS"),
@@ -34,8 +30,7 @@ export function OrganizationPeople({
             people.filter(
                 (person) =>
                     (filter === "TODOS" ||
-                        (filter === "SIN_CUENTA" &&
-                            !person.cuentasHabilitadas) ||
+                        (filter === "SIN_CUENTA" && !person.cuentasHabilitadas) ||
                         (filter === "SIN_UNIDAD" && person.sinUnidad)) &&
                     searchText(
                         [
@@ -74,12 +69,8 @@ export function OrganizationPeople({
                             setPage(0);
                         }}
                     >
-                        <option value="TODOS">
-                            Todos los empleados activos
-                        </option>
-                        <option value="SIN_CUENTA">
-                            Sin cuenta habilitada
-                        </option>
+                        <option value="TODOS">Todos los empleados activos</option>
+                        <option value="SIN_CUENTA">Sin cuenta habilitada</option>
                         <option value="SIN_UNIDAD">Unidad pendiente</option>
                     </select>
                 </label>
@@ -93,16 +84,25 @@ export function OrganizationPeople({
                             <th>Puesto</th>
                             <th>Unidad institucional</th>
                             <th>Cuenta en Tickets</th>
-                            {data?.definitions.activos?.actions.LEER && (
-                                <th>Bienes</th>
-                            )}
+                            {data?.definitions.activos?.actions.LEER && <th>Bienes</th>}
                         </tr>
                     </thead>
                     <tbody>
                         {filtered.slice(offset, offset + 25).map((person) => (
                             <tr key={person.empresa + ":" + person.empleado}>
                                 <td>{person.empleado}</td>
-                                <td>{person.usuariosIds?.length===1?<Link className={styles.link} href={'/equipo/'+person.usuariosIds[0]}>{person.nombre}</Link>:person.nombre}</td>
+                                <td>
+                                    {person.usuariosIds?.length === 1 ? (
+                                        <Link
+                                            className={styles.link}
+                                            href={"/equipo/" + person.usuariosIds[0]}
+                                        >
+                                            {person.nombre}
+                                        </Link>
+                                    ) : (
+                                        person.nombre
+                                    )}
+                                </td>
                                 <td>{person.puesto}</td>
                                 <td>
                                     {person.unidad ||
@@ -110,29 +110,26 @@ export function OrganizationPeople({
                                             ? `Unidad ${person.unidadCodigo} · Nombre pendiente`
                                             : "Pendiente de vincular")}
                                 </td>
-                                <td>
-                                    {person.cuentasHabilitadas
-                                        ? "Habilitada"
-                                        : "Sin cuenta habilitada"}
-                                </td>
+                                <td>{person.cuentasHabilitadas ? "Habilitada" : "Sin cuenta habilitada"}</td>
                                 {data?.definitions.activos?.actions.LEER && (
                                     <td>
-                                        <Link className={styles.link} href={"/espacio/inventario?view=inventario&empleado="+person.empleado}>Ver bienes</Link>
+                                        <Link
+                                            className={styles.link}
+                                            href={
+                                                "/espacio/inventario?view=inventario&empleado=" +
+                                                person.empleado
+                                            }
+                                        >
+                                            Ver bienes
+                                        </Link>
                                     </td>
                                 )}
                             </tr>
                         ))}
                         {!filtered.length && (
                             <tr>
-                                <td
-                                    colSpan={
-                                        data?.definitions.activos?.actions.LEER
-                                            ? 6
-                                            : 5
-                                    }
-                                >
-                                    No hay empleados que coincidan con estos
-                                    filtros.
+                                <td colSpan={data?.definitions.activos?.actions.LEER ? 6 : 5}>
+                                    No hay empleados que coincidan con estos filtros.
                                 </td>
                             </tr>
                         )}
@@ -154,18 +151,13 @@ export function OrganizationPeople({
                     </Button>
                     <Button
                         variant="outlined"
-                        state={
-                            offset + 25 >= filtered.length
-                                ? "disabled"
-                                : "default"
-                        }
+                        state={offset + 25 >= filtered.length ? "disabled" : "default"}
                         onClick={() => setPage((v) => v + 1)}
                     >
                         Siguiente personal
                     </Button>
                 </div>
             </div>
-
         </section>
     );
 }

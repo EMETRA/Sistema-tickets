@@ -9,7 +9,6 @@ export type FormActionsAlign = "left" | "right" | "center" | "space-between";
  * Propiedades del componente FormActions.
  */
 export interface FormActionsProps {
-
     /**
      * Contenido del formfield.
      */
@@ -25,5 +24,4 @@ export interface FormActionsProps {
      * Clase CSS adicional.
      */
     className?: string;
-
-};
+}

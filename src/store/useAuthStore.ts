@@ -1,20 +1,20 @@
-import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
-import Cookies from 'js-cookie';
-import { UsuarioPerfil } from '@/api/graphql/home/types';
-import { UserRole } from '@/types/roles';
+import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
+import Cookies from "js-cookie";
+import { UsuarioPerfil } from "@/api/graphql/home/types";
+import { UserRole } from "@/types/roles";
 import {
     AUTH_COOKIE_NAME,
     AUTH_COOKIE_OPTIONS,
     AUTH_ROLE_COOKIE_NAME,
     AUTH_DEPARTAMENTO_COOKIE_NAME,
-} from '@/auth/constants';
-import { normalizeRole } from '@/auth/normalizeRole';
+} from "@/auth/constants";
+import { normalizeRole } from "@/auth/normalizeRole";
 
 interface AuthState {
     token: string | null;
     user: UsuarioPerfil | null;
-    userId: UsuarioPerfil['id_usuario'] | null;
+    userId: UsuarioPerfil["id_usuario"] | null;
     isHydrated: boolean;
 
     setAuth: (token: string, user: UsuarioPerfil) => void;
@@ -23,7 +23,7 @@ interface AuthState {
 
     hasRole: (roles: UserRole | UserRole[]) => boolean;
     getRole: () => UserRole;
-    getUserId: () => UsuarioPerfil['id_usuario'] | null;
+    getUserId: () => UsuarioPerfil["id_usuario"] | null;
     getDepartamento: () => string | null;
 }
 
@@ -61,8 +61,8 @@ export const useAuthStore = create<AuthState>()(
                 Cookies.remove(AUTH_COOKIE_NAME);
                 Cookies.remove(AUTH_ROLE_COOKIE_NAME);
                 Cookies.remove(AUTH_DEPARTAMENTO_COOKIE_NAME);
-                localStorage.removeItem('auth-storage');
-                window.location.href = '/login';
+                localStorage.removeItem("auth-storage");
+                window.location.href = "/login";
             },
 
             setHydrated: () => set({ isHydrated: true }),
@@ -79,7 +79,7 @@ export const useAuthStore = create<AuthState>()(
             getDepartamento: () => get().user?.departamento ?? null,
         }),
         {
-            name: 'auth-storage',
+            name: "auth-storage",
             storage: createJSONStorage(() => localStorage),
             onRehydrateStorage: () => (state) => {
                 if (state?.token && state.user) {
@@ -88,6 +88,6 @@ export const useAuthStore = create<AuthState>()(
                 }
                 state?.setHydrated();
             },
-        }
-    )
+        },
+    ),
 );

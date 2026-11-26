@@ -23,7 +23,8 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
     className,
     onTicketUpdated,
 }) => {
-    const searchId = useId(), filtersId = useId();
+    const searchId = useId(),
+        filtersId = useId();
     const [selectedFilter, setSelectedFilter] = useState("all");
     const [selectedStatus, setSelectedStatus] = useState("all");
     const [query, setQuery] = useState("");
@@ -31,9 +32,7 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
     const [page, setPage] = useState(0);
     const [ticketToDelete, setTicketToDelete] = useState<string | null>(null);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-    const [hiddenTicketIds, setHiddenTicketIds] = useState<
-        Array<string | number>
-    >([]);
+    const [hiddenTicketIds, setHiddenTicketIds] = useState<Array<string | number>>([]);
     const [pendingCancellation, setPendingCancellation] = useState<{
         id: string;
         title: string;
@@ -41,23 +40,15 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
     const [openAssignedChipModal, setOpenAssignedChipModal] = useState(false);
     const [ticketToAssign, setTicketToAssign] = useState<string | null>(null);
     const [isAssigning, setIsAssigning] = useState(false);
-    const [selectedTickedId, setSelectedTicketId] = useState<string | null>(
-        null,
-    );
+    const [selectedTickedId, setSelectedTicketId] = useState<string | null>(null);
     const role = useAuthStore((state) => state.getRole());
     const filteredTickets = useMemo(
         () =>
             tickets.filter((ticket) => {
                 if (hiddenTicketIds.includes(ticket.id)) return false;
-                if (selectedFilter === "asignado" && !ticket.assignedTo)
-                    return false;
-                if (selectedFilter === "sin_asignar" && ticket.assignedTo)
-                    return false;
-                if (
-                    selectedStatus !== "all" &&
-                    ticket.status.state !== selectedStatus
-                )
-                    return false;
+                if (selectedFilter === "asignado" && !ticket.assignedTo) return false;
+                if (selectedFilter === "sin_asignar" && ticket.assignedTo) return false;
+                if (selectedStatus !== "all" && ticket.status.state !== selectedStatus) return false;
                 const text = [
                     ticket.code || ticket.id,
                     ticket.title,
@@ -72,17 +63,11 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
     );
     const pageCount = Math.max(1, Math.ceil(filteredTickets.length / 10));
     const currentPage = Math.min(page, pageCount - 1);
-    const rows = filteredTickets.slice(
-        currentPage * 10,
-        (currentPage + 1) * 10,
-    );
+    const rows = filteredTickets.slice(currentPage * 10, (currentPage + 1) * 10);
     const statuses = [
-        ...new Map(
-            tickets.map((ticket) => [ticket.status.state, ticket.status.label]),
-        ).entries(),
+        ...new Map(tickets.map((ticket) => [ticket.status.state, ticket.status.label])).entries(),
     ];
-    const openTicket = (id: string) =>
-        onOpenTicket ? onOpenTicket(id) : setSelectedTicketId(id);
+    const openTicket = (id: string) => (onOpenTicket ? onOpenTicket(id) : setSelectedTicketId(id));
     // Manejar apertura del modal de eliminación
     const handleDeleteClick = (ticketId: string) => {
         if (pendingCancellation) {
@@ -96,14 +81,8 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
     // Confirmar cancelación y mostrar ventana para revertir
     const handleConfirmDelete = () => {
         if (ticketToDelete !== null) {
-            const selectedTicket = tickets.find(
-                (ticket) => ticket.id === ticketToDelete,
-            );
-            setHiddenTicketIds((prev) =>
-                prev.includes(ticketToDelete)
-                    ? prev
-                    : [...prev, ticketToDelete],
-            );
+            const selectedTicket = tickets.find((ticket) => ticket.id === ticketToDelete);
+            setHiddenTicketIds((prev) => (prev.includes(ticketToDelete) ? prev : [...prev, ticketToDelete]));
             setPendingCancellation({
                 id: ticketToDelete,
                 title: selectedTicket?.title || "Ticket",
@@ -124,9 +103,7 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
             return;
         }
 
-        setHiddenTicketIds((prev) =>
-            prev.filter((id) => id !== pendingCancellation.id),
-        );
+        setHiddenTicketIds((prev) => prev.filter((id) => id !== pendingCancellation.id));
         setPendingCancellation(null);
     };
 
@@ -184,10 +161,7 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
     };
 
     return (
-        <section
-            className={classNames(styles.panel, className)}
-            aria-label="Listado de tickets"
-        >
+        <section className={classNames(styles.panel, className)} aria-label="Listado de tickets">
             <div className={styles.toolbar}>
                 <div className={styles.search}>
                     <label htmlFor={searchId}>Buscar tickets</label>
@@ -210,9 +184,7 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
                         onClick={() => setFiltersOpen(!filtersOpen)}
                     >
                         Filtros
-                        {selectedFilter !== "all" || selectedStatus !== "all"
-                            ? " · Activos"
-                            : ""}
+                        {selectedFilter !== "all" || selectedStatus !== "all" ? " · Activos" : ""}
                     </Button>
                     {onRefresh && (
                         <Button
@@ -309,10 +281,7 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
                                     <button
                                         className={styles.code}
                                         onClick={() => openTicket(ticket.id)}
-                                        aria-label={
-                                            "Abrir ticket " +
-                                            (ticket.code || ticket.id)
-                                        }
+                                        aria-label={"Abrir ticket " + (ticket.code || ticket.id)}
                                     >
                                         {ticket.code || "#" + ticket.id}
                                     </button>
@@ -321,18 +290,14 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
                                     <button
                                         className={styles.subject}
                                         onClick={() => openTicket(ticket.id)}
-                                        aria-label={
-                                            "Ver detalle de " + ticket.title
-                                        }
+                                        aria-label={"Ver detalle de " + ticket.title}
                                     >
                                         {ticket.title}
                                     </button>
                                 </td>
                                 <td>
                                     {ticket.user.name}
-                                    {ticket.user.department && (
-                                        <small>{ticket.user.department}</small>
-                                    )}
+                                    {ticket.user.department && <small>{ticket.user.department}</small>}
                                 </td>
                                 <td>
                                     <TicketStateChip
@@ -345,17 +310,10 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
                                         <AssignedChip
                                             assigned={!!ticket.assignedTo}
                                             userName={ticket.assignedTo?.name}
-                                            avatarSrc={
-                                                ticket.assignedTo?.avatarSrc
-                                            }
-                                            avatarInitials={
-                                                ticket.assignedTo?.initials
-                                            }
+                                            avatarSrc={ticket.assignedTo?.avatarSrc}
+                                            avatarInitials={ticket.assignedTo?.initials}
                                             onClick={() => {
-                                                if (!isAssigning)
-                                                    handleAssignClick(
-                                                        ticket.id,
-                                                    );
+                                                if (!isAssigning) handleAssignClick(ticket.id);
                                             }}
                                         />
                                     ) : (
@@ -366,28 +324,19 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
                                 <td>
                                     {onDelete &&
                                         (role === "ADMINISTRADOR" ||
-                                            (role === "USUARIO" &&
-                                                !ticket.assignedTo)) &&
+                                            (role === "USUARIO" && !ticket.assignedTo)) &&
                                         !["cancelado", "completado", "resuelto"].includes(
                                             ticket.status.state,
                                         ) && (
-                                        <button
-                                            className={styles.cancel}
-                                            aria-label={
-                                                "Cancelar ticket " +
-                                                    ticket.title
-                                            }
-                                            disabled={
-                                                !!pendingCancellation ||
-                                                    isAssigning
-                                            }
-                                            onClick={() =>
-                                                handleDeleteClick(ticket.id)
-                                            }
-                                        >
-                                            Cancelar
-                                        </button>
-                                    )}
+                                            <button
+                                                className={styles.cancel}
+                                                aria-label={"Cancelar ticket " + ticket.title}
+                                                disabled={!!pendingCancellation || isAssigning}
+                                                onClick={() => handleDeleteClick(ticket.id)}
+                                            >
+                                                Cancelar
+                                            </button>
+                                        )}
                                 </td>
                             </tr>
                         ))}
@@ -396,11 +345,7 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
             </div>
             {!loading && !rows.length && (
                 <div className={styles.empty}>
-                    <strong>
-                        {tickets.length
-                            ? "No hay coincidencias"
-                            : "Todavía no hay tickets"}
-                    </strong>
+                    <strong>{tickets.length ? "No hay coincidencias" : "Todavía no hay tickets"}</strong>
                     <p>
                         {tickets.length
                             ? "Prueba otro término o limpia los filtros."
@@ -410,23 +355,16 @@ export const TicketsTablePanel: React.FC<TicketsTablePanelProps> = ({
             )}
             <footer className={styles.footer}>
                 <span>
-                    {filteredTickets.length}{" "}
-                    {filteredTickets.length === 1 ? "registro" : "registros"}
+                    {filteredTickets.length} {filteredTickets.length === 1 ? "registro" : "registros"}
                 </span>
                 <nav aria-label="Paginación de tickets">
-                    <button
-                        disabled={currentPage === 0}
-                        onClick={() => setPage(currentPage - 1)}
-                    >
+                    <button disabled={currentPage === 0} onClick={() => setPage(currentPage - 1)}>
                         Anterior
                     </button>
                     <span aria-current="page">
                         {currentPage + 1} de {pageCount}
                     </span>
-                    <button
-                        disabled={currentPage >= pageCount - 1}
-                        onClick={() => setPage(currentPage + 1)}
-                    >
+                    <button disabled={currentPage >= pageCount - 1} onClick={() => setPage(currentPage + 1)}>
                         Siguiente
                     </button>
                 </nav>

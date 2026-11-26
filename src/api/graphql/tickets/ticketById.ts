@@ -41,4 +41,4 @@ export const GET_TICKET_BY_ID_QUERY = `
   }
 `;
 
-export type { GetTicketByIdResponse } from './types';
+export type { GetTicketByIdResponse } from "./types";

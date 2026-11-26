@@ -15,11 +15,11 @@ export const FilterUsersBar = ({
     selectedCategory,
     onCategoryChange,
     onFilterClick,
-    className
+    className,
 }: FilterUsersBarProps) => {
     return (
         <div className={classNames(styles.barContainer, className)}>
-            <SearchField 
+            <SearchField
                 value={searchValue}
                 onChange={onSearchChange}
                 onSearch={onSearchSubmit}
@@ -29,19 +29,20 @@ export const FilterUsersBar = ({
             />
 
             <div className={styles.actions}>
-                {variant === "categories" && categories.map((cat) => (
-                    <Button
-                        key={cat.value}
-                        rounded
-                        variant={selectedCategory === cat.value ? "contained" : "text"}
-                        color={selectedCategory === cat.value ? "default" : "cancel"}
-                        onClick={() => onCategoryChange?.(cat.value)}
-                        className={styles.catButton}
-                        state={disabled ? "disabled" : 'default'}
-                    >
-                        {cat.label}
-                    </Button>
-                ))}
+                {variant === "categories" &&
+                    categories.map((cat) => (
+                        <Button
+                            key={cat.value}
+                            rounded
+                            variant={selectedCategory === cat.value ? "contained" : "text"}
+                            color={selectedCategory === cat.value ? "default" : "cancel"}
+                            onClick={() => onCategoryChange?.(cat.value)}
+                            className={styles.catButton}
+                            state={disabled ? "disabled" : "default"}
+                        >
+                            {cat.label}
+                        </Button>
+                    ))}
                 {variant === "filter-button" && (
                     <Button
                         rounded
@@ -50,7 +51,7 @@ export const FilterUsersBar = ({
                         icon="filter-solid"
                         left
                         onClick={onFilterClick}
-                        state={disabled ? "disabled" : 'default'}
+                        state={disabled ? "disabled" : "default"}
                     >
                         Filtrar
                     </Button>

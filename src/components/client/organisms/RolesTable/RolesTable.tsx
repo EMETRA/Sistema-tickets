@@ -19,18 +19,16 @@ const RolesTable: React.FC<RolesTableProps> = ({
     onSubmit,
     onEdit,
     onDelete,
-    className
+    className,
 }) => {
-
     const [view, setView] = useState<RolesView>("table");
     const [selectedRole, setSelectedRole] = useState<Roles | null>(null);
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedDelete, setSelectedDelete] = useState<number>(0);
 
-
     if (view === "create") {
         return (
-            <RolesForm 
+            <RolesForm
                 permissions={permissions}
                 onCancel={() => setView("table")}
                 onSubmit={(data) => {
@@ -48,18 +46,16 @@ const RolesTable: React.FC<RolesTableProps> = ({
                 permissions={permissions}
                 onCancel={() => setView("table")}
                 onSubmit={(data) => {
-                    
                     if (!selectedRole) return;
 
                     const payload = {
                         ...selectedRole,
-                        ...data
+                        ...data,
                     };
 
                     onEdit?.(payload);
 
                     setView("table");
-
                 }}
             />
         );
@@ -67,23 +63,14 @@ const RolesTable: React.FC<RolesTableProps> = ({
 
     return (
         <div className={classNames(styles.RolesTable, className)}>
-
             <div className={styles.header}>
-                <TableHeader 
-                    iconName="user-group-solid"
-                    label="Roles para el sistema"
-                />
+                <TableHeader iconName="user-group-solid" label="Roles para el sistema" />
 
-                <Button
-                    onClick={() => setView("create")}
-                >
-                    Nuevo
-                </Button>
+                <Button onClick={() => setView("create")}>Nuevo</Button>
             </div>
-            
-            <div className={styles.table}>
 
-                <TableRow 
+            <div className={styles.table}>
+                <TableRow
                     isHeader
                     gridTemplate={GRID}
                     cells={[
@@ -91,12 +78,12 @@ const RolesTable: React.FC<RolesTableProps> = ({
                         { icon: "adress-card-solid", label: "Nombre del rol" },
                         { icon: "file-lines-regular", label: "Código del rol" },
                         { icon: "spinner-solid", label: "Estado" },
-                        { icon: "gears-solid", label: "", align: "center" }
+                        { icon: "gears-solid", label: "", align: "center" },
                     ]}
                 />
 
                 {roles.map((rol) => (
-                    <TableRow 
+                    <TableRow
                         key={rol.id}
                         id={rol.id}
                         gridTemplate={GRID}
@@ -106,24 +93,22 @@ const RolesTable: React.FC<RolesTableProps> = ({
                             { content: <Text>{rol.name}</Text> },
                             { content: <Text>{rol.roleCode}</Text> },
                             {
-                                content: (
-                                    <TicketStateChip label={rol.status} state="ingresado" />
-                                ),
-                                align: "center"
+                                content: <TicketStateChip label={rol.status} state="ingresado" />,
+                                align: "center",
                             },
-                            { 
+                            {
                                 content: (
                                     <div>
-                                        <IconButton 
-                                            icon="file-pen-solid" 
+                                        <IconButton
+                                            icon="file-pen-solid"
                                             iconColor="#8A8A8A"
                                             onClick={() => {
                                                 setSelectedRole(rol);
                                                 setView("edit");
                                             }}
                                         />
-                                        <IconButton 
-                                            icon="trash-solid" 
+                                        <IconButton
+                                            icon="trash-solid"
                                             iconColor="#8A8A8A"
                                             onClick={() => {
                                                 setModalOpen(true);
@@ -131,14 +116,14 @@ const RolesTable: React.FC<RolesTableProps> = ({
                                             }}
                                         />
                                     </div>
-                                ), 
-                                align: "center"
-                            }
+                                ),
+                                align: "center",
+                            },
                         ]}
                     />
                 ))}
 
-                <ModalContent 
+                <ModalContent
                     isOpen={modalOpen}
                     onClose={() => setModalOpen(false)}
                     onConfirm={() => {
@@ -148,7 +133,6 @@ const RolesTable: React.FC<RolesTableProps> = ({
                     title="¿Estas seguro de querer eliminar este rol?"
                     description="Esta acción no se podrá revertir"
                 />
-
             </div>
         </div>
     );

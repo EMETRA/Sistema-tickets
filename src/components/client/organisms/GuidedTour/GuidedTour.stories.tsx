@@ -22,9 +22,24 @@ type Story = StoryObj<typeof meta>;
 
 const STEPS: TourStep[] = [
     { id: "hola", title: "Te damos la bienvenida", body: "Un paso centrado, sin elemento señalado." },
-    { id: "menu", target: '[data-tour="demo-menu"]', title: "Tu menú", body: "El recorrido resalta el elemento y coloca la tarjeta a su lado." },
-    { id: "boton", target: '[data-tour="demo-boton"]', title: "Crear ticket", body: "Si no cabe a la derecha, la tarjeta se coloca debajo o arriba." },
-    { id: "falta", target: '[data-tour="no-existe"]', title: "Paso omitido", body: "Este elemento no existe, así que no se muestra." },
+    {
+        id: "menu",
+        target: '[data-tour="demo-menu"]',
+        title: "Tu menú",
+        body: "El recorrido resalta el elemento y coloca la tarjeta a su lado.",
+    },
+    {
+        id: "boton",
+        target: '[data-tour="demo-boton"]',
+        title: "Crear ticket",
+        body: "Si no cabe a la derecha, la tarjeta se coloca debajo o arriba.",
+    },
+    {
+        id: "falta",
+        target: '[data-tour="no-existe"]',
+        title: "Paso omitido",
+        body: "Este elemento no existe, así que no se muestra.",
+    },
     { id: "fin", title: "¡Listo!", body: "Terminar guarda que ya se vio el recorrido." },
 ];
 
@@ -33,7 +48,16 @@ function Demo() {
     const [result, setResult] = useState("");
     return (
         <div style={{ display: "grid", gridTemplateColumns: "220px 1fr", minHeight: 520 }}>
-            <nav data-tour="demo-menu" style={{ padding: 16, borderRight: "1px solid var(--tickets-border)", display: "grid", gap: 8, alignContent: "start" }}>
+            <nav
+                data-tour="demo-menu"
+                style={{
+                    padding: 16,
+                    borderRight: "1px solid var(--tickets-border)",
+                    display: "grid",
+                    gap: 8,
+                    alignContent: "start",
+                }}
+            >
                 <a>Inicio</a>
                 <a>Mis solicitudes</a>
                 <a>Calendario</a>

@@ -1,9 +1,9 @@
 /**
  * Query GraphQL para exportar el reporte RRHH a Excel
- * 
+ *
  * Parámetros:
  * - input: ReporteRhInput
- * 
+ *
  * Retorna:
  * - contentBase64
  * - filename

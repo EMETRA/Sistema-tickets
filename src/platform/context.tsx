@@ -1,12 +1,5 @@
 "use client";
-import {
-    createContext,
-    useContext,
-    useCallback,
-    useEffect,
-    useState,
-    useRef,
-} from "react";
+import { createContext, useContext, useCallback, useEffect, useState, useRef } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { platformFetch, PlatformError } from "./client";
 import { setPlatformRuntime } from "./runtime";
@@ -44,33 +37,18 @@ export function PlatformProvider({ children }: { children: React.ReactNode }) {
         setLoading(true);
         setError("");
         try {
-            const value =
-                await platformFetch<PlatformContextData>("/bootstrap");
+            const value = await platformFetch<PlatformContextData>("/bootstrap");
             if (version !== generation.current) return;
-            if (
-                value.enabled !== true ||
-                !value.actor ||
-                !value.definitions ||
-                !Array.isArray(value.teams)
-            )
-                throw new PlatformError(
-                    "La respuesta del espacio de trabajo no es válida.",
-                    502,
-                );
+            if (value.enabled !== true || !value.actor || !value.definitions || !Array.isArray(value.teams))
+                throw new PlatformError("La respuesta del espacio de trabajo no es válida.", 502);
             setData(value);
             setPlatformRuntime(value);
             setDisabled(false);
         } catch (e) {
             if (version !== generation.current) return;
             setData(null);
-            if (e instanceof PlatformError && e.code === "FEATURE_DISABLED")
-                setDisabled(true);
-            else
-                setError(
-                    e instanceof Error
-                        ? e.message
-                        : "No se pudo cargar tu espacio de trabajo.",
-                );
+            if (e instanceof PlatformError && e.code === "FEATURE_DISABLED") setDisabled(true);
+            else setError(e instanceof Error ? e.message : "No se pudo cargar tu espacio de trabajo.");
         } finally {
             if (version === generation.current) setLoading(false);
         }
@@ -84,9 +62,7 @@ export function PlatformProvider({ children }: { children: React.ReactNode }) {
         return invalidate;
     }, [refresh, invalidate]);
     return (
-        <Context.Provider value={{ data, loading, error, disabled, refresh }}>
-            {children}
-        </Context.Provider>
+        <Context.Provider value={{ data, loading, error, disabled, refresh }}>{children}</Context.Provider>
     );
 }
 export function usePlatform() {

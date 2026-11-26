@@ -32,7 +32,13 @@ function Controlled({ initial = [] as number[], disabled = false }) {
     const [value, setValue] = useState<number[]>(initial);
     return (
         <div style={{ maxWidth: 520 }}>
-            <PeoplePicker label="Participantes" value={value} onChange={setValue} search={search} disabled={disabled} />
+            <PeoplePicker
+                label="Participantes"
+                value={value}
+                onChange={setValue}
+                search={search}
+                disabled={disabled}
+            />
         </div>
     );
 }

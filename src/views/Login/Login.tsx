@@ -35,35 +35,28 @@ const Login: React.FC = () => {
     // const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
     /**
-   * Obtener información del usuario desde el backend
-   * El token se envía automáticamente via apiFetch
-   */
-    const fetchUserInfo = async (
-        token: string,
-    ): Promise<UsuarioPerfil | null> => {
+     * Obtener información del usuario desde el backend
+     * El token se envía automáticamente via apiFetch
+     */
+    const fetchUserInfo = async (token: string): Promise<UsuarioPerfil | null> => {
         try {
-            const response = await apiFetch<{ usuario: UsuarioPerfil }>(
-                "/api/usuario",
-                token,
-            );
+            const response = await apiFetch<{ usuario: UsuarioPerfil }>("/api/usuario", token);
             return response.usuario || null;
         } catch (error) {
             const e = error as {
-        statusCode?: number;
-        body?: { referencia?: string };
-      };
+                statusCode?: number;
+                body?: { referencia?: string };
+            };
             const message =
-        e.statusCode === 401
-            ? "La sesión no fue validada. Vuelve a iniciar sesión."
-            : e.statusCode === 403
-                ? "Tu cuenta no tiene permiso para consultar el perfil."
-                : "Se obtuvo la respuesta de acceso, pero no se pudo cargar tu perfil. Intenta nuevamente.";
+                e.statusCode === 401
+                    ? "La sesión no fue validada. Vuelve a iniciar sesión."
+                    : e.statusCode === 403
+                      ? "Tu cuenta no tiene permiso para consultar el perfil."
+                      : "Se obtuvo la respuesta de acceso, pero no se pudo cargar tu perfil. Intenta nuevamente.";
             const referencia = e.body?.referencia;
             throw new Error(
                 message +
-          (referencia && /^[a-f0-9-]{36}$/.test(referencia)
-              ? ` Referencia: ${referencia}`
-              : ""),
+                    (referencia && /^[a-f0-9-]{36}$/.test(referencia) ? ` Referencia: ${referencia}` : ""),
             );
         }
     };
@@ -112,11 +105,7 @@ const Login: React.FC = () => {
 
             router.push("/home");
         } catch (err) {
-            setError(
-                err instanceof Error
-                    ? err.message
-                    : "No se pudo completar el inicio de sesión.",
-            );
+            setError(err instanceof Error ? err.message : "No se pudo completar el inicio de sesión.");
             setClave("");
             // setCaptchaToken(null);
         } finally {
@@ -125,13 +114,18 @@ const Login: React.FC = () => {
         }
     };
 
-    if (activando) return (
-        <ActivarCuenta correo={email} claveTemporal={clave} salir={(completado) => {
-            setClave("");
-            setActivando(false);
-            setActivada(completado);
-        }} />
-    );
+    if (activando)
+        return (
+            <ActivarCuenta
+                correo={email}
+                claveTemporal={clave}
+                salir={(completado) => {
+                    setClave("");
+                    setActivando(false);
+                    setActivada(completado);
+                }}
+            />
+        );
 
     return (
         <AccessLayout>
@@ -143,9 +137,11 @@ const Login: React.FC = () => {
                             Tu perfil y tus permisos se cargan después de validar tu cuenta.
                         </Text>
                     </div>
-                    {activada && <p role="status" className={styles.activationSuccess}>
-                        Tu cuenta está activa. Inicia sesión con la nueva contraseña.
-                    </p>}
+                    {activada && (
+                        <p role="status" className={styles.activationSuccess}>
+                            Tu cuenta está activa. Inicia sesión con la nueva contraseña.
+                        </p>
+                    )}
                     <div className={styles.formFieldsContainer}>
                         <FormField htmlFor="email" label="Usuario" required>
                             <Input
@@ -194,20 +190,14 @@ const Login: React.FC = () => {
                         )}
                     </div>
                     <FormActions className={styles.loginButton}>
-                        <Button
-                            color="default"
-                            fullWidth
-                            type="submit"
-                            state={busy ? "loading" : "default"}
-                        >
+                        <Button color="default" fullWidth type="submit" state={busy ? "loading" : "default"}>
                             {busy ? "Iniciando..." : "Iniciar Sesión"}
                         </Button>
                     </FormActions>
                 </form>
             </div>
             <p className={styles.accessNote}>
-                El acceso a cada aplicación depende de los permisos otorgados por
-                Informática.
+                El acceso a cada aplicación depende de los permisos otorgados por Informática.
             </p>
         </AccessLayout>
     );

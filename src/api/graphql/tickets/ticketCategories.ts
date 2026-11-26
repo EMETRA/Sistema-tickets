@@ -19,4 +19,4 @@ export const GET_TICKET_CATEGORIES_QUERY = `
   }
 `;
 
-export type { GetTicketCategoriesResponse } from './types';
+export type { GetTicketCategoriesResponse } from "./types";

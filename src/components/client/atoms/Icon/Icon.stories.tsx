@@ -11,8 +11,8 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const NavigationItem: Story = {
-    parameters: { 
-        backgrounds: { default: 'dark' } 
+    parameters: {
+        backgrounds: { default: "dark" },
     },
     args: {
         name: "home",

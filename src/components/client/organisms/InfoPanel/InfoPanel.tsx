@@ -33,11 +33,7 @@ const PANEL_CONFIG: Record<InfoPanelType, { iconName: IconName; label: string }>
  * @param {InfoPanelProps} props - Las propiedades del componente
  * @returns {JSX.Element} El componente InfoPanel renderizado
  */
-export const InfoPanel: React.FC<InfoPanelProps> = ({
-    type,
-    items,
-    className,
-}) => {
+export const InfoPanel: React.FC<InfoPanelProps> = ({ type, items, className }) => {
     const config = PANEL_CONFIG[type];
     const showDividers = type === "upcoming-events";
 
@@ -46,25 +42,23 @@ export const InfoPanel: React.FC<InfoPanelProps> = ({
 
     return (
         <div className={classNames(styles.InfoPanel, className)}>
-            <TableHeader 
-                iconName={config.iconName} 
-                label={config.label} 
-                className={styles.header}
-            />
-            
+            <TableHeader iconName={config.iconName} label={config.label} className={styles.header} />
+
             <div className={styles.itemsContainer}>
                 {limitedItems.length === 0 ? (
                     <Text variant="caption" className={styles.noDataText}>
                         No hay información disponible.
                     </Text>
-                ) : (limitedItems.map((item, index) => (
-                    <React.Fragment key={index}>
-                        <EventItem {...item} className={styles.item} />
-                        {showDividers && index < limitedItems.length - 1 && (
-                            <div className={styles.divider} />
-                        )}
-                    </React.Fragment>
-                )))}
+                ) : (
+                    limitedItems.map((item, index) => (
+                        <React.Fragment key={index}>
+                            <EventItem {...item} className={styles.item} />
+                            {showDividers && index < limitedItems.length - 1 && (
+                                <div className={styles.divider} />
+                            )}
+                        </React.Fragment>
+                    ))
+                )}
             </div>
         </div>
     );

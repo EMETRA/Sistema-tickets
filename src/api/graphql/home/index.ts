@@ -3,13 +3,15 @@
  */
 
 // Query Definitions
-export { GET_USER_QUERY, GET_USER_BY_ID_QUERY, type GetUserResponse, type GetUserByIdResponse } from "./usuario";
+export {
+    GET_USER_QUERY,
+    GET_USER_BY_ID_QUERY,
+    type GetUserResponse,
+    type GetUserByIdResponse,
+} from "./usuario";
 export { GET_PERFIL_EQUIPO_QUERY, type GetPerfilEquipoResponse } from "./perfilEquipo";
 export { GET_MY_STATS_QUERY, type GetMyStatsResponse } from "./myStats";
-export {
-    GET_APPS_CATALOG_QUERY,
-    type GetAppsCatalogResponse,
-} from "./appsCatalog";
+export { GET_APPS_CATALOG_QUERY, type GetAppsCatalogResponse } from "./appsCatalog";
 export { getAppsCatalog } from "./getAppsCatalog";
 
 // Types

@@ -14,8 +14,8 @@ export const PaginaPrincipal: StoryObj<typeof TopBar> = {
         iconName: "house-solid",
         userName: "Gildder Caceres",
         userRole: "Administrador",
-        userStatus: "online"
-    }
+        userStatus: "online",
+    },
 };
 
 export const VistaEquipo: StoryObj<typeof TopBar> = {
@@ -24,6 +24,6 @@ export const VistaEquipo: StoryObj<typeof TopBar> = {
         iconName: "users-solid",
         userName: "Gildder Caceres",
         userRole: "Administrador",
-        userStatus: "online"
-    }
+        userStatus: "online",
+    },
 };

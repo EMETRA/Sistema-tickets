@@ -36,25 +36,18 @@ export function RecordEditor({
             (t) =>
                 context!.actor.admin ||
                 !["calendario", "accesos"].includes(def.group) ||
-                context!.memberships.some(
-                    (m) => m.equipoId === t.id && m.funcion === "JEFATURA",
-                ),
+                context!.memberships.some((m) => m.equipoId === t.id && m.funcion === "JEFATURA"),
         ),
         dialog = useRef<HTMLDialogElement>(null),
         busyRef = useRef(false);
     const [searchInventory, setSearchInventory] = useState(false);
     const [nombre, setNombre] = useState(record?.nombre || initialName || ""),
-        [equipoId, setEquipo] = useState(
-            record?.equipoId || initialTeamId || availableTeams[0]?.id || "",
-        ),
+        [equipoId, setEquipo] = useState(record?.equipoId || initialTeamId || availableTeams[0]?.id || ""),
         [visibilidad, setVisibility] = useState(
-            record?.visibilidad ||
-                (type === "solicitudes" ? "PRIVADA" : "EQUIPO"),
+            record?.visibilidad || (type === "solicitudes" ? "PRIVADA" : "EQUIPO"),
         ),
         [estado, setEstado] = useState(
-            record?.estado ||
-                def.states?.[0] ||
-                (type === "solicitudes" ? "PENDIENTE" : "ACTIVO"),
+            record?.estado || def.states?.[0] || (type === "solicitudes" ? "PENDIENTE" : "ACTIVO"),
         ),
         [datos, setDatos] = useState<Record<string, unknown>>(
             record?.datos || {
@@ -69,21 +62,15 @@ export function RecordEditor({
     }, []);
     const fields = def.fields.filter(
         (f) =>
-            (f.key !== "activoId" ||
-                context!.definitions.activos?.actions.LEER) &&
-            !["x", "y", "planoX", "planoY", "inventarioReferencia"].includes(
-                f.key,
-            ),
+            (f.key !== "activoId" || context!.definitions.activos?.actions.LEER) &&
+            !["x", "y", "planoX", "planoY", "inventarioReferencia"].includes(f.key),
     );
-    const fromHr =
-        ["equipos", "miembros"].includes(type) && !!record?.datos._rrhh;
+    const fromHr = ["equipos", "miembros"].includes(type) && !!record?.datos._rrhh;
     async function changeField(key: string, value: unknown) {
         setDatos((p) => ({ ...p, [key]: value }));
         if (type === "dispositivos" && key === "activoId" && value) {
             try {
-                const asset = await platformFetch<PlatformRecord>(
-                    "/records/activos/" + value,
-                );
+                const asset = await platformFetch<PlatformRecord>("/records/activos/" + value);
                 setNombre(asset.nombre);
                 setDatos((p) => ({
                     ...p,
@@ -93,9 +80,7 @@ export function RecordEditor({
                     modelo: asset.datos.modelo,
                 }));
             } catch {
-                setError(
-                    "No se pudo cargar la ficha vinculada. Reintenta antes de guardar.",
-                );
+                setError("No se pudo cargar la ficha vinculada. Reintenta antes de guardar.");
             }
         }
     }
@@ -113,9 +98,7 @@ export function RecordEditor({
                     ...(record ? { version: record.version } : {}),
                     data: {
                         nombre,
-                        equipoId: ["equipos", "modulos"].includes(type)
-                            ? null
-                            : equipoId,
+                        equipoId: ["equipos", "modulos"].includes(type) ? null : equipoId,
                         visibilidad,
                         estado,
                         datos,
@@ -148,7 +131,7 @@ export function RecordEditor({
                 if (!busy) onClose();
             }}
         >
-            {(
+            {
                 <header className={sheet.head}>
                     <span className={sheet.icon} aria-hidden="true">
                         <WorkspaceIcon name={sectionIcon} size={20} />
@@ -158,49 +141,54 @@ export function RecordEditor({
                         <h2 id="record-editor-title">
                             {record ? record.nombre : "Registrar " + def.singular.toLowerCase()}
                         </h2>
-                        <p className={sheet.sub}>
-                            {def.singular} · Los campos con * son obligatorios.
-                        </p>
+                        <p className={sheet.sub}>{def.singular} · Los campos con * son obligatorios.</p>
                     </div>
-                    <button type="button" className={sheet.close} onClick={onClose} disabled={busy} aria-label="Cerrar formulario">
+                    <button
+                        type="button"
+                        className={sheet.close}
+                        onClick={onClose}
+                        disabled={busy}
+                        aria-label="Cerrar formulario"
+                    >
                         ×
                     </button>
                 </header>
-            )}
-            {!record && !datos.inventarioReferencia && def.actions.LEER && ["activos", "dispositivos"].includes(type) && (
-                <section className={styles.card} style={{ margin: "14px 22px 0" }}>
-                {!searchInventory ? <Button type="button" variant="outlined" onClick={()=>setSearchInventory(true)}>Buscar un bien en Activos Fijos</Button> : <InventoryPicker
-                    type={type}
-                    onSelect={(item) => {
-                        setNombre(
-                            item.descripcion.slice(0, 200) ||
-                                "Bien " + item.numeroInventario,
-                        );
-                        const clase = inventoryClass(
-                            item.descripcion,
-                            type === "dispositivos",
-                        );
-                        setDatos((p) => ({
-                            ...p,
-                            inventarioReferencia: item.referencia,
-                            numeroInventario: item.numeroInventario,
-                            serie: item.serie,
-                            modelo: item.modelo,
-                            ...(clase ? { clase } : {}),
-                            ...(type === "activos"
-                                ? { detalle: item.descripcion }
-                                : {}),
-                        }));
-                    }}
-                />}
-                </section>
-            )}
+            }
+            {!record &&
+                !datos.inventarioReferencia &&
+                def.actions.LEER &&
+                ["activos", "dispositivos"].includes(type) && (
+                    <section className={styles.card} style={{ margin: "14px 22px 0" }}>
+                        {!searchInventory ? (
+                            <Button type="button" variant="outlined" onClick={() => setSearchInventory(true)}>
+                                Buscar un bien en Activos Fijos
+                            </Button>
+                        ) : (
+                            <InventoryPicker
+                                type={type}
+                                onSelect={(item) => {
+                                    setNombre(
+                                        item.descripcion.slice(0, 200) || "Bien " + item.numeroInventario,
+                                    );
+                                    const clase = inventoryClass(item.descripcion, type === "dispositivos");
+                                    setDatos((p) => ({
+                                        ...p,
+                                        inventarioReferencia: item.referencia,
+                                        numeroInventario: item.numeroInventario,
+                                        serie: item.serie,
+                                        modelo: item.modelo,
+                                        ...(clase ? { clase } : {}),
+                                        ...(type === "activos" ? { detalle: item.descripcion } : {}),
+                                    }));
+                                }}
+                            />
+                        )}
+                    </section>
+                )}
             {typeof datos.inventarioReferencia === "string" && (
                 <p role="status" className={sheet.callout} style={{ margin: "14px 22px 0" }}>
-                    Vinculado al bien institucional{" "}
-                    {String(datos.numeroInventario)}. Revisa el tipo sugerido,
-                    la instalación y el responsable técnico; en red confirma
-                    también los puertos reales.
+                    Vinculado al bien institucional {String(datos.numeroInventario)}. Revisa el tipo sugerido,
+                    la instalación y el responsable técnico; en red confirma también los puertos reales.
                 </p>
             )}
             <form onSubmit={save} className={sheet.form}>
@@ -225,9 +213,7 @@ export function RecordEditor({
                                         className={styles.control}
                                         aria-label="Equipo de trabajo"
                                         value={equipoId}
-                                        onChange={(e) =>
-                                            setEquipo(e.target.value)
-                                        }
+                                        onChange={(e) => setEquipo(e.target.value)}
                                         required
                                         disabled={busy || fromHr}
                                     >
@@ -240,119 +226,96 @@ export function RecordEditor({
                                     </select>
                                 </label>
                             )}
-                            {fields.map((field) => type === "actividades" && field.key === "lugar" ? (
-                                <MeetingPlaceField
-                                    key={field.key}
-                                    value={datos.lugar}
-                                    disabled={busy}
-                                    onChange={(value) => void changeField("lugar", value)}
-                                />
-                            ) : (
-                                <PlatformField
-                                    key={field.key}
-                                    field={field}
-                                    value={datos[field.key]}
-                                    disabled={
-                                        busy ||
-                                        (field.key === "numeroInventario" &&
-                                            !!datos.inventarioReferencia) ||
-                                        (fromHr && field.key === "unidadRh") ||
-                                        (type === "miembros" &&
-                                            Boolean(record) &&
-                                            field.key === "usuarioId")
-                                    }
-                                    onChange={(value) =>
-                                        void changeField(field.key, value)
-                                    }
-                                />
-                            ))}
+                            {fields.map((field) =>
+                                type === "actividades" && field.key === "lugar" ? (
+                                    <MeetingPlaceField
+                                        key={field.key}
+                                        value={datos.lugar}
+                                        disabled={busy}
+                                        onChange={(value) => void changeField("lugar", value)}
+                                    />
+                                ) : (
+                                    <PlatformField
+                                        key={field.key}
+                                        field={field}
+                                        value={datos[field.key]}
+                                        disabled={
+                                            busy ||
+                                            (field.key === "numeroInventario" &&
+                                                !!datos.inventarioReferencia) ||
+                                            (fromHr && field.key === "unidadRh") ||
+                                            (type === "miembros" &&
+                                                Boolean(record) &&
+                                                field.key === "usuarioId")
+                                        }
+                                        onChange={(value) => void changeField(field.key, value)}
+                                    />
+                                ),
+                            )}
                             {type === "actividades" && (
                                 <label className={styles.field}>
                                     {"¿Quién puede verla?"}
                                     <select
                                         className={styles.control}
                                         value={visibilidad}
-                                        onChange={(e) =>
-                                            setVisibility(e.target.value)
-                                        }
+                                        onChange={(e) => setVisibility(e.target.value)}
                                         disabled={busy}
                                     >
-                                        <option value="EQUIPO">
-                                            {"Mi equipo · la ve todo el equipo"}
-                                        </option>
+                                        <option value="EQUIPO">{"Mi equipo · la ve todo el equipo"}</option>
                                         <option value="PRIVADA">{"Personal · solo la veo yo"}</option>
                                         {context!.actor.admin && (
-                                            <option value="EMPRESA">
-                                                {"Toda la empresa"}
-                                            </option>
+                                            <option value="EMPRESA">{"Toda la empresa"}</option>
                                         )}
                                     </select>
                                 </label>
                             )}
-                            {record &&
-                                ![
-                                    "solicitudes",
-                                    "movimientos-activos",
-                                ].includes(type) && (
-                                    <label className={styles.field}>
-                                        Estado
-                                        <select
-                                            className={styles.control}
-                                            value={estado}
-                                            onChange={(e) =>
-                                                setEstado(e.target.value)
-                                            }
-                                            disabled={busy}
-                                        >
-                                            {[
-                                                ...new Set([
-                                                    ...(def.states || [
-                                                        "ACTIVO",
-                                                        "INACTIVO",
-                                                    ]),
-                                                    estado,
-                                                ]),
-                                            ].map((s) => (
-                                                <option key={s} value={s}>
-                                                    {statusLabel(s)}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </label>
-                                )}
+                            {record && !["solicitudes", "movimientos-activos"].includes(type) && (
+                                <label className={styles.field}>
+                                    Estado
+                                    <select
+                                        className={styles.control}
+                                        value={estado}
+                                        onChange={(e) => setEstado(e.target.value)}
+                                        disabled={busy}
+                                    >
+                                        {[
+                                            ...new Set([...(def.states || ["ACTIVO", "INACTIVO"]), estado]),
+                                        ].map((s) => (
+                                            <option key={s} value={s}>
+                                                {statusLabel(s)}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </label>
+                            )}
                         </div>
                     </section>
                     <aside className={styles.card} hidden>
                         <h3>Resumen</h3>
                         {fromHr && (
                             <p className={styles.muted}>
-                                La unidad se actualiza desde RRHH. Puedes
-                                revisar las responsabilidades y los ajustes del
-                                equipo sin perder su origen institucional.
+                                La unidad se actualiza desde RRHH. Puedes revisar las responsabilidades y los
+                                ajustes del equipo sin perder su origen institucional.
                             </p>
                         )}
-                        {["activos", "dispositivos"].includes(type) &&
-                            !datos.inventarioReferencia && (
-                                <p className={styles.error}>
-                                    Número ingresado manualmente. Selecciona el
-                                    bien de su tarjeta para vincularlo al
-                                    inventario institucional.
-                                </p>
-                            )}
+                        {["activos", "dispositivos"].includes(type) && !datos.inventarioReferencia && (
+                            <p className={styles.error}>
+                                Número ingresado manualmente. Selecciona el bien de su tarjeta para vincularlo
+                                al inventario institucional.
+                            </p>
+                        )}
                         <p>{nombre || def.singular}</p>
                         <p className={styles.muted}>
-                            {context!.teams.find((t) => t.id === equipoId)
-                                ?.nombre || "Administración institucional"}
+                            {context!.teams.find((t) => t.id === equipoId)?.nombre ||
+                                "Administración institucional"}
                         </p>
                         <p className={styles.muted}>
-                            El cambio se registrará a nombre de{" "}
-                            {context!.actor.nombre}. El historial conservará la
-                            fecha y el resultado de la operación.
+                            El cambio se registrará a nombre de {context!.actor.nombre}. El historial
+                            conservará la fecha y el resultado de la operación.
                         </p>
                         {context!.actor.admin && (
                             <p className={styles.muted}>
-                                Antes de aplicar el cambio revisarás dos
-                                confirmaciones.
+                                Antes de aplicar el cambio revisarás dos confirmaciones.
                             </p>
                         )}
                     </aside>
@@ -364,17 +327,25 @@ export function RecordEditor({
                 )}
                 {fromHr && (
                     <p className={sheet.callout} style={{ margin: "0 22px 14px" }}>
-                        La unidad se actualiza desde RRHH; puedes ajustar responsabilidades sin perder su origen.
+                        La unidad se actualiza desde RRHH; puedes ajustar responsabilidades sin perder su
+                        origen.
                     </p>
                 )}
-                {(
+                {
                     <footer className={sheet.foot}>
                         <p>
                             Se registrará a nombre de {context!.actor.nombre}
-                            {context!.actor.admin ? "; antes de aplicarlo revisarás dos confirmaciones." : "."}
+                            {context!.actor.admin
+                                ? "; antes de aplicarlo revisarás dos confirmaciones."
+                                : "."}
                         </p>
                         <div className={sheet.footActions}>
-                            <Button type="button" variant="outlined" onClick={onClose} state={busy ? "disabled" : "default"}>
+                            <Button
+                                type="button"
+                                variant="outlined"
+                                onClick={onClose}
+                                state={busy ? "disabled" : "default"}
+                            >
                                 Cancelar
                             </Button>
                             <Button type="submit" state={busy ? "loading" : "default"}>
@@ -382,7 +353,7 @@ export function RecordEditor({
                             </Button>
                         </div>
                     </footer>
-                )}
+                }
             </form>
         </dialog>
     );

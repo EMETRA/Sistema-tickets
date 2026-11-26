@@ -13,10 +13,12 @@ export const RichTextToolbar = ({ editor }: { editor: Editor }) => {
         if (!editor) return;
 
         const handler = () => setUpdate((prev) => prev + 1);
-        
+
         // Escuchamos transacciones para actualizar el estado visual de los botones
         editor.on("transaction", handler);
-        return () => { editor.off("transaction", handler); };
+        return () => {
+            editor.off("transaction", handler);
+        };
     }, [editor]);
 
     if (!editor) return null;
@@ -26,7 +28,11 @@ export const RichTextToolbar = ({ editor }: { editor: Editor }) => {
         { icon: "fuente-cursiva", action: () => editor.chain().focus().toggleItalic().run(), name: "italic" },
         { icon: "subrayar", action: () => editor.chain().focus().toggleUnderline().run(), name: "underline" },
         { icon: "tachado", action: () => editor.chain().focus().toggleStrike().run(), name: "strike" },
-        { icon: "bullet-list", action: () => editor.chain().focus().toggleBulletList().run(), name: "bulletList" },
+        {
+            icon: "bullet-list",
+            action: () => editor.chain().focus().toggleBulletList().run(),
+            name: "bulletList",
+        },
     ];
 
     return (
@@ -36,8 +42,8 @@ export const RichTextToolbar = ({ editor }: { editor: Editor }) => {
                     key={i}
                     type="button"
                     onClick={btn.action}
-                    className={classNames(styles.toolBtn, { 
-                        [styles.active]: editor.isActive(btn.name) 
+                    className={classNames(styles.toolBtn, {
+                        [styles.active]: editor.isActive(btn.name),
                     })}
                 >
                     <Icon name={btn.icon} size={10} />

@@ -1,13 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { TicketDetail } from "@/components/client/organisms/TicketDetail";
-export function TicketView({
-    ticketId,
-    returnHref,
-}: {
-    ticketId: string;
-    returnHref: string;
-}) {
+export function TicketView({ ticketId, returnHref }: { ticketId: string; returnHref: string }) {
     const router = useRouter();
     return (
         <TicketDetail

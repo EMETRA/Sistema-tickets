@@ -56,7 +56,11 @@
   align-items: center;
   gap: 12px;
   padding: 14px 16px;
-  background: linear-gradient(110deg, var(--tickets-surface), color-mix(in srgb, var(--accent) 7%, var(--tickets-surface)));
+  background: linear-gradient(
+    110deg,
+    var(--tickets-surface),
+    color-mix(in srgb, var(--accent) 7%, var(--tickets-surface))
+  );
   border-bottom: 1px solid var(--tickets-divider);
   color: inherit;
   text-decoration: none;
@@ -88,7 +92,9 @@
 }
 .arrow {
   color: var(--tickets-text-muted);
-  transition: transform 0.15s ease, color 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    color 0.15s ease;
 }
 .sections {
   display: flex;

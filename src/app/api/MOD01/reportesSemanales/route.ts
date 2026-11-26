@@ -1,11 +1,11 @@
 import { falloModulo } from "@/api/graphql/module-response";
-import { NextRequest, NextResponse } from 'next/server';
-import { graphqlRequest } from '@/api/graphql/client';
+import { NextRequest, NextResponse } from "next/server";
+import { graphqlRequest } from "@/api/graphql/client";
 import {
     GET_REPORTES_SEMANALES_QUERY,
     type GetReportesSemanalesResponse,
     type ReporteSemanalFilterInput,
-} from '@/api/graphql/MOD01';
+} from "@/api/graphql/MOD01";
 
 /**
  * GET /api/MOD01/reportesSemanales
@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
         const filters: ReporteSemanalFilterInput = {};
 
         // Campos numéricos
-        const idColaborador = searchParams.get('idColaborador');
+        const idColaborador = searchParams.get("idColaborador");
         if (idColaborador) {
             const numValue = parseInt(idColaborador, 10);
             if (!isNaN(numValue)) {
@@ -38,23 +38,23 @@ export async function GET(request: NextRequest) {
         }
 
         // Campos string
-        const proyecto = searchParams.get('proyecto');
+        const proyecto = searchParams.get("proyecto");
         if (proyecto) {
             filters.proyecto = proyecto;
         }
 
-        const fechaDesde = searchParams.get('fechaDesde');
+        const fechaDesde = searchParams.get("fechaDesde");
         if (fechaDesde) {
             filters.fechaDesde = fechaDesde;
         }
 
-        const fechaHasta = searchParams.get('fechaHasta');
+        const fechaHasta = searchParams.get("fechaHasta");
         if (fechaHasta) {
             filters.fechaHasta = fechaHasta;
         }
 
         // Limit con default
-        const limit = searchParams.get('limit');
+        const limit = searchParams.get("limit");
         if (limit) {
             const numValue = parseInt(limit, 10);
             if (!isNaN(numValue)) {
@@ -62,17 +62,16 @@ export async function GET(request: NextRequest) {
             }
         }
 
-        const result = await graphqlRequest<Record<string, unknown>>(
-            GET_REPORTES_SEMANALES_QUERY,
-            {
-                variables: {
-                    filters: Object.keys(filters).length > 0 ? filters : undefined,
-                },
-            }
-        );
+        const result = await graphqlRequest<Record<string, unknown>>(GET_REPORTES_SEMANALES_QUERY, {
+            variables: {
+                filters: Object.keys(filters).length > 0 ? filters : undefined,
+            },
+        });
 
         const typedResult = result as unknown as GetReportesSemanalesResponse;
 
         return NextResponse.json(typedResult);
-    } catch (error) { return falloModulo(error, "MOD01/reportesSemanales"); }
+    } catch (error) {
+        return falloModulo(error, "MOD01/reportesSemanales");
+    }
 }

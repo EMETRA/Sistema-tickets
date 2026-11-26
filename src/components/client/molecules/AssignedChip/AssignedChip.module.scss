@@ -6,13 +6,15 @@
   border-radius: 24px;
   transition: all 0.2s ease;
   font-family: var(--font-montserrat), sans-serif;
-  background-color: #F5F5F5; background-color: light-dark(#F5F5F5, #131926);  
+  background-color: #f5f5f5;
+  background-color: light-dark(#f5f5f5, #131926);
   cursor: pointer;
   max-width: 100%;
   overflow: hidden;
 
   &:hover {
-    background-color: #E0E0E0; background-color: light-dark(#E0E0E0, #111722);
+    background-color: #e0e0e0;
+    background-color: light-dark(#e0e0e0, #111722);
   }
 }
 

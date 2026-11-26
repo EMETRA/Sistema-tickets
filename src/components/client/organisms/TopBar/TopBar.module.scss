@@ -115,7 +115,15 @@
   }
 }
 
-.notification { display:flex; padding:8px; border-radius:8px; color:var(--tickets-text-secondary); &:hover { background:var(--tickets-primary-soft); } }
+.notification {
+  display: flex;
+  padding: 8px;
+  border-radius: 8px;
+  color: var(--tickets-text-secondary);
+  &:hover {
+    background: var(--tickets-primary-soft);
+  }
+}
 
 .paletteTrigger {
   display: flex;
@@ -133,7 +141,9 @@
   font-size: 12px;
   cursor: pointer;
   text-align: left;
-  transition: border-color 0.15s ease, background-color 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
   span {
     flex: 1;
     min-width: 0;

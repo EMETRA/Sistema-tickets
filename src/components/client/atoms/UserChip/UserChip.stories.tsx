@@ -22,7 +22,7 @@ const meta = {
                 control: "text",
                 description: "Iniciales del usuario",
             },
-        }
+        },
     },
 } satisfies Meta<typeof UserChip>;
 

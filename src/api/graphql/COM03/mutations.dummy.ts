@@ -1,8 +1,4 @@
-import type {
-    GuardarNoticiaCmsResponse,
-    GuardarNoticiaCmsResult,
-    GuardarNoticiaCmsVariables,
-} from './types';
+import type { GuardarNoticiaCmsResponse, GuardarNoticiaCmsResult, GuardarNoticiaCmsVariables } from "./types";
 
 /**
  * TODO [COM03-BACKEND]: simulación de las mutaciones mientras no exista la API.
@@ -25,17 +21,23 @@ export const USAR_SIMULACION = false;
  * estado real y mensaje, tal como llegan en `extensions.originalError`.
  */
 const ERRORES_README = {
-    SIN_TOKEN: { statusCode: 401, message: 'Token Bearer requerido' },
-    TOKEN_VENCIDO: { statusCode: 401, message: 'Token inválido o expirado' },
-    SIN_PERMISO_EDITAR: { statusCode: 403, message: 'No tiene el permiso requerido: VIVI_NOTICIAS_EDITAR' },
-    SIN_PERMISO_PUBLICAR: { statusCode: 403, message: 'No tiene el permiso requerido: VIVI_NOTICIAS_PUBLICAR' },
-    CLAVE_INVALIDA: { statusCode: 400, message: 'claveIdempotente es requerida (1 a 64 caracteres)' },
-    FALTAN_SLUG_TITULO: { statusCode: 400, message: 'Al crear, slug y titulo son obligatorios' },
-    IDEMPOTENCY_CONFLICT: { statusCode: 409, message: 'IDEMPOTENCY_CONFLICT' },
-    SLUG_IDIOMA_CONFLICT: { statusCode: 409, message: 'SLUG_IDIOMA_CONFLICT' },
-    NEWS_NOT_FOUND: { statusCode: 404, message: 'NEWS_NOT_FOUND' },
-    PORTAL_NO_CONFIGURADO: { statusCode: 503, message: 'API_PORTAL_URL o API_PORTAL_INTERNAL_KEY no configuradas' },
-    PORTAL_NO_RESPONDE: { statusCode: 502, message: 'No se pudo contactar api-portal: ECONNREFUSED' },
+    SIN_TOKEN: { statusCode: 401, message: "Token Bearer requerido" },
+    TOKEN_VENCIDO: { statusCode: 401, message: "Token inválido o expirado" },
+    SIN_PERMISO_EDITAR: { statusCode: 403, message: "No tiene el permiso requerido: VIVI_NOTICIAS_EDITAR" },
+    SIN_PERMISO_PUBLICAR: {
+        statusCode: 403,
+        message: "No tiene el permiso requerido: VIVI_NOTICIAS_PUBLICAR",
+    },
+    CLAVE_INVALIDA: { statusCode: 400, message: "claveIdempotente es requerida (1 a 64 caracteres)" },
+    FALTAN_SLUG_TITULO: { statusCode: 400, message: "Al crear, slug y titulo son obligatorios" },
+    IDEMPOTENCY_CONFLICT: { statusCode: 409, message: "IDEMPOTENCY_CONFLICT" },
+    SLUG_IDIOMA_CONFLICT: { statusCode: 409, message: "SLUG_IDIOMA_CONFLICT" },
+    NEWS_NOT_FOUND: { statusCode: 404, message: "NEWS_NOT_FOUND" },
+    PORTAL_NO_CONFIGURADO: {
+        statusCode: 503,
+        message: "API_PORTAL_URL o API_PORTAL_INTERNAL_KEY no configuradas",
+    },
+    PORTAL_NO_RESPONDE: { statusCode: 502, message: "No se pudo contactar api-portal: ECONNREFUSED" },
 } as const;
 
 /**
@@ -69,9 +71,9 @@ let siguienteId = 100;
  * - Misma clave y mismo contenido: responde igual, con `idempotente: true`.
  * - Misma clave y contenido distinto: 409 IDEMPOTENCY_CONFLICT.
  */
-export async function simularGuardarNoticiaCms(
-    { input }: GuardarNoticiaCmsVariables
-): Promise<GuardarNoticiaCmsResponse> {
+export async function simularGuardarNoticiaCms({
+    input,
+}: GuardarNoticiaCmsVariables): Promise<GuardarNoticiaCmsResponse> {
     const { claveIdempotente } = input;
     await esperar();
     if (SIMULAR_ERROR_GUARDAR) {
@@ -91,13 +93,14 @@ export async function simularGuardarNoticiaCms(
     }
 
     const fecha = input.fechaPublicacion ?? null;
-    const visible = input.estado === 'publicada'
-        && input.visibilidad === 'publica'
-        && (!fecha || new Date(fecha).getTime() <= Date.now());
+    const visible =
+        input.estado === "publicada" &&
+        input.visibilidad === "publica" &&
+        (!fecha || new Date(fecha).getTime() <= Date.now());
     const id = input.id ?? siguienteId++;
 
     const resultado: GuardarNoticiaCmsResult = {
-        resultado: visible ? 'publicada' : 'guardada',
+        resultado: visible ? "publicada" : "guardada",
         idempotente: false,
         noticia: {
             id,

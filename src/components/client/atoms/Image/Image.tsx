@@ -12,12 +12,12 @@ const isValidSrc = (src: unknown): boolean => {
 };
 
 const Image = ({ className, rounded, alt, src, ...props }: ImageProps) => (
-    <NextImage 
-        className={classNames(styles.image, { [styles.rounded]: rounded }, className)} 
+    <NextImage
+        className={classNames(styles.image, { [styles.rounded]: rounded }, className)}
         alt={alt}
         src={isValidSrc(src) ? src : FALLBACK_SRC}
-        {...props} 
-    />    
+        {...props}
+    />
 );
 
 export default Image;

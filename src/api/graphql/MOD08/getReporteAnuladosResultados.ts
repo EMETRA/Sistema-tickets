@@ -13,7 +13,7 @@
  * - fechaInicio <= fechaFin
  *
  * Requiere permisos financieros (Bearer requerido)
- * 
+ *
  * Retorna:
  * - tipoReporte: Tipo de reporte solicitado
  * - fechaInicio/fechaFin: Rango consultado

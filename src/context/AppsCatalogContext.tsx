@@ -1,12 +1,6 @@
 "use client";
 
-import {
-    createContext,
-    useContext,
-    useEffect,
-    useRef,
-    type ReactNode,
-} from "react";
+import { createContext, useContext, useEffect, useRef, type ReactNode } from "react";
 import { useGetAppsCatalog } from "@/api/hooks/useGetAppsCatalog";
 import type { AppsCatalog } from "@/config/apps-catalog";
 
@@ -47,9 +41,7 @@ export function AppsCatalogProvider({ children }: { children: ReactNode }) {
 export function useAppsCatalogContext(): AppsCatalogContextValue {
     const ctx = useContext(AppsCatalogContext);
     if (!ctx) {
-        throw new Error(
-            "useAppsCatalogContext debe usarse dentro de AppsCatalogProvider"
-        );
+        throw new Error("useAppsCatalogContext debe usarse dentro de AppsCatalogProvider");
     }
     return ctx;
 }

@@ -1,13 +1,6 @@
 "use client";
 import Link from "next/link";
-import {
-    createContext,
-    useCallback,
-    useContext,
-    useEffect,
-    useRef,
-    useState,
-} from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { platformFetch, PlatformError } from "./client";
 import { hrDate, HR_STATES, type HrNotice } from "./hr";
@@ -20,11 +13,7 @@ const Context = createContext({
     error: "",
     refresh: async () => {},
 });
-export function HrNotificationsProvider({
-    children,
-}: {
-    children: React.ReactNode;
-}) {
+export function HrNotificationsProvider({ children }: { children: React.ReactNode }) {
     const token = useAuthStore((s) => s.token),
         hydrated = useAuthStore((s) => s.isHydrated);
     const [data, setData] = useState<Inbox | null>(null),
@@ -51,8 +40,7 @@ export function HrNotificationsProvider({
             if (version !== generation.current) return;
             const denied =
                 e instanceof PlatformError &&
-                ([401, 403].includes(e.status) ||
-                    e.code === "FEATURE_DISABLED");
+                ([401, 403].includes(e.status) || e.code === "FEATURE_DISABLED");
             if (denied)
                 setData(
                     e instanceof PlatformError && e.code === "FEATURE_DISABLED"
@@ -64,12 +52,8 @@ export function HrNotificationsProvider({
             setError(
                 e instanceof PlatformError && e.code === "FEATURE_DISABLED"
                     ? ""
-                    : (e instanceof Error
-                          ? e.message
-                          : "No se pudieron leer las notificaciones.") +
-                          (e instanceof PlatformError && e.reference
-                              ? " Referencia: " + e.reference
-                              : ""),
+                    : (e instanceof Error ? e.message : "No se pudieron leer las notificaciones.") +
+                          (e instanceof PlatformError && e.reference ? " Referencia: " + e.reference : ""),
             );
         }
     }, [token, hydrated]);
@@ -89,13 +73,7 @@ export function HrNotificationsProvider({
             if (document.visibilityState === "visible") void refresh();
         };
         const timer = error
-            ? setTimeout(
-                  update,
-                  Math.min(
-                      300000,
-                      30000 * 2 ** Math.min(4, Math.max(0, failures - 1)),
-                  ),
-              )
+            ? setTimeout(update, Math.min(300000, 30000 * 2 ** Math.min(4, Math.max(0, failures - 1))))
             : data?.habilitado
               ? setInterval(update, 60000)
               : null;
@@ -110,29 +88,20 @@ export function HrNotificationsProvider({
             window.removeEventListener("tickets-hr-updated", update);
         };
     }, [token, hydrated, data?.habilitado, error, failures, blocked, refresh]);
-    return (
-        <Context.Provider value={{ data, error, refresh }}>
-            {children}
-        </Context.Provider>
-    );
+    return <Context.Provider value={{ data, error, refresh }}>{children}</Context.Provider>;
 }
 export const useHrNotifications = () => useContext(Context);
 export function HrMandatoryNotice() {
     const { data } = useHrNotifications();
     if (!data?.pendientes) return null;
     return (
-        <aside
-            className={local.notice}
-            aria-label="Actualización obligatoria de RRHH"
-        >
+        <aside className={local.notice} aria-label="Actualización obligatoria de RRHH">
             <div>
                 <strong>Actualización de datos obligatoria</strong>
                 <span>
                     {data.pendientes === 1
                         ? "Tienes una campaña pendiente."
-                        : "Tienes " +
-                          data.pendientes +
-                          " campañas pendientes."}{" "}
+                        : "Tienes " + data.pendientes + " campañas pendientes."}{" "}
                     Revisa sus campos y fecha de cierre.
                 </span>
             </div>
@@ -157,12 +126,8 @@ export function HrNotificationsPage() {
                         {error}
                     </p>
                 )}
-                {!data && !error && (
-                    <p role="status">Consultando notificaciones…</p>
-                )}
-                {data && !data.items.length && (
-                    <p>No hay campañas de actualización para tu cuenta.</p>
-                )}
+                {!data && !error && <p role="status">Consultando notificaciones…</p>}
+                {data && !data.items.length && <p>No hay campañas de actualización para tu cuenta.</p>}
                 {data?.items.map((c) => (
                     <article key={c.id} className={local.campaign}>
                         <div>
@@ -171,8 +136,7 @@ export function HrNotificationsPage() {
                             <p>
                                 <strong>
                                     {c.ventana === "CERRADA"
-                                        ? "Campaña cerrada · " +
-                                          HR_STATES[c.estado]
+                                        ? "Campaña cerrada · " + HR_STATES[c.estado]
                                         : c.ventana === "PROGRAMADA"
                                           ? "Programada"
                                           : c.pendiente
@@ -185,21 +149,13 @@ export function HrNotificationsPage() {
                                     : "Cierre: " + hrDate(c.fin)}
                             </p>
                         </div>
-                        <Link
-                            href={
-                                "/mi-perfil?campana=" + encodeURIComponent(c.id)
-                            }
-                        >
-                            Ver actualización
-                        </Link>
+                        <Link href={"/mi-perfil?campana=" + encodeURIComponent(c.id)}>Ver actualización</Link>
                     </article>
                 ))}
             </section>
             <section className={styles.card}>
                 <h2>Seguimiento de tickets</h2>
-                <Link href="/mis-tickets">
-                    Ver respuestas y actualizaciones de mis tickets
-                </Link>
+                <Link href="/mis-tickets">Ver respuestas y actualizaciones de mis tickets</Link>
             </section>
         </div>
     );
@@ -210,9 +166,7 @@ export function HrNotificationBadge() {
     return data?.pendientes ? (
         <span
             className={local.badge}
-            aria-label={
-                data.pendientes + " actualizaciones obligatorias pendientes"
-            }
+            aria-label={data.pendientes + " actualizaciones obligatorias pendientes"}
         >
             {data.pendientes > 99 ? "99+" : data.pendientes}
         </span>

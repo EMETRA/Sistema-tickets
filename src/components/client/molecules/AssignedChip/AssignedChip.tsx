@@ -26,11 +26,7 @@ export const AssignedChip: React.FC<AssignedChipProps> = ({
     if (!assigned) {
         return (
             <div className={classNames(styles.AssignedChip, className)} onClick={onClick}>
-                <Avatar 
-                    src="/images/no-user.png"
-                    size="sm"
-                    className={styles.avatar}
-                />
+                <Avatar src="/images/no-user.png" size="sm" className={styles.avatar} />
                 <Text variant="body" className={styles.userName}>
                     Sin asignar
                 </Text>
@@ -41,7 +37,7 @@ export const AssignedChip: React.FC<AssignedChipProps> = ({
     // Si está asignado, mostrar usuario
     return (
         <div className={classNames(styles.AssignedChip, className)} onClick={onClick}>
-            <UserChip 
+            <UserChip
                 userName={userName!}
                 avatarProps={{
                     src: avatarSrc,

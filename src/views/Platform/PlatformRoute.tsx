@@ -30,9 +30,8 @@ export function PlatformRoute({ section }: { section: string }) {
             <section className={styles.card}>
                 <h2>Módulos pendientes de habilitación</h2>
                 <p>
-                    La ampliación requiere aplicar los scripts de base de datos
-                    y habilitar el API. El administrador puede consultar la guía
-                    de instalación.
+                    La ampliación requiere aplicar los scripts de base de datos y habilitar el API. El
+                    administrador puede consultar la guía de instalación.
                 </p>
             </section>
         );
@@ -53,7 +52,11 @@ export function PlatformRoute({ section }: { section: string }) {
         );
     switch (section) {
         case "organizacion":
-            return <Suspense fallback={<p role="status">Cargando personal y equipos…</p>}><OrganizationWorkspace /></Suspense>;
+            return (
+                <Suspense fallback={<p role="status">Cargando personal y equipos…</p>}>
+                    <OrganizationWorkspace />
+                </Suspense>
+            );
         case "busqueda":
             return <SearchWorkspace />;
         case "calendario":
@@ -63,9 +66,17 @@ export function PlatformRoute({ section }: { section: string }) {
         case "asignacion":
             return <AssignmentsWorkspace />;
         case "inventario":
-            return <Suspense fallback={<p role="status">Cargando activos…</p>}><AssetsWorkspace /></Suspense>;
+            return (
+                <Suspense fallback={<p role="status">Cargando activos…</p>}>
+                    <AssetsWorkspace />
+                </Suspense>
+            );
         case "red":
-            return <Suspense fallback={<p role="status">Cargando red…</p>}><NetworkWorkspace /></Suspense>;
+            return (
+                <Suspense fallback={<p role="status">Cargando red…</p>}>
+                    <NetworkWorkspace />
+                </Suspense>
+            );
         case "accesos":
             return (
                 <Suspense
@@ -87,21 +98,14 @@ export function PlatformRoute({ section }: { section: string }) {
         case "solicitudes":
             return (
                 <section className={styles.page}>
-                    <AccessNavigation
-                        active="requests"
-                        admin={data.actor.admin}
-                    />
+                    <AccessNavigation active="requests" admin={data.actor.admin} />
                     {data.actor.admin && (
                         <p className={styles.muted}>
-                            Revisa las solicitudes aquí o utiliza las pestañas
-                            para administrar usuarios, perfiles, roles, módulos
-                            y permisos.
+                            Revisa las solicitudes aquí o utiliza las pestañas para administrar usuarios,
+                            perfiles, roles, módulos y permisos.
                         </p>
                     )}
-                    <ResourceWorkspace
-                        group="accesos"
-                        types={["solicitudes"]}
-                    />
+                    <ResourceWorkspace group="accesos" types={["solicitudes"]} />
                 </section>
             );
         default:

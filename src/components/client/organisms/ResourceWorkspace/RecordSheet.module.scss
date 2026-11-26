@@ -137,13 +137,15 @@
 .callout {
   padding: 10px 14px;
   border-radius: 10px;
-  border: 1px solid #c7d2fb; border: 1px solid light-dark(#c7d2fb, #2a3449);
+  border: 1px solid #c7d2fb;
+  border: 1px solid light-dark(#c7d2fb, #2a3449);
   background: var(--tickets-primary-soft);
   font-size: 13px;
   line-height: 1.5;
   color: var(--tickets-text);
   &[data-tone="warning"] {
-    border-color: #f0d9a8; border-color: light-dark(#f0d9a8, #2a3449);
+    border-color: #f0d9a8;
+    border-color: light-dark(#f0d9a8, #2a3449);
     background: var(--tickets-warning-soft);
     color: var(--tickets-warning);
   }

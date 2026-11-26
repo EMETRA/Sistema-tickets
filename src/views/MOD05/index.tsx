@@ -1,1 +1,1 @@
-export { default } from './MOD05';
+export { default } from "./MOD05";

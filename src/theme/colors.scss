@@ -1,116 +1,115 @@
 //Fondos
-$background: var(--tickets-background, #F4F6FB);
+$background: var(--tickets-background, #f4f6fb);
 
-$card-background: var(--tickets-surface, #FFFFFF);
-$secondary-card-background: var(--tickets-surface-subtle, #F8FAFF);
+$card-background: var(--tickets-surface, #ffffff);
+$secondary-card-background: var(--tickets-surface-subtle, #f8faff);
 
-$input-background: var(--tickets-surface, #FFFFFF);
+$input-background: var(--tickets-surface, #ffffff);
 
-$navbar-background: var(--tickets-surface, #FFFFFF);
+$navbar-background: var(--tickets-surface, #ffffff);
 
 // Textos
-$primary-text: var(--tickets-text, #263B58);
-$secondary-text: var(--tickets-text-secondary, #61728B);
-$tertiary-text: var(--tickets-text-muted, #75849B);
-$cuaternary-text: #CCCCCC;
-$quintary-text: #0F1E7C;
-$sub-text: #B1B1B1;
-
+$primary-text: var(--tickets-text, #263b58);
+$secondary-text: var(--tickets-text-secondary, #61728b);
+$tertiary-text: var(--tickets-text-muted, #75849b);
+$cuaternary-text: #cccccc;
+$quintary-text: #0f1e7c;
+$sub-text: #b1b1b1;
 
 // Azules
-$azul-1: #1700A5;
-$azul-2: #013BA6;
-$azul-3: #3229B9;
-$azul-4: #403EC3;
-$azul-5: #4361EE;
-$azul-6: #5B67F7;
-$azul-7: #697BE1;
-$azul-8: #7790EB;
-$azul-9: #84A4F5;
-$azul-10: #92B9FF;
+$azul-1: #1700a5;
+$azul-2: #013ba6;
+$azul-3: #3229b9;
+$azul-4: #403ec3;
+$azul-5: #4361ee;
+$azul-6: #5b67f7;
+$azul-7: #697be1;
+$azul-8: #7790eb;
+$azul-9: #84a4f5;
+$azul-10: #92b9ff;
 
 // Celestes
-$celeste-1: #54C8E8;
-$celeste-2: #5FCCE9;
-$celeste-3: #6AD0EB;
-$celeste-4: #75D4ED;
-$celeste-5: #80D8EE;
-$celeste-6: #88DBF0;
-$celeste-7: #96DFF2;
-$celeste-8: #A1E3F4;
-$celeste-9: #ACE7F5;
-$celeste-10: #B7EBF7;
+$celeste-1: #54c8e8;
+$celeste-2: #5fcce9;
+$celeste-3: #6ad0eb;
+$celeste-4: #75d4ed;
+$celeste-5: #80d8ee;
+$celeste-6: #88dbf0;
+$celeste-7: #96dff2;
+$celeste-8: #a1e3f4;
+$celeste-9: #ace7f5;
+$celeste-10: #b7ebf7;
 
 // Verde Oscuros
-$verde-oscuro-1: #00BC70;
-$verde-oscuro-2: #0CC077;
-$verde-oscuro-3: #19C47F;
-$verde-oscuro-4: #25C986;
-$verde-oscuro-5: #31CD8D;
-$verde-oscuro-6: #3ED194;
-$verde-oscuro-7: #4AD59B;
-$verde-oscuro-8: #56DAA2;
-$verde-oscuro-9: #63DEA9;
-$verde-oscuro-10: #6DE2B0;
+$verde-oscuro-1: #00bc70;
+$verde-oscuro-2: #0cc077;
+$verde-oscuro-3: #19c47f;
+$verde-oscuro-4: #25c986;
+$verde-oscuro-5: #31cd8d;
+$verde-oscuro-6: #3ed194;
+$verde-oscuro-7: #4ad59b;
+$verde-oscuro-8: #56daa2;
+$verde-oscuro-9: #63dea9;
+$verde-oscuro-10: #6de2b0;
 
 // Verde Claros
-$verde-claro-1: #97D700;
-$verde-claro-2: #9DDA0B;
-$verde-claro-3: #A3DD15;
-$verde-claro-4: #A8E020;
-$verde-claro-5: #AEE32A;
-$verde-claro-6: #B4E635;
-$verde-claro-7: #BAE93F;
-$verde-claro-8: #BFEC4A;
-$verde-claro-9: #C5EF54;
-$verde-claro-10: #CBF25F;
+$verde-claro-1: #97d700;
+$verde-claro-2: #9dda0b;
+$verde-claro-3: #a3dd15;
+$verde-claro-4: #a8e020;
+$verde-claro-5: #aee32a;
+$verde-claro-6: #b4e635;
+$verde-claro-7: #bae93f;
+$verde-claro-8: #bfec4a;
+$verde-claro-9: #c5ef54;
+$verde-claro-10: #cbf25f;
 
 // Amarillos
-$amarillo-1: #FFCE00;
-$amarillo-2: #FFD216;
-$amarillo-3: #FFD62C;
-$amarillo-4: #FFDA42;
-$amarillo-5: #FFDE58;
-$amarillo-6: #FFE16D;
-$amarillo-7: #FFE583;
-$amarillo-8: #FFE999;
-$amarillo-9: #FFEDAF;
-$amarillo-10: #FFF1C5;
+$amarillo-1: #ffce00;
+$amarillo-2: #ffd216;
+$amarillo-3: #ffd62c;
+$amarillo-4: #ffda42;
+$amarillo-5: #ffde58;
+$amarillo-6: #ffe16d;
+$amarillo-7: #ffe583;
+$amarillo-8: #ffe999;
+$amarillo-9: #ffedaf;
+$amarillo-10: #fff1c5;
 
 // Rojos
-$rojo-1: #E63946;
-$rojo-2: #F53B47;
-$rojo-3: #F5434F;
-$rojo-4: #F54B57;
-$rojo-5: #F4535F;
-$rojo-6: #F45B67;
-$rojo-7: #F4626E;
-$rojo-8: #F46A76;
-$rojo-9: #F4727E;
-$rojo-10: #F47A86;
+$rojo-1: #e63946;
+$rojo-2: #f53b47;
+$rojo-3: #f5434f;
+$rojo-4: #f54b57;
+$rojo-5: #f4535f;
+$rojo-6: #f45b67;
+$rojo-7: #f4626e;
+$rojo-8: #f46a76;
+$rojo-9: #f4727e;
+$rojo-10: #f47a86;
 
 // Naranjas
-$naranja-1: #FF9100;
-$naranja-2: #FF9100;
-$naranja-3: #FEA229;
-$naranja-4: #FEAA3E;
-$naranja-5: #FEB352;
-$naranja-6: #FDBB67;
-$naranja-7: #FDC47B;
-$naranja-8: #FDCC90;
-$naranja-9: #FCD5A4;
-$naranja-10: #FCDDB9;
+$naranja-1: #ff9100;
+$naranja-2: #ff9100;
+$naranja-3: #fea229;
+$naranja-4: #feaa3e;
+$naranja-5: #feb352;
+$naranja-6: #fdbb67;
+$naranja-7: #fdc47b;
+$naranja-8: #fdcc90;
+$naranja-9: #fcd5a4;
+$naranja-10: #fcddb9;
 
 // Negros y grises
-$negro-1: #263B58;
-$negro-2: #2B2D42;
-$gris-1: #A9A9A9;
-$gris-2: #E4E4E4;
-$gris-3: #E8EDEF;
-$gris-4: #8D8DA8;
+$negro-1: #263b58;
+$negro-2: #2b2d42;
+$gris-1: #a9a9a9;
+$gris-2: #e4e4e4;
+$gris-3: #e8edef;
+$gris-4: #8d8da8;
 
 $brand-green: hsl(88 63% 45%);
-$brand-green-weak: hsl(88 63% 80% / .35);
+$brand-green-weak: hsl(88 63% 80% / 0.35);
 $primary-blue: hsl(223 83% 40%);
 $surface: #fff;
 $ink: hsl(220 15% 20%);

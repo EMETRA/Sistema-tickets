@@ -6,10 +6,7 @@ import { TicketDetail } from "@/components/client/organisms/TicketDetail";
 import type { TicketFormData } from "@/components/client/organisms/TicketCreationPanel/types";
 import { ErrorHandler } from "@/api/graphql/errors";
 import { useCreateTicketDialog } from "@/store/useCreateTicketDialog";
-import {
-    TICKET_DEPARTMENTS,
-    useSubmitTicket,
-} from "@/views/TicketsCreation/useSubmitTicket";
+import { TICKET_DEPARTMENTS, useSubmitTicket } from "@/views/TicketsCreation/useSubmitTicket";
 import styles from "./CreateTicketDialog.module.scss";
 
 type Created = { id: string; label: string };
@@ -62,10 +59,7 @@ export function CreateTicketDialog() {
                 <header className={styles.header}>
                     <div>
                         <h2>Nuevo ticket</h2>
-                        <p>
-                            Describe la solicitud; el área elegida la recibirá
-                            en su bandeja.
-                        </p>
+                        <p>Describe la solicitud; el área elegida la recibirá en su bandeja.</p>
                     </div>
                     <button
                         type="button"
@@ -127,11 +121,7 @@ export function CreateTicketDialog() {
                     </button>
                 </div>
             </PopOver>
-            <TicketDetail
-                isOpen={!!viewing}
-                ticketId={viewing || ""}
-                onClose={() => setViewing(null)}
-            />
+            <TicketDetail isOpen={!!viewing} ticketId={viewing || ""} onClose={() => setViewing(null)} />
         </>
     );
 }

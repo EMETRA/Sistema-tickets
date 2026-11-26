@@ -1,8 +1,60 @@
-.chip { font-family: var(--font-montserrat), sans-serif; display: inline-flex; align-items: center; justify-content: center; padding: 5px 10px; border-radius: 7px; font-size: 11px; font-weight: 600; white-space: nowrap; gap: 7px; }
-.dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
-.ingresado, .creado, .sin_asignar { background: var(--tickets-neutral-soft); color: var(--tickets-text-secondary); }
-.asignado { background: #fff1d1; background: light-dark(#fff1d1, #5c4a1f); color: #80540d; color: light-dark(#80540d, #eec88b); }
-.en_trabajo, .en_atencion { background: var(--tickets-primary-soft); color: #3453b7; color: light-dark(#3453b7, #98a9e2); }
-.completado, .resuelto { background: #e5f5eb; background: light-dark(#e5f5eb, #12342f); color: #176b43; color: light-dark(#176b43, #92e8bf); }
-.cancelado { background: #fff0f2; background: light-dark(#fff0f2, #37192b); color: #a33146; color: light-dark(#a33146, #e099a6); }
-.outlined { background: transparent; color: var(--tickets-text-secondary); border: 1px solid var(--tickets-border); &.active { background: var(--tickets-primary); color: #fff; border-color: var(--tickets-primary); } }
+.chip {
+  font-family: var(--font-montserrat), sans-serif;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 10px;
+  border-radius: 7px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  gap: 7px;
+}
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+.ingresado,
+.creado,
+.sin_asignar {
+  background: var(--tickets-neutral-soft);
+  color: var(--tickets-text-secondary);
+}
+.asignado {
+  background: #fff1d1;
+  background: light-dark(#fff1d1, #5c4a1f);
+  color: #80540d;
+  color: light-dark(#80540d, #eec88b);
+}
+.en_trabajo,
+.en_atencion {
+  background: var(--tickets-primary-soft);
+  color: #3453b7;
+  color: light-dark(#3453b7, #98a9e2);
+}
+.completado,
+.resuelto {
+  background: #e5f5eb;
+  background: light-dark(#e5f5eb, #12342f);
+  color: #176b43;
+  color: light-dark(#176b43, #92e8bf);
+}
+.cancelado {
+  background: #fff0f2;
+  background: light-dark(#fff0f2, #37192b);
+  color: #a33146;
+  color: light-dark(#a33146, #e099a6);
+}
+.outlined {
+  background: transparent;
+  color: var(--tickets-text-secondary);
+  border: 1px solid var(--tickets-border);
+  &.active {
+    background: var(--tickets-primary);
+    color: #fff;
+    border-color: var(--tickets-primary);
+  }
+}

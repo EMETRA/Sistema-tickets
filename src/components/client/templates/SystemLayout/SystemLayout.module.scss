@@ -89,10 +89,26 @@
   border-bottom: 1px solid var(--tickets-border);
   font-size: 11px;
   line-height: 1.5;
-  > div { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
-  span { color: var(--tickets-text-secondary); }
-  a { text-decoration: underline; }
-  button { padding: 7px 10px; color: var(--tickets-primary); background: var(--tickets-surface); border: 1px solid var(--tickets-border); border-radius: 7px; cursor: pointer; }
+  > div {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  span {
+    color: var(--tickets-text-secondary);
+  }
+  a {
+    text-decoration: underline;
+  }
+  button {
+    padding: 7px 10px;
+    color: var(--tickets-primary);
+    background: var(--tickets-surface);
+    border: 1px solid var(--tickets-border);
+    border-radius: 7px;
+    cursor: pointer;
+  }
 }
 .standardContent.standardContent > * {
   width: 100%;

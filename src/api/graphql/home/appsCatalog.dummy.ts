@@ -78,7 +78,12 @@ export const APPS_CATALOG_DUMMY: AppsCatalog = {
                     iconName: "clipboard-list-solid",
                 },
                 modules: [
-                    {id:"rh-datos",label:"RRHH",title:"Actualización de datos del personal",iconName:"clipboard-list-solid"},
+                    {
+                        id: "rh-datos",
+                        label: "RRHH",
+                        title: "Actualización de datos del personal",
+                        iconName: "clipboard-list-solid",
+                    },
                     {
                         id: "mod04",
                         label: "MOD04",
@@ -230,8 +235,15 @@ export const APPS_CATALOG_DUMMY: AppsCatalog = {
                 ],
             },
             reportes: {
-                meta: {id:'reportes',label:'REPORTES',title:'Reportes',iconName:'chart-bar-solid'},
-                modules: [{id:'juz02',label:'JUZ02',title:'Reimpresión de boletas de tránsito N',iconName:'clipboard-solid'}],
+                meta: { id: "reportes", label: "REPORTES", title: "Reportes", iconName: "chart-bar-solid" },
+                modules: [
+                    {
+                        id: "juz02",
+                        label: "JUZ02",
+                        title: "Reimpresión de boletas de tránsito N",
+                        iconName: "clipboard-solid",
+                    },
+                ],
             },
         },
     },

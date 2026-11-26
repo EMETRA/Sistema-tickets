@@ -17,13 +17,9 @@ export function RecordPage({ type, id }: { type: string; id: string }) {
     useEffect(() => {
         if (!data?.definitions[type]?.actions?.LEER) return;
         const c = new AbortController();
-        platformFetch<PlatformRecord>(
-            "/records/" +
-                encodeURIComponent(type) +
-                "/" +
-                encodeURIComponent(id),
-            { signal: c.signal },
-        )
+        platformFetch<PlatformRecord>("/records/" + encodeURIComponent(type) + "/" + encodeURIComponent(id), {
+            signal: c.signal,
+        })
             .then(setRecord)
             .catch((e) => {
                 if (!c.signal.aborted) setFailure(e.message);
@@ -34,9 +30,7 @@ export function RecordPage({ type, id }: { type: string; id: string }) {
     if (error || failure || !data?.definitions[type]?.actions?.LEER)
         return (
             <p className={styles.error} role="alert">
-                {error ||
-                    failure ||
-                    "No tienes permiso para consultar este registro."}
+                {error || failure || "No tienes permiso para consultar este registro."}
             </p>
         );
     const group =

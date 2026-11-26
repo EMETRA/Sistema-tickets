@@ -9,10 +9,12 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit -p tsconfig.typecheck.json",
-    "lint": "eslint",
+    "lint": "eslint .",
     "storybook": "storybook dev",
     "build-storybook": "storybook build",
-    "test:integracion": "node --test test/integracion/*.test.cjs"
+    "test:integracion": "node --test test/integracion/*.test.cjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "@tiptap/extension-strike": "^3.20.4",
@@ -43,8 +45,10 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
+    "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-storybook": "^10.2.8",
     "playwright": "^1.53.2",
+    "prettier": "^3.10.1",
     "sass-embedded": "^1.97.3",
     "storybook": "^10.2.8",
     "typescript": "^5",

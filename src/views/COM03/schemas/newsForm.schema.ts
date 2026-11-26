@@ -39,9 +39,10 @@ export const newsPublishSchema = z.object({
     idioma: requiredText("Selecciona un idioma"),
     visibilidad: requiredText("Selecciona la visibilidad"),
     // Se escribe dd/mm/aaaa; al enviar se convierte a ISO (buildGuardarNoticiaPayload).
-    fechaPublicacion: requiredText(
-        "La fecha de publicación es obligatoria",
-    ).refine(isValidFecha, FECHA_INVALIDA),
+    fechaPublicacion: requiredText("La fecha de publicación es obligatoria").refine(
+        isValidFecha,
+        FECHA_INVALIDA,
+    ),
     slug: requiredText("La URL (slug) es obligatoria").regex(
         /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
         "Usa solo minúsculas, números y guiones",
@@ -79,10 +80,7 @@ export type NewsValidationMode = "publicar" | "borrador";
  * Valida los valores y devuelve los errores por ruta ("titulo", "secciones.1.contenido", ...).
  * Un objeto vacío significa que el formulario es válido.
  */
-export function validateNewsForm(
-    values: unknown,
-    mode: NewsValidationMode,
-): NewsFormErrors {
+export function validateNewsForm(values: unknown, mode: NewsValidationMode): NewsFormErrors {
     const schema = mode === "publicar" ? newsPublishSchema : newsDraftSchema;
     const result = schema.safeParse(values);
     let locationError = "";
@@ -93,9 +91,7 @@ export function validateNewsForm(
     }
     if (result.success) return locationError ? { ubicacion: locationError } : {};
 
-    const errors: NewsFormErrors = locationError
-        ? { ubicacion: locationError }
-        : {};
+    const errors: NewsFormErrors = locationError ? { ubicacion: locationError } : {};
     result.error.issues.forEach((issue) => {
         const path = issue.path.join(".");
         if (!errors[path]) errors[path] = issue.message;

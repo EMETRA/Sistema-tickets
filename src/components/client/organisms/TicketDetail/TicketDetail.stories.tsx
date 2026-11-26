@@ -17,14 +17,18 @@ export const InteractiveExample = () => {
     const [open, setOpen] = useState(false);
 
     return (
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: "20px", padding: "20px" }}>
+        <div
+            style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-start",
+                gap: "20px",
+                padding: "20px",
+            }}
+        >
             <Button onClick={() => setOpen(true)}>Abrir ticket details</Button>
 
-            <TicketDetail
-                ticketId="123"
-                isOpen={open}
-                onClose={() => setOpen(false)}
-            />
+            <TicketDetail ticketId="123" isOpen={open} onClose={() => setOpen(false)} />
         </div>
     );
 };

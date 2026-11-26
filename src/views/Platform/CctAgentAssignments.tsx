@@ -43,20 +43,14 @@ export function CctAgentAssignments({ agente }: { agente: CctRow }) {
         <section aria-label="Asignaciones de remisiones">
             <h3>Asignaciones de remisiones</h3>
             {!agente.TIPO_AGENTE ? (
-                <p>
-                    Falta el tipo del agente en el catálogo para enlazar sus
-                    talonarios con certeza.
-                </p>
+                <p>Falta el tipo del agente en el catálogo para enlazar sus talonarios con certeza.</p>
             ) : (
                 <>
                     {busy && <p role="status">Consultando talonarios…</p>}
                     {error && (
                         <div role="alert" className={styles.error}>
                             {error}
-                            <Button
-                                variant="outlined"
-                                onClick={() => void load(data?.offset || 0)}
-                            >
+                            <Button variant="outlined" onClick={() => void load(data?.offset || 0)}>
                                 Reintentar asignaciones
                             </Button>
                         </div>
@@ -77,11 +71,7 @@ export function CctAgentAssignments({ agente }: { agente: CctRow }) {
                                     "FECHA_FINAL",
                                 ]}
                             />
-                            <CctPager
-                                data={data}
-                                disabled={busy}
-                                onPage={(offset) => void load(offset)}
-                            />
+                            <CctPager data={data} disabled={busy} onPage={(offset) => void load(offset)} />
                         </>
                     )}
                 </>

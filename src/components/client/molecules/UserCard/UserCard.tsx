@@ -96,7 +96,7 @@ export const UserCard: React.FC<UserCardProps & { id: string }> = ({
                                     className={styles.dropdownItem}
                                     onClick={() => handleOptionClick(option.value)}
                                 >
-                                    <span 
+                                    <span
                                         className={styles.statusDot}
                                         style={{ backgroundColor: option.color }}
                                     />
@@ -110,38 +110,18 @@ export const UserCard: React.FC<UserCardProps & { id: string }> = ({
 
             {/* Información del usuario */}
             <div className={styles.userInfo}>
-                <Text className={styles.name}>
-                    {name}
-                </Text>
-                <Text className={styles.email}>
-                    {email}
-                </Text>
-                <Text className={styles.role}>
-                    {role}
-                </Text>
-                <Text className={styles.role}>
-                    {department}
-                </Text>
+                <Text className={styles.name}>{name}</Text>
+                <Text className={styles.email}>{email}</Text>
+                <Text className={styles.role}>{role}</Text>
+                <Text className={styles.role}>{department}</Text>
             </div>
 
             {/* Estadísticas */}
             <div className={styles.stats}>
-                {(role === "USUARIO") && (
-                    <div className={styles.statsCover} />
-                )}
-                <StatInLine
-                    label="Asignados"
-                    value={assignedCount}
-                    type="assigned"
-                    size="small"
-                />
+                {role === "USUARIO" && <div className={styles.statsCover} />}
+                <StatInLine label="Asignados" value={assignedCount} type="assigned" size="small" />
                 <div className={styles.divider} />
-                <StatInLine
-                    label="Resueltos"
-                    value={resolvedCount}
-                    type="resolved"
-                    size="small"
-                />
+                <StatInLine label="Resueltos" value={resolvedCount} type="resolved" size="small" />
             </div>
         </div>
     );

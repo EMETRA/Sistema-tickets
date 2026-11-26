@@ -11,6 +11,6 @@ export default meta;
 export const Default: StoryObj<typeof UserInfoPanel> = {
     args: {
         locations: ["Zona 3", "Zona 7", "Zona 5", "Zona 1"],
-        vacationDays: 15
-    }
+        vacationDays: 15,
+    },
 };

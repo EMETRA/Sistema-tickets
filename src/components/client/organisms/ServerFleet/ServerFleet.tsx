@@ -43,7 +43,9 @@ export function ServerFleet({
                 const rows = await Promise.all(
                     r.items.map(async (record) => ({
                         record,
-                        snapshot: await platformFetch<ServerSnapshot>("/monitor/" + record.id, opts).catch(() => null),
+                        snapshot: await platformFetch<ServerSnapshot>("/monitor/" + record.id, opts).catch(
+                            () => null,
+                        ),
                     })),
                 );
                 if (!c.signal.aborted) {
@@ -95,14 +97,20 @@ export function ServerFleet({
                                     <span>{label}</span>
                                     <span
                                         className={styles.track}
-                                        data-level={(value ?? 0) > 85 ? "high" : (value ?? 0) > 65 ? "mid" : "low"}
+                                        data-level={
+                                            (value ?? 0) > 85 ? "high" : (value ?? 0) > 65 ? "mid" : "low"
+                                        }
                                     >
                                         <span style={{ width: `${Math.min(100, value ?? 0)}%` }} />
                                     </span>
-                                    <span className={styles.pct}>{value === null ? "—" : Math.round(value) + "%"}</span>
+                                    <span className={styles.pct}>
+                                        {value === null ? "—" : Math.round(value) + "%"}
+                                    </span>
                                 </span>
                             ))}
-                            {!meters.length && <span className={styles.noData}>Sin mediciones recientes</span>}
+                            {!meters.length && (
+                                <span className={styles.noData}>Sin mediciones recientes</span>
+                            )}
                             <span className={styles.foot}>
                                 {snapshot?.contenedores.length ?? 0} contenedores
                                 {stopped ? ` · ${stopped} detenido${stopped > 1 ? "s" : ""}` : ""}
@@ -122,7 +130,12 @@ export function ServerFleet({
                             {body}
                         </button>
                     ) : (
-                        <Link key={record.id} href="/espacio/infraestructura" className={styles.card} data-health={health}>
+                        <Link
+                            key={record.id}
+                            href="/espacio/infraestructura"
+                            className={styles.card}
+                            data-health={health}
+                        >
                             {body}
                         </Link>
                     );

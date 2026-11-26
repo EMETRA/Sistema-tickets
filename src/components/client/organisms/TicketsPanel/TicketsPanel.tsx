@@ -28,11 +28,7 @@ const formatDate = (date: Date): string => {
  * @param {TicketsPanelProps} props - Las propiedades del componente
  * @returns {JSX.Element} El componente TicketsPanel renderizado
  */
-export const TicketsPanel: React.FC<TicketsPanelProps> = ({
-    variant,
-    tickets,
-    className,
-}) => {
+export const TicketsPanel: React.FC<TicketsPanelProps> = ({ variant, tickets, className }) => {
     // Limitar a máximo 10 tickets
     const limitedTickets = tickets.slice(0, 10);
 
@@ -98,7 +94,10 @@ export const TicketsPanel: React.FC<TicketsPanelProps> = ({
                                     },
                                     {
                                         content: (
-                                            <TicketStateChip state={ticket.status} label={ticket.statusLabel} />
+                                            <TicketStateChip
+                                                state={ticket.status}
+                                                label={ticket.statusLabel}
+                                            />
                                         ),
                                         align: "left",
                                     },
@@ -111,17 +110,13 @@ export const TicketsPanel: React.FC<TicketsPanelProps> = ({
                                         align: "left",
                                     },
                                     {
-                                        content: (
-                                            <Text variant="body">{formatDate(ticket.dateIngress)}</Text>
-                                        ),
+                                        content: <Text variant="body">{formatDate(ticket.dateIngress)}</Text>,
                                         align: "center",
                                     },
                                     {
                                         content: (
                                             <Text variant="body">
-                                                {ticket.dateAssigned
-                                                    ? formatDate(ticket.dateAssigned)
-                                                    : "-"}
+                                                {ticket.dateAssigned ? formatDate(ticket.dateAssigned) : "-"}
                                             </Text>
                                         ),
                                         align: "center",
@@ -179,9 +174,7 @@ export const TicketsPanel: React.FC<TicketsPanelProps> = ({
                                     align: "left",
                                 },
                                 {
-                                    content: (
-                                        <Text variant="body">{formatDate(ticket.dateIngress)}</Text>
-                                    ),
+                                    content: <Text variant="body">{formatDate(ticket.dateIngress)}</Text>,
                                     align: "left",
                                 },
                                 {

@@ -7,7 +7,8 @@ export type NoticeTone = "error" | "warning" | "info" | "success" | "forbidden" 
 
 const GLYPH: Record<NoticeTone, string> = {
     error: "M12 8v5m0 3h.01M10.3 3.9 2.6 17.2A2 2 0 0 0 4.3 20h15.4a2 2 0 0 0 1.7-2.8L13.7 3.9a2 2 0 0 0-3.4 0Z",
-    warning: "M12 8v5m0 3h.01M10.3 3.9 2.6 17.2A2 2 0 0 0 4.3 20h15.4a2 2 0 0 0 1.7-2.8L13.7 3.9a2 2 0 0 0-3.4 0Z",
+    warning:
+        "M12 8v5m0 3h.01M10.3 3.9 2.6 17.2A2 2 0 0 0 4.3 20h15.4a2 2 0 0 0 1.7-2.8L13.7 3.9a2 2 0 0 0-3.4 0Z",
     info: "M12 11v6m0-10h.01M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Z",
     success: "m5 12.5 4.5 4.5L19 7.5",
     forbidden: "M7 11V8a5 5 0 0 1 10 0v3M5 11h14v10H5Z",
@@ -42,9 +43,23 @@ export function StateNotice({
     const showCreate = useCreateTicketDialog((s) => s.show);
     const alert = tone === "error" || tone === "forbidden" || tone === "warning";
     return (
-        <section className={styles.notice} data-tone={tone} data-compact={compact || undefined} role={alert ? "alert" : "status"}>
+        <section
+            className={styles.notice}
+            data-tone={tone}
+            data-compact={compact || undefined}
+            role={alert ? "alert" : "status"}
+        >
             <span className={styles.icon} aria-hidden="true">
-                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                    viewBox="0 0 24 24"
+                    width="22"
+                    height="22"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                >
                     <path d={GLYPH[tone]} />
                 </svg>
             </span>

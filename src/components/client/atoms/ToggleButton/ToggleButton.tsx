@@ -8,7 +8,10 @@ import type { ToggleButtonProps } from "./types";
 import styles from "./ToggleButton.module.scss";
 
 export const ToggleButton = forwardRef<HTMLDivElement, ToggleButtonProps>(
-    ({ options, value, onChange, disabled = false, variant = "primary", maxVisibleOptions, className }, ref) => {
+    (
+        { options, value, onChange, disabled = false, variant = "primary", maxVisibleOptions, className },
+        ref,
+    ) => {
         const [startIndex, setStartIndex] = useState(0);
 
         // Determinar el color del botón según la variante
@@ -50,11 +53,15 @@ export const ToggleButton = forwardRef<HTMLDivElement, ToggleButtonProps>(
         return (
             <div
                 ref={ref}
-                className={classNames(styles.ToggleButton, {
-                    [styles["ToggleButton--disabled"]]: disabled,
-                    [styles["ToggleButton--withNavigation"]]: needsNavigation,
-                    [styles["ToggleButton--segmented"]]: variant === "segmented",
-                }, className)}
+                className={classNames(
+                    styles.ToggleButton,
+                    {
+                        [styles["ToggleButton--disabled"]]: disabled,
+                        [styles["ToggleButton--withNavigation"]]: needsNavigation,
+                        [styles["ToggleButton--segmented"]]: variant === "segmented",
+                    },
+                    className,
+                )}
             >
                 {needsNavigation && (
                     <IconButton
@@ -129,7 +136,7 @@ export const ToggleButton = forwardRef<HTMLDivElement, ToggleButtonProps>(
                 )}
             </div>
         );
-    }
+    },
 );
 
 ToggleButton.displayName = "ToggleButton";

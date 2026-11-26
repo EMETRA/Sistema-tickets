@@ -100,7 +100,9 @@ export const Interactive = {
                     onChange={setSelectedFilter}
                 />
                 <div style={{ marginTop: "20px", padding: "10px", background: "#f5f5f5" }}>
-                    <p>Filtro seleccionado: <strong>{selectedFilter}</strong></p>
+                    <p>
+                        Filtro seleccionado: <strong>{selectedFilter}</strong>
+                    </p>
                 </div>
             </div>
         );

@@ -1,21 +1,21 @@
 import { falloModulo } from "@/api/graphql/module-response";
 /**
  * Route Handler: GET /api/MOD08/reporteAnuladosResultados
- * 
+ *
  * Propósito: Obtener resultados filtrados de reportes anulados
- * 
+ *
  * Parámetros de query string requeridos:
  * - fechaInicio: string (YYYY-MM-DD)
  * - fechaFin: string (YYYY-MM-DD)
  * - tipoReporte: string (RECIBOS_PAGO | TICKET_PARQUEOS | PARALELO_FORMAS)
- * 
+ *
  * Validaciones:
  * - Todas las fechas son requeridas
  * - Formato debe ser YYYY-MM-DD
  * - Fechas deben ser válidas en el calendario
  * - fechaInicio <= fechaFin
  * - Requiere permisos financieros (Bearer)
- * 
+ *
  * Respuesta exitosa (200):
  * {
  *   data: {
@@ -36,10 +36,14 @@ import { falloModulo } from "@/api/graphql/module-response";
  * }
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { graphqlRequest } from '@/api/graphql/client';
-import { GET_REPORTE_ANULADOS_RESULTADOS_QUERY, TipoReporteAnulado, TipoReporteAnuladoEnum } from '@/api/graphql/MOD08';
-import type { GetReporteAnuladosResultadosResponse, ReporteAnuladosInput } from '@/api/graphql/MOD08';
+import { NextRequest, NextResponse } from "next/server";
+import { graphqlRequest } from "@/api/graphql/client";
+import {
+    GET_REPORTE_ANULADOS_RESULTADOS_QUERY,
+    TipoReporteAnulado,
+    TipoReporteAnuladoEnum,
+} from "@/api/graphql/MOD08";
+import type { GetReporteAnuladosResultadosResponse, ReporteAnuladosInput } from "@/api/graphql/MOD08";
 
 /**
  * Valida el formato de una fecha YYYY-MM-DD
@@ -55,11 +59,11 @@ function isValidDateFormat(dateString: string): boolean {
     const timestamp = date.getTime();
 
     // Comparar la fecha parseada con la cadena original para evitar fechas inválidas como 2026-02-30
-    if (typeof timestamp !== 'number' || Number.isNaN(timestamp)) {
+    if (typeof timestamp !== "number" || Number.isNaN(timestamp)) {
         return false;
     }
 
-    const isoDate = date.toISOString().split('T')[0];
+    const isoDate = date.toISOString().split("T")[0];
     return isoDate === dateString;
 }
 
@@ -73,9 +77,9 @@ function isValidTipoReporte(tipo: string): tipo is TipoReporteAnulado {
 export async function GET(request: NextRequest) {
     try {
         const searchParams = request.nextUrl.searchParams;
-        const fechaInicio = searchParams.get('fechaInicio');
-        const fechaFin = searchParams.get('fechaFin');
-        const tipoReporte = searchParams.get('tipoReporte');
+        const fechaInicio = searchParams.get("fechaInicio");
+        const fechaFin = searchParams.get("fechaFin");
+        const tipoReporte = searchParams.get("tipoReporte");
 
         const timestamp = new Date().toISOString();
 
@@ -83,8 +87,8 @@ export async function GET(request: NextRequest) {
         if (!fechaInicio) {
             return NextResponse.json(
                 {
-                    error: 'Parámetro requerido ausente',
-                    message: 'fechaInicio es requerido (formato: YYYY-MM-DD)',
+                    error: "Parámetro requerido ausente",
+                    message: "fechaInicio es requerido (formato: YYYY-MM-DD)",
                     timestamp,
                 },
                 { status: 400 },
@@ -94,8 +98,8 @@ export async function GET(request: NextRequest) {
         if (!fechaFin) {
             return NextResponse.json(
                 {
-                    error: 'Parámetro requerido ausente',
-                    message: 'fechaFin es requerido (formato: YYYY-MM-DD)',
+                    error: "Parámetro requerido ausente",
+                    message: "fechaFin es requerido (formato: YYYY-MM-DD)",
                     timestamp,
                 },
                 { status: 400 },
@@ -105,8 +109,8 @@ export async function GET(request: NextRequest) {
         if (!tipoReporte) {
             return NextResponse.json(
                 {
-                    error: 'Parámetro requerido ausente',
-                    message: 'tipoReporte es requerido (RECIBOS_PAGO | TICKET_PARQUEOS | PARALELO_FORMAS)',
+                    error: "Parámetro requerido ausente",
+                    message: "tipoReporte es requerido (RECIBOS_PAGO | TICKET_PARQUEOS | PARALELO_FORMAS)",
                     timestamp,
                 },
                 { status: 400 },
@@ -117,7 +121,7 @@ export async function GET(request: NextRequest) {
         if (!isValidDateFormat(fechaInicio)) {
             return NextResponse.json(
                 {
-                    error: 'Formato de fecha inválido',
+                    error: "Formato de fecha inválido",
                     message: `fechaInicio debe estar en formato YYYY-MM-DD (recibido: ${fechaInicio})`,
                     timestamp,
                 },
@@ -128,7 +132,7 @@ export async function GET(request: NextRequest) {
         if (!isValidDateFormat(fechaFin)) {
             return NextResponse.json(
                 {
-                    error: 'Formato de fecha inválido',
+                    error: "Formato de fecha inválido",
                     message: `fechaFin debe estar en formato YYYY-MM-DD (recibido: ${fechaFin})`,
                     timestamp,
                 },
@@ -140,7 +144,7 @@ export async function GET(request: NextRequest) {
         if (fechaInicio > fechaFin) {
             return NextResponse.json(
                 {
-                    error: 'Rango de fechas inválido',
+                    error: "Rango de fechas inválido",
                     message: `fechaInicio (${fechaInicio}) debe ser menor o igual a fechaFin (${fechaFin})`,
                     timestamp,
                 },
@@ -152,7 +156,7 @@ export async function GET(request: NextRequest) {
         if (!isValidTipoReporte(tipoReporte)) {
             return NextResponse.json(
                 {
-                    error: 'Tipo de reporte inválido',
+                    error: "Tipo de reporte inválido",
                     message: `tipoReporte debe ser uno de: RECIBOS_PAGO, TICKET_PARQUEOS, PARALELO_FORMAS (recibido: ${tipoReporte})`,
                     timestamp,
                 },
@@ -169,7 +173,7 @@ export async function GET(request: NextRequest) {
 
         const response = await graphqlRequest<GetReporteAnuladosResultadosResponse>(
             GET_REPORTE_ANULADOS_RESULTADOS_QUERY,
-            { 
+            {
                 variables: { input },
             },
         );
@@ -180,5 +184,7 @@ export async function GET(request: NextRequest) {
             },
             { status: 200 },
         );
-    } catch (error) { return falloModulo(error, "MOD08/reporteAnuladosResultados"); }
+    } catch (error) {
+        return falloModulo(error, "MOD08/reporteAnuladosResultados");
+    }
 }

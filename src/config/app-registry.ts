@@ -1,10 +1,6 @@
 import { WorkerNotificationsWorkspace } from "@/views/Platform/WorkerNotificationsWorkspace";
 import { ViviPmtWorkspace } from "@/views/Platform/ViviPmtWorkspace";
-import {
-    CctConsultas,
-    CctFormularios,
-    CctReportes,
-} from "@/views/Platform/CctWorkspace";
+import { CctConsultas, CctFormularios, CctReportes } from "@/views/Platform/CctWorkspace";
 import { TransitReprintsWorkspace } from "@/views/Platform/TransitReprintsWorkspace";
 import { ViviReportsWorkspace } from "@/views/Platform/ViviReportsWorkspace";
 import { PayrollWorkspace } from "@/views/Platform/PayrollWorkspace";

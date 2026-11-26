@@ -30,7 +30,7 @@ export const ProgressRingStat: React.FC<ProgressRingStatProps> = ({
                 strokeWidth={strokeWidth}
                 className={styles.RingContainer}
             />
-      
+
             <p className={styles.Label}>{label}</p>
         </div>
     );

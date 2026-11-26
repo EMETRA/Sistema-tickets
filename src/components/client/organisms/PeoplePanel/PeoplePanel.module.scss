@@ -60,7 +60,8 @@
   box-shadow: var(--tickets-shadow);
   overflow: hidden;
   &[data-missing] {
-    border-color: #f6d9de; border-color: light-dark(#f6d9de, #2a3449);
+    border-color: #f6d9de;
+    border-color: light-dark(#f6d9de, #2a3449);
     header {
       background: color-mix(in srgb, var(--tickets-danger) 7%, var(--tickets-surface));
       h3 {
@@ -179,9 +180,12 @@ a.name:hover {
   text-align: left;
   color: var(--tickets-text);
   cursor: pointer;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
   &:hover {
-    border-color: #b8c5f5; border-color: light-dark(#b8c5f5, #2a3449);
+    border-color: #b8c5f5;
+    border-color: light-dark(#b8c5f5, #2a3449);
     box-shadow: 0 8px 24px #1a2b4a14;
   }
   &:focus-visible {

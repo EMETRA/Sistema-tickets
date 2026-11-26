@@ -43,11 +43,19 @@ const initials = (name: string) =>
         .join("")
         .toUpperCase();
 const time = (iso: string) =>
-    new Intl.DateTimeFormat("es-GT", { hour: "2-digit", minute: "2-digit", hourCycle: "h23", timeZone: "America/Guatemala" }).format(new Date(iso));
+    new Intl.DateTimeFormat("es-GT", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hourCycle: "h23",
+        timeZone: "America/Guatemala",
+    }).format(new Date(iso));
 function dayTitle(day: string) {
-    const label = new Intl.DateTimeFormat("es-GT", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" }).format(
-        new Date(day + "T12:00:00Z"),
-    );
+    const label = new Intl.DateTimeFormat("es-GT", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        timeZone: "UTC",
+    }).format(new Date(day + "T12:00:00Z"));
     if (day === guatemalaDay()) return "Hoy · " + label;
     if (day === guatemalaDay(new Date(Date.now() - 86400000))) return "Ayer · " + label;
     return label.charAt(0).toUpperCase() + label.slice(1);
@@ -74,7 +82,8 @@ export function AuditFeed({ items }: { items: AuditEntry[] }) {
                                 {problems > 0 && (
                                     <strong>
                                         {" "}
-                                        · {problems} {problems === 1 ? "denegado o fallido" : "denegados o fallidos"}
+                                        · {problems}{" "}
+                                        {problems === 1 ? "denegado o fallido" : "denegados o fallidos"}
                                     </strong>
                                 )}
                             </span>
@@ -102,10 +111,16 @@ export function AuditFeed({ items }: { items: AuditEntry[] }) {
                                             <details className={common.inlineDetails}>
                                                 <summary>Antes y después</summary>
                                                 <div className={styles.diff}>
-                                                    <pre className={common.log}>{JSON.stringify(e.antes, null, 2)}</pre>
-                                                    <pre className={common.log}>{JSON.stringify(e.despues, null, 2)}</pre>
+                                                    <pre className={common.log}>
+                                                        {JSON.stringify(e.antes, null, 2)}
+                                                    </pre>
+                                                    <pre className={common.log}>
+                                                        {JSON.stringify(e.despues, null, 2)}
+                                                    </pre>
                                                 </div>
-                                                <small className={common.muted}>Solicitud: {e.solicitudId}</small>
+                                                <small className={common.muted}>
+                                                    Solicitud: {e.solicitudId}
+                                                </small>
                                             </details>
                                         </div>
                                         <span className={common.chip} data-tone={tone}>

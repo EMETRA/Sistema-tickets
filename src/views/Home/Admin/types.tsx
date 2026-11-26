@@ -8,28 +8,28 @@ import { TicketData } from "@/components/client/organisms/TicketsPanel";
  * Props para página de Home para Administrador
  */
 export interface AdminHomeProps {
-  /**
-   * Datos estadísticos para mostrar el Ticket Stat
-   */
-  ticketStats: TicketStatData[];
-  
-  /**
-   * Datos para el gráfico de rendimiento
-  */
-  performanceData: BarChartDataPoint[];
- 
-  /**
-  * Datos para los paneles de información
-  */
-  eventsInfoPanel: EventItemProps[];
+    /**
+     * Datos estadísticos para mostrar el Ticket Stat
+     */
+    ticketStats: TicketStatData[];
 
-  /**
-   * Datos para el gráfico de tickets resueltos
-   */
-  resolvedTicketsData: DonutChartDataItem[];
-  
-  /**
-   * Lista de tickets para mostrar en el panel de tickets
-   */
-  tickets: TicketData[];
+    /**
+     * Datos para el gráfico de rendimiento
+     */
+    performanceData: BarChartDataPoint[];
+
+    /**
+     * Datos para los paneles de información
+     */
+    eventsInfoPanel: EventItemProps[];
+
+    /**
+     * Datos para el gráfico de tickets resueltos
+     */
+    resolvedTicketsData: DonutChartDataItem[];
+
+    /**
+     * Lista de tickets para mostrar en el panel de tickets
+     */
+    tickets: TicketData[];
 }

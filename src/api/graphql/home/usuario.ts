@@ -35,9 +35,9 @@ export const GET_USER_BY_ID_QUERY = `
 `;
 
 export interface GetUserResponse {
-  usuario: UsuarioPerfil;
+    usuario: UsuarioPerfil;
 }
 
 export interface GetUserByIdResponse {
-  usuario: UsuarioPerfil;
+    usuario: UsuarioPerfil;
 }

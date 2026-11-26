@@ -13,7 +13,8 @@
   left: 0;
   padding: 10px 5px;
   background-color: var(--tickets-surface);
-  border: 1px solid #ccc; border: 1px solid light-dark(#ccc, #2a3449);
+  border: 1px solid #ccc;
+  border: 1px solid light-dark(#ccc, #2a3449);
   border-radius: 4px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   z-index: 1000;
@@ -22,13 +23,13 @@
   width: 100%;
 }
 
-
 .menuItem {
   padding: 5px;
   cursor: pointer;
 
   &:hover {
-      background-color: #f5f5f5; background-color: light-dark(#f5f5f5, #131926);
+    background-color: #f5f5f5;
+    background-color: light-dark(#f5f5f5, #131926);
   }
 }
 
@@ -36,7 +37,7 @@
   margin-left: 8px;
 
   transition: transform 0.3s ease;
-  
+
   &.isOpen {
     transform: rotate(-180deg);
   }

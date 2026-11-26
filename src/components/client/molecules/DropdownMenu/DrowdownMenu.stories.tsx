@@ -47,5 +47,5 @@ export const Default: Story = {
                 <p>Elemento seleccionado: {selectedItem.value}</p>
             </>
         );
-    }
+    },
 };

@@ -16,17 +16,16 @@ const PermissionsForm: React.FC<PermissionsFormProps> = ({
     initialData,
     onSubmit,
     onCancel,
-    className
+    className,
 }) => {
-
     const [module, setModule] = useState(1);
     const [name, setName] = useState("");
     const [code, setCode] = useState("");
     const [description, setDescription] = useState("");
 
-    const options = modules.map(item => 
-    { return { label: item.name, value: item.id }}
-    );
+    const options = modules.map((item) => {
+        return { label: item.name, value: item.id };
+    });
 
     useEffect(() => {
         if (initialData) {
@@ -35,89 +34,55 @@ const PermissionsForm: React.FC<PermissionsFormProps> = ({
             setCode(initialData.code);
             setDescription(initialData.description || "");
         }
-    }, [initialData])
+    }, [initialData]);
 
     const handleSubmit = () => {
-        onSubmit?.({module, name, code, description});
+        onSubmit?.({ module, name, code, description });
     };
 
     return (
         <div className={classNames(styles.PermissionsForm, className)}>
-
-            <TableHeader 
+            <TableHeader
                 iconName="user-lock-solid"
                 label={initialData ? "Editar permiso" : "Crear nuevo permiso"}
             />
 
             <div className={styles.form}>
                 <form onSubmit={handleSubmit}>
-                    <SelectField
-                        label="Módulo"
-                        htmlFor="module"
-                        required
-                    >
-                        <Select 
-                            id="module" 
-                            options={options} 
+                    <SelectField label="Módulo" htmlFor="module" required>
+                        <Select
+                            id="module"
+                            options={options}
                             value={module}
                             onChange={(e) => setModule(parseInt(e.target.value))}
                             required
                         />
                     </SelectField>
 
-                    <FormField
-                        label="Nombre del permiso"
-                        htmlFor="name"
-                        required
-                    >
-                        <Input 
-                            id="name" 
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            required
-                        />
+                    <FormField label="Nombre del permiso" htmlFor="name" required>
+                        <Input id="name" value={name} onChange={(e) => setName(e.target.value)} required />
                     </FormField>
 
-                    <FormField
-                        label="Código del permiso"
-                        htmlFor="code"
-                        required
-                    >
-                        <Input 
-                            id="code" 
-                            value={code}
-                            onChange={(e) => setCode(e.target.value)}
-                            required
-                        />
+                    <FormField label="Código del permiso" htmlFor="code" required>
+                        <Input id="code" value={code} onChange={(e) => setCode(e.target.value)} required />
                     </FormField>
 
-                    <FormField
-                        label="Descripción del permiso"
-                        htmlFor="description"
-                    >
-                        <TextArea 
-                            id="description" 
+                    <FormField label="Descripción del permiso" htmlFor="description">
+                        <TextArea
+                            id="description"
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                         />
                     </FormField>
 
                     <FormActions align="center">
-                        <Button
-                            color="cancel"
-                            onClick={onCancel}
-                        >
+                        <Button color="cancel" onClick={onCancel}>
                             Cancelar
                         </Button>
-                        <Button
-                            type="submit"
-                        >
-                            {initialData ? "Editar" : "Grabar"}
-                        </Button>
+                        <Button type="submit">{initialData ? "Editar" : "Grabar"}</Button>
                     </FormActions>
                 </form>
             </div>
-
         </div>
     );
 };

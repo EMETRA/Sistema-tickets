@@ -19,7 +19,13 @@ const initials = (name: string) =>
 const PREVIEW = 12;
 
 /** Propuesta: el personal de RRHH como directorio por unidad, con el estado de su cuenta. */
-export function PeopleDirectoryView({ people, onRefresh }: { people: OrganizationPerson[]; onRefresh: () => void }) {
+export function PeopleDirectoryView({
+    people,
+    onRefresh,
+}: {
+    people: OrganizationPerson[];
+    onRefresh: () => void;
+}) {
     const [query, setQuery] = useState("");
     const [filter, setFilter] = useState<Filter>("TODOS");
     const [expanded, setExpanded] = useState<Record<string, boolean>>({});
@@ -41,8 +47,17 @@ export function PeopleDirectoryView({ people, onRefresh }: { people: Organizatio
             map.set(key, [...(map.get(key) || []), p]);
         }
         return [...map.entries()]
-            .map(([unit, list]) => ({ unit, list: list.sort((a, b) => a.nombre.localeCompare(b.nombre)), noUnit: !list[0].unidad }))
-            .sort((a, b) => Number(a.noUnit) - Number(b.noUnit) || b.list.length - a.list.length || a.unit.localeCompare(b.unit));
+            .map(([unit, list]) => ({
+                unit,
+                list: list.sort((a, b) => a.nombre.localeCompare(b.nombre)),
+                noUnit: !list[0].unidad,
+            }))
+            .sort(
+                (a, b) =>
+                    Number(a.noUnit) - Number(b.noUnit) ||
+                    b.list.length - a.list.length ||
+                    a.unit.localeCompare(b.unit),
+            );
     }, [people, query, filter]);
     const total = groups.reduce((n, g) => n + g.list.length, 0);
 
@@ -53,11 +68,30 @@ export function PeopleDirectoryView({ people, onRefresh }: { people: Organizatio
                     [
                         ["TODOS", "Empleados activos", people.length, "Según RRHH", "info"],
                         ["CON_CUENTA", "Con cuenta en el panel", withAccount, "Pueden ingresar", "success"],
-                        ["SIN_CUENTA", "Sin cuenta", people.length - withAccount, "Aún no ingresan al panel", people.length - withAccount ? "warning" : "neutral"],
-                        ["SIN_UNIDAD", "Sin unidad", noUnit, "Revisar en RRHH", noUnit ? "danger" : "neutral"],
+                        [
+                            "SIN_CUENTA",
+                            "Sin cuenta",
+                            people.length - withAccount,
+                            "Aún no ingresan al panel",
+                            people.length - withAccount ? "warning" : "neutral",
+                        ],
+                        [
+                            "SIN_UNIDAD",
+                            "Sin unidad",
+                            noUnit,
+                            "Revisar en RRHH",
+                            noUnit ? "danger" : "neutral",
+                        ],
                     ] as const
                 ).map(([id, label, value, hint, tone]) => (
-                    <button key={id} type="button" className={tiles.tile} data-tone={tone} aria-pressed={filter === id} onClick={() => setFilter(id)}>
+                    <button
+                        key={id}
+                        type="button"
+                        className={tiles.tile}
+                        data-tone={tone}
+                        aria-pressed={filter === id}
+                        onClick={() => setFilter(id)}
+                    >
                         <span className={tiles.tileLabel}>{label}</span>
                         <strong>{value}</strong>
                         <small>{hint}</small>
@@ -74,7 +108,8 @@ export function PeopleDirectoryView({ people, onRefresh }: { people: Organizatio
                     onChange={(e) => setQuery(e.target.value)}
                 />
                 <span className={styles.count}>
-                    {total} {total === 1 ? "persona" : "personas"} en {groups.length} {groups.length === 1 ? "unidad" : "unidades"}
+                    {total} {total === 1 ? "persona" : "personas"} en {groups.length}{" "}
+                    {groups.length === 1 ? "unidad" : "unidades"}
                 </span>
                 <button type="button" className={styles.ghost} onClick={onRefresh}>
                     Actualizar
@@ -84,11 +119,17 @@ export function PeopleDirectoryView({ people, onRefresh }: { people: Organizatio
                 const open = expanded[unit] || list.length <= PREVIEW;
                 const accounts = list.filter((p) => p.cuentasHabilitadas > 0).length;
                 return (
-                    <section key={unit} className={styles.unit} data-missing={missing || undefined} aria-label={unit}>
+                    <section
+                        key={unit}
+                        className={styles.unit}
+                        data-missing={missing || undefined}
+                        aria-label={unit}
+                    >
                         <header>
                             <h3>{unit}</h3>
                             <span>
-                                {list.length} {list.length === 1 ? "persona" : "personas"} · {accounts} con cuenta
+                                {list.length} {list.length === 1 ? "persona" : "personas"} · {accounts} con
+                                cuenta
                             </span>
                         </header>
                         <ul className={styles.people}>
@@ -96,12 +137,19 @@ export function PeopleDirectoryView({ people, onRefresh }: { people: Organizatio
                                 const account = p.cuentasHabilitadas > 0;
                                 return (
                                     <li key={`${p.empresa}:${p.empleado}`} className={styles.person}>
-                                        <span className={styles.avatar} data-account={account || undefined} aria-hidden="true">
+                                        <span
+                                            className={styles.avatar}
+                                            data-account={account || undefined}
+                                            aria-hidden="true"
+                                        >
                                             {initials(p.nombre)}
                                         </span>
                                         <div className={styles.personText}>
                                             {p.usuariosIds?.length === 1 ? (
-                                                <Link href={"/equipo/" + p.usuariosIds[0]} className={styles.name}>
+                                                <Link
+                                                    href={"/equipo/" + p.usuariosIds[0]}
+                                                    className={styles.name}
+                                                >
                                                     {p.nombre}
                                                 </Link>
                                             ) : (
@@ -111,10 +159,19 @@ export function PeopleDirectoryView({ people, onRefresh }: { people: Organizatio
                                                 {p.puesto || "Puesto sin registrar"} · {p.empleado}
                                             </small>
                                             <span className={styles.personActions}>
-                                                <span className={common.chip} data-tone={account ? "success" : "warning"}>
+                                                <span
+                                                    className={common.chip}
+                                                    data-tone={account ? "success" : "warning"}
+                                                >
                                                     {account ? "Con cuenta" : "Sin cuenta"}
                                                 </span>
-                                                <Link className={common.link} href={"/espacio/inventario?view=inventario&empleado=" + p.empleado}>
+                                                <Link
+                                                    className={common.link}
+                                                    href={
+                                                        "/espacio/inventario?view=inventario&empleado=" +
+                                                        p.empleado
+                                                    }
+                                                >
                                                     Ver bienes
                                                 </Link>
                                                 {!account && (
@@ -129,7 +186,11 @@ export function PeopleDirectoryView({ people, onRefresh }: { people: Organizatio
                             })}
                         </ul>
                         {!open && (
-                            <button type="button" className={styles.more} onClick={() => setExpanded((e) => ({ ...e, [unit]: true }))}>
+                            <button
+                                type="button"
+                                className={styles.more}
+                                onClick={() => setExpanded((e) => ({ ...e, [unit]: true }))}
+                            >
                                 Ver las {list.length - PREVIEW} personas restantes
                             </button>
                         )}

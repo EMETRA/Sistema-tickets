@@ -46,9 +46,9 @@ const NewsContentSection: React.FC<NewsContentSectionProps> = ({
         setRejectedFiles(rejected);
         const used = imageLimit?.usedBytes ?? 0;
         const { fitting, tooLarge } = fitFilesInLimit(accepted.slice(0, 1), used, imageLimit?.maxBytes);
-        setSizeError(tooLarge.length > 0 && imageLimit
-            ? sizeLimitMessage(tooLarge, used, imageLimit.maxBytes)
-            : null);
+        setSizeError(
+            tooLarge.length > 0 && imageLimit ? sizeLimitMessage(tooLarge, used, imageLimit.maxBytes) : null,
+        );
         if (fitting.length > 0) onImageChange(fitting[0]);
     };
 
@@ -130,15 +130,25 @@ const NewsContentSection: React.FC<NewsContentSectionProps> = ({
                         variant="compact"
                         multiple={false}
                         accept={accept}
-                        title={onVideoAdd ? "Imagen o video de esta sección (opcional)" : "Imagen de esta sección (opcional)"}
-                        subtitle={onVideoAdd ? "Arrastra una imagen o pega abajo el enlace de un video. Puedes dejarla vacía." : "Puedes dejarla vacía."}
+                        title={
+                            onVideoAdd
+                                ? "Imagen o video de esta sección (opcional)"
+                                : "Imagen de esta sección (opcional)"
+                        }
+                        subtitle={
+                            onVideoAdd
+                                ? "Arrastra una imagen o pega abajo el enlace de un video. Puedes dejarla vacía."
+                                : "Puedes dejarla vacía."
+                        }
                         onFiles={handleFiles}
                         rejectedFiles={rejectedFiles}
                     />
-                    {sizeError && <span className={styles.error} role="alert">{sizeError}</span>}
-                    {onVideoAdd && (
-                        <YouTubeLinkField id={`seccion-${section.id}-video`} onAdd={onVideoAdd} />
+                    {sizeError && (
+                        <span className={styles.error} role="alert">
+                            {sizeError}
+                        </span>
                     )}
+                    {onVideoAdd && <YouTubeLinkField id={`seccion-${section.id}-video`} onAdd={onVideoAdd} />}
                 </div>
             )}
         </div>

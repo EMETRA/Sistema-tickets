@@ -3,17 +3,8 @@ import { AppCard } from "../../molecules/AppCard";
 import styles from "./AppsGrid.module.scss";
 import classNames from "classnames";
 
-export const AppsGrid = ({
-    title,
-    apps,
-    description,
-    showHeading = true,
-    className,
-}: AppsGridProps) => (
-    <section
-        className={classNames(styles.container, className)}
-        aria-label={title}
-    >
+export const AppsGrid = ({ title, apps, description, showHeading = true, className }: AppsGridProps) => (
+    <section className={classNames(styles.container, className)} aria-label={title}>
         {(showHeading || description) && (
             <header className={styles.header}>
                 {showHeading && <h1>{title}</h1>}
@@ -23,10 +14,7 @@ export const AppsGrid = ({
         {apps.length === 0 ? (
             <div className={styles.empty}>
                 <h2>No hay aplicaciones disponibles</h2>
-                <p>
-                    Los accesos aparecerán aquí cuando se asignen permisos a tu
-                    perfil.
-                </p>
+                <p>Los accesos aparecerán aquí cuando se asignen permisos a tu perfil.</p>
             </div>
         ) : (
             <div className={styles.grid}>

@@ -3,7 +3,8 @@
   flex-direction: column;
   min-width: 0;
   background: var(--tickets-surface);
-  border: 1px solid #e0e6f0; border: 1px solid light-dark(#e0e6f0, #2a3449);
+  border: 1px solid #e0e6f0;
+  border: 1px solid light-dark(#e0e6f0, #2a3449);
   border-radius: 16px;
   overflow: hidden;
   font-family: var(--font-montserrat), sans-serif;
@@ -15,7 +16,8 @@
   flex-wrap: wrap;
   gap: 16px;
   padding: 18px 20px;
-  border-bottom: 1px solid #e1e7f0; border-bottom: 1px solid light-dark(#e1e7f0, #2a3449);
+  border-bottom: 1px solid #e1e7f0;
+  border-bottom: 1px solid light-dark(#e1e7f0, #2a3449);
   > * {
     max-width: 100%;
   }
@@ -42,20 +44,24 @@
     font-size: 12px;
     color: #6a7d97;
     padding: 12px 20px;
-    background: #fafbfd; background: light-dark(#fafbfd, #161d2c);
+    background: #fafbfd;
+    background: light-dark(#fafbfd, #161d2c);
   }
   th {
     background: var(--tickets-surface-subtle);
-    color: #627590; color: light-dark(#627590, #b0bbc9);
+    color: #627590;
+    color: light-dark(#627590, #b0bbc9);
     font-size: 12px;
     font-weight: 600;
     padding: 14px 20px;
-    border-bottom: 1px solid #e1e7f0; border-bottom: 1px solid light-dark(#e1e7f0, #2a3449);
+    border-bottom: 1px solid #e1e7f0;
+    border-bottom: 1px solid light-dark(#e1e7f0, #2a3449);
   }
   td {
     padding: 16px 20px;
     vertical-align: middle;
-    border-bottom: 1px solid #edf0f5; border-bottom: 1px solid light-dark(#edf0f5, #2a3449);
+    border-bottom: 1px solid #edf0f5;
+    border-bottom: 1px solid light-dark(#edf0f5, #2a3449);
   }
   tr:last-child td {
     border-bottom: 0;
@@ -75,12 +81,14 @@
 .title {
   font-size: 13px;
   font-weight: 700;
-  color: #263b56; color: light-dark(#263b56, #a3b9d6);
+  color: #263b56;
+  color: light-dark(#263b56, #a3b9d6);
   line-height: 1.6;
 }
 .text {
   font-size: 13px;
-  color: #425771; color: light-dark(#425771, #abbbce);
+  color: #425771;
+  color: light-dark(#425771, #abbbce);
   line-height: 1.5;
 }
 .muted {
@@ -108,24 +116,34 @@
   font-weight: 600;
 }
 .pill.pill--warning {
-  background: #fff3d7; background: light-dark(#fff3d7, #584720);
-  color: #7b5712; color: light-dark(#7b5712, #eecc8b);
+  background: #fff3d7;
+  background: light-dark(#fff3d7, #584720);
+  color: #7b5712;
+  color: light-dark(#7b5712, #eecc8b);
 }
 .pill.pill--success {
-  background: #e9f5ef; background: light-dark(#e9f5ef, #132e30);
-  color: #246045; color: light-dark(#246045, #9fdbc0);
+  background: #e9f5ef;
+  background: light-dark(#e9f5ef, #132e30);
+  color: #246045;
+  color: light-dark(#246045, #9fdbc0);
 }
 .pill.pill--neutral {
-  background: #f0f3f8; background: light-dark(#f0f3f8, #132039);
-  color: #5c6e86; color: light-dark(#5c6e86, #b0bbc9);
+  background: #f0f3f8;
+  background: light-dark(#f0f3f8, #132039);
+  color: #5c6e86;
+  color: light-dark(#5c6e86, #b0bbc9);
 }
 .pill.pill--info {
-  background: #eaf1fe; background: light-dark(#eaf1fe, #132549);
-  color: #365b95; color: light-dark(#365b95, #9eb6dc);
+  background: #eaf1fe;
+  background: light-dark(#eaf1fe, #132549);
+  color: #365b95;
+  color: light-dark(#365b95, #9eb6dc);
 }
 .pill.pill--danger {
-  background: #fdeef0; background: light-dark(#fdeef0, #32192a);
-  color: #9b323e; color: light-dark(#9b323e, #df9ba3);
+  background: #fdeef0;
+  background: light-dark(#fdeef0, #32192a);
+  color: #9b323e;
+  color: light-dark(#9b323e, #df9ba3);
 }
 .errorState,
 .emptyState {
@@ -135,20 +153,23 @@
   text-align: center;
   align-items: center;
   h2 {
-    color: #304561; color: light-dark(#304561, #a6b9d3);
+    color: #304561;
+    color: light-dark(#304561, #a6b9d3);
     font-size: 18px;
     margin: 10px 0;
   }
   p {
     margin: 0 auto 18px;
     max-width: 520px;
-    color: #667992; color: light-dark(#667992, #e5eaf5);
+    color: #667992;
+    color: light-dark(#667992, #e5eaf5);
     font-size: 14px;
     line-height: 1.6;
   }
 }
 .errorState {
-  background: #fffcfc; background: light-dark(#fffcfc, #161d2c);
+  background: #fffcfc;
+  background: light-dark(#fffcfc, #161d2c);
 }
 .loadingState {
   padding: 28px;
@@ -162,7 +183,8 @@
   display: block;
   height: 14px;
   border-radius: 6px;
-  background: #edf0f6; background: light-dark(#edf0f6, #131f38);
+  background: #edf0f6;
+  background: light-dark(#edf0f6, #131f38);
   animation: pulse 1.4s ease-in-out infinite;
 }
 .skeleton--short {

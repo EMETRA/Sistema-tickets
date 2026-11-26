@@ -73,7 +73,10 @@ export function SettingsView() {
             <section className={styles.section} aria-labelledby="ajustes-apariencia">
                 <header>
                     <h2 id="ajustes-apariencia">Apariencia</h2>
-                    <p>Elige cómo se ve el panel en este navegador. Se aplica al instante en todas las pantallas.</p>
+                    <p>
+                        Elige cómo se ve el panel en este navegador. Se aplica al instante en todas las
+                        pantallas.
+                    </p>
                 </header>
                 <div className={styles.themes} role="radiogroup" aria-labelledby="ajustes-apariencia">
                     {THEMES.map((t) => (
@@ -128,7 +131,11 @@ export function SettingsView() {
                                 className={styles.size}
                                 onClick={() => setAccessibility("textSize", t.id)}
                             >
-                                <span className={styles.sample} style={{ fontSize: 22 * t.scale }} aria-hidden="true">
+                                <span
+                                    className={styles.sample}
+                                    style={{ fontSize: 22 * t.scale }}
+                                    aria-hidden="true"
+                                >
                                     Aa
                                 </span>
                                 <span className={styles.themeText}>
@@ -180,7 +187,10 @@ export function SettingsView() {
                 <div className={styles.toggleRow}>
                     <span className={styles.toggleText}>
                         <strong id="ajustes-recorrido">Recorrido guiado</strong>
-                        <small>Un paseo de un minuto por el menú, la búsqueda, los tickets y estos ajustes. Puedes repetirlo las veces que quieras.</small>
+                        <small>
+                            Un paseo de un minuto por el menú, la búsqueda, los tickets y estos ajustes.
+                            Puedes repetirlo las veces que quieras.
+                        </small>
                     </span>
                     <button type="button" className={styles.reset} onClick={startTour}>
                         Ver recorrido

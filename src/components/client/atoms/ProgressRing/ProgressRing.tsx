@@ -41,11 +41,8 @@ export const ProgressRing = ({
             </svg>
             {/* Texto central con el porcentaje */}
             <div className={styles.content}>
-                <span 
-                    className={styles.percentageText}
-                    style={{ fontSize: fontSize || `${size * 0.2}px` }}
-                >
-                    {percentage} %           
+                <span className={styles.percentageText} style={{ fontSize: fontSize || `${size * 0.2}px` }}>
+                    {percentage} %
                 </span>
             </div>
         </div>

@@ -1,4 +1,3 @@
-
 import type { UploadedFile } from "../../components/client/organisms/TicketCreationPanel/types";
 export type { UploadedFile };
 
@@ -12,4 +11,3 @@ export interface casesNotificationFormData {
     reference: string;
     file: UploadedFile;
 }
-

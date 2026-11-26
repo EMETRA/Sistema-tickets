@@ -8,7 +8,7 @@ import { Button } from "../../atoms/Button";
 const meta = {
     title: "Molecules/AuthForm",
     component: AuthForm,
-    tags: ["autodocs"]
+    tags: ["autodocs"],
 } satisfies Meta<typeof AuthForm>;
 
 export default meta;
@@ -33,6 +33,6 @@ export const LoginExample: Story = {
                     </Button>
                 </FormActions>
             </>
-        )
-    }
+        ),
+    },
 };

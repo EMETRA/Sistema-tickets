@@ -3,16 +3,19 @@ import { TicketStateChipProps } from "./types";
 import styles from "./TicketStateChip.module.scss";
 import classNames from "classnames";
 
-export const TicketStateChip = ({ 
-    label, 
-    variant = "default", 
-    state = "ingresado", 
-    className 
+export const TicketStateChip = ({
+    label,
+    variant = "default",
+    state = "ingresado",
+    className,
 }: TicketStateChipProps) => {
-    const stateKey = state.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replaceAll(" ", "_");
+    const stateKey = state
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replaceAll(" ", "_");
     return (
         <div className={classNames(styles.chip, styles[variant], styles[stateKey], className)}>
-            {variant !== 'outlined' && <span className={styles.dot}></span>}
+            {variant !== "outlined" && <span className={styles.dot}></span>}
             <span className={styles.label}>{label}</span>
         </div>
     );

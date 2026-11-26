@@ -10,12 +10,6 @@ export default async function TicketPage({
 }) {
     const { ticketId } = await params;
     const { origen } = await searchParams;
-    if (!/^[1-9]\d*$/.test(ticketId) || !Number.isSafeInteger(Number(ticketId)))
-        notFound();
-    return (
-        <TicketView
-            ticketId={ticketId}
-            returnHref={origen === "tickets" ? "/tickets" : "/mis-tickets"}
-        />
-    );
+    if (!/^[1-9]\d*$/.test(ticketId) || !Number.isSafeInteger(Number(ticketId))) notFound();
+    return <TicketView ticketId={ticketId} returnHref={origen === "tickets" ? "/tickets" : "/mis-tickets"} />;
 }

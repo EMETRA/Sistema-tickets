@@ -27,12 +27,12 @@ const previewOnly = () => {};
 const Configuration: React.FC = () => {
     const [activeView, setActiveView] = useState<ConfigManageView>("requests");
     const [data, setData] = useState<{
-    requests: Request[];
-    modules: Modules[];
-    permissions: Permissions[];
-    roles: Roles[];
-    enrolls: Enroll[];
-  } | null>(null);
+        requests: Request[];
+        modules: Modules[];
+        permissions: Permissions[];
+        roles: Roles[];
+        enrolls: Enroll[];
+    } | null>(null);
     const [error, setError] = useState(false);
 
     useEffect(() => {

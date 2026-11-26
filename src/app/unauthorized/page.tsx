@@ -14,14 +14,10 @@ export default function UnauthorizedPage() {
             <div className={styles.content}>
                 <Title variant="large">Acceso no autorizado</Title>
                 <Text variant="caption">
-                    No tienes permisos para visualizar esta página. Si crees que se trata
-                    de un error, contacta al administrador.
+                    No tienes permisos para visualizar esta página. Si crees que se trata de un error,
+                    contacta al administrador.
                 </Text>
-                <Button
-                    type="button"
-                    color="cancel"
-                    onClick={() => router.push("/home")}
-                >
+                <Button type="button" color="cancel" onClick={() => router.push("/home")}>
                     Volver al inicio
                 </Button>
             </div>

@@ -13,6 +13,6 @@ export const Default: Story = {
     args: {
         lastMaintenance: "28/11/2023",
         nextMaintenance: "28/11/2023",
-        observations: "Ejemplo de una descripcion, limpieza de cpu, cambio de baterias."
+        observations: "Ejemplo de una descripcion, limpieza de cpu, cambio de baterias.",
     },
 };

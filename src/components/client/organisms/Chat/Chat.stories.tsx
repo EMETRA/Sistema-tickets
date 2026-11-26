@@ -18,8 +18,18 @@ export const Default: Story = {
 
 export const InteractiveExample = () => {
     return (
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: "20px", padding: "20px", width: "80%", height: "300px",  }}>
+        <div
+            style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-start",
+                gap: "20px",
+                padding: "20px",
+                width: "80%",
+                height: "300px",
+            }}
+        >
             <Chat ticketId="12345" />
         </div>
-    )
-}
+    );
+};

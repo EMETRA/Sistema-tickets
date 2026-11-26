@@ -1,38 +1,66 @@
-.mainContainer { padding: 1.5rem; display: flex; flex-direction: column; gap: 1.5rem; }
-.filterBar { 
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    background: var(--tickets-surface);
-    border: 2px solid #e5e5e5; border: 2px solid light-dark(#e5e5e5, #2a3449);
-    border-radius: 12px;
-    padding: 1rem 1.5rem;
+.mainContainer {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.filterBar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: var(--tickets-surface);
+  border: 2px solid #e5e5e5;
+  border: 2px solid light-dark(#e5e5e5, #2a3449);
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
 }
 
 .filterField {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .filterLabel {
-    font-size: 14px;
-    white-space: nowrap;
+  font-size: 14px;
+  white-space: nowrap;
 }
 
 .cardsGrid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
 }
-.chartContainer { 
-    background: var(--tickets-surface);
-    border: 2px solid #e5e5e5; border: 2px solid light-dark(#e5e5e5, #2a3449);
-    border-radius: 12px;
-    padding: 1.5rem; 
+.chartContainer {
+  background: var(--tickets-surface);
+  border: 2px solid #e5e5e5;
+  border: 2px solid light-dark(#e5e5e5, #2a3449);
+  border-radius: 12px;
+  padding: 1.5rem;
 }
-.chartTitle { font-size: 18px; font-weight: 700; margin-bottom: 1rem; }
-.tableContainer { background: var(--tickets-surface); overflow: hidden; }
-.tableTitle { font-size: 15px; font-weight: 500; padding: 1.5rem 0rem 1rem; display: block; }
-.tableFooter { padding: 1rem 1.5rem; border-top: 0.5px solid #e5e5e5; border-top: 0.5px solid light-dark(#e5e5e5, #2a3449); }
-.tableFooterText { font-size: 10px; color: #666; color: light-dark(#666, #e5eaf5); margin-left: -1.5rem; }
+.chartTitle {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+.tableContainer {
+  background: var(--tickets-surface);
+  overflow: hidden;
+}
+.tableTitle {
+  font-size: 15px;
+  font-weight: 500;
+  padding: 1.5rem 0rem 1rem;
+  display: block;
+}
+.tableFooter {
+  padding: 1rem 1.5rem;
+  border-top: 0.5px solid #e5e5e5;
+  border-top: 0.5px solid light-dark(#e5e5e5, #2a3449);
+}
+.tableFooterText {
+  font-size: 10px;
+  color: #666;
+  color: light-dark(#666, #e5eaf5);
+  margin-left: -1.5rem;
+}

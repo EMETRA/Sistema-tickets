@@ -1,4 +1,4 @@
-import { VisibilidadNoticia, type GuardarNoticiaCmsInput, type NoticiaListItem } from './types';
+import { VisibilidadNoticia, type GuardarNoticiaCmsInput, type NoticiaListItem } from "./types";
 
 /**
  * Input de `guardarNoticiaCms` para cambiar solo el estado de una noticia ya guardada
@@ -10,8 +10,8 @@ import { VisibilidadNoticia, type GuardarNoticiaCmsInput, type NoticiaListItem }
  * y que "archivada" → "borrador" está permitido.
  */
 export function cambioEstadoInput(
-    noticia: Pick<NoticiaListItem, 'id' | 'slug' | 'titulo' | 'idioma' | 'visibilidad'>,
-    estado: 'archivada' | 'borrador',
+    noticia: Pick<NoticiaListItem, "id" | "slug" | "titulo" | "idioma" | "visibilidad">,
+    estado: "archivada" | "borrador",
     claveIdempotente: string,
 ): GuardarNoticiaCmsInput {
     return {
@@ -20,7 +20,7 @@ export function cambioEstadoInput(
         slug: noticia.slug,
         titulo: noticia.titulo,
         estado,
-        visibilidad: noticia.visibilidad === VisibilidadNoticia.PRIVADA ? 'privada' : 'publica',
+        visibilidad: noticia.visibilidad === VisibilidadNoticia.PRIVADA ? "privada" : "publica",
         idioma: noticia.idioma,
     };
 }

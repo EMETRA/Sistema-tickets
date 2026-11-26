@@ -20,13 +20,7 @@ const Context = createContext<Actions>({
     ELIMINAR: false,
 });
 export const useModuleActions = () => useContext(Context);
-export function ModuleAccessGate({
-    moduleId,
-    children,
-}: {
-    moduleId: string;
-    children: React.ReactNode;
-}) {
+export function ModuleAccessGate({ moduleId, children }: { moduleId: string; children: React.ReactNode }) {
     const token = useAuthStore((s) => s.token),
         hydrated = useAuthStore((s) => s.isHydrated);
     const [revision, setRevision] = useState(0);
@@ -39,12 +33,9 @@ export function ModuleAccessGate({
     useEffect(() => {
         if (!token || !hydrated) return;
         const controller = new AbortController();
-        platformFetch<Access>(
-            "/module-access/" + encodeURIComponent(moduleId),
-            {
-                signal: controller.signal,
-            },
-        )
+        platformFetch<Access>("/module-access/" + encodeURIComponent(moduleId), {
+            signal: controller.signal,
+        })
             .then((data) => {
                 if (
                     !data ||
@@ -52,14 +43,11 @@ export function ModuleAccessGate({
                     typeof data.allowed !== "boolean" ||
                     !data.actions ||
                     ["LEER", "INSERTAR", "EDITAR", "ELIMINAR"].some(
-                        (action) =>
-                            typeof data.actions[action as keyof Actions] !==
-                            "boolean",
+                        (action) => typeof data.actions[action as keyof Actions] !== "boolean",
                     )
                 )
                     throw new Error("Respuesta de acceso inválida");
-                if (!controller.signal.aborted)
-                    setCheck({ token, id: moduleId, data });
+                if (!controller.signal.aborted) setCheck({ token, id: moduleId, data });
             })
             .catch(() => {
                 if (!controller.signal.aborted)
@@ -110,9 +98,5 @@ export function ModuleAccessGate({
                 }
             />
         );
-    return (
-        <Context.Provider value={check.data.actions}>
-            {children}
-        </Context.Provider>
-    );
+    return <Context.Provider value={check.data.actions}>{children}</Context.Provider>;
 }

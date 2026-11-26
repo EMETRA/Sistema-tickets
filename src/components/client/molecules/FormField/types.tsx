@@ -4,7 +4,6 @@ import { ReactNode } from "react";
  * Propiedades del componente FormField.
  */
 export interface FormFieldProps {
-
     /**
      * Etiqueta del campo.
      */
@@ -30,5 +29,4 @@ export interface FormFieldProps {
      * Clase CSS adicional.
      */
     className?: string;
-
-};
+}

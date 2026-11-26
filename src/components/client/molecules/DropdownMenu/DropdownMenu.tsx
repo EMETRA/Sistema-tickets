@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import classNames from "classnames";
 import { Title } from "@/components/client/atoms/Title";
@@ -12,24 +11,29 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({ items, onSelect, cla
     const [isOpen, setIsOpen] = useState(false);
     const [selectedValue, setSelectedValue] = useState("");
 
-    const selectedItem = items.find((item) => item.value === selectedValue)
-    || items[0]
-    || ({ label: "Seleccionar", value: "" } as DropdownMenuItem);
+    const selectedItem =
+        items.find((item) => item.value === selectedValue) ||
+        items[0] ||
+        ({ label: "Seleccionar", value: "" } as DropdownMenuItem);
 
     const handleToggle = () => {
         setIsOpen(!isOpen);
-    }
+    };
 
     const handleSelect = (item: DropdownMenuItem) => {
         onSelect(item);
         setIsOpen(false);
         setSelectedValue(item.value);
-    }
+    };
 
     return (
         <div className={classNames(styles.dropdownMenu, className)} onClick={handleToggle}>
             <Title variant="mid">{selectedItem.label}</Title>
-            <Icon name="angle-down-solid" variant="status" className={classNames(styles.iconButton, { [styles.isOpen]: isOpen })} />
+            <Icon
+                name="angle-down-solid"
+                variant="status"
+                className={classNames(styles.iconButton, { [styles.isOpen]: isOpen })}
+            />
             {isOpen && (
                 <ul className={styles.menu}>
                     {items.map((item) => (
@@ -41,7 +45,6 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({ items, onSelect, cla
             )}
         </div>
     );
-
-}
+};
 
 export default DropdownMenu;

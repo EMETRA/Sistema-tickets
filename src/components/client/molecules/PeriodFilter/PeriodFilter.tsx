@@ -5,8 +5,7 @@ import styles from "./PeriodFilter.module.scss";
 
 type Preset = { id: string; label: string; range: () => [string, string] };
 
-const daysAgo = (days: number) =>
-    guatemalaDay(new Date(Date.now() - days * 86400000));
+const daysAgo = (days: number) => guatemalaDay(new Date(Date.now() - days * 86400000));
 
 export const PERIOD_PRESETS: Preset[] = [
     { id: "7", label: "7 días", range: () => [daysAgo(7), guatemalaDay()] },
@@ -79,11 +78,7 @@ export function PeriodFilter({
             <span className={styles.label} id="periodo-label">
                 Periodo
             </span>
-            <div
-                className={styles.segmented}
-                role="group"
-                aria-labelledby="periodo-label"
-            >
+            <div className={styles.segmented} role="group" aria-labelledby="periodo-label">
                 {PERIOD_PRESETS.map((preset) => (
                     <button
                         key={preset.id}
@@ -121,9 +116,7 @@ export function PeriodFilter({
                             value={draft.from}
                             max={draft.to || undefined}
                             disabled={disabled}
-                            onChange={(e) =>
-                                setDraft((d) => ({ ...d, from: e.target.value }))
-                            }
+                            onChange={(e) => setDraft((d) => ({ ...d, from: e.target.value }))}
                         />
                     </label>
                     <span aria-hidden="true" className={styles.dash}>
@@ -136,9 +129,7 @@ export function PeriodFilter({
                             value={draft.to}
                             min={draft.from || undefined}
                             disabled={disabled}
-                            onChange={(e) =>
-                                setDraft((d) => ({ ...d, to: e.target.value }))
-                            }
+                            onChange={(e) => setDraft((d) => ({ ...d, to: e.target.value }))}
                         />
                     </label>
                     {invalid && (

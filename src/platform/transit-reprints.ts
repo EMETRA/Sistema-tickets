@@ -38,16 +38,11 @@ export type TransitSlip = {
 };
 export function transitSlipNumber(value: string): string {
     const match = /^(?:N[\s-]*)?([1-9]\d{0,14})$/i.exec(value.trim());
-    if (!match)
-        throw Error(
-            "Ingresa el número de una boleta serie N, por ejemplo N-1234567.",
-        );
+    if (!match) throw Error("Ingresa el número de una boleta serie N, por ejemplo N-1234567.");
     return match[1];
 }
 export function transitSlipPath(value: string, pdf = false) {
-    return (
-        "/transit-reprints/N/" + transitSlipNumber(value) + (pdf ? "/pdf" : "")
-    );
+    return "/transit-reprints/N/" + transitSlipNumber(value) + (pdf ? "/pdf" : "");
 }
 export function validTransitSlip(value: unknown): value is TransitSlip {
     if (!value || typeof value !== "object") return false;
@@ -79,9 +74,7 @@ export function validTransitSlip(value: unknown): value is TransitSlip {
         d.serie === "N" &&
         strings.every((key) => typeof d[key] === "string") &&
         /^[1-9]\d{0,14}$/.test(d.numero) &&
-        (d.saldoActual === null ||
-            (typeof d.saldoActual === "number" &&
-                Number.isFinite(d.saldoActual))) &&
+        (d.saldoActual === null || (typeof d.saldoActual === "number" && Number.isFinite(d.saldoActual))) &&
         typeof d.montoOriginal === "number" &&
         Number.isFinite(d.montoOriginal) &&
         d.montoOriginal >= 0 &&

@@ -12,8 +12,11 @@
   font-size: 13px;
   line-height: 1.3;
   cursor: pointer;
-  transition: background-color 0.15s ease, border-color 0.15s ease,
-    color 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -35,7 +38,9 @@
   &--contained {
     border-radius: var(--tickets-control-radius, 9px);
     color: #ffffff;
-    box-shadow: 0 1px 2px #1a2b4a1f, inset 0 1px 0 #ffffff1f;
+    box-shadow:
+      0 1px 2px #1a2b4a1f,
+      inset 0 1px 0 #ffffff1f;
 
     // Colores para contained
     &.Button--default {

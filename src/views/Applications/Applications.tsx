@@ -18,8 +18,7 @@ export function Applications() {
                 onRetry={() => void refetch()}
             />
         );
-    if (catalog && Object.keys(catalog).length)
-        return <AppsDirectory catalog={catalog} />;
+    if (catalog && Object.keys(catalog).length) return <AppsDirectory catalog={catalog} />;
     return (
         <AppsGrid
             title="Aplicaciones autorizadas"

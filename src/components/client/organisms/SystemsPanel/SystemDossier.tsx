@@ -8,7 +8,15 @@ import type { PlatformRecord } from "@/platform/types";
 import { daysFromToday, relativeDays } from "../AssetsPanel/assetDates";
 import { RecordDetail } from "../ResourceWorkspace/RecordDetail";
 import { RecordEditor } from "../ResourceWorkspace/RecordEditor";
-import { ENVIRONMENTS, ENV_LABEL, RESULT, SEVERITY, isOpenIncident, lastDeploy, type Portfolio } from "./systemsData";
+import {
+    ENVIRONMENTS,
+    ENV_LABEL,
+    RESULT,
+    SEVERITY,
+    isOpenIncident,
+    lastDeploy,
+    type Portfolio,
+} from "./systemsData";
 import common from "../../templates/PlatformPage/PlatformPage.module.scss";
 import styles from "./SystemsPanel.module.scss";
 
@@ -46,24 +54,46 @@ export function SystemDossier({
         .sort((a, b) => String(b.datos.fecha).localeCompare(String(a.datos.fecha)));
     const incidents = portfolio.incidents
         .filter((i) => i.datos.aplicacionId === app.id)
-        .sort((a, b) => Number(isOpenIncident(b)) - Number(isOpenIncident(a)) || (SEVERITY[String(b.datos.severidad)]?.[2] || 0) - (SEVERITY[String(a.datos.severidad)]?.[2] || 0));
+        .sort(
+            (a, b) =>
+                Number(isOpenIncident(b)) - Number(isOpenIncident(a)) ||
+                (SEVERITY[String(b.datos.severidad)]?.[2] || 0) -
+                    (SEVERITY[String(a.datos.severidad)]?.[2] || 0),
+        );
     const schemas = portfolio.schemas.filter((s) => s.datos.aplicacionId === app.id);
     const server = portfolio.servers[String(app.datos.servidorId || "")];
     const busy = !!(sub || create || editing);
 
     return (
         <>
-            <PopOver isOpen={!busy} onClose={onClose} ariaLabel={"Expediente de " + app.nombre} className={styles.dossier}>
+            <PopOver
+                isOpen={!busy}
+                onClose={onClose}
+                ariaLabel={"Expediente de " + app.nombre}
+                className={styles.dossier}
+            >
                 <header className={styles.dossierHead}>
                     <span className={styles.monogram} aria-hidden="true">
-                        {app.nombre.split(/\s+/).slice(0, 2).map((w) => w[0]).join("").toUpperCase()}
+                        {app.nombre
+                            .split(/\s+/)
+                            .slice(0, 2)
+                            .map((w) => w[0])
+                            .join("")
+                            .toUpperCase()}
                     </span>
                     <div>
                         <p className={styles.eyebrow}>Sistema · {String(app.datos.codigo || "Sin código")}</p>
                         <h2>{app.nombre}</h2>
-                        {!!app.datos.descripcion && <p className={styles.lead}>{String(app.datos.descripcion)}</p>}
+                        {!!app.datos.descripcion && (
+                            <p className={styles.lead}>{String(app.datos.descripcion)}</p>
+                        )}
                     </div>
-                    <button type="button" className={styles.close} onClick={onClose} aria-label="Cerrar expediente">
+                    <button
+                        type="button"
+                        className={styles.close}
+                        onClick={onClose}
+                        aria-label="Cerrar expediente"
+                    >
                         ×
                     </button>
                 </header>
@@ -88,8 +118,16 @@ export function SystemDossier({
                         <div>
                             <dt>Enlaces</dt>
                             <dd className={styles.urls}>
-                                {app.datos.frontUrl ? <a href={String(app.datos.frontUrl)} target="_blank" rel="noreferrer">Aplicación ↗</a> : null}
-                                {app.datos.backUrl ? <a href={String(app.datos.backUrl)} target="_blank" rel="noreferrer">API ↗</a> : null}
+                                {app.datos.frontUrl ? (
+                                    <a href={String(app.datos.frontUrl)} target="_blank" rel="noreferrer">
+                                        Aplicación ↗
+                                    </a>
+                                ) : null}
+                                {app.datos.backUrl ? (
+                                    <a href={String(app.datos.backUrl)} target="_blank" rel="noreferrer">
+                                        API ↗
+                                    </a>
+                                ) : null}
                                 {!app.datos.frontUrl && !app.datos.backUrl && "Sin enlaces"}
                             </dd>
                         </div>
@@ -100,12 +138,18 @@ export function SystemDossier({
                         <div className={styles.envs}>
                             {ENVIRONMENTS.map((env) => {
                                 const d = lastDeploy(portfolio.deploys, app.id, env);
-                                const [label, tone] = d ? RESULT[String(d.datos.resultado)] || ["Registrado", "neutral"] : ["Sin despliegue", "none"];
+                                const [label, tone] = d
+                                    ? RESULT[String(d.datos.resultado)] || ["Registrado", "neutral"]
+                                    : ["Sin despliegue", "none"];
                                 return (
                                     <span key={env} className={styles.env} data-tone={tone}>
                                         <small>{ENV_LABEL[env]}</small>
                                         <code>{d ? String(d.datos.revision) : "—"}</code>
-                                        <em>{d ? `${label} · ${relativeDays(daysFromToday(d.datos.fecha)).toLowerCase()}` : label}</em>
+                                        <em>
+                                            {d
+                                                ? `${label} · ${relativeDays(daysFromToday(d.datos.fecha)).toLowerCase()}`
+                                                : label}
+                                        </em>
                                     </span>
                                 );
                             })}
@@ -117,60 +161,93 @@ export function SystemDossier({
                             <div className={styles.blockHead}>
                                 <h3>Incidentes ({incidents.filter(isOpenIncident).length} abiertos)</h3>
                                 {can("incidencias", "INSERTAR") && (
-                                    <button type="button" className={common.link} onClick={() => setCreate("incidencias")}>
+                                    <button
+                                        type="button"
+                                        className={common.link}
+                                        onClick={() => setCreate("incidencias")}
+                                    >
                                         + Registrar incidente
                                     </button>
                                 )}
                             </div>
                             <ul className={styles.rows}>
                                 {incidents.map((i) => {
-                                    const [label, tone] = SEVERITY[String(i.datos.severidad)] || ["Sin severidad", "neutral"];
+                                    const [label, tone] = SEVERITY[String(i.datos.severidad)] || [
+                                        "Sin severidad",
+                                        "neutral",
+                                    ];
                                     const open = isOpenIncident(i);
                                     return (
                                         <li key={i.id} data-closed={!open || undefined}>
-                                            <button type="button" onClick={() => setSub({ type: "incidencias", record: i })}>
-                                                <span className={common.chip} data-tone={open ? tone : "neutral"}>
+                                            <button
+                                                type="button"
+                                                onClick={() => setSub({ type: "incidencias", record: i })}
+                                            >
+                                                <span
+                                                    className={common.chip}
+                                                    data-tone={open ? tone : "neutral"}
+                                                >
                                                     {open ? label : "Cerrado"}
                                                 </span>
                                                 <span className={styles.rowText}>
                                                     {i.nombre}
                                                     <small>
                                                         {relativeDays(daysFromToday(i.creadoEn))}
-                                                        {i.datos.ticketId ? ` · Ticket #${String(i.datos.ticketId)}` : ""}
+                                                        {i.datos.ticketId
+                                                            ? ` · Ticket #${String(i.datos.ticketId)}`
+                                                            : ""}
                                                     </small>
                                                 </span>
                                             </button>
                                         </li>
                                     );
                                 })}
-                                {!incidents.length && <li className={styles.none}>Sin incidentes registrados.</li>}
+                                {!incidents.length && (
+                                    <li className={styles.none}>Sin incidentes registrados.</li>
+                                )}
                             </ul>
                         </section>
                         <section className={styles.block}>
                             <div className={styles.blockHead}>
                                 <h3>Despliegues</h3>
                                 {can("despliegues", "INSERTAR") && (
-                                    <button type="button" className={common.link} onClick={() => setCreate("despliegues")}>
+                                    <button
+                                        type="button"
+                                        className={common.link}
+                                        onClick={() => setCreate("despliegues")}
+                                    >
                                         + Registrar despliegue
                                     </button>
                                 )}
                             </div>
                             <ol className={styles.timeline}>
                                 {deploys.slice(0, 6).map((d) => {
-                                    const [label, tone] = RESULT[String(d.datos.resultado)] || ["Registrado", "neutral"];
+                                    const [label, tone] = RESULT[String(d.datos.resultado)] || [
+                                        "Registrado",
+                                        "neutral",
+                                    ];
                                     return (
                                         <li key={d.id} data-tone={tone}>
-                                            <button type="button" onClick={() => setSub({ type: "despliegues", record: d })}>
+                                            <button
+                                                type="button"
+                                                onClick={() => setSub({ type: "despliegues", record: d })}
+                                            >
                                                 <code>{String(d.datos.revision)}</code>
                                                 <span className={styles.rowText}>
-                                                    {ENV_LABEL[String(d.datos.entorno)] || String(d.datos.entorno)} · {label}
-                                                    <small>{relativeDays(daysFromToday(d.datos.fecha))}</small>
+                                                    {ENV_LABEL[String(d.datos.entorno)] ||
+                                                        String(d.datos.entorno)}{" "}
+                                                    · {label}
+                                                    <small>
+                                                        {relativeDays(daysFromToday(d.datos.fecha))}
+                                                    </small>
                                                 </span>
                                             </button>
                                         </li>
                                     );
                                 })}
-                                {!deploys.length && <li className={styles.none}>Sin despliegues registrados.</li>}
+                                {!deploys.length && (
+                                    <li className={styles.none}>Sin despliegues registrados.</li>
+                                )}
                             </ol>
                         </section>
                     </div>
@@ -181,8 +258,13 @@ export function SystemDossier({
                             <ul className={styles.rows}>
                                 {repos.map((r) => (
                                     <li key={r.id}>
-                                        <button type="button" onClick={() => setSub({ type: "repositorios", record: r })}>
-                                            <span className={common.chip}>{String(r.datos.componente || "OTRO")}</span>
+                                        <button
+                                            type="button"
+                                            onClick={() => setSub({ type: "repositorios", record: r })}
+                                        >
+                                            <span className={common.chip}>
+                                                {String(r.datos.componente || "OTRO")}
+                                            </span>
                                             <span className={styles.rowText}>
                                                 {r.nombre}
                                                 <small>Rama {String(r.datos.rama || "—")}</small>
@@ -190,7 +272,9 @@ export function SystemDossier({
                                         </button>
                                     </li>
                                 ))}
-                                {!repos.length && <li className={styles.none}>Sin repositorios vinculados.</li>}
+                                {!repos.length && (
+                                    <li className={styles.none}>Sin repositorios vinculados.</li>
+                                )}
                             </ul>
                         </section>
                         <section className={styles.block}>
@@ -198,25 +282,39 @@ export function SystemDossier({
                             <ul className={styles.rows}>
                                 {schemas.map((s) => (
                                     <li key={s.id}>
-                                        <button type="button" onClick={() => setSub({ type: "esquemas", record: s })}>
+                                        <button
+                                            type="button"
+                                            onClick={() => setSub({ type: "esquemas", record: s })}
+                                        >
                                             <code>{String(s.datos.owner || "—")}</code>
                                             <span className={styles.rowText}>
                                                 {s.nombre}
-                                                {!!s.datos.descripcion && <small>{String(s.datos.descripcion)}</small>}
+                                                {!!s.datos.descripcion && (
+                                                    <small>{String(s.datos.descripcion)}</small>
+                                                )}
                                             </span>
                                         </button>
                                     </li>
                                 ))}
-                                {!schemas.length && <li className={styles.none}>Sin esquemas registrados.</li>}
+                                {!schemas.length && (
+                                    <li className={styles.none}>Sin esquemas registrados.</li>
+                                )}
                             </ul>
                         </section>
                     </div>
                 </div>
                 <footer className={styles.dossierFoot}>
-                    <Button variant="outlined" onClick={() => setSub({ type: "aplicaciones", record: detail })}>
+                    <Button
+                        variant="outlined"
+                        onClick={() => setSub({ type: "aplicaciones", record: detail })}
+                    >
                         Ver ficha completa
                     </Button>
-                    {can("aplicaciones", "EDITAR") && <Button onClick={() => setEditing({ type: "aplicaciones", record: detail })}>Editar sistema</Button>}
+                    {can("aplicaciones", "EDITAR") && (
+                        <Button onClick={() => setEditing({ type: "aplicaciones", record: detail })}>
+                            Editar sistema
+                        </Button>
+                    )}
                 </footer>
             </PopOver>
             {sub && !editing && (

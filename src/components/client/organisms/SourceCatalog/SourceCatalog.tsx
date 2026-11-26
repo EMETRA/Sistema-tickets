@@ -10,33 +10,33 @@ import styles from "@/components/client/templates/PlatformPage/PlatformPage.modu
 import localStyles from "./SourceCatalog.module.scss";
 
 type Item = {
-  owner?: string;
-  objetos?: number;
-  invalidos?: number;
-  nombre?: string;
-  nombreCompleto?: string;
-  url?: string;
-  descripcion?: string;
-  ramaPredeterminada?: string;
-  privado?: boolean;
-  archivado?: boolean;
+    owner?: string;
+    objetos?: number;
+    invalidos?: number;
+    nombre?: string;
+    nombreCompleto?: string;
+    url?: string;
+    descripcion?: string;
+    ramaPredeterminada?: string;
+    privado?: boolean;
+    archivado?: boolean;
 };
 type Catalog = {
-  items: Item[];
-  disponible?: boolean;
-  estado?: string;
-  organizaciones?: string[];
-  organizacion?: string;
-  limitado?: boolean;
-  hayMas?: boolean;
+    items: Item[];
+    disponible?: boolean;
+    estado?: string;
+    organizaciones?: string[];
+    organizacion?: string;
+    limitado?: boolean;
+    hayMas?: boolean;
 };
 const errors: Record<string, string> = {
     SIN_CREDENCIAL:
-    "GitHub aún no está conectado. Configura la credencial de solo lectura en api-tickets; después vuelve a consultar.",
+        "GitHub aún no está conectado. Configura la credencial de solo lectura en api-tickets; después vuelve a consultar.",
     SIN_ACCESO:
-    "La credencial no tiene acceso a la organización. Revisa sus repositorios autorizados y la autorización de la organización.",
+        "La credencial no tiene acceso a la organización. Revisa sus repositorios autorizados y la autorización de la organización.",
     NO_ENCONTRADO_O_SIN_ACCESO:
-    "La organización no está disponible para la integración. Revisa el nombre y su acceso.",
+        "La organización no está disponible para la integración. Revisa el nombre y su acceso.",
     LIMITE_GITHUB: "GitHub alcanzó el límite de consultas. Intenta más tarde.",
     NO_DISPONIBLE: "No se pudo consultar GitHub. Vuelve a intentar.",
 };
@@ -44,8 +44,8 @@ export function SourceCatalog({
     kind,
     onLinked,
 }: {
-  kind: "oracle" | "github";
-  onLinked: (record: PlatformRecord) => void;
+    kind: "oracle" | "github";
+    onLinked: (record: PlatformRecord) => void;
 }) {
     const { data } = usePlatform();
     const [draft, setDraft] = useState(""),
@@ -76,16 +76,12 @@ export function SourceCatalog({
         })
             .then((value) => {
                 if (!Array.isArray(value.items))
-                    throw new Error(
-                        "La fuente devolvió un formato inesperado. Reintenta la consulta.",
-                    );
+                    throw new Error("La fuente devolvió un formato inesperado. Reintenta la consulta.");
                 if (!c.signal.aborted) setResult(value);
             })
             .catch((e: unknown) => {
                 if (!c.signal.aborted)
-                    setError(
-                        e instanceof Error ? e.message : "No se pudo consultar la fuente",
-                    );
+                    setError(e instanceof Error ? e.message : "No se pudo consultar la fuente");
             })
             .finally(() => {
                 if (!c.signal.aborted) setLoading(false);
@@ -98,15 +94,11 @@ export function SourceCatalog({
         <section
             className={styles.card}
             aria-label={
-                kind === "oracle"
-                    ? "Esquemas disponibles en Oracle"
-                    : "Repositorios disponibles en GitHub"
+                kind === "oracle" ? "Esquemas disponibles en Oracle" : "Repositorios disponibles en GitHub"
             }
         >
             <h2>
-                {kind === "oracle"
-                    ? "Esquemas disponibles en Oracle"
-                    : "Repositorios disponibles en GitHub"}
+                {kind === "oracle" ? "Esquemas disponibles en Oracle" : "Repositorios disponibles en GitHub"}
             </h2>
             <p className={styles.muted}>
                 {kind === "oracle"
@@ -146,24 +138,14 @@ export function SourceCatalog({
                         value={draft}
                         maxLength={kind === "oracle" ? 128 : 100}
                         onChange={(e) => setDraft(e.target.value)}
-                        placeholder={
-                            kind === "oracle" ? "Ej. ADMEMETRAIT" : "Ej. api-tickets"
-                        }
+                        placeholder={kind === "oracle" ? "Ej. ADMEMETRAIT" : "Ej. api-tickets"}
                     />
                 </label>
-                <Button
-                    type="submit"
-                    variant="outlined"
-                    state={loading ? "disabled" : "default"}
-                >
+                <Button type="submit" variant="outlined" state={loading ? "disabled" : "default"}>
                     Consultar fuente
                 </Button>
             </form>
-            {loading && (
-                <p role="status">
-                    Consultando {kind === "oracle" ? "Oracle" : "GitHub"}…
-                </p>
-            )}
+            {loading && <p role="status">Consultando {kind === "oracle" ? "Oracle" : "GitHub"}…</p>}
             {error && (
                 <p role="alert" className={styles.error}>
                     {error}
@@ -179,10 +161,8 @@ export function SourceCatalog({
                     {!result.items.length ? (
                         <p role="status">
                             No se encontraron{" "}
-                            {kind === "oracle"
-                                ? "esquemas visibles"
-                                : "repositorios accesibles"}{" "}
-                            con este filtro.
+                            {kind === "oracle" ? "esquemas visibles" : "repositorios accesibles"} con este
+                            filtro.
                         </p>
                     ) : (
                         <div className={`${styles.tableRegion} ${localStyles.sourceRegion}`}>
@@ -196,9 +176,7 @@ export function SourceCatalog({
                                     <tr>
                                         <th>{kind === "oracle" ? "Esquema" : "Repositorio"}</th>
                                         <th>
-                                            {kind === "oracle"
-                                                ? "Objetos visibles"
-                                                : "Rama predeterminada"}
+                                            {kind === "oracle" ? "Objetos visibles" : "Rama predeterminada"}
                                         </th>
                                         <th>Estado</th>
                                         <th>Acción</th>
@@ -226,7 +204,13 @@ export function SourceCatalog({
                                                     <strong>{item.owner}</strong>
                                                 )}
                                             </td>
-                                            <td data-label={kind === "oracle" ? "Objetos visibles" : "Rama predeterminada"}>
+                                            <td
+                                                data-label={
+                                                    kind === "oracle"
+                                                        ? "Objetos visibles"
+                                                        : "Rama predeterminada"
+                                                }
+                                            >
                                                 {kind === "oracle"
                                                     ? item.objetos
                                                     : item.ramaPredeterminada || "Sin rama informada"}
@@ -237,10 +221,10 @@ export function SourceCatalog({
                                                         ? `${item.invalidos} inválidos`
                                                         : "Sin objetos inválidos"
                                                     : item.archivado
-                                                        ? "Archivado"
-                                                        : item.privado
-                                                            ? "Privado"
-                                                            : "Público"}
+                                                      ? "Archivado"
+                                                      : item.privado
+                                                        ? "Privado"
+                                                        : "Público"}
                                             </td>
                                             <td className={localStyles.linkAction}>
                                                 {data.definitions[type]?.actions.INSERTAR && (
@@ -261,8 +245,7 @@ export function SourceCatalog({
                     )}
                     {result.limitado && (
                         <p className={styles.muted}>
-                            Se muestran hasta 100 esquemas. Filtra el nombre para encontrar
-                            los restantes.
+                            Se muestran hasta 100 esquemas. Filtra el nombre para encontrar los restantes.
                         </p>
                     )}
                     {kind === "github" && (
@@ -290,9 +273,7 @@ export function SourceCatalog({
                 <RecordEditor
                     type={type}
                     initialName={editing.owner || editing.nombre || ""}
-                    initial={
-                        kind === "oracle" ? { owner: editing.owner } : { url: editing.url }
-                    }
+                    initial={kind === "oracle" ? { owner: editing.owner } : { url: editing.url }}
                     onClose={() => setEditing(null)}
                     onSaved={(record) => {
                         setEditing(null);
@@ -303,7 +284,7 @@ export function SourceCatalog({
             <p className={styles.muted}>
                 Al vincular, selecciona la aplicación, el equipo y la visibilidad.{" "}
                 {kind === "github" &&
-          "Indica la rama realmente desplegada; la rama predeterminada no la confirma."}{" "}
+                    "Indica la rama realmente desplegada; la rama predeterminada no la confirma."}{" "}
                 Se conserva el historial y las confirmaciones administrativas.
             </p>
         </section>

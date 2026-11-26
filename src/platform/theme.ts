@@ -77,7 +77,9 @@ export type AccessibilityPrefs = {
     motion: MotionPreference;
 };
 
-const A11Y_KEYS: { [K in keyof AccessibilityPrefs]: { key: string; attr: string; values: readonly AccessibilityPrefs[K][] } } = {
+const A11Y_KEYS: {
+    [K in keyof AccessibilityPrefs]: { key: string; attr: string; values: readonly AccessibilityPrefs[K][] };
+} = {
     textSize: { key: "panel-texto", attr: "textSize", values: ["normal", "large", "xlarge"] },
     contrast: { key: "panel-contraste", attr: "contrast", values: ["normal", "more"] },
     motion: { key: "panel-animaciones", attr: "motion", values: ["system", "reduce"] },
@@ -97,7 +99,11 @@ let a11ySnapshot: AccessibilityPrefs | null = null;
 const A11Y_DEFAULTS: AccessibilityPrefs = { textSize: "normal", contrast: "normal", motion: "system" };
 
 export function readAccessibility(): AccessibilityPrefs {
-    const next = { textSize: readPref("textSize"), contrast: readPref("contrast"), motion: readPref("motion") };
+    const next = {
+        textSize: readPref("textSize"),
+        contrast: readPref("contrast"),
+        motion: readPref("motion"),
+    };
     if (
         !a11ySnapshot ||
         a11ySnapshot.textSize !== next.textSize ||
@@ -185,7 +191,10 @@ export function useAccessibilitySync() {
 }
 
 const A11Y_BOOT = Object.values(A11Y_KEYS)
-    .map(({ key, attr, values }) => `v=localStorage.getItem("${key}");r.dataset.${attr}=${JSON.stringify(values)}.indexOf(v)>=0?v:"${values[0]}";`)
+    .map(
+        ({ key, attr, values }) =>
+            `v=localStorage.getItem("${key}");r.dataset.${attr}=${JSON.stringify(values)}.indexOf(v)>=0?v:"${values[0]}";`,
+    )
     .join("");
 
 /** Script previo al pintado: evita el destello claro (y saltos de tamaño) al cargar. */

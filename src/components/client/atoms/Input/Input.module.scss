@@ -13,7 +13,9 @@
   min-width: 0;
   color: var(--tickets-text, #263b58);
   font-size: 13px;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
 
   &::placeholder {
     color: #98a5b8;
@@ -94,7 +96,8 @@
   min-height: 200px;
 
   &:hover {
-    background: #f8f9ff; background: light-dark(#f8f9ff, #131e4a);
+    background: #f8f9ff;
+    background: light-dark(#f8f9ff, #131e4a);
     border-color: #0e3cc1;
   }
 

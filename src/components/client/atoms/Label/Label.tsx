@@ -16,5 +16,4 @@ export const Label = ({ children, htmlFor, className }: LabelProps) => {
     );
 };
 
-
 export default Label;

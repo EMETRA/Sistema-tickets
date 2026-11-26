@@ -18,11 +18,7 @@ import { FileItem } from "../../molecules/FileItem";
 import { LabelChipGroup } from "../../molecules/LabelChipGroup";
 import { YouTubeLinkField } from "../../molecules/YouTubeLinkField";
 import { NewsContentSection } from "../NewsContentSection";
-import {
-    apiDateToDdMmYyyy,
-    ddMmYyyyToIsoDate,
-    maskDateInput,
-} from "@/helpers/dateInput";
+import { apiDateToDdMmYyyy, ddMmYyyyToIsoDate, maskDateInput } from "@/helpers/dateInput";
 import {
     fileDescription,
     filterAcceptedFiles,
@@ -35,22 +31,18 @@ import type { NewsFormProps, NewsSectionField } from "./types";
 import styles from "./NewsForm.module.scss";
 
 interface CalendarPickerButtonProps {
-  /** Fecha actual del campo, dd/mm/aaaa */
-  value: string;
-  disabled: boolean;
-  /** Fecha elegida, dd/mm/aaaa */
-  onPick: (fecha: string) => void;
+    /** Fecha actual del campo, dd/mm/aaaa */
+    value: string;
+    disabled: boolean;
+    /** Fecha elegida, dd/mm/aaaa */
+    onPick: (fecha: string) => void;
 }
 
 /**
  * Botón de calendario para el campo de fecha. Abre el selector nativo del navegador sobre un
  * input type="date" oculto (su valor siempre es YYYY-MM-DD) y devuelve la fecha en dd/mm/aaaa.
  */
-function CalendarPickerButton({
-    value,
-    disabled,
-    onPick,
-}: CalendarPickerButtonProps) {
+function CalendarPickerButton({ value, disabled, onPick }: CalendarPickerButtonProps) {
     const pickerRef = useRef<HTMLInputElement>(null);
 
     const openPicker = () => {
@@ -141,9 +133,7 @@ const NewsForm: React.FC<NewsFormProps> = ({
         "aria-invalid": Boolean(errors[path]),
     });
 
-    const sectionErrors = (
-        index: number,
-    ): Partial<Record<NewsSectionField, string>> => ({
+    const sectionErrors = (index: number): Partial<Record<NewsSectionField, string>> => ({
         encabezado: errors[`secciones.${index}.encabezado`],
         contenido: errors[`secciones.${index}.contenido`],
     });
@@ -153,9 +143,7 @@ const NewsForm: React.FC<NewsFormProps> = ({
         () =>
             values.etiquetaIds
                 .map((id) => options.etiquetas.find((option) => option.value === id))
-                .filter((option): option is NonNullable<typeof option> =>
-                    Boolean(option),
-                ),
+                .filter((option): option is NonNullable<typeof option> => Boolean(option)),
         [values.etiquetaIds, options.etiquetas],
     );
 
@@ -164,11 +152,7 @@ const NewsForm: React.FC<NewsFormProps> = ({
         setRejectedMain(rejected);
         // La imagen principal reemplaza a la anterior: la anterior no cuenta para el límite.
         const used = newImagesBytes(values, values.archivoPrincipal);
-        const { fitting, tooLarge } = fitFilesInLimit(
-            accepted.slice(0, 1),
-            used,
-            accept.maxTotalBytes,
-        );
+        const { fitting, tooLarge } = fitFilesInLimit(accepted.slice(0, 1), used, accept.maxTotalBytes);
         setSizeErrorMain(
             tooLarge.length > 0 && accept.maxTotalBytes
                 ? sizeLimitMessage(tooLarge, used, accept.maxTotalBytes)
@@ -181,13 +165,8 @@ const NewsForm: React.FC<NewsFormProps> = ({
         const { accepted, rejected } = filterAcceptedFiles(files, accept.galeria);
         setRejectedGallery(rejected);
         const used = newImagesBytes(values);
-        const { fitting, tooLarge } = fitFilesInLimit(
-            accepted,
-            used,
-            accept.maxTotalBytes,
-        );
-        const usedAfter =
-      used + fitting.reduce((total, file) => total + file.size, 0);
+        const { fitting, tooLarge } = fitFilesInLimit(accepted, used, accept.maxTotalBytes);
+        const usedAfter = used + fitting.reduce((total, file) => total + file.size, 0);
         setSizeErrorGallery(
             tooLarge.length > 0 && accept.maxTotalBytes
                 ? sizeLimitMessage(tooLarge, usedAfter, accept.maxTotalBytes)
@@ -210,8 +189,7 @@ const NewsForm: React.FC<NewsFormProps> = ({
                     {heading}
                 </Title>
                 <Text variant="caption" className={styles.hint}>
-                    Los campos con * son obligatorios. Los marcados como automáticos no se
-                    editan aquí.
+                    Los campos con * son obligatorios. Los marcados como automáticos no se editan aquí.
                 </Text>
             </div>
 
@@ -265,12 +243,8 @@ const NewsForm: React.FC<NewsFormProps> = ({
                                     id="noticia-subcategoria"
                                     options={options.subcategorias}
                                     value={values.subcategoriaId}
-                                    onChange={(e) =>
-                                        onFieldChange("subcategoriaId", e.target.value)
-                                    }
-                                    state={
-                                        options.subcategorias.length <= 1 ? "disabled" : "default"
-                                    }
+                                    onChange={(e) => onFieldChange("subcategoriaId", e.target.value)}
+                                    state={options.subcategorias.length <= 1 ? "disabled" : "default"}
                                 />
                             </FormField>
                         </div>
@@ -281,9 +255,7 @@ const NewsForm: React.FC<NewsFormProps> = ({
                                 editable
                                 labels={selectedTags}
                                 availableOptions={options.etiquetas}
-                                onChange={(labels) =>
-                                    onTagsChange(labels.map((label) => label.value))
-                                }
+                                onChange={(labels) => onTagsChange(labels.map((label) => label.value))}
                             />
                         </div>
 
@@ -299,11 +271,7 @@ const NewsForm: React.FC<NewsFormProps> = ({
                                 />
                             </FormField>
 
-                            <FormField
-                                label="Visibilidad"
-                                htmlFor="noticia-visibilidad"
-                                required
-                            >
+                            <FormField label="Visibilidad" htmlFor="noticia-visibilidad" required>
                                 <Select
                                     id="noticia-visibilidad"
                                     placeholder="Selecciona la visibilidad"
@@ -316,10 +284,7 @@ const NewsForm: React.FC<NewsFormProps> = ({
                         </div>
 
                         <div className={styles.row}>
-                            <FormField
-                                label="Ubicación de la noticia"
-                                htmlFor="noticia-ubicacion"
-                            >
+                            <FormField label="Ubicación de la noticia" htmlFor="noticia-ubicacion">
                                 <Input
                                     disabled={disabled}
                                     id="noticia-ubicacion"
@@ -352,11 +317,7 @@ const NewsForm: React.FC<NewsFormProps> = ({
                             </FormField>
                         </div>
                         <div className={styles.row}>
-                            <FormField
-                                label="Fecha de publicación"
-                                htmlFor="noticia-fecha"
-                                required
-                            >
+                            <FormField label="Fecha de publicación" htmlFor="noticia-fecha" required>
                                 {/* Se escribe dd/mm/aaaa (no type="date": su formato depende del navegador)
                             o se elige en el calendario del botón. */}
                                 <Input
@@ -368,18 +329,13 @@ const NewsForm: React.FC<NewsFormProps> = ({
                                     maxLength={10}
                                     value={values.fechaPublicacion}
                                     onChange={(e) =>
-                                        onFieldChange(
-                                            "fechaPublicacion",
-                                            maskDateInput(e.target.value),
-                                        )
+                                        onFieldChange("fechaPublicacion", maskDateInput(e.target.value))
                                     }
                                     icon={
                                         <CalendarPickerButton
                                             value={values.fechaPublicacion}
                                             disabled={disabled}
-                                            onPick={(fecha) =>
-                                                onFieldChange("fechaPublicacion", fecha)
-                                            }
+                                            onPick={(fecha) => onFieldChange("fechaPublicacion", fecha)}
                                         />
                                     }
                                     {...errorProps("fechaPublicacion")}
@@ -394,26 +350,21 @@ const NewsForm: React.FC<NewsFormProps> = ({
                                     {...errorProps("slug")}
                                 />
                                 <span className={styles.helper}>
-                                    Sugerido a partir del título. Puedes editarlo; el valor que
-                                    quede aquí es el que se guarda.
+                                    Sugerido a partir del título. Puedes editarlo; el valor que quede aquí es
+                                    el que se guarda.
                                 </span>
                             </FormField>
                         </div>
 
                         <div className={styles.row}>
-                            <FormField
-                                label="Tiempo de lectura (minutos)"
-                                htmlFor="noticia-tiempo"
-                            >
+                            <FormField label="Tiempo de lectura (minutos)" htmlFor="noticia-tiempo">
                                 <Input
                                     id="noticia-tiempo"
                                     type="number"
                                     min={1}
                                     placeholder="Ej. 4"
                                     value={values.tiempoLectura}
-                                    onChange={(e) =>
-                                        onFieldChange("tiempoLectura", e.target.value)
-                                    }
+                                    onChange={(e) => onFieldChange("tiempoLectura", e.target.value)}
                                     {...errorProps("tiempoLectura")}
                                 />
                                 <span className={styles.helper}>Puede dejarse vacío.</span>
@@ -437,17 +388,13 @@ const NewsForm: React.FC<NewsFormProps> = ({
                                     canMoveUp={index > 0}
                                     canMoveDown={index < values.secciones.length - 1}
                                     canRemove={values.secciones.length > 1}
-                                    onChange={(field, value) =>
-                                        onSectionChange(section.id, field, value)
-                                    }
-                                    onImageChange={(file) =>
-                                        onSectionImageChange(section.id, file)
-                                    }
+                                    onChange={(field, value) => onSectionChange(section.id, field, value)}
+                                    onImageChange={(file) => onSectionImageChange(section.id, file)}
                                     imageLimit={sectionImageLimit(index)}
                                     onVideoAdd={
                                         onSectionVideoAdd
                                             ? (url, youtubeId) =>
-                                                onSectionVideoAdd(section.id, url, youtubeId)
+                                                  onSectionVideoAdd(section.id, url, youtubeId)
                                             : undefined
                                     }
                                     onMoveUp={() => onMoveSection(section.id, "up")}
@@ -475,17 +422,12 @@ const NewsForm: React.FC<NewsFormProps> = ({
                         </div>
                     </section>
                 </div>
-                <aside
-                    className={styles.mediaColumn}
-                    aria-label="Archivos de la noticia"
-                >
+                <aside className={styles.mediaColumn} aria-label="Archivos de la noticia">
                     <section className={styles.card}>
                         <div className={styles.cardHeader}>
                             <h2 className={styles.cardTitle}>Imagen o video principal</h2>
                             <LabelChip
-                                label={
-                                    mainFileRequired ? "Único, obligatorio" : "Único, opcional"
-                                }
+                                label={mainFileRequired ? "Único, obligatorio" : "Único, opcional"}
                                 className={styles.badge}
                             />
                         </div>

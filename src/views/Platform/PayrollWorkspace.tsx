@@ -3,11 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/client/atoms/Button";
 import { usePlatform } from "@/platform/context";
 import { useModuleActions } from "@/components/client/organisms/ModuleAccessGate/ModuleAccessGate";
-import {
-    platformCommand,
-    platformFetch,
-    PlatformError,
-} from "@/platform/client";
+import { platformCommand, platformFetch, PlatformError } from "@/platform/client";
 import layout from "./PayrollWorkspace.module.scss";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
 type Options = {
@@ -86,10 +82,7 @@ export function PayrollWorkspace() {
     }, [pdf]);
     useEffect(() => {
         let active = true;
-        platformFetch<Options>(
-            "/boletas/options" +
-                (tipo ? "?tipo=" + encodeURIComponent(tipo) : ""),
-        )
+        platformFetch<Options>("/boletas/options" + (tipo ? "?tipo=" + encodeURIComponent(tipo) : ""))
             .then((r) => {
                 if (active) setOptions(r);
             })
@@ -103,11 +96,7 @@ export function PayrollWorkspace() {
     async function loadStatus(id: string) {
         const request = ++statusRequest.current;
         const result = await platformFetch<Status>("/boletas/jobs/" + id);
-        if (
-            mounted.current &&
-            selectedJob.current === id &&
-            request === statusRequest.current
-        )
+        if (mounted.current && selectedJob.current === id && request === statusRequest.current)
             setStatus(result);
         return result;
     }
@@ -134,9 +123,7 @@ export function PayrollWorkspace() {
         setBusy(true);
         clear();
         try {
-            setPreview(
-                await platformFetch<Preview>("/boletas/preview?" + params()),
-            );
+            setPreview(await platformFetch<Preview>("/boletas/preview?" + params()));
         } catch (e) {
             setError(e instanceof Error ? e.message : "No se pudo consultar");
         } finally {
@@ -169,9 +156,7 @@ export function PayrollWorkspace() {
                                 " boletas pendientes; actualiza su estado antes de continuar.",
                         );
                         setDeliveryMessage("");
-                    } else if (
-                        progress.items.some((i) => i.estado !== "ACEPTADO_SMTP")
-                    ) {
+                    } else if (progress.items.some((i) => i.estado !== "ACEPTADO_SMTP")) {
                         setDeliveryError(
                             "El lote tiene resultados que requieren revisión. Consulta el diagnóstico de cada boleta antes de reenviar.",
                         );
@@ -185,27 +170,22 @@ export function PayrollWorkspace() {
                     break;
                 }
                 if (r.codigo === "CORREO_PERSONAL_CAMBIO") {
-                    setDeliveryMessage("Se omitió una boleta con el correo personal desactualizado. El lote continúa.");
+                    setDeliveryMessage(
+                        "Se omitió una boleta con el correo personal desactualizado. El lote continúa.",
+                    );
                     continue;
                 }
                 if (r.estado !== "ACEPTADO_SMTP") {
                     setDeliveryError(
                         "El envío requiere revisión. Los registros pendientes se conservaron." +
-                            (r.referencia
-                                ? " Referencia: " + r.referencia
-                                : ""),
+                            (r.referencia ? " Referencia: " + r.referencia : ""),
                     );
                     setDeliveryMessage("");
                     break;
                 }
-                const accepted = progress.items.filter(
-                    (i) => i.estado === "ACEPTADO_SMTP",
-                ).length;
+                const accepted = progress.items.filter((i) => i.estado === "ACEPTADO_SMTP").length;
                 setDeliveryMessage(
-                    accepted +
-                        " aceptada(s) por SMTP · " +
-                        progress.pendientes +
-                        " pendientes.",
+                    accepted + " aceptada(s) por SMTP · " + progress.pendientes + " pendientes.",
                 );
                 if (progress.pendientes === 0) {
                     setDeliveryMessage(
@@ -217,9 +197,7 @@ export function PayrollWorkspace() {
                 }
             }
             if (stop.current && mounted.current)
-                setDeliveryMessage(
-                    "Lote pausado. Los resultados y las boletas pendientes se conservaron.",
-                );
+                setDeliveryMessage("Lote pausado. Los resultados y las boletas pendientes se conservaron.");
             if (mounted.current) await refreshJobs();
         } catch (e) {
             if (mounted.current) {
@@ -229,11 +207,7 @@ export function PayrollWorkspace() {
                         ? e.message
                         : "No se pudo confirmar el envío. Actualiza el lote antes de reintentar.") +
                         (e instanceof PlatformError
-                            ? " HTTP " +
-                              e.status +
-                              (e.reference
-                                  ? " · Referencia: " + e.reference
-                                  : "")
+                            ? " HTTP " + e.status + (e.reference ? " · Referencia: " + e.reference : "")
                             : ""),
                 );
             }
@@ -273,17 +247,10 @@ export function PayrollWorkspace() {
             ]);
             setJob(r.id);
             setPreview(null);
-            setMessage(
-                "Lote autorizado. Consulta su avance en Lotes y resultados.",
-            );
+            setMessage("Lote autorizado. Consulta su avance en Lotes y resultados.");
             await processJob(r.id);
         } catch (e) {
-            if (mounted.current)
-                setError(
-                    e instanceof Error
-                        ? e.message
-                        : "No se pudo autorizar el lote",
-                );
+            if (mounted.current) setError(e instanceof Error ? e.message : "No se pudo autorizar el lote");
         } finally {
             flight.current = false;
             if (mounted.current) setBusy(false);
@@ -305,9 +272,7 @@ export function PayrollWorkspace() {
             const blob = await platformFetch<Blob>("/boletas/pdf?" + params());
             setPdf(URL.createObjectURL(blob));
         } catch (e) {
-            setError(
-                e instanceof Error ? e.message : "No se pudo generar el PDF",
-            );
+            setError(e instanceof Error ? e.message : "No se pudo generar el PDF");
         } finally {
             setBusy(false);
         }
@@ -318,11 +283,7 @@ export function PayrollWorkspace() {
             await refreshJobs();
             if (selectedJob.current) await loadStatus(selectedJob.current);
         } catch (e) {
-            setDeliveryError(
-                e instanceof Error
-                    ? e.message
-                    : "No se pudo actualizar el lote",
-            );
+            setDeliveryError(e instanceof Error ? e.message : "No se pudo actualizar el lote");
         }
     }
     const actualizarCorreo = status?.items.some(
@@ -339,7 +300,9 @@ export function PayrollWorkspace() {
                 "POST",
                 { envio, resultado, evidencia },
                 true,
-                (actualizarCorreo ? "Actualizar correo personal de boleta " : "Conciliar resultado de boleta ") + envio,
+                (actualizarCorreo
+                    ? "Actualizar correo personal de boleta "
+                    : "Conciliar resultado de boleta ") + envio,
             );
             setStatus(await platformFetch<Status>("/boletas/jobs/" + job));
             setReconciliation(null);
@@ -354,8 +317,8 @@ export function PayrollWorkspace() {
         <section className={styles.page}>
             <header>
                 <p className={styles.muted}>
-                    Consulta la nómina, revisa el documento y autoriza su envío.
-                    Este proceso se ejecuta manualmente y conserva su historial.
+                    Consulta la nómina, revisa el documento y autoriza su envío. Este proceso se ejecuta
+                    manualmente y conserva su historial.
                 </p>
             </header>
             {error && (
@@ -369,20 +332,16 @@ export function PayrollWorkspace() {
                 {options && (
                     <p role="status">
                         <strong>
-                            {options.modo === "PRUEBA"
-                                ? "Prueba controlada"
-                                : "Envío a empleados"}
+                            {options.modo === "PRUEBA" ? "Prueba controlada" : "Envío a empleados"}
                         </strong>{" "}
                         · Remitente: {options.remitente}
-                        {options.destinoPrueba &&
-                            ` · Destinatario exclusivo: ${options.destinoPrueba}`}
+                        {options.destinoPrueba && ` · Destinatario exclusivo: ${options.destinoPrueba}`}
                     </p>
                 )}
                 {options && !options.correoConfigurado && (
                     <p className={styles.error}>
-                        Falta configurar el SMTP exclusivo de boletas. Puedes
-                        revisar la información y el PDF; el envío permanece
-                        bloqueado.
+                        Falta configurar el SMTP exclusivo de boletas. Puedes revisar la información y el PDF;
+                        el envío permanece bloqueado.
                     </p>
                 )}
                 <form
@@ -435,9 +394,7 @@ export function PayrollWorkspace() {
                     </label>
                     <label className={styles.field}>
                         Código de empleado{" "}
-                        {options?.modo === "PRUEBA"
-                            ? "(obligatorio para enviar una prueba)"
-                            : "(opcional)"}
+                        {options?.modo === "PRUEBA" ? "(obligatorio para enviar una prueba)" : "(opcional)"}
                         <input
                             aria-label="Código de empleado"
                             className={styles.control}
@@ -451,12 +408,7 @@ export function PayrollWorkspace() {
                             }}
                         />
                     </label>
-                    <Button
-                        type="submit"
-                        state={
-                            busy ? "loading" : sending ? "disabled" : "default"
-                        }
-                    >
+                    <Button type="submit" state={busy ? "loading" : sending ? "disabled" : "default"}>
                         Revisar nómina
                     </Button>
                 </form>
@@ -465,15 +417,9 @@ export function PayrollWorkspace() {
                 <section className={`${styles.card} ${layout.stack}`}>
                     <h3>Revisión antes del envío</h3>
                     <p>
-                        {preview.total}{" "}
-                        {preview.total === 1 ? "empleado" : "empleados"} ·{" "}
-                        {preview.aptos}{" "}
-                        {preview.aptos === 1 ? "boleta apta" : "boletas aptas"}{" "}
-                        · {preview.excluidos.length}{" "}
-                        {preview.excluidos.length === 1
-                            ? "excluido"
-                            : "excluidos"}
-                        .
+                        {preview.total} {preview.total === 1 ? "empleado" : "empleados"} · {preview.aptos}{" "}
+                        {preview.aptos === 1 ? "boleta apta" : "boletas aptas"} · {preview.excluidos.length}{" "}
+                        {preview.excluidos.length === 1 ? "excluido" : "excluidos"}.
                     </p>
                     <p>
                         Modo: <strong>{preview.modo}</strong>.{" "}
@@ -483,8 +429,8 @@ export function PayrollWorkspace() {
                     </p>
                     {preview.requiereEmpleado && (
                         <p>
-                            Selecciona un empleado para la primera prueba. No se
-                            enviará la nómina completa al buzón de pruebas.
+                            Selecciona un empleado para la primera prueba. No se enviará la nómina completa al
+                            buzón de pruebas.
                         </p>
                     )}
                     <div className={styles.tableRegion}>
@@ -498,10 +444,7 @@ export function PayrollWorkspace() {
                             </thead>
                             <tbody>
                                 {preview.empleados
-                                    .slice(
-                                        previewPage * 25,
-                                        (previewPage + 1) * 25,
-                                    )
+                                    .slice(previewPage * 25, (previewPage + 1) * 25)
                                     .map((e) => (
                                         <tr key={e.empleado}>
                                             <td>{e.empleado}</td>
@@ -514,30 +457,25 @@ export function PayrollWorkspace() {
                     </div>
                     {preview.empleados.length > 25 && (
                         <p>
-                            Revisa los empleados por páginas; también puedes
-                            filtrar por código de empleado.
+                            Revisa los empleados por páginas; también puedes filtrar por código de empleado.
                         </p>
                     )}
                     {preview.empleados.length > 25 && (
                         <div className={styles.toolbar}>
                             <Button
                                 variant="outlined"
-                                state={
-                                    previewPage === 0 ? "disabled" : "default"
-                                }
+                                state={previewPage === 0 ? "disabled" : "default"}
                                 onClick={() => setPreviewPage((p) => p - 1)}
                             >
                                 Empleados anteriores
                             </Button>
                             <span>
-                                Página {previewPage + 1} de{" "}
-                                {Math.ceil(preview.empleados.length / 25)}
+                                Página {previewPage + 1} de {Math.ceil(preview.empleados.length / 25)}
                             </span>
                             <Button
                                 variant="outlined"
                                 state={
-                                    (previewPage + 1) * 25 >=
-                                    preview.empleados.length
+                                    (previewPage + 1) * 25 >= preview.empleados.length
                                         ? "disabled"
                                         : "default"
                                 }
@@ -553,8 +491,7 @@ export function PayrollWorkspace() {
                             <ul>
                                 {preview.excluidos.map((e) => (
                                     <li key={e.empleado}>
-                                        {e.empleado}:{" "}
-                                        {e.motivo.replaceAll("_", " ")}
+                                        {e.empleado}: {e.motivo.replaceAll("_", " ")}
                                     </li>
                                 ))}
                             </ul>
@@ -580,10 +517,7 @@ export function PayrollWorkspace() {
                             }
                             onClick={() => void authorize()}
                         >
-                            Autorizar y enviar{" "}
-                            {preview.aptos === 1
-                                ? "boleta"
-                                : `${preview.aptos} boletas`}
+                            Autorizar y enviar {preview.aptos === 1 ? "boleta" : `${preview.aptos} boletas`}
                         </Button>
                     </div>
                 </section>
@@ -625,8 +559,7 @@ export function PayrollWorkspace() {
                             <option value="">Seleccionar lote</option>
                             {jobs.map((j) => (
                                 <option key={j.id} value={j.id}>
-                                    {j.tipo} / {j.maestro} · {j.modo} ·{" "}
-                                    {j.pendientes} pendientes
+                                    {j.tipo} / {j.maestro} · {j.modo} · {j.pendientes} pendientes
                                 </option>
                             ))}
                         </select>
@@ -643,25 +576,17 @@ export function PayrollWorkspace() {
                     <>
                         <p role="status">
                             {status.pendientes} pendientes ·{" "}
-                            {
-                                status.items.filter(
-                                    (i) => i.estado === "ACEPTADO_SMTP",
-                                ).length
-                            }{" "}
-                            aceptados por SMTP
+                            {status.items.filter((i) => i.estado === "ACEPTADO_SMTP").length} aceptados por
+                            SMTP
                         </p>
                         <p className={styles.muted}>
-                            Aceptado por SMTP confirma la recepción del servidor
-                            de correo. Los resultados inciertos requieren
-                            revisión antes de cualquier reenvío.
+                            Aceptado por SMTP confirma la recepción del servidor de correo. Los resultados
+                            inciertos requieren revisión antes de cualquier reenvío.
                         </p>
                         <div className={layout.actions}>
                             <Button
                                 state={
-                                    !actions.INSERTAR ||
-                                    !status.pendientes ||
-                                    sending ||
-                                    busy
+                                    !actions.INSERTAR || !status.pendientes || sending || busy
                                         ? "disabled"
                                         : "default"
                                 }
@@ -693,38 +618,32 @@ export function PayrollWorkspace() {
                                     {status.items.map((i) => (
                                         <tr key={i.id}>
                                             <td>{i.empleado}</td>
-                                            <td>
-                                                {i.estado.replaceAll("_", " ")}
-                                            </td>
+                                            <td>{i.estado.replaceAll("_", " ")}</td>
                                             <td>
                                                 {i.error === "CORREO_PERSONAL_CAMBIO"
                                                     ? "Requiere actualizar el correo personal"
                                                     : i.error || "—"}
                                                 {data?.actor.admin &&
-                                                    [
-                                                        "EN_ENVIO",
-                                                        "INCIERTO",
-                                                        "ERROR_PREPARACION",
-                                                    ].includes(i.estado) && (
+                                                    ["EN_ENVIO", "INCIERTO", "ERROR_PREPARACION"].includes(
+                                                        i.estado,
+                                                    ) && (
                                                         <Button
                                                             variant="outlined"
-                                                            state={
-                                                                busy || sending
-                                                                    ? "disabled"
-                                                                    : "default"
-                                                            }
+                                                            state={busy || sending ? "disabled" : "default"}
                                                             onClick={() =>
-                                                                setReconciliation(
-                                                                    {
-                                                                        envio: i.id,
-                                                                        resultado: i.error === "CORREO_PERSONAL_CAMBIO" ? "NO_ENVIADO" : "",
-                                                                        evidencia:
-                                                                            "",
-                                                                    },
-                                                                )
+                                                                setReconciliation({
+                                                                    envio: i.id,
+                                                                    resultado:
+                                                                        i.error === "CORREO_PERSONAL_CAMBIO"
+                                                                            ? "NO_ENVIADO"
+                                                                            : "",
+                                                                    evidencia: "",
+                                                                })
                                                             }
                                                         >
-                                                            {i.error === "CORREO_PERSONAL_CAMBIO" ? "Actualizar correo personal" : "Conciliar envío"}
+                                                            {i.error === "CORREO_PERSONAL_CAMBIO"
+                                                                ? "Actualizar correo personal"
+                                                                : "Conciliar envío"}
                                                         </Button>
                                                     )}
                                             </td>
@@ -744,35 +663,35 @@ export function PayrollWorkspace() {
                         void reconcile();
                     }}
                 >
-                    <h3>{actualizarCorreo ? "Actualizar correo personal" : "Conciliar resultado del envío"}</h3>
+                    <h3>
+                        {actualizarCorreo ? "Actualizar correo personal" : "Conciliar resultado del envío"}
+                    </h3>
                     <p>
                         {actualizarCorreo
                             ? "La boleta está sin enviar. Confirma el correo personal con RRHH para actualizar el destinatario del lote."
                             : "Revisa primero el buzón o el proveedor. Confirma «No enviado» para habilitar otro intento."}
                     </p>
-                    {!actualizarCorreo && <label className={styles.field}>
-                        Resultado verificado
-                        <select
-                            aria-label="Resultado verificado"
-                            className={styles.control}
-                            required
-                            value={reconciliation.resultado}
-                            onChange={(e) =>
-                                setReconciliation({
-                                    ...reconciliation,
-                                    resultado: e.target.value,
-                                })
-                            }
-                        >
-                            <option value="">Seleccionar resultado</option>
-                            <option value="ACEPTADO_SMTP">
-                                El proveedor confirma que fue aceptado
-                            </option>
-                            <option value="NO_ENVIADO">
-                                Confirmado: no fue enviado
-                            </option>
-                        </select>
-                    </label>}
+                    {!actualizarCorreo && (
+                        <label className={styles.field}>
+                            Resultado verificado
+                            <select
+                                aria-label="Resultado verificado"
+                                className={styles.control}
+                                required
+                                value={reconciliation.resultado}
+                                onChange={(e) =>
+                                    setReconciliation({
+                                        ...reconciliation,
+                                        resultado: e.target.value,
+                                    })
+                                }
+                            >
+                                <option value="">Seleccionar resultado</option>
+                                <option value="ACEPTADO_SMTP">El proveedor confirma que fue aceptado</option>
+                                <option value="NO_ENVIADO">Confirmado: no fue enviado</option>
+                            </select>
+                        </label>
+                    )}
                     <label className={styles.field}>
                         Evidencia de la revisión
                         <textarea

@@ -43,13 +43,18 @@
 }
 button.tile {
   cursor: pointer;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
   &:hover {
-    border-color: #b8c5f5; border-color: light-dark(#b8c5f5, #2a3449);
+    border-color: #b8c5f5;
+    border-color: light-dark(#b8c5f5, #2a3449);
   }
   &[aria-pressed="true"] {
     border-color: var(--tone);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--tone) 16%, transparent), var(--tickets-shadow);
+    box-shadow:
+      0 0 0 3px color-mix(in srgb, var(--tone) 16%, transparent),
+      var(--tickets-shadow);
   }
   &:focus-visible {
     outline: 2px solid var(--tickets-primary);

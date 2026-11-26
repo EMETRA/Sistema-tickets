@@ -13,14 +13,7 @@ import { ModalContent } from "../../molecules/ModalContent";
 
 const GRID = "minmax(0,1fr) minmax(0,1.8fr) minmax(0,1fr) minmax(0,1fr)";
 
-const ModulesTable: React.FC<ModulesTableProps> = ({
-    modules,
-    onSubmit,
-    onEdit,
-    onDelete,
-    className
-}) => {
-
+const ModulesTable: React.FC<ModulesTableProps> = ({ modules, onSubmit, onEdit, onDelete, className }) => {
     const [view, setView] = useState<ModulesView>("table");
     const [selectedModule, setSelectedModule] = useState<Modules | null>(null);
     const [modalOpen, setModalOpen] = useState(false);
@@ -28,68 +21,59 @@ const ModulesTable: React.FC<ModulesTableProps> = ({
 
     if (view === "create") {
         return (
-            <ModulesForm 
+            <ModulesForm
                 onCancel={() => setView("table")}
                 onSubmit={(data) => {
-                    onSubmit?.(data)
+                    onSubmit?.(data);
                     setView("table");
                 }}
             />
-        )
+        );
     }
 
     if (view === "edit") {
         return (
-            <ModulesForm 
+            <ModulesForm
                 initialData={selectedModule}
                 onCancel={() => setView("table")}
                 onSubmit={(data) => {
-
                     if (!selectedModule) return;
-                    
+
                     const payload = {
                         ...selectedModule,
-                        ...data
+                        ...data,
                     };
 
-                    onEdit?.(payload)
-                    
+                    onEdit?.(payload);
+
                     setView("table");
-                    
                 }}
             />
-        )
+        );
     }
 
     return (
         <div className={classNames(styles.ModulesTable, className)}>
-
             <div className={styles.header}>
-                <TableHeader 
-                    iconName="layer-group-solid"
-                    label="Modulos del sistema"
-                />
+                <TableHeader iconName="layer-group-solid" label="Modulos del sistema" />
 
-                <Button onClick={() => setView("create")}>
-                    Nuevo
-                </Button>
+                <Button onClick={() => setView("create")}>Nuevo</Button>
             </div>
 
             <div className={styles.table}>
-
-                <TableRow 
+                <TableRow
                     isHeader
                     gridTemplate={GRID}
                     cells={[
                         { icon: "hashtag-solid", label: "Código" },
                         { icon: "clipboard-solid", label: "Nombre del módulo" },
                         { icon: "spinner-solid", label: "Estado" },
-                        { icon: "gears-solid", label: "", align: "center" }
+                        { icon: "gears-solid", label: "", align: "center" },
                     ]}
                 />
 
                 {modules.map((mod) => (
-                    <TableRow 
+                    <TableRow
                         key={mod.id}
                         id={mod.id}
                         gridTemplate={GRID}
@@ -98,15 +82,13 @@ const ModulesTable: React.FC<ModulesTableProps> = ({
                             { content: <Text>{mod.id}</Text> },
                             { content: <Text>{mod.name}</Text> },
                             {
-                                content: (
-                                    <TicketStateChip label={mod.status} state="ingresado" />
-                                ), 
-                                align: "center"
+                                content: <TicketStateChip label={mod.status} state="ingresado" />,
+                                align: "center",
                             },
                             {
                                 content: (
                                     <div>
-                                        <IconButton 
+                                        <IconButton
                                             icon="file-pen-solid"
                                             iconColor="#8A8A8A"
                                             onClick={() => {
@@ -114,7 +96,7 @@ const ModulesTable: React.FC<ModulesTableProps> = ({
                                                 setView("edit");
                                             }}
                                         />
-                                        <IconButton 
+                                        <IconButton
                                             icon="trash-solid"
                                             iconColor="#8A8A8A"
                                             onClick={() => {
@@ -124,13 +106,13 @@ const ModulesTable: React.FC<ModulesTableProps> = ({
                                         />
                                     </div>
                                 ),
-                                align: "center"
-                            }
+                                align: "center",
+                            },
                         ]}
                     />
                 ))}
 
-                <ModalContent 
+                <ModalContent
                     isOpen={modalOpen}
                     onClose={() => setModalOpen(false)}
                     onConfirm={() => {
@@ -140,7 +122,6 @@ const ModulesTable: React.FC<ModulesTableProps> = ({
                     title="¿Estas seguro de querer eliminar este módulo?"
                     description="Esta acción no se podrá revertir"
                 />
-
             </div>
         </div>
     );

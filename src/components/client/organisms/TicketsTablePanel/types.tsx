@@ -6,90 +6,90 @@ import { ChipState } from "../../atoms/TicketStateChip/types";
  * Extiende Member agregando el departamento
  */
 export interface User extends Member {
-  /**
-   * Departamento o área del usuario
-   */
-  department?: string;
+    /**
+     * Departamento o área del usuario
+     */
+    department?: string;
 }
 
 /**
  * Información de un ticket en el sistema
  */
 export interface Ticket {
-  /**
-   * ID único del ticket
-   */
-  id: string;
-  code?: string;
+    /**
+     * ID único del ticket
+     */
+    id: string;
+    code?: string;
 
-  /**
-   * Usuario que creó el ticket
-   */
-  user: User;
+    /**
+     * Usuario que creó el ticket
+     */
+    user: User;
 
-  /**
-   * Título del ticket
-   */
-  title: string;
+    /**
+     * Título del ticket
+     */
+    title: string;
 
-  /**
-   * Descripción del ticket
-   */
-  description: string;
+    /**
+     * Descripción del ticket
+     */
+    description: string;
 
-  /**
-   * Fecha del ticket (formato legible, ej: "Hoy, 17:24")
-   */
-  date: string;
+    /**
+     * Fecha del ticket (formato legible, ej: "Hoy, 17:24")
+     */
+    date: string;
 
-  /**
-   * Estado actual del ticket
-   */
-  status: {
-    label: string;
-    state: ChipState;
-  };
+    /**
+     * Estado actual del ticket
+     */
+    status: {
+        label: string;
+        state: ChipState;
+    };
 
-  /**
-   * Usuario asignado al ticket (null si no está asignado)
-   */
-  assignedTo?: User | null;
+    /**
+     * Usuario asignado al ticket (null si no está asignado)
+     */
+    assignedTo?: User | null;
 }
 
 /**
  * Props del componente TicketsTablePanel
  */
 export interface TicketsTablePanelProps {
-  /**
-   * Lista de tickets a mostrar en la tabla
-   */
-  tickets: Ticket[];
+    /**
+     * Lista de tickets a mostrar en la tabla
+     */
+    tickets: Ticket[];
 
-  /**
-  * Callback cuando se confirma la cancelación definitiva de un ticket
-  */
-  onDelete?: (ticketId: string) => void | Promise<void>;
+    /**
+     * Callback cuando se confirma la cancelación definitiva de un ticket
+     */
+    onDelete?: (ticketId: string) => void | Promise<void>;
 
-  /**
-  * Callback para asignar/reasignar un ticket a un usuario
-  */
-  onAssign?: (ticketId: string, userId: string) => void | Promise<void>;
+    /**
+     * Callback para asignar/reasignar un ticket a un usuario
+     */
+    onAssign?: (ticketId: string, userId: string) => void | Promise<void>;
 
-  /**
-   * Callback cuando se exporta la tabla
-   */
-  onExport?: () => void;
-  onRefresh?: () => void;
-  onOpenTicket?: (ticketId: string) => void;
+    /**
+     * Callback cuando se exporta la tabla
+     */
+    onExport?: () => void;
+    onRefresh?: () => void;
+    onOpenTicket?: (ticketId: string) => void;
 
-  /**
-   * Indica si la tabla está en estado de carga
-   */
-  loading?: boolean;
+    /**
+     * Indica si la tabla está en estado de carga
+     */
+    loading?: boolean;
 
-  /**
-   * Clase CSS adicional
-   */
-  className?: string;
-  onTicketUpdated?: () => void; 
+    /**
+     * Clase CSS adicional
+     */
+    className?: string;
+    onTicketUpdated?: () => void;
 }

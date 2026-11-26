@@ -21,9 +21,7 @@ export function AdministrativeConfirmation() {
     const [checked, setChecked] = useState(false);
     const [busy, setBusy] = useState(false);
     const [error, setError] = useState("");
-    const userName = useAuthStore(
-        (state) => state.user?.nombre || "Administrador",
-    );
+    const userName = useAuthStore((state) => state.user?.nombre || "Administrador");
 
     useEffect(() => {
         const pendingQueue = queue.current;
@@ -78,11 +76,7 @@ export function AdministrativeConfirmation() {
                 finish(true);
             }
         } catch (e) {
-            setError(
-                e instanceof Error
-                    ? e.message
-                    : "No se pudo confirmar. Intenta nuevamente.",
-            );
+            setError(e instanceof Error ? e.message : "No se pudo confirmar. Intenta nuevamente.");
         } finally {
             setBusy(false);
         }
@@ -98,18 +92,11 @@ export function AdministrativeConfirmation() {
                 if (!busy) finish(false);
             }}
         >
-            <div
-                className={styles.progress}
-                aria-label={`Confirmación ${step} de 2`}
-            >
+            <div className={styles.progress} aria-label={`Confirmación ${step} de 2`}>
                 <span className={styles.current}>1 · Revisar</span>
-                <span className={step === 2 ? styles.current : undefined}>
-                    2 · Confirmar
-                </span>
+                <span className={step === 2 ? styles.current : undefined}>2 · Confirmar</span>
             </div>
-            <h2 id="admin-confirm-title">
-                {step === 1 ? "Revisa el cambio" : "Confirma y aplica"}
-            </h2>
+            <h2 id="admin-confirm-title">{step === 1 ? "Revisa el cambio" : "Confirma y aplica"}</h2>
             <p id="admin-confirm-description">
                 {step === 1
                     ? "Comprueba la acción antes de continuar. Todavía no se ha enviado la solicitud."
@@ -141,19 +128,13 @@ export function AdministrativeConfirmation() {
                     Cancelar
                 </Button>
                 {step === 1 ? (
-                    <Button
-                        type="button"
-                        onClick={() => void advance()}
-                        state={busy ? "loading" : "default"}
-                    >
+                    <Button type="button" onClick={() => void advance()} state={busy ? "loading" : "default"}>
                         Confirmar revisión · 1 de 2
                     </Button>
                 ) : (
                     <Button
                         type="button"
-                        state={
-                            busy ? "loading" : checked ? "default" : "disabled"
-                        }
+                        state={busy ? "loading" : checked ? "default" : "disabled"}
                         onClick={() => void advance()}
                     >
                         Confirmar y aplicar · 2 de 2

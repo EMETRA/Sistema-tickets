@@ -21,24 +21,13 @@ export const TicketStat: React.FC<TicketStatProps> = (props) => {
 
     return (
         <div className={classNames(styles.TicketStat, className)}>
-            <div 
-                className={styles.IconContainer}
-                style={{ backgroundColor: color }}
-            >
-                <Icon 
-                    name={iconName} 
-                    size={32}
-                    variant="status"
-                    className={styles.Icon}
-                />
+            <div className={styles.IconContainer} style={{ backgroundColor: color }}>
+                <Icon name={iconName} size={32} variant="status" className={styles.Icon} />
             </div>
-      
+
             <div className={styles.Content}>
                 <h3 className={styles.Label}>{label}</h3>
-                <p 
-                    className={styles.Value}
-                    style={{ color }}
-                >
+                <p className={styles.Value} style={{ color }}>
                     {value.toLocaleString()} tickets
                 </p>
             </div>

@@ -154,9 +154,7 @@ export function resolveIconFile(name: string): SvgFileName {
     if (isIconName(name)) return name;
 
     if (process.env.NODE_ENV === "development") {
-        console.warn(
-            `[Icon] Ícono desconocido "${name}". Usando fallback "${DEFAULT_ICON_FILE}".`,
-        );
+        console.warn(`[Icon] Ícono desconocido "${name}". Usando fallback "${DEFAULT_ICON_FILE}".`);
     }
 
     return DEFAULT_ICON_FILE;

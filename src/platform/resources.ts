@@ -25,8 +25,7 @@ export const RESOURCE_PRESENTATION: Record<
     instalaciones: {
         title: "Ubicaciones",
         singular: "Ubicación",
-        description:
-            "Sedes, edificios y niveles utilizados por los bienes, las visitas y la red.",
+        description: "Sedes, edificios y niveles utilizados por los bienes, las visitas y la red.",
         columns: [
             { key: "direccion", label: "Dirección" },
             { key: "nivel", label: "Nivel" },
@@ -36,8 +35,7 @@ export const RESOURCE_PRESENTATION: Record<
     intervenciones: {
         title: "Mantenimientos y visitas",
         singular: "Mantenimiento o visita",
-        description:
-            "Trabajo realizado sobre un bien o una ubicación, su técnico y próxima revisión.",
+        description: "Trabajo realizado sobre un bien o una ubicación, su técnico y próxima revisión.",
         columns: [
             { key: "tipo", label: "Trabajo" },
             { key: "activoId", label: "Bien" },
@@ -62,8 +60,7 @@ export const RESOURCE_PRESENTATION: Record<
     dispositivos: {
         title: "Dispositivos de red",
         singular: "Dispositivo de red",
-        description:
-            "Switches, routers, puntos de acceso y equipos con ubicación y puertos configurados.",
+        description: "Switches, routers, puntos de acceso y equipos con ubicación y puertos configurados.",
         columns: [
             { key: "clase", label: "Tipo" },
             { key: "numeroInventario", label: "Inventario" },
@@ -75,8 +72,7 @@ export const RESOURCE_PRESENTATION: Record<
     conexiones: {
         title: "Conexiones por puerto",
         singular: "Conexión",
-        description:
-            "Enlaces entre dos dispositivos y sus puertos. El mapa utiliza estos mismos registros.",
+        description: "Enlaces entre dos dispositivos y sus puertos. El mapa utiliza estos mismos registros.",
         columns: [
             { key: "origenId", label: "Origen" },
             { key: "puertoOrigen", label: "Puerto" },
@@ -110,28 +106,23 @@ export function resourceDefinition(type: string, def: Definition): Definition {
     const copy = RESOURCE_PRESENTATION[type];
     return copy ? { ...def, title: copy.title, singular: copy.singular } : def;
 }
-export function resourceValue(
-    row: PlatformRecord,
-    key: string,
-    teams: { id: string; nombre: string }[],
-) {
-    if (key === "equipoId")
-        return (
-            teams.find((t) => t.id === row.equipoId)?.nombre ||
-            "Sin equipo asignado"
-        );
+export function resourceValue(row: PlatformRecord, key: string, teams: { id: string; nombre: string }[]) {
+    if (key === "equipoId") return teams.find((t) => t.id === row.equipoId)?.nombre || "Sin equipo asignado";
     if (row.labels?.[key]) return row.labels[key];
     const value = row.datos[key];
     if (value == null || value === "") return "Sin dato";
     if (typeof value === "boolean") return value ? "Sí" : "No";
-    if (
-        typeof value === "string" &&
-        /^[a-f\d]{8}(-[a-f\d]{4}){3}-[a-f\d]{12}$/i.test(value)
-    )
+    if (typeof value === "string" && /^[a-f\d]{8}(-[a-f\d]{4}){3}-[a-f\d]{12}$/i.test(value))
         return "Consultar detalle";
-    if (typeof value === "string" && ["fecha","proximaRevision","ultimaRevision"].includes(key)) {
-        if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value.split('-').reverse().join('/');
-        const date=new Date(value); if(Number.isFinite(+date)) return new Intl.DateTimeFormat('es-GT',{timeZone:'America/Guatemala',dateStyle:'short',timeStyle:'short'}).format(date);
+    if (typeof value === "string" && ["fecha", "proximaRevision", "ultimaRevision"].includes(key)) {
+        if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value.split("-").reverse().join("/");
+        const date = new Date(value);
+        if (Number.isFinite(+date))
+            return new Intl.DateTimeFormat("es-GT", {
+                timeZone: "America/Guatemala",
+                dateStyle: "short",
+                timeStyle: "short",
+            }).format(date);
     }
     return String(value).replaceAll("_", " ");
 }

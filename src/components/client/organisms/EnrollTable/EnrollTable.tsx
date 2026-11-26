@@ -12,25 +12,17 @@ import { Button } from "../../atoms/Button";
 
 const GRID = "minmax(0, 1.8fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr)";
 
-const EnrollTable: React.FC<EnrollTableProps> = ({
-    enroll,
-    onApprove,
-    onApproveAll,
-    className
-}) => {
-
+const EnrollTable: React.FC<EnrollTableProps> = ({ enroll, onApprove, onApproveAll, className }) => {
     const [selected, setSelected] = useState<number[]>([]);
 
     const isAllSelected = selected.length === enroll.length;
 
     const handleSelectAll = (checked: boolean) => {
-        setSelected(checked ? enroll.map(e => e.id) : [])
+        setSelected(checked ? enroll.map((e) => e.id) : []);
     };
 
     const handleSelectRow = (id: number, checked: boolean) => {
-        setSelected(prev => 
-            checked ? [...prev, id] : prev.filter(r => r !== id)
-        );
+        setSelected((prev) => (checked ? [...prev, id] : prev.filter((r) => r !== id)));
     };
 
     const handleApproveAll = () => {
@@ -44,23 +36,16 @@ const EnrollTable: React.FC<EnrollTableProps> = ({
 
     return (
         <div className={classNames(styles.EnrollTable, className)}>
-
             <div className={styles.header}>
-
-                <TableHeader 
-                    label="Asignar permisos"
-                    iconName="id-badge-solid"
-                />
+                <TableHeader label="Asignar permisos" iconName="id-badge-solid" />
 
                 <Button onClick={handleApproveAll} state={selected.length === 0 ? "disabled" : "default"}>
                     Asignar seleccionados
                 </Button>
-
             </div>
 
             <div className={styles.table}>
-
-                <TableRow 
+                <TableRow
                     isHeader
                     selectable
                     isSelected={isAllSelected}
@@ -72,12 +57,12 @@ const EnrollTable: React.FC<EnrollTableProps> = ({
                         { icon: "file-lines-regular", label: "No. Empleado" },
                         { icon: "adress-book-regular", label: "Permiso solicitado" },
                         { icon: "spinner-solid", label: "Estado" },
-                        { icon: "gears-solid", label: "", align: "center" }
+                        { icon: "gears-solid", label: "", align: "center" },
                     ]}
                 />
 
                 {enroll.map((en) => (
-                    <TableRow 
+                    <TableRow
                         key={en.id}
                         id={en.id}
                         selectable
@@ -94,33 +79,29 @@ const EnrollTable: React.FC<EnrollTableProps> = ({
                                             <Text variant="body">{en.name}</Text>
                                         </div>
                                     </div>
-                                )
+                                ),
                             },
                             { content: <Text variant="muted">{en.department}</Text> },
                             { content: <Text>{en.employeeNumber}</Text> },
                             { content: <Text>{en.permission}</Text> },
-                            { 
-                                content: (
-                                    <TicketStateChip label={en.status} state="ingresado" />
-                                ),
-                                align: "center"
+                            {
+                                content: <TicketStateChip label={en.status} state="ingresado" />,
+                                align: "center",
                             },
-                            { 
+                            {
                                 content: (
-                                    <IconButton 
+                                    <IconButton
                                         icon="paper-plane-solid"
                                         iconColor="#8A8A8A"
                                         onClick={() => handleApprove(en.id)}
                                     />
-                                ), 
-                                align: "center" 
-                            }
+                                ),
+                                align: "center",
+                            },
                         ]}
                     />
                 ))}
-
             </div>
-
         </div>
     );
 };

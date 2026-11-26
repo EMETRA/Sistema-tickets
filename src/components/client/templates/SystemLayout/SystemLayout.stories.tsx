@@ -11,7 +11,7 @@ const meta: Meta<typeof SystemLayout> = {
         nextjs: {
             appDirectory: true,
             navigation: {
-                pathname: '/dashboard', 
+                pathname: "/dashboard",
             },
         },
     },
@@ -35,18 +35,20 @@ export const LayoutPage: StoryObj<typeof SystemLayout> = {
         // },
         children: (
             <>
-                <div style={{
-                    width: "100%",
-                    height: "100%",
-                    display: "flex",
-                    alignItems: "center",    
-                    justifyContent: "center"
-                }}>
+                <div
+                    style={{
+                        width: "100%",
+                        height: "100%",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                    }}
+                >
                     Hola
                 </div>
             </>
-        )
-    }
+        ),
+    },
 };
 
 export const ExamplePage: StoryObj<typeof SystemLayout> = {
@@ -65,23 +67,19 @@ export const ExamplePage: StoryObj<typeof SystemLayout> = {
         // },
         children: (
             <>
-                <ProfileHeader 
+                <ProfileHeader
                     bannerSrc="/images/city.png"
                     initials="G"
                     name="Gildder Alberto Caceres Urizar"
                     role="Administrador"
-                    switchOptions={[{label: 'Perfil', value: 'perfil'}]}
+                    switchOptions={[{ label: "Perfil", value: "perfil" }]}
                     switchValue="perfil"
                     onSwitchChange={() => {}}
                 />
-                <div style={{ padding: '32px' }}>
-                    <UserPerformance 
-                        enteredTickets={150}
-                        solvedTickets={120}
-                        inProgressTickets={1}
-                    />
+                <div style={{ padding: "32px" }}>
+                    <UserPerformance enteredTickets={150} solvedTickets={120} inProgressTickets={1} />
                 </div>
             </>
-        )
-    }
+        ),
+    },
 };

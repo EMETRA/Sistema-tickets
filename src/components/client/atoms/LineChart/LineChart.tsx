@@ -2,27 +2,18 @@
 
 import React, { useMemo } from "react";
 import classNames from "classnames";
-import {
-    Line,
-    XAxis,
-    YAxis,
-    CartesianGrid,
-    Tooltip,
-    ResponsiveContainer,
-    Area,
-    AreaChart,
-} from "recharts";
+import { Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from "recharts";
 import styles from "./LineChart.module.scss";
 import { LineChartProps } from "./types";
 
 // CustomTooltip componente para mostrar información detallada
 const CustomTooltip = (props: unknown) => {
-    const tooltipProps = props as { 
-    active?: boolean; 
-    payload?: Array<{ 
-      payload?: { name?: string; value?: number }
-    }> 
-  };
+    const tooltipProps = props as {
+        active?: boolean;
+        payload?: Array<{
+            payload?: { name?: string; value?: number };
+        }>;
+    };
     const { active, payload } = tooltipProps;
 
     if (active && payload && payload.length > 0) {
@@ -60,7 +51,7 @@ export const LineChart: React.FC<LineChartProps> = ({
                 name: item.label,
                 value: item.value,
             })),
-        [data]
+        [data],
     );
 
     // Si no hay datos, mostrar un mensaje
@@ -71,10 +62,7 @@ export const LineChart: React.FC<LineChartProps> = ({
     return (
         <div className={classNames(styles.LineChartContainer, className)}>
             <ResponsiveContainer width={width} height={height}>
-                <AreaChart
-                    data={chartData}
-                    margin={{ top: 20, right: 30, bottom: 20, left: 20 }}
-                >
+                <AreaChart data={chartData} margin={{ top: 20, right: 30, bottom: 20, left: 20 }}>
                     {showGrid && <CartesianGrid strokeDasharray="3 3" />}
                     <XAxis
                         dataKey="name"
@@ -98,12 +86,7 @@ export const LineChart: React.FC<LineChartProps> = ({
                             <stop offset="100%" stopColor={areaColor} stopOpacity={0.1} />
                         </linearGradient>
                     </defs>
-                    <Area
-                        type="monotone"
-                        dataKey="value"
-                        stroke="none"
-                        fill="url(#areaGradient)"
-                    />
+                    <Area type="monotone" dataKey="value" stroke="none" fill="url(#areaGradient)" />
                     <Line
                         type="monotone"
                         dataKey="value"

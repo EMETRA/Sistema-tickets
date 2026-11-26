@@ -1,49 +1,49 @@
 .group {
-    font-family: var(--font-montserrat), sans-serif;
-    display: inline-flex;
-    gap: 0;
-    align-items: center;
-    background-color: var(--tickets-neutral-soft);
-    border-radius: 10px;
-    padding: 4px;
+  font-family: var(--font-montserrat), sans-serif;
+  display: inline-flex;
+  gap: 0;
+  align-items: center;
+  background-color: var(--tickets-neutral-soft);
+  border-radius: 10px;
+  padding: 4px;
 
-    &.disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
+  &.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 }
 
 .button {
-    border-radius: 8px;
-    padding: 10px 20px;
-    font-weight: 500;
-    font-size: 14px;
-    transition: all 0.2s ease;
-    white-space: nowrap;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-weight: 500;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
 
-    &.selected {
-        background-color: var(--tickets-surface) !important;
-        color: #000000 !important;
+  &.selected {
+    background-color: var(--tickets-surface) !important;
+    color: #000000 !important;
 
-        svg {
-            color: #000000 !important;
-        }
+    svg {
+      color: #000000 !important;
+    }
+  }
+
+  &.unselected {
+    background-color: transparent !important;
+    color: #a9a9a9 !important;
+
+    svg {
+      color: #a9a9a9 !important;
     }
 
-    &.unselected {
-        background-color: transparent !important;
-        color: #A9A9A9 !important;
-
-        svg {
-            color: #A9A9A9 !important;
-        }
-
-        &:hover:not(:disabled) {
-            background-color: rgba(#A9A9A9, 0.1) !important;
-        }
-
-        &:active:not(:disabled) {
-            background-color: rgba(#A9A9A9, 0.15) !important;
-        }
+    &:hover:not(:disabled) {
+      background-color: rgba(#a9a9a9, 0.1) !important;
     }
+
+    &:active:not(:disabled) {
+      background-color: rgba(#a9a9a9, 0.15) !important;
+    }
+  }
 }

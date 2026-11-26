@@ -3,12 +3,12 @@ import { Image } from "./index";
 
 const meta: Meta<typeof Image> = { title: "Atoms/Image", component: Image, tags: ["autodocs"] };
 export default meta;
-export const Default: StoryObj<typeof Image> = { 
-    args: { 
+export const Default: StoryObj<typeof Image> = {
+    args: {
         src: "/images/image.png",
-        alt: "Logo Emetra o Imagen de prueba", 
-        width: 150, 
-        height: 150, 
-        rounded: false 
-    } 
+        alt: "Logo Emetra o Imagen de prueba",
+        width: 150,
+        height: 150,
+        rounded: false,
+    },
 };

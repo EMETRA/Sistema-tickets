@@ -22,4 +22,4 @@ export const GET_TICKET_ATTACHMENTS_QUERY = `
   }
 `;
 
-export type { GetTicketAttachmentsResponse } from './types';
+export type { GetTicketAttachmentsResponse } from "./types";

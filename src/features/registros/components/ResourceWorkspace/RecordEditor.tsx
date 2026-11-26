@@ -308,12 +308,22 @@ export function RecordEditor({
                                         onChange={(e) => setVisibility(e.target.value)}
                                         disabled={busy}
                                     >
-                                        <option value="EQUIPO">{"Mi equipo · la ve todo el equipo"}</option>
-                                        <option value="PRIVADA">{"Personal · solo la veo yo"}</option>
+                                        <option value="EQUIPO">Mi equipo · la ve todo el equipo</option>
+                                        <option value="PRIVADA">Personal · solo la veo yo</option>
                                         {context!.actor.admin && (
-                                            <option value="EMPRESA">{"Toda la empresa"}</option>
+                                            <option value="EMPRESA">Toda la empresa</option>
                                         )}
                                     </select>
+                                    {/* En el API, agregar participantes no les da acceso: la visibilidad decide quién la ve. */}
+                                    {visibilidad !== "EMPRESA" &&
+                                        Array.isArray(datos.participantes) &&
+                                        datos.participantes.length > 0 && (
+                                            <small className={styles.muted} role="note">
+                                                {visibilidad === "PRIVADA"
+                                                    ? "Solo tú la verás en el calendario. Las personas que agregues no la verán: compárteles el enlace o la invitación."
+                                                    : "La verá tu equipo. Si agregas a alguien de otro equipo, no aparecerá en su calendario: compártele el enlace o la invitación."}
+                                            </small>
+                                        )}
                                 </label>
                             )}
                             {record && !["solicitudes", "movimientos-activos"].includes(type) && (

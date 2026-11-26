@@ -1,7 +1,8 @@
 "use client";
-import { startTransition, useEffect, useState } from "react";
+import { keepPreviousData } from "@tanstack/react-query";
+import { queryErrorMessage, usePlatformQuery } from "@/platform/query";
+import { useEffect, useState } from "react";
 import { WorkspaceIcon } from "@/components/client/atoms/WorkspaceIcon/WorkspaceIcon";
-import { PlatformError, platformFetch } from "@/platform/client";
 import {
     inventoryClass,
     type InventoryItem,
@@ -48,11 +49,7 @@ export function AssetInventory({
         [extra, setExtra] = useState<Record<string, string>>({}),
         [draft, setDraft] = useState<Record<string, string>>({}),
         [more, setMore] = useState(false),
-        [offset, setOffset] = useState(0),
-        [result, setResult] = useState<Result | null>(null),
-        [busy, setBusy] = useState(true),
-        [error, setError] = useState(""),
-        [revision, setRevision] = useState(0);
+        [offset, setOffset] = useState(0);
     const [q, setQ] = useState("");
     // El texto libre se aplica al dejar de escribir.
     useEffect(() => {
@@ -62,31 +59,19 @@ export function AssetInventory({
         }, 400);
         return () => clearTimeout(timer);
     }, [text]);
-    useEffect(() => {
-        const controller = new AbortController();
-        const params = new URLSearchParams();
-        if (q) params.set("q", q);
-        for (const [key, value] of Object.entries(extra)) if (value) params.set(key, value);
-        if (usuarioId) params.set("usuarioId", usuarioId);
-        if (equipoId) params.set("equipoId", equipoId);
-        if (fixedEmployee) params.set("empleado", String(fixedEmployee));
-        params.set("offset", String(offset));
-        startTransition(() => {
-            setBusy(true);
-            setError("");
-        });
-        platformFetch<Result>(`/inventory/${type}?${params}`, { signal: controller.signal })
-            .then((r) => !controller.signal.aborted && setResult(r))
-            .catch((e) => {
-                if (controller.signal.aborted) return;
-                setError(
-                    (e instanceof Error ? e.message : "No se pudo consultar Activos Fijos.") +
-                        (e instanceof PlatformError && e.reference ? ` Referencia: ${e.reference}` : ""),
-                );
-            })
-            .finally(() => !controller.signal.aborted && setBusy(false));
-        return () => controller.abort();
-    }, [type, q, extra, offset, usuarioId, equipoId, fixedEmployee, revision]);
+    const params = new URLSearchParams();
+    if (q) params.set("q", q);
+    for (const [key, value] of Object.entries(extra)) if (value) params.set(key, value);
+    if (usuarioId) params.set("usuarioId", usuarioId);
+    if (equipoId) params.set("equipoId", equipoId);
+    if (fixedEmployee) params.set("empleado", String(fixedEmployee));
+    params.set("offset", String(offset));
+    const query = usePlatformQuery<Result>(`/inventory/${type}?${params}`, {
+        placeholderData: keepPreviousData,
+    });
+    const result = query.data ?? null;
+    const busy = query.isFetching;
+    const error = query.error ? queryErrorMessage(query.error, "No se pudo consultar Activos Fijos.") : "";
 
     const items = result?.items || [];
     const withFicha = items.filter((i) => i.fichaId).length;
@@ -126,7 +111,7 @@ export function AssetInventory({
                 >
                     Más filtros{active.length ? ` · ${active.length}` : ""}
                 </button>
-                <button type="button" className={styles.ghost} onClick={() => setRevision((r) => r + 1)}>
+                <button type="button" className={styles.ghost} onClick={() => void query.refetch()}>
                     Actualizar
                 </button>
             </div>

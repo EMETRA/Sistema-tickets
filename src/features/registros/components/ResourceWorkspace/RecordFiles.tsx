@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { queryErrorMessage, usePlatformQuery } from "@/platform/query";
 import Image from "next/image";
 import { Button } from "@/components/client/atoms/Button";
 import { downloadPlatform, platformCommand, platformFetch } from "@/platform/client";
@@ -25,22 +26,12 @@ export function RecordFiles({
     const { data } = usePlatform(),
         def = data!.definitions[type],
         input = useRef<HTMLInputElement>(null),
-        [files, setFiles] = useState<FileInfo[]>([]),
         [loading, setLoading] = useState(false),
         [error, setError] = useState(""),
-        [revision, setRevision] = useState(0),
         [preview, setPreview] = useState<string | null>(null);
-    useEffect(() => {
-        const controller = new AbortController();
-        platformFetch<FileInfo[]>("/records/" + type + "/" + record.id + "/files", {
-            signal: controller.signal,
-        })
-            .then(setFiles)
-            .catch((e) => {
-                if (!controller.signal.aborted) setError(e.message);
-            });
-        return () => controller.abort();
-    }, [type, record.id, revision]);
+    const filesQuery = usePlatformQuery<FileInfo[]>("/records/" + type + "/" + record.id + "/files");
+    const files = filesQuery.data ?? [];
+    const loadError = queryErrorMessage(filesQuery.error);
     useEffect(
         () => () => {
             if (preview) URL.revokeObjectURL(preview);
@@ -74,7 +65,7 @@ export function RecordFiles({
                 "Adjuntar documento a " + record.nombre,
                 form,
             );
-            setRevision((r) => r + 1);
+            void filesQuery.refetch();
         } catch (e) {
             setError(e instanceof Error ? e.message : "No se pudo adjuntar el archivo.");
         } finally {
@@ -120,9 +111,9 @@ export function RecordFiles({
             <p className={styles.muted}>
                 PDF, JPEG o PNG · Hasta 20 MB por archivo. El acceso conserva los permisos del registro.
             </p>
-            {error && (
+            {(error || loadError) && (
                 <p role="alert" className={styles.error}>
-                    {error}
+                    {error || loadError}
                 </p>
             )}
             <ul className={styles.timeline}>

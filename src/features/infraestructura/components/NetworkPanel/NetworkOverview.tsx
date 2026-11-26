@@ -1,6 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
-import { platformFetch } from "@/platform/client";
+import { usePlatformQueries } from "@/platform/query";
 import type { PageResult, PlatformRecord } from "@/platform/types";
 import { daysFromToday } from "../AssetsPanel/assetDates";
 import { portsUsed } from "./networkStyle";
@@ -14,37 +13,32 @@ export function NetworkOverview({
     revision?: number;
     onSelect: (tab: string) => void;
 }) {
-    const [counts, setCounts] = useState<{
-        devices?: number;
-        links?: number;
-        inactive?: number;
-        occupancy?: number;
-        stale?: number;
-    }>({});
-    useEffect(() => {
-        const c = new AbortController();
-        const list = (type: string) =>
-            platformFetch<PageResult<PlatformRecord>>(`/records/${type}?limit=100`, {
-                signal: c.signal,
-            }).catch(() => null);
-        Promise.all([list("dispositivos"), list("conexiones")]).then(([d, e]) => {
-            if (c.signal.aborted || !d) return;
-            const edges = e?.items || [];
-            const total = d.items.reduce((n, r) => n + (Number(r.datos.puertos) || 0), 0);
-            const used = d.items.reduce((n, r) => n + portsUsed(r, edges), 0);
-            setCounts({
-                devices: d.total,
-                links: edges.filter((x) => x.estado !== "INACTIVO").length,
-                inactive: edges.filter((x) => x.estado === "INACTIVO").length,
-                occupancy: total ? Math.round((used / total) * 100) : undefined,
-                stale: d.items.filter((r) => {
-                    const days = daysFromToday(r.datos.ultimaRevision);
-                    return days === null || days < -180;
-                }).length,
-            });
-        });
-        return () => c.abort();
-    }, [revision]);
+    const lists = usePlatformQueries<PageResult<PlatformRecord>>(
+        ["/records/dispositivos?limit=100", "/records/conexiones?limit=100"],
+        { revision },
+    );
+    const [d, e] = lists.data;
+    const edges = e?.items || [];
+    const totalPorts = d ? d.items.reduce((n, r) => n + (Number(r.datos.puertos) || 0), 0) : 0;
+    const usedPorts = d ? d.items.reduce((n, r) => n + portsUsed(r, edges), 0) : 0;
+    const counts = d
+        ? {
+              devices: d.total,
+              links: edges.filter((x) => x.estado !== "INACTIVO").length,
+              inactive: edges.filter((x) => x.estado === "INACTIVO").length,
+              occupancy: totalPorts ? Math.round((usedPorts / totalPorts) * 100) : undefined,
+              stale: d.items.filter((r) => {
+                  const days = daysFromToday(r.datos.ultimaRevision);
+                  return days === null || days < -180;
+              }).length,
+          }
+        : ({} as {
+              devices?: number;
+              links?: number;
+              inactive?: number;
+              occupancy?: number;
+              stale?: number;
+          });
     const items = [
         {
             tab: "dispositivos",

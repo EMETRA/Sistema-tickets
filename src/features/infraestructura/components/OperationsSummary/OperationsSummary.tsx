@@ -1,7 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { platformFetch } from "@/platform/client";
+import { usePlatformQueries } from "@/platform/query";
 import { usePlatform } from "@/platform/context";
 import { guatemalaDay } from "@/platform/dates";
 import type { PageResult, PlatformRecord } from "@/platform/types";
@@ -24,51 +23,35 @@ type Counts = {
  */
 export function OperationsSummary({ from, to }: { from: string; to: string }) {
     const { data } = usePlatform();
-    const [counts, setCounts] = useState<Counts | null>(null);
     const allowed = (type: string) => !!data?.definitions[type]?.actions.LEER;
     const visible = ["despliegues", "incidencias", "intervenciones", "movimientos-activos"].some(allowed);
-    useEffect(() => {
-        if (!visible) return;
-        const c = new AbortController();
-        const list = (type: string) =>
-            allowed(type)
-                ? platformFetch<PageResult<PlatformRecord>>(`/records/${type}?limit=100`, {
-                      signal: c.signal,
-                  })
-                      .then((r) => r.items)
-                      .catch(() => [])
-                : Promise.resolve([] as PlatformRecord[]);
-        const inside = (value: unknown) => {
-            if (!value) return false;
-            const day = /^\d{4}-\d{2}-\d{2}$/.test(String(value))
-                ? String(value)
-                : guatemalaDay(new Date(String(value)));
-            return day >= from && day <= to;
-        };
-        Promise.all([
-            list("despliegues"),
-            list("incidencias"),
-            list("intervenciones"),
-            list("movimientos-activos"),
-        ]).then(([d, i, w, m]) => {
-            if (c.signal.aborted) return;
-            const deploys = d.filter((x) => inside(x.datos.fecha));
-            const incidents = i.filter((x) => inside(x.creadoEn));
-            const work = w.filter((x) => inside(x.datos.fecha));
-            setCounts({
-                deploys: deploys.length,
-                badDeploys: deploys.filter((x) => x.datos.resultado !== "CORRECTO").length,
-                incidents: incidents.length,
-                severe: incidents.filter((x) => ["ALTA", "CRITICA"].includes(String(x.datos.severidad)))
-                    .length,
-                work: work.length,
-                corrective: work.filter((x) => x.datos.tipo === "CORRECTIVO").length,
-                moves: m.filter((x) => inside(x.datos.fecha)).length,
-            });
-        });
-        return () => c.abort();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [from, to, visible]);
+    const types = ["despliegues", "incidencias", "intervenciones", "movimientos-activos"];
+    const lists = usePlatformQueries<PageResult<PlatformRecord>>(
+        types.map((t) => (allowed(t) ? `/records/${t}?limit=100` : null)),
+        { enabled: visible },
+    );
+    const inside = (value: unknown) => {
+        if (!value) return false;
+        const day = /^\d{4}-\d{2}-\d{2}$/.test(String(value))
+            ? String(value)
+            : guatemalaDay(new Date(String(value)));
+        return day >= from && day <= to;
+    };
+    const [d, i, w, m] = lists.data.map((r) => r?.items ?? []);
+    const deploys = d.filter((x) => inside(x.datos.fecha));
+    const incidents = i.filter((x) => inside(x.creadoEn));
+    const work = w.filter((x) => inside(x.datos.fecha));
+    const counts: Counts | null = lists.pending
+        ? null
+        : {
+              deploys: deploys.length,
+              badDeploys: deploys.filter((x) => x.datos.resultado !== "CORRECTO").length,
+              incidents: incidents.length,
+              severe: incidents.filter((x) => ["ALTA", "CRITICA"].includes(String(x.datos.severidad))).length,
+              work: work.length,
+              corrective: work.filter((x) => x.datos.tipo === "CORRECTIVO").length,
+              moves: m.filter((x) => inside(x.datos.fecha)).length,
+          };
     if (!visible) return null;
     return (
         <section className={styles.section} aria-labelledby="ops-summary">

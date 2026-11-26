@@ -83,19 +83,12 @@ export function RecordDetail({
     useEffect(() => {
         dialog.current?.showModal();
     }, []);
-    const [preview, setPreview] = useState<RequestPreview | null>(null);
-    useEffect(() => {
-        if (type !== "solicitudes" || !data!.actor.admin || current.estado !== "PENDIENTE") return;
-        const controller = new AbortController();
-        platformFetch<RequestPreview>("/requests/" + current.id + "/preview", {
-            signal: controller.signal,
-        })
-            .then(setPreview)
-            .catch((e) => {
-                if (!controller.signal.aborted) setError(e.message);
-            });
-        return () => controller.abort();
-    }, [type, data, current.id, current.estado]);
+    const previewQuery = usePlatformQuery<RequestPreview>(
+        type === "solicitudes" && data!.actor.admin && current.estado === "PENDIENTE"
+            ? "/requests/" + current.id + "/preview"
+            : null,
+    );
+    const preview = previewQuery.data ?? null;
     async function remove() {
         setBusy(true);
         setError("");
@@ -274,9 +267,9 @@ export function RecordDetail({
                         </button>
                     ))}
                 </nav>
-                {(error || loadError) && (
+                {(error || loadError || previewQuery.error) && (
                     <p role="alert" className={styles.error}>
-                        {error || loadError}
+                        {error || loadError || queryErrorMessage(previewQuery.error)}
                     </p>
                 )}
                 {tab === "files" ? (

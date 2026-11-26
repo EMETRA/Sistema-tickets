@@ -1,9 +1,10 @@
 "use client";
+import { keepPreviousData, useQueryClient } from "@tanstack/react-query";
+import { queryErrorMessage, usePlatformQueries, usePlatformQuery } from "@/platform/query";
 import { statusLabel, statusTone } from "@/helpers/statusTone";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/client/atoms/Button";
 import { usePlatform } from "@/platform/context";
-import { platformFetch } from "@/platform/client";
 import type { PageResult, PlatformRecord } from "@/platform/types";
 import { RESOURCE_PRESENTATION, resourceDefinition, resourceValue } from "@/platform/resources";
 import { RecordEditor } from "./RecordEditor";
@@ -44,15 +45,6 @@ export function ResourceWorkspace({
     const [type, setType] = useState(initialType || options[0]?.[0] || ""),
         [query, setQuery] = useState(""),
         [offset, setOffset] = useState(0),
-        [result, setResult] = useState<PageResult<PlatformRecord>>({
-            items: [],
-            total: 0,
-            offset: 0,
-            limit: 25,
-        }),
-        [loading, setLoading] = useState(true),
-        [error, setError] = useState(""),
-        [revision, setRevision] = useState(0),
         [selected, setSelected] = useState<PlatformRecord | null>(null),
         [editing, setEditing] = useState<PlatformRecord | null | undefined>(undefined),
         [message, setMessage] = useState(""),
@@ -62,9 +54,13 @@ export function ResourceWorkspace({
     const rawDef = data!.definitions[type],
         def = rawDef ? resourceDefinition(type, rawDef) : null,
         copy = RESOURCE_PRESENTATION[type];
-    const refresh = useCallback(() => setRevision((v) => v + 1), []);
+    const queryClient = useQueryClient();
+    // «Actualizar»: vuelve a consultar las listas de registros del panel.
+    const refresh = useCallback(
+        () => void queryClient.invalidateQueries({ queryKey: ["platform"] }),
+        [queryClient],
+    );
     // Propuesta: las listas no traen nombres de personas ni de referencias; se resuelven aquí.
-    const [refNames, setRefNames] = useState<Record<string, string>>({});
     const refFields =
         copy && def
             ? copy.columns
@@ -74,61 +70,39 @@ export function ResourceWorkspace({
                           !!f && (f.type === "user" || (f.type === "ref" && !!f.resource)),
                   )
             : [];
-    const refKey = refFields.map((f) => f.key + ":" + (f.resource || f.type)).join(",");
+    const refSources = [
+        ...new Set(
+            refFields.map((f) => (f.type === "user" ? "/people?q=" : `/records/${f.resource}?limit=100`)),
+        ),
+    ];
+    const refLists = usePlatformQueries<
+        PageResult<PlatformRecord> | { id: number | string; nombre: string }[]
+    >(refSources, { staleTime: 60_000 });
+    const refNames = useMemo(
+        () =>
+            Object.fromEntries(
+                refLists.data
+                    .flatMap((r) => (r ? (Array.isArray(r) ? r : r.items) : []))
+                    .map((x) => [String(x.id), x.nombre]),
+            ) as Record<string, string>,
+        [refLists.data],
+    );
+    // La búsqueda se aplica 200 ms después de dejar de escribir.
+    const [debouncedQuery, setDebouncedQuery] = useState(query);
     useEffect(() => {
-        if (!refKey) return;
-        const controller = new AbortController();
-        const sources = [
-            ...new Set(
-                refFields.map((f) => (f.type === "user" ? "/people?q=" : `/records/${f.resource}?limit=100`)),
-            ),
-        ];
-        Promise.all(
-            sources.map((path) =>
-                platformFetch<PageResult<PlatformRecord> | { id: number | string; nombre: string }[]>(path, {
-                    signal: controller.signal,
-                })
-                    .then((r) => (Array.isArray(r) ? r : r.items))
-                    .catch(() => []),
-            ),
-        ).then((lists) => {
-            if (controller.signal.aborted) return;
-            setRefNames(Object.fromEntries(lists.flat().map((x) => [String(x.id), x.nombre])));
-        });
-        return () => controller.abort();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [refKey]);
-    useEffect(() => {
-        if (!def?.actions.LEER) return;
-        const controller = new AbortController();
-        const timer = setTimeout(() => {
-            setLoading(true);
-            setError("");
-            const params = new URLSearchParams({
-                limit: "25",
-                offset: String(offset),
-                q: query,
-            });
-            if (scopeEquipoId) params.set("equipoId", scopeEquipoId);
-            if (estado && STATE_FILTERS[type]) params.set("estado", estado);
-            platformFetch<PageResult<PlatformRecord>>(`/records/${type}?${params}`, {
-                signal: controller.signal,
-            })
-                .then((r) => {
-                    if (!controller.signal.aborted) setResult(r);
-                })
-                .catch((e) => {
-                    if (!controller.signal.aborted) setError(e.message);
-                })
-                .finally(() => {
-                    if (!controller.signal.aborted) setLoading(false);
-                });
-        }, 200);
-        return () => {
-            clearTimeout(timer);
-            controller.abort();
-        };
-    }, [type, def?.actions.LEER, query, offset, revision, scopeEquipoId, estado]);
+        const timer = setTimeout(() => setDebouncedQuery(query), 200);
+        return () => clearTimeout(timer);
+    }, [query]);
+    const listParams = new URLSearchParams({ limit: "25", offset: String(offset), q: debouncedQuery });
+    if (scopeEquipoId) listParams.set("equipoId", scopeEquipoId);
+    if (estado && STATE_FILTERS[type]) listParams.set("estado", estado);
+    const list = usePlatformQuery<PageResult<PlatformRecord>>(
+        def?.actions.LEER ? `/records/${type}?${listParams}` : null,
+        { placeholderData: keepPreviousData },
+    );
+    const result = list.data ?? { items: [], total: 0, offset: 0, limit: 25 };
+    const loading = list.isFetching;
+    const error = queryErrorMessage(list.error);
     if (!def) return <p className={styles.card}>No tienes registros disponibles en esta sección.</p>;
     return (
         <section className={styles.page} aria-label={def.title}>

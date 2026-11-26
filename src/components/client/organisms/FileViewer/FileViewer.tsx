@@ -1,5 +1,7 @@
 "use client";
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { platformKey, usePlatformQuery } from "@/platform/query";
 import { Button } from "@/components/client/atoms/Button";
 import { platformFetch, PlatformError } from "@/platform/client";
 import styles from "./FileViewer.module.scss";
@@ -31,14 +33,7 @@ export function FileViewer({
 }) {
     const dialog = useRef<HTMLDialogElement>(null),
         titleId = useId();
-    const [revision, setRevision] = useState(0),
-        [loading, setLoading] = useState(true),
-        [error, setError] = useState("");
-    const [reference, setReference] = useState<string | undefined>();
-    const [preview, setPreview] = useState<Preview | null>(null);
-    const [office, setOffice] = useState<OfficeDocument | null>(null),
-        [officeLoading, setOfficeLoading] = useState(false),
-        [officeError, setOfficeError] = useState("");
+    const [mediaError, setMediaError] = useState("");
     const officeFile = /\.(docx?|xlsx?)$/i.test(file.name);
     useEffect(() => {
         const node = dialog.current;
@@ -47,77 +42,59 @@ export function FileViewer({
             if (node?.open) node.close();
         };
     }, []);
-    useEffect(() => {
-        const controller = new AbortController();
-        let url: string | undefined;
-        setOffice(null);
-        setOfficeError("");
-        setOfficeLoading(false);
-        platformFetch<Blob>(`/tickets/${encodeURIComponent(ticketId)}/files/${encodeURIComponent(file.id)}`, {
-            signal: controller.signal,
-        })
-            .then(async (blob) => {
-                if (controller.signal.aborted) return;
-                const mime = blob.type.split(";")[0];
-                const text =
-                    mime === "text/plain"
-                        ? (await blob.slice(0, 1024 * 1024).text()) +
-                          (blob.size > 1024 * 1024
-                              ? "\n… Vista previa limitada a 1 MB. Descarga el archivo para verlo completo."
-                              : "")
-                        : undefined;
-                if (controller.signal.aborted) return;
-                url = URL.createObjectURL(blob);
-                setPreview({ url, mime, text });
-                if (officeFile) {
-                    setLoading(false);
-                    setOfficeLoading(true);
-                    try {
-                        const document = await platformFetch<OfficeDocument>(
-                            `/tickets/${encodeURIComponent(ticketId)}/files/${encodeURIComponent(file.id)}/preview`,
-                            { signal: controller.signal },
-                        );
-                        if (!controller.signal.aborted) setOffice(document);
-                    } catch (failure: unknown) {
-                        if (!controller.signal.aborted) {
-                            setOfficeError(
-                                failure instanceof PlatformError
-                                    ? failure.message
-                                    : "No se pudo preparar la vista previa. Puedes descargar el original o reintentar.",
-                            );
-                            setReference(failure instanceof PlatformError ? failure.reference : undefined);
-                        }
-                    } finally {
-                        if (!controller.signal.aborted) setOfficeLoading(false);
-                    }
-                }
-            })
-            .catch((failure: unknown) => {
-                if (!controller.signal.aborted) {
-                    setError(
-                        failure instanceof PlatformError && failure.status === 404
-                            ? "El archivo no está disponible. Solicita que lo revisen y reintenta."
-                            : failure instanceof PlatformError && failure.status === 403
-                              ? "No tienes acceso a este archivo del ticket."
-                              : "No se pudo abrir el archivo. Revisa tu acceso al ticket o reintenta.",
-                    );
-                    setReference(failure instanceof PlatformError ? failure.reference : undefined);
-                }
-            })
-            .finally(() => {
-                if (!controller.signal.aborted) setLoading(false);
-            });
-        return () => {
-            controller.abort();
-            if (url) URL.revokeObjectURL(url);
-        };
-    }, [ticketId, file.id, revision, officeFile]);
+    const filePath = `/tickets/${encodeURIComponent(ticketId)}/files/${encodeURIComponent(file.id)}`;
+    // Archivo original (el contenido no cambia: se guarda en caché mientras el visor esté abierto).
+    const fileQuery = useQuery({
+        queryKey: [...platformKey(filePath), "contenido"],
+        staleTime: Infinity,
+        queryFn: async ({ signal }) => {
+            const blob = await platformFetch<Blob>(filePath, { signal });
+            const mime = blob.type.split(";")[0];
+            const text =
+                mime === "text/plain"
+                    ? (await blob.slice(0, 1024 * 1024).text()) +
+                      (blob.size > 1024 * 1024
+                          ? "\n… Vista previa limitada a 1 MB. Descarga el archivo para verlo completo."
+                          : "")
+                    : undefined;
+            return { blob, mime, text };
+        },
+    });
+    const url = useMemo(
+        () => (fileQuery.data ? URL.createObjectURL(fileQuery.data.blob) : undefined),
+        [fileQuery.data],
+    );
+    useEffect(() => () => void (url && URL.revokeObjectURL(url)), [url]);
+    const preview: Preview | null =
+        fileQuery.data && url ? { url, mime: fileQuery.data.mime, text: fileQuery.data.text } : null;
+    // Word y Excel: vista previa convertida en el servidor, después de tener el original.
+    const officeQuery = usePlatformQuery<OfficeDocument>(
+        officeFile && fileQuery.data ? filePath + "/preview" : null,
+        { staleTime: Infinity },
+    );
+    const office = officeQuery.data ?? null;
+    const failure = fileQuery.error;
+    const error =
+        mediaError ||
+        (failure
+            ? failure instanceof PlatformError && failure.status === 404
+                ? "El archivo no está disponible. Solicita que lo revisen y reintenta."
+                : failure instanceof PlatformError && failure.status === 403
+                  ? "No tienes acceso a este archivo del ticket."
+                  : "No se pudo abrir el archivo. Revisa tu acceso al ticket o reintenta."
+            : "");
+    const officeError = officeQuery.error
+        ? officeQuery.error instanceof PlatformError
+            ? officeQuery.error.message
+            : "No se pudo preparar la vista previa. Puedes descargar el original o reintentar."
+        : "";
+    const reference = [failure, officeQuery.error].find((e) => e instanceof PlatformError)?.reference;
+    const loading = fileQuery.isFetching;
+    const officeLoading = officeQuery.isFetching;
     function retry() {
-        setLoading(true);
-        setError("");
-        setReference(undefined);
-        setPreview(null);
-        setRevision((value) => value + 1);
+        setMediaError("");
+        void fileQuery.refetch();
+        if (officeFile) void officeQuery.refetch();
     }
     function close() {
         dialog.current?.close();
@@ -177,13 +154,19 @@ export function FileViewer({
                     </div>
                 )}
                 {!loading && !error && office && (
-                    <OfficePreview key={file.id + ":" + revision} document={office} name={file.name} />
+                    <OfficePreview
+                        key={file.id + ":" + officeQuery.dataUpdatedAt}
+                        document={office}
+                        name={file.name}
+                    />
                 )}
                 {!loading && !error && !officeFile && preview && (
                     <FilePreview
                         preview={preview}
                         name={file.name}
-                        onError={() => setError("No se pudo mostrar la imagen. Reintenta abrir el archivo.")}
+                        onError={() =>
+                            setMediaError("No se pudo mostrar la imagen. Reintenta abrir el archivo.")
+                        }
                     />
                 )}
             </section>

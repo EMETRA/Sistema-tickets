@@ -1,6 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
-import { platformFetch } from "@/platform/client";
+import { usePlatformQueries } from "@/platform/query";
 import type { PageResult, PlatformRecord } from "@/platform/types";
 import { daysFromToday, latestByAsset } from "./assetDates";
 import styles from "./AssetsPanel.module.scss";
@@ -15,34 +14,28 @@ export function AssetsOverview({
     onSelect: (tab: string) => void;
     revision?: number;
 }) {
-    const [counts, setCounts] = useState<Counts>({});
-    useEffect(() => {
-        const c = new AbortController();
-        const opts = { signal: c.signal };
-        const list = (type: string, limit = 100) =>
-            platformFetch<PageResult<PlatformRecord>>(`/records/${type}?limit=${limit}`, opts).catch(
-                () => null,
-            );
-        Promise.all([list("activos", 1), list("intervenciones"), list("movimientos-activos")]).then(
-            ([a, i, m]) => {
-                if (c.signal.aborted) return;
-                const due = i
-                    ? latestByAsset(i.items)
-                          .map((r) => daysFromToday(r.datos.proximaRevision))
-                          .filter((d): d is number => d !== null)
-                    : [];
-                setCounts({
-                    fichas: a?.total,
-                    vencidos: i ? due.filter((d) => d < 0).length : undefined,
-                    proximos: i ? due.filter((d) => d >= 0 && d <= 30).length : undefined,
-                    movimientos: m
-                        ? m.items.filter((r) => (daysFromToday(r.datos.fecha) ?? -99) >= -30).length
-                        : undefined,
-                });
-            },
-        );
-        return () => c.abort();
-    }, [revision]);
+    const lists = usePlatformQueries<PageResult<PlatformRecord>>(
+        [
+            "/records/activos?limit=1",
+            "/records/intervenciones?limit=100",
+            "/records/movimientos-activos?limit=100",
+        ],
+        { revision },
+    );
+    const [a, i, m] = lists.data;
+    const due = i
+        ? latestByAsset(i.items)
+              .map((r) => daysFromToday(r.datos.proximaRevision))
+              .filter((d): d is number => d !== null)
+        : [];
+    const counts: Counts = {
+        fichas: a?.total,
+        vencidos: i ? due.filter((d) => d < 0).length : undefined,
+        proximos: i ? due.filter((d) => d >= 0 && d <= 30).length : undefined,
+        movimientos: m
+            ? m.items.filter((r) => (daysFromToday(r.datos.fecha) ?? -99) >= -30).length
+            : undefined,
+    };
     const tiles = [
         {
             id: "fichas",

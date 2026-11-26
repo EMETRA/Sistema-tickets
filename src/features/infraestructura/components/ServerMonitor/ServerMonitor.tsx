@@ -1,9 +1,9 @@
 "use client";
-import { startTransition, useEffect, useId, useState } from "react";
+import { queryErrorMessage, usePlatformQuery } from "@/platform/query";
+import { useId, useState } from "react";
 import { Button } from "@/components/client/atoms/Button";
 import { WorkspaceIcon } from "@/components/client/atoms/WorkspaceIcon/WorkspaceIcon";
 import { PlatformField } from "@/components/client/molecules/PlatformField/PlatformField";
-import { platformFetch } from "@/platform/client";
 import {
     executionLabel,
     gib,
@@ -58,49 +58,32 @@ export function ServerMonitor({
     hidePicker?: boolean;
 }) {
     const [server, setServer] = useState(initialServer);
-    const [snapshot, setSnapshot] = useState<ServerSnapshot | null>(null);
-    const [revision, setRevision] = useState(0);
     const [logs, setLogs] = useState(false);
-    const [logsLoaded, setLogsLoaded] = useState(false);
     const [selected, setSelected] = useState("");
     const [query, setQuery] = useState("");
     const [filter, setFilter] = useState<ContainerFilter>("todos");
-    const [error, setError] = useState("");
-    const [loading, setLoading] = useState(false);
     const searchId = useId(),
         logId = useId();
     const requestLogs = logs && canReadLogs;
-    useEffect(() => {
-        if (!server || !active) return;
-        const controller = new AbortController();
-        startTransition(() => {
-            setLoading(true);
-            setError("");
-        });
-        platformFetch<ServerSnapshot>("/monitor/" + server + (requestLogs ? "?logs=1" : ""), {
-            signal: controller.signal,
-        })
-            .then((value) => {
-                if (!controller.signal.aborted) {
-                    setSnapshot(value);
-                    setLogsLoaded(requestLogs);
-                }
-            })
-            .catch((error) => {
-                if (!controller.signal.aborted) setError(error.message);
-            })
-            .finally(() => {
-                if (!controller.signal.aborted) setLoading(false);
-            });
-        return () => controller.abort();
-    }, [server, requestLogs, revision, active]);
-    useEffect(() => {
-        if (!server || !active) return;
-        const timer = setInterval(() => {
-            if (document.visibilityState === "visible") setRevision((value) => value + 1);
-        }, 60000);
-        return () => clearInterval(timer);
-    }, [server, active]);
+    // Mediciones del servidor; se actualizan cada minuto mientras la pestaña está visible.
+    const monitor = usePlatformQuery<ServerSnapshot>(
+        server && active ? "/monitor/" + server + (requestLogs ? "?logs=1" : "") : null,
+        {
+            // Al pedir o quitar registros se conserva la medición del mismo servidor; al cambiar de
+            // servidor no se muestra la del anterior.
+            placeholderData: (previous, previousQuery) =>
+                String(previousQuery?.queryKey[1] ?? "").split("?")[0] === "/monitor/" + server
+                    ? previous
+                    : undefined,
+            refetchInterval: 60_000,
+        },
+    );
+    const snapshot = monitor.data ?? null;
+    // Los registros (logs) están cargados solo si la respuesta mostrada es la que los pidió.
+    const logsLoaded = requestLogs && !!monitor.data && !monitor.isPlaceholderData;
+    const error = queryErrorMessage(monitor.error);
+    const loading = monitor.isFetching;
+
     const containers = snapshot?.contenedores || [];
     const visible = containers.filter((c) => matchesContainer(c, query, filter));
     const running = containers.filter((c) => c.estado === "running").length;
@@ -129,12 +112,8 @@ export function ServerMonitor({
                         value={server}
                         onChange={(value) => {
                             setServer(String(value));
-                            setSnapshot(null);
                             setSelected("");
                             setLogs(false);
-                            setLogsLoaded(false);
-                            setError("");
-                            setLoading(false);
                             setQuery("");
                             setFilter("todos");
                         }}
@@ -169,7 +148,7 @@ export function ServerMonitor({
                 <Button
                     variant="outlined"
                     state={!server || loading ? "disabled" : "default"}
-                    onClick={() => setRevision((value) => value + 1)}
+                    onClick={() => void monitor.refetch()}
                 >
                     {loading ? "Consultando…" : "Actualizar mediciones"}
                 </Button>

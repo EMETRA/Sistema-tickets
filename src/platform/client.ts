@@ -69,6 +69,13 @@ async function digest(value: unknown) {
         .map((x) => x.toString(16).padStart(2, "0"))
         .join("");
 }
+/** Avisos de cambios guardados: la caché de consultas (platform/query) se actualiza al recibirlos. */
+const mutationListeners = new Set<(path: string) => void>();
+export function onPlatformMutation(listener: (path: string) => void) {
+    mutationListeners.add(listener);
+    return () => void mutationListeners.delete(listener);
+}
+
 export async function platformCommand<T>(
     path: string,
     method: string,
@@ -120,6 +127,7 @@ export async function platformCommand<T>(
     });
     keys.delete(key);
     sessionStorage.removeItem("tk-command-" + key);
+    mutationListeners.forEach((listener) => listener(path));
     return result;
 }
 export async function downloadPlatform(path: string, name: string) {

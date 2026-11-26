@@ -1,7 +1,7 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { usePlatformQueries } from "@/platform/query";
 import { Button } from "@/components/client/atoms/Button";
-import { platformFetch } from "@/platform/client";
 import { usePlatform } from "@/platform/context";
 import type { PageResult, PlatformRecord } from "@/platform/types";
 import { RecordDetail } from "@/features/registros/components/ResourceWorkspace/RecordDetail";
@@ -35,27 +35,15 @@ export function TeamsBoard({
     onShowTable: () => void;
 }) {
     const { data } = usePlatform();
-    const [teams, setTeams] = useState<PlatformRecord[] | null>(null);
-    const [members, setMembers] = useState<PlatformRecord[]>([]);
-    const [revision, setRevision] = useState(0);
     const [selected, setSelected] = useState<PlatformRecord | null>(null);
     const [editing, setEditing] = useState<PlatformRecord | null | undefined>(undefined);
     const canCreate = !!data?.definitions.equipos?.actions.INSERTAR;
-    useEffect(() => {
-        const c = new AbortController();
-        const list = (type: string) =>
-            platformFetch<PageResult<PlatformRecord>>(`/records/${type}?limit=100`, {
-                signal: c.signal,
-            }).then((r) => r.items);
-        Promise.all([list("equipos"), list("miembros").catch(() => [] as PlatformRecord[])])
-            .then(([t, m]) => {
-                if (c.signal.aborted) return;
-                setTeams(t);
-                setMembers(m);
-            })
-            .catch(() => !c.signal.aborted && setTeams([]));
-        return () => c.abort();
-    }, [revision, outer]);
+    const lists = usePlatformQueries<PageResult<PlatformRecord>>(
+        ["/records/equipos?limit=100", "/records/miembros?limit=100"],
+        { revision: outer },
+    );
+    const teams = lists.pending ? null : (lists.data[0]?.items ?? []);
+    const members = lists.data[1]?.items ?? [];
 
     if (!teams) return <p className={common.muted}>Consultando equipos…</p>;
     return (
@@ -153,7 +141,7 @@ export function TeamsBoard({
                     onSaved={() => {
                         setEditing(undefined);
                         setSelected(null);
-                        setRevision((r) => r + 1);
+                        void lists.refetch();
                     }}
                 />
             )}
@@ -163,7 +151,7 @@ export function TeamsBoard({
                     record={selected}
                     onClose={() => setSelected(null)}
                     onEdit={(r) => setEditing(r)}
-                    onChanged={() => setRevision((r) => r + 1)}
+                    onChanged={() => void lists.refetch()}
                 />
             )}
         </section>

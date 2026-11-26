@@ -1,6 +1,8 @@
 "use client";
 import { StateNotice } from "@/components/client/molecules/StateNotice";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { platformKey } from "@/platform/query";
 import { platformFetch } from "@/platform/client";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Button } from "@/components/client/atoms/Button";
@@ -23,65 +25,47 @@ export const useModuleActions = () => useContext(Context);
 export function ModuleAccessGate({ moduleId, children }: { moduleId: string; children: React.ReactNode }) {
     const token = useAuthStore((s) => s.token),
         hydrated = useAuthStore((s) => s.isHydrated);
-    const [revision, setRevision] = useState(0);
-    const [check, setCheck] = useState<{
-        token: string;
-        id: string;
-        data?: Access;
-        error?: string;
-    } | null>(null);
-    useEffect(() => {
-        if (!token || !hydrated) return;
-        const controller = new AbortController();
-        platformFetch<Access>("/module-access/" + encodeURIComponent(moduleId), {
-            signal: controller.signal,
-        })
-            .then((data) => {
-                if (
-                    !data ||
-                    data.moduloId !== moduleId ||
-                    typeof data.allowed !== "boolean" ||
-                    !data.actions ||
-                    ["LEER", "INSERTAR", "EDITAR", "ELIMINAR"].some(
-                        (action) => typeof data.actions[action as keyof Actions] !== "boolean",
-                    )
-                )
-                    throw new Error("Respuesta de acceso inválida");
-                if (!controller.signal.aborted) setCheck({ token, id: moduleId, data });
-            })
-            .catch(() => {
-                if (!controller.signal.aborted)
-                    setCheck({
-                        token,
-                        id: moduleId,
-                        error: "No se pudo comprobar tu acceso al formulario.",
-                    });
+    // El acceso depende de la sesión: la clave incluye el token para no reutilizar el de otra cuenta.
+    const access = useQuery({
+        queryKey: [...platformKey("/module-access/" + moduleId), token],
+        enabled: !!token && hydrated,
+        retry: false,
+        queryFn: async ({ signal }) => {
+            const data = await platformFetch<Access>("/module-access/" + encodeURIComponent(moduleId), {
+                signal,
             });
-        return () => controller.abort();
-    }, [moduleId, token, hydrated, revision]);
-    if (!hydrated || !check || check.token !== token || check.id !== moduleId)
+            if (
+                !data ||
+                data.moduloId !== moduleId ||
+                typeof data.allowed !== "boolean" ||
+                !data.actions ||
+                ["LEER", "INSERTAR", "EDITAR", "ELIMINAR"].some(
+                    (action) => typeof data.actions[action as keyof Actions] !== "boolean",
+                )
+            )
+                throw new Error("Respuesta de acceso inválida");
+            return data;
+        },
+    });
+    const check = access.data
+        ? { data: access.data }
+        : access.error
+          ? { data: undefined, error: "No se pudo comprobar tu acceso al formulario." }
+          : null;
+    if (!hydrated || !check)
         return (
             <p role="status" className={styles.card}>
                 Comprobando acceso al formulario…
             </p>
         );
-    if (check.error)
+    if ("error" in check && check.error)
         return (
             <StateNotice
                 tone="error"
                 title="Acceso pendiente de comprobar"
                 description={check.error}
                 helpTopic="acceso"
-                actions={
-                    <Button
-                        onClick={() => {
-                            setCheck(null);
-                            setRevision((v) => v + 1);
-                        }}
-                    >
-                        Reintentar acceso
-                    </Button>
-                }
+                actions={<Button onClick={() => void access.refetch()}>Reintentar acceso</Button>}
             />
         );
     if (!check.data?.allowed)

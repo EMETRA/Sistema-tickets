@@ -1,8 +1,8 @@
 "use client";
 import { meetingLink, meetingPlace } from "@/platform/meeting";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { platformFetch } from "@/platform/client";
+import { useEffect, useMemo, useState } from "react";
+import { usePlatformQueries } from "@/platform/query";
 import { usePlatform } from "@/platform/context";
 import {
     activitiesForDay,
@@ -64,7 +64,6 @@ export function CalendarRail({
     const [picked, setPicked] = useState({ anchor, month: anchor });
     const month = picked.anchor === anchor ? picked.month : anchor;
     const setMonth = (value: string) => setPicked({ anchor, month: value });
-    const [ops, setOps] = useState<OpsEvent[] | null>(null);
     const [now, setNow] = useState(() => Date.now());
     const showOps = !!(
         data?.definitions.intervenciones?.actions.LEER || data?.definitions.despliegues?.actions.LEER
@@ -76,58 +75,50 @@ export function CalendarRail({
     }, []);
 
     // Operación del periodo: revisiones de activos programadas y despliegues.
-    useEffect(() => {
-        if (!showOps) return;
-        const c = new AbortController();
-        const list = (type: string) =>
-            platformFetch<PageResult<PlatformRecord>>(`/records/${type}?limit=100`, { signal: c.signal })
-                .then((r) => r.items)
-                .catch(() => [] as PlatformRecord[]);
+    const opsLists = usePlatformQueries<PageResult<PlatformRecord>>(
+        ["intervenciones", "despliegues", "activos", "aplicaciones"].map((t) => `/records/${t}?limit=100`),
+        { enabled: showOps },
+    );
+    const ops = useMemo<OpsEvent[] | null>(() => {
+        if (!showOps || opsLists.pending) return null;
+        const [work, deploys, assets, apps] = opsLists.data.map((r) => r?.items ?? []);
         const first = guatemalaDay(new Date(from)),
             last = guatemalaDay(new Date(Date.parse(to) - 1));
-        Promise.all([
-            list("intervenciones"),
-            list("despliegues"),
-            list("activos"),
-            list("aplicaciones"),
-        ]).then(([work, deploys, assets, apps]) => {
-            if (c.signal.aborted) return;
-            const name = (rows: PlatformRecord[], id: unknown) => rows.find((r) => r.id === id)?.nombre;
-            const inRange = (day: string) => day >= first && day <= last;
-            const revisions: OpsEvent[] = work
-                .filter(
-                    (w) =>
-                        /^\d{4}-\d{2}-\d{2}$/.test(String(w.datos.proximaRevision || "")) &&
-                        inRange(String(w.datos.proximaRevision)),
-                )
-                .map((w) => ({
-                    id: "r" + w.id,
-                    day: String(w.datos.proximaRevision),
-                    kind: "revision" as const,
-                    title: "Revisión: " + (name(assets, w.datos.activoId) || w.nombre),
-                    detail: w.nombre,
-                    tone: String(w.datos.proximaRevision) < today ? "danger" : "warning",
-                    href: "/espacio/inventario?view=mantenimientos",
-                }));
-            const releases: OpsEvent[] = deploys
-                .filter((d) => d.datos.fecha && inRange(guatemalaDay(new Date(String(d.datos.fecha)))))
-                .map((d) => ({
-                    id: "d" + d.id,
-                    day: guatemalaDay(new Date(String(d.datos.fecha))),
-                    time: activityTime(d.datos.fecha),
-                    kind: "despliegue" as const,
-                    title: `${name(apps, d.datos.aplicacionId) || "Sistema"} ${String(d.datos.revision || "")}`,
-                    detail: `${ENV[String(d.datos.entorno)] || d.datos.entorno} · ${String(d.datos.resultado || "").toLowerCase()}`,
-                    tone: DEPLOY_TONE[String(d.datos.resultado)] || "neutral",
-                    href: "/espacio/sistemas",
-                }));
-            const events = [...revisions, ...releases].sort(
-                (a, b) => a.day.localeCompare(b.day) || (a.time || "").localeCompare(b.time || ""),
-            );
-            setOps(events);
-        });
-        return () => c.abort();
-    }, [showOps, from, to, today]);
+
+        const name = (rows: PlatformRecord[], id: unknown) => rows.find((r) => r.id === id)?.nombre;
+        const inRange = (day: string) => day >= first && day <= last;
+        const revisions: OpsEvent[] = work
+            .filter(
+                (w) =>
+                    /^\d{4}-\d{2}-\d{2}$/.test(String(w.datos.proximaRevision || "")) &&
+                    inRange(String(w.datos.proximaRevision)),
+            )
+            .map((w) => ({
+                id: "r" + w.id,
+                day: String(w.datos.proximaRevision),
+                kind: "revision" as const,
+                title: "Revisión: " + (name(assets, w.datos.activoId) || w.nombre),
+                detail: w.nombre,
+                tone: String(w.datos.proximaRevision) < today ? "danger" : "warning",
+                href: "/espacio/inventario?view=mantenimientos",
+            }));
+        const releases: OpsEvent[] = deploys
+            .filter((d) => d.datos.fecha && inRange(guatemalaDay(new Date(String(d.datos.fecha)))))
+            .map((d) => ({
+                id: "d" + d.id,
+                day: guatemalaDay(new Date(String(d.datos.fecha))),
+                time: activityTime(d.datos.fecha),
+                kind: "despliegue" as const,
+                title: `${name(apps, d.datos.aplicacionId) || "Sistema"} ${String(d.datos.revision || "")}`,
+                detail: `${ENV[String(d.datos.entorno)] || d.datos.entorno} · ${String(d.datos.resultado || "").toLowerCase()}`,
+                tone: DEPLOY_TONE[String(d.datos.resultado)] || "neutral",
+                href: "/espacio/sistemas",
+            }));
+        const events = [...revisions, ...releases].sort(
+            (a, b) => a.day.localeCompare(b.day) || (a.time || "").localeCompare(b.time || ""),
+        );
+        return events;
+    }, [showOps, opsLists.pending, opsLists.data, from, to, today]);
 
     const todays = activitiesForDay(records, today)
         .map((s) => s.record)

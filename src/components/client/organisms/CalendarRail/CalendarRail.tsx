@@ -60,18 +60,16 @@ export function CalendarRail({
     onSelect: (record: PlatformRecord) => void;
 }) {
     const { data } = usePlatform();
-    const [month, setMonth] = useState(anchor);
+    // Mes del minicalendario: sigue al periodo visible salvo que la persona lo cambie.
+    const [picked, setPicked] = useState({ anchor, month: anchor });
+    const month = picked.anchor === anchor ? picked.month : anchor;
+    const setMonth = (value: string) => setPicked({ anchor, month: value });
     const [ops, setOps] = useState<OpsEvent[] | null>(null);
     const [now, setNow] = useState(() => Date.now());
     const showOps = !!(
         data?.definitions.intervenciones?.actions.LEER || data?.definitions.despliegues?.actions.LEER
     );
 
-    useEffect(() => {
-        // Sigue al periodo visible cuando se navega desde el calendario principal.
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setMonth(anchor);
-    }, [anchor]);
     useEffect(() => {
         const timer = setInterval(() => setNow(Date.now()), 60000);
         return () => clearInterval(timer);

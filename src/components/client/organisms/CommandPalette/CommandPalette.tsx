@@ -170,7 +170,6 @@ export function CommandPalette({ items, ticketScope }: { items: PaletteItem[]; t
         else if (item.href) router.push(item.href);
     };
 
-    let index = -1;
     return (
         <>
             <dialog
@@ -237,8 +236,7 @@ export function CommandPalette({ items, ticketScope }: { items: PaletteItem[]; t
                             </span>
                             <ul role="group" aria-label={group}>
                                 {entries.map((item) => {
-                                    index += 1;
-                                    const i = index;
+                                    const i = flat.indexOf(item);
                                     return (
                                         <li
                                             key={item.id}

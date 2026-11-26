@@ -236,11 +236,11 @@ export const SystemLayout = ({ children, className }: { children: React.ReactNod
         if (!catalog || !pathname) return;
         const [, home, appKey, sectionKey, moduleKey] = pathname.split("/");
         if (home !== "home" || !appKey || !sectionKey || !moduleKey) return;
-        const module = catalog[appKey]?.sections[sectionKey]?.modules.find((m) => m.id === moduleKey);
-        if (module)
+        const found = catalog[appKey]?.sections[sectionKey]?.modules.find((m) => m.id === moduleKey);
+        if (found)
             rememberModule({
                 path: pathname,
-                title: module.title,
+                title: found.title,
                 area: `${areaName(catalog[appKey].meta.title)} › ${catalog[appKey].sections[sectionKey].meta.title}`,
             });
     }, [catalog, pathname]);

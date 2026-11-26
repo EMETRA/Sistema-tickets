@@ -1,7 +1,7 @@
 "use client";
 import { StateNotice } from "@/components/client/molecules/StateNotice";
 import { Button } from "@/components/client/atoms/Button";
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
 import styles from "./Home.module.scss";
 
@@ -9,17 +9,18 @@ export function HomeHeading({ description }: { description: string }) {
     const name = useAuthStore((state) => state.user?.nombre)
         ?.trim()
         .split(/\s+/)[0];
-    const [date, setDate] = useState("");
-    useEffect(() => {
-        setDate(
+    // Fecha local del navegador; vacía al renderizar en el servidor (sin desajuste de hidratación).
+    const date = useSyncExternalStore(
+        () => () => {},
+        () =>
             new Intl.DateTimeFormat("es-GT", {
                 timeZone: "America/Guatemala",
                 weekday: "long",
                 day: "numeric",
                 month: "long",
             }).format(new Date()),
-        );
-    }, []);
+        () => "",
+    );
     return (
         <header className={styles.heading}>
             <div>

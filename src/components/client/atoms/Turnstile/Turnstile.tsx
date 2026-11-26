@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import styles from "./Turnstile.module.scss";
 
 /**
@@ -73,13 +73,7 @@ function buildIframeSrc(embedUrl: string, parentOrigin: string): string {
  * Turnstile remoto embebido vía iframe (panel-emetra).
  * El token se recibe por postMessage con el contrato `{ type: "turnstile-token", token }`.
  */
-export const Turnstile: React.FC<TurnstileProps> = ({
-    onSuccess,
-    onError,
-    onExpire: _onExpire,
-    disabled = false,
-    className,
-}) => {
+export const Turnstile: React.FC<TurnstileProps> = ({ onSuccess, onError, disabled = false, className }) => {
     const embedUrl = process.env.NEXT_PUBLIC_TURNSTILE_EMBED_URL?.trim() ?? "";
     const embedOrigin = useMemo(() => {
         if (!embedUrl) return null;
@@ -91,7 +85,13 @@ export const Turnstile: React.FC<TurnstileProps> = ({
     const onErrorRef = useRef(onError);
 
     const [loadError, setLoadError] = useState(false);
-    const [iframeSrc, setIframeSrc] = useState<string | null>(null);
+    // El origen de la página solo existe en el navegador (null al renderizar en el servidor).
+    const parentOrigin = useSyncExternalStore(
+        () => () => {},
+        () => window.location.origin,
+        () => null,
+    );
+    const iframeSrc = embedOrigin && parentOrigin ? buildIframeSrc(embedUrl, parentOrigin) : null;
 
     useEffect(() => {
         disabledRef.current = disabled;
@@ -99,16 +99,8 @@ export const Turnstile: React.FC<TurnstileProps> = ({
     }, [disabled, onError]);
 
     useEffect(() => {
-        if (!embedOrigin) {
-            setIframeSrc(null);
-            setLoadError(true);
-            onErrorRef.current?.(TURNSTILE_LOAD_ERROR_MESSAGE);
-            return;
-        }
-
-        setIframeSrc(buildIframeSrc(embedUrl, window.location.origin));
-        setLoadError(false);
-    }, [embedUrl, embedOrigin]);
+        if (!embedOrigin) onErrorRef.current?.(TURNSTILE_LOAD_ERROR_MESSAGE);
+    }, [embedOrigin]);
 
     const handleMessage = useCallback(
         (event: MessageEvent) => {

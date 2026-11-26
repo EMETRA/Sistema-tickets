@@ -922,7 +922,7 @@ async function createLab(file, options = {}) {
         if (req.method === "GET")
           return s.files
             .filter((f) => f.tipo === type && f.registroId === id)
-            .map(({ base64, ...f }) => f);
+            .map(({ base64: _base64, ...f }) => f);
         return command(s, a, req, p, body, (proof) => {
           if (!allowed(a, type, "EDITAR") && !allowed(a, type, "INSERTAR"))
             fail(403, "Sin permiso para adjuntar.");

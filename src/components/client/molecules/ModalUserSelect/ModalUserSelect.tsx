@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import classNames from "classnames";
 import { PopOver } from "@/components/client/atoms/PopOver";
 import { Title } from "@/components/client/atoms/Title";
@@ -21,63 +21,38 @@ import styles from "./ModalUserSelect.module.scss";
 export const ModalUserSelect = ({ isOpen, onClose, onConfirm }: ModalUserSelectProps) => {
     const [selectedUserId, setSelectedUserId] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
-    const [users, setUsers] = useState<User[]>([]);
-    const {
-        data: usersList,
-        loading: isLoadingUsers,
-        error: usersErr,
-        refetch: refetchUsers,
-    } = useGetUsers();
-    const [usersError, setUsersError] = useState("");
-
-    const [currentUserId, setCurrentUserId] = useState<string>("1"); // Valor inicial por defecto
+    // Término con espera de 300 ms para no filtrar en cada tecla.
+    const [debouncedTerm, setDebouncedTerm] = useState("");
+    const { data: usersList, loading: isLoadingUsers, error: usersErr } = useGetUsers();
+    const usersError = usersErr?.message || "";
 
     const { getUserId } = useAuthStore();
+    const currentUserId = getUserId() || "1";
 
     useEffect(() => {
-        const storedId = getUserId();
-        if (storedId) {
-            setCurrentUserId(storedId);
-        }
-    }, [getUserId]);
-
-    useEffect(() => {
-        if (!isOpen) {
-            return;
-        }
-
-        // Sync error from hook
-        if (usersErr) setUsersError(usersErr.message);
-        else setUsersError("");
-
-        const debounceId = setTimeout(() => {
-            const normalized = searchTerm.trim().toLowerCase();
-            const techUsers = usersList.filter(
-                (user) => user.rol === "TECNICO" || user.rol === "DESARROLLADOR",
-            );
-            const filtered = normalized
-                ? techUsers.filter(
-                      (u) =>
-                          u.name.toLowerCase().includes(normalized) ||
-                          u.email.toLowerCase().includes(normalized),
-                  )
-                : techUsers;
-
-            setUsers(filtered);
-            setSelectedUserId((previousSelectedUserId) =>
-                filtered.some((user) => user.id === previousSelectedUserId) ? previousSelectedUserId : "",
-            );
-        }, 300);
-
+        const debounceId = setTimeout(() => setDebouncedTerm(searchTerm.trim().toLowerCase()), 300);
         return () => clearTimeout(debounceId);
-    }, [isOpen, searchTerm, usersList, usersErr]);
+    }, [searchTerm]);
+
+    const users: User[] = useMemo(() => {
+        const techUsers = usersList.filter((user) => user.rol === "TECNICO" || user.rol === "DESARROLLADOR");
+        return debouncedTerm
+            ? techUsers.filter(
+                  (u) =>
+                      u.name.toLowerCase().includes(debouncedTerm) ||
+                      u.email.toLowerCase().includes(debouncedTerm),
+              )
+            : techUsers;
+    }, [usersList, debouncedTerm]);
+    // La selección solo vale si la persona sigue en la lista filtrada.
+    const effectiveSelectedId = users.some((user) => user.id === selectedUserId) ? selectedUserId : "";
 
     const handleConfirm = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
         e.stopPropagation();
 
-        if (selectedUserId) {
-            onConfirm(selectedUserId);
+        if (effectiveSelectedId) {
+            onConfirm(effectiveSelectedId);
             setSelectedUserId("");
             setSearchTerm("");
         }
@@ -112,7 +87,7 @@ export const ModalUserSelect = ({ isOpen, onClose, onConfirm }: ModalUserSelectP
                                   key={user.id}
                                   onClick={() => setSelectedUserId(user.id)}
                                   className={classNames(styles.userItem, {
-                                      [styles.selected]: selectedUserId === user.id,
+                                      [styles.selected]: effectiveSelectedId === user.id,
                                   })}
                               >
                                   <UserChip
@@ -138,7 +113,7 @@ export const ModalUserSelect = ({ isOpen, onClose, onConfirm }: ModalUserSelectP
                     </Button>
                     <Button
                         onClick={handleConfirm}
-                        state={selectedUserId && !isLoadingUsers ? "default" : "disabled"}
+                        state={effectiveSelectedId && !isLoadingUsers ? "default" : "disabled"}
                     >
                         Asignar
                     </Button>

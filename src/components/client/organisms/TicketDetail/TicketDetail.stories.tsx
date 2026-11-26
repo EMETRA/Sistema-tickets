@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import type { Meta } from "@storybook/nextjs-vite";
 import { TicketDetail } from "./index";
 
 import { useState } from "react";
@@ -11,7 +11,6 @@ const meta: Meta<typeof TicketDetail> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof meta>;
 
 export const InteractiveExample = () => {
     const [open, setOpen] = useState(false);

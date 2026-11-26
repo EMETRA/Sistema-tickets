@@ -147,6 +147,7 @@ export function EvidenciasCaso({ archivos }: { archivos: Archivo[] }) {
                     {seleccion.mime.startsWith("video/") ? (
                         <video ref={previewVideo} controls autoPlay={false} src={seleccion.url} />
                     ) : (
+                        // eslint-disable-next-line @next/next/no-img-element -- vista previa de archivos locales (blob:), next/image no aplica
                         <img src={seleccion.url} alt={seleccion.nombre} />
                     )}
                 </figure>
@@ -168,6 +169,7 @@ export function EvidenciasCaso({ archivos }: { archivos: Archivo[] }) {
                     {seleccion.mime.startsWith("video/") ? (
                         <video controls autoPlay={false} src={seleccion.url} />
                     ) : (
+                        // eslint-disable-next-line @next/next/no-img-element -- vista previa de archivos locales (blob:), next/image no aplica
                         <img src={seleccion.url} alt={seleccion.nombre} />
                     )}
                 </dialog>

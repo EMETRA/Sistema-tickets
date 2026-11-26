@@ -22,10 +22,12 @@ export function ParticipantChips({ ids }: { ids: number[] }) {
 export function MeetingCard({ activity }: { activity: PlatformRecord }) {
     const link = meetingLink(activity.datos.lugar);
     const [copied, setCopied] = useState(false);
+    // Hora de apertura de la ficha (se lee una vez, fuera del render).
+    const [openedAt] = useState(() => Date.now());
     if (!link) return null;
     const room = meetingPlace(activity.datos.lugar);
     const end = Date.parse(String(activity.datos.fin || ""));
-    const finished = Number.isFinite(end) && end < Date.now();
+    const finished = Number.isFinite(end) && end < openedAt;
     return (
         <section
             className={styles.meeting}

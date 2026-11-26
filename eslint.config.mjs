@@ -21,6 +21,25 @@ const eslintConfig = defineConfig([
         "storybook-static/**",
     ]),
     ...storybook.configs["flat/recommended"],
+    {
+        // Scripts del laboratorio, despliegue y pruebas: CommonJS de Node.
+        files: ["**/*.cjs"],
+        languageOptions: { sourceType: "commonjs" },
+        rules: {
+            "@typescript-eslint/no-require-imports": "off",
+            // En CommonJS `module` es el objeto del módulo, no un import de Next.
+            "@next/next/no-assign-module-variable": "off",
+        },
+    },
+    {
+        // Parámetros y variables con «_» se ignoran a propósito (p. ej. _request).
+        rules: {
+            "@typescript-eslint/no-unused-vars": [
+                "warn",
+                { argsIgnorePattern: "^_", varsIgnorePattern: "^_", caughtErrorsIgnorePattern: "^_" },
+            ],
+        },
+    },
     // Prettier se encarga del formato; ESLint solo de errores y buenas prácticas.
     prettier,
 ]);

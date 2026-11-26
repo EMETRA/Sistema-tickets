@@ -34,7 +34,7 @@ const MediaGrid = ({ items, columns = 1 }: MediaGridProps) => {
             <div className={styles.grid} style={{ "--columns": columns } as React.CSSProperties}>
                 {items.map((item, index) => {
                     if (item.type === "image") {
-                        const { type, ...imageProps } = item;
+                        const { type: _type, ...imageProps } = item;
                         return (
                             <button
                                 key={`image-${index}`}
@@ -47,21 +47,21 @@ const MediaGrid = ({ items, columns = 1 }: MediaGridProps) => {
                                     })
                                 }
                             >
-                                <Image {...imageProps} />
+                                <Image {...imageProps} alt={imageProps.alt} />
                             </button>
                         );
                     }
 
                     if (item.type === "video") {
-                        const { type, ...videoProps } = item;
+                        const { type: _type, ...videoProps } = item;
                         return <Video key={`video-${index}`} {...videoProps} />;
                     }
                 })}
             </div>
             <div className={styles.grid} style={{ "--columns": columns } as React.CSSProperties}>
-                {items.map((item, index) => {
+                {items.map((item) => {
                     if (item.type === "file") {
-                        const { type, ...fileProps } = item;
+                        const { type: _type, ...fileProps } = item;
                         return <File key={fileProps.id} download {...fileProps} />;
                     }
                 })}
@@ -84,6 +84,7 @@ const MediaGrid = ({ items, columns = 1 }: MediaGridProps) => {
                             className={styles.close}
                             onClick={() => setPreview(null)}
                         />
+                        {/* eslint-disable-next-line @next/next/no-img-element -- vista previa de archivos locales (blob:), next/image no aplica */}
                         <img
                             src={preview.src}
                             alt={preview.alt}

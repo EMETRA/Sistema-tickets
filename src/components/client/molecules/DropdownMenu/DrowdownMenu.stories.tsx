@@ -36,7 +36,7 @@ export const Default: Story = {
 
     render: (args) => {
         const [selectedItem, setSelectedItem] = useState(args.items[0]);
-        const handleSelect = (item: any) => {
+        const handleSelect = (item: (typeof args.items)[number]) => {
             setSelectedItem(item);
             args.onSelect(item);
         };

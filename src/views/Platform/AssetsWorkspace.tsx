@@ -1,10 +1,10 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
-import { AssetsOverview, MaintenanceBoard } from "@/components/client/organisms/AssetsPanel";
+import { AssetsOverview, MaintenanceBoard } from "@/features/infraestructura/components/AssetsPanel";
 import { usePlatform } from "@/platform/context";
-import { InventoryWorkspace } from "@/components/client/organisms/ResourceWorkspace/InventoryWorkspace";
-import { ResourceWorkspace } from "@/components/client/organisms/ResourceWorkspace/ResourceWorkspace";
+import { InventoryWorkspace } from "@/features/registros/components/ResourceWorkspace/InventoryWorkspace";
+import { ResourceWorkspace } from "@/features/registros/components/ResourceWorkspace/ResourceWorkspace";
 import { WorkspaceNavigation, useWorkspaceTab, type WorkspaceTab } from "./WorkspaceNavigation";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
 const sections: (WorkspaceTab & { type: string })[] = [

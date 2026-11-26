@@ -2,8 +2,8 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { useCreateTicketDialog } from "@/store/useCreateTicketDialog";
-import { TicketsTablePanel } from "@/components/client/organisms/TicketsTablePanel";
-import { Ticket } from "@/components/client/organisms/TicketsTablePanel/types";
+import { TicketsTablePanel } from "@/features/tickets/components/TicketsTablePanel";
+import { Ticket } from "@/features/tickets/components/TicketsTablePanel/types";
 import { useTicketsByRole, useUpdateTicket } from "@/api/hooks";
 import styles from "./Tickets.module.scss";
 

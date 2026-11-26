@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import { Button } from "@/components/client/atoms/Button";
-import { InventoryCatalog } from "@/components/client/organisms/ResourceWorkspace/InventoryPicker";
+import { InventoryCatalog } from "@/features/registros/components/ResourceWorkspace/InventoryPicker";
 import { useAuthStore } from "@/store/useAuthStore";
 import { platformCommand, platformFetch, PlatformError } from "@/platform/client";
 import {

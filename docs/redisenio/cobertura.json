@@ -277,7 +277,7 @@
       "id": "P12",
       "chapter": "Tickets",
       "title": "Detalle del ticket: conversación",
-      "referenceSource": "src/components/client/organisms/TicketDetail/TicketDetail.tsx",
+      "referenceSource": "src/features/tickets/components/TicketDetail/TicketDetail.tsx",
       "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
       "note": "Bandejas con alcance del servidor, asignación por permisos/membresía, primera atención, cancelación e historial conservado.",
       "implementedPath": "/espacio/asignacion"
@@ -286,7 +286,7 @@
       "id": "P13",
       "chapter": "Tickets",
       "title": "Historial del ticket",
-      "referenceSource": "src/components/client/organisms/TicketHistory/TicketHistory.tsx",
+      "referenceSource": "src/features/tickets/components/TicketHistory/TicketHistory.tsx",
       "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
       "note": "Bandejas con alcance del servidor, asignación por permisos/membresía, primera atención, cancelación e historial conservado.",
       "implementedPath": "/espacio/asignacion"
@@ -295,7 +295,7 @@
       "id": "P14",
       "chapter": "Tickets",
       "title": "Admin: revisar el cambio · Paso 1 de 2",
-      "referenceSource": "src/components/client/organisms/TicketsTablePanel/TicketsTablePanel.tsx",
+      "referenceSource": "src/features/tickets/components/TicketsTablePanel/TicketsTablePanel.tsx",
       "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
       "note": "Dos etapas del mismo administrador vinculadas y comprobadas por el API; auditoría persistida. No requiere otro aprobador."
     },
@@ -303,7 +303,7 @@
       "id": "P15",
       "chapter": "Tickets",
       "title": "Admin: eliminación con historial conservado",
-      "referenceSource": "src/components/client/organisms/TicketsTablePanel/TicketsTablePanel.tsx",
+      "referenceSource": "src/features/tickets/components/TicketsTablePanel/TicketsTablePanel.tsx",
       "status": "UI_API_IMPLEMENTADAS_REQUIERE_INSTALACION",
       "note": "Bandejas con alcance del servidor, asignación por permisos/membresía, primera atención, cancelación e historial conservado.",
       "implementedPath": "/espacio/asignacion"

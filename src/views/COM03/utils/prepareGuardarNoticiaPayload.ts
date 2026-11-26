@@ -1,6 +1,6 @@
 import { apiFetch, graphqlRequestClient } from "@/api/graphql/client";
 import { NoticiaCmsError, type AccionNoticia, type NoticiaDetalle } from "@/api/graphql/COM03";
-import type { NewsFormFile, NewsFormValues } from "@/components/client/organisms/NewsForm";
+import type { NewsFormFile, NewsFormValues } from "@/features/comunicacion/components/NewsForm";
 import { cmsMediaUrl, type CmsResourceDto } from "@/api/cms/mappers";
 import { buildGuardarNoticiaPayload } from "./buildGuardarNoticiaPayload";
 

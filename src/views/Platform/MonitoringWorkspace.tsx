@@ -1,8 +1,8 @@
 "use client";
 import { useState } from "react";
-import { ResourceWorkspace } from "@/components/client/organisms/ResourceWorkspace/ResourceWorkspace";
-import { ServerMonitor } from "@/components/client/organisms/ServerMonitor/ServerMonitor";
-import { ServerFleet } from "@/components/client/organisms/ServerFleet";
+import { ResourceWorkspace } from "@/features/registros/components/ResourceWorkspace/ResourceWorkspace";
+import { ServerMonitor } from "@/features/infraestructura/components/ServerMonitor/ServerMonitor";
+import { ServerFleet } from "@/features/infraestructura/components/ServerFleet";
 import { usePlatform } from "@/platform/context";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
 

@@ -1,4 +1,4 @@
-import type { UploadedFile } from "../../components/client/organisms/TicketCreationPanel/types";
+import type { UploadedFile } from "@/features/tickets/components/TicketCreationPanel/types";
 export type { UploadedFile };
 
 export interface casesNotificationFormData {

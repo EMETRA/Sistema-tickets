@@ -1,5 +1,5 @@
 "use client";
-import { RecordSearch } from "@/components/client/organisms/RecordSearch";
+import { RecordSearch } from "@/features/registros/components/RecordSearch";
 
 export function SearchWorkspace() {
     return <RecordSearch />;

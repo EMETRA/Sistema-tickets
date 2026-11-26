@@ -40,6 +40,26 @@ const eslintConfig = defineConfig([
             ],
         },
     },
+    {
+        // Sistema de diseño (Atomic Design): átomos, moléculas y organismos son
+        // presentacionales y no dependen de las áreas de negocio (src/features).
+        files: ["src/components/client/{atoms,molecules,organisms}/**/*.{ts,tsx}"],
+        ignores: ["**/*.stories.tsx"],
+        rules: {
+            "no-restricted-imports": [
+                "error",
+                {
+                    patterns: [
+                        {
+                            group: ["@/features/*", "**/features/*"],
+                            message:
+                                "El sistema de diseño no importa áreas de negocio: mueve la lógica a src/features o recibe los datos por props.",
+                        },
+                    ],
+                },
+            ],
+        },
+    },
     // Prettier se encarga del formato; ESLint solo de errores y buenas prácticas.
     prettier,
 ]);

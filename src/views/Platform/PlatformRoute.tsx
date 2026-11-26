@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import { Button } from "@/components/client/atoms/Button";
 import { usePlatform } from "@/platform/context";
 import { platformSections } from "@/platform/navigation";
-import { ResourceWorkspace } from "@/components/client/organisms/ResourceWorkspace/ResourceWorkspace";
+import { ResourceWorkspace } from "@/features/registros/components/ResourceWorkspace/ResourceWorkspace";
 import { SearchWorkspace } from "./SearchWorkspace";
 import { CalendarWorkspace } from "./CalendarWorkspace";
 import { MetricsWorkspace } from "./MetricsWorkspace";

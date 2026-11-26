@@ -2,12 +2,12 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { WorkspaceIcon } from "@/components/client/atoms/WorkspaceIcon/WorkspaceIcon";
-import { TicketDetail } from "@/components/client/organisms/TicketDetail";
+import { TicketDetail } from "@/features/tickets/components/TicketDetail";
 import { usePlatform } from "@/platform/context";
 import { platformFetch } from "@/platform/client";
 import { guatemalaDay } from "@/platform/dates";
 import { readRecents, type RecentModule } from "@/platform/recents";
-import { ServerFleet } from "@/components/client/organisms/ServerFleet";
+import { ServerFleet } from "@/features/infraestructura/components/ServerFleet";
 import type { PageResult, PlatformRecord } from "@/platform/types";
 import { useAppsCatalogContext } from "@/context/AppsCatalogContext";
 import { buildModulePath } from "@/config/apps-catalog";

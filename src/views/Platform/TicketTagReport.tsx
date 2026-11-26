@@ -6,7 +6,7 @@ import { PeriodFilter, formatPeriod } from "@/components/client/molecules/Period
 import mx from "./MetricsWorkspace.module.scss";
 import { platformFetch, PlatformError } from "@/platform/client";
 import { guatemalaDay } from "@/platform/dates";
-import { displayDate } from "@/components/client/organisms/ResourceWorkspace/RecordDetail";
+import { displayDate } from "@/helpers/displayDate";
 import {
     ticketReportCsv,
     ticketReportQuery,

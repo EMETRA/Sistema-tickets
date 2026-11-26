@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { displayDate } from "../../organisms/ResourceWorkspace/RecordDetail";
+import { displayDate } from "@/helpers/displayDate";
 
 import { Icon } from "@/components/client/atoms/Icon";
 import { Title } from "@/components/client/atoms/Title";

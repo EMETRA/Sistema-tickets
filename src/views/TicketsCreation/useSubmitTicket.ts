@@ -1,7 +1,7 @@
 "use client";
 import { useCallback } from "react";
 import { useCreateTicket } from "@/api/hooks/useCreateTicket";
-import type { TicketFormData } from "@/components/client/organisms/TicketCreationPanel/types";
+import type { TicketFormData } from "@/features/tickets/components/TicketCreationPanel/types";
 import { useAuthStore } from "@/store/useAuthStore";
 
 export const TICKET_DEPARTMENTS = [

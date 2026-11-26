@@ -7,7 +7,7 @@ import {
     type SeccionNoticiaCmsInput,
     type VisibilidadNoticiaCms,
 } from "@/api/graphql/COM03";
-import type { NewsFormFile, NewsFormValues } from "@/components/client/organisms/NewsForm";
+import type { NewsFormFile, NewsFormValues } from "@/features/comunicacion/components/NewsForm";
 import { ddMmYyyyToApiDateTime } from "@/helpers/dateInput";
 import { textToHtml } from "@/helpers/textHtml";
 

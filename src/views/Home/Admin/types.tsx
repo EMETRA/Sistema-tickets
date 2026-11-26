@@ -2,7 +2,7 @@ import { TicketStatData } from "@/components/client/organisms/DashboardStatsBar"
 import { EventItemProps } from "@/components/client/molecules/EventItem";
 import { BarChartDataPoint } from "@/components/client/atoms/BarChart";
 import { DonutChartDataItem } from "@/components/client/atoms/DonutChart";
-import { TicketData } from "@/components/client/organisms/TicketsPanel";
+import { TicketData } from "@/features/tickets/components/TicketsPanel";
 
 /**
  * Props para página de Home para Administrador

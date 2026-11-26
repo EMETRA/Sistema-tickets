@@ -4,21 +4,21 @@ import { WorkspaceNavigation, useWorkspaceTab, type WorkspaceTab } from "./Works
 import { InventoryLinkDialog } from "./InventoryLinkDialog";
 import { startTransition, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/client/atoms/Button";
-import { RecordDetail } from "@/components/client/organisms/ResourceWorkspace/RecordDetail";
-import { RecordEditor } from "@/components/client/organisms/ResourceWorkspace/RecordEditor";
-import { ResourceWorkspace } from "@/components/client/organisms/ResourceWorkspace/ResourceWorkspace";
+import { RecordDetail } from "@/features/registros/components/ResourceWorkspace/RecordDetail";
+import { RecordEditor } from "@/features/registros/components/ResourceWorkspace/RecordEditor";
+import { ResourceWorkspace } from "@/features/registros/components/ResourceWorkspace/ResourceWorkspace";
 import { usePlatform } from "@/platform/context";
 import { platformCommand, platformFetch } from "@/platform/client";
 import type { PlatformRecord } from "@/platform/types";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
-import net from "@/components/client/organisms/NetworkPanel/NetworkPanel.module.scss";
-import { DeviceInspector, NetworkOverview } from "@/components/client/organisms/NetworkPanel";
+import net from "@/features/infraestructura/components/NetworkPanel/NetworkPanel.module.scss";
+import { DeviceInspector, NetworkOverview } from "@/features/infraestructura/components/NetworkPanel";
 import {
     CLASS_LABEL,
     classGlyph,
     edgeStyle,
     portsUsed,
-} from "@/components/client/organisms/NetworkPanel/networkStyle";
+} from "@/features/infraestructura/components/NetworkPanel/networkStyle";
 import type { PageResult } from "@/platform/types";
 type Graph = {
     dispositivos: PlatformRecord[];

@@ -1,6 +1,6 @@
 import { VisibilidadNoticia } from "@/api/graphql/COM03";
 import type { SelectOption } from "@/components/client/atoms/Select/types";
-import type { NewsFormAccept } from "@/components/client/organisms/NewsForm";
+import type { NewsFormAccept } from "@/features/comunicacion/components/NewsForm";
 
 /**
  * Visibilidad según TB_NOTICIA.VISIBILIDAD.

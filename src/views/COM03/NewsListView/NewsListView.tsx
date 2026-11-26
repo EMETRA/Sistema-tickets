@@ -7,7 +7,7 @@ import { Text } from "@/components/client/atoms/Text";
 import { Button } from "@/components/client/atoms/Button";
 import { ModalContent } from "@/components/client/molecules/ModalContent";
 import { LoadingModal } from "@/components/client/molecules/LoadingModal";
-import { NewsTablePanel } from "@/components/client/organisms/NewsTablePanel";
+import { NewsTablePanel } from "@/features/comunicacion/components/NewsTablePanel";
 import type { NewsFilter } from "../types";
 import styles from "./NewsListView.module.scss";
 

@@ -1,14 +1,14 @@
 "use client";
 
-import { CreateTicketDialog } from "@/components/client/organisms/CreateTicketDialog";
-import { CommandPalette, type PaletteItem } from "@/components/client/organisms/CommandPalette";
+import { CreateTicketDialog } from "@/features/tickets/components/CreateTicketDialog";
+import { CommandPalette, type PaletteItem } from "@/features/navegacion/components/CommandPalette";
 import { PanelSidebar, type PanelLink } from "@/components/client/organisms/PanelSidebar";
 import { useCommandPalette } from "@/store/useCommandPalette";
 import { rememberModule } from "@/platform/recents";
 import { areaAccent, areaName } from "@/config/app-areas";
 import { spaceMeta } from "@/platform/spaces";
 import { useAccessibilitySync, useThemeSync } from "@/platform/theme";
-import { GuidedTourHost } from "../../organisms/GuidedTour";
+import { GuidedTourHost } from "@/features/recorrido/components/GuidedTour";
 import { SpaceHeader } from "../../molecules/SpaceHeader";
 import { useCreateTicketDialog } from "@/store/useCreateTicketDialog";
 import { usePlatform } from "@/platform/context";

@@ -5,9 +5,9 @@ import React, { useEffect, useRef } from "react";
 import { MyPerformanceChart } from "@/components/client/organisms/MyPerformanceChart";
 import { MyStatisticsPanel } from "@/components/client/organisms/MyStatisticsPanel";
 import { InfoPanel } from "@/components/client/organisms/InfoPanel";
-import TicketsPanel from "@/components/client/organisms/TicketsPanel/TicketsPanel";
+import TicketsPanel from "@/features/tickets/components/TicketsPanel/TicketsPanel";
 import { EventItemProps } from "@/components/client/molecules/EventItem";
-import { TicketData } from "@/components/client/organisms/TicketsPanel";
+import { TicketData } from "@/features/tickets/components/TicketsPanel";
 import { ChipState } from "@/components/client/atoms/TicketStateChip/types";
 import {
     useGetUser,

@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef } from "react";
 import { Button } from "@/components/client/atoms/Button";
-import { InventoryWorkspace } from "@/components/client/organisms/ResourceWorkspace/InventoryWorkspace";
+import { InventoryWorkspace } from "@/features/registros/components/ResourceWorkspace/InventoryWorkspace";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
 export function InventoryLinkDialog({ onClose, onSaved }: { onClose: () => void; onSaved: () => void }) {
     const dialog = useRef<HTMLDialogElement>(null);

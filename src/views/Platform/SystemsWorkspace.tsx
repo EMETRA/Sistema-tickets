@@ -1,15 +1,15 @@
 "use client";
 import { startTransition, useEffect, useState } from "react";
 import { Button } from "@/components/client/atoms/Button";
-import { RepositoryStatus } from "@/components/client/organisms/RepositoryStatus/RepositoryStatus";
-import { SourceCatalog } from "@/components/client/organisms/SourceCatalog/SourceCatalog";
+import { RepositoryStatus } from "@/features/infraestructura/components/RepositoryStatus/RepositoryStatus";
+import { SourceCatalog } from "@/features/infraestructura/components/SourceCatalog/SourceCatalog";
 import { usePlatform } from "@/platform/context";
 import { PlatformField } from "@/components/client/molecules/PlatformField/PlatformField";
-import { ResourceWorkspace } from "@/components/client/organisms/ResourceWorkspace/ResourceWorkspace";
+import { ResourceWorkspace } from "@/features/registros/components/ResourceWorkspace/ResourceWorkspace";
 import { platformFetch } from "@/platform/client";
-import { displayDate } from "@/components/client/organisms/ResourceWorkspace/RecordDetail";
+import { displayDate } from "@/helpers/displayDate";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
-import { SystemsPortfolio } from "@/components/client/organisms/SystemsPanel";
+import { SystemsPortfolio } from "@/features/infraestructura/components/SystemsPanel";
 type Objects = {
     owner: string;
     consultadoEn: string;

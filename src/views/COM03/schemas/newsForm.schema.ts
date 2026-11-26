@@ -1,6 +1,6 @@
 import { newsLocationInput } from "@/api/cms/news-location";
 import { z } from "zod";
-import type { NewsFormErrors } from "@/components/client/organisms/NewsForm";
+import type { NewsFormErrors } from "@/features/comunicacion/components/NewsForm";
 import { ddMmYyyyToIsoDate } from "@/helpers/dateInput";
 
 const requiredText = (message: string) => z.string().trim().min(1, message);

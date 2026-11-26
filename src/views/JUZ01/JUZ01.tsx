@@ -6,7 +6,7 @@ import { z } from "zod";
 import { FormField } from "@/components/client/molecules/FormField";
 import { Input } from "@/components/client/atoms/Input";
 import { Button } from "@/components/client/atoms/Button";
-import { displayDate } from "@/components/client/organisms/ResourceWorkspace/RecordDetail";
+import { displayDate } from "@/helpers/displayDate";
 import { estadoCasoJuzgado } from "@/api/graphql/juzgado-vista";
 import { buscarCasosJuzgado, mensajeJuzgado, type CoincidenciaJuzgado } from "@/api/graphql/juzgado";
 import { JUZ01Schema } from "./JUZ01.schema";

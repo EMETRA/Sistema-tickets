@@ -24,9 +24,9 @@ import { Text } from "@/components/client/atoms/Text";
 import { Title } from "@/components/client/atoms/Title";
 import { ModalContent } from "@/components/client/molecules/ModalContent";
 import { LoadingModal } from "@/components/client/molecules/LoadingModal";
-import { NewsForm, type NewsFormOptions } from "@/components/client/organisms/NewsForm";
-import { NewsPreview } from "@/components/client/organisms/NewsPreview";
-import { NewsResultCard } from "@/components/client/organisms/NewsResultCard";
+import { NewsForm, type NewsFormOptions } from "@/features/comunicacion/components/NewsForm";
+import { NewsPreview } from "@/features/comunicacion/components/NewsPreview";
+import { NewsResultCard } from "@/features/comunicacion/components/NewsResultCard";
 import { crearCacheRecursos, prepareGuardarNoticiaPayload } from "../utils/prepareGuardarNoticiaPayload";
 import { claveParaIntento, contenidoDelIntento, type IntentoGuardado } from "../utils/claveIdempotente";
 import {
@@ -45,7 +45,7 @@ import {
 } from "../constants";
 import { useNewsForm } from "../hooks/useNewsForm";
 import styles from "./NewsFormView.module.scss";
-import NewsActivity from "@/components/client/organisms/NewsActivity/NewsActivity";
+import NewsActivity from "@/features/comunicacion/components/NewsActivity/NewsActivity";
 
 interface NewsFormViewProps {
     /** null = crear; con valor = editar */

@@ -10,7 +10,7 @@ import { useGetUserById } from "@/api/hooks/useGetUserById";
 import { useGetTicketsByUserId } from "@/api/hooks/useGetTicketsByUserId";
 import { useAuthStore } from "@/store/useAuthStore";
 import { HomeState } from "../Home/HomeHeading";
-import { InventoryCatalog } from "@/components/client/organisms/ResourceWorkspace/InventoryPicker";
+import { InventoryCatalog } from "@/features/registros/components/ResourceWorkspace/InventoryPicker";
 import styles from "./Profile.module.scss";
 
 function ColleagueProfile({ userId }: { userId?: string }) {

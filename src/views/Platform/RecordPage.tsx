@@ -4,8 +4,8 @@ import { useRouter } from "next/navigation";
 import { usePlatform } from "@/platform/context";
 import { platformFetch } from "@/platform/client";
 import type { PlatformRecord } from "@/platform/types";
-import { RecordDetail } from "@/components/client/organisms/ResourceWorkspace/RecordDetail";
-import { RecordEditor } from "@/components/client/organisms/ResourceWorkspace/RecordEditor";
+import { RecordDetail } from "@/features/registros/components/ResourceWorkspace/RecordDetail";
+import { RecordEditor } from "@/features/registros/components/ResourceWorkspace/RecordEditor";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
 export function RecordPage({ type, id }: { type: string; id: string }) {
     const { data, loading, error } = usePlatform(),

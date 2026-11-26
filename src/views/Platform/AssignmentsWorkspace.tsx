@@ -3,11 +3,11 @@ import { statusTone } from "@/helpers/statusTone";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/client/atoms/Button";
 import { PlatformField } from "@/components/client/molecules/PlatformField/PlatformField";
-import { TicketDetail } from "@/components/client/organisms/TicketDetail";
+import { TicketDetail } from "@/features/tickets/components/TicketDetail";
 import { usePlatform } from "@/platform/context";
 import { platformCommand, platformFetch } from "@/platform/client";
 import type { PageResult } from "@/platform/types";
-import { displayDate } from "@/components/client/organisms/ResourceWorkspace/RecordDetail";
+import { displayDate } from "@/helpers/displayDate";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
 import queue from "./QueueSummary.module.scss";
 type Ticket = {

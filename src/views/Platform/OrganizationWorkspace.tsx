@@ -2,12 +2,12 @@
 import { startTransition, useEffect, useState } from "react";
 import { usePlatform } from "@/platform/context";
 import { platformFetch } from "@/platform/client";
-import { ResourceWorkspace } from "@/components/client/organisms/ResourceWorkspace/ResourceWorkspace";
-import { type OrganizationPerson } from "@/components/client/organisms/OrganizationPeople/OrganizationPeople";
+import { ResourceWorkspace } from "@/features/registros/components/ResourceWorkspace/ResourceWorkspace";
+import { type OrganizationPerson } from "@/features/personas/components/OrganizationPeople/OrganizationPeople";
 import { OrganizationSync } from "./OrganizationSync";
 import { WorkspaceNavigation, useWorkspaceTab, type WorkspaceTab } from "./WorkspaceNavigation";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
-import { PeopleDirectoryView, TeamsBoard } from "@/components/client/organisms/PeoplePanel";
+import { PeopleDirectoryView, TeamsBoard } from "@/features/personas/components/PeoplePanel";
 function PeopleDirectory() {
     const [people, setPeople] = useState<OrganizationPerson[] | null>(null),
         [error, setError] = useState(""),

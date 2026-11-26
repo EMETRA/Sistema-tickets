@@ -13,7 +13,7 @@ import type {
     NewsFormTextField,
     NewsFormValues,
     NewsSectionField,
-} from "@/components/client/organisms/NewsForm";
+} from "@/features/comunicacion/components/NewsForm";
 import {
     apiDateToDdMmYyyy,
     ddMmYyyyToIsoDate,

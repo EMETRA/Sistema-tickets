@@ -1,1 +1,1 @@
-export type { NewsFilter } from "@/components/client/organisms/NewsTablePanel";
+export type { NewsFilter } from "@/features/comunicacion/components/NewsTablePanel";

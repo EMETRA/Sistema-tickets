@@ -2,8 +2,8 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { TicketCreationPanel } from "@/components/client/organisms/TicketCreationPanel";
-import { TicketFormData } from "@/components/client/organisms/TicketCreationPanel/types";
+import { TicketCreationPanel } from "@/features/tickets/components/TicketCreationPanel";
+import { TicketFormData } from "@/features/tickets/components/TicketCreationPanel/types";
 import styles from "./TicketsCreation.module.scss";
 import { ErrorHandler } from "@/api/graphql/errors";
 import { useCreateTicketDialog } from "@/store/useCreateTicketDialog";

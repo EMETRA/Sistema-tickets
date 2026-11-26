@@ -7,7 +7,7 @@ import { ACCESS_TABS, accessTab, type AccessTab } from "@/platform/access-naviga
 import { Button } from "@/components/client/atoms/Button";
 import { usePlatform } from "@/platform/context";
 import { platformCommand, platformFetch } from "@/platform/client";
-import { ResourceWorkspace } from "@/components/client/organisms/ResourceWorkspace/ResourceWorkspace";
+import { ResourceWorkspace } from "@/features/registros/components/ResourceWorkspace/ResourceWorkspace";
 import MOD06 from "@/views/MOD06";
 import { ModuleAccessGate } from "@/components/client/organisms/ModuleAccessGate/ModuleAccessGate";
 import { PlatformField } from "@/components/client/molecules/PlatformField/PlatformField";

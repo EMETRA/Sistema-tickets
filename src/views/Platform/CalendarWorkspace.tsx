@@ -1,7 +1,7 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/client/atoms/Button";
-import { WeeklyCalendar } from "@/components/client/organisms/WeeklyCalendar/WeeklyCalendar";
+import { WeeklyCalendar } from "@/features/calendario/components/WeeklyCalendar/WeeklyCalendar";
 import { usePlatform } from "@/platform/context";
 import { platformFetch } from "@/platform/client";
 import type { PageResult, PlatformRecord } from "@/platform/types";
@@ -19,11 +19,12 @@ import {
     weekDays,
     type CalendarView,
 } from "@/platform/calendar";
-import { RecordEditor } from "@/components/client/organisms/ResourceWorkspace/RecordEditor";
-import { RecordDetail, displayDate } from "@/components/client/organisms/ResourceWorkspace/RecordDetail";
+import { RecordEditor } from "@/features/registros/components/ResourceWorkspace/RecordEditor";
+import { displayDate } from "@/helpers/displayDate";
+import { RecordDetail } from "@/features/registros/components/ResourceWorkspace/RecordDetail";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
 import calendar from "./CalendarWorkspace.module.scss";
-import { CalendarRail } from "@/components/client/organisms/CalendarRail";
+import { CalendarRail } from "@/features/calendario/components/CalendarRail";
 
 type Scope = "EQUIPO" | "EMPRESA" | "PRIVADA";
 const scopeNames = {

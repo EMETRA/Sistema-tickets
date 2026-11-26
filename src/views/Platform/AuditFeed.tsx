@@ -1,7 +1,7 @@
 "use client";
 import { statusLabel, statusTone } from "@/helpers/statusTone";
 import { guatemalaDay } from "@/platform/dates";
-import { displayDate } from "@/components/client/organisms/ResourceWorkspace/RecordDetail";
+import { displayDate } from "@/helpers/displayDate";
 import common from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
 import styles from "./AuditFeed.module.scss";
 

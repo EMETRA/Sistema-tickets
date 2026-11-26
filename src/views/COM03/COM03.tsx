@@ -5,7 +5,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useGetPermisosNoticias } from "@/api/hooks";
 import { Text } from "@/components/client/atoms/Text";
 import { Title } from "@/components/client/atoms/Title";
-import { NewsResultCard } from "@/components/client/organisms/NewsResultCard";
+import { NewsResultCard } from "@/features/comunicacion/components/NewsResultCard";
 import NewsListView from "./NewsListView/NewsListView";
 import NewsFormView from "./NewsFormView/NewsFormView";
 import { permisosParaUI } from "./utils/permisos";

@@ -5,15 +5,15 @@ import React, { useEffect, useRef, useState } from "react";
 import { DashboardStatsBar } from "@/components/client/organisms/DashboardStatsBar";
 import { PerformanceChartPanel } from "@/components/client/organisms/PerformanceChartPanel";
 import { InfoPanel } from "@/components/client/organisms/InfoPanel";
-import { TicketsResolvePanel } from "@/components/client/organisms/TicketsResolvePanel";
+import { TicketsResolvePanel } from "@/features/tickets/components/TicketsResolvePanel";
 import type { DonutChartDataItem } from "@/components/client/atoms/DonutChart";
 import type { BarChartDataPoint } from "@/components/client/atoms/BarChart";
-import TicketsPanel from "@/components/client/organisms/TicketsPanel/TicketsPanel";
+import TicketsPanel from "@/features/tickets/components/TicketsPanel/TicketsPanel";
 import styles from "./AdminHome.module.scss";
 
 import { TicketStatData } from "@/components/client/organisms/DashboardStatsBar";
 import { EventItemProps } from "@/components/client/molecules/EventItem";
-import { TicketData } from "@/components/client/organisms/TicketsPanel";
+import { TicketData } from "@/features/tickets/components/TicketsPanel";
 import { ChipState } from "@/components/client/atoms/TicketStateChip/types";
 import type { PrimaryFilter } from "@/components/client/organisms/PerformanceChartPanel/types";
 import {

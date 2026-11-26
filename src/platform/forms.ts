@@ -29,24 +29,48 @@ export function texto(label: string, { requerido = false, max = 200 } = {}) {
     return requerido ? base.min(1, mensajes.requerido(label)) : base;
 }
 
-/** Valor vacío del formulario ("" o null) → undefined, para tratarlo como «sin dato». */
-const vacio = (v: unknown) => (v === "" || v === null ? undefined : v);
+/** Valor vacío ("", solo espacios o null) → undefined, para tratarlo como «sin dato» (como el API). */
+const vacio = (v: unknown) => (v === null || (typeof v === "string" && !v.trim()) ? undefined : v);
 
-/** Esquema de un campo de la plataforma según su definición (mismas reglas que valida el API). */
+/**
+ * Esquema de un campo de la plataforma según su definición. Reproduce las reglas del API
+ * (api-tickets: platform.validation.ts `validData`): enteros desde 1, listas de hasta 100
+ * personas, textos de hasta 500 caracteres (8000 en descripciones), fechas exactas y enlaces
+ * http(s) sin usuario ni contraseña.
+ */
 export function esquemaCampo(field: Field): z.ZodType {
     const { label } = field;
     let schema: z.ZodType;
     switch (field.type) {
-        case "number": {
-            let n = z.coerce.number({ error: mensajes.numero(label) });
-            if (field.min !== undefined) n = n.min(field.min, mensajes.rango(label, field.min, field.max));
-            if (field.max !== undefined) n = n.max(field.max, mensajes.rango(label, field.min, field.max));
-            schema = n;
+        case "number":
+        case "user": {
+            const min = field.min ?? 1;
+            let n = z.coerce
+                .number({ error: mensajes.numero(label) })
+                .int(mensajes.numero(label))
+                .min(min, mensajes.rango(label, min, field.max));
+            if (field.max !== undefined) n = n.max(field.max, mensajes.rango(label, min, field.max));
+            schema = field.type === "user" ? z.coerce.number().int().positive(mensajes.opcion(label)) : n;
             break;
         }
-        case "date":
         case "datetime":
-            schema = z.string().refine((v) => Number.isFinite(+new Date(v)), mensajes.fecha(label));
+            schema = z
+                .string()
+                .refine(
+                    (v) => /^\d{4}-\d\d-\d\dT/.test(v) && Number.isFinite(Date.parse(v)),
+                    mensajes.fecha(label),
+                );
+            break;
+        case "date":
+            schema = z
+                .string()
+                .refine(
+                    (v) =>
+                        /^\d{4}-\d\d-\d\d$/.test(v) &&
+                        Number.isFinite(Date.parse(v)) &&
+                        new Date(v).toISOString().slice(0, 10) === v,
+                    mensajes.fecha(label),
+                );
             break;
         case "select":
             schema = field.options?.length
@@ -54,24 +78,35 @@ export function esquemaCampo(field: Field): z.ZodType {
                 : z.string();
             break;
         case "url":
-            schema = z.url({ protocol: /^https?$/, error: mensajes.enlace(label) });
+            schema = z.string().refine((v) => {
+                try {
+                    const url = new URL(v.trim());
+                    return ["http:", "https:"].includes(url.protocol) && !url.username && !url.password;
+                } catch {
+                    return false;
+                }
+            }, mensajes.enlace(label));
+            break;
+        case "ref":
+            schema = z.string().uuid(mensajes.opcion(label));
             break;
         case "boolean":
             schema = z.boolean();
             break;
         case "list":
-            schema = z.array(z.union([z.number(), z.string()]));
+            schema = z
+                .array(z.coerce.number().int().positive())
+                .max(100, `«${label}» admite hasta 100 personas.`);
             break;
         case "textarea":
             schema = z.string().max(8000, mensajes.maximo(label, 8000));
             break;
         default:
-            schema = z.union([z.string().max(500, mensajes.maximo(label, 500)), z.number()]);
+            schema = z.string().max(500, mensajes.maximo(label, 500));
     }
     if (field.required) {
-        if (field.type === "list")
-            return z.array(z.union([z.number(), z.string()])).min(1, mensajes.requerido(label));
-        // Vacío → undefined; si falta, un solo mensaje claro en lugar del error de tipo.
+        if (field.type === "list") return (schema as z.ZodArray<z.ZodType>).min(1, mensajes.requerido(label));
+        // Vacío o solo espacios → undefined; si falta, un solo mensaje claro en lugar del error de tipo.
         return z
             .preprocess(vacio, schema.optional())
             .refine((v) => v !== undefined, { error: mensajes.requerido(label) });

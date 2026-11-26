@@ -27,7 +27,11 @@
         "max": 43200
       }
     ],
-    "adminOnly": true
+    "adminOnly": true,
+    "states": [
+      "ACTIVO",
+      "INACTIVO"
+    ]
   },
   "miembros": {
     "table": "TB_TK_MIEMBROS",
@@ -57,7 +61,11 @@
         ]
       }
     ],
-    "adminOnly": true
+    "adminOnly": true,
+    "states": [
+      "ACTIVO",
+      "INACTIVO"
+    ]
   },
   "actividades": {
     "table": "TB_TK_ACTIVIDADES",
@@ -97,7 +105,12 @@
         "required": false
       }
     ],
-    "audience": "everyone"
+    "audience": "everyone",
+    "states": [
+      "ACTIVO",
+      "RESUELTO",
+      "CANCELADO"
+    ]
   },
   "instalaciones": {
     "table": "TB_TK_INSTALACIONES",
@@ -130,6 +143,10 @@
         "type": "url",
         "required": false
       }
+    ],
+    "states": [
+      "ACTIVO",
+      "INACTIVO"
     ]
   },
   "activos": {
@@ -139,6 +156,11 @@
     "group": "inventario",
     "permission": "TICKETS_ACTIVOS",
     "fields": [
+      {
+        "key": "inventarioReferencia",
+        "label": "Referencia institucional",
+        "type": "text"
+      },
       {
         "key": "numeroInventario",
         "label": "Número de inventario institucional",
@@ -155,6 +177,9 @@
           "PORTATIL",
           "IMPRESORA",
           "SERVIDOR",
+          "SWITCH",
+          "ROUTER",
+          "ACCESS_POINT",
           "OTRO"
         ]
       },
@@ -185,7 +210,7 @@
       },
       {
         "key": "responsableId",
-        "label": "Responsable",
+        "label": "Responsable técnico",
         "type": "user",
         "required": true
       },
@@ -195,6 +220,10 @@
         "type": "textarea",
         "required": false
       }
+    ],
+    "states": [
+      "ACTIVO",
+      "INACTIVO"
     ]
   },
   "intervenciones": {
@@ -254,7 +283,10 @@
         "required": false
       }
     ],
-    "immutable": true
+    "immutable": true,
+    "states": [
+      "ACTIVO"
+    ]
   },
   "movimientos-activos": {
     "table": "TB_TK_MOV_ACTIVOS",
@@ -306,7 +338,10 @@
         "required": true
       }
     ],
-    "immutable": true
+    "immutable": true,
+    "states": [
+      "ACTIVO"
+    ]
   },
   "dispositivos": {
     "table": "TB_TK_RED_DISPOSITIVOS",
@@ -315,6 +350,27 @@
     "group": "red",
     "permission": "TICKETS_DISPOSITIVOS",
     "fields": [
+      {
+        "key": "activoId",
+        "label": "Ficha de equipo vinculada",
+        "type": "ref",
+        "resource": "activos"
+      },
+      {
+        "key": "serie",
+        "label": "Serie",
+        "type": "text"
+      },
+      {
+        "key": "modelo",
+        "label": "Modelo",
+        "type": "text"
+      },
+      {
+        "key": "inventarioReferencia",
+        "label": "Referencia institucional",
+        "type": "text"
+      },
       {
         "key": "planoX",
         "label": "Posición en plano X",
@@ -397,6 +453,10 @@
         "type": "textarea",
         "required": false
       }
+    ],
+    "states": [
+      "ACTIVO",
+      "INACTIVO"
     ]
   },
   "conexiones": {
@@ -454,6 +514,10 @@
         "type": "textarea",
         "required": false
       }
+    ],
+    "states": [
+      "ACTIVO",
+      "INACTIVO"
     ]
   },
   "aplicaciones": {
@@ -505,6 +569,10 @@
         "type": "textarea",
         "required": false
       }
+    ],
+    "states": [
+      "ACTIVO",
+      "INACTIVO"
     ]
   },
   "repositorios": {
@@ -545,6 +613,10 @@
           "OTRO"
         ]
       }
+    ],
+    "states": [
+      "ACTIVO",
+      "INACTIVO"
     ]
   },
   "despliegues": {
@@ -609,7 +681,10 @@
         "required": false
       }
     ],
-    "immutable": true
+    "immutable": true,
+    "states": [
+      "ACTIVO"
+    ]
   },
   "incidencias": {
     "table": "TB_TK_INCIDENCIAS",
@@ -656,6 +731,11 @@
         "type": "text",
         "required": false
       }
+    ],
+    "states": [
+      "ABIERTO",
+      "RESUELTO",
+      "CANCELADO"
     ]
   },
   "servidores": {
@@ -701,7 +781,11 @@
         "required": false
       }
     ],
-    "adminOnly": true
+    "adminOnly": true,
+    "states": [
+      "ACTIVO",
+      "INACTIVO"
+    ]
   },
   "contenedores": {
     "table": "TB_TK_CONTENEDORES",
@@ -736,6 +820,10 @@
         "type": "textarea",
         "required": false
       }
+    ],
+    "states": [
+      "ACTIVO",
+      "INACTIVO"
     ]
   },
   "esquemas": {
@@ -765,7 +853,11 @@
         "required": false
       }
     ],
-    "adminOnly": true
+    "adminOnly": true,
+    "states": [
+      "ACTIVO",
+      "INACTIVO"
+    ]
   },
   "solicitudes": {
     "immutable": true,
@@ -837,7 +929,10 @@
         "required": true
       }
     ],
-    "audience": "everyone"
+    "audience": "everyone",
+    "states": [
+      "PENDIENTE"
+    ]
   },
   "modulos": {
     "table": "TB_TK_MODULOS",
@@ -907,6 +1002,10 @@
         "required": false
       }
     ],
-    "adminOnly": true
+    "adminOnly": true,
+    "states": [
+      "ACTIVO",
+      "INACTIVO"
+    ]
   }
 }

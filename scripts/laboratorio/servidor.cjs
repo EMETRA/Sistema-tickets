@@ -162,45 +162,87 @@ function verifyVersion(row, body) {
   if (Number(body.version) !== row.version)
     fail(409, "El registro cambió. Actualiza antes de guardar.");
 }
-function validate(type, data) {
+// Mismas reglas que el API (api-tickets: platform.validation.ts validData y records.save),
+// para que lo que pasa en el laboratorio también pase en QA. Normaliza data en el lugar.
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+function validate(type, data, { request = false } = {}) {
   const d = definitions[type];
   if (!d) fail(404, "Recurso no encontrado.");
+  if (!data || typeof data !== "object" || Array.isArray(data)) fail(400, "Datos inválidos");
+  const allowed = ["nombre", "equipoId", "visibilidad", "estado", "datos"];
+  if (request && Object.keys(data).some((k) => !allowed.includes(k)))
+    fail(400, "La solicitud contiene campos no permitidos");
+  const nombre = String(data.nombre || "").trim();
+  if (!nombre || nombre.length > 200) fail(400, "Ingresa un nombre de hasta 200 caracteres");
+  data.nombre = nombre;
+  if (!data.equipoId && !["equipos", "modulos"].includes(type))
+    fail(400, "Selecciona el equipo de trabajo");
+  const visibilidad = String(data.visibilidad || "EQUIPO");
   if (
-    !data ||
-    typeof data !== "object" ||
-    typeof data.nombre !== "string" ||
-    !data.nombre.trim()
+    !["PRIVADA", "EQUIPO", "EMPRESA"].includes(visibilidad) ||
+    (visibilidad === "EMPRESA" && type !== "actividades") ||
+    (type === "solicitudes" && visibilidad !== "PRIVADA")
   )
-    fail(400, "Nombre requerido.");
-  if (
-    data.nombre.length > 200 ||
-    !data.datos ||
-    typeof data.datos !== "object" ||
-    Array.isArray(data.datos)
-  )
-    fail(400, "Registro inválido.");
+    fail(400, "Visibilidad no permitida para este módulo");
+  const raw = data.datos && typeof data.datos === "object" && !Array.isArray(data.datos) ? { ...data.datos } : fail(400, "Datos inválidos");
+  delete raw._rrhh;
+  delete raw._automatico;
+  delete raw._inventario;
+  const keys = d.fields.map((f) => f.key);
+  if (Object.keys(raw).some((k) => !keys.includes(k)))
+    fail(400, "La solicitud contiene campos no permitidos");
+  const out = {};
   for (const f of d.fields) {
-    const v = data.datos[f.key];
-    if (f.required && (v === undefined || v === null || v === ""))
-      fail(400, "Completa " + f.label + ".");
-    if (v === undefined || v === null || v === "") continue;
-    if (f.options && !f.options.includes(v))
-      fail(400, "Opción inválida: " + f.label);
-    if (
-      f.type === "number" &&
-      (!Number.isFinite(Number(v)) ||
-        (f.min !== undefined && Number(v) < f.min) ||
-        (f.max !== undefined && Number(v) > f.max))
-    )
-      fail(400, "Valor inválido: " + f.label);
-    if (["date", "datetime"].includes(f.type) && !Number.isFinite(+new Date(v)))
-      fail(400, "Fecha inválida: " + f.label);
+    let v = raw[f.key];
+    if (v === "" || v === null || v === undefined) {
+      if (f.required) fail(400, "Completa " + f.label);
+      continue;
+    }
+    if (f.type === "boolean") {
+      if (typeof v !== "boolean") fail(400, "Revisa " + f.label);
+    } else if (f.type === "number" || f.type === "user") {
+      const n = Number(v);
+      if (!Number.isSafeInteger(n) || n < (f.min ?? 1) || n > (f.max ?? Number.MAX_SAFE_INTEGER))
+        fail(400, "Valor numérico inválido");
+      v = n;
+    } else if (f.type === "list") {
+      if (!Array.isArray(v) || v.length > 100 || v.some((x) => !Number.isSafeInteger(x) || x <= 0))
+        fail(400, "Revisa " + f.label);
+      v = [...new Set(v)];
+    } else {
+      if (typeof v !== "string" || v.length > (f.type === "textarea" ? 8000 : 500))
+        fail(400, "Revisa " + f.label);
+      v = v.trim();
+      if (f.required && !v) fail(400, "Completa " + f.label);
+      if (f.type === "select" && !f.options?.includes(v)) fail(400, "Opción no permitida: " + f.label);
+      if (f.type === "ref" && !UUID.test(v)) fail(400, "Identificador inválido");
+      if (f.type === "datetime") {
+        if (!/^\d{4}-\d\d-\d\dT/.test(v) || !Number.isFinite(Date.parse(v))) fail(400, "Fecha inválida");
+        v = new Date(v).toISOString();
+      }
+      if (
+        f.type === "date" &&
+        (!/^\d{4}-\d\d-\d\d$/.test(v) || !Number.isFinite(Date.parse(v)) || new Date(v).toISOString().slice(0, 10) !== v)
+      )
+        fail(400, "Fecha inválida");
+      if (f.type === "url" && v) {
+        let url;
+        try {
+          url = new URL(v);
+        } catch {
+          fail(400, "URL inválida");
+        }
+        if (!["https:", "http:"].includes(url.protocol) || url.username || url.password) fail(400, "URL inválida");
+      }
+    }
+    out[f.key] = v;
   }
-  if (
-    type === "actividades" &&
-    new Date(data.datos.fin) <= new Date(data.datos.inicio)
-  )
-    fail(400, "El final debe ser posterior al inicio.");
+  if (JSON.stringify(out).length > 24000) fail(400, "El registro supera el tamaño permitido");
+  if (type === "actividades" && Date.parse(out.fin) <= Date.parse(out.inicio))
+    fail(400, "La finalización debe ser posterior al inicio");
+  // Se conservan las claves internas que el servidor mantiene (RRHH, inventario, detección automática).
+  for (const k of ["_rrhh", "_automatico", "_inventario"]) if (data.datos[k] !== undefined) out[k] = data.datos[k];
+  data.datos = out;
 }
 function catalog(s) {
   return {
@@ -1008,7 +1050,7 @@ async function createLab(file, options = {}) {
           return { id, retirado: true };
         }
         const data = clone(body.data);
-        validate(type, data);
+        validate(type, data, { request: true });
         if (
           !a.admin &&
           (data.equipoId !== a.equipoId ||

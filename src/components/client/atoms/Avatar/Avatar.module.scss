@@ -63,3 +63,9 @@
 .busy {
   background-color: #f44336;
 } // Rojo
+
+// Las iniciales toman el color de tinta calculado para el fondo del avatar
+// (blanco u oscuro), aunque una tabla u otro contenedor coloree los <span>.
+.avatar .initials {
+  color: inherit;
+}

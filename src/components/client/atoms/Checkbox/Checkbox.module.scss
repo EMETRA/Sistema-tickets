@@ -64,7 +64,7 @@
 
 // Cuando el checkbox está marcado
 .HiddenCheckbox:checked ~ .CheckboxButton {
-  background-color: var(--tickets-primary);
+  background-color: var(--tickets-primary-fill);
   border-color: #cecece;
   border-color: light-dark(#cecece, #2a3449);
 

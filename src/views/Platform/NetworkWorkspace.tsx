@@ -452,7 +452,7 @@ export function NetworkWorkspace() {
                                             ref={svg}
                                             viewBox={!physical ? fitBox : "0 0 1200 700"}
                                             style={{ width: zoom * 100 + "%" }}
-                                            role="img"
+                                            role="group"
                                             aria-label={"Red de " + graph.instalacion.nombre}
                                             onPointerMove={(e) => {
                                                 if (!drag.current) return;
@@ -547,17 +547,15 @@ export function NetworkWorkspace() {
                                                         transform={"translate(" + p.x + " " + p.y + ")"}
                                                         role="button"
                                                         tabIndex={0}
-                                                        aria-label={
-                                                            row.nombre +
-                                                            " " +
-                                                            String(row.datos.clase || row.datos.tipo || "")
-                                                        }
                                                         style={{
                                                             cursor: canEdit ? "grab" : "pointer",
                                                         }}
                                                         onClick={() => setSelected(row)}
                                                         onKeyDown={(e) => {
-                                                            if (e.key === "Enter") setSelected(row);
+                                                            if (e.key === "Enter" || e.key === " ") {
+                                                                e.preventDefault();
+                                                                setSelected(row);
+                                                            }
                                                             if (
                                                                 canEdit &&
                                                                 [
@@ -614,6 +612,10 @@ export function NetworkWorkspace() {
                                                             svg.current?.setPointerCapture(e.pointerId);
                                                         }}
                                                     >
+                                                        {/* Nombre accesible: el texto visible; el tipo de equipo como descripción. */}
+                                                        <desc>
+                                                            {String(row.datos.clase || row.datos.tipo || "")}
+                                                        </desc>
                                                         {(() => {
                                                             const clase = String(row.datos.clase || "EQUIPO");
                                                             const total = Number(row.datos.puertos) || 0;

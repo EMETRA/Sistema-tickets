@@ -122,8 +122,9 @@
   background: transparent;
   gap: 8px;
   border-radius: 999px;
+  // Solo el nombre: las iniciales del avatar conservan su tinta (blanca u oscura según el fondo).
   p,
-  span {
+  span:not([class*="initials"]) {
     font-size: 13px;
     font-weight: 500;
     color: var(--tickets-text);

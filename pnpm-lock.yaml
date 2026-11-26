@@ -43,7 +43,7 @@ dependencies:
     version: 3.0.5
   next:
     specifier: 16.1.6
-    version: 16.1.6(@babel/core@7.29.0)(react-dom@19.2.3)(react@19.2.3)(sass@1.98.0)
+    version: 16.1.6(@babel/core@7.29.0)(@playwright/test@1.64.0)(react-dom@19.2.3)(react@19.2.3)(sass@1.98.0)
   react:
     specifier: 19.2.3
     version: 19.2.3
@@ -73,6 +73,15 @@ dependencies:
     version: 5.0.12(@types/react@19.2.14)(react@19.2.3)
 
 devDependencies:
+  '@axe-core/playwright':
+    specifier: ^4.14.1
+    version: 4.14.1(playwright-core@1.64.0)
+  '@playwright/test':
+    specifier: ^1.64.0
+    version: 1.64.0
+  '@storybook/addon-a11y':
+    specifier: ^10.2.8
+    version: 10.2.8(storybook@10.2.8)
   '@storybook/nextjs-vite':
     specifier: ^10.2.8
     version: 10.2.8(@babel/core@7.29.0)(next@16.1.6)(react-dom@19.2.3)(react@19.2.3)(storybook@10.2.8)(typescript@5.9.3)(vite@7.3.1)
@@ -123,6 +132,16 @@ packages:
 
   /@adobe/css-tools@4.4.4:
     resolution: {integrity: sha512-Elp+iwUx5rN5+Y8xLt5/GRoG20WGoDCQ/1Fb+1LiGtvwbDavuSk0jhD/eZdckHAuzcDzccnkv+rEjyWfRx18gg==}
+    dev: true
+
+  /@axe-core/playwright@4.14.1(playwright-core@1.64.0):
+    resolution: {integrity: sha512-cSN1ijrWLnlOof22sPN4RtWGSoPpt7GzOVyOKomyhnPsy1fPNoRdBiJAUziuCRs8KoK50kKufiMUFt7itAuwOg==}
+    engines: {node: '>=22.12.0'}
+    peerDependencies:
+      playwright-core: '>= 1.0.0'
+    dependencies:
+      axe-core: 4.14.1
+      playwright-core: 1.64.0
     dev: true
 
   /@babel/code-frame@7.29.0:
@@ -1234,6 +1253,13 @@ packages:
       '@parcel/watcher-win32-x64': 2.5.6
     optional: true
 
+  /@playwright/test@1.64.0:
+    resolution: {integrity: sha512-oTN9FNYuN6bqQMwiho6jJKLCG2/QOYCixGXuCjRmzOq23eODeukuY2XiAVoVpAECbuezMt1MHQjAiQxK8F+Y+g==}
+    engines: {node: '>=20'}
+    hasBin: true
+    dependencies:
+      playwright: 1.64.0
+
   /@reduxjs/toolkit@2.11.2(react-redux@9.2.0)(react@19.2.3):
     resolution: {integrity: sha512-Kd6kAHTA6/nUpp8mySPqj3en3dm0tdMIgbttnQ1xFMVpufoj+ADi8pXLBsd4xzTRHQa7t/Jv8W5UnCuW4kuWMQ==}
     peerDependencies:
@@ -1485,6 +1511,16 @@ packages:
     resolution: {integrity: sha512-e7Mew686owMaPJVNNLs55PUvgz371nKgwsc4vxE49zsODpJEnxgxRo2y/OKrqueavXgZNMDVj3DdHFlaSAeU8g==}
     dev: false
 
+  /@storybook/addon-a11y@10.2.8(storybook@10.2.8):
+    resolution: {integrity: sha512-EW5MzPKNzyPorvodd416U2Np+zEdMPe+BSyomjm0oCXoC/6rDurf05H1pa99rZsrTDRrpog+HCz8iVa4XSwN5Q==}
+    peerDependencies:
+      storybook: ^10.2.8
+    dependencies:
+      '@storybook/global': 5.0.0
+      axe-core: 4.14.1
+      storybook: 10.2.8(@testing-library/dom@10.4.1)(prettier@3.10.1)(react-dom@19.2.3)(react@19.2.3)
+    dev: true
+
   /@storybook/builder-vite@10.2.8(storybook@10.2.8)(vite@7.3.1):
     resolution: {integrity: sha512-+6/Lwi7W0YIbzHDh798GPp0IHUYDwp0yv0Y1eVNK/StZD0tnv4/1C28NKyP+O7JOsFsuWI1qHiDhw8kNURugZw==}
     peerDependencies:
@@ -1554,7 +1590,7 @@ packages:
       '@storybook/builder-vite': 10.2.8(storybook@10.2.8)(vite@7.3.1)
       '@storybook/react': 10.2.8(react-dom@19.2.3)(react@19.2.3)(storybook@10.2.8)(typescript@5.9.3)
       '@storybook/react-vite': 10.2.8(react-dom@19.2.3)(react@19.2.3)(storybook@10.2.8)(typescript@5.9.3)(vite@7.3.1)
-      next: 16.1.6(@babel/core@7.29.0)(react-dom@19.2.3)(react@19.2.3)(sass@1.98.0)
+      next: 16.1.6(@babel/core@7.29.0)(@playwright/test@1.64.0)(react-dom@19.2.3)(react@19.2.3)(sass@1.98.0)
       react: 19.2.3
       react-dom: 19.2.3(react@19.2.3)
       storybook: 10.2.8(@testing-library/dom@10.4.1)(prettier@3.10.1)(react-dom@19.2.3)(react@19.2.3)
@@ -2665,6 +2701,11 @@ packages:
 
   /axe-core@4.11.1:
     resolution: {integrity: sha512-BASOg+YwO2C+346x3LZOeoovTIoTrRqEsqMa6fmfAV0P+U9mFr9NsyOEpiYvFjbc64NMrSswhV50WdXzdb/Z5A==}
+    engines: {node: '>=4'}
+    dev: true
+
+  /axe-core@4.14.1:
+    resolution: {integrity: sha512-FHfa+lmNjQZfJz1q8wKqIDwC6DExcHt/pkjNQb09a3NPjCKg2rhu5qb2S4r76ASyFNNtuFooJpZe37OgudVGtQ==}
     engines: {node: '>=4'}
     dev: true
 
@@ -4437,7 +4478,7 @@ packages:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
     dev: true
 
-  /next@16.1.6(@babel/core@7.29.0)(react-dom@19.2.3)(react@19.2.3)(sass@1.98.0):
+  /next@16.1.6(@babel/core@7.29.0)(@playwright/test@1.64.0)(react-dom@19.2.3)(react@19.2.3)(sass@1.98.0):
     resolution: {integrity: sha512-hkyRkcu5x/41KoqnROkfTm2pZVbKxvbZRuNvKXLRXxs3VfyO0WhY50TQS40EuKO9SW3rBj/sF3WbVwDACeMZyw==}
     engines: {node: '>=20.9.0'}
     hasBin: true
@@ -4459,6 +4500,7 @@ packages:
         optional: true
     dependencies:
       '@next/env': 16.1.6
+      '@playwright/test': 1.64.0
       '@swc/helpers': 0.5.15
       baseline-browser-mapping: 2.9.19
       caniuse-lite: 1.0.30001770
@@ -4654,7 +4696,6 @@ packages:
     resolution: {integrity: sha512-T9r+MZkTECl2+oUcZ26YgZzTrYidTsIhYYkJix+6iDOymOb1FB2RLLSOxRGnZGv5DStt+aduIVbt+E8WygXYpg==}
     engines: {node: '>=20'}
     hasBin: true
-    dev: true
 
   /playwright@1.64.0:
     resolution: {integrity: sha512-kVzTnYFYEyQ9RGzBjNCd2+yEqWmVbxl3AHPynv3qQ6JTjv4a+kwRcnqQwIpuP3NnrnIrE/Q6wWAIAvMfIE2/Yg==}
@@ -4662,7 +4703,6 @@ packages:
     hasBin: true
     dependencies:
       playwright-core: 1.64.0
-    dev: true
 
   /possible-typed-array-names@1.1.0:
     resolution: {integrity: sha512-/+5VFTchJDoVj3bhoqi6UeymcD00DAwb1nJwamzPvHEszJ4FpF6SNNbUbOS8yI56qHzdV8eK0qEfOSiodkTdxg==}
@@ -5986,7 +6026,7 @@ packages:
       image-size: 2.0.2
       magic-string: 0.30.21
       module-alias: 2.3.4
-      next: 16.1.6(@babel/core@7.29.0)(react-dom@19.2.3)(react@19.2.3)(sass@1.98.0)
+      next: 16.1.6(@babel/core@7.29.0)(@playwright/test@1.64.0)(react-dom@19.2.3)(react@19.2.3)(sass@1.98.0)
       storybook: 10.2.8(@testing-library/dom@10.4.1)(prettier@3.10.1)(react-dom@19.2.3)(react@19.2.3)
       ts-dedent: 2.2.0
       vite: 7.3.1(@types/node@20.19.33)(sass-embedded@1.97.3)(sass@1.98.0)

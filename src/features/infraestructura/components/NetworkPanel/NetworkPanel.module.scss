@@ -276,7 +276,7 @@
     display: block;
     height: 100%;
     border-radius: 3px;
-    background: var(--tickets-primary);
+    background: var(--tickets-primary-fill);
     &[data-level="mid"] {
       background: #d99a1e;
     }

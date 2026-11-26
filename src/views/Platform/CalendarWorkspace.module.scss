@@ -264,7 +264,7 @@
   flex-direction: column;
   gap: 5px;
   &[aria-current="date"] .dayNumber strong {
-    background: var(--tickets-primary);
+    background: var(--tickets-primary-fill);
     color: #fff;
     border-radius: 50%;
   }

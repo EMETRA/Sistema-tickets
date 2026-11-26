@@ -162,7 +162,7 @@
     color: var(--tickets-text);
   }
   &[aria-current="page"] {
-    background: var(--tickets-primary);
+    background: var(--tickets-primary-fill);
     color: #fff;
     --workspace-icon-accent: #ffffff26;
   }

@@ -103,7 +103,7 @@
 }
 .apply {
   border-color: var(--tickets-primary);
-  background: var(--tickets-primary);
+  background: var(--tickets-primary-fill);
   color: #fff;
   &:hover:not(:disabled) {
     background: var(--tickets-primary-hover);

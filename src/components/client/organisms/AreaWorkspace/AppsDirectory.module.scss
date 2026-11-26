@@ -78,6 +78,10 @@
   &:hover .arrow {
     transform: translateX(3px);
     color: var(--accent);
+    // En oscuro, el color del área se aclara para leerse sobre el fondo (≥ 4.5:1).
+    :global([data-theme="dark"]) & {
+      color: color-mix(in srgb, var(--accent), #fff 45%);
+    }
   }
 }
 .icon {
@@ -126,6 +130,10 @@
     &:hover {
       background: color-mix(in srgb, var(--accent) 8%, var(--tickets-surface));
       color: var(--accent);
+      // En oscuro, el color del área se aclara para leerse sobre el fondo (≥ 4.5:1).
+      :global([data-theme="dark"]) & {
+        color: color-mix(in srgb, var(--accent), #fff 45%);
+      }
     }
   }
 }
@@ -137,6 +145,10 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--accent);
+  // En oscuro, el color del área se aclara para leerse sobre el fondo (≥ 4.5:1).
+  :global([data-theme="dark"]) & {
+    color: color-mix(in srgb, var(--accent), #fff 45%);
+  }
   text-decoration: none;
   &:hover {
     text-decoration: underline;

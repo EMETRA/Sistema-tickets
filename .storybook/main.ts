@@ -7,7 +7,7 @@ const config: StorybookConfig = {
         "../src/theme/**/*.stories.@(ts|tsx)",
         "../src/features/**/*.stories.@(js|jsx|mjs|ts|tsx)",
     ],
-    addons: [],
+    addons: ["@storybook/addon-a11y"],
     framework: "@storybook/nextjs-vite",
     staticDirs: ["../public"],
     // Mismo alias que tsconfig («@/…» → src/), para que las historias usen los imports del panel.

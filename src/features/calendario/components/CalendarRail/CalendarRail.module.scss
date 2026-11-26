@@ -94,7 +94,7 @@
       height: 4px;
       margin-left: -2px;
       border-radius: 50%;
-      background: var(--tickets-primary);
+      background: var(--tickets-primary-fill);
     }
     &[aria-current="date"] {
       color: var(--tickets-primary);
@@ -102,7 +102,7 @@
       box-shadow: inset 0 0 0 1px var(--tickets-primary);
     }
     &[data-selected] {
-      background: var(--tickets-primary);
+      background: var(--tickets-primary-fill);
       color: #fff;
       font-weight: 700;
       &::after {
@@ -141,8 +141,7 @@
   justify-content: center;
   gap: 6px;
   border-radius: 8px;
-  background: #3d55d6;
-  background: light-dark(var(--tickets-primary), #4057d8);
+  background: var(--tickets-primary-fill);
   color: #fff;
   font-weight: 600;
   text-decoration: none;
@@ -195,8 +194,15 @@
   text-align: left;
   color: var(--tickets-text);
   cursor: pointer;
+  // Ya terminó: colores secundarios (legibles, ≥ 4.5:1) en lugar de transparencia.
   &[data-past] {
-    opacity: 0.55;
+    background: var(--tickets-surface-subtle);
+    border-left-color: var(--tickets-border-strong);
+    color: var(--tickets-text-secondary);
+    .time,
+    small {
+      color: var(--tickets-text-muted);
+    }
   }
   &:hover {
     filter: brightness(0.98);

@@ -85,7 +85,7 @@
     }
     &[data-current] {
       width: 20px;
-      background: var(--tickets-primary);
+      background: var(--tickets-primary-fill);
     }
   }
 }
@@ -115,8 +115,7 @@
 }
 .primary {
   border: 0;
-  background: #3d55d6;
-  background: light-dark(var(--tickets-primary), #4057d8);
+  background: var(--tickets-primary-fill);
   color: #fff;
   &:hover {
     filter: brightness(1.07);

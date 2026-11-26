@@ -49,3 +49,11 @@
   animation-duration: 0.01ms !important;
   animation-iteration-count: 1 !important;
 }
+
+/* Sin transiciones hasta que el panel termina de cargar: evita que el modo
+   oscuro o el tamaño de letra se vean «llegar» desde el tema claro. */
+:root:not([data-ready]) *,
+:root:not([data-ready]) *::before,
+:root:not([data-ready]) *::after {
+  transition: none !important;
+}

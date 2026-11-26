@@ -39,7 +39,7 @@
   &[aria-current="date"] {
     color: var(--tickets-primary);
     strong {
-      background: var(--tickets-primary);
+      background: var(--tickets-primary-fill);
       color: #fff;
       border-radius: 50%;
     }
@@ -171,4 +171,13 @@
     position: relative;
     min-height: 38px;
   }
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }

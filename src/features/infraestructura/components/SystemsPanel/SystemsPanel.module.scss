@@ -172,11 +172,12 @@
     --tone: var(--tickets-danger);
   }
   &[data-tone="warning"] {
-    --tone: #d99a1e;
+    --tone: var(--tickets-warning);
   }
+  // Sin monitoreo: borde punteado en lugar de transparencia (el texto sigue legible).
   &[data-tone="none"] {
     box-shadow: none;
-    opacity: 0.7;
+    border-style: dashed;
   }
   small {
     font-size: 10px;
@@ -376,8 +377,9 @@
     font-size: 11px;
     font-weight: 600;
   }
+  // Cerrado: texto secundario en lugar de transparencia.
   li[data-closed] {
-    opacity: 0.6;
+    color: var(--tickets-text-secondary);
   }
 }
 .timeline li {
@@ -411,7 +413,7 @@
     --tone: var(--tickets-danger);
   }
   &[data-tone="warning"] {
-    --tone: #d99a1e;
+    --tone: var(--tickets-warning);
   }
 }
 .rowText {

@@ -114,11 +114,11 @@
       border-radius: 5px;
     }
     &::-webkit-meter-optimum-value {
-      background: var(--tickets-primary);
+      background: var(--tickets-primary-fill);
       border-radius: 5px;
     }
     &::-moz-meter-bar {
-      background: var(--tickets-primary);
+      background: var(--tickets-primary-fill);
       border-radius: 5px;
     }
   }

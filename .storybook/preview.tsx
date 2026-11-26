@@ -67,6 +67,9 @@ const preview: Preview = {
         },
     ],
     parameters: {
+        // Panel «Accessibility» (axe) en cada historia; «todo» muestra los avisos sin bloquear.
+        // Cambiar a "error" cuando todas las historias heredadas estén corregidas.
+        a11y: { test: "todo" },
         controls: {
             matchers: {
                 color: /(background|color)$/i,

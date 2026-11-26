@@ -122,13 +122,15 @@ export function WeeklyCalendar({
                                         left: `calc(${(lane / lanes) * 100}% + 4px)`,
                                         width: `calc(${100 / lanes}% - 8px)`,
                                     }}
-                                    aria-label={`${record.nombre} · ${activityTime(record.datos.inicio)}–${activityTime(record.datos.fin)} · ${activityScope(record)}${meetingLink(record.datos.lugar) ? " · reunión virtual" : ""}`}
                                     title={`${record.nombre} · ${activityTime(record.datos.inicio)}–${activityTime(record.datos.fin)} · ${activityScope(record)}`}
                                     onClick={() => onSelect(record)}
                                 >
                                     <strong>
                                         {meetingLink(record.datos.lugar) && <VideoMark />}
                                         {record.nombre}
+                                        {meetingLink(record.datos.lugar) && (
+                                            <span className={styles.srOnly}> (reunión virtual)</span>
+                                        )}
                                     </strong>
                                     <small>
                                         {activityTime(record.datos.inicio)}–{activityTime(record.datos.fin)}

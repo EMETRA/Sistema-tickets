@@ -7,7 +7,7 @@ const { randomUUID } = require("node:crypto");
 const { chromium } = require("playwright");
 const { start } = require("../../scripts/laboratorio/iniciar.cjs");
 const root = path.resolve(__dirname, "../..");
-const load = require("./load-ts.cjs")(root);
+const load = require("../integracion/load-ts.cjs")(root);
 const { guatemalaDay } = load("src/platform/dates.ts");
 const { weekDays } = load("src/platform/calendar.ts");
 

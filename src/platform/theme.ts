@@ -169,6 +169,12 @@ export function useAccessibility(): AccessibilityPrefs {
     );
 }
 
+/** Aplica el tema y las preferencias guardadas (al hidratar y al cambiar de pestaña). */
+export function applyStoredPreferences() {
+    applyTheme(readTheme());
+    applyAccessibility(readAccessibility());
+}
+
 /** Reaplica las preferencias de accesibilidad (p. ej. tras cambiarlas en otra pestaña). */
 export function useAccessibilitySync() {
     const prefs = useAccessibility();

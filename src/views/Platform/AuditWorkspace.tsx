@@ -1,10 +1,13 @@
 "use client";
+import { statusLabel, statusTone } from "@/helpers/statusTone";
 import { startTransition, useEffect, useState } from "react";
 import { Button } from "@/components/client/atoms/Button";
 import { platformFetch } from "@/platform/client";
 import { displayDate } from "@/components/client/organisms/ResourceWorkspace/RecordDetail";
 import type { PageResult } from "@/platform/types";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
+import { AuditFeed } from "./AuditFeed";
+import { useProposalDesign } from "@/platform/proposal";
 type Audit = {
     id: string;
     actor: string;
@@ -20,6 +23,7 @@ type Audit = {
     confirmadoEn: string | null;
 };
 export function AuditWorkspace() {
+    const proposal = useProposalDesign();
     const [result, setResult] = useState<PageResult<Audit>>({
             items: [],
             total: 0,
@@ -86,7 +90,9 @@ export function AuditWorkspace() {
                         >
                             <option value="">Todos</option>
                             {["CORRECTO", "DENEGADO", "FALLIDO"].map((x) => (
-                                <option key={x}>{x}</option>
+                                <option key={x} value={x}>
+                                    {statusLabel(x)}
+                                </option>
                             ))}
                         </select>
                     </label>
@@ -104,6 +110,8 @@ export function AuditWorkspace() {
                 </p>
             ) : loading ? (
                 <p role="status">Consultando trazabilidad…</p>
+            ) : proposal ? (
+                <AuditFeed items={result.items} />
             ) : (
                 <div className={styles.tableRegion}>
                     <table className={styles.table}>
@@ -117,17 +125,29 @@ export function AuditWorkspace() {
                         </thead>
                         <tbody>
                             {result.items.map((r) => (
-                                <tr key={r.id}>
+                                <tr
+                                    key={r.id}
+                                    className={
+                                        statusTone(r.resultado) === "danger"
+                                            ? styles.rowAlert
+                                            : undefined
+                                    }
+                                >
                                     <td>
-                                        {displayDate(r.fecha)}
+                                        <strong>{r.actor}</strong>
                                         <br />
-                                        {r.actor}
+                                        <small className={styles.muted}>
+                                            {displayDate(r.fecha)}
+                                        </small>
                                     </td>
                                     <td>
-                                        {r.accion} · {r.tipo}
+                                        <strong>{statusLabel(r.accion)}</strong>{" "}
+                                        · {r.tipo}
                                         <br />
-                                        <small>{r.registroId}</small>
-                                        <details>
+                                        <small className={styles.muted}>
+                                            {r.registroId}
+                                        </small>
+                                        <details className={styles.inlineDetails}>
                                             <summary>Antes y después</summary>
                                             <div className={styles.grid}>
                                                 <pre className={styles.log}>
@@ -151,8 +171,11 @@ export function AuditWorkspace() {
                                         </details>
                                     </td>
                                     <td>
-                                        <span className={styles.chip}>
-                                            {r.resultado}
+                                        <span
+                                            className={styles.chip}
+                                            data-tone={statusTone(r.resultado)}
+                                        >
+                                            {statusLabel(r.resultado)}
                                         </span>
                                     </td>
                                     <td>

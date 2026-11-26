@@ -5,7 +5,7 @@
 .Dropzone {
     width: 100%;
     padding: 32px 24px;
-    border: 1px dashed #aabaff;
+    border: 1px dashed #aabaff; border: 1px dashed light-dark(#aabaff, #2a3449);
     border-radius: 10px;
     background-color: var(--tickets-surface-subtle);
     display: flex;

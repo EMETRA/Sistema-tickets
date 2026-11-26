@@ -1,7 +1,7 @@
 .headerContainer {
     width: 100%;
-    background-color: #FFFFFF;
-    border-bottom: 1px solid #E0E0E0;
+    background-color: var(--tickets-surface);
+    border-bottom: 1px solid var(--tickets-border);
     overflow: hidden;
 }
 
@@ -38,7 +38,7 @@
     margin-top: -60px; 
     border-width: 2px !important;
     border-color: #FFFFFF !important;
-    background-color: #FFFFFF;
+    background-color: var(--tickets-surface);
 }
 
 .textGroup {
@@ -50,7 +50,7 @@
     .userName {
         font-size: 24px;
         font-weight: 700;
-        color: #333333;
+        color: #333333; color: light-dark(#333333, #e5eaf5);
         margin: 0;
     }
 

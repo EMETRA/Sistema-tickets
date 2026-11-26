@@ -1,7 +1,7 @@
 @use "../../../../theme/surfaces.scss" as surfaces;
 .panelCard {
-    background-color: #FFFFFF;
-    border: 1px solid #E0E0E0;
+    background-color: var(--tickets-surface);
+    border: 1px solid var(--tickets-border);
     border-radius: 16px;
     padding: 40px;
     display: flex;

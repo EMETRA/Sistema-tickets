@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { meetingLink } from "@/platform/meeting";
 import type { PlatformRecord } from "@/platform/types";
 import {
     activitiesForDay,
@@ -77,7 +78,7 @@ export function WeeklyCalendar({
                                             data-scope={activityScope(record)}
                                             onClick={() => onSelect(record)}
                                         >
-                                            <strong>{record.nombre}</strong>
+                                            <strong>{meetingLink(record.datos.lugar) && <VideoMark />}{record.nombre}</strong>
                                             <small>
                                                 Actividad de varios días
                                             </small>
@@ -146,11 +147,11 @@ export function WeeklyCalendar({
                                     left: `calc(${(lane / lanes) * 100}% + 4px)`,
                                     width: `calc(${100 / lanes}% - 8px)`,
                                 }}
-                                aria-label={`${record.nombre} · ${activityTime(record.datos.inicio)}–${activityTime(record.datos.fin)} · ${activityScope(record)}`}
+                                aria-label={`${record.nombre} · ${activityTime(record.datos.inicio)}–${activityTime(record.datos.fin)} · ${activityScope(record)}${meetingLink(record.datos.lugar) ? " · reunión virtual" : ""}`}
                                 title={`${record.nombre} · ${activityTime(record.datos.inicio)}–${activityTime(record.datos.fin)} · ${activityScope(record)}`}
                                 onClick={() => onSelect(record)}
                             >
-                                <strong>{record.nombre}</strong>
+                                <strong>{meetingLink(record.datos.lugar) && <VideoMark />}{record.nombre}</strong>
                                 <small>
                                     {activityTime(record.datos.inicio)}–
                                     {activityTime(record.datos.fin)}
@@ -170,5 +171,14 @@ export function WeeklyCalendar({
                 ))}
             </div>
         </div>
+    );
+}
+
+function VideoMark() {
+    return (
+        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ marginRight: 4, verticalAlign: "-1px" }}>
+            <rect x="3" y="6" width="13" height="12" rx="2.5" />
+            <path d="m16 10.5 5-3v9l-5-3" />
+        </svg>
     );
 }

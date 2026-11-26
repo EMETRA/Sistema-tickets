@@ -47,11 +47,17 @@ function Metric({
 export function ServerMonitor({
     active,
     canReadLogs,
+    initialServer = "",
+    hidePicker = false,
 }: {
   active: boolean;
   canReadLogs: boolean;
+  /** Servidor elegido desde fuera (p. ej. la vista de flota). */
+  initialServer?: string;
+  /** Oculta el selector cuando la elección se hace en otra parte. */
+  hidePicker?: boolean;
 }) {
-    const [server, setServer] = useState("");
+    const [server, setServer] = useState(initialServer);
     const [snapshot, setSnapshot] = useState<ServerSnapshot | null>(null);
     const [revision, setRevision] = useState(0);
     const [logs, setLogs] = useState(false);
@@ -119,7 +125,7 @@ export function ServerMonitor({
     return (
         <div className={styles.monitor}>
             <section className={styles.overview} aria-label="Servidor y observación">
-                <div className={styles.serverPicker}>
+                <div className={styles.serverPicker} hidden={hidePicker}>
                     <PlatformField
                         field={{
                             key: "servidorId",

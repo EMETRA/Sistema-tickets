@@ -1,4 +1,5 @@
 "use client";
+import { statusLabel, statusTone } from "@/helpers/statusTone";
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/client/atoms/Button";
 import { usePlatform } from "@/platform/context";
@@ -10,8 +11,19 @@ import {
     resourceValue,
 } from "@/platform/resources";
 import { RecordEditor } from "./RecordEditor";
+import { useProposalDesign } from "@/platform/proposal";
 import { RecordDetail, displayDate } from "./RecordDetail";
 import styles from "../../templates/PlatformPage/PlatformPage.module.scss";
+// Filtros rápidos por estado (el API acepta ?estado=).
+const STATE_FILTERS: Record<string, [string, string][]> = {
+    solicitudes: [
+        ["PENDIENTE", "Pendientes"],
+        ["APROBADA_PENDIENTE_CUENTA", "Aprobadas sin cuenta"],
+        ["ATENDIDA", "Atendidas"],
+        ["RECHAZADA", "Rechazadas"],
+        ["", "Todas"],
+    ],
+};
 export function ResourceWorkspace({
     group,
     initialType,
@@ -30,6 +42,7 @@ export function ResourceWorkspace({
     extraActions?: React.ReactNode;
 }) {
     const { data } = usePlatform();
+    const proposal = useProposalDesign();
     const options = Object.entries(data!.definitions).filter(
         ([id, d]) => d.group === group && (!types || types.includes(id)),
     );
@@ -49,11 +62,41 @@ export function ResourceWorkspace({
         [editing, setEditing] = useState<PlatformRecord | null | undefined>(
             undefined,
         ),
-        [message, setMessage] = useState("");
+        [message, setMessage] = useState(""),
+        // Propuesta: las solicitudes abren en «Pendientes», la pregunta diaria.
+        [estado, setEstado] = useState(
+            proposal && type === "solicitudes" ? "PENDIENTE" : "",
+        );
+    const stateFilters = proposal ? STATE_FILTERS[type] : undefined;
     const rawDef = data!.definitions[type],
         def = rawDef ? resourceDefinition(type, rawDef) : null,
         copy = RESOURCE_PRESENTATION[type];
     const refresh = useCallback(() => setRevision((v) => v + 1), []);
+    // Propuesta: las listas no traen nombres de personas ni de referencias; se resuelven aquí.
+    const [refNames, setRefNames] = useState<Record<string, string>>({});
+    const refFields = proposal && copy && def
+        ? copy.columns
+              .map((c) => def.fields.find((f) => f.key === c.key))
+              .filter((f): f is NonNullable<typeof f> => !!f && (f.type === "user" || (f.type === "ref" && !!f.resource)))
+        : [];
+    const refKey = refFields.map((f) => f.key + ":" + (f.resource || f.type)).join(",");
+    useEffect(() => {
+        if (!refKey) return;
+        const controller = new AbortController();
+        const sources = [...new Set(refFields.map((f) => (f.type === "user" ? "/people?q=" : `/records/${f.resource}?limit=100`)))];
+        Promise.all(
+            sources.map((path) =>
+                platformFetch<PageResult<PlatformRecord> | { id: number | string; nombre: string }[]>(path, { signal: controller.signal })
+                    .then((r) => (Array.isArray(r) ? r : r.items))
+                    .catch(() => []),
+            ),
+        ).then((lists) => {
+            if (controller.signal.aborted) return;
+            setRefNames(Object.fromEntries(lists.flat().map((x) => [String(x.id), x.nombre])));
+        });
+        return () => controller.abort();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [refKey]);
     useEffect(() => {
         if (!def?.actions.LEER) return;
         const controller = new AbortController();
@@ -66,6 +109,7 @@ export function ResourceWorkspace({
                 q: query,
             });
             if (scopeEquipoId) params.set("equipoId", scopeEquipoId);
+            if (estado && STATE_FILTERS[type]) params.set("estado", estado);
             platformFetch<PageResult<PlatformRecord>>(
                 `/records/${type}?${params}`,
                 { signal: controller.signal },
@@ -84,7 +128,7 @@ export function ResourceWorkspace({
             clearTimeout(timer);
             controller.abort();
         };
-    }, [type, def?.actions.LEER, query, offset, revision, scopeEquipoId]);
+    }, [type, def?.actions.LEER, query, offset, revision, scopeEquipoId, estado]);
     if (!def)
         return (
             <p className={styles.card}>
@@ -144,6 +188,21 @@ export function ResourceWorkspace({
                         <input className={styles.control + " " + styles.search} type="search"
                             aria-label="Buscar registro" placeholder="Buscar registro" value={query}
                             onChange={(e) => { setQuery(e.target.value); setOffset(0); }} />
+                        {stateFilters && (
+                            <div className={styles.stateFilters} role="group" aria-label="Filtrar por estado">
+                                {stateFilters.map(([value, label]) => (
+                                    <button
+                                        key={value}
+                                        type="button"
+                                        aria-pressed={estado === value}
+                                        data-tone={value ? statusTone(value) : undefined}
+                                        onClick={() => { setEstado(value); setOffset(0); }}
+                                    >
+                                        {label}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
                         {!loading && !error && <p className={styles.muted} role="status">
                             {result.total} {result.total === 1 ? "registro" : "registros"}
                         </p>}
@@ -195,10 +254,25 @@ export function ResourceWorkspace({
                                             {copy ? (
                                                 copy.columns.map((c) => (
                                                     <td key={c.key}>
-                                                        {resourceValue(
-                                                            row,
-                                                            c.key,
-                                                            data!.teams,
+                                                        {c.key === "estado" ? (
+                                                            <span
+                                                                className={styles.chip}
+                                                                data-tone={statusTone(row.estado)}
+                                                            >
+                                                                {statusLabel(row.estado)}
+                                                            </span>
+                                                        ) : (
+                                                            (refFields.some((f) => f.key === c.key) &&
+                                                                refNames[String(row.datos[c.key])]) ||
+                                                            (proposal &&
+                                                                def.fields.find((f) => f.key === c.key)?.type === "select" &&
+                                                                !!row.datos[c.key] &&
+                                                                statusLabel(String(row.datos[c.key]))) ||
+                                                            resourceValue(
+                                                                row,
+                                                                c.key,
+                                                                data!.teams,
+                                                            )
                                                         )}
                                                     </td>
                                                 ))
@@ -209,10 +283,12 @@ export function ResourceWorkspace({
                                                             className={
                                                                 styles.chip
                                                             }
+                                                            data-tone={statusTone(
+                                                                row.estado,
+                                                            )}
                                                         >
-                                                            {row.estado.replaceAll(
-                                                                "_",
-                                                                " ",
+                                                            {statusLabel(
+                                                                row.estado,
                                                             )}
                                                         </span>
                                                     </td>

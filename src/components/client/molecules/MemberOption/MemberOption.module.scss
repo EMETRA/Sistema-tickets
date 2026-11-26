@@ -15,12 +15,12 @@
     }
 
     &.active {
-        background-color: #F0F2F5;
+        background-color: #F0F2F5; background-color: light-dark(#F0F2F5, #131e32);
     }
 }
 
 .name {
-    color: #333333;
+    color: #333333; color: light-dark(#333333, #e5eaf5);
     font-weight: 500;
     margin: 0;
     white-space: nowrap;

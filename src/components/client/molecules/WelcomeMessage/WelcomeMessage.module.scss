@@ -14,7 +14,7 @@
 }
 
 .name {
-  color: #AACC00;
+  color: #AACC00; color: light-dark(#AACC00, #deee8b);
   margin-left: 10px;
   font-size: 1.5rem; 
 }
@@ -28,7 +28,7 @@
 .caption {
   margin-top: 8px;
   margin-bottom: 8px;
-  color: #666666;
+  color: #666666; color: light-dark(#666666, #e5eaf5);
   text-align: center;
   justify-content: center;
   align-self: center;

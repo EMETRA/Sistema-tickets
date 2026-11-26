@@ -5,6 +5,7 @@ import { Icon } from "../../atoms/Icon";
 import { Text } from "../../atoms/Text";
 import type { NewsResultCardProps } from "./types";
 import styles from "./NewsResultCard.module.scss";
+import { StateNotice } from "../../molecules/StateNotice";
 
 /**
  * Componente NewsResultCard - Resultado de publicar, programar o guardar una noticia (éxito o error).
@@ -21,43 +22,35 @@ const NewsResultCard: React.FC<NewsResultCardProps> = ({
     className,
 }) => {
     const isSuccess = status === "success";
-
     return (
-        <div
-            className={classNames(styles.NewsResultCard, className)}
-            role={isSuccess ? "status" : "alert"}
+        <StateNotice
+            tone={isSuccess ? "success" : "error"}
+            title={title}
+            description={description}
+            reference={typeof reference === "string" ? reference : undefined}
+            helpTopic={isSuccess ? undefined : "comunicacion"}
+            actions={
+                <>
+                    <Button onClick={primaryAction.onClick}>{primaryAction.label}</Button>
+                    {secondaryAction && (
+                        <Button variant="outlined" onClick={secondaryAction.onClick}>
+                            {secondaryAction.label}
+                        </Button>
+                    )}
+                </>
+            }
         >
-            <span className={classNames(styles.statusIcon, isSuccess ? styles.success : styles.error)} aria-hidden="true">
-                {isSuccess ? <Icon name="check-solid" size={20} color="#FFFFFF" /> : "!"}
-            </span>
-
-            <h2 className={styles.title}>{title}</h2>
-            <Text variant="caption" className={styles.description}>{description}</Text>
-
-            {badge && (
-                <span className={styles.badge}>
-                    <Icon name="clock-rotate-left-solid" size={11} color="#B45309" />
-                    {badge}
-                </span>
-            )}
-
-            {note && <Text variant="caption" className={styles.note}>{note}</Text>}
-
-            {reference && (
-                <div className={styles.reference}>{reference}</div>
-            )}
-
-            <div className={styles.actions}>
-                <Button rounded onClick={primaryAction.onClick}>
-                    {primaryAction.label}
-                </Button>
-                {secondaryAction && (
-                    <Button variant="outlined" color="neutral-light" rounded onClick={secondaryAction.onClick}>
-                        {secondaryAction.label}
-                    </Button>
+            <div className={classNames(styles.extra, className)}>
+                {badge && (
+                    <span className={styles.badge}>
+                        <Icon name="clock-rotate-left-solid" size={11} color="currentColor" />
+                        {badge}
+                    </span>
                 )}
+                {note && <Text variant="caption" className={styles.note}>{note}</Text>}
+                {reference && typeof reference !== "string" && <div className={styles.reference}>{reference}</div>}
             </div>
-        </div>
+        </StateNotice>
     );
 };
 

@@ -16,7 +16,7 @@
         width: 100%;
         min-width: 0;
         border: 1px solid var(--tickets-border);
-        background: #fff;
+        background: var(--tickets-surface);
         border-radius: 7px;
         padding: 10px 12px;
         font: inherit;
@@ -34,13 +34,13 @@
     overscroll-behavior: contain;
     border: 1px solid var(--tickets-border);
     border-radius: 8px;
-    background: #fff;
+    background: var(--tickets-surface);
     label {
         display: flex;
         align-items: flex-start;
         gap: 10px;
         padding: 11px 12px;
-        border-bottom: 1px solid #edf0f7;
+        border-bottom: 1px solid #edf0f7; border-bottom: 1px solid light-dark(#edf0f7, #2a3449);
         cursor: pointer;
         &:last-child {
             border-bottom: 0;
@@ -70,11 +70,11 @@
             line-height: 1.5;
         }
         &:hover {
-            background: #f8faff;
+            background: var(--tickets-surface-subtle);
         }
     }
     .selected {
-        background: #f2f5ff;
+        background: #f2f5ff; background: light-dark(#f2f5ff, #13214a);
     }
     p {
         font-size: 12px;

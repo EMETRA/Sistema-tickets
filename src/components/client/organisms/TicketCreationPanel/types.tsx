@@ -87,4 +87,6 @@ export interface TicketCreationPanelProps {
    */
   className?: string;
   uploadProgress?: number; 
+  /** "dialog": formulario compacto para la ventana de creación. */
+  variant?: "page" | "dialog";
 }

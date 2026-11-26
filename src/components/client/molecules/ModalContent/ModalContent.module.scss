@@ -1,6 +1,6 @@
 .modalCard {
     max-width: 350px;
-    width: 90vw;
+    width: calc(90vw / var(--vp-zoom, 1));
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -25,13 +25,13 @@
         margin: 15px;
         font-size: 20px;
         font-weight: 600;
-        color: #333333;
+        color: #333333; color: light-dark(#333333, #e5eaf5);
         margin-bottom: 10px;
     }
 
     .description {
         margin: 0;
-        color: #666666;
+        color: #666666; color: light-dark(#666666, #e5eaf5);
         line-height: 1.5;
         font-size: 15px;
     }
@@ -51,7 +51,7 @@
 // ============================================
 
 .compactCard {
-    width: min(27.5rem, 90vw);
+    width: min(27.5rem, calc(90vw / var(--vp-zoom, 1)));
     display: flex;
     flex-direction: column;
     gap: 1.75rem;
@@ -73,14 +73,14 @@
     margin: 0;
     font-size: 1.125rem;
     font-weight: 700;
-    color: #1a1a1a;
+    color: #1a1a1a; color: light-dark(#1a1a1a, #e5eaf5);
 }
 
 .compactDescription.compactDescription {
     margin: 0;
     font-size: 0.8125rem;
     line-height: 1.45;
-    color: #666666;
+    color: #666666; color: light-dark(#666666, #e5eaf5);
 }
 
 .compactActions {

@@ -47,6 +47,16 @@ Las cuentas nuevas aprobadas son ficticias y muestran `SIMULADA_SIN_ENVIO` en la
 
 El catálogo de las aplicaciones institucionales permanece vacío en este entorno. Noticias, Juzgado y los procesos de los módulos heredados requieren sus servicios; no se devuelven resultados de publicación, notificación o resolución falsamente exitosos. Sus pruebas automáticas con contratos controlados siguen disponibles en `test/integracion`.
 
+## Propuesta «Panel institucional» y catálogo de ejemplo
+
+En **Cambiar perfil / controles**:
+
+- **Catálogo de aplicaciones institucionales**: carga (o vacía) el catálogo de ejemplo con Informática, RRHH, Recaudación, Financiero, Jurídico, Juzgado y Comunicación para recorrer el apartado de Aplicaciones. Los módulos que dependen de servicios de la oficina siguen mostrando su error explícito.
+- **Datos de ejemplo de Informática**: simula Activos Fijos (8 bienes ficticios, con y sin ficha técnica) y agrega fichas, mantenimientos vencidos y próximos, ubicaciones, movimientos, una red de 8 dispositivos con enlaces de fibra, UTP e inactivos, un portafolio de 5 sistemas con repositorios, despliegues (correctos, fallidos y revertidos), incidentes y esquemas, una agenda de Informática alrededor de hoy y 10 empleados de RRHH adicionales (sin cuenta o sin unidad), para recorrer **Activos y mantenimiento**, **Red y cableado**, **Aplicaciones y sistemas**, **Servidores**, **Calendario** y **Personal y equipos**. Se retiran con el mismo control sin tocar el resto de los datos.
+- **Diseño del panel**: alterna entre el diseño actual y la propuesta. También se alterna desde la franja amarilla (**Diseño: actual ⇄ ver propuesta**). Es una cookie local del laboratorio (`panel_propuesta`); sin ella el Panel muestra el diseño actual.
+
+La propuesta reorganiza la navegación por espacios (Mi trabajo, Aplicaciones, Informática), agrega el buscador global (**⌘K**, **Ctrl+K** o **/**), un Inicio tipo lanzador por rol, la portada de cada área y el directorio de aplicaciones.
+
 ## Datos, reinicios y fallos simulados
 
 Los cambios se guardan en **`.laboratorio/estado.json`**, excluido de Git. Detener y volver a iniciar conserva registros, archivos, conversaciones y el historial de esta simulación. Volver a seleccionar un perfil al iniciar una nueva sesión.

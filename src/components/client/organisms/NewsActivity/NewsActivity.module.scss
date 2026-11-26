@@ -1,9 +1,9 @@
 .card {
     padding: 20px 24px;
-    background: #fff;
-    border: 1px solid #e0e6f0;
+    background: var(--tickets-surface);
+    border: 1px solid #e0e6f0; border: 1px solid light-dark(#e0e6f0, #2a3449);
     border-radius: 16px;
-    color: #263b56;
+    color: #263b56; color: light-dark(#263b56, #a3b9d6);
     h2 {
         margin: 0 0 18px;
         font-size: 16px;
@@ -17,7 +17,7 @@
     font-size: 13px;
     line-height: 1.5;
     dt {
-        color: #627590;
+        color: #627590; color: light-dark(#627590, #b0bbc9);
         font-size: 12px;
         margin-bottom: 3px;
     }
@@ -28,12 +28,12 @@
     dd span {
         display: block;
         font-weight: 600;
-        color: #263b56;
+        color: #263b56; color: light-dark(#263b56, #a3b9d6);
     }
     time {
         display: block;
         font-size: 11px;
-        color: #627590;
+        color: #627590; color: light-dark(#627590, #b0bbc9);
         margin-top: 2px;
     }
 }

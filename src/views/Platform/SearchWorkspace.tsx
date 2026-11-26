@@ -1,10 +1,13 @@
 "use client";
+import { statusLabel, statusTone } from "@/helpers/statusTone";
 import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/client/atoms/Button";
 import { platformFetch } from "@/platform/client";
 import type { PlatformRecord } from "@/platform/types";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
+import { RecordSearch } from "@/components/client/organisms/RecordSearch";
+import { useProposalDesign } from "@/platform/proposal";
 type Result = {
     consulta: string;
     grupos: {
@@ -17,6 +20,11 @@ type Result = {
     limitePorGrupo: number;
 };
 export function SearchWorkspace() {
+    const proposal = useProposalDesign();
+    if (proposal) return <RecordSearch />;
+    return <LegacySearch />;
+}
+function LegacySearch() {
     const [q, setQuery] = useState(""),
         [result, setResult] = useState<Result | null>(null),
         [error, setError] = useState(""),
@@ -94,8 +102,11 @@ export function SearchWorkspace() {
                                         >
                                             {item.nombre}
                                         </Link>
-                                        <span className={styles.chip}>
-                                            {item.estado}
+                                        <span
+                                            className={styles.chip}
+                                            data-tone={statusTone(item.estado)}
+                                        >
+                                            {statusLabel(item.estado)}
                                         </span>
                                     </li>
                                 ))}

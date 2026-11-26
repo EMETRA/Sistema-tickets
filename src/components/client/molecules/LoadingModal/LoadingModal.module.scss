@@ -1,7 +1,7 @@
 @use "../../../../theme/colors.scss" as *;
 
 .LoadingModal {
-    width: min(19.5rem, 90vw);
+    width: min(19.5rem, calc(90vw / var(--vp-zoom, 1)));
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -25,7 +25,7 @@
     margin: 0;
     font-size: 0.9375rem;
     font-weight: 700;
-    color: $negro-2;
+    color: var(--tickets-text);
 }
 
 .description.description {

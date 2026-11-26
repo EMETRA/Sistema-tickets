@@ -5,10 +5,13 @@ import { useAppsCatalogContext } from "@/context/AppsCatalogContext";
 import { resolveIconFile } from "@/components/client/atoms/Icon/types";
 import { getMainApps } from "@/config/apps-catalog";
 import { HomeState } from "../Home/HomeHeading";
+import { AppsDirectory } from "@/components/client/organisms/AreaWorkspace";
+import { useProposalDesign } from "@/platform/proposal";
 
 export function Applications() {
     const router = useRouter();
     const { catalog, loading, error, refetch } = useAppsCatalogContext();
+    const proposal = useProposalDesign();
     if (loading) return <HomeState loading message="Cargando aplicaciones…" />;
     if (error)
         return (
@@ -17,6 +20,8 @@ export function Applications() {
                 onRetry={() => void refetch()}
             />
         );
+    if (proposal && catalog && Object.keys(catalog).length)
+        return <AppsDirectory catalog={catalog} />;
     return (
         <AppsGrid
             title="Aplicaciones autorizadas"

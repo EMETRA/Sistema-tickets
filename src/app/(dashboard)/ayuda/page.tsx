@@ -1,11 +1,25 @@
 "use client";
 import Link from "next/link";
 import { usePlatform } from "@/platform/context";
+import { startTour } from "@/platform/tour";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
 export default function HelpPage() {
     const { data } = usePlatform();
     return (
         <section className={styles.page}>
+            <article className={styles.card}>
+                <h2>Primeros pasos</h2>
+                <p className={styles.muted}>
+                    Un recorrido de un minuto te muestra el menú, la búsqueda,
+                    cómo crear un ticket y dónde ajustar el tamaño de la letra o
+                    el modo oscuro.
+                </p>
+                <div className={styles.actions}>
+                    <button type="button" className={styles.link} onClick={startTour}>
+                        Ver recorrido guiado
+                    </button>
+                </div>
+            </article>
             <article className={styles.card}>
                 <h2>Solicitar ayuda a Informática</h2>
                 <p className={styles.muted}>

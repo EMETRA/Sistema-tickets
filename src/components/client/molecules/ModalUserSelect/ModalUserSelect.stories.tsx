@@ -3,7 +3,13 @@ import { ModalUserSelect } from "./ModalUserSelect";
 import { Button } from "../../atoms/Button";
 import { Text } from "../../atoms/Text";
 import { useEffect, useState } from "react";
-import { AssignableUser, getAssignableUsersDummy } from "@/api/graphql/queries/getAssignableUsers";
+
+// El módulo de datos ficticios original ya no existe; la historia usa los suyos.
+type AssignableUser = { id: string; workstation: string; userInfo: { userName: string } };
+const getAssignableUsersDummy = async (): Promise<AssignableUser[]> => [
+    { id: "1", workstation: "Soporte técnico", userInfo: { userName: "Técnico ficticio" } },
+    { id: "2", workstation: "Desarrollo", userInfo: { userName: "Desarrolladora ficticia" } },
+];
 
 const meta: Meta<typeof ModalUserSelect> = {
     title: "Molecules/ModalUserSelect",

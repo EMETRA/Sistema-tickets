@@ -5,9 +5,9 @@
     flex-direction: column;
     gap: 0.25rem;
     padding: 1rem;
-    border: 1px solid $gris-2;
+    border: 1px solid var(--tickets-border);
     border-radius: 0.5rem;
-    background-color: #F9FAFC;
+    background-color: #F9FAFC; background-color: light-dark(#F9FAFC, #131f38);
     font-family: var(--font-montserrat), sans-serif;
 }
 

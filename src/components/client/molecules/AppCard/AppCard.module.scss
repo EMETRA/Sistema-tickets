@@ -18,7 +18,7 @@
   font: inherit;
   text-align: left;
   cursor: pointer;
-  &:hover { border-color: #bac7ee; background: var(--tickets-surface-subtle); }
+  &:hover { border-color: #bac7ee; border-color: light-dark(#bac7ee, #2a3449); background: var(--tickets-surface-subtle); }
   &:focus-visible { outline: 2px solid var(--tickets-primary); outline-offset: 2px; }
 }
 .icon {

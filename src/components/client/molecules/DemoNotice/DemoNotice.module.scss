@@ -1,8 +1,8 @@
 .notice {
   padding: 14px 18px;
-  color: #78520b;
-  background: #fff6e5;
-  border: 1px solid #ebd7ad;
+  color: #78520b; color: light-dark(#78520b, #eecc8b);
+  background: #fff6e5; background: light-dark(#fff6e5, #413624);
+  border: 1px solid #ebd7ad; border: 1px solid light-dark(#ebd7ad, #2a3449);
   border-radius: 10px;
   font-size: 12px;
   line-height: 1.8;

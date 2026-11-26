@@ -1,17 +1,17 @@
 //Fondos
-$background: #F4F6FB;
+$background: var(--tickets-background, #F4F6FB);
 
-$card-background: #FFFFFF;
-$secondary-card-background: #F8FAFF;
+$card-background: var(--tickets-surface, #FFFFFF);
+$secondary-card-background: var(--tickets-surface-subtle, #F8FAFF);
 
-$input-background: #FFFFFF;
+$input-background: var(--tickets-surface, #FFFFFF);
 
-$navbar-background: #FFFFFF;
+$navbar-background: var(--tickets-surface, #FFFFFF);
 
 // Textos
-$primary-text: #263B58;
-$secondary-text: #61728B;
-$tertiary-text: #75849B;
+$primary-text: var(--tickets-text, #263B58);
+$secondary-text: var(--tickets-text-secondary, #61728B);
+$tertiary-text: var(--tickets-text-muted, #75849B);
 $cuaternary-text: #CCCCCC;
 $quintary-text: #0F1E7C;
 $sub-text: #B1B1B1;

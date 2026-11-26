@@ -15,6 +15,7 @@ export const UserMenu = ({
     status,
     className,
     profilePath,
+    settingsPath,
     onChangeView,
 }: UserMenuProps) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -61,7 +62,7 @@ export const UserMenu = ({
                     aria-label="Menú de usuario"
                     aria-expanded={isMenuOpen}
                     size={20}
-                    iconColor="#000000"
+                    iconColor="var(--tickets-text)"
                     className={classNames(styles.chevron, {
                         [styles.chevronOpen]: isMenuOpen,
                     })}
@@ -78,6 +79,17 @@ export const UserMenu = ({
                                     onClick={() => setIsMenuOpen(false)}
                                 >
                                     Mi perfil
+                                </Link>
+                            </li>
+                        )}
+                        {settingsPath && (
+                            <li>
+                                <Link
+                                    href={settingsPath}
+                                    className={styles.menuItem}
+                                    onClick={() => setIsMenuOpen(false)}
+                                >
+                                    Ajustes y apariencia
                                 </Link>
                             </li>
                         )}

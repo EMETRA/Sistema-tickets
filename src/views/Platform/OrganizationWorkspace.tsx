@@ -15,7 +15,10 @@ import {
     type WorkspaceTab,
 } from "./WorkspaceNavigation";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
+import { PeopleDirectoryView, TeamsBoard } from "@/components/client/organisms/PeoplePanel";
+import { useProposalDesign } from "@/platform/proposal";
 function PeopleDirectory() {
+    const proposal = useProposalDesign();
     const [people, setPeople] = useState<OrganizationPerson[] | null>(null),
         [error, setError] = useState(""),
         [revision, setRevision] = useState(0);
@@ -37,6 +40,18 @@ function PeopleDirectory() {
             });
         return () => controller.abort();
     }, [revision]);
+    if (proposal)
+        return error ? (
+            <p role="alert" className={styles.error}>
+                {error}
+            </p>
+        ) : people ? (
+            <PeopleDirectoryView people={people} onRefresh={() => setRevision((v) => v + 1)} />
+        ) : (
+            <p role="status" className={styles.muted}>
+                Consultando el personal de RRHH…
+            </p>
+        );
     return (
         <section className={styles.listPanel}>
             <div className={styles.toolbar}>
@@ -97,7 +112,9 @@ function Responsibilities() {
 }
 export function OrganizationWorkspace() {
     const { data } = usePlatform();
+    const proposal = useProposalDesign();
     const [revision, setRevision] = useState(0);
+    const [teamsTable, setTeamsTable] = useState(false);
     const tabs: WorkspaceTab[] = [];
     if (data?.actor.admin)
         tabs.push({
@@ -147,6 +164,9 @@ export function OrganizationWorkspace() {
                             />
                         </details>
                     )}
+                    {proposal && !teamsTable ? (
+                        <TeamsBoard revision={revision} onShowTable={() => setTeamsTable(true)} />
+                    ) : (
                     <ResourceWorkspace
                         key={revision}
                         group="organizacion"
@@ -155,6 +175,7 @@ export function OrganizationWorkspace() {
                         hideTabs
                         hideDescription
                     />
+                    )}
                 </>
             )}
         </section>

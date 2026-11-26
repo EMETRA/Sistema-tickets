@@ -1,5 +1,16 @@
 "use client";
 
+import { CreateTicketDialog } from "@/components/client/organisms/CreateTicketDialog";
+import { CommandPalette, type PaletteItem } from "@/components/client/organisms/CommandPalette";
+import { PanelSidebar, type PanelLink } from "@/components/client/organisms/PanelSidebar";
+import { useCommandPalette } from "@/store/useCommandPalette";
+import { rememberModule, useProposalDesign } from "@/platform/proposal";
+import { areaAccent, areaName } from "@/config/app-areas";
+import { spaceMeta } from "@/platform/spaces";
+import { useAccessibilitySync, useThemeSync } from "@/platform/theme";
+import { GuidedTourHost } from "../../organisms/GuidedTour";
+import { SpaceHeader } from "../../molecules/SpaceHeader";
+import { useCreateTicketDialog } from "@/store/useCreateTicketDialog";
 import { usePlatform } from "@/platform/context";
 import { PLATFORM_SECTIONS, platformSections } from "@/platform/navigation";
 import { usePathname, useRouter } from "next/navigation";
@@ -15,6 +26,7 @@ import {
     getSections,
     getAppPathMeta,
     buildSectionPath,
+    buildModulePath,
 } from "@/config/apps-catalog";
 import styles from "./SystemLayout.module.scss";
 import classNames from "classnames";
@@ -98,6 +110,10 @@ export const SystemLayout = ({
     ]);
 
     const platform = usePlatform();
+    useThemeSync();
+    useAccessibilitySync();
+    const showCreateTicket = useCreateTicketDialog((s) => s.show);
+    const canCreateTicket = canAccessPath(currentRole, "/tickets-creation");
     const navItems = getMenuByRole(currentRole)
         .filter(
             (page) =>
@@ -130,6 +146,91 @@ export const SystemLayout = ({
             href: `/home/${app.meta.id}`,
         }))
         : [];
+
+    // ── Propuesta «Panel institucional» (activable desde el laboratorio) ──
+    const proposal = useProposalDesign() && !!platform.data;
+    const showPalette = useCommandPalette((s) => s.show);
+    const workspaceLinks = workspaceNavigation
+        ? [...workspaceNavigation.primary, ...workspaceNavigation.secondary]
+        : [];
+    const pick = (path: string, label?: string) => {
+        const found = workspaceLinks.find((l) => l.path === path);
+        return found ? [{ ...found, label: label || found.label }] : [];
+    };
+    const staff = !!platform.data && (platform.data.actor.admin || platform.data.actor.mode !== "USUARIO");
+    const panelPrimary: PanelLink[] = [
+        { path: "/home", label: "Inicio", iconName: "house-solid" },
+        ...(platform.data?.capabilities.assign || platform.data?.capabilities.attend
+            ? pick("/espacio/asignacion", platform.data.capabilities.assign ? "Mesa de servicio" : "Mis asignados")
+            : []),
+        { path: "/mis-tickets", label: "Mis solicitudes", iconName: "ticket-solid" },
+        ...pick("/espacio/calendario"),
+    ];
+    const panelTools: PanelLink[] = workspaceLinks.filter(
+        (l) =>
+            l.path.startsWith("/espacio/") &&
+            !panelPrimary.some((p) => p.path === l.path) &&
+            l.path !== "/espacio/calendario",
+    );
+    const panelApps = catalog
+        ? Object.values(catalog).map((app) => ({
+            id: app.meta.id,
+            label: areaName(app.meta.title),
+            path: `/home/${app.meta.id}`,
+            iconName: app.meta.iconName,
+            accent: areaAccent(app.meta.id),
+            sections: Object.values(app.sections).map((section) => ({
+                path: buildSectionPath(app.meta.id, section.meta.id),
+                label: section.meta.title,
+                iconName: section.meta.iconName,
+            })),
+        }))
+        : [];
+    const paletteItems: PaletteItem[] = [
+        ...(canCreateTicket
+            ? [{ id: "accion-crear", label: "Crear ticket", hint: "Nueva solicitud a Informática", group: "Acciones" as const, icon: "ticket-solid", run: showCreateTicket, keywords: "nuevo solicitud soporte ayuda reportar" }]
+            : []),
+        ...panelPrimary.map((l) => ({ id: "ir-" + l.path, label: l.label, group: "Ir a" as const, icon: l.iconName, href: l.path })),
+        ...panelTools.map((l) => ({ id: "it-" + l.path, label: l.label, group: "Informática" as const, icon: l.iconName, href: l.path, hint: staff ? "Informática" : undefined })),
+        ...panelApps.map((a) => ({ id: "app-" + a.id, label: a.label, hint: `${a.sections.length} secciones`, group: "Aplicaciones" as const, icon: a.iconName, catalogIcon: true, accent: a.accent, href: a.path, keywords: "aplicaciones sistema" })),
+        ...(catalog
+            ? Object.values(catalog).flatMap((app) =>
+                Object.values(app.sections).flatMap((section) => [
+                    ...section.modules.map((module) => ({
+                        id: `mod-${app.meta.id}-${section.meta.id}-${module.id}`,
+                        label: module.title,
+                        hint: `${areaName(app.meta.title)} › ${section.meta.title}`,
+                        group: "Módulos" as const,
+                        icon: module.iconName,
+                        catalogIcon: true,
+                        accent: areaAccent(app.meta.id),
+                        href: buildModulePath(app.meta.id, section.meta.id, module.id),
+                        keywords: `${module.label} ${app.meta.label}`,
+                    })),
+                ]),
+            )
+            : []),
+    ];
+    const ticketScope = platform.data
+        ? platform.data.capabilities.assign
+            ? "cola"
+            : platform.data.capabilities.attend
+                ? "asignados"
+                : "creados"
+        : undefined;
+    // Recientes: los módulos de aplicaciones que la persona abre.
+    useEffect(() => {
+        if (!catalog || !pathname) return;
+        const [, home, appKey, sectionKey, moduleKey] = pathname.split("/");
+        if (home !== "home" || !appKey || !sectionKey || !moduleKey) return;
+        const module = catalog[appKey]?.sections[sectionKey]?.modules.find((m) => m.id === moduleKey);
+        if (module)
+            rememberModule({
+                path: pathname,
+                title: module.title,
+                area: `${areaName(catalog[appKey].meta.title)} › ${catalog[appKey].sections[sectionKey].meta.title}`,
+            });
+    }, [catalog, pathname]);
 
     const activePage = (() => {
         if (!pathname) return PAGES_CONFIG.home;
@@ -164,6 +265,18 @@ export const SystemLayout = ({
         return PAGES_CONFIG.home;
     })();
 
+    // Encabezado de espacio de la propuesta (solo pantallas con propósito conocido).
+    const proposalSpace = proposal && pathname ? spaceMeta(pathname, staff) : null;
+    const proposalTitle =
+        pathname === "/espacio/asignacion"
+            ? platform.data?.capabilities.assign
+                ? "Mesa de servicio"
+                : "Mis asignados"
+            : proposalSpace?.title || activePage.title;
+    const proposalIcon =
+        [...panelPrimary, ...panelTools].find((l) => l.path === pathname)?.iconName ||
+        (pathname === "/aplicaciones" ? "table-cells-large-solid" : activePage.iconName);
+
     const hasAccess =
         Boolean(token) &&
         canAccessPath(currentRole, pathname ?? "/home") &&
@@ -190,31 +303,45 @@ export const SystemLayout = ({
     return (
         <RoleProvider role={currentRole}>
             <AdministrativeConfirmation />
+            <GuidedTourHost autoStart={proposal} />
             {workspaceView.canChangeView && <WorkspaceViewSwitcher key={workspaceView.mode + String(viewDialogOpen)}
                 open={viewDialogOpen} mode={workspaceView.mode} onClose={closeViewDialog}
                 onApply={workspaceView.setMode} />}
-            <div data-workspace-shell className={classNames(styles.layout, className)}>
+            <div data-workspace-shell data-proposal={proposal || undefined} className={classNames(styles.layout, className)}>
                 <a href="#main-content" className={styles.skipLink}>
                     Ir al contenido
                 </a>
-                <SideBarNavigation
-                    items={workspaceNavigation?.primary || navItems}
-                    secondaryItems={secondaryItems}
-                    helpPath="/ayuda"
-                    sectionItems={sectionItems}
-                    applicationLabel={
-                        appId && catalog
-                            ? catalog[appId]?.meta.label
-                            : undefined
-                    }
-                    open={menuOpen}
-                    onClose={() => setMenuOpen(false)}
-                    onLogout={logout}
-                    activePath={pathname ? pathname : "/home"}
-                    onNavigate={(path) => router.push(path)}
-                    logoIcon={appId ? "house-solid" : "ticket-solid"}
-                    className={styles.sidebar}
-                />
+                {proposal ? (
+                    <PanelSidebar
+                        primary={panelPrimary}
+                        apps={panelApps}
+                        tools={panelTools}
+                        toolsLabel={platform.data?.actor.admin || ["TECNICO", "DESARROLLADOR", "DEVOPS", "ASIGNACION"].includes(platform.data?.actor.mode || "") ? "Informática" : "Herramientas"}
+                        activePath={pathname || "/home"}
+                        open={menuOpen}
+                        onClose={() => setMenuOpen(false)}
+                        onLogout={logout}
+                    />
+                ) : (
+                    <SideBarNavigation
+                        items={workspaceNavigation?.primary || navItems}
+                        secondaryItems={secondaryItems}
+                        helpPath="/ayuda"
+                        sectionItems={sectionItems}
+                        applicationLabel={
+                            appId && catalog
+                                ? catalog[appId]?.meta.label
+                                : undefined
+                        }
+                        open={menuOpen}
+                        onClose={() => setMenuOpen(false)}
+                        onLogout={logout}
+                        activePath={pathname ? pathname : "/home"}
+                        onNavigate={(path) => router.push(path)}
+                        logoIcon={appId ? "house-solid" : "ticket-solid"}
+                        className={styles.sidebar}
+                    />
+                )}
 
                 <div className={styles.container}>
                     <TopBar
@@ -222,24 +349,21 @@ export const SystemLayout = ({
                         applications={applicationLinks}
                         profilePath="/mi-perfil"
                         createTicketPath={
-                            canAccessPath(currentRole, "/tickets-creation")
-                                ? "/tickets-creation"
-                                : undefined
+                            canCreateTicket ? "/tickets-creation" : undefined
+                        }
+                        onSearch={proposal ? showPalette : undefined}
+                        onCreateTicket={
+                            pathname === "/tickets-creation"
+                                ? undefined
+                                : showCreateTicket
                         }
                         notificationsPath="/notificaciones"
-                        settingsPath={
-                            workspaceView.active ? undefined : platform.data
-                                ? platform.data.actor.admin
-                                    ? "/espacio/accesos"
-                                    : undefined
-                                : canAccessPath(currentRole, "/config")
-                                    ? "/config"
-                                    : undefined
-                        }
+                        // Ajustes personales para todos (apariencia); la administración se enlaza desde ahí.
+                        settingsPath="/ajustes"
                         unit={user?.departamento || undefined}
                         menuOpen={menuOpen}
                         onMenuClick={() => setMenuOpen((open) => !open)}
-                        title={activePage.title}
+                        title={proposalSpace ? proposalTitle : activePage.title}
                         iconName={activePage.iconName}
                         userName={user?.nombre || "Usuario"}
                         userRole={
@@ -272,7 +396,9 @@ export const SystemLayout = ({
                                 <Link href="/home">Inicio</Link>
                                 <span aria-hidden="true">/</span>
                                 <Link href={`/home/${appContext.appId}`}>
-                                    {catalog[appContext.appId]?.meta.label}
+                                    {proposal
+                                        ? areaName(catalog[appContext.appId]?.meta.title || "")
+                                        : catalog[appContext.appId]?.meta.label}
                                 </Link>
                                 {appContext.sectionId && (!appContext.moduleId ||
                                     catalog[appContext.appId]?.sections[appContext.sectionId]?.meta.label.trim().toLocaleLowerCase() !== activePage.title.trim().toLocaleLowerCase()) && (
@@ -288,7 +414,7 @@ export const SystemLayout = ({
                                                 catalog[appContext.appId]
                                                     ?.sections[
                                                         appContext.sectionId
-                                                    ]?.meta.label
+                                                    ]?.meta[proposal ? "title" : "label"]
                                             }
                                         </Link>
                                     </>
@@ -309,10 +435,19 @@ export const SystemLayout = ({
                                     !appContext && pathname !== "/home",
                             })}
                         >
-                            {!appContext && pathname !== "/home" && !/^\/mis-tickets\/[^/]+$/.test(pathname || "") && (
+                            {!appContext && pathname !== "/home" && !/^\/mis-tickets\/[^/]+$/.test(pathname || "") && proposalSpace && (
+                                <SpaceHeader
+                                    space={proposalSpace.space}
+                                    title={proposalTitle}
+                                    description={proposalSpace.description}
+                                    iconName={proposalIcon}
+                                    actions={["/mis-tickets", "/tickets"].includes(pathname || "") && canCreateTicket ? <Button onClick={showCreateTicket}>+ Crear ticket</Button> : undefined}
+                                />
+                            )}
+                            {!appContext && pathname !== "/home" && !/^\/mis-tickets\/[^/]+$/.test(pathname || "") && !proposalSpace && (
                                 <PageHeading title={activePage.title}
                                     description={pathname === "/mis-tickets" ? "Solicitudes relacionadas con tu cuenta." : pathname === "/tickets" ? "Consulta y organiza los tickets dentro de tu alcance." : pathname === "/aplicaciones" ? "Accesos disponibles según tu perfil." : undefined}
-                                    actions={["/mis-tickets", "/tickets"].includes(pathname || "") && canAccessPath(currentRole, "/tickets-creation") ? <Button onClick={() => router.push("/tickets-creation")}>+ Crear ticket</Button> : undefined}
+                                    actions={["/mis-tickets", "/tickets"].includes(pathname || "") && canCreateTicket ? <Button onClick={showCreateTicket}>+ Crear ticket</Button> : undefined}
                                 />
                             )}
                             <div
@@ -328,6 +463,8 @@ export const SystemLayout = ({
                     </main>
                 </div>
             </div>
+            {canCreateTicket && <CreateTicketDialog />}
+            {proposal && <CommandPalette items={paletteItems} ticketScope={ticketScope} />}
         </RoleProvider>
     );
 };

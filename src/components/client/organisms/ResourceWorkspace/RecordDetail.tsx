@@ -1,4 +1,5 @@
 "use client";
+import { statusLabel, statusTone } from "@/helpers/statusTone";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/client/atoms/Button";
 import { resourceDefinition } from "@/platform/resources";
@@ -8,6 +9,12 @@ import type { PlatformRecord } from "@/platform/types";
 import Link from "next/link";
 import { RecordFiles } from "./RecordFiles";
 import styles from "../../templates/PlatformPage/PlatformPage.module.scss";
+import sheet from "./RecordSheet.module.scss";
+import { WorkspaceIcon } from "../../atoms/WorkspaceIcon/WorkspaceIcon";
+import { PLATFORM_SECTIONS } from "@/platform/navigation";
+import { useProposalDesign } from "@/platform/proposal";
+import { MeetingCard, ParticipantChips } from "./MeetingCard";
+import { meetingLink, meetingPlace } from "@/platform/meeting";
 export function displayDate(value: unknown) {
     if (!value) return "No disponible";
     const text = String(value);
@@ -58,6 +65,7 @@ export function RecordDetail({
     onEdit: (record: PlatformRecord) => void;
     onChanged: () => void;
 }) {
+    const proposal = useProposalDesign();
     const { data } = usePlatform(),
         def = resourceDefinition(type, data!.definitions[type]),
         dialog = useRef<HTMLDialogElement>(null),
@@ -207,16 +215,62 @@ export function RecordDetail({
             setBusy(false);
         }
     }
+    // Propuesta: valor legible por tipo de campo; vacío se muestra como «—».
+    const sectionIcon =
+        PLATFORM_SECTIONS.find((s) => s.id === def.group)?.iconName || "table-cells-large-solid";
+    const teamName =
+        data!.teams.find((t) => t.id === current.equipoId)?.nombre || "Administración institucional";
+    const factValue = (field: { key: string; type: string }) => {
+        const label = current.labels?.[field.key];
+        const raw = current.datos[field.key];
+        if (label) return label;
+        if (raw === null || raw === undefined || raw === "") return null;
+        if (proposal && type === "actividades" && field.key === "lugar" && meetingLink(raw))
+            return meetingPlace(raw) ? `${meetingPlace(raw)} y en línea` : "En línea (ver enlace arriba)";
+        if (type === "actividades" && field.key === "participantes" && Array.isArray(raw))
+            return raw.length ? <ParticipantChips ids={raw.map(Number)} /> : null;
+        if (["date", "datetime"].includes(field.type)) return displayDate(raw);
+        if (field.type === "select") return statusLabel(String(raw));
+        if (field.type === "url")
+            return (
+                <a href={String(raw)} target="_blank" rel="noreferrer">
+                    {String(raw)} ↗
+                </a>
+            );
+        return display(raw);
+    };
     return (
         <dialog
             ref={dialog}
-            className={styles.dialog}
+            className={proposal ? `${styles.dialog} ${sheet.sheet}` : styles.dialog}
             aria-labelledby="record-detail-title"
             onCancel={(e) => {
                 e.preventDefault();
                 if (!busy) onClose();
             }}
         >
+            {proposal ? (
+                <header className={sheet.head}>
+                    <span className={sheet.icon} aria-hidden="true">
+                        <WorkspaceIcon name={sectionIcon} size={20} />
+                    </span>
+                    <div className={sheet.titles}>
+                        <p className={sheet.kind}>
+                            {def.singular}
+                            <span className={styles.chip} data-tone={statusTone(current.estado)}>
+                                {statusLabel(current.estado)}
+                            </span>
+                        </p>
+                        <h2 id="record-detail-title">{current.nombre}</h2>
+                        <p className={sheet.sub}>
+                            {teamName} · Actualizado {displayDate(current.actualizadoEn)}
+                        </p>
+                    </div>
+                    <button type="button" className={sheet.close} onClick={onClose} disabled={busy} aria-label="Cerrar ficha">
+                        ×
+                    </button>
+                </header>
+            ) : (
             <div className={styles.dialogHeader}>
                 <h2 id="record-detail-title">{current.nombre}</h2>
                 <Button
@@ -227,10 +281,14 @@ export function RecordDetail({
                     Cerrar
                 </Button>
             </div>
-            <div className={styles.dialogBody}>
-                <div className={styles.toolbar}>
-                    <span className={styles.chip}>
-                        {current.estado.replaceAll("_", " ")}
+            )}
+            <div className={proposal ? sheet.body : styles.dialogBody}>
+                <div className={styles.toolbar} hidden={proposal}>
+                    <span
+                        className={styles.chip}
+                        data-tone={statusTone(current.estado)}
+                    >
+                        {statusLabel(current.estado)}
                     </span>
                     <div className={styles.actions}>
                         {!readOnly && def.actions.EDITAR && (
@@ -330,16 +388,32 @@ export function RecordDetail({
                     </section>
                 ) : (
                     <>
-                        <section className={styles.card}>
+                        <section className={proposal ? undefined : styles.card}>
                             {type === 'incidencias' && automatic && <div><h3>Detectada automáticamente</h3><p>Ocurrencias: {automatic.cantidad} · Primera detección: {displayDate(automatic.primeraVez)} · Última detección: {displayDate(automatic.ultimaVez)}</p></div>}
                             {employment && <div className={styles.card}><h3>Datos de RRHH</h3><p className={styles.muted}>Unidad institucional: {type === "equipos" ? current.nombre : data!.teams.find(t => t.id === current.equipoId)?.nombre || "Consulta la ficha del equipo"}. El puesto se actualiza al generar equipos desde RRHH.</p>{employment.puesto && <p><strong>Puesto: </strong>{employment.puesto}</p>}</div>}
                             {["activos","dispositivos"].includes(type) && !!current.datos._inventario && <section className={styles.card}><h3>Asignación institucional</h3><p>Tarjeta: {String((current.datos._inventario as {tarjeta?:string}).tarjeta||'')}</p><p>Empleado: {String((current.datos._inventario as {nombreEmpleado?:string}).nombreEmpleado||'')} · {String((current.datos._inventario as {empleado?:number}).empleado||'')}</p><p className={styles.muted}>La tarjeta se consulta en el inventario institucional. El responsable técnico de esta ficha se gestiona por separado.</p></section>}
                             {["activos", "dispositivos"].includes(type) &&
                                 !current.datos.inventarioReferencia && (
-                                    <p className={styles.error}>
+                                    <p className={proposal ? sheet.callout : styles.error} data-tone="warning">
                                         Este registro aún no está vinculado a una tarjeta de responsabilidad institucional.
                                     </p>
                                 )}
+                            {proposal && type === "actividades" && <MeetingCard activity={current} />}
+                            {proposal ? (
+                                <dl className={sheet.facts}>
+                                    {def.fields
+                                        .filter((f) => !["x", "y", "planoX", "planoY"].includes(f.key))
+                                        .map((field) => {
+                                            const value = factValue(field);
+                                            return (
+                                                <div key={field.key} className={field.type === "textarea" || field.type === "list" ? sheet.wide : undefined}>
+                                                    <dt>{field.label}</dt>
+                                                    <dd className={value === null ? sheet.empty : undefined}>{value ?? "—"}</dd>
+                                                </div>
+                                            );
+                                        })}
+                                </dl>
+                            ) : (
                             <dl className={styles.detail}>
                                 <div>
                                     <dt>Equipo</dt>
@@ -389,6 +463,7 @@ export function RecordDetail({
                                         </div>
                                     ))}
                             </dl>
+                            )}
                         </section>
                         {type === "solicitudes" && (
                             <section className={styles.card}>
@@ -521,6 +596,22 @@ export function RecordDetail({
                     </>
                 )}
             </div>
+            {proposal && (
+                <footer className={sheet.foot}>
+                    {!readOnly && def.actions.ELIMINAR && !current.datos._rrhh && (
+                        <button type="button" className={sheet.danger} onClick={() => void remove()} disabled={busy}>
+                            Retirar registro
+                        </button>
+                    )}
+                    <p>{readOnly ? "Disponible solo para consulta." : "Los cambios quedan en el historial con fecha y responsable."}</p>
+                    <div className={sheet.footActions}>
+                        <Button variant="outlined" onClick={onClose} state={busy ? "disabled" : "default"}>
+                            Cerrar
+                        </Button>
+                        {!readOnly && def.actions.EDITAR && <Button onClick={() => onEdit(current)}>Editar</Button>}
+                    </div>
+                </footer>
+            )}
         </dialog>
     );
 }

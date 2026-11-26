@@ -10,6 +10,14 @@ const { once } = require("node:events");
 const { createLab } = require("./servidor.cjs");
 const { page, sessionPage, banner } = require("./interfaz.cjs");
 const root = path.resolve(__dirname, "../..");
+// Interruptor del laboratorio para comparar el diseño actual con la propuesta.
+const PROPOSAL_COOKIE = "panel_propuesta";
+const proposalActive = (req) =>
+  /(?:^|;\s*)panel_propuesta=1(?:;|$)/.test(req.headers.cookie || "");
+function exampleCatalog() {
+  const load = require(path.join(root, "test/integracion/load-ts.cjs"))(root);
+  return load("src/api/graphql/home/appsCatalog.dummy.ts").APPS_CATALOG_DUMMY;
+}
 const listen = async (server, port) => {
   server.listen(port, "127.0.0.1");
   await once(server, "listening");
@@ -88,8 +96,26 @@ async function start(options = {}) {
           res.end(value);
         };
       if (url.pathname.startsWith("/__laboratorio")) {
+        const extras = () => ({
+          propuesta: proposalActive(req),
+          catalogo: Object.keys(lab.state.data.applicationCatalog || {}).length > 0,
+          activos: !!lab.state.data.assetExample,
+        });
+        if (url.pathname === "/__laboratorio/propuesta" && req.method === "GET") {
+          const next = proposalActive(req) ? "0" : "1";
+          const back = url.searchParams.get("volver") || "/home";
+          const location = /^\/(?!\/)[^\s]*$/.test(back) ? back : "/home";
+          res.writeHead(303, {
+            Location: location,
+            "Set-Cookie": `${PROPOSAL_COOKIE}=${next}; Path=/; SameSite=Lax`,
+            "Cache-Control": "no-store",
+          });
+          return res.end();
+        }
         if (req.method === "POST") {
-          if (req.headers.origin && req.headers.origin !== base) {
+          // La página de controles usa Referrer-Policy: no-referrer, por lo que
+          // algunos navegadores envían Origin "null"; el nonce sigue protegiendo.
+          if (req.headers.origin && req.headers.origin !== base && req.headers.origin !== "null") {
             res.writeHead(403);
             return res.end("Origen inválido.");
           }
@@ -102,6 +128,41 @@ async function start(options = {}) {
           if (form.get("nonce") !== nonce) {
             res.writeHead(403);
             return res.end("Control de laboratorio inválido.");
+          }
+          if (url.pathname === "/__laboratorio/activos") {
+            const load = form.get("accion") === "cargar";
+            const assets = require("./activos-ejemplo.cjs");
+            await lab.state.change((s) => {
+              if (load) assets.seedAssets(s, s.ids);
+              else assets.removeAssets(s);
+            });
+            return html(
+              page(
+                lab.state.data.users,
+                nonce,
+                load
+                  ? "Datos de ejemplo cargados: Activos Fijos simulado, fichas, mantenimientos, red y portafolio de sistemas."
+                  : "Datos de ejemplo retirados.",
+                extras(),
+              ),
+            );
+          }
+          if (url.pathname === "/__laboratorio/catalogo") {
+            const load = form.get("accion") === "cargar";
+            const catalog = load ? exampleCatalog() : {};
+            await lab.state.change((s) => {
+              s.applicationCatalog = catalog;
+            });
+            return html(
+              page(
+                lab.state.data.users,
+                nonce,
+                load
+                  ? "Catálogo de ejemplo cargado. Entra con un perfil y abre Aplicaciones."
+                  : "Catálogo vaciado.",
+                extras(),
+              ),
+            );
           }
           if (url.pathname === "/__laboratorio/reiniciar") {
             await lab.state.reset();
@@ -138,7 +199,7 @@ async function start(options = {}) {
           );
           return html(sessionPage(token, user));
         }
-        return html(page(lab.state.data.users, nonce));
+        return html(page(lab.state.data.users, nonce, "", extras()));
       }
       if (
         url.pathname === "/" &&
@@ -186,7 +247,7 @@ async function start(options = {}) {
             response.on("data", (b) => chunks.push(b));
             response.on("end", () => {
               let value = Buffer.concat(chunks).toString("utf8");
-              value = value.replace("</body>", banner + "</body>");
+              value = value.replace("</body>", banner(proposalActive(req)) + "</body>");
               delete headers["content-length"];
               delete headers["content-encoding"];
               res.writeHead(response.statusCode, headers);

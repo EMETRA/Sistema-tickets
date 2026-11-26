@@ -1,8 +1,15 @@
 .report {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 16px;
     min-width: 0;
+}
+.title {
+    font-size: 17px;
+    line-height: 1.4;
+}
+.report .kpis3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 .empty {
     padding: 24px 0;

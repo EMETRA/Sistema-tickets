@@ -3,19 +3,24 @@
   font-family: inherit;
   box-sizing: border-box;
   outline: none;
-  background: #ffffff;
+  background: var(--tickets-surface);
   border: 1px solid var(--tickets-border, #dfe5f2);
   border-radius: 8px;
-  padding: 12px 13px;
+  min-height: var(--tickets-control-height, 38px);
+  padding: 9px 12px;
   font-weight: 400;
   width: 100%;
   min-width: 0;
   color: var(--tickets-text, #263b58);
-  font-size: 14px;
-  transition: border-color 0.2s ease;
+  font-size: 13px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 
   &::placeholder {
-    color: #a9a9a9;
+    color: #98a5b8;
+  }
+
+  &:hover:not(:focus):not([disabled]) {
+    border-color: var(--tickets-border-strong, #cdd6e6);
   }
 
   &:focus {
@@ -89,7 +94,7 @@
   min-height: 200px;
 
   &:hover {
-    background: #f8f9ff;
+    background: #f8f9ff; background: light-dark(#f8f9ff, #131e4a);
     border-color: #0e3cc1;
   }
 

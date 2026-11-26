@@ -3,7 +3,7 @@
 
 .popUpCard {
     max-width: 500px;
-    width: 90vw;
+    width: calc(90vw / var(--vp-zoom, 1));
     display: flex;
     flex-direction: column;
     align-items: center;

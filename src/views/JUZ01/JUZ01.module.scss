@@ -15,7 +15,7 @@
   min-width: 0;
 }
 .searchPanel {
-  padding: clamp(20px, 2.5vw, 28px);
+  padding: clamp(20px, calc(2.5vw / var(--vp-zoom, 1)), 28px);
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -70,7 +70,7 @@
 }
 .fieldError {
   margin: 0;
-  color: #ac2945;
+  color: #ac2945; color: light-dark(#ac2945, #e594a5);
   font-size: 13px;
   line-height: 1.6;
 }
@@ -84,8 +84,8 @@
   margin: 0;
   padding: 14px;
   border-radius: 8px;
-  background: #fff2f4;
-  color: #ac2945;
+  background: #fff2f4; background: light-dark(#fff2f4, #37192b);
+  color: #ac2945; color: light-dark(#ac2945, #e594a5);
   font-size: 13px;
   p {
     margin: 5px 0 0;
@@ -157,15 +157,15 @@
     overflow-wrap: anywhere;
     line-height: 1.7;
     mark {
-      background: #e7ecff;
-      color: #273f91;
+      background: #e7ecff; background: light-dark(#e7ecff, #122150);
+      color: #273f91; color: light-dark(#273f91, #97a8e3);
       font-weight: 700;
       border-radius: 3px;
       padding: 2px 0;
     }
   }
   tbody tr:hover {
-    background: #fafbff;
+    background: var(--tickets-surface-subtle);
   }
 }
 .date {

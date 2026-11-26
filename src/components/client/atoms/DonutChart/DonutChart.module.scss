@@ -54,7 +54,7 @@
 }
 
 .Label {
-  color: $negro-1;
+  color: var(--tickets-text);
   font-size: 14px;
   font-weight: 400;
 }
@@ -67,6 +67,6 @@
 .EmptyState {
   padding: 32px;
   text-align: center;
-  color: $gris-1;
+  color: var(--tickets-text-muted);
   font-size: 14px;
 }

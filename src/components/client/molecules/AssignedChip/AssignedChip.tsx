@@ -32,7 +32,7 @@ export const AssignedChip: React.FC<AssignedChipProps> = ({
                     className={styles.avatar}
                 />
                 <Text variant="body" className={styles.userName}>
-                    Sin Asignacion
+                    Sin asignar
                 </Text>
             </div>
         );

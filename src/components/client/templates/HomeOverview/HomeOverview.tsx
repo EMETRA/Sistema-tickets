@@ -3,7 +3,13 @@ import type { ReactNode } from "react";
 import { MetricCard } from "../../molecules/MetricCard";
 import { WorkspaceIcon } from "../../atoms/WorkspaceIcon/WorkspaceIcon";
 import styles from "./HomeOverview.module.scss";
-export type HomeShortcut = { label: string; href: string; icon: string };
+export type HomeShortcut = {
+    label: string;
+    href: string;
+    icon: string;
+    /** Abre una ventana en lugar de navegar (el href queda como respaldo). */
+    onClick?: () => void;
+};
 export type HomeMetric = {
     label: string;
     value?: number | string;
@@ -60,13 +66,22 @@ export function HomeOverview({
                         className={styles.shortcut}
                         key={s.href}
                         href={s.href}
+                        onClick={
+                            s.onClick
+                                ? (event) => {
+                                    if (event.metaKey || event.ctrlKey || event.shiftKey) return;
+                                    event.preventDefault();
+                                    s.onClick?.();
+                                }
+                                : undefined
+                        }
                     >
                         <span className={styles.shortcutIcon}>
-                            <WorkspaceIcon name={s.icon} size={26} />
+                            <WorkspaceIcon name={s.icon} size={20} />
                         </span>
-                        <h2>{s.label}</h2>
-                        <span className={styles.shortcutAction}>
-                            Ingresar <span aria-hidden="true">→</span>
+                        <h2 className={styles.shortcutLabel}>{s.label}</h2>
+                        <span className={styles.shortcutAction} aria-hidden="true">
+                            →
                         </span>
                     </Link>
                 ))}

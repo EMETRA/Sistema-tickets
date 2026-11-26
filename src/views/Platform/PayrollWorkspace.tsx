@@ -818,7 +818,7 @@ export function PayrollWorkspace() {
                     <iframe
                         title="Boleta de pago PDF"
                         src={pdf}
-                        style={{ width: "100%", height: "65vh", border: 0 }}
+                        style={{ width: "100%", height: "calc(65vh / var(--vp-zoom, 1))", border: 0 }}
                     />
                 </dialog>
             )}

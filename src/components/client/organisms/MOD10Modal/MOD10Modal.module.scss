@@ -29,7 +29,7 @@
 }
 
 .contentContainer {
-    border: 1px solid #edf0f2;
+    border: 1px solid #edf0f2; border: 1px solid light-dark(#edf0f2, #2a3449);
     border-radius: 16px;
     padding: 24px;
 }

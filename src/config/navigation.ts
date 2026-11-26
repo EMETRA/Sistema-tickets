@@ -13,6 +13,7 @@ export interface PageMetadata {
 export const PAGES_CONFIG: Record<string, PageMetadata> = {
     mi_perfil: {path:"/mi-perfil",label:"Mi perfil",title:"Mi perfil",iconName:"user-solid"},
     notificaciones: {path:"/notificaciones",label:"Notificaciones",title:"Notificaciones",iconName:"bell-regular"},
+    ajustes: {path:"/ajustes",label:"Ajustes",title:"Ajustes",iconName:"gear-solid"},
     ayuda: {path:"/ayuda",label:"Ayuda",title:"Ayuda",iconName:"circle-exclamation-solid"},
     aplicaciones: {
         path: "/aplicaciones",
@@ -83,7 +84,7 @@ export const PAGES_CONFIG: Record<string, PageMetadata> = {
     crear_ticket: {
         path: "/tickets-creation",
         label: "CREAR TICKET",
-        title: "Nuevo Ticket",
+        title: "Nuevo ticket",
         iconName: "file-circle-plus-solid",
     },
 };

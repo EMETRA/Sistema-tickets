@@ -3,7 +3,7 @@
     display: inline-flex;
     gap: 0;
     align-items: center;
-    background-color: #F2F2F2;
+    background-color: var(--tickets-neutral-soft);
     border-radius: 10px;
     padding: 4px;
 
@@ -22,7 +22,7 @@
     white-space: nowrap;
 
     &.selected {
-        background-color: #FFFFFF !important;
+        background-color: var(--tickets-surface) !important;
         color: #000000 !important;
 
         svg {

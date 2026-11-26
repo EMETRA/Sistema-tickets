@@ -23,10 +23,10 @@ async function run() {
       const heading=page.getByRole('heading',{name:title,exact:true});await heading.waitFor();await page.waitForLoadState('networkidle');await fits();
       const primary=page.getByRole('region',{name:index===6?'Acciones recientes':index===2?'Tickets de mi equipo':index<=1?'Tickets recientes':'Mis tickets asignados',exact:true});
       const calendar=page.getByRole('complementary',{name:'Calendario',exact:true});await white(primary);await white(calendar);
-      assert.equal(await heading.evaluate(el=>getComputedStyle(el.parentElement).borderLeftWidth),'4px');
+      assert.equal(await heading.evaluate(el=>getComputedStyle(el.parentElement).borderLeftWidth),'0px','El encabezado de Inicio va sin tarjeta ni filete lateral');
       assert.equal(await page.locator('#main-content').evaluate(el=>getComputedStyle(el).backgroundColor),'rgb(244, 246, 251)');
       const cards=await page.getByRole('group',{name:'Indicadores de tickets'}).getByRole('article').all();assert.equal(cards.length,4);
-      for(const card of cards){await white(card);assert.ok((await card.boundingBox()).height>=129);}
+      for(const card of cards){await white(card);const h=(await card.boundingBox()).height;assert.ok(h>=70&&h<=120,'Indicador compacto: '+h);}
       const shortcuts=page.getByRole('navigation',{name:'Accesos de mi espacio'}).getByRole('link');assert.equal(await shortcuts.count(),3);
       if(index===6) {
         assert.deepEqual(await page.getByRole('group',{name:'Indicadores de tickets'}).locator('article > span:first-child').allTextContents(),['Mis solicitudes','En atención','Resueltas','Pendientes de respuesta']);

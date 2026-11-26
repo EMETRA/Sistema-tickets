@@ -1,7 +1,7 @@
 @use "../../../../theme/surfaces.scss" as surfaces;
 .reportCard {
-    background-color: #FFFFFF;
-    border: 1px solid #E0E0E0;
+    background-color: var(--tickets-surface);
+    border: 1px solid var(--tickets-border);
     border-radius: 16px;
     display: flex;
     padding: 32px;
@@ -37,7 +37,7 @@
 
 .divider {
     width: 1px;
-    background-color: #E0E0E0;
+    background-color: #E0E0E0; background-color: light-dark(#E0E0E0, #111722);
     align-self: stretch;
 }
 

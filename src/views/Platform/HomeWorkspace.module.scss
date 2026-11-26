@@ -1,18 +1,18 @@
 @use "@/theme/surfaces";
 .tickets {
   @include surfaces.panel;
-  padding: 22px;
+  padding: 20px 22px;
   min-width: 0;
   header {
-    margin-bottom: 17px;
+    margin-bottom: 14px;
     h2 {
       font-size: 16px;
       line-height: 1.4;
       margin: 0;
     }
     p {
-      margin-top: 4px;
-      font-size: 11px;
+      margin-top: 2px;
+      font-size: 12px;
       color: var(--tickets-text-secondary);
     }
   }
@@ -21,8 +21,8 @@
     justify-content: space-between;
     flex-wrap: wrap;
     gap: 12px;
-    padding-top: 17px;
-    font-size: 11px;
+    padding-top: 14px;
+    font-size: 12px;
     color: var(--tickets-text-secondary);
     a {
       color: var(--tickets-primary);
@@ -32,24 +32,60 @@
 }
 .tableRegion {
   overflow-x: auto;
+  margin: 0 -22px;
   table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 11px;
+    font-size: 13px;
   }
   th {
     text-align: left;
-    font-weight: 500;
-    color: var(--tickets-text-secondary);
-    padding: 12px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--tickets-text-muted);
+    padding: 9px 12px;
     background: var(--tickets-surface-subtle);
+    border-top: 1px solid var(--tickets-divider);
+    border-bottom: 1px solid var(--tickets-divider);
   }
   td {
-    padding: 17px 8px;
+    padding: 12px;
     border-bottom: 1px solid var(--tickets-divider);
-    vertical-align: top;
+    vertical-align: middle;
     overflow-wrap: anywhere;
     min-width: 85px;
+  }
+  th:first-child,
+  td:first-child {
+    padding-left: 22px;
+  }
+  th:last-child,
+  td:last-child {
+    padding-right: 22px;
+  }
+}
+.rowAlert {
+  background: color-mix(in srgb, var(--tickets-danger) 7%, var(--tickets-surface));
+  > td:first-child {
+    box-shadow: inset 3px 0 0 var(--tickets-danger);
+  }
+}
+.flag {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--tickets-danger);
+  &::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
   }
 }
 .recordLink {
@@ -67,27 +103,37 @@
 }
 .state {
   display: inline-flex;
-  border-radius: 7px;
-  padding: 5px 9px;
-  background: var(--tickets-surface-disabled);
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  border-radius: 999px;
+  padding: 3px 9px;
+  background: var(--tickets-neutral-soft);
   color: var(--tickets-text-secondary);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
+  &::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
   &[data-state="2"] {
-    color: #80540d;
-    background: #fff1d4;
+    color: #80540d; color: light-dark(#80540d, #eec88b);
+    background: #fff1d4; background: light-dark(#fff1d4, #5c481f);
   }
   &[data-state="3"] {
-    color: #34559f;
+    color: #34559f; color: light-dark(#34559f, #9bb0de);
     background: var(--tickets-primary-soft);
   }
   &[data-state="4"] {
-    color: #a3313c;
-    background: #fff1f3;
+    color: #a3313c; color: light-dark(#a3313c, #e099a0);
+    background: var(--tickets-danger-soft);
   }
   &[data-state="5"] {
-    color: #177849;
-    background: #e5f5eb;
+    color: #177849; color: light-dark(#177849, #90eabe);
+    background: #e5f5eb; background: light-dark(#e5f5eb, #12342f);
   }
 }
 .empty {

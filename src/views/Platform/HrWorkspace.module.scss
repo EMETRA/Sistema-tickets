@@ -4,9 +4,9 @@
     align-items: center;
     gap: 16px;
     padding: 14px 32px;
-    background: #fff8e8;
+    background: #fff8e8; background: light-dark(#fff8e8, #3c3525);
     border-bottom: 1px solid #eddca7;
-    color: #4c431f;
+    color: #4c431f; color: light-dark(#4c431f, #d9cda1);
     font-size: 13px;
     div {
         display: grid;
@@ -94,8 +94,8 @@
     padding: 14px;
     border: 1px solid #badac8;
     border-radius: 8px;
-    background: #f0faf4;
-    color: #1e6140;
+    background: #f0faf4; background: light-dark(#f0faf4, #13312f);
+    color: #1e6140; color: light-dark(#1e6140, #9ae0bd);
 }
 .formGrid {
     display: grid;
@@ -117,7 +117,7 @@
         position: sticky;
         top: 0;
         z-index: 1;
-        background: white;
+        background: var(--tickets-surface);
     }
     input[type="checkbox"] {
         width: 18px;
@@ -139,7 +139,7 @@
         padding: 16px;
         border: 1px solid var(--tickets-border);
         border-radius: 8px;
-        background: white;
+        background: var(--tickets-surface);
     }
     strong {
         display: block;
@@ -252,5 +252,5 @@
 }
 
 .campaignDialog {
-    width: min(960px, calc(100vw - 32px));
+    width: min(960px, calc(calc(100vw / var(--vp-zoom, 1)) - 32px));
 }

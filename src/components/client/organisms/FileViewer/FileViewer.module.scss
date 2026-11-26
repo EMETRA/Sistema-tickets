@@ -1,7 +1,7 @@
 .dialog {
-    width: min(1200px, 95vw);
-    height: min(900px, 94dvh);
-    max-height: 94dvh;
+    width: min(1200px, calc(95vw / var(--vp-zoom, 1)));
+    height: min(900px, calc(94dvh / var(--vp-zoom, 1)));
+    max-height: calc(94dvh / var(--vp-zoom, 1));
     border: 1px solid var(--tickets-border);
     border-radius: var(--tickets-radius);
     margin: auto;

@@ -35,7 +35,7 @@
         width: 100%;
         height: 260px;
         object-fit: contain;
-        background: #f6f8fc;
+        background: var(--tickets-surface-subtle);
         border-radius: 8px;
     }
     label {
@@ -83,7 +83,7 @@
     font-size: 13px;
     color: var(--tickets-text-secondary);
 }
-.decisionDialog { width: min(720px, calc(100vw - 32px)); }
+.decisionDialog { width: min(720px, calc(calc(100vw / var(--vp-zoom, 1)) - 32px)); }
 .decisionContent {
     display: grid;
     min-width: 0;

@@ -83,7 +83,8 @@ async function run() {
     assert.equal(await page.getByRole('button',{name:'Abrir ticket QA-001',exact:true}).count(),0);
     await page.getByRole('button',{name:'Limpiar filtros',exact:true}).click();
     await page.getByRole('button',{name:'Ver detalle de No carga un adjunto',exact:true}).click();
-    await page.waitForURL('**/mis-tickets/1');
+    // Mis tickets abre el detalle en ventana (como Asignación) sin salir de la lista.
+    await page.getByRole('dialog').getByRole('heading',{name:'QA-001 · No carga un adjunto',exact:true}).waitFor();assert.ok(page.url().endsWith('/mis-tickets'));
     await page.getByRole('heading',{name:'QA-001 · No carga un adjunto',exact:true}).waitFor();
     await page.getByText('Estamos revisando la solicitud.',{exact:true}).waitFor();
     assert.equal(await page.getByRole('heading',{name:'Gestión del ticket',exact:true}).count(),0);

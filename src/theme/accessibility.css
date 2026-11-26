@@ -1,0 +1,81 @@
+/* ── Accesibilidad (Ajustes → Accesibilidad) ─────────────────────────────
+   Atributos en <html> puestos por platform/theme.ts antes del primer pintado. */
+
+/* Tamaño del texto. El panel usa medidas en px, así que se escala la
+   interfaz completa (como el zoom del navegador): texto, botones y áreas
+   táctiles crecen juntos y nada se encima.
+   Bajo zoom, vh/vw también se multiplican: los estilos dividen esas unidades
+   entre --vp-zoom. El valor de aquí es el esperado; platform/theme.ts lo mide
+   en el navegador y lo corrige si el motor no escala esas unidades. */
+:root {
+  --vp-zoom: 1;
+}
+:root[data-text-size="large"] {
+  --vp-zoom: 1.125;
+  zoom: 1.125;
+}
+:root[data-text-size="xlarge"] {
+  --vp-zoom: 1.25;
+  zoom: 1.25;
+}
+@media (max-width: 640px) {
+  :root[data-text-size="large"] {
+    --vp-zoom: 1.06;
+    zoom: 1.06;
+  }
+  :root[data-text-size="xlarge"] {
+    --vp-zoom: 1.12;
+    zoom: 1.12;
+  }
+}
+
+/* Alto contraste: textos secundarios más oscuros (≥ 7:1 sobre la superficie),
+   bordes visibles y foco más grueso. */
+:root[data-contrast="more"] {
+  --tickets-primary: #2f4bd6;
+  --tickets-primary-hover: #2440c4;
+  --tickets-text: #14223a;
+  --tickets-text-secondary: #33425a;
+  --tickets-text-muted: #45536a;
+  --tickets-border: #808ca2;
+  --tickets-border-strong: #66728a;
+  --tickets-divider: #b4bfd1;
+  --tickets-success: #0f5f39;
+  --tickets-danger: #9c2433;
+  --tickets-warning: #5f3e06;
+  --tickets-info: #263fae;
+  --tickets-focus: 0 0 0 3px #2f4bd680;
+}
+:root[data-contrast="more"][data-theme="dark"] {
+  --tickets-primary: #93a5ff;
+  --tickets-primary-hover: #a8b6ff;
+  --tickets-text: #f6f8fd;
+  --tickets-text-secondary: #d5dcea;
+  --tickets-text-muted: #bcc6da;
+  --tickets-border: #5b6884;
+  --tickets-border-strong: #7684a2;
+  --tickets-divider: #414c66;
+  --tickets-success: #7dd9ae;
+  --tickets-danger: #ff9ea9;
+  --tickets-warning: #f3c771;
+  --tickets-info: #b5c2ff;
+  --tickets-focus: 0 0 0 3px #93a5ff99;
+}
+:root[data-contrast="more"] :focus-visible {
+  outline-width: 3px !important;
+  outline-offset: 2px;
+}
+:root[data-contrast="more"] :is(p, dd, li, td) a[href] {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Reducir animaciones (además de la preferencia del sistema operativo). */
+:root[data-motion="reduce"] *,
+:root[data-motion="reduce"] *::before,
+:root[data-motion="reduce"] *::after {
+  scroll-behavior: auto !important;
+  transition-duration: 0.01ms !important;
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+}

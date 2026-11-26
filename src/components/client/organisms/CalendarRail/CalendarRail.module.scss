@@ -1,0 +1,335 @@
+.rail {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
+  border: 1px solid var(--tickets-border);
+  border-radius: 14px;
+  background: var(--tickets-surface);
+  box-shadow: var(--tickets-shadow);
+  h3 {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 2px 8px;
+    margin: 0;
+    font-size: 13px;
+    font-weight: 700;
+    small {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--tickets-text-muted);
+    }
+  }
+}
+// Colores de visibilidad, los mismos del calendario.
+.rail {
+  [data-scope] {
+    --scope: #71569a;
+    --scope-soft: #f3effa;
+  }
+  [data-scope="EMPRESA"] {
+    --scope: #64748b;
+    --scope-soft: #edf1f7;
+  }
+  [data-scope="PRIVADA"] {
+    --scope: #2d785f;
+    --scope-soft: #e8f5f0;
+  }
+}
+// ── Minicalendario ────────────────────────────────────────────
+.miniHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  strong {
+    font-size: 13px;
+  }
+  button {
+    width: 28px;
+    height: 28px;
+    border: 0;
+    border-radius: 7px;
+    background: none;
+    font-size: 16px;
+    color: var(--tickets-text-secondary);
+    cursor: pointer;
+    &:hover {
+      background: var(--tickets-neutral-soft);
+    }
+  }
+}
+.mini {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 2px;
+  text-align: center;
+  button {
+    position: relative;
+    aspect-ratio: 1;
+    border: 0;
+    border-radius: 8px;
+    background: none;
+    font: inherit;
+    font-size: 12px;
+    color: var(--tickets-text);
+    cursor: pointer;
+    font-variant-numeric: tabular-nums;
+    &:hover {
+      background: var(--tickets-primary-soft);
+    }
+    &[data-busy]::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: 3px;
+      width: 4px;
+      height: 4px;
+      margin-left: -2px;
+      border-radius: 50%;
+      background: var(--tickets-primary);
+    }
+    &[aria-current="date"] {
+      color: var(--tickets-primary);
+      font-weight: 700;
+      box-shadow: inset 0 0 0 1px var(--tickets-primary);
+    }
+    &[data-selected] {
+      background: var(--tickets-primary);
+      color: #fff;
+      font-weight: 700;
+      &::after {
+        background: var(--tickets-surface);
+      }
+    }
+  }
+}
+.dow {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--tickets-text-muted);
+  padding: 4px 0;
+}
+// ── Hoy ───────────────────────────────────────────────────────
+.next {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 9px;
+  background: var(--tickets-primary-soft);
+  font-size: 12px;
+  color: var(--tickets-primary);
+  p {
+    margin: 0;
+  }
+  strong {
+    color: var(--tickets-text);
+  }
+}
+.joinNext,
+.join {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 8px;
+  background: #3d55d6;
+  background: light-dark(var(--tickets-primary), #4057d8);
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+  &:hover {
+    filter: brightness(1.08);
+  }
+  &:focus-visible {
+    outline: 2px solid var(--tickets-primary);
+    outline-offset: 2px;
+  }
+}
+.joinNext {
+  min-height: 36px;
+  font-size: 13px;
+}
+.join {
+  flex: none;
+  min-height: 32px;
+  padding: 0 10px;
+  font-size: 12px;
+}
+.withJoin {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  > button {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+}
+.today,
+.ops {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.today button {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  padding: 7px 8px;
+  border: 0;
+  border-left: 3px solid var(--scope);
+  border-radius: 6px;
+  background: var(--scope-soft);
+  font: inherit;
+  text-align: left;
+  color: var(--tickets-text);
+  cursor: pointer;
+  &[data-past] {
+    opacity: 0.55;
+  }
+  &:hover {
+    filter: brightness(0.98);
+  }
+}
+.time {
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--scope, var(--tickets-text-secondary));
+  font-variant-numeric: tabular-nums;
+}
+.what {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  font-size: 12px;
+  font-weight: 600;
+  small {
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--tickets-text-muted);
+  }
+}
+.none {
+  padding: 6px 2px;
+  font-size: 12px;
+  color: var(--tickets-text-muted);
+}
+// ── Filtros ───────────────────────────────────────────────────
+.scopes {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 6px;
+    border: 0;
+    border-radius: 8px;
+    background: none;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--tickets-text);
+    text-align: left;
+    cursor: pointer;
+    em {
+      margin-left: auto;
+      font-style: normal;
+      font-size: 11px;
+      color: var(--tickets-text-muted);
+    }
+    &:hover {
+      background: var(--tickets-surface-subtle);
+    }
+    &[aria-pressed="false"] {
+      color: var(--tickets-text-muted);
+    }
+  }
+}
+.check {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  border-radius: 4px;
+  border: 2px solid var(--scope);
+  background: var(--scope);
+  box-shadow: inset 0 0 0 2px #fff;
+  [aria-pressed="false"] > & {
+    background: var(--tickets-surface);
+  }
+}
+// ── Operación ─────────────────────────────────────────────────
+.ops li {
+  --tone: #9aa6b8;
+  &[data-tone="success"] {
+    --tone: var(--tickets-success);
+  }
+  &[data-tone="danger"] {
+    --tone: var(--tickets-danger);
+  }
+  &[data-tone="warning"] {
+    --tone: #d99a1e;
+  }
+  a {
+    display: flex;
+    gap: 10px;
+    padding: 7px 8px;
+    border-radius: 8px;
+    color: inherit;
+    text-decoration: none;
+    box-shadow: inset 3px 0 0 var(--tone);
+    &:hover {
+      background: var(--tickets-surface-subtle);
+    }
+  }
+}
+.opsDay {
+  display: flex;
+  flex-direction: column;
+  width: 44px;
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--tickets-text-secondary);
+  text-transform: capitalize;
+  small {
+    font-weight: 500;
+    color: var(--tickets-text-muted);
+  }
+}
+.kind {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--tone);
+}
+
+// Variantes oscuras de los colores de visibilidad.
+:global([data-theme="dark"]) .rail {
+  [data-scope] {
+    --scope: #b9a6e6;
+    --scope-soft: #262140;
+  }
+  [data-scope="EMPRESA"] {
+    --scope: #a9b5ca;
+    --scope-soft: #222b3e;
+  }
+  [data-scope="PRIVADA"] {
+    --scope: #79d3b1;
+    --scope-soft: #15312a;
+  }
+}

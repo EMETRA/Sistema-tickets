@@ -6,5 +6,7 @@ export interface UserMenuProps {
   onMenuClick?: () => void;
   className?: string;
   profilePath?: string;
+  /** Ajustes personales (apariencia). */
+  settingsPath?: string;
   onChangeView?: () => void;
 }

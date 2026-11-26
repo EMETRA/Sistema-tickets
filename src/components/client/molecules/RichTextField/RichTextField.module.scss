@@ -2,7 +2,7 @@
     display: flex;
     flex-direction: column;
     border: 1px solid var(--tickets-border, #dfe5f2);
-    background: #fff;
+    background: var(--tickets-surface);
     transition: all 0.2s ease-in-out;
     border-radius: 10px;
 }
@@ -11,7 +11,7 @@
     display: flex;
     padding: 8px;
     gap: 4px;
-    background: #f9fafb;
+    background: var(--tickets-surface-subtle);
     border-bottom: 1px solid var(--tickets-border, #dfe5f2);
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
@@ -27,10 +27,10 @@
     background: transparent;
     border-radius: 4px;
     cursor: pointer;
-    color: #6b7280;
+    color: var(--tickets-text-secondary);
 
     &:hover {
-        background: #f3f4f6;
+        background: var(--tickets-neutral-soft);
     }
 
     &.active {
@@ -39,12 +39,22 @@
     }
 }
 
+// Todo el recuadro recibe el clic, no solo la primera línea.
 .editorContainer {
-    padding: 12px;
+    display: flex;
+    flex-direction: column;
     min-height: 150px;
+    cursor: text;
+    > div {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
 }
 
 .editorContent {
+    flex: 1;
+    padding: 12px;
     outline: none;
     font-size: 0.85rem;
     line-height: 1.5;

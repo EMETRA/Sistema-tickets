@@ -4,6 +4,7 @@ const { randomUUID, createHash } = require("node:crypto");
 const { parse, getOperationAST, valueFromASTUntyped } = require("graphql");
 const { State, definitions, clone, now } = require("./estado.cjs");
 const ticketLabels = require('./ticket-labels.cjs');
+const assets = require('./activos-ejemplo.cjs');
 const fail = (status, message) => {
   throw Object.assign(new Error(message), { status });
 };
@@ -323,7 +324,7 @@ async function createLab(file, options = {}) {
   function bootstrap(s, a) {
     return {
       enabled: true,
-      inventoryConnected: false,
+      inventoryConnected: !!s.assetExample,
       defaultTicketTeamId: s.ids.it,
       actor: { id: a.id, nombre: a.nombre, admin: a.admin, mode: a.mode },
       definitions: Object.fromEntries(
@@ -375,7 +376,7 @@ async function createLab(file, options = {}) {
     if (p === "/bootstrap") return bootstrap(s, a);
     if (p === "/organization/people") {
       if (!a.admin) fail(403, "Solo Informática consulta el directorio institucional.");
-      return {empresa:97,personal:s.users.map(u=>({empresa:97,empleado:9000000+u.id,nombre:u.nombre,puesto:u.rol,unidadCodigo:u.equipoId===s.ids.it?1:2,unidad:u.equipoId===s.ids.it?'Informática ficticia':'Contabilidad ficticia',sinUnidad:false,cuentasHabilitadas:1,usuariosIds:[u.id]}))};
+      return {empresa:97,personal:s.users.map(u=>({empresa:97,empleado:9000000+u.id,nombre:u.nombre,puesto:u.rol,unidadCodigo:u.equipoId===s.ids.it?1:2,unidad:u.equipoId===s.ids.it?'Informática ficticia':'Contabilidad ficticia',sinUnidad:false,cuentasHabilitadas:1,usuariosIds:[u.id]})).concat(s.assetExample?assets.people():[])};
     }
     if (p === "/catalog") return s.applicationCatalog || {}; // Catálogo ficticio explícito de los recorridos; sin trámites externos.
     if (parts[0] === 'module-access') {
@@ -981,6 +982,9 @@ async function createLab(file, options = {}) {
           items = items.filter((r) => r.nombre.toLowerCase().includes(term));
         if (q.get("equipoId"))
           items = items.filter((r) => r.equipoId === q.get("equipoId"));
+        // Igual que el API real: filtro opcional por estado del registro.
+        if (q.get("estado"))
+          items = items.filter((r) => r.estado === q.get("estado"));
         if (type === "actividades")
           items = items.filter(
             (r) =>
@@ -1092,6 +1096,8 @@ async function createLab(file, options = {}) {
         return r;
       });
     }
+    // Activos Fijos simulado solo cuando se cargaron los activos de ejemplo.
+    if (parts[0] === "inventory" && s.assetExample) return assets.inventory(s, q);
     fail(
       501,
       "Esta operación está fuera del laboratorio. No se consultó un servicio externo.",

@@ -1,3 +1,4 @@
+import path from 'node:path';
 import type { StorybookConfig } from '@storybook/nextjs-vite';
 
 const config: StorybookConfig = {
@@ -7,7 +8,18 @@ const config: StorybookConfig = {
     "addons": [],
     "framework": "@storybook/nextjs-vite",
     "staticDirs": [
-        "..\\public"
-    ]
+        "../public"
+    ],
+    // Mismo alias que tsconfig («@/…» → src/), para que las historias usen los imports del panel.
+    viteFinal: async (viteConfig) => ({
+        ...viteConfig,
+        resolve: {
+            ...viteConfig.resolve,
+            alias: {
+                ...(viteConfig.resolve?.alias as Record<string, string> | undefined),
+                '@': path.resolve(process.cwd(), 'src'),
+            },
+        },
+    }),
 };
 export default config;

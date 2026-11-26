@@ -19,13 +19,13 @@
         
         .label {
         font-weight: 700;
-        color: #333333;
+        color: #333333; color: light-dark(#333333, #e5eaf5);
         }
     }
 }
 
 .label {
-    color: #000000;
+    color: #000000; color: light-dark(#000000, #e5eaf5);
     font-size: 16px;
     font-weight: 600;
     text-align: left;

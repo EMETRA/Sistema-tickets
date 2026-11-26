@@ -5,13 +5,13 @@
     margin: 0 0 24px;
     padding: 8px;
     border: 1px solid var(--tickets-border);
-    background: #fff;
+    background: var(--tickets-surface);
     border-radius: 12px;
     button {
         padding: 10px 16px;
         border: 0;
         border-radius: 7px;
-        background: white;
+        background: var(--tickets-surface);
         color: var(--tickets-text-secondary);
         cursor: pointer;
     }
@@ -86,7 +86,7 @@
     }
 }
 .review {
-    background: #f7f9ff;
+    background: var(--tickets-surface-subtle);
     border: 1px solid var(--tickets-border);
     padding: 20px;
     border-radius: 10px;
@@ -94,10 +94,10 @@
 }
 .success {
     padding: 14px 18px;
-    background: #eaf8ef;
-    border: 1px solid #cbe5d3;
+    background: #eaf8ef; background: light-dark(#eaf8ef, #13322e);
+    border: 1px solid #cbe5d3; border: 1px solid light-dark(#cbe5d3, #2a3449);
     border-radius: 8px;
-    color: #236c43;
+    color: #236c43; color: light-dark(#236c43, #9bdfb9);
 }
 .inline {
     display: flex;
@@ -135,7 +135,7 @@
     }
 }
 .dialog {
-    width: min(1100px, calc(100vw - 32px));
+    width: min(1100px, calc(calc(100vw / var(--vp-zoom, 1)) - 32px));
     padding: 0;
     border: 1px solid var(--tickets-border);
     border-radius: 12px;
@@ -152,7 +152,7 @@
         display: block;
         border: 0;
         width: 100%;
-        height: 75vh;
+        height: calc(75vh / var(--vp-zoom, 1));
     }
 }
 .check {
@@ -205,11 +205,11 @@
     td:last-child {
         position: sticky;
         right: 0;
-        background: white;
+        background: var(--tickets-surface);
         box-shadow: -4px 0 7px #203e7008;
     }
     th:last-child {
-        background: #f7f9fd;
+        background: #f7f9fd; background: light-dark(#f7f9fd, #132241);
     }
 }
 
@@ -230,7 +230,7 @@
         border: 1px solid var(--tickets-border);
         border-radius: 12px;
         color: var(--tickets-text);
-        background: white;
+        background: var(--tickets-surface);
         cursor: pointer;
         strong {
             display: block;
@@ -245,7 +245,7 @@
         }
         &[aria-pressed="true"] {
             border-color: var(--tickets-primary, #445af5);
-            background: #f7f9ff;
+            background: var(--tickets-surface-subtle);
         }
     }
 }
@@ -408,6 +408,6 @@ table.wideTable {
     }
 }
 
-.formDialog { width: min(880px, calc(100vw - 32px)); }
+.formDialog { width: min(880px, calc(calc(100vw / var(--vp-zoom, 1)) - 32px)); }
 .dialogBody { padding: var(--tickets-panel-padding); }
 .dialogBody h2, .dialogBody h3 { margin-bottom: 0; }

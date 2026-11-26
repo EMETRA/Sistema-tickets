@@ -7,11 +7,14 @@ import AdminHome from "@/views/Home/Admin";
 import TechHome from "@/views/Home/Tech";
 import UserHome from "@/views/Home/User";
 import { useWorkspaceView } from "@/platform/presentation-context";
+import { LaunchpadHome } from "@/views/Platform/LaunchpadHome";
+import { useProposalDesign } from "@/platform/proposal";
 
 export default function HomePage() {
     const platform = usePlatform();
     const view = useWorkspaceView();
     const role = useAuthStore((state) => state.getRole());
+    const proposal = useProposalDesign();
 
     const views: Partial<Record<string, React.ReactNode>> = {
         ADMINISTRADOR: <AdminHome />,
@@ -20,6 +23,7 @@ export default function HomePage() {
         USUARIO: <UserHome />,
     };
 
+    if (platform.data && proposal) return <LaunchpadHome key={view.mode + platform.data.actor.id} />;
     if (platform.data) return <HomeWorkspace key={view.mode + platform.data.actor.id} />;
     if (platform.loading || (!platform.disabled && !platform.error))
         return <p role="status">Cargando tu espacio de trabajo…</p>;

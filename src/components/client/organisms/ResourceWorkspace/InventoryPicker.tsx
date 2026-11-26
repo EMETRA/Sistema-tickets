@@ -126,8 +126,7 @@ export function InventoryCatalog({
                 <div>
                     <h3>{title}</h3>
                     <p className={styles.muted}>
-                        Tarjetas y asignaciones vigentes de EMETRA. Se consultan
-                        en Activos Fijos; los datos técnicos se completan en
+                        Origen: Activos Fijos. La ficha técnica se completa en
                         Tickets.
                     </p>
                 </div>
@@ -256,29 +255,34 @@ export function InventoryCatalog({
                                         {(onSelect || onOpen) && (
                                             <td>
                                                 {i.fichaId && onOpen ? (
-                                                    <Button
+                                                    <button
                                                         type="button"
-                                                        variant="outlined"
+                                                        className={styles.link}
                                                         onClick={() =>
                                                             onOpen(i.fichaId!)
                                                         }
                                                     >
                                                         Ver ficha
-                                                    </Button>
+                                                    </button>
                                                 ) : onSelect &&
                                                   i.fichaCompleta ? (
-                                                    <Button
+                                                    <button
                                                         type="button"
-                                                        variant="outlined"
+                                                        className={styles.link}
+                                                        aria-label={
+                                                            "Crear ficha técnica " +
+                                                            i.numeroInventario
+                                                        }
                                                         onClick={() =>
                                                             onSelect(i)
                                                         }
                                                     >
-                                                        Crear ficha técnica{" "}
-                                                        {i.numeroInventario}
-                                                    </Button>
+                                                        + Crear ficha técnica
+                                                    </button>
                                                 ) : (
-                                                    "Solo consulta"
+                                                    <span className={styles.muted}>
+                                                        Solo consulta
+                                                    </span>
                                                 )}
                                             </td>
                                         )}

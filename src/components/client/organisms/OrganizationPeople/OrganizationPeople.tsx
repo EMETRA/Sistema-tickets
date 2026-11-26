@@ -140,7 +140,7 @@ export function OrganizationPeople({
                 </table>
             </div>
             <div className={styles.toolbar}>
-                <p>
+                <p className={styles.muted}>
                     {filtered.length} empleados · Página {page + 1} de{" "}
                     {Math.max(1, Math.ceil(filtered.length / 25))}
                 </p>

@@ -1,6 +1,6 @@
 .StatusCard {
-    background: #fff;
-    border: 2px solid #e5e5e5;
+    background: var(--tickets-surface);
+    border: 2px solid #e5e5e5; border: 2px solid light-dark(#e5e5e5, #2a3449);
     border-radius: 10px;
     border-top-width: 4px;
     padding: 2rem 1.5rem;

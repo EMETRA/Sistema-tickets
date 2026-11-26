@@ -6,6 +6,6 @@
 .reference { margin: -5px 0 22px; }
 .summary { align-self: start; dl { margin: 24px 0; display: grid; gap: 20px; font-size: 12px; dt { color: var(--tickets-text-secondary); margin-bottom: 8px; } dd { margin: 0; overflow-wrap: anywhere; } } }
 .actions { display: flex; gap: 10px; flex-wrap: wrap; padding-top: 20px; border-top: 1px solid var(--tickets-border); }
-.card .error { padding: 12px 16px; border: 1px solid #efccd2; border-radius: 9px; color: var(--tickets-danger); background: #fff5f6; margin-bottom: 20px; }
+.card .error { padding: 12px 16px; border: 1px solid #efccd2; border: 1px solid light-dark(#efccd2, #2a3449); border-radius: 9px; color: var(--tickets-danger); background: var(--tickets-danger-soft); margin-bottom: 20px; }
 @media (max-width: 850px) { .layout { grid-template-columns: minmax(0, 1fr); } .summary { width: 100%; } }
 @media (max-width: 650px) { .inputs, .fields { grid-template-columns: minmax(0, 1fr); } .result { padding: 18px; } }

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useCreateTicketDialog } from "@/store/useCreateTicketDialog";
 import { TicketsTablePanel } from "@/components/client/organisms/TicketsTablePanel";
 import { Ticket } from "@/components/client/organisms/TicketsTablePanel/types";
 import {
@@ -15,7 +15,7 @@ import { ErrorHandler } from "@/api/graphql/errors";
 import type { ChipState } from "@/components/client/atoms/TicketStateChip/types";
 
 const Tickets = ({ scope = "role" }: { scope?: "role" | "created" }) => {
-    const router = useRouter();
+    const createdVersion = useCreateTicketDialog((s) => s.createdVersion);
     // Hook que obtiene tickets filtrados automáticamente según el rol del usuario
     const {
         data: ticketsData,
@@ -38,6 +38,12 @@ const Tickets = ({ scope = "role" }: { scope?: "role" | "created" }) => {
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    // Un ticket creado desde la ventana aparece sin recargar la lista.
+    useEffect(() => {
+        if (createdVersion) void refetchTickets();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [createdVersion]);
 
     const handleCancelTicket = async (ticketId: string) => {
         setActionMessage("");
@@ -206,7 +212,6 @@ const Tickets = ({ scope = "role" }: { scope?: "role" | "created" }) => {
                 onDelete={handleCancelTicket}
                 onExport={handleExportTickets}
                 onRefresh={() => void refetchTickets()}
-                onOpenTicket={id => router.push(`/mis-tickets/${encodeURIComponent(id)}${scope === "role" ? "?origen=tickets" : ""}`)}
                 onTicketUpdated={refetchTickets}
             />
         </div>

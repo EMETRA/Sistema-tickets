@@ -49,8 +49,8 @@
     border: 1px solid var(--tickets-border);
     border-radius: 8px;
     width: 100%;
-    height: min(900px, 75vh);
-    background: #f8faff;
+    height: min(900px, calc(75vh / var(--vp-zoom, 1)));
+    background: var(--tickets-surface-subtle);
 }
 .link {
     display: inline-flex;
@@ -76,7 +76,7 @@
         grid-template-columns: 1fr;
     }
     .preview {
-        height: 65vh;
+        height: calc(65vh / var(--vp-zoom, 1));
     }
     .link {
         width: 100%;

@@ -13,9 +13,9 @@
     gap: 6px;
     padding: 6px 10px;
     min-height: 38px;
-    border: 2px solid #EDF0F2;
+    border: 2px solid #EDF0F2; border: 2px solid light-dark(#EDF0F2, #2a3449);
     border-radius: 8px;
-    background-color: #ffffff;
+    background-color: var(--tickets-surface);
     cursor: pointer;
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
     outline: none;
@@ -59,8 +59,8 @@
     margin: 0;
     padding: 4px;
     list-style: none;
-    background-color: #ffffff;
-    border: 2px solid #EDF0F2;
+    background-color: var(--tickets-surface);
+    border: 2px solid #EDF0F2; border: 2px solid light-dark(#EDF0F2, #2a3449);
     border-radius: 8px;
     box-shadow:
         0 4px 6px -1px rgba(0, 0, 0, 0.07),
@@ -78,11 +78,11 @@
     outline: none;
 
     &:hover {
-        background-color: #f3f4f6;
+        background-color: var(--tickets-neutral-soft);
     }
 
     &:focus-visible {
-        background-color: #eff6ff;
+        background-color: #eff6ff; background-color: light-dark(#eff6ff, #13294a);
     }
 }
 

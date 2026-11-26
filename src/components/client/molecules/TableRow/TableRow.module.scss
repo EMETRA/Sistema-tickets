@@ -2,18 +2,18 @@
   --row-scale: 1;
   display: grid;
   align-items: stretch;
-  background-color: #FFFFFF;
+  background-color: var(--tickets-surface);
   width: 100%;
 
-  border-bottom: 1px solid #E0E0E0;
+  border-bottom: 1px solid var(--tickets-border);
 
   &.header {
-    background-color: #F9F9F9;
-    border: 2px solid #BDBDBD;
+    background-color: var(--tickets-surface-subtle);
+    border: 2px solid var(--tickets-border);
     border-radius: 8px 8px 0 0;
     
     .cell {
-      border-right: 1px solid #D0D7DE;
+      border-right: 1px solid var(--tickets-border);
       padding: calc(8px * var(--row-scale)) calc(12px * var(--row-scale)); 
       min-height: calc(25px * var(--row-scale)); 
     }
@@ -22,7 +22,7 @@
   transition: background-color 0.2s ease;
 
   &.selected {
-    background-color: #F0F4FF; 
+    background-color: #F0F4FF; background-color: light-dark(#F0F4FF, #13224a); 
   }
 }
 
@@ -43,7 +43,7 @@
 
 // Opcional: si quieres que el checkbox del header tenga el mismo estilo gris
 .header .checkboxCell {
-  background-color: #F9F9F9;
+  background-color: var(--tickets-surface-subtle);
 }
 
 .cell {
@@ -123,8 +123,8 @@
   }
 
   &.header {
-    background-color: #FFFFFF; // Fondo blanco para headers de módulo
-    border: 1px solid #E0E0E0;
+    background-color: var(--tickets-surface); // Fondo blanco para headers de módulo
+    border: 1px solid var(--tickets-border);
     
     .checkboxCell {
         background-color: transparent;

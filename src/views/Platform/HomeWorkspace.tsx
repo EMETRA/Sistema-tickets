@@ -1,4 +1,5 @@
 "use client";
+import { useCreateTicketDialog } from "@/store/useCreateTicketDialog";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
@@ -94,6 +95,7 @@ export function HomeWorkspace() {
         tickets: true,
         calendar: true,
     });
+    const createdVersion = useCreateTicketDialog((s) => s.createdVersion);
     const [revision, setRevision] = useState(0),
         [ticketId, setTicket] = useState<number | null>(null);
     const mode = data!.actor.mode,
@@ -164,12 +166,14 @@ export function HomeWorkspace() {
             .catch(() => fail("calendar"))
             .finally(() => finish("calendar"));
         return () => c.abort();
-    }, [team, scope, headTeam, revision, personal]);
+        // createdVersion: un ticket creado desde la ventana se refleja en Inicio.
+    }, [team, scope, headTeam, revision, personal, createdVersion]);
     const retry = () => {
         setPending({ metrics: true, tickets: !personal, calendar: true });
         setErrors({});
         setRevision((n) => n + 1);
     };
+    const showCreateTicket = useCreateTicketDialog((s) => s.show);
     const metrics: HomeMetric[] = personal
         ? [
               { label: "Mis solicitudes", value: summary?.tickets.total },
@@ -219,6 +223,7 @@ export function HomeWorkspace() {
             label: "Crear ticket",
             href: "/tickets-creation",
             icon: "ticket-solid",
+            onClick: showCreateTicket,
         },
         {
             label: "Mis métricas",
@@ -336,7 +341,10 @@ export function HomeWorkspace() {
                     </thead>
                     <tbody>
                         {tickets?.items.map((t) => (
-                            <tr key={t.id}>
+                            <tr
+                                key={t.id}
+                                className={t.alerta ? homeStyles.rowAlert : undefined}
+                            >
                                 <td>
                                     <button
                                         className={homeStyles.recordLink}
@@ -348,10 +356,10 @@ export function HomeWorkspace() {
                                 <td>
                                     {t.titulo}
                                     {t.alerta && (
-                                        <p className={styles.error}>
-                                            Sin primera atención: superó el
-                                            umbral del equipo.
-                                        </p>
+                                        <span className={homeStyles.flag}>
+                                            Sin primera atención · superó el
+                                            umbral del equipo
+                                        </span>
                                     )}
                                 </td>
                                 <td>

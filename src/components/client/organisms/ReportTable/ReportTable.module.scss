@@ -1,7 +1,7 @@
 @use "../../../../theme/surfaces.scss" as surfaces;
 .ReportTable {
-    background-color: #FFFFFF;
-    border: 1px solid #F0F0F0;
+    background-color: var(--tickets-surface);
+    border: 1px solid #F0F0F0; border: 1px solid light-dark(#F0F0F0, #2a3449);
     border-radius: 16px;
     padding: 32px;
     width: 60%;

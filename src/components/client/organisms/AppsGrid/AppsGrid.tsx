@@ -34,6 +34,7 @@ export const AppsGrid = ({
                     <AppCard
                         key={app.title + app.iconLabel}
                         {...app}
+                        title={areaName(app.title)}
                         className={styles.card}
                     />
                 ))}
@@ -41,4 +42,8 @@ export const AppsGrid = ({
         )}
     </section>
 );
+/** "Aplicaciones de Informática" → "Informática": el área se lee desde su primera palabra. */
+function areaName(title: string) {
+    return title.replace(/^aplicaciones\s+(de\s+(la\s+|los\s+|las\s+)?)?/i, "") || title;
+}
 export default AppsGrid;

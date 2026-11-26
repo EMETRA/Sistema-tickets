@@ -32,6 +32,7 @@ export const TicketCreationPanel: React.FC<TicketCreationPanelProps> = ({
     uploadProgress = 0,
     initialValues,
     className,
+    variant = "page",
 }) => {
     // Estados del formulario
     const [subject, setSubject] = useState(initialValues?.subject || "");
@@ -112,6 +113,51 @@ export const TicketCreationPanel: React.FC<TicketCreationPanelProps> = ({
     };
 
     const department = departments.find(option => String(option.value) === departmentId)?.label;
+    const filesList = uploadedFiles.length > 0 && <div className={styles.filesList}>
+        {uploadedFiles.map(file => <FileItem key={file.id} name={file.name}
+            status={loading ? "uploading" : "ready"} progress={loading ? uploadProgress : 0}
+            description={loading ? undefined : "Seleccionado · se enviará al guardar"}
+            onRemove={loading ? undefined : () => handleRemoveFile(file.id)} />)}
+    </div>;
+    if (variant === "dialog")
+        return (
+            <form onSubmit={handleSubmit} className={classNames(styles.dialogForm, className)} aria-label="Nuevo ticket">
+                <div className={styles.dialogBody}>
+                    <div className={styles.fieldsRow}>
+                        <FormField label="Asunto" htmlFor="subject" required className={styles.fieldAsunto}>
+                            <Input id="subject" maxLength={150} type="text" value={subject} autoFocus
+                                onChange={(e) => setSubject(e.target.value)} placeholder="Ej. La impresora de recepción no imprime"
+                                state={loading ? "disabled" : "default"} required />
+                        </FormField>
+                        <FormField label="Área que atiende" htmlFor="department" required className={styles.fieldDepartamento}>
+                            <Select id="department" value={departmentId} onChange={(e) => setDepartmentId(e.target.value)}
+                                options={departments} placeholder="Selecciona un área"
+                                state={loading ? "disabled" : "default"} required />
+                        </FormField>
+                    </div>
+                    <FormField label="Descripción del problema" htmlFor="description" required>
+                        <RichTextField id="description" readOnly={loading} value={description} onChange={setDescription} placeholder="Qué ocurre, desde cuándo y qué ya intentaste…" />
+                    </FormField>
+                    <div className={styles.dialogFiles}>
+                        <span className={styles.dialogLabel}>Archivos adjuntos <small>· opcional</small></span>
+                        <FileDropzone subtitle="PDF, Office o imágenes. Se envían al crear el ticket." accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.ppt,.pptx,.jpg,.jpeg,.png,.gif" onFiles={loading ? () => {} : handleFiles} rejectedFiles={rejectedFiles} />
+                        {filesList}
+                    </div>
+                </div>
+                <footer className={styles.dialogFooter}>
+                    <p className={styles.help}>
+                        {department ? `Lo recibirá ${department}` : "Los campos con * son obligatorios."}
+                        {uploadedFiles.length > 0 && ` · ${uploadedFiles.length} ${uploadedFiles.length === 1 ? "adjunto" : "adjuntos"}`}
+                    </p>
+                    <div className={styles.dialogActions}>
+                        <Button type="button" variant="outlined" color="cancel" onClick={handleCancel}
+                            state={loading ? "disabled" : "default"}>Cancelar</Button>
+                        <Button type="submit" variant="contained" color="default"
+                            state={loading ? "loading" : "default"} loadingText="Enviando...">Crear ticket</Button>
+                    </div>
+                </footer>
+            </form>
+        );
     return (
         <div className={classNames(styles.TicketCreationPanel, className)}>
             <form onSubmit={handleSubmit} className={styles.form}>
@@ -137,12 +183,7 @@ export const TicketCreationPanel: React.FC<TicketCreationPanelProps> = ({
                 <section className={styles.filesSection} aria-labelledby="ticket-files-title">
                     <Title variant="mid" tag="h2" id="ticket-files-title">Archivos adjuntos</Title>
                     <FileDropzone subtitle="PDF, documentos de Office e imágenes. Se enviarán al guardar." accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.ppt,.pptx,.jpg,.jpeg,.png,.gif" onFiles={loading ? () => {} : handleFiles} rejectedFiles={rejectedFiles} />
-                    {uploadedFiles.length > 0 && <div className={styles.filesList}>
-                        {uploadedFiles.map(file => <FileItem key={file.id} name={file.name}
-                            status={loading ? "uploading" : "ready"} progress={loading ? uploadProgress : 0}
-                            description={loading ? undefined : "Seleccionado · se enviará al guardar"}
-                            onRemove={loading ? undefined : () => handleRemoveFile(file.id)} />)}
-                    </div>}
+                    {filesList}
                 </section>
                 <aside className={styles.summary} aria-labelledby="ticket-summary-title">
                     <Title variant="mid" tag="h2" id="ticket-summary-title">Resumen de la solicitud</Title>

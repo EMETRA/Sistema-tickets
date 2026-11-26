@@ -15,8 +15,8 @@
 }
 
 .preview {
-    width: 100vw;
-    height: 100vh;
+    width: calc(100vw / var(--vp-zoom, 1));
+    height: calc(100vh / var(--vp-zoom, 1));
     min-width: 0;
     padding: 0;
     background: transparent;
@@ -36,8 +36,8 @@
 }
 
 .previewImage {
-    width: 70vw;
-    height: 70vh;
+    width: calc(70vw / var(--vp-zoom, 1));
+    height: calc(70vh / var(--vp-zoom, 1));
     object-fit: contain;
 }
 

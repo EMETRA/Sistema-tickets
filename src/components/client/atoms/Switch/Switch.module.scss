@@ -45,7 +45,7 @@
 /* Slider (círculo que se mueve) */
 .Slider {
   position: absolute;
-  background-color: white;
+  background-color: var(--tickets-surface);
   border-radius: 50%;
   transition: transform 0.3s ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
@@ -84,7 +84,7 @@
 /* Label */
 .Label {
   font-size: 14px;
-  color: #262626;
+  color: var(--tickets-text);
   line-height: 1.4;
 }
 

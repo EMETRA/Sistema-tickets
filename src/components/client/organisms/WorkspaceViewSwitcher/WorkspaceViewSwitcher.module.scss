@@ -1,11 +1,11 @@
 .dialog {
-  width: min(520px, calc(100vw - 32px));
-  max-height: calc(100dvh - 32px);
+  width: min(520px, calc(calc(100vw / var(--vp-zoom, 1)) - 32px));
+  max-height: calc(calc(100dvh / var(--vp-zoom, 1)) - 32px);
   margin: auto;
   padding: 28px;
   border: 1px solid var(--tickets-border);
   border-radius: 18px;
-  background: #fff;
+  background: var(--tickets-surface);
   color: var(--tickets-text);
   box-shadow: 0 20px 80px #192e5740;
   &::backdrop {
@@ -38,7 +38,7 @@
     min-height: 44px;
     border: 1px solid var(--tickets-border);
     border-radius: 9px;
-    background: #fff;
+    background: var(--tickets-surface);
     color: inherit;
     padding: 10px;
   }
@@ -53,7 +53,7 @@
     min-height: 42px;
     border: 1px solid var(--tickets-border);
     border-radius: 9px;
-    background: #fff;
+    background: var(--tickets-surface);
     color: var(--tickets-primary);
     padding: 10px 16px;
     cursor: pointer;

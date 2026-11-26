@@ -20,9 +20,27 @@
     dt { color: var(--tickets-text-secondary); font-size: 12px; margin-bottom: 4px; }
     dd { margin: 0; color: var(--tickets-text); line-height: 1.7; font-size: 13px; overflow-wrap: anywhere; }
 }
-.formActions { grid-column: 1 / -1; flex-wrap: wrap; }
+// Acciones bajo el formulario y siempre visibles al redactar en pantallas bajas.
+.formActions {
+    grid-column: 1; flex-wrap: wrap; position: sticky; bottom: 12px; z-index: 2;
+    padding-top: 12px; padding-bottom: 12px; box-shadow: var(--tickets-shadow-raised);
+}
 @media (max-width: 900px) {
     .form { grid-template-columns: minmax(0, 1fr); }
     .summary { grid-column: 1; grid-row: auto; position: static; }
 }
 @media (max-width: 650px) { .fieldsRow { grid-template-columns: minmax(0, 1fr); } }
+
+// ── Variante ventana ─────────────────────────────────────────────
+.dialogForm { display: flex; flex-direction: column; min-height: 0; flex: 1 1 auto; }
+.dialogBody { display: flex; flex-direction: column; gap: 18px; padding: 20px 24px 24px; overflow-y: auto; min-height: 0; flex: 1 1 auto; }
+.dialogFiles { display: flex; flex-direction: column; gap: 8px; }
+.dialogLabel { font-size: 13px; font-weight: 600; color: var(--tickets-text); small { font-weight: 400; color: var(--tickets-text-muted); font-size: 12px; } }
+.dialogFooter {
+    display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+    padding: 14px 24px; border-top: 1px solid var(--tickets-border); background: var(--tickets-surface-subtle);
+    border-radius: 0 0 var(--tickets-radius) var(--tickets-radius);
+    .help { line-height: 1.5; }
+}
+.dialogActions { display: flex; gap: 10px; margin-left: auto; }
+@media (max-width: 650px) { .dialogBody { padding: 16px; } .dialogFooter { padding: 12px 16px; } }

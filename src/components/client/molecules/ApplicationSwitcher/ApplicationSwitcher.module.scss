@@ -1,6 +1,6 @@
 .root {
   position: relative;
-  width: clamp(170px, 19vw, 290px);
+  width: clamp(170px, calc(19vw / var(--vp-zoom, 1)), 290px);
 }
 .search {
   display: flex;
@@ -9,7 +9,7 @@
   padding: 10px 13px;
   border: 1px solid var(--tickets-border);
   border-radius: 9px;
-  background: #f8faff;
+  background: var(--tickets-surface-subtle);
   input {
     min-width: 0;
     width: 100%;
@@ -36,7 +36,7 @@
   max-height: 380px;
   overflow-y: auto;
   padding: 8px;
-  background: #fff;
+  background: var(--tickets-surface);
   border: 1px solid var(--tickets-border);
   box-shadow: 0 12px 28px #20396320;
   border-radius: 12px;

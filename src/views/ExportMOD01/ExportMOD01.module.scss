@@ -5,8 +5,8 @@
 }
 
 .card {
-    background: #fff;
-    border: 0.5px solid #e5e5e5;
+    background: var(--tickets-surface);
+    border: 0.5px solid #e5e5e5; border: 0.5px solid light-dark(#e5e5e5, #2a3449);
     border-radius: 12px;
     padding: 2rem;
 }

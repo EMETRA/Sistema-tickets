@@ -25,7 +25,7 @@
         border-radius: 8px;
         min-height: 42px;
         padding: 10px 12px;
-        background: #fff;
+        background: var(--tickets-surface);
         color: var(--tickets-text);
         font: inherit;
     }
@@ -80,7 +80,7 @@
         padding: 8px 12px;
         border: 1px solid var(--tickets-border);
         border-radius: 8px;
-        background: #fff;
+        background: var(--tickets-surface);
         font-size: 12px;
     }
     strong {

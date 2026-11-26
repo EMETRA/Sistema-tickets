@@ -9,6 +9,8 @@ import { ResourceWorkspace } from "@/components/client/organisms/ResourceWorkspa
 import { platformFetch } from "@/platform/client";
 import { displayDate } from "@/components/client/organisms/ResourceWorkspace/RecordDetail";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
+import { SystemsPortfolio } from "@/components/client/organisms/SystemsPanel";
+import { useProposalDesign } from "@/platform/proposal";
 type Objects = {
   owner: string;
   consultadoEn: string;
@@ -32,7 +34,8 @@ type Objects = {
 };
 export function SystemsWorkspace() {
   const { data } = usePlatform();
-  const [tab, setTab] = useState("catalogo"),
+  const proposal = useProposalDesign();
+  const [tab, setTab] = useState(proposal ? "portafolio" : "catalogo"),
     [schema, setSchema] = useState<unknown>(""),
     [repo, setRepo] = useState("");
   const [result, setResult] = useState<Objects | null>(null),
@@ -80,6 +83,17 @@ export function SystemsWorkspace() {
   return (
     <section className={styles.page}>
       <nav className={styles.tabs} aria-label="Aplicaciones y fuentes técnicas">
+        {proposal && (
+          <button
+            aria-current={tab === "portafolio" ? "page" : undefined}
+            onClick={() => {
+              setTab("portafolio");
+              setMessage("");
+            }}
+          >
+            Portafolio
+          </button>
+        )}
         <button
           aria-current={tab === "catalogo" ? "page" : undefined}
           onClick={() => {
@@ -87,7 +101,7 @@ export function SystemsWorkspace() {
             setMessage("");
           }}
         >
-          Aplicaciones y seguimiento
+          {proposal ? "Registros" : "Aplicaciones y seguimiento"}
         </button>
         {!!data?.definitions.repositorios?.actions.LEER && (
           <button
@@ -117,7 +131,9 @@ export function SystemsWorkspace() {
           {message}
         </p>
       )}
-      {tab === "catalogo" ? (
+      {tab === "portafolio" ? (
+        <SystemsPortfolio onShowRecords={() => setTab("catalogo")} />
+      ) : tab === "catalogo" ? (
         <ResourceWorkspace group="sistemas" />
       ) : tab === "repositorios" ? (
         <>

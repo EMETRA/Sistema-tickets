@@ -9,7 +9,7 @@
     gap: 0.5rem;
     padding: 1.75rem 1.5rem 1.5rem;
     background-color: $card-background;
-    border: 1px solid $gris-2;
+    border: 1px solid var(--tickets-border);
     border-radius: 0.75rem;
     text-align: center;
     font-family: var(--font-montserrat), sans-serif;
@@ -39,7 +39,7 @@
     margin: 0.5rem 0 0;
     font-size: 1.25rem;
     font-weight: 700;
-    color: $negro-2;
+    color: var(--tickets-text);
 }
 
 .description.description {
@@ -57,7 +57,7 @@
     background-color: $naranja-10;
     font-size: 0.75rem;
     font-weight: 600;
-    color: #B45309;
+    color: #B45309; color: light-dark(#B45309, #eeb68b);
 }
 
 .note.note {
@@ -70,9 +70,9 @@
     width: 100%;
     padding: 0.5rem 0.75rem;
     border-radius: 0.375rem;
-    background-color: #F4F5F8;
+    background-color: #F4F5F8; background-color: light-dark(#F4F5F8, #131c33);
     font-size: 0.75rem;
-    color: $gris-4;
+    color: var(--tickets-text-muted);
     text-align: center;
 }
 
@@ -80,4 +80,14 @@
     display: flex;
     gap: 0.75rem;
     margin-top: 0.75rem;
+}
+
+.extra:empty {
+  display: none;
+}
+.extra {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-start;
 }

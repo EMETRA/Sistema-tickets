@@ -32,7 +32,7 @@
 
 .formContainer {
   border-radius: 8px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--tickets-border);
 }
 
 .cardLoading {
@@ -53,7 +53,7 @@
   max-width: 100%;
   align-self: flex-start;
   align-items: stretch;
-  padding: clamp(18px, 2.3vw, 30px);
+  padding: clamp(18px, calc(2.3vw / var(--vp-zoom, 1)), 30px);
   border: 1px solid var(--tickets-border);
   border-radius: var(--tickets-radius);
   background: var(--tickets-surface);

@@ -4,11 +4,11 @@
   isolation: isolate;
   transform: translateZ(0);
   width: var(--tickets-sidebar, 228px);
-  height: 100dvh;
+  height: calc(100dvh / var(--vp-zoom, 1));
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
-  background: #fff;
+  background: var(--tickets-surface);
   border-right: 1px solid var(--tickets-border, #dfe5f2);
 }
 .brand {
@@ -16,7 +16,7 @@
   flex-direction: column;
   gap: 5px;
   padding: 27px 25px;
-  color: #243b70;
+  color: var(--tickets-text);
   strong {
     font-size: 22px;
     letter-spacing: 0.8px;
@@ -57,7 +57,7 @@
     width: 100%;
     min-height: 44px;
     padding: 12px;
-    color: #536ca1;
+    color: var(--tickets-text-secondary);
     background: transparent;
     border: 0;
     border-radius: 9px;
@@ -65,7 +65,7 @@
     cursor: pointer;
     font-size: 12px;
     &:hover {
-      background: #edf1ff;
+      background: var(--tickets-primary-soft);
     }
   }
 }

@@ -103,11 +103,11 @@
     height: 6px;
     margin-top: 5px;
     border: 0;
-    background: #edf1f8;
+    background: #edf1f8; background: light-dark(#edf1f8, #13213c);
     border-radius: 5px;
     appearance: none;
     &::-webkit-meter-bar {
-      background: #edf1f8;
+      background: #edf1f8; background: light-dark(#edf1f8, #13213c);
       border: 0;
       border-radius: 5px;
     }
@@ -171,7 +171,7 @@
   border: 1px solid var(--tickets-border);
   border-radius: 8px;
   color: var(--tickets-text);
-  background: #fff;
+  background: var(--tickets-surface);
   min-width: 0;
   &:focus-visible {
     outline: 2px solid var(--tickets-primary);
@@ -189,7 +189,7 @@
     font-size: 11px;
     border: 1px solid transparent;
     border-radius: 7px;
-    background: #f6f8fc;
+    background: var(--tickets-surface-subtle);
     color: var(--tickets-text-secondary);
     cursor: pointer;
     span {
@@ -198,7 +198,7 @@
     }
     &[aria-pressed="true"] {
       color: var(--tickets-primary);
-      border-color: #c4ceff;
+      border-color: #c4ceff; border-color: light-dark(#c4ceff, #2a3449);
       background: var(--tickets-primary-soft, #edf1ff);
     }
   }
@@ -215,13 +215,13 @@
     font-size: 11px;
     font-weight: 500;
     color: var(--tickets-text-secondary);
-    background: #f8faff;
+    background: var(--tickets-surface-subtle);
     white-space: nowrap;
   }
   td,
   th {
     padding: 15px 24px;
-    border-top: 1px solid #edf0f7;
+    border-top: 1px solid #edf0f7; border-top: 1px solid light-dark(#edf0f7, #2a3449);
     vertical-align: middle;
   }
   td {
@@ -238,7 +238,7 @@
     }
   }
   tbody tr:hover {
-    background: #fafbff;
+    background: var(--tickets-surface-subtle);
   }
 }
 .badge {
@@ -247,15 +247,15 @@
   padding: 4px 8px;
   font-size: 10px;
   white-space: nowrap;
-  background: #eef1f7;
-  color: #62728b;
+  background: var(--tickets-neutral-soft);
+  color: #62728b; color: light-dark(#62728b, #e5eaf5);
   &[data-tone="success"] {
-    background: #edf8f2;
-    color: #216b4c;
+    background: #edf8f2; background: light-dark(#edf8f2, #132f30);
+    color: #216b4c; color: light-dark(#216b4c, #9ae0c2);
   }
   &[data-tone="danger"] {
-    background: #fff0f1;
-    color: #a03646;
+    background: #fff0f1; background: light-dark(#fff0f1, #371928);
+    color: #a03646; color: light-dark(#a03646, #de9ca6);
   }
 }
 .health {
@@ -266,10 +266,10 @@
   color: var(--tickets-text-secondary);
   white-space: nowrap;
   &[data-tone="success"] {
-    color: #216b4c;
+    color: #216b4c; color: light-dark(#216b4c, #9ae0c2);
   }
   &[data-tone="danger"] {
-    color: #a03646;
+    color: #a03646; color: light-dark(#a03646, #de9ca6);
   }
 }
 .image {
@@ -292,7 +292,7 @@
   text-underline-offset: 3px;
 }
 .tableFooter {
-  border-top: 1px solid #edf0f7;
+  border-top: 1px solid #edf0f7; border-top: 1px solid light-dark(#edf0f7, #2a3449);
   padding: 14px 24px;
   color: var(--tickets-text-secondary);
   font-size: 10px;
@@ -310,7 +310,7 @@
   }
 }
 .logBody {
-  border-top: 1px solid #edf0f7;
+  border-top: 1px solid #edf0f7; border-top: 1px solid light-dark(#edf0f7, #2a3449);
 }
 .logToolbar {
   display: flex;
@@ -346,7 +346,7 @@
   font-size: 12px;
   line-height: 1.9;
   color: var(--tickets-text-secondary);
-  background: #fafbfe;
+  background: #fafbfe; background: light-dark(#fafbfe, #161d2c);
 }
 .empty {
   text-align: center;
@@ -369,8 +369,8 @@
 }
 .notice {
   border: 1px solid #ead7ac;
-  background: #fff9ed;
-  color: #785c25;
+  background: #fff9ed; background: light-dark(#fff9ed, #373126);
+  color: #785c25; color: light-dark(#785c25, #e0c89a);
   padding: 14px 18px;
   border-radius: 10px;
   font-size: 12px;
@@ -443,4 +443,12 @@
   .logToolbar span {
     margin-left: 0;
   }
+}
+
+// Con el servidor elegido en la flota, el selector se oculta y la observación ocupa su lugar.
+.serverPicker[hidden] {
+  display: none;
+}
+.overview:has(.serverPicker[hidden]) {
+  grid-template-columns: minmax(0, 1fr) auto;
 }

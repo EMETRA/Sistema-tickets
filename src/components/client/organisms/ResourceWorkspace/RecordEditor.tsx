@@ -2,12 +2,18 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/client/atoms/Button";
 import { PlatformField } from "@/components/client/molecules/PlatformField/PlatformField";
+import { MeetingPlaceField } from "./MeetingFields";
 import { resourceDefinition } from "@/platform/resources";
 import { usePlatform } from "@/platform/context";
 import { InventoryPicker, inventoryClass } from "./InventoryPicker";
 import { platformCommand, platformFetch } from "@/platform/client";
 import type { PlatformRecord } from "@/platform/types";
 import styles from "../../templates/PlatformPage/PlatformPage.module.scss";
+import sheet from "./RecordSheet.module.scss";
+import { statusLabel } from "@/helpers/statusTone";
+import { WorkspaceIcon } from "../../atoms/WorkspaceIcon/WorkspaceIcon";
+import { PLATFORM_SECTIONS } from "@/platform/navigation";
+import { useProposalDesign } from "@/platform/proposal";
 export function RecordEditor({
     type,
     record,
@@ -25,6 +31,7 @@ export function RecordEditor({
     onClose: () => void;
     onSaved: (record: PlatformRecord) => void;
 }) {
+    const proposal = useProposalDesign();
     const { data: context } = usePlatform(),
         def = resourceDefinition(type, context!.definitions[type]),
         availableTeams = context!.teams.filter(
@@ -131,16 +138,37 @@ export function RecordEditor({
             setBusy(false);
         }
     }
+    const sectionIcon =
+        PLATFORM_SECTIONS.find((s) => s.id === def.group)?.iconName || "table-cells-large-solid";
     return (
         <dialog
             ref={dialog}
-            className={styles.dialog}
+            className={proposal ? `${styles.dialog} ${sheet.sheet}` : styles.dialog}
             aria-labelledby="record-editor-title"
             onCancel={(e) => {
                 e.preventDefault();
                 if (!busy) onClose();
             }}
         >
+            {proposal ? (
+                <header className={sheet.head}>
+                    <span className={sheet.icon} aria-hidden="true">
+                        <WorkspaceIcon name={sectionIcon} size={20} />
+                    </span>
+                    <div className={sheet.titles}>
+                        <p className={sheet.kind}>{record ? "Editar" : "Nuevo registro"}</p>
+                        <h2 id="record-editor-title">
+                            {record ? record.nombre : "Registrar " + def.singular.toLowerCase()}
+                        </h2>
+                        <p className={sheet.sub}>
+                            {def.singular} · Los campos con * son obligatorios.
+                        </p>
+                    </div>
+                    <button type="button" className={sheet.close} onClick={onClose} disabled={busy} aria-label="Cerrar formulario">
+                        ×
+                    </button>
+                </header>
+            ) : (
             <div className={styles.dialogHeader}>
                 <h2 id="record-editor-title">
                     {record ? "Editar" : "Registrar"}{" "}
@@ -155,8 +183,9 @@ export function RecordEditor({
                     Cerrar
                 </Button>
             </div>
+            )}
             {!record && !datos.inventarioReferencia && def.actions.LEER && ["activos", "dispositivos"].includes(type) && (
-                <section className={styles.card}>
+                <section className={styles.card} style={proposal ? { margin: "14px 22px 0" } : undefined}>
                 {!searchInventory ? <Button type="button" variant="outlined" onClick={()=>setSearchInventory(true)}>Buscar un bien en Activos Fijos</Button> : <InventoryPicker
                     type={type}
                     onSelect={(item) => {
@@ -184,17 +213,17 @@ export function RecordEditor({
                 </section>
             )}
             {typeof datos.inventarioReferencia === "string" && (
-                <p role="status" className={styles.card}>
+                <p role="status" className={proposal ? sheet.callout : styles.card} style={proposal ? { margin: "14px 22px 0" } : undefined}>
                     Vinculado al bien institucional{" "}
                     {String(datos.numeroInventario)}. Revisa el tipo sugerido,
                     la instalación y el responsable técnico; en red confirma
                     también los puertos reales.
                 </p>
             )}
-            <form onSubmit={save} className={styles.dialogBody}>
-                <div className={styles.split}>
-                    <section className={styles.card}>
-                        <div className={styles.formGrid}>
+            <form onSubmit={save} className={proposal ? sheet.form : styles.dialogBody}>
+                <div className={proposal ? undefined : styles.split}>
+                    <section className={proposal ? undefined : styles.card}>
+                        <div className={proposal ? sheet.formBody : styles.formGrid}>
                             <label className={styles.field}>
                                 Nombre *
                                 <input
@@ -228,7 +257,14 @@ export function RecordEditor({
                                     </select>
                                 </label>
                             )}
-                            {fields.map((field) => (
+                            {fields.map((field) => type === "actividades" && proposal && field.key === "lugar" ? (
+                                <MeetingPlaceField
+                                    key={field.key}
+                                    value={datos.lugar}
+                                    disabled={busy}
+                                    onChange={(value) => void changeField("lugar", value)}
+                                />
+                            ) : (
                                 <PlatformField
                                     key={field.key}
                                     field={field}
@@ -249,7 +285,7 @@ export function RecordEditor({
                             ))}
                             {type === "actividades" && (
                                 <label className={styles.field}>
-                                    Visibilidad
+                                    {proposal ? "¿Quién puede verla?" : "Visibilidad"}
                                     <select
                                         className={styles.control}
                                         value={visibilidad}
@@ -259,12 +295,12 @@ export function RecordEditor({
                                         disabled={busy}
                                     >
                                         <option value="EQUIPO">
-                                            Mi equipo
+                                            {proposal ? "Mi equipo · la ve todo el equipo" : "Mi equipo"}
                                         </option>
-                                        <option value="PRIVADA">Privada</option>
+                                        <option value="PRIVADA">{proposal ? "Personal · solo la veo yo" : "Privada"}</option>
                                         {context!.actor.admin && (
                                             <option value="EMPRESA">
-                                                General de la empresa
+                                                {proposal ? "Toda la empresa" : "General de la empresa"}
                                             </option>
                                         )}
                                     </select>
@@ -294,14 +330,16 @@ export function RecordEditor({
                                                     estado,
                                                 ]),
                                             ].map((s) => (
-                                                <option key={s}>{s}</option>
+                                                <option key={s} value={s}>
+                                                    {proposal ? statusLabel(s) : s}
+                                                </option>
                                             ))}
                                         </select>
                                     </label>
                                 )}
                         </div>
                     </section>
-                    <aside className={styles.card}>
+                    <aside className={styles.card} hidden={proposal}>
                         <h3>Resumen</h3>
                         {fromHr && (
                             <p className={styles.muted}>
@@ -337,10 +375,31 @@ export function RecordEditor({
                     </aside>
                 </div>
                 {error && (
-                    <p role="alert" className={styles.error}>
+                    <p role="alert" className={styles.error} style={proposal ? { margin: "0 22px 14px" } : undefined}>
                         {error}
                     </p>
                 )}
+                {proposal && fromHr && (
+                    <p className={sheet.callout} style={{ margin: "0 22px 14px" }}>
+                        La unidad se actualiza desde RRHH; puedes ajustar responsabilidades sin perder su origen.
+                    </p>
+                )}
+                {proposal ? (
+                    <footer className={sheet.foot}>
+                        <p>
+                            Se registrará a nombre de {context!.actor.nombre}
+                            {context!.actor.admin ? "; antes de aplicarlo revisarás dos confirmaciones." : "."}
+                        </p>
+                        <div className={sheet.footActions}>
+                            <Button type="button" variant="outlined" onClick={onClose} state={busy ? "disabled" : "default"}>
+                                Cancelar
+                            </Button>
+                            <Button type="submit" state={busy ? "loading" : "default"}>
+                                {record ? "Guardar cambios" : "Registrar"}
+                            </Button>
+                        </div>
+                    </footer>
+                ) : (
                 <div className={styles.actions}>
                     <Button
                         type="button"
@@ -354,6 +413,7 @@ export function RecordEditor({
                         Guardar
                     </Button>
                 </div>
+                )}
             </form>
         </dialog>
     );

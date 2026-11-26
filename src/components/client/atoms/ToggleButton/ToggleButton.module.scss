@@ -39,7 +39,7 @@
 
   // Variante segmented: pista gris con la opción activa en blanco
   &--segmented {
-    background-color: $gris-3;
+    background-color: var(--tickets-neutral-soft);
     border-radius: 0.5rem;
     padding: 0.25rem;
     gap: 0.25rem;
@@ -57,13 +57,13 @@
     font-family: var(--font-montserrat), sans-serif;
     font-size: 0.8125rem;
     font-weight: 600;
-    color: $gris-4;
+    color: var(--tickets-text-muted);
     cursor: pointer;
     white-space: nowrap;
     transition: all 0.2s ease;
 
     &:hover:not(:disabled):not(.ToggleButton__segment--selected) {
-      color: $negro-2;
+      color: var(--tickets-text);
     }
 
     &:disabled {
@@ -84,7 +84,7 @@
     padding: 10px 24px;
     border-radius: 50px;
     font-weight: 500;
-    color: $gris-1;
+    color: var(--tickets-text-muted);
     cursor: pointer;
     transition: all 0.2s ease;
     white-space: nowrap;

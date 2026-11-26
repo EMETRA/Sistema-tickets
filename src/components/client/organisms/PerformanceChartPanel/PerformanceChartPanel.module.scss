@@ -13,7 +13,7 @@
   // VARIANTE PRIMARY
   // ============================================
   &.primary {
-    background-color: #FFFFFF;
+    background-color: var(--tickets-surface);
     border: 1px solid #7A7A7A40;
     border-radius: 10px;
     padding: 24px 24px 0 24px;
@@ -48,7 +48,7 @@
     }
 
     .contentContainer {
-      background-color: #FFFFFF;
+      background-color: var(--tickets-surface);
       border: 1px solid #7A7A7A40;
       border-radius: 10px;
       padding: 24px;

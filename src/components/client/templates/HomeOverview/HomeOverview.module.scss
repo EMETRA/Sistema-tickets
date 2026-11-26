@@ -2,47 +2,37 @@
 .page {
   display: flex;
   flex-direction: column;
-  gap: 23px;
+  gap: 20px;
   padding: 27px 30px;
   min-width: 0;
   color: var(--tickets-text);
 }
 .hero {
-  background: var(--tickets-surface);
-  border: 1px solid var(--tickets-border);
-  border-left: 4px solid var(--tickets-primary);
-  border-radius: 13px;
-  padding: 25px 28px;
+  // Encabezado limpio sobre el fondo, sin tarjeta: el título ya ordena la vista.
   h1 {
-    font-size: 27px;
+    font-size: clamp(23px, calc(2vw / var(--vp-zoom, 1)), 27px);
     font-weight: 700;
-    line-height: 1.4;
-    margin: 10px 0 7px;
-    letter-spacing: -0.35px;
+    line-height: 1.3;
+    margin: 6px 0 4px;
+    letter-spacing: -0.4px;
   }
 }
 .eyebrow {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 1.25px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
+  color: var(--tickets-primary);
 }
 .description {
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.6;
   color: var(--tickets-text-secondary);
 }
 .metrics {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 15px;
-  > article {
-    min-height: 130px;
-    padding: 18px;
-    gap: 8px;
-    border-radius: 12px;
-    box-shadow: none;
-  }
+  gap: 12px;
 }
 .content {
   display: grid;
@@ -54,45 +44,45 @@
 .shortcuts {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
+  gap: 12px;
 }
 .shortcut {
   @include surfaces.panel;
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  padding: 20px;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
   min-width: 0;
-  min-height: 170px;
   border-radius: 12px;
-  h2 {
-    font-size: 15px;
-    line-height: 1.5;
-    margin: 16px 0 15px;
-  }
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
   &:hover {
-    border-color: var(--tickets-primary);
-    box-shadow: 0 4px 12px #20396312;
+    border-color: #b8c5f5; border-color: light-dark(#b8c5f5, #2a3449);
+    box-shadow: var(--tickets-shadow-raised);
+  }
+  &:hover .shortcutAction {
+    transform: translateX(2px);
+    color: var(--tickets-primary);
   }
 }
 .shortcutIcon {
   display: inline-flex;
+  flex-shrink: 0;
   padding: 8px;
   border-radius: 9px;
   background: var(--tickets-primary-soft);
   color: var(--tickets-primary);
 }
-.shortcutAction {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  width: 100%;
-  margin-top: auto;
-  padding-top: 14px;
-  border-top: 1px solid var(--tickets-divider);
-  color: var(--tickets-primary);
-  font-size: 12px;
+.shortcutLabel {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
   font-weight: 600;
+  line-height: 1.4;
+}
+.shortcutAction {
+  color: var(--tickets-text-muted);
+  font-size: 16px;
+  transition: transform 0.15s ease, color 0.15s ease;
 }
 @media (min-width: 768px) and (max-width: 1199px) {
   .page {
@@ -115,16 +105,10 @@
     padding: 18px 14px;
     gap: 18px;
   }
-  .hero {
-    padding: 20px;
-    h1 {
-      font-size: 23px;
-    }
+  .hero h1 {
+    font-size: 23px;
   }
   .shortcuts {
     grid-template-columns: minmax(0, 1fr);
-  }
-  .shortcut {
-    min-height: 150px;
   }
 }

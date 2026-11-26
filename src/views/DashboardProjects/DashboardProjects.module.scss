@@ -9,8 +9,8 @@
     display: flex;
     align-items: center;
     gap: 1rem;
-    background: #fff;
-    border: 2px solid #e5e5e5;
+    background: var(--tickets-surface);
+    border: 2px solid #e5e5e5; border: 2px solid light-dark(#e5e5e5, #2a3449);
     border-radius: 12px;
     padding: 1rem 1.5rem;
 }
@@ -33,8 +33,8 @@
 }
 
 .chartContainer {
-    background: #fff;
-    border: 2px solid #e5e5e5;
+    background: var(--tickets-surface);
+    border: 2px solid #e5e5e5; border: 2px solid light-dark(#e5e5e5, #2a3449);
     border-radius: 12px;
     padding: 1.5rem;
     display: flex;
@@ -44,7 +44,7 @@
 }
 
 .tableContainer {
-    background: #fff;
+    background: var(--tickets-surface);
     overflow: hidden;
 }
 

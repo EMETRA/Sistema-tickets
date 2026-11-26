@@ -6,12 +6,14 @@
   box-sizing: border-box;
   outline: none;
   border: none;
-  min-height: 42px;
-  padding: 10px 18px;
+  min-height: var(--tickets-control-height, 38px);
+  padding: 8px 16px;
   font-weight: 600;
   font-size: 13px;
+  line-height: 1.3;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease,
+    color 0.15s ease, box-shadow 0.15s ease;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -33,6 +35,7 @@
   &--contained {
     border-radius: var(--tickets-control-radius, 9px);
     color: #ffffff;
+    box-shadow: 0 1px 2px #1a2b4a1f, inset 0 1px 0 #ffffff1f;
 
     // Colores para contained
     &.Button--default {
@@ -97,7 +100,7 @@
 
     &.Button--neutral-light {
       background-color: #d3d3d366;
-      color: $negro-1;
+      color: var(--tickets-text);
 
       &:hover:not(.Button--disabled):not(.Button--loading) {
         background-color: #d3d3d388;
@@ -114,7 +117,7 @@
     border-radius: var(--tickets-control-radius, 9px);
     background-color: transparent;
     border: 1px solid var(--tickets-border, #dfe5f2);
-    color: $negro-1;
+    color: var(--tickets-text);
 
     &:hover:not(.Button--disabled):not(.Button--loading) {
       background-color: rgba($gris-2, 0.3);
@@ -126,14 +129,21 @@
     }
 
     // Colores para outlined
+    // Secundario neutro: el azul queda reservado a la acción principal.
     &.Button--default {
-      border-color: $azul-5;
-      color: $azul-5;
+      background-color: var(--tickets-surface, #fff);
+      border-color: var(--tickets-border-strong, #cdd6e6);
+      color: var(--tickets-text, #263b58);
+      box-shadow: 0 1px 2px #1a2b4a0d;
 
       &:hover:not(.Button--disabled):not(.Button--loading) {
-        background-color: rgba($azul-5, 0.1);
-        border-color: color.adjust($azul-5, $lightness: -10%);
-        color: color.adjust($azul-5, $lightness: -10%);
+        background-color: var(--tickets-surface-subtle);
+        border-color: #b7c2d6;
+        color: var(--tickets-text, #263b58);
+      }
+
+      &:active:not(.Button--disabled):not(.Button--loading) {
+        background-color: var(--tickets-neutral-soft);
       }
     }
 
@@ -157,14 +167,17 @@
       }
     }
 
+    // Cancelar se lee igual que cualquier acción secundaria.
     &.Button--cancel {
-      border-color: $negro-1;
-      color: $negro-1;
+      background-color: var(--tickets-surface, #fff);
+      border-color: var(--tickets-border-strong, #cdd6e6);
+      color: var(--tickets-text, #263b58);
+      box-shadow: 0 1px 2px #1a2b4a0d;
 
       &:hover:not(.Button--disabled):not(.Button--loading) {
-        background-color: rgba($negro-1, 0.1);
-        border-color: color.adjust($negro-1, $lightness: -10%);
-        color: color.adjust($negro-1, $lightness: -10%);
+        background-color: var(--tickets-surface-subtle);
+        border-color: #b7c2d6;
+        color: var(--tickets-text, #263b58);
       }
     }
   }
@@ -174,7 +187,7 @@
     background-color: transparent;
     border: none;
     padding: 8px 12px;
-    color: $negro-2;
+    color: var(--tickets-text);
     border-radius: var(--tickets-control-radius, 9px);
 
     &:hover:not(.Button--disabled):not(.Button--loading) {
@@ -213,7 +226,7 @@
     }
 
     &.Button--cancel {
-      color: $negro-1;
+      color: var(--tickets-text);
 
       &:hover:not(.Button--disabled):not(.Button--loading) {
         background-color: rgba($negro-1, 0.1);
@@ -239,7 +252,8 @@
 
   // Estado disabled
   &--disabled {
-    opacity: 0.5;
+    opacity: 0.45;
+    box-shadow: none;
     cursor: not-allowed;
     pointer-events: none;
   }

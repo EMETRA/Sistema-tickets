@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import { THEME_BOOT_SCRIPT } from "@/platform/theme";
 
 // const geistSans = Geist({
 //     variable: "--font-geist-sans",
@@ -40,7 +41,11 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en">
+        <html lang="es" data-theme="light" suppressHydrationWarning>
+            <head>
+                {/* Aplica el tema guardado antes del primer pintado. */}
+                <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
+            </head>
             <body className={montserrat.variable}>
                 {children}
             </body>

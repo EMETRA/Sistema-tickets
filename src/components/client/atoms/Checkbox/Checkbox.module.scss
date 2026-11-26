@@ -51,7 +51,7 @@
   justify-content: center;
   border: 1px solid #262626;
   border-radius: 4px;
-  background-color: #ffffff;
+  background-color: var(--tickets-surface);
   transition: all 0.2s ease;
   flex-shrink: 0;
   
@@ -65,7 +65,7 @@
 // Cuando el checkbox está marcado
 .HiddenCheckbox:checked ~ .CheckboxButton {
   background-color: #4361EE;
-  border-color: #CECECE;
+  border-color: #CECECE; border-color: light-dark(#CECECE, #2a3449);
   
   .CheckIcon {
     opacity: 1;
@@ -91,7 +91,7 @@
   font-family: inherit;
   font-size: 14px;
   font-weight: 400;
-  color: #262626;
+  color: var(--tickets-text);
   line-height: 1.5;
 }
 

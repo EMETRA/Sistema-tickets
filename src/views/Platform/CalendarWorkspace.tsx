@@ -26,6 +26,8 @@ import {
 } from "@/components/client/organisms/ResourceWorkspace/RecordDetail";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
 import calendar from "./CalendarWorkspace.module.scss";
+import { CalendarRail } from "@/components/client/organisms/CalendarRail";
+import { useProposalDesign } from "@/platform/proposal";
 
 type Scope = "EQUIPO" | "EMPRESA" | "PRIVADA";
 const scopeNames = {
@@ -35,6 +37,7 @@ const scopeNames = {
 };
 export function CalendarWorkspace() {
     const { data } = usePlatform();
+    const proposal = useProposalDesign();
     const def = data!.definitions.actividades;
     const today = guatemalaDay();
     const [anchor, setAnchor] = useState(today);
@@ -151,8 +154,8 @@ export function CalendarWorkspace() {
         <section className={calendar.page}>
             <div className={calendar.intro}>
                 <p>
-                    Mi equipo y actividades generales{" "}
-                    <span>· Hora de Guatemala</span>
+                    {proposal ? "" : "Mi equipo y actividades generales "}
+                    <span>{proposal ? "Hora de Guatemala" : "· Hora de Guatemala"}</span>
                 </p>
                 <div className={styles.actions}>
                     <Button
@@ -177,6 +180,7 @@ export function CalendarWorkspace() {
                     className={calendar.filters}
                     role="group"
                     aria-label="Filtrar actividades por visibilidad"
+                    hidden={proposal}
                 >
                     {(["EQUIPO", "EMPRESA", "PRIVADA"] as Scope[]).map(
                         (scope) => (
@@ -245,6 +249,7 @@ export function CalendarWorkspace() {
                     </div>
                 </div>
             </div>
+            <div className={proposal ? calendar.withRail : undefined}>
             <section
                 className={calendar.panel}
                 aria-label="Actividades del calendario"
@@ -293,7 +298,7 @@ export function CalendarWorkspace() {
                                 Fin de semana
                             </label>
                         )}
-                        <label className={calendar.date}>
+                        <label className={calendar.date} hidden={proposal}>
                             <span>Ir a fecha</span>
                             <input
                                 type="date"
@@ -512,6 +517,30 @@ export function CalendarWorkspace() {
                     )}
                 </footer>
             </section>
+            {proposal && (
+                <CalendarRail
+                    anchor={anchor}
+                    today={today}
+                    from={from}
+                    to={to}
+                    records={records.filter(validActivity)}
+                    scopes={scopes}
+                    scopeLabels={{
+                        EQUIPO: data!.actor.admin ? "Equipos" : data!.memberships.length > 1 ? "Mis equipos" : "Mi equipo",
+                        EMPRESA: "General de la empresa",
+                        PRIVADA: "Privadas",
+                    }}
+                    onToggleScope={(scope) =>
+                        setScopes((old) => (old.includes(scope) ? old.filter((x) => x !== scope) : [...old, scope]))
+                    }
+                    onPick={(day) => {
+                        setAnchor(day);
+                        if (new Date(day + "T12:00:00Z").getUTCDay() % 6 === 0) setWeekends(true);
+                    }}
+                    onSelect={setSelected}
+                />
+            )}
+            </div>
             {edit !== undefined && (
                 <RecordEditor
                     type="actividades"

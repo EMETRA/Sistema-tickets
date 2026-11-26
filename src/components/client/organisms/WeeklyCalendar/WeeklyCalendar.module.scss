@@ -3,7 +3,7 @@
     max-width: 100%;
     border: 1px solid var(--tickets-border);
     border-radius: 12px;
-    background: #fff;
+    background: var(--tickets-surface);
     &:focus-visible {
         outline: 2px solid var(--tickets-primary);
         outline-offset: 3px;
@@ -19,7 +19,7 @@
 .corner {
     min-height: 66px;
     border-bottom: 1px solid var(--tickets-border);
-    background: #fafbff;
+    background: var(--tickets-surface-subtle);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -50,10 +50,10 @@
     color: var(--tickets-text-secondary);
 }
 .hours {
-    background: #fff;
+    background: var(--tickets-surface);
     div {
         position: relative;
-        border-bottom: 1px solid #f0f2f8;
+        border-bottom: 1px solid #f0f2f8; border-bottom: 1px solid light-dark(#f0f2f8, #2a3449);
     }
     span {
         position: absolute;
@@ -80,8 +80,8 @@
     border: 0;
     border-left: 3px solid #8d6cc8;
     border-radius: 5px;
-    background: #f0eafa;
-    color: #655185;
+    background: #f0eafa; background: light-dark(#f0eafa, #1e1942);
+    color: #655185; color: light-dark(#655185, #b9adcd);
     padding: 6px 8px;
     display: flex;
     flex-direction: column;
@@ -112,14 +112,14 @@
         display: none;
     }
     &[data-scope="EMPRESA"] {
-        background: #edf1f7;
+        background: var(--tickets-neutral-soft);
         border-left-color: #94a4be;
-        color: #5b6e89;
+        color: #5b6e89; color: light-dark(#5b6e89, #afbaca);
     }
     &[data-scope="PRIVADA"] {
-        background: #e8f5f0;
+        background: #e8f5f0; background: light-dark(#e8f5f0, #123033);
         border-left-color: #48a183;
-        color: #276c57;
+        color: #276c57; color: light-dark(#276c57, #9edcc9);
     }
     &:hover {
         filter: brightness(0.97);
@@ -146,7 +146,7 @@
     }
     &:hover,
     &:focus-visible {
-        background: #f2f5ff;
+        background: #f2f5ff; background: light-dark(#f2f5ff, #13214a);
         outline: 1px solid #c5cfff;
         span {
             visibility: visible;

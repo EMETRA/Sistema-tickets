@@ -89,7 +89,7 @@ async function run() {
     await page.evaluate(({ user }) => localStorage.setItem('auth-storage', JSON.stringify({ state: { token: 'qa-token-controlado', user, userId: user.id_usuario }, version: 0 })), { user });
     const url = `http://127.0.0.1:3741/home/juzgado/consultas/juz01/detail?caseNumber=${codigo}`;
     await page.goto('http://127.0.0.1:3741/aplicaciones');
-    await page.getByRole('button', { name: 'Ingresar a Aplicaciones Juzgado', exact: true }).click();
+    await page.getByRole('button', { name: 'Ingresar a Juzgado', exact: true }).click();
     await page.waitForURL('**/home/juzgado/consultas');
     await page.getByRole('button', { name: 'Ingresar a Consultar caso', exact: true }).click();
     await page.waitForURL('**/home/juzgado/consultas/juz01');

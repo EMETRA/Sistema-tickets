@@ -1,4 +1,5 @@
 "use client";
+import { StateNotice } from "@/components/client/molecules/StateNotice";
 import { createContext, useContext, useEffect, useState } from "react";
 import { platformFetch } from "@/platform/client";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -78,30 +79,36 @@ export function ModuleAccessGate({
         );
     if (check.error)
         return (
-            <section role="alert" className={styles.card}>
-                <h2>Acceso pendiente de comprobar</h2>
-                <p>{check.error}</p>
-                <Button
-                    variant="outlined"
-                    onClick={() => {
-                        setCheck(null);
-                        setRevision((v) => v + 1);
-                    }}
-                >
-                    Reintentar acceso
-                </Button>
-            </section>
+            <StateNotice
+                tone="error"
+                title="Acceso pendiente de comprobar"
+                description={check.error}
+                helpTopic="acceso"
+                actions={
+                    <Button
+                        onClick={() => {
+                            setCheck(null);
+                            setRevision((v) => v + 1);
+                        }}
+                    >
+                        Reintentar acceso
+                    </Button>
+                }
+            />
         );
     if (!check.data?.allowed)
         return (
-            <section role="alert" className={styles.card}>
-                <h2>Sin acceso a este formulario</h2>
-                <p>
-                    Tu cuenta no tiene los permisos necesarios para realizar
-                    este proceso. Puedes solicitar acceso a Informática.
-                </p>
-                <Link href="/aplicaciones">Volver a aplicaciones</Link>
-            </section>
+            <StateNotice
+                tone="forbidden"
+                title="Sin acceso a este formulario"
+                description="Tu cuenta no tiene los permisos necesarios para realizar este proceso. Puedes solicitar acceso a Informática."
+                actions={
+                    <>
+                        <Link href="/espacio/solicitudes">Solicitar acceso</Link>
+                        <Link href="/aplicaciones">Volver a aplicaciones</Link>
+                    </>
+                }
+            />
         );
     return (
         <Context.Provider value={check.data.actions}>

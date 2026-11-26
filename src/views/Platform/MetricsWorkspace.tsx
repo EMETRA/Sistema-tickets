@@ -1,6 +1,6 @@
 "use client";
 import { guatemalaDay } from "@/platform/dates";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useEffectEvent } from "react";
 import { Button } from "@/components/client/atoms/Button";
 import { PeriodFilter, formatPeriod } from "@/components/client/molecules/PeriodFilter";
 import local from "./MetricsWorkspace.module.scss";
@@ -87,11 +87,12 @@ export function MetricsWorkspace() {
             if (!controller.signal.aborted) setLoading(false);
         }
     }
+    // Carga inicial con el periodo por defecto; después cada filtro se aplica al cambiar.
+    const loadOnMount = useEffectEvent(() => void load());
     useEffect(() => {
-        // La consulta inicial toma el periodo por defecto; cada filtro se aplica al cambiar.
-        void load();
-        return () => request.current?.abort();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        loadOnMount();
+        const current = request;
+        return () => current.current?.abort();
     }, []);
     // Cada filtro se aplica al cambiar; la última selección vive en un ref
     // para que el callback del periodo sea estable.

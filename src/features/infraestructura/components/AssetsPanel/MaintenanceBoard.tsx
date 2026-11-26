@@ -1,7 +1,7 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
+import { usePlatformQueries } from "@/platform/query";
 import { Button } from "@/components/client/atoms/Button";
-import { platformFetch } from "@/platform/client";
 import { usePlatform } from "@/platform/context";
 import type { PageResult, PlatformRecord } from "@/platform/types";
 import { displayDate } from "@/helpers/displayDate";
@@ -26,39 +26,32 @@ export function MaintenanceBoard({
     onChanged?: () => void;
 }) {
     const { data } = usePlatform();
-    const [rows, setRows] = useState<PlatformRecord[] | null>(null);
     // Las listas no traen nombres de referencias; se resuelven con fichas y ubicaciones.
-    const [names, setNames] = useState<Record<string, string>>({});
-    const [error, setError] = useState("");
-    const [revision, setRevision] = useState(0);
     const [selected, setSelected] = useState<PlatformRecord | null>(null);
     const [editing, setEditing] = useState<PlatformRecord | null | undefined>(undefined);
     const canCreate = !!data?.definitions.intervenciones?.actions.INSERTAR;
 
-    useEffect(() => {
-        const c = new AbortController();
-        const opts = { signal: c.signal };
-        const lookup = (type: string) =>
-            platformFetch<PageResult<PlatformRecord>>(`/records/${type}?limit=100`, opts)
-                .then((r) => r.items)
-                .catch(() => []);
-        Promise.all([
-            platformFetch<PageResult<PlatformRecord>>("/records/intervenciones?limit=100", opts),
-            lookup("activos"),
-            lookup("instalaciones"),
-        ])
-            .then(([r, activos, sitios]) => {
-                if (c.signal.aborted) return;
-                setNames(Object.fromEntries([...activos, ...sitios].map((x) => [x.id, x.nombre])));
-                setRows(r.items);
-            })
-            .catch(
-                (e) =>
-                    !c.signal.aborted &&
-                    setError(e instanceof Error ? e.message : "No se pudieron cargar los mantenimientos."),
-            );
-        return () => c.abort();
-    }, [revision]);
+    const lists = usePlatformQueries<PageResult<PlatformRecord>>([
+        "/records/intervenciones?limit=100",
+        "/records/activos?limit=100",
+        "/records/instalaciones?limit=100",
+    ]);
+    const [work, activos, sitios] = lists.data;
+    const rows = work?.items ?? null;
+    const names = useMemo(
+        () =>
+            Object.fromEntries(
+                [...(activos?.items ?? []), ...(sitios?.items ?? [])].map((x) => [x.id, x.nombre]),
+            ) as Record<string, string>,
+        [activos, sitios],
+    );
+    // Sin la lista de mantenimientos no hay tablero; las demás solo aportan nombres.
+    const error =
+        !lists.pending && !work
+            ? lists.error instanceof Error
+                ? lists.error.message
+                : "No se pudieron cargar los mantenimientos."
+            : "";
 
     const latest = latestByAsset(rows || []).map((r) => ({ r, due: daysFromToday(r.datos.proximaRevision) }));
     const overdue = latest.filter((x) => x.due !== null && x.due < 0).sort((a, b) => a.due! - b.due!);
@@ -172,7 +165,7 @@ export function MaintenanceBoard({
                     onSaved={() => {
                         setEditing(undefined);
                         setSelected(null);
-                        setRevision((v) => v + 1);
+                        void lists.refetch();
                         onChanged?.();
                     }}
                 />
@@ -184,7 +177,7 @@ export function MaintenanceBoard({
                     onClose={() => setSelected(null)}
                     onEdit={(r) => setEditing(r)}
                     onChanged={() => {
-                        setRevision((v) => v + 1);
+                        void lists.refetch();
                         onChanged?.();
                     }}
                 />

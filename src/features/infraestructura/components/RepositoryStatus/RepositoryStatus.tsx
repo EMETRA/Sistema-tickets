@@ -1,8 +1,8 @@
 "use client";
-import { startTransition, useEffect, useState } from "react";
+import { useState } from "react";
+import { queryErrorMessage, usePlatformQuery } from "@/platform/query";
 import { Button } from "@/components/client/atoms/Button";
 import { PlatformField } from "@/components/client/molecules/PlatformField/PlatformField";
-import { platformFetch } from "@/platform/client";
 import { displayDate } from "@/helpers/displayDate";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
 
@@ -62,31 +62,11 @@ function checkName(item: { estado: string; resultado: string | null }) {
     );
 }
 export function RepositoryStatus({ initialId = "" }: { initialId?: string }) {
-    const [id, setId] = useState<unknown>(initialId),
-        [snapshot, setSnapshot] = useState<Snapshot | null>(null),
-        [revision, setRevision] = useState(0),
-        [loading, setLoading] = useState(false),
-        [error, setError] = useState("");
-    useEffect(() => {
-        startTransition(() => {
-            setSnapshot(null);
-            setError("");
-            setLoading(!!id);
-        });
-        if (!id) return;
-        const c = new AbortController();
-        platformFetch<Snapshot>("/repositories/" + id, { signal: c.signal })
-            .then((value) => {
-                if (!c.signal.aborted) setSnapshot(value);
-            })
-            .catch((e) => {
-                if (!c.signal.aborted) setError(e.message);
-            })
-            .finally(() => {
-                if (!c.signal.aborted) setLoading(false);
-            });
-        return () => c.abort();
-    }, [id, revision]);
+    const [id, setId] = useState<unknown>(initialId);
+    const repo = usePlatformQuery<Snapshot>(id ? "/repositories/" + id : null);
+    const snapshot = repo.data ?? null;
+    const loading = repo.isFetching;
+    const error = queryErrorMessage(repo.error);
     return (
         <section className={styles.page} aria-label="Estado de repositorios vinculados">
             <div className={styles.toolbar}>
@@ -105,7 +85,7 @@ export function RepositoryStatus({ initialId = "" }: { initialId?: string }) {
                 <Button
                     variant="outlined"
                     state={!id ? "disabled" : loading ? "loading" : "default"}
-                    onClick={() => setRevision((n) => n + 1)}
+                    onClick={() => void repo.refetch()}
                 >
                     Consultar GitHub
                 </Button>

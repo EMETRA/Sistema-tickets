@@ -1,7 +1,8 @@
 "use client";
-import { startTransition, useEffect, useState } from "react";
+import { useState } from "react";
+import { queryErrorMessage, usePlatformQuery } from "@/platform/query";
 import { Button } from "@/components/client/atoms/Button";
-import { PlatformError, platformFetch } from "@/platform/client";
+import { PlatformError } from "@/platform/client";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
 export type InventoryItem = {
     referencia: string;
@@ -67,45 +68,19 @@ export function InventoryCatalog({
         [numero, setNumero] = useState(""),
         [q, setQ] = useState(""),
         [filters, setFilters] = useState(""),
-        [offset, setOffset] = useState(0),
-        [revision, setRevision] = useState(0),
-        [result, setResult] = useState<Result | null>(null),
-        [busy, setBusy] = useState(true),
-        [error, setError] = useState(""),
-        [denied, setDenied] = useState(false);
-    useEffect(() => {
-        const controller = new AbortController();
-        const params = new URLSearchParams(filters);
-        if (usuarioId) params.set("usuarioId", usuarioId);
-        if (equipoId) params.set("equipoId", equipoId);
-        if (fixedEmployee) params.set("empleado", String(fixedEmployee));
-        params.set("offset", String(offset));
-        startTransition(() => {
-            setBusy(true);
-            setError("");
-            setDenied(false);
-            setResult(null);
-        });
-        platformFetch<Result>(`/inventory/${type}?${params}`, {
-            signal: controller.signal,
-        })
-            .then((r) => {
-                if (!controller.signal.aborted) setResult(r);
-            })
-            .catch((e) => {
-                if (!controller.signal.aborted) {
-                    setDenied(e instanceof PlatformError && e.status === 403);
-                    setError(
-                        (e instanceof Error ? e.message : "No se pudo consultar Activos Fijos.") +
-                            (e instanceof PlatformError && e.reference ? ` Referencia: ${e.reference}` : ""),
-                    );
-                }
-            })
-            .finally(() => {
-                if (!controller.signal.aborted) setBusy(false);
-            });
-        return () => controller.abort();
-    }, [type, usuarioId, equipoId, fixedEmployee, filters, offset, revision]);
+        [offset, setOffset] = useState(0);
+    const inventoryParams = new URLSearchParams(filters);
+    if (usuarioId) inventoryParams.set("usuarioId", usuarioId);
+    if (equipoId) inventoryParams.set("equipoId", equipoId);
+    if (fixedEmployee) inventoryParams.set("empleado", String(fixedEmployee));
+    inventoryParams.set("offset", String(offset));
+    const inventory = usePlatformQuery<Result>(`/inventory/${type}?${inventoryParams}`);
+    const result = inventory.isFetching ? null : (inventory.data ?? null);
+    const busy = inventory.isFetching;
+    const denied = inventory.error instanceof PlatformError && inventory.error.status === 403;
+    const error = inventory.error
+        ? queryErrorMessage(inventory.error, "No se pudo consultar Activos Fijos.")
+        : "";
     function search(e?: { preventDefault(): void }) {
         e?.preventDefault();
         setFilters(
@@ -116,7 +91,8 @@ export function InventoryCatalog({
             ).toString(),
         );
         setOffset(0);
-        setRevision((v) => v + 1);
+        // Con los mismos filtros, «Consultar» vuelve a pedir los datos.
+        void inventory.refetch();
     }
     const FilterContainer = embedded ? "div" : "form";
     return (
@@ -132,7 +108,7 @@ export function InventoryCatalog({
                     type="button"
                     variant="outlined"
                     state={busy ? "disabled" : "default"}
-                    onClick={() => setRevision((v) => v + 1)}
+                    onClick={() => void inventory.refetch()}
                 >
                     Actualizar bienes
                 </Button>

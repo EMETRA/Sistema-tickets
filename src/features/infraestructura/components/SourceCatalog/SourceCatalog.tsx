@@ -1,5 +1,7 @@
 "use client";
-import { startTransition, useEffect, useState } from "react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { platformKey, queryErrorMessage } from "@/platform/query";
 import { Button } from "@/components/client/atoms/Button";
 import { platformFetch } from "@/platform/client";
 import { usePlatform } from "@/platform/context";
@@ -52,42 +54,26 @@ export function SourceCatalog({
         [query, setQuery] = useState(""),
         [page, setPage] = useState(1),
         [org, setOrg] = useState("");
-    const [result, setResult] = useState<Catalog | null>(null),
-        [error, setError] = useState(""),
-        [loading, setLoading] = useState(false),
-        [revision, setRevision] = useState(0);
     const [editing, setEditing] = useState<Item | null>(null);
     const type = kind === "oracle" ? "esquemas" : "repositorios";
-    useEffect(() => {
-        if (!data?.actor.admin) return;
-        const c = new AbortController();
-        startTransition(() => {
-            setLoading(true);
-            setError("");
-            setResult(null);
-        });
-        const params = new URLSearchParams({ q: query });
-        if (kind === "github") {
-            params.set("pagina", String(page));
-            if (org) params.set("organizacion", org);
-        }
-        platformFetch<Catalog>("/sources/" + kind + "?" + params, {
-            signal: c.signal,
-        })
-            .then((value) => {
-                if (!Array.isArray(value.items))
-                    throw new Error("La fuente devolvió un formato inesperado. Reintenta la consulta.");
-                if (!c.signal.aborted) setResult(value);
-            })
-            .catch((e: unknown) => {
-                if (!c.signal.aborted)
-                    setError(e instanceof Error ? e.message : "No se pudo consultar la fuente");
-            })
-            .finally(() => {
-                if (!c.signal.aborted) setLoading(false);
-            });
-        return () => c.abort();
-    }, [kind, query, page, org, revision, data?.actor.admin]);
+    const sourceParams = new URLSearchParams({ q: query });
+    if (kind === "github") {
+        sourceParams.set("pagina", String(page));
+        if (org) sourceParams.set("organizacion", org);
+    }
+    const source = useQuery({
+        queryKey: platformKey("/sources/" + kind + "?" + sourceParams),
+        enabled: !!data?.actor.admin,
+        queryFn: async ({ signal }) => {
+            const value = await platformFetch<Catalog>("/sources/" + kind + "?" + sourceParams, { signal });
+            if (!Array.isArray(value.items))
+                throw new Error("La fuente devolvió un formato inesperado. Reintenta la consulta.");
+            return value;
+        },
+    });
+    const result = source.data ?? null;
+    const loading = source.isFetching;
+    const error = source.error ? queryErrorMessage(source.error, "No se pudo consultar la fuente") : "";
     if (!data?.actor.admin) return null;
     const connected = result && result.disponible !== false;
     return (
@@ -111,7 +97,7 @@ export function SourceCatalog({
                     e.preventDefault();
                     setQuery(draft.trim());
                     setPage(1);
-                    setRevision((n) => n + 1);
+                    void source.refetch();
                 }}
             >
                 {!!result?.organizaciones && result.organizaciones.length > 1 && (

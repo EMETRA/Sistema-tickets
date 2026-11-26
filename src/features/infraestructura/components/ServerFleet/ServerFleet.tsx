@@ -1,6 +1,8 @@
 "use client";
+import { useQuery } from "@tanstack/react-query";
+import { platformKey } from "@/platform/query";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useEffectEvent } from "react";
 import classNames from "classnames";
 import { platformFetch } from "@/platform/client";
 import { usagePercent, uptime, type ServerSnapshot } from "@/platform/monitoring";
@@ -34,29 +36,31 @@ export function ServerFleet({
     revision?: number;
     onLoaded?: (ids: string[]) => void;
 }) {
-    const [servers, setServers] = useState<Server[] | null>(null);
+    const fleet = useQuery({
+        queryKey: [...platformKey(`/flota?limit=${limit}`), revision],
+        queryFn: async ({ signal }) => {
+            const opts = { signal };
+            const r = await platformFetch<PageResult<PlatformRecord>>(
+                `/records/servidores?limit=${limit}`,
+                opts,
+            );
+            return Promise.all(
+                r.items.map(async (record) => ({
+                    record,
+                    snapshot: await platformFetch<ServerSnapshot>("/monitor/" + record.id, opts).catch(
+                        () => null,
+                    ),
+                })),
+            );
+        },
+    });
+    const servers: Server[] | null = fleet.isPending ? null : (fleet.data ?? []);
+    // Avisa al padre qué servidores hay (p. ej. para elegir el primero en el monitor).
+    const loadedIds = fleet.data?.map((row) => row.record.id).join(",");
+    const notifyLoaded = useEffectEvent((ids: string[]) => onLoaded?.(ids));
     useEffect(() => {
-        const c = new AbortController();
-        const opts = { signal: c.signal };
-        platformFetch<PageResult<PlatformRecord>>(`/records/servidores?limit=${limit}`, opts)
-            .then(async (r) => {
-                const rows = await Promise.all(
-                    r.items.map(async (record) => ({
-                        record,
-                        snapshot: await platformFetch<ServerSnapshot>("/monitor/" + record.id, opts).catch(
-                            () => null,
-                        ),
-                    })),
-                );
-                if (!c.signal.aborted) {
-                    setServers(rows);
-                    onLoaded?.(rows.map((row) => row.record.id));
-                }
-            })
-            .catch(() => !c.signal.aborted && setServers([]));
-        return () => c.abort();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [limit, revision]);
+        if (loadedIds !== undefined) notifyLoaded(loadedIds ? loadedIds.split(",") : []);
+    }, [loadedIds]);
 
     const counts = (servers || []).reduce(
         (acc, s) => ({ ...acc, [serverHealth(s.snapshot)]: acc[serverHealth(s.snapshot)] + 1 }),

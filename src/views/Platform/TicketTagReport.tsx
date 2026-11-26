@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useEffectEvent } from "react";
 import Link from "next/link";
 import { Button } from "@/components/client/atoms/Button";
 import { PeriodFilter, formatPeriod } from "@/components/client/molecules/PeriodFilter";
@@ -72,11 +72,12 @@ export function TicketTagReport() {
             if (!controller.signal.aborted) setLoading(false);
         }
     }
+    // Carga inicial con el periodo por defecto; después cada filtro se aplica al cambiar.
+    const loadOnMount = useEffectEvent(() => void load());
     useEffect(() => {
-        void load();
-        return () => request.current?.abort();
-        // Carga inicial; después cada filtro se aplica al cambiar.
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        loadOnMount();
+        const current = request;
+        return () => current.current?.abort();
     }, []);
     function exportCsv() {
         if (!result || !applied || !result.grupos.length) return;

@@ -1,12 +1,12 @@
 "use client";
-import { startTransition, useEffect, useState } from "react";
+import { queryErrorMessage, usePlatformQuery } from "@/platform/query";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/client/atoms/Button";
 import { RepositoryStatus } from "@/features/infraestructura/components/RepositoryStatus/RepositoryStatus";
 import { SourceCatalog } from "@/features/infraestructura/components/SourceCatalog/SourceCatalog";
 import { usePlatform } from "@/platform/context";
 import { PlatformField } from "@/components/client/molecules/PlatformField/PlatformField";
 import { ResourceWorkspace } from "@/features/registros/components/ResourceWorkspace/ResourceWorkspace";
-import { platformFetch } from "@/platform/client";
 import { displayDate } from "@/helpers/displayDate";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
 import { SystemsPortfolio } from "@/features/infraestructura/components/SystemsPanel";
@@ -36,43 +36,24 @@ export function SystemsWorkspace() {
     const [tab, setTab] = useState("portafolio"),
         [schema, setSchema] = useState<unknown>(""),
         [repo, setRepo] = useState("");
-    const [result, setResult] = useState<Objects | null>(null),
-        [query, setQuery] = useState(""),
-        [error, setError] = useState(""),
-        [loading, setLoading] = useState(false),
-        [revision, setRevision] = useState(0);
+    const [query, setQuery] = useState("");
     const [oracleSource, setOracleSource] = useState(false),
         [githubSource, setGithubSource] = useState(false),
         [message, setMessage] = useState("");
+    // Objetos del esquema Oracle elegido; la búsqueda se aplica 250 ms después de escribir.
+    const [objectsTerm, setObjectsTerm] = useState("");
     useEffect(() => {
-        startTransition(() => {
-            setResult(null);
-            setError("");
-            setLoading(false);
-        });
-        if (!schema || tab !== "oracle") return;
-        const c = new AbortController();
-        const timer = setTimeout(() => {
-            setLoading(true);
-            platformFetch<Objects>("/objects/" + schema + "?q=" + encodeURIComponent(query.trim()), {
-                signal: c.signal,
-            })
-                .then((value) => {
-                    if (!c.signal.aborted) setResult(value);
-                })
-                .catch((e: unknown) => {
-                    if (!c.signal.aborted)
-                        setError(e instanceof Error ? e.message : "No se pudieron consultar los objetos");
-                })
-                .finally(() => {
-                    if (!c.signal.aborted) setLoading(false);
-                });
-        }, 250);
-        return () => {
-            clearTimeout(timer);
-            c.abort();
-        };
-    }, [schema, tab, query, revision]);
+        const timer = setTimeout(() => setObjectsTerm(query.trim()), 250);
+        return () => clearTimeout(timer);
+    }, [query]);
+    const objects = usePlatformQuery<Objects>(
+        schema && tab === "oracle" ? "/objects/" + schema + "?q=" + encodeURIComponent(objectsTerm) : null,
+    );
+    const result = objects.data ?? null;
+    const loading = objects.isFetching;
+    const error = objects.error
+        ? queryErrorMessage(objects.error, "No se pudieron consultar los objetos")
+        : "";
     return (
         <section className={styles.page}>
             <nav className={styles.tabs} aria-label="Aplicaciones y fuentes técnicas">
@@ -197,7 +178,7 @@ export function SystemsWorkspace() {
                             <Button
                                 variant="outlined"
                                 state={!schema || loading ? "disabled" : "default"}
-                                onClick={() => setRevision((n) => n + 1)}
+                                onClick={() => void objects.refetch()}
                             >
                                 Actualizar objetos
                             </Button>

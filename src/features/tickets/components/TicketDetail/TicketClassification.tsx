@@ -1,7 +1,9 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { platformKey, usePlatformQuery } from "@/platform/query";
+import { useEffect, useState, useMemo } from "react";
 import { Button } from "@/components/client/atoms/Button";
-import { platformCommand, platformFetch, PlatformError } from "@/platform/client";
+import { platformCommand, PlatformError } from "@/platform/client";
 import { AdministrativeChangeCancelled } from "@/api/administrative-confirmation";
 import { TagInput } from "@/components/client/molecules/TagInput/TagInput";
 import styles from "./TicketClassification.module.scss";
@@ -29,61 +31,49 @@ export function TicketClassification({
     onCatalogChanged?: () => Promise<unknown>;
     catalogReady?: boolean;
 }) {
-    const [selected, setSelected] = useState<string[]>([]),
+    const queryClient = useQueryClient();
+    const [draft, setDraft] = useState<string[] | null>(null),
         [busy, setBusy] = useState(false),
-        [error, setError] = useState("");
+        [actionError, setError] = useState("");
     const [createdTags, setCreatedTags] = useState<Tag[]>([]),
         [catalogMessage, setCatalogMessage] = useState("");
-    const [reference, setReference] = useState<string>();
+    const [actionReference, setReference] = useState<string>();
     const [saved, setSaved] = useState(false);
-    const [applied, setApplied] = useState<{
-            version: number;
-            etiquetas: Tag[];
-            puedeEditar: boolean;
-        } | null>(null),
-        [revision, setRevision] = useState(0),
-        [loading, setLoading] = useState(true);
+    type RawTags = {
+        version: number;
+        etiquetas: { id: number; nombre: string; color: string | null }[];
+        puedeEditar: boolean;
+    };
+    const tagsPath = `/tickets/${ticketId}/tags`;
+    const tagsQuery = usePlatformQuery<RawTags>(tagsPath);
+    const applied = useMemo(
+        () =>
+            tagsQuery.data
+                ? {
+                      ...tagsQuery.data,
+                      etiquetas: tagsQuery.data.etiquetas.map((tag) => ({ ...tag, id: String(tag.id) })),
+                  }
+                : null,
+        [tagsQuery.data],
+    );
+    // Selección en edición; sin cambios, coincide con las etiquetas guardadas.
+    const selected = draft ?? applied?.etiquetas.map((tag) => tag.id) ?? [];
+    const loading = tagsQuery.isPending;
+    const loadFailure = tagsQuery.error;
+    const error =
+        actionError ||
+        (loadFailure
+            ? loadFailure instanceof Error
+                ? loadFailure.message
+                : "No se pudieron consultar las etiquetas."
+            : "");
+    const reference =
+        actionReference ?? (loadFailure instanceof PlatformError ? loadFailure.reference : undefined);
+    // Avisa al detalle del ticket cuántas etiquetas tiene y que no hay cambios pendientes.
     useEffect(() => {
-        const controller = new AbortController();
-        setLoading(true);
-        setError("");
-        setSaved(false);
-        setReference(undefined);
-        onCountChange(null);
-        platformFetch<{
-            version: number;
-            etiquetas: { id: number; nombre: string; color: string | null }[];
-            puedeEditar: boolean;
-        }>(`/tickets/${ticketId}/tags`, { signal: controller.signal })
-            .then((result) => {
-                if (controller.signal.aborted) return;
-                const loaded = {
-                    ...result,
-                    etiquetas: result.etiquetas.map((tag) => ({
-                        ...tag,
-                        id: String(tag.id),
-                    })),
-                };
-                setApplied(loaded);
-                setSelected(loaded.etiquetas.map((tag) => tag.id));
-                onDirtyChange(false);
-                onCountChange(loaded.etiquetas.length);
-            })
-            .catch((failure) => {
-                if (!controller.signal.aborted) {
-                    setError(
-                        failure instanceof Error
-                            ? failure.message
-                            : "No se pudieron consultar las etiquetas.",
-                    );
-                    setReference(failure instanceof PlatformError ? failure.reference : undefined);
-                }
-            })
-            .finally(() => {
-                if (!controller.signal.aborted) setLoading(false);
-            });
-        return () => controller.abort();
-    }, [ticketId, revision, onDirtyChange, onCountChange]);
+        onCountChange(applied ? applied.etiquetas.length : null);
+        if (applied) onDirtyChange(false);
+    }, [applied, onCountChange, onDirtyChange]);
     const savedTags = applied?.etiquetas || [];
     const same = (ids: string[]) =>
         ids.length === savedTags.length && savedTags.every((tag) => ids.includes(tag.id));
@@ -99,7 +89,7 @@ export function TicketClassification({
             .trim()
             .replace(/\s+/g, " ");
     function select(next: string[]) {
-        setSelected(next);
+        setDraft(next);
         setSaved(false);
         onDirtyChange(!same(next));
         setError("");
@@ -133,14 +123,11 @@ export function TicketClassification({
                         .join(", ") || "Sin etiquetas"
                 }`,
             );
-            setApplied({
-                ...applied,
-                version: result.version,
-                etiquetas: result.etiquetas.map((tag) => ({
-                    ...tag,
-                    id: String(tag.id),
-                })),
-            });
+            // La ficha guarda la clasificación aplicada; la edición vuelve a «sin cambios».
+            queryClient.setQueryData<RawTags>(platformKey(tagsPath), (previous) =>
+                previous ? { ...previous, version: result.version, etiquetas: result.etiquetas } : previous,
+            );
+            setDraft(null);
             onDirtyChange(false);
             onCountChange(result.etiquetas.length);
             await onSaved();
@@ -247,7 +234,15 @@ export function TicketClassification({
                 <div role="alert">
                     <p>{error}</p>
                     {reference && <p>Referencia: {reference}</p>}
-                    <Button variant="outlined" onClick={() => setRevision((value) => value + 1)}>
+                    <Button
+                        variant="outlined"
+                        onClick={() => {
+                            setDraft(null);
+                            setError("");
+                            setReference(undefined);
+                            void tagsQuery.refetch();
+                        }}
+                    >
                         Reintentar etiquetas
                     </Button>
                 </div>
@@ -283,7 +278,12 @@ export function TicketClassification({
                                 type="button"
                                 variant="outlined"
                                 state={busy ? "disabled" : "default"}
-                                onClick={() => setRevision((value) => value + 1)}
+                                onClick={() => {
+                                    setDraft(null);
+                                    setError("");
+                                    setReference(undefined);
+                                    void tagsQuery.refetch();
+                                }}
                             >
                                 Actualizar etiquetas guardadas
                             </Button>

@@ -1,5 +1,6 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { platformKey, queryErrorMessage } from "@/platform/query";
 import { platformFetch } from "@/platform/client";
 import type { ServerSnapshot } from "@/platform/monitoring";
 import type { PageResult, PlatformRecord } from "@/platform/types";
@@ -43,46 +44,41 @@ export function lastDeploy(deploys: PlatformRecord[], appId: string, env: string
 
 /** Carga el portafolio completo; las listas no traen nombres de referencias, se cruzan aquí. */
 export function usePortfolio(revision: number) {
-    const [data, setData] = useState<Portfolio | null>(null);
-    const [error, setError] = useState("");
-    useEffect(() => {
-        const c = new AbortController();
-        const opts = { signal: c.signal };
-        const list = (type: string) =>
-            platformFetch<PageResult<PlatformRecord>>(`/records/${type}?limit=100`, opts)
-                .then((r) => r.items)
-                .catch(() => [] as PlatformRecord[]);
-        Promise.all([
-            platformFetch<PageResult<PlatformRecord>>("/records/aplicaciones?limit=100", opts).then(
-                (r) => r.items,
-            ),
-            list("repositorios"),
-            list("despliegues"),
-            list("incidencias"),
-            list("esquemas"),
-            list("servidores"),
-        ])
-            .then(async ([apps, repos, deploys, incidents, schemas, serverRows]) => {
-                const used = new Set(apps.map((a) => String(a.datos.servidorId || "")));
-                const servers: Portfolio["servers"] = {};
-                await Promise.all(
-                    serverRows
-                        .filter((s) => used.has(s.id))
-                        .map(async (s) => {
-                            const snap = await platformFetch<ServerSnapshot>("/monitor/" + s.id, opts).catch(
-                                () => null,
-                            );
-                            servers[s.id] = { name: s.nombre, health: serverHealth(snap) };
-                        }),
-                );
-                if (!c.signal.aborted) setData({ apps, repos, deploys, incidents, schemas, servers });
-            })
-            .catch(
-                (e) =>
-                    !c.signal.aborted &&
-                    setError(e instanceof Error ? e.message : "No se pudo cargar el portafolio."),
+    const query = useQuery({
+        queryKey: [...platformKey("/portafolio"), revision],
+        queryFn: async ({ signal }): Promise<Portfolio> => {
+            const opts = { signal };
+            const list = (type: string) =>
+                platformFetch<PageResult<PlatformRecord>>(`/records/${type}?limit=100`, opts)
+                    .then((r) => r.items)
+                    .catch(() => [] as PlatformRecord[]);
+            const [apps, repos, deploys, incidents, schemas, serverRows] = await Promise.all([
+                platformFetch<PageResult<PlatformRecord>>("/records/aplicaciones?limit=100", opts).then(
+                    (r) => r.items,
+                ),
+                list("repositorios"),
+                list("despliegues"),
+                list("incidencias"),
+                list("esquemas"),
+                list("servidores"),
+            ]);
+            const used = new Set(apps.map((a) => String(a.datos.servidorId || "")));
+            const servers: Portfolio["servers"] = {};
+            await Promise.all(
+                serverRows
+                    .filter((s) => used.has(s.id))
+                    .map(async (s) => {
+                        const snap = await platformFetch<ServerSnapshot>("/monitor/" + s.id, opts).catch(
+                            () => null,
+                        );
+                        servers[s.id] = { name: s.nombre, health: serverHealth(snap) };
+                    }),
             );
-        return () => c.abort();
-    }, [revision]);
-    return { data, error };
+            return { apps, repos, deploys, incidents, schemas, servers };
+        },
+    });
+    return {
+        data: query.data ?? null,
+        error: query.error ? queryErrorMessage(query.error, "No se pudo cargar el portafolio.") : "",
+    };
 }

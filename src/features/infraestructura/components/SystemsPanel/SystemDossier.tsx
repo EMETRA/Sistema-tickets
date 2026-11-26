@@ -1,8 +1,8 @@
 "use client";
-import { useEffect, useState } from "react";
+import { usePlatformQuery } from "@/platform/query";
+import { useState } from "react";
 import { Button } from "@/components/client/atoms/Button";
 import { PopOver } from "@/components/client/atoms/PopOver";
-import { platformFetch } from "@/platform/client";
 import { usePlatform } from "@/platform/context";
 import type { PlatformRecord } from "@/platform/types";
 import { daysFromToday, relativeDays } from "../AssetsPanel/assetDates";
@@ -35,18 +35,14 @@ export function SystemDossier({
     onChanged: () => void;
 }) {
     const { data } = usePlatform();
-    const [detail, setDetail] = useState<PlatformRecord>(app);
     const [sub, setSub] = useState<Sub | null>(null);
     const [create, setCreate] = useState<string | null>(null);
     const [editing, setEditing] = useState<Sub | null>(null);
     // El detalle trae los nombres de las referencias (responsable, servidor).
-    useEffect(() => {
-        const c = new AbortController();
-        platformFetch<PlatformRecord>(`/records/aplicaciones/${app.id}`, { signal: c.signal })
-            .then((r) => !c.signal.aborted && setDetail(r))
-            .catch(() => undefined);
-        return () => c.abort();
-    }, [app.id]);
+    const detailQuery = usePlatformQuery<PlatformRecord>(`/records/aplicaciones/${app.id}`, {
+        placeholderData: app,
+    });
+    const detail = detailQuery.data ?? app;
     const can = (type: string, action: "INSERTAR" | "EDITAR") => !!data?.definitions[type]?.actions[action];
     const repos = portfolio.repos.filter((r) => r.datos.aplicacionId === app.id);
     const deploys = portfolio.deploys

@@ -1,6 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { mensajes, texto } from "@/platform/forms";
 import classNames from "classnames";
 import { Title } from "@/components/client/atoms/Title";
 import { FormField } from "@/components/client/molecules/FormField";
@@ -13,6 +17,22 @@ import { Button } from "@/components/client/atoms/Button";
 import type { TicketCreationPanelProps, TicketFormData, UploadedFile } from "./types";
 import styles from "./TicketCreationPanel.module.scss";
 import { RichTextField } from "@/components/client/molecules/RichTextField";
+
+/** Texto visible de la descripción (el editor guarda HTML). */
+const plainText = (html: string) =>
+    html
+        .replace(/<[^>]*>/g, " ")
+        .replace(/&nbsp;/g, " ")
+        .trim();
+const ticketSchema = z.object({
+    subject: texto("Asunto", { requerido: true, max: 150 }),
+    departmentId: z.string().min(1, mensajes.opcion("Área que atiende")),
+    description: z
+        .string()
+        .max(24000, mensajes.maximo("Descripción del problema", 24000))
+        .refine((v) => plainText(v).length > 0, mensajes.requerido("Descripción del problema")),
+});
+type TicketValues = z.infer<typeof ticketSchema>;
 
 /**
  * Componente TicketCreationPanel - Formulario completo para crear un ticket
@@ -30,10 +50,30 @@ export const TicketCreationPanel: React.FC<TicketCreationPanelProps> = ({
     className,
     variant = "page",
 }) => {
-    // Estados del formulario
-    const [subject, setSubject] = useState(initialValues?.subject || "");
-    const [departmentId, setDepartmentId] = useState(initialValues?.departmentId?.toString() || "");
-    const [description, setDescription] = useState(initialValues?.description || "");
+    // Campos validados con las mismas reglas del API (asunto ≤ 150, descripción con texto ≤ 24 000).
+    const {
+        control,
+        setValue,
+        handleSubmit: validate,
+        formState: { errors, isSubmitted },
+    } = useForm<TicketValues>({
+        resolver: zodResolver(ticketSchema),
+        defaultValues: {
+            subject: initialValues?.subject || "",
+            departmentId: initialValues?.departmentId?.toString() || "",
+            description: initialValues?.description || "",
+        },
+    });
+    const [subject, departmentId, description] = useWatch({
+        control,
+        name: ["subject", "departmentId", "description"],
+    });
+    // Después del primer intento, cada cambio vuelve a validar y quita el mensaje al corregir.
+    const update = (name: keyof TicketValues, value: string) =>
+        setValue(name, value, { shouldValidate: isSubmitted, shouldDirty: true });
+    const setSubject = (value: string) => update("subject", value);
+    const setDepartmentId = (value: string) => update("departmentId", value);
+    const setDescription = (value: string) => update("description", value);
     const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>(initialValues?.files || []);
     const [rejectedFiles, setRejectedFiles] = useState<string[]>([]);
     const ALLOWED_EXTENSIONS = [
@@ -83,19 +123,16 @@ export const TicketCreationPanel: React.FC<TicketCreationPanelProps> = ({
     };
 
     // Manejar envío del formulario
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-
+    const handleSubmit = validate((values) => {
         if (loading) return;
         const formData: TicketFormData = {
-            subject,
-            departmentId,
-            description,
+            subject: values.subject.trim(),
+            departmentId: values.departmentId,
+            description: values.description,
             files: uploadedFiles,
         };
-
         onSubmit?.(formData);
-    };
+    });
 
     // Manejar cancelación
     const handleCancel = () => {
@@ -121,12 +158,19 @@ export const TicketCreationPanel: React.FC<TicketCreationPanelProps> = ({
         return (
             <form
                 onSubmit={handleSubmit}
+                noValidate
                 className={classNames(styles.dialogForm, className)}
                 aria-label="Nuevo ticket"
             >
                 <div className={styles.dialogBody}>
                     <div className={styles.fieldsRow}>
-                        <FormField label="Asunto" htmlFor="subject" required className={styles.fieldAsunto}>
+                        <FormField
+                            label="Asunto"
+                            htmlFor="subject"
+                            required
+                            className={styles.fieldAsunto}
+                            error={errors.subject?.message}
+                        >
                             <Input
                                 id="subject"
                                 maxLength={150}
@@ -143,6 +187,7 @@ export const TicketCreationPanel: React.FC<TicketCreationPanelProps> = ({
                             label="Área que atiende"
                             htmlFor="department"
                             required
+                            error={errors.departmentId?.message}
                             className={styles.fieldDepartamento}
                         >
                             <Select
@@ -156,7 +201,12 @@ export const TicketCreationPanel: React.FC<TicketCreationPanelProps> = ({
                             />
                         </FormField>
                     </div>
-                    <FormField label="Descripción del problema" htmlFor="description" required>
+                    <FormField
+                        label="Descripción del problema"
+                        htmlFor="description"
+                        required
+                        error={errors.description?.message}
+                    >
                         <RichTextField
                             id="description"
                             readOnly={loading}
@@ -209,14 +259,20 @@ export const TicketCreationPanel: React.FC<TicketCreationPanelProps> = ({
         );
     return (
         <div className={classNames(styles.TicketCreationPanel, className)}>
-            <form onSubmit={handleSubmit} className={styles.form}>
+            <form onSubmit={handleSubmit} noValidate className={styles.form}>
                 <section className={styles.details} aria-labelledby="ticket-details-title">
                     <Title variant="mid" tag="h2" id="ticket-details-title" className={styles.title}>
                         Detalles del ticket
                     </Title>
                     <p className={styles.help}>Los campos con * son obligatorios.</p>
                     <div className={styles.fieldsRow}>
-                        <FormField label="Asunto" htmlFor="subject" required className={styles.fieldAsunto}>
+                        <FormField
+                            label="Asunto"
+                            htmlFor="subject"
+                            required
+                            className={styles.fieldAsunto}
+                            error={errors.subject?.message}
+                        >
                             <Input
                                 id="subject"
                                 maxLength={150}
@@ -232,6 +288,7 @@ export const TicketCreationPanel: React.FC<TicketCreationPanelProps> = ({
                             label="Departamento"
                             htmlFor="department"
                             required
+                            error={errors.departmentId?.message}
                             className={styles.fieldDepartamento}
                         >
                             <Select
@@ -245,7 +302,12 @@ export const TicketCreationPanel: React.FC<TicketCreationPanelProps> = ({
                             />
                         </FormField>
                     </div>
-                    <FormField label="Descripción del problema" htmlFor="description" required>
+                    <FormField
+                        label="Descripción del problema"
+                        htmlFor="description"
+                        required
+                        error={errors.description?.message}
+                    >
                         <RichTextField
                             id="description"
                             readOnly={loading}

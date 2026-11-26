@@ -29,4 +29,9 @@ export interface FormFieldProps {
      * Clase CSS adicional.
      */
     className?: string;
+
+    /**
+     * Mensaje de validación (se muestra debajo del campo y se anuncia a lectores de pantalla).
+     */
+    error?: string;
 }

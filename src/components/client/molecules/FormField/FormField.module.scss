@@ -23,3 +23,10 @@
   margin-left: 4px;
   color: $rojo-1;
 }
+
+.error {
+  margin: 4px 0 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--tickets-danger);
+}

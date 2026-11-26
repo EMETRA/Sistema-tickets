@@ -5,7 +5,14 @@ import styles from "./FormField.module.scss";
 import { FormFieldProps } from "./types";
 import { Label } from "../../atoms/Label";
 
-const FormField: React.FC<FormFieldProps> = ({ label, htmlFor, required = false, children, className }) => {
+const FormField: React.FC<FormFieldProps> = ({
+    label,
+    htmlFor,
+    required = false,
+    children,
+    className,
+    error,
+}) => {
     return (
         <div className={classNames(styles.FormField, className)}>
             <Label htmlFor={htmlFor}>
@@ -14,6 +21,11 @@ const FormField: React.FC<FormFieldProps> = ({ label, htmlFor, required = false,
             </Label>
 
             <div className={styles.control}>{children}</div>
+            {error && (
+                <p role="alert" id={htmlFor + "-error"} className={styles.error}>
+                    {error}
+                </p>
+            )}
         </div>
     );
 };

@@ -1,5 +1,6 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { usePlatformQuery } from "@/platform/query";
+import { useEffect, useMemo, useRef, useState, useEffectEvent } from "react";
 import { PopOver } from "@/components/client/atoms/PopOver";
 import { AnalisisEvidencias } from "@/views/JUZ01Detail/AnalisisEvidencias";
 import type { AnalisisEvidencias as Analisis } from "@/api/graphql/juzgado";
@@ -76,31 +77,22 @@ function Evidencia({
     checked: boolean;
     onCheck: (yes: boolean) => void;
 }) {
-    const [attempt, setAttempt] = useState(0),
-        [url, setUrl] = useState(""),
-        [error, setError] = useState(""),
+    const [mediaError, setMediaError] = useState(""),
         [ready, setReady] = useState(false);
-    useEffect(() => {
-        const controller = new AbortController();
-        let objectUrl = "";
-        setUrl("");
-        setError("");
+    const query = usePlatformQuery<Blob>(`/vivi-pmt/casos/${caso}/evidencias/${archivo.ID}`, {
+        staleTime: 5 * 60_000,
+    });
+    // URL local del archivo descargado; se libera al cambiar de evidencia o al cerrar.
+    const url = useMemo(() => (query.data ? URL.createObjectURL(query.data) : ""), [query.data]);
+    useEffect(() => () => void (url && URL.revokeObjectURL(url)), [url]);
+    const error = mediaError || (query.error ? errorText(query.error) : "");
+    const retry = () => {
+        setMediaError("");
         setReady(false);
+        // La revisión se vuelve a confirmar después de recargar la evidencia.
         onCheck(false);
-        platformFetch<Blob>(`/vivi-pmt/casos/${caso}/evidencias/${archivo.ID}`, { signal: controller.signal })
-            .then((blob) => {
-                if (controller.signal.aborted) return;
-                objectUrl = URL.createObjectURL(blob);
-                setUrl(objectUrl);
-            })
-            .catch((e) => {
-                if (!controller.signal.aborted) setError(errorText(e));
-            });
-        return () => {
-            controller.abort();
-            if (objectUrl) URL.revokeObjectURL(objectUrl);
-        };
-    }, [caso, archivo.ID, attempt]);
+        void query.refetch();
+    };
     return (
         <article className={local.evidence}>
             <strong>
@@ -110,7 +102,7 @@ function Evidencia({
             {error ? (
                 <div role="alert">
                     <p>{error}</p>
-                    <Button variant="outlined" onClick={() => setAttempt((x) => x + 1)}>
+                    <Button variant="outlined" onClick={retry}>
                         Reintentar evidencia
                     </Button>
                 </div>
@@ -124,18 +116,19 @@ function Evidencia({
                     onLoadedMetadata={() => setReady(true)}
                     onError={() => {
                         setReady(false);
-                        setError("No se pudo reproducir el video. Puedes descargarlo para revisarlo.");
+                        setMediaError("No se pudo reproducir el video. Puedes descargarlo para revisarlo.");
                     }}
                 />
             ) : (
                 <a href={url} target="_blank" rel="noreferrer">
+                    {/* eslint-disable-next-line @next/next/no-img-element -- evidencia descargada (blob:), next/image no aplica */}
                     <img
                         src={url}
                         alt={`Evidencia ${archivo.ID} del reporte`}
                         onLoad={() => setReady(true)}
                         onError={() => {
                             setReady(false);
-                            setError("No se pudo mostrar la fotografía.");
+                            setMediaError("No se pudo mostrar la fotografía.");
                         }}
                     />
                 </a>
@@ -225,11 +218,13 @@ export function ViviPmtWorkspace() {
             if (!controller.signal.aborted) setBusy(false);
         }
     }
+    const loadOnMount = useEffectEvent(() => void load());
     useEffect(() => {
-        void load();
+        loadOnMount();
         const timer = setInterval(() => setClock(Date.now()), 15000);
+        const current = request;
         return () => {
-            request.current?.abort();
+            current.current?.abort();
             clearInterval(timer);
         };
     }, []);

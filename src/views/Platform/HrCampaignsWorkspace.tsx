@@ -55,11 +55,11 @@ export function HrCampaignsWorkspace() {
         flight = useRef(false);
     useEffect(() => {
         mounted.current = true;
+        // Al desmontar se invalidan las respuestas pendientes de cada consulta.
+        const refs = [generation, reportGeneration, detailGeneration];
         return () => {
             mounted.current = false;
-            generation.current++;
-            reportGeneration.current++;
-            detailGeneration.current++;
+            for (const ref of refs) ref.current++;
         };
     }, []);
     const load = useCallback(async () => {

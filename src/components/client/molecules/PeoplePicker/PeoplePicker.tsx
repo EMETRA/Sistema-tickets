@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useId, useRef, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { platformFetch } from "@/platform/client";
 import styles from "./PeoplePicker.module.scss";
 
@@ -12,7 +13,8 @@ const apiSearch =
     (query, signal) =>
         platformFetch<Person[]>(lookupPath + "?q=" + encodeURIComponent(query), { signal });
 
-const cache = new Map<number, string>();
+/** Clave de caché compartida (TanStack Query) para las búsquedas de personas. */
+const peopleKey = (lookupPath: string, query: string) => ["personas", lookupPath, query] as const;
 
 function initials(name: string) {
     return name
@@ -23,22 +25,19 @@ function initials(name: string) {
         .join("");
 }
 
-/** Nombres de personas por id, usando `/people` (con caché por sesión). */
+/** Nombres de personas por id: usa la lista de `/people` y cualquier búsqueda ya hecha (caché compartida). */
 export function usePeopleNames(ids: number[], lookupPath = "/people", search?: PeopleSearch) {
-    const [, setVersion] = useState(0);
-    const missing = ids.filter((id) => !cache.has(id)).join(",");
-    useEffect(() => {
-        if (!missing) return;
-        const controller = new AbortController();
-        (search || apiSearch(lookupPath))("", controller.signal)
-            .then((people) => {
-                for (const p of people) cache.set(Number(p.id), p.nombre);
-                setVersion((v) => v + 1);
-            })
-            .catch(() => undefined);
-        return () => controller.abort();
-    }, [missing, lookupPath, search]);
-    return (id: number) => cache.get(id);
+    const client = useQueryClient();
+    useQuery({
+        queryKey: peopleKey(lookupPath, ""),
+        queryFn: ({ signal }) => (search || apiSearch(lookupPath))("", signal),
+        enabled: ids.length > 0,
+        staleTime: 5 * 60_000,
+    });
+    const names = new Map<number, string>();
+    for (const [, people] of client.getQueriesData<Person[]>({ queryKey: ["personas", lookupPath] }))
+        for (const p of people || []) names.set(Number(p.id), p.nombre);
+    return (id: number) => names.get(id);
 }
 
 export function PersonChip({
@@ -94,30 +93,26 @@ export function PeoplePicker({
         [query, setQuery] = useState(""),
         [open, setOpen] = useState(false),
         [active, setActive] = useState(0),
-        [options, setOptions] = useState<Person[]>([]),
-        [error, setError] = useState(""),
+        [term, setTerm] = useState(""),
         box = useRef<HTMLDivElement>(null);
     const nameOf = usePeopleNames(value, lookupPath, search);
+    // Espera 200 ms después de la última tecla antes de buscar.
     useEffect(() => {
-        if (!open) return;
-        const controller = new AbortController();
-        const timer = setTimeout(() => {
-            (search || apiSearch(lookupPath))(query.trim(), controller.signal)
-                .then((people) => {
-                    for (const p of people) cache.set(Number(p.id), p.nombre);
-                    setOptions(people.map((p) => ({ id: Number(p.id), nombre: p.nombre })));
-                    setError("");
-                })
-                .catch((e) => {
-                    if (!controller.signal.aborted)
-                        setError(e instanceof Error ? e.message : "No se pudo buscar personas.");
-                });
-        }, 200);
-        return () => {
-            clearTimeout(timer);
-            controller.abort();
-        };
-    }, [open, query, lookupPath, search]);
+        const timer = setTimeout(() => setTerm(query.trim()), 200);
+        return () => clearTimeout(timer);
+    }, [query]);
+    const results = useQuery({
+        queryKey: peopleKey(lookupPath, term),
+        queryFn: ({ signal }) => (search || apiSearch(lookupPath))(term, signal),
+        enabled: open,
+        staleTime: 60_000,
+    });
+    const options = (results.data || []).map((p) => ({ id: Number(p.id), nombre: p.nombre }));
+    const error = results.error
+        ? results.error instanceof Error
+            ? results.error.message
+            : "No se pudo buscar personas."
+        : "";
     const available = options.filter((o) => !value.includes(o.id)).slice(0, 8);
     function add(person: Person) {
         onChange([...value, person.id]);

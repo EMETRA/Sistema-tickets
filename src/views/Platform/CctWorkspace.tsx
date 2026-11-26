@@ -1,4 +1,5 @@
 "use client";
+import { usePlatformQuery } from "@/platform/query";
 import { CctAgentAssignments } from "./CctAgentAssignments";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -926,35 +927,16 @@ function Directory({ kind }: { kind: "vehiculos" | "pilotos" | "agentes" }) {
     );
 }
 function CctWorkspace({ module }: { module: string }) {
-    const [bootstrap, setBootstrap] = useState<CctBootstrap | null>(null),
-        [error, setError] = useState(""),
-        [tab, setTab] = useState("remisiones"),
-        [report, setReport] = useState("cepos");
+    const [report, setReport] = useState("cepos");
     const params = useSearchParams();
-    useEffect(() => {
-        const v = params.get("vista");
-        setTab(v && ["remisiones", "vehiculos", "pilotos", "agentes"].includes(v) ? v : "remisiones");
-    }, [params]);
-    const request = useRef<AbortController | null>(null);
-    async function load() {
-        request.current?.abort();
-        const ctl = new AbortController();
-        request.current = ctl;
-        setError("");
-        try {
-            setBootstrap(
-                await platformFetch("/cct/bootstrap?modulo=" + module, {
-                    signal: ctl.signal,
-                }),
-            );
-        } catch (e) {
-            if (!ctl.signal.aborted) setError(cctError(e));
-        }
-    }
-    useEffect(() => {
-        void load();
-        return () => request.current?.abort();
-    }, [module]);
+    // La pestaña sale de la URL (?vista=…), así se puede compartir o volver atrás.
+    const vista = params.get("vista");
+    const tab =
+        vista && ["remisiones", "vehiculos", "pilotos", "agentes"].includes(vista) ? vista : "remisiones";
+    const query = usePlatformQuery<CctBootstrap>("/cct/bootstrap?modulo=" + module);
+    const bootstrap = query.data ?? null;
+    const error = query.error ? cctError(query.error) : "";
+    const load = () => query.refetch();
     if (error)
         return (
             <section className={styles.card}>

@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useEffectEvent } from "react";
 import { Button } from "@/components/client/atoms/Button";
 import { platformFetch, PlatformError } from "@/platform/client";
 import { cctLabel, cctQuery, CCT_STATES, type CctPage, type CctRow } from "@/platform/cct";
@@ -226,9 +226,11 @@ export function CctPicker({
             if (!ctl.signal.aborted) setBusy(false);
         }
     }
+    const loadOnChange = useEffectEvent(() => void load());
     useEffect(() => {
-        void load();
-        return () => request.current?.abort();
+        loadOnChange();
+        const current = request;
+        return () => current.current?.abort();
     }, [kind]);
     return (
         <fieldset className={local.picker} disabled={disabled}>

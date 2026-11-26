@@ -1,4 +1,6 @@
 "use client";
+import { useQueryClient } from "@tanstack/react-query";
+import { platformKey } from "@/platform/query";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/client/atoms/Button";
 import { PlatformField } from "@/components/client/molecules/PlatformField/PlatformField";
@@ -30,6 +32,7 @@ export function RecordEditor({
     onClose: () => void;
     onSaved: (record: PlatformRecord) => void;
 }) {
+    const queryClient = useQueryClient();
     const { data: context } = usePlatform(),
         def = resourceDefinition(type, context!.definitions[type]),
         availableTeams = context!.teams.filter(
@@ -107,6 +110,9 @@ export function RecordEditor({
                 context!.actor.admin,
                 (record ? "Actualizar " : "Registrar ") + def.singular,
             );
+            // La ficha abierta y las listas se actualizan con lo guardado.
+            queryClient.setQueryData(platformKey("/records/" + type + "/" + saved.id), saved);
+            void queryClient.invalidateQueries({ queryKey: ["platform"] });
             onSaved(saved);
         } catch (e) {
             setError(

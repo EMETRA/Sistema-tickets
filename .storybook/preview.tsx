@@ -1,4 +1,5 @@
 import type { Preview } from "@storybook/nextjs-vite";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "../src/theme/tokens.css";
 import "../src/theme/accessibility.css";
 
@@ -56,7 +57,13 @@ const preview: Preview = {
             root.dataset.contrast = context.globals.contrast || "normal";
             document.body.style.background = "var(--tickets-background)";
             document.body.style.color = "var(--tickets-text)";
-            return <Story />;
+            // Cada historia con su propia caché de consultas (TanStack Query), sin reintentos.
+            const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+            return (
+                <QueryClientProvider client={client}>
+                    <Story />
+                </QueryClientProvider>
+            );
         },
     ],
     parameters: {

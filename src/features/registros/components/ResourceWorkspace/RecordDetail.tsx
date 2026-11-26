@@ -1,4 +1,6 @@
 "use client";
+import { useQueryClient } from "@tanstack/react-query";
+import { platformKey, queryErrorMessage, usePlatformQuery } from "@/platform/query";
 import { displayDate } from "@/helpers/displayDate";
 import { statusLabel, statusTone } from "@/helpers/statusTone";
 import { useEffect, useRef, useState } from "react";
@@ -35,6 +37,15 @@ type Change = {
     antes: unknown;
     despues: unknown;
 };
+type DetailRecord = PlatformRecord & {
+    labels?: Record<string, string>;
+    invitacion?: {
+        estado: string;
+        intentadoEn: string | null;
+        enviadoEn: string | null;
+    };
+};
+
 export function RecordDetail({
     type,
     record,
@@ -51,50 +62,27 @@ export function RecordDetail({
     const { data } = usePlatform(),
         def = resourceDefinition(type, data!.definitions[type]),
         dialog = useRef<HTMLDialogElement>(null),
-        [current, setCurrent] = useState<
-            PlatformRecord & {
-                labels?: Record<string, string>;
-                invitacion?: {
-                    estado: string;
-                    intentadoEn: string | null;
-                    enviadoEn: string | null;
-                };
-            }
-        >(record),
-        [history, setHistory] = useState<Change[]>([]),
         [tab, setTab] = useState("info"),
         [error, setError] = useState(""),
         [busy, setBusy] = useState(false),
         [decision, setDecision] = useState("APROBAR"),
         [observacion, setObservacion] = useState("");
+    const queryClient = useQueryClient();
+    const detailPath = "/records/" + type + "/" + record.id;
+    // Ficha completa (con etiquetas e invitación); mientras llega se muestra la fila de la lista.
+    const detail = usePlatformQuery<DetailRecord>(detailPath, { placeholderData: record });
+    const current: DetailRecord = detail.data ?? record;
+    const setCurrent = (next: DetailRecord) => queryClient.setQueryData(platformKey(detailPath), next);
+    const historyQuery = usePlatformQuery<Change[]>(tab === "history" ? detailPath + "/history" : null);
+    const history = historyQuery.data ?? [];
+    const loadError = queryErrorMessage(detail.error || historyQuery.error);
     const readOnly = type === "actividades" && current.visibilidad === "EMPRESA" && !data!.actor.admin;
     const employment = current.datos._rrhh as { unidad?: string; puesto?: string } | undefined;
     const automatic = current.datos._automatico as
         { cantidad?: number; primeraVez?: string; ultimaVez?: string } | undefined;
     useEffect(() => {
         dialog.current?.showModal();
-        const controller = new AbortController();
-        platformFetch<PlatformRecord>("/records/" + type + "/" + record.id, {
-            signal: controller.signal,
-        })
-            .then(setCurrent)
-            .catch((e) => {
-                if (!controller.signal.aborted) setError(e.message);
-            });
-        return () => controller.abort();
-    }, [type, record.id]);
-    useEffect(() => {
-        if (tab !== "history") return;
-        const controller = new AbortController();
-        platformFetch<Change[]>("/records/" + type + "/" + record.id + "/history", {
-            signal: controller.signal,
-        })
-            .then(setHistory)
-            .catch((e) => {
-                if (!controller.signal.aborted) setError(e.message);
-            });
-        return () => controller.abort();
-    }, [type, record.id, tab]);
+    }, []);
     const [preview, setPreview] = useState<RequestPreview | null>(null);
     useEffect(() => {
         if (type !== "solicitudes" || !data!.actor.admin || current.estado !== "PENDIENTE") return;
@@ -286,9 +274,9 @@ export function RecordDetail({
                         </button>
                     ))}
                 </nav>
-                {error && (
+                {(error || loadError) && (
                     <p role="alert" className={styles.error}>
-                        {error}
+                        {error || loadError}
                     </p>
                 )}
                 {tab === "files" ? (

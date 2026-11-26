@@ -63,8 +63,9 @@ export function HrNotificationsProvider({ children }: { children: React.ReactNod
         setFailures(0);
         setError("");
         void refresh();
+        const current = generation;
         return () => {
-            generation.current++;
+            current.current++;
         };
     }, [refresh]);
     useEffect(() => {

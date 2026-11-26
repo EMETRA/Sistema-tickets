@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useEffectEvent } from "react";
 import { Button } from "@/components/client/atoms/Button";
 import { platformFetch } from "@/platform/client";
 import type { CctPage, CctRow } from "@/platform/cct";
@@ -35,9 +35,12 @@ export function CctAgentAssignments({ agente }: { agente: CctRow }) {
             if (!c.signal.aborted) setBusy(false);
         }
     }
+    // Carga inicial con la versión más reciente de load (sin repetir el efecto).
+    const loadOnChange = useEffectEvent(() => void load());
     useEffect(() => {
-        if (agente.TIPO_AGENTE) void load();
-        return () => request.current?.abort();
+        if (agente.TIPO_AGENTE) loadOnChange();
+        const current = request;
+        return () => current.current?.abort();
     }, [agente.TIPO_AGENTE, agente.CHAPA]);
     return (
         <section aria-label="Asignaciones de remisiones">

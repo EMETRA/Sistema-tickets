@@ -1,7 +1,7 @@
 "use client";
-import { startTransition, useEffect, useState } from "react";
+import { queryErrorMessage, usePlatformQuery } from "@/platform/query";
+import { useState } from "react";
 import { usePlatform } from "@/platform/context";
-import { platformFetch } from "@/platform/client";
 import { ResourceWorkspace } from "@/features/registros/components/ResourceWorkspace/ResourceWorkspace";
 import { type OrganizationPerson } from "@/features/personas/components/OrganizationPeople/OrganizationPeople";
 import { OrganizationSync } from "./OrganizationSync";
@@ -9,32 +9,15 @@ import { WorkspaceNavigation, useWorkspaceTab, type WorkspaceTab } from "./Works
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
 import { PeopleDirectoryView, TeamsBoard } from "@/features/personas/components/PeoplePanel";
 function PeopleDirectory() {
-    const [people, setPeople] = useState<OrganizationPerson[] | null>(null),
-        [error, setError] = useState(""),
-        [revision, setRevision] = useState(0);
-    useEffect(() => {
-        const controller = new AbortController();
-        startTransition(() => {
-            setPeople(null);
-            setError("");
-        });
-        platformFetch<{ personal: OrganizationPerson[] }>("/organization/people", {
-            signal: controller.signal,
-        })
-            .then((result) => {
-                if (!controller.signal.aborted) setPeople(result.personal);
-            })
-            .catch((e) => {
-                if (!controller.signal.aborted) setError(e.message);
-            });
-        return () => controller.abort();
-    }, [revision]);
+    const query = usePlatformQuery<{ personal: OrganizationPerson[] }>("/organization/people");
+    const people = query.data?.personal ?? null;
+    const error = query.error ? queryErrorMessage(query.error) : "";
     return error ? (
         <p role="alert" className={styles.error}>
             {error}
         </p>
     ) : people ? (
-        <PeopleDirectoryView people={people} onRefresh={() => setRevision((v) => v + 1)} />
+        <PeopleDirectoryView people={people} onRefresh={() => void query.refetch()} />
     ) : (
         <p role="status" className={styles.muted}>
             Consultando el personal de RRHH…

@@ -1,4 +1,5 @@
 "use client";
+import { usePlatformQuery } from "@/platform/query";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import { Button } from "@/components/client/atoms/Button";
@@ -380,30 +381,14 @@ function HrUpdateForm({ id, onSent }: { id: string; onSent: () => void }) {
     );
 }
 export function HrProfileWorkspace({ campaignId }: { campaignId?: string }) {
-    const [profile, setProfile] = useState<HrProfile | null>(null),
-        [error, setError] = useState(""),
-        [filter, setFilter] = useState(""),
+    const [filter, setFilter] = useState(""),
         [view, setView] = useState("datos");
     const token = useAuthStore((s) => s.token),
-        userId = useAuthStore((s) => s.getUserId()),
-        generation = useRef(0);
-    const load = useCallback(async () => {
-        const version = ++generation.current;
-        setError("");
-        try {
-            const p = await platformFetch<HrProfile>("/hr/me");
-            if (version === generation.current) setProfile(p);
-        } catch (e) {
-            if (version === generation.current) setError(hrError(e));
-        }
-    }, []);
-    useEffect(() => {
-        setProfile(null);
-        if (token) void load();
-        return () => {
-            generation.current++;
-        };
-    }, [token, load]);
+        userId = useAuthStore((s) => s.getUserId());
+    const query = usePlatformQuery<HrProfile>(token ? "/hr/me" : null);
+    const profile = query.data ?? null;
+    const error = query.error ? hrError(query.error) : "";
+    const load = () => query.refetch();
     const groups = profile ? [...new Set(profile.campos.map((f) => f.grupo))] : [];
     return (
         <div className={styles.page}>

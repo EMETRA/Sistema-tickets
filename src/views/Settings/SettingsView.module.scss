@@ -84,7 +84,7 @@
     --p-accent: #6f86ff;
   }
   &[data-preview="system"] {
-    background: linear-gradient(115deg, #f4f6fb 0 50%, #0e1320 50% 100%);
+    background: linear-gradient(115deg, var(--tickets-background) 0 50%, #0e1320 50% 100%);
     --p-surface: transparent;
   }
 }

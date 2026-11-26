@@ -14,7 +14,9 @@
     "build-storybook": "storybook build",
     "test:integracion": "node --test test/integracion/*.test.cjs",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "tokens": "node scripts/tokens/generar.cjs",
+    "tokens:check": "node scripts/tokens/generar.cjs --check"
   },
   "dependencies": {
     "@tiptap/extension-strike": "^3.20.4",

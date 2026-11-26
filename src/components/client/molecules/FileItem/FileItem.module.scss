@@ -1,5 +1,4 @@
 @use "../../../../../src/theme/colors.scss" as *;
-@use "sass:color";
 
 // Estilos base del fileitem
 .FileItem {
@@ -10,7 +9,7 @@
   padding: 10px 12px;
   border: 2px solid $cuaternary-text;
   border-radius: 10px;
-  background-color: rgba($tertiary-text, 0.2);
+  background-color: color-mix(in srgb, #{$tertiary-text} 20%, transparent);
 }
 
 .left {

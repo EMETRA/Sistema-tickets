@@ -29,38 +29,8 @@
   }
 }
 
-/* Alto contraste: textos secundarios más oscuros (≥ 7:1 sobre la superficie),
-   bordes visibles y foco más grueso. */
-:root[data-contrast="more"] {
-  --tickets-primary: #2f4bd6;
-  --tickets-primary-hover: #2440c4;
-  --tickets-text: #14223a;
-  --tickets-text-secondary: #33425a;
-  --tickets-text-muted: #45536a;
-  --tickets-border: #808ca2;
-  --tickets-border-strong: #66728a;
-  --tickets-divider: #b4bfd1;
-  --tickets-success: #0f5f39;
-  --tickets-danger: #9c2433;
-  --tickets-warning: #5f3e06;
-  --tickets-info: #263fae;
-  --tickets-focus: 0 0 0 3px #2f4bd680;
-}
-:root[data-contrast="more"][data-theme="dark"] {
-  --tickets-primary: #93a5ff;
-  --tickets-primary-hover: #a8b6ff;
-  --tickets-text: #f6f8fd;
-  --tickets-text-secondary: #d5dcea;
-  --tickets-text-muted: #bcc6da;
-  --tickets-border: #5b6884;
-  --tickets-border-strong: #7684a2;
-  --tickets-divider: #414c66;
-  --tickets-success: #7dd9ae;
-  --tickets-danger: #ff9ea9;
-  --tickets-warning: #f3c771;
-  --tickets-info: #b5c2ff;
-  --tickets-focus: 0 0 0 3px #93a5ff99;
-}
+/* Alto contraste: los colores están en tokens.css (generado desde tokens.json);
+   aquí solo el foco más grueso y los enlaces subrayados. */
 :root[data-contrast="more"] :focus-visible {
   outline-width: 3px !important;
   outline-offset: 2px;

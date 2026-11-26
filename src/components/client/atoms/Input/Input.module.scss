@@ -88,7 +88,7 @@
   justify-content: center;
   gap: 16px;
   padding: 32px;
-  border: 3px dashed #4361ee;
+  border: 3px dashed var(--tickets-primary);
   border-radius: 14px;
   background: #4361ee0f;
   cursor: pointer;
@@ -102,7 +102,7 @@
   }
 
   &:focus {
-    outline: 2px solid #4361ee;
+    outline: 2px solid var(--tickets-primary);
     outline-offset: 2px;
   }
 }
@@ -141,7 +141,7 @@
 .FileLinkText {
   margin: 0;
   font-size: 16px;
-  color: #4361ee;
+  color: var(--tickets-primary);
   font-weight: 600;
   text-decoration: underline;
 }
@@ -155,7 +155,7 @@
 }
 
 .Icon {
-  color: #4361ee;
+  color: var(--tickets-primary);
 }
 
 // IconButton para password

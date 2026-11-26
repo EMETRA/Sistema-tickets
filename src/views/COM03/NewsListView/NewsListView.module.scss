@@ -9,7 +9,7 @@
   border: 1px solid #dfe6f2;
   border: 1px solid light-dark(#dfe6f2, #2a3449);
   border-radius: 16px;
-  border-left: 4px solid #4361ee;
+  border-left: 4px solid var(--tickets-primary);
 }
 .eyebrow {
   font-size: 11px;

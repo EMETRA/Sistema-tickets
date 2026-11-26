@@ -11,7 +11,7 @@
   border: 1px solid light-dark(#dfe6f2, #2a3449);
   border-radius: 16px;
   background: var(--tickets-surface);
-  border-left: 4px solid #4361ee;
+  border-left: 4px solid var(--tickets-primary);
   h1 {
     margin: 6px 0;
     font-size: clamp(24px, calc(2.2vw / var(--vp-zoom, 1)), 32px);

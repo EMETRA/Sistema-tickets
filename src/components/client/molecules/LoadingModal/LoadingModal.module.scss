@@ -15,7 +15,7 @@
   width: 2.25rem;
   height: 2.25rem;
   margin-bottom: 0.75rem;
-  border: 3px solid rgba($azul-5, 0.2);
+  border: 3px solid color-mix(in srgb, #{$azul-5} 20%, transparent);
   border-top-color: $azul-5;
   border-radius: 50%;
   animation: spin 0.9s linear infinite;

@@ -26,7 +26,7 @@
 .asignado {
   background: #fff1d1;
   background: light-dark(#fff1d1, #5c4a1f);
-  color: #80540d;
+  color: var(--tickets-warning);
   color: light-dark(#80540d, #eec88b);
 }
 .en_trabajo,

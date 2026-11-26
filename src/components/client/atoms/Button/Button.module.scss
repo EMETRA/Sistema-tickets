@@ -1,5 +1,4 @@
 @use "../../../../../src/theme/colors.scss" as *;
-@use "sass:color";
 
 // Estilos base del botón
 .Button {
@@ -59,11 +58,11 @@
       background-color: $verde-claro-1;
 
       &:hover:not(.Button--disabled):not(.Button--loading) {
-        background-color: color.adjust($verde-claro-1, $lightness: -10%);
+        background-color: color-mix(in srgb, #{$verde-claro-1}, #000 10%);
       }
 
       &:active:not(.Button--disabled):not(.Button--loading) {
-        background-color: color.adjust($verde-claro-1, $lightness: -20%);
+        background-color: color-mix(in srgb, #{$verde-claro-1}, #000 20%);
       }
     }
 
@@ -71,11 +70,11 @@
       background-color: $rojo-1;
 
       &:hover:not(.Button--disabled):not(.Button--loading) {
-        background-color: color.adjust($rojo-1, $lightness: -20%);
+        background-color: color-mix(in srgb, #{$rojo-1}, #000 20%);
       }
 
       &:active:not(.Button--disabled):not(.Button--loading) {
-        background-color: color.adjust($rojo-1, $lightness: -10%);
+        background-color: color-mix(in srgb, #{$rojo-1}, #000 10%);
       }
     }
 
@@ -83,11 +82,11 @@
       background-color: $negro-1;
 
       &:hover:not(.Button--disabled):not(.Button--loading) {
-        background-color: color.adjust($negro-1, $lightness: -20%);
+        background-color: color-mix(in srgb, #{$negro-1}, #000 20%);
       }
 
       &:active:not(.Button--disabled):not(.Button--loading) {
-        background-color: color.adjust($negro-1, $lightness: -30%);
+        background-color: color-mix(in srgb, #{$negro-1}, #000 30%);
       }
     }
 
@@ -95,11 +94,11 @@
       background-color: $amarillo-1;
 
       &:hover:not(.Button--disabled):not(.Button--loading) {
-        background-color: color.adjust($amarillo-1, $lightness: -10%);
+        background-color: color-mix(in srgb, #{$amarillo-1}, #000 10%);
       }
 
       &:active:not(.Button--disabled):not(.Button--loading) {
-        background-color: color.adjust($amarillo-1, $lightness: -20%);
+        background-color: color-mix(in srgb, #{$amarillo-1}, #000 20%);
       }
     }
 
@@ -125,12 +124,12 @@
     color: var(--tickets-text);
 
     &:hover:not(.Button--disabled):not(.Button--loading) {
-      background-color: rgba($gris-2, 0.3);
-      border-color: color.adjust($gris-2, $lightness: -10%);
+      background-color: color-mix(in srgb, #{$gris-2} 30%, transparent);
+      border-color: color-mix(in srgb, #{$gris-2}, #000 10%);
     }
 
     &:active:not(.Button--disabled):not(.Button--loading) {
-      background-color: rgba($gris-2, 0.5);
+      background-color: color-mix(in srgb, #{$gris-2} 50%, transparent);
     }
 
     // Colores para outlined
@@ -157,7 +156,7 @@
       color: $verde-claro-1;
 
       &:hover:not(.Button--disabled):not(.Button--loading) {
-        background-color: rgba($verde-claro-1, 0.2);
+        background-color: color-mix(in srgb, #{$verde-claro-1} 20%, transparent);
       }
     }
 
@@ -166,9 +165,9 @@
       color: $rojo-1;
 
       &:hover:not(.Button--disabled):not(.Button--loading) {
-        background-color: rgba($rojo-1, 0.1);
-        border-color: color.adjust($rojo-1, $lightness: -5%);
-        color: color.adjust($rojo-1, $lightness: -5%);
+        background-color: color-mix(in srgb, #{$rojo-1} 10%, transparent);
+        border-color: color-mix(in srgb, #{$rojo-1}, #000 5%);
+        color: color-mix(in srgb, #{$rojo-1}, #000 5%);
       }
     }
 
@@ -196,11 +195,11 @@
     border-radius: var(--tickets-control-radius, 9px);
 
     &:hover:not(.Button--disabled):not(.Button--loading) {
-      background-color: rgba($negro-2, 0.08);
+      background-color: color-mix(in srgb, #{$negro-2} 8%, transparent);
     }
 
     &:active:not(.Button--disabled):not(.Button--loading) {
-      background-color: rgba($negro-2, 0.15);
+      background-color: color-mix(in srgb, #{$negro-2} 15%, transparent);
     }
 
     // Colores para text
@@ -208,8 +207,8 @@
       color: $azul-5;
 
       &:hover:not(.Button--disabled):not(.Button--loading) {
-        background-color: rgba($azul-5, 0.1);
-        color: color.adjust($azul-5, $lightness: -10%);
+        background-color: color-mix(in srgb, #{$azul-5} 10%, transparent);
+        color: color-mix(in srgb, #{$azul-5}, #000 10%);
       }
     }
 
@@ -217,7 +216,7 @@
       color: $verde-claro-1;
 
       &:hover:not(.Button--disabled):not(.Button--loading) {
-        background-color: rgba($verde-claro-1, 0.2);
+        background-color: color-mix(in srgb, #{$verde-claro-1} 20%, transparent);
       }
     }
 
@@ -225,8 +224,8 @@
       color: $rojo-1;
 
       &:hover:not(.Button--disabled):not(.Button--loading) {
-        background-color: rgba($rojo-1, 0.2);
-        color: color.adjust($rojo-1, $lightness: -5%);
+        background-color: color-mix(in srgb, #{$rojo-1} 20%, transparent);
+        color: color-mix(in srgb, #{$rojo-1}, #000 5%);
       }
     }
 
@@ -234,8 +233,8 @@
       color: var(--tickets-text);
 
       &:hover:not(.Button--disabled):not(.Button--loading) {
-        background-color: rgba($negro-1, 0.1);
-        color: color.adjust($negro-1, $lightness: -10%);
+        background-color: color-mix(in srgb, #{$negro-1} 10%, transparent);
+        color: color-mix(in srgb, #{$negro-1}, #000 10%);
       }
     }
   }

@@ -34,9 +34,9 @@
 .errorSummary.errorSummary {
   margin: 0;
   padding: 0.625rem 0.875rem;
-  border: 1px solid rgba($rojo-1, 0.4);
+  border: 1px solid color-mix(in srgb, #{$rojo-1} 40%, transparent);
   border-radius: 0.5rem;
-  background-color: rgba($rojo-1, 0.06);
+  background-color: color-mix(in srgb, #{$rojo-1} 6%, transparent);
   font-size: 0.8125rem;
   color: $rojo-1;
 }

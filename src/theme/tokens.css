@@ -1,3 +1,6 @@
+/* Generado por scripts/tokens/generar.cjs desde src/theme/tokens.json. No editar a mano. */
+
+/* Tema claro (base) y paleta institucional. */
 :root {
   --tickets-primary: #4361ee;
   --tickets-primary-hover: #3654db;
@@ -30,6 +33,92 @@
   --tickets-focus: 0 0 0 3px #4361ee25;
   --tickets-sidebar: 228px;
   --tickets-page-padding: clamp(15px, calc(2vw / var(--vp-zoom, 1)), 28px);
+
+  --paleta-azul-1: #1700a5;
+  --paleta-azul-2: #013ba6;
+  --paleta-azul-3: #3229b9;
+  --paleta-azul-4: #403ec3;
+  --paleta-azul-5: #4361ee;
+  --paleta-azul-6: #5b67f7;
+  --paleta-azul-7: #697be1;
+  --paleta-azul-8: #7790eb;
+  --paleta-azul-9: #84a4f5;
+  --paleta-azul-10: #92b9ff;
+  --paleta-celeste-1: #54c8e8;
+  --paleta-celeste-2: #5fcce9;
+  --paleta-celeste-3: #6ad0eb;
+  --paleta-celeste-4: #75d4ed;
+  --paleta-celeste-5: #80d8ee;
+  --paleta-celeste-6: #88dbf0;
+  --paleta-celeste-7: #96dff2;
+  --paleta-celeste-8: #a1e3f4;
+  --paleta-celeste-9: #ace7f5;
+  --paleta-celeste-10: #b7ebf7;
+  --paleta-verde-oscuro-1: #00bc70;
+  --paleta-verde-oscuro-2: #0cc077;
+  --paleta-verde-oscuro-3: #19c47f;
+  --paleta-verde-oscuro-4: #25c986;
+  --paleta-verde-oscuro-5: #31cd8d;
+  --paleta-verde-oscuro-6: #3ed194;
+  --paleta-verde-oscuro-7: #4ad59b;
+  --paleta-verde-oscuro-8: #56daa2;
+  --paleta-verde-oscuro-9: #63dea9;
+  --paleta-verde-oscuro-10: #6de2b0;
+  --paleta-verde-claro-1: #97d700;
+  --paleta-verde-claro-2: #9dda0b;
+  --paleta-verde-claro-3: #a3dd15;
+  --paleta-verde-claro-4: #a8e020;
+  --paleta-verde-claro-5: #aee32a;
+  --paleta-verde-claro-6: #b4e635;
+  --paleta-verde-claro-7: #bae93f;
+  --paleta-verde-claro-8: #bfec4a;
+  --paleta-verde-claro-9: #c5ef54;
+  --paleta-verde-claro-10: #cbf25f;
+  --paleta-amarillo-1: #ffce00;
+  --paleta-amarillo-2: #ffd216;
+  --paleta-amarillo-3: #ffd62c;
+  --paleta-amarillo-4: #ffda42;
+  --paleta-amarillo-5: #ffde58;
+  --paleta-amarillo-6: #ffe16d;
+  --paleta-amarillo-7: #ffe583;
+  --paleta-amarillo-8: #ffe999;
+  --paleta-amarillo-9: #ffedaf;
+  --paleta-amarillo-10: #fff1c5;
+  --paleta-rojo-1: #e63946;
+  --paleta-rojo-2: #f53b47;
+  --paleta-rojo-3: #f5434f;
+  --paleta-rojo-4: #f54b57;
+  --paleta-rojo-5: #f4535f;
+  --paleta-rojo-6: #f45b67;
+  --paleta-rojo-7: #f4626e;
+  --paleta-rojo-8: #f46a76;
+  --paleta-rojo-9: #f4727e;
+  --paleta-rojo-10: #f47a86;
+  --paleta-naranja-1: #ff9100;
+  --paleta-naranja-2: #ff9100;
+  --paleta-naranja-3: #fea229;
+  --paleta-naranja-4: #feaa3e;
+  --paleta-naranja-5: #feb352;
+  --paleta-naranja-6: #fdbb67;
+  --paleta-naranja-7: #fdc47b;
+  --paleta-naranja-8: #fdcc90;
+  --paleta-naranja-9: #fcd5a4;
+  --paleta-naranja-10: #fcddb9;
+  --paleta-negro-1: #263b58;
+  --paleta-negro-2: #2b2d42;
+  --paleta-gris-1: #a9a9a9;
+  --paleta-gris-2: #e4e4e4;
+  --paleta-gris-3: #e8edef;
+  --paleta-gris-4: #8d8da8;
+  --paleta-cuaternary-text: #cccccc;
+  --paleta-quintary-text: #0f1e7c;
+  --paleta-sub-text: #b1b1b1;
+  --paleta-brand-green: hsl(88 63% 45%);
+  --paleta-brand-green-weak: hsl(88 63% 80% / 0.35);
+  --paleta-primary-blue: hsl(223 83% 40%);
+  --paleta-surface: #fff;
+  --paleta-ink: hsl(220 15% 20%);
+  --paleta-muted: hsl(220 10% 45%);
 }
 
 /* ── Tema oscuro ─────────────────────────────────────────────────────────
@@ -64,4 +153,37 @@
   --tickets-focus: 0 0 0 3px #6f86ff4d;
   --background: var(--tickets-background);
   --workspace-icon-accent: #26315a;
+}
+
+/* ── Alto contraste (Ajustes → Lectura y accesibilidad) ──────────────────
+   Textos secundarios ≥ 7:1 sobre la superficie y bordes visibles. */
+:root[data-contrast="more"] {
+  --tickets-primary: #2f4bd6;
+  --tickets-primary-hover: #2440c4;
+  --tickets-text: #14223a;
+  --tickets-text-secondary: #33425a;
+  --tickets-text-muted: #45536a;
+  --tickets-border: #808ca2;
+  --tickets-border-strong: #66728a;
+  --tickets-divider: #b4bfd1;
+  --tickets-success: #0f5f39;
+  --tickets-danger: #9c2433;
+  --tickets-warning: #5f3e06;
+  --tickets-info: #263fae;
+  --tickets-focus: 0 0 0 3px #2f4bd680;
+}
+:root[data-contrast="more"][data-theme="dark"] {
+  --tickets-primary: #93a5ff;
+  --tickets-primary-hover: #a8b6ff;
+  --tickets-text: #f6f8fd;
+  --tickets-text-secondary: #d5dcea;
+  --tickets-text-muted: #bcc6da;
+  --tickets-border: #5b6884;
+  --tickets-border-strong: #7684a2;
+  --tickets-divider: #414c66;
+  --tickets-success: #7dd9ae;
+  --tickets-danger: #ff9ea9;
+  --tickets-warning: #f3c771;
+  --tickets-info: #b5c2ff;
+  --tickets-focus: 0 0 0 3px #93a5ff99;
 }

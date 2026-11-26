@@ -1,8 +1,9 @@
 "use client";
+import { usePlatformQuery } from "@/platform/query";
 
-import { useEffect, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { Button } from "@/components/client/atoms/Button";
-import { PlatformError, platformFetch } from "@/platform/client";
+import { PlatformError } from "@/platform/client";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
 import local from "./WorkerNotificationsWorkspace.module.scss";
 
@@ -68,8 +69,6 @@ type Fine = {
         estado: string;
     })[];
 };
-const request = <T,>(path: string, values: Record<string, string>, signal?: AbortSignal) =>
-    platformFetch<T>("/worker-notifications/" + path + "?" + new URLSearchParams(values), { signal });
 const labels = new Intl.DateTimeFormat("es-GT", {
     timeZone: "America/Guatemala",
     dateStyle: "short",
@@ -180,7 +179,6 @@ export function WorkerNotificationsWorkspace() {
         hasta: civil.format(new Date()),
     }));
     const [summaryPeriod, applyPeriod] = useState(period);
-    const [summary, setSummary] = useState<Summary | null>(null);
     const [resultChannel, setResultChannel] = useState<Channel>("CORREO");
     const [outcome, setOutcome] = useState<Outcome>("DSN_POSITIVO");
     const [resultQuery, applyResult] = useState({
@@ -189,81 +187,62 @@ export function WorkerNotificationsWorkspace() {
         resultado: outcome,
         offset: "0",
     });
-    const [mailResults, setMailResults] = useState<MailResults | null>(null);
     const [filters, setFilters] = useState({ q: "", canal: "", estado: "" });
     const [queueQuery, applyQueue] = useState({ ...filters, offset: "0" });
-    const [queue, setQueue] = useState<Page<QueueItem> | null>(null);
     const [fineInput, setFineInput] = useState("");
     const [fineQuery, setFineQuery] = useState<{ q: string } | null>(null);
-    const [fine, setFine] = useState<Fine | null>(null);
-    const [pending, setPending] = useState(false);
-    const [error, setError] = useState("");
-    useEffect(() => {
-        const controller = new AbortController();
-        let current = true;
-        const signal = AbortSignal.any([controller.signal, AbortSignal.timeout(45000)]);
-        if (tab === "multa" && !fineQuery) {
-            setPending(false);
-            setError("");
-            return;
-        }
-        setPending(true);
-        setError("");
-        const read = async () => {
-            try {
-                if (tab === "resumen") {
-                    const result = await request<Summary>("summary", summaryPeriod, signal);
-                    if (current) setSummary(result);
-                } else if (tab === "cola") {
-                    const result = await request<Page<QueueItem>>("pending", queueQuery, signal);
-                    if (current) setQueue(result);
-                } else if (tab === "resultados") {
-                    const result = await request<MailResults>("results", resultQuery, signal);
-                    if (current) setMailResults(result);
-                } else if (fineQuery) {
-                    const result = await request<Fine>("fine", fineQuery, signal);
-                    if (current) setFine(result);
-                }
-            } catch (e) {
-                if (current) setError(errorText(e));
-            } finally {
-                if (current) setPending(false);
-            }
-        };
-        void read();
-        return () => {
-            current = false;
-            controller.abort();
-        };
-    }, [tab, summaryPeriod, queueQuery, fineQuery, resultQuery]);
+    // Una consulta por pestaña, con los filtros aplicados («Consultar»); cada cambio pide datos nuevos.
+    const notificationPath = (path: string, values: Record<string, string>) =>
+        "/worker-notifications/" + path + "?" + new URLSearchParams(values);
+    const summaryQuery = usePlatformQuery<Summary>(
+        tab === "resumen" ? notificationPath("summary", summaryPeriod) : null,
+    );
+    const queueRequest = usePlatformQuery<Page<QueueItem>>(
+        tab === "cola" ? notificationPath("pending", queueQuery) : null,
+    );
+    const resultsQuery = usePlatformQuery<MailResults>(
+        tab === "resultados" ? notificationPath("results", resultQuery) : null,
+    );
+    const fineRequest = usePlatformQuery<Fine>(
+        tab === "multa" && fineQuery ? notificationPath("fine", fineQuery) : null,
+    );
+    const summary = summaryQuery.data ?? null;
+    const queue = queueRequest.data ?? null;
+    const mailResults = resultsQuery.data ?? null;
+    const fine = fineRequest.data ?? null;
+    const active =
+        tab === "resumen"
+            ? summaryQuery
+            : tab === "cola"
+              ? queueRequest
+              : tab === "resultados"
+                ? resultsQuery
+                : fineRequest;
+    const pending = active.isFetching;
+    const error = active.error ? errorText(active.error) : "";
     function inspect(key: string) {
         setFineInput(key);
         setFineQuery({ q: key });
-        setFine(null);
         setTab("multa");
     }
     function inspectResults(canal: Channel, resultado: Outcome) {
         setResultChannel(canal);
         setOutcome(resultado);
-        setMailResults(null);
         applyResult({ ...summaryPeriod, canal, resultado, offset: "0" });
         setTab("resultados");
     }
     function onSearch(event: FormEvent) {
         event.preventDefault();
         if (tab === "resumen") {
-            setSummary(null);
             applyPeriod({ ...period });
         }
         if (tab === "cola") {
-            setQueue(null);
             applyQueue({ ...filters, offset: "0" });
         }
         if (tab === "resultados") inspectResults(resultChannel, outcome);
         if (tab === "multa" && fineInput.trim()) inspect(fineInput.trim());
     }
     const next = (offset: number) => {
-        setQueue(null);
         applyQueue({ ...queueQuery, offset: String(offset) });
     };
     return (
@@ -588,7 +567,6 @@ export function WorkerNotificationsWorkspace() {
                     <Pages
                         {...mailResults}
                         onChange={(offset) => {
-                            setMailResults(null);
                             applyResult({ ...resultQuery, offset: String(offset) });
                         }}
                     />

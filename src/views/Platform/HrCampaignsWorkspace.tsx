@@ -1,5 +1,6 @@
 "use client";
-import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
+import { usePlatformQuery } from "@/platform/query";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { PopOver } from "@/components/client/atoms/PopOver";
 import { Button } from "@/components/client/atoms/Button";
 import { usePlatform } from "@/platform/context";
@@ -26,12 +27,10 @@ export function HrCampaignsWorkspace() {
     const { data: platform } = usePlatform(),
         actions = useModuleActions(),
         admin = Boolean(platform?.actor.admin);
-    const [list, setList] = useState<List | null>(null),
-        [options, setOptions] = useState<HrField[]>([]),
-        [page, setPage] = useState(0),
+    const [page, setPage] = useState(0),
         [creating, setCreating] = useState(false),
         [selected, setSelected] = useState(""),
-        [error, setError] = useState(""),
+        [actionError, setError] = useState(""),
         [message, setMessage] = useState(""),
         [busy, setBusy] = useState(false);
     const [name, setName] = useState(""),
@@ -42,70 +41,46 @@ export function HrCampaignsWorkspace() {
         [end, setEnd] = useState(() => hrLocalInput(hrDeadline(new Date(), "7"))),
         [fields, setFields] = useState<Record<string, HrSelection>>({}),
         [filter, setFilter] = useState("");
-    const [report, setReport] = useState<HrReport | null>(null),
-        [reportPage, setReportPage] = useState(0),
+    const [reportPage, setReportPage] = useState(0),
         [state, setState] = useState(""),
         [detail, setDetail] = useState<HrReview | null>(null),
         [decision, setDecision] = useState("APROBAR"),
         [note, setNote] = useState("");
     const mounted = useRef(true),
-        generation = useRef(0),
-        reportGeneration = useRef(0),
         detailGeneration = useRef(0),
         flight = useRef(false);
     useEffect(() => {
         mounted.current = true;
         // Al desmontar se invalidan las respuestas pendientes de cada consulta.
-        const refs = [generation, reportGeneration, detailGeneration];
+        const detailRef = detailGeneration;
         return () => {
             mounted.current = false;
-            for (const ref of refs) ref.current++;
+            detailRef.current++;
         };
     }, []);
-    const load = useCallback(async () => {
-        const version = ++generation.current;
-        setError("");
-        try {
-            const [o, l] = await Promise.all([
-                platformFetch<{ campos: HrField[] }>("/hr/options"),
-                platformFetch<List>("/hr/campaigns?offset=" + page),
-            ]);
-            if (version !== generation.current || !mounted.current) return;
-            setOptions(o.campos);
-            setList(l);
-        } catch (e) {
-            if (version === generation.current && mounted.current) setError(hrError(e));
-        }
-    }, [page]);
-    useEffect(() => {
-        void load();
-    }, [load]);
-    const loadReport = useCallback(async () => {
-        if (!selected) {
-            setReport(null);
-            return;
-        }
-        const version = ++reportGeneration.current;
-        setError("");
-        try {
-            const r = await platformFetch<HrReport>(
-                "/hr/campaigns/" +
-                    selected +
-                    "/report?offset=" +
-                    reportPage +
-                    (state ? "&estado=" + encodeURIComponent(state) : ""),
-            );
-            if (version === reportGeneration.current && mounted.current) setReport(r);
-        } catch (e) {
-            if (version === reportGeneration.current && mounted.current) setError(hrError(e));
-        }
-    }, [selected, reportPage, state]);
-    useEffect(() => {
-        detailGeneration.current++;
-        setReport(null);
-        setDetail(null);
-        void loadReport();
-    }, [loadReport]);
+    // Catálogo de campos, campañas (por página) y reporte de la campaña elegida.
+    const optionsQuery = usePlatformQuery<{ campos: HrField[] }>("/hr/options");
+    const listQuery = usePlatformQuery<List>("/hr/campaigns?offset=" + page);
+    const reportQuery = usePlatformQuery<HrReport>(
+        selected
+            ? "/hr/campaigns/" +
+                  selected +
+                  "/report?offset=" +
+                  reportPage +
+                  (state ? "&estado=" + encodeURIComponent(state) : "")
+            : null,
+    );
+    const options = optionsQuery.data?.campos ?? [];
+    const list = listQuery.data ?? null;
+    const report = reportQuery.data ?? null;
+    const loadFailure = optionsQuery.error || listQuery.error || reportQuery.error;
+    const error = actionError || (loadFailure ? hrError(loadFailure) : "");
+    const load = async () => {
+        await Promise.all([optionsQuery.refetch(), listQuery.refetch()]);
+    };
+    const loadReport = async () => {
+        if (selected) await reportQuery.refetch();
+    };
     async function inspect(userId: number) {
         const version = ++detailGeneration.current;
         setDetail(null);
@@ -649,6 +624,7 @@ export function HrCampaignsWorkspace() {
                             onChange={(e) => {
                                 setState(e.target.value);
                                 setReportPage(0);
+                                setDetail(null);
                             }}
                         >
                             <option value="">Todos los estados</option>
@@ -696,14 +672,20 @@ export function HrCampaignsWorkspace() {
                         <Button
                             variant="outlined"
                             state={busy || reportPage === 0 ? "disabled" : "default"}
-                            onClick={() => setReportPage((v) => Math.max(0, v - 50))}
+                            onClick={() => {
+                                setDetail(null);
+                                setReportPage((v) => Math.max(0, v - 50));
+                            }}
                         >
                             Anterior
                         </Button>
                         <Button
                             variant="outlined"
                             state={busy || !report.hayMas ? "disabled" : "default"}
-                            onClick={() => setReportPage((v) => v + 50)}
+                            onClick={() => {
+                                setDetail(null);
+                                setReportPage((v) => v + 50);
+                            }}
                         >
                             Siguiente
                         </Button>

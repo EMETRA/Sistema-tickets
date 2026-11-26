@@ -1,12 +1,13 @@
 "use client";
-import { startTransition, useEffect, useRef, useState } from "react";
+import { queryErrorMessage, usePlatformQuery } from "@/platform/query";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { AccessNavigation } from "@/components/client/molecules/AccessNavigation/AccessNavigation";
 import { AccessChoices as Multi } from "@/components/client/molecules/AccessChoices/AccessChoices";
 import { ACCESS_TABS, accessTab, type AccessTab } from "@/platform/access-navigation";
 import { Button } from "@/components/client/atoms/Button";
 import { usePlatform } from "@/platform/context";
-import { platformCommand, platformFetch } from "@/platform/client";
+import { platformCommand } from "@/platform/client";
 import { ResourceWorkspace } from "@/features/registros/components/ResourceWorkspace/ResourceWorkspace";
 import MOD06 from "@/views/MOD06";
 import { ModuleAccessGate } from "@/components/client/organisms/ModuleAccessGate/ModuleAccessGate";
@@ -73,84 +74,50 @@ function AccessCatalog({ tab }: { tab: AccessTab }) {
         </PopOver>
     );
     const { data: context, refresh } = usePlatform(),
-        [catalog, setCatalog] = useState<Catalog | null>(null),
         [query, setQuery] = useState(""),
-        [error, setError] = useState(""),
+        [actionError, setError] = useState(""),
         [message, setMessage] = useState(""),
         [revision, setRevision] = useState(0),
         [editing, setEditing] = useState<Named | null | undefined>(),
         [target, setTarget] = useState<unknown>(""),
         [source, setSource] = useState<unknown>(""),
-        [effective, setEffective] = useState<Effective | null>(null),
-        [preview, setPreview] = useState<{
-            agregar: Named[];
-            retirar: Named[];
-            origen: Effective;
-        } | null>(null),
-        [profile, setProfile] = useState(""),
-        [roles, setRoles] = useState<number[]>([]),
-        [permissions, setPermissions] = useState<number[]>([]),
         [busy, setBusy] = useState(false),
         [nombre, setNombre] = useState(""),
         [descripcion, setDescripcion] = useState("");
     const dialog = useRef<HTMLDialogElement>(null),
         [related, setRelated] = useState<number[]>([]);
-    useEffect(() => {
-        const c = new AbortController();
-        platformFetch<Catalog>("/rbac", { signal: c.signal })
-            .then((result) => {
-                if (!c.signal.aborted) {
-                    setCatalog(result);
-                    setError("");
-                }
-            })
-            .catch((e) => {
-                if (!c.signal.aborted) setError(e.message);
-            });
-        return () => c.abort();
-    }, [revision]);
-    useEffect(() => {
-        startTransition(() => {
-            setEffective(null);
-        });
-        startTransition(() => {
-            setPreview(null);
-        });
-        if (!target) return;
-        const c = new AbortController();
-        platformFetch<Effective>("/rbac/effective?user=" + target, {
-            signal: c.signal,
-        })
-            .then((v) => {
-                setEffective(v);
-                setProfile(v.perfilId ? String(v.perfilId) : "");
-                setRoles(v.rolesAdicionales);
-                setPermissions(v.permisosAdicionales);
-            })
-            .catch((e) => {
-                if (!c.signal.aborted) setError(e.message);
-            });
-        return () => c.abort();
-    }, [target, revision]);
-    useEffect(() => {
-        startTransition(() => {
-            setPreview(null);
-        });
-        if (!source || !target) return;
-        const c = new AbortController();
-        platformFetch<{
-            agregar: Named[];
-            retirar: Named[];
-            origen: Effective;
-        }>("/rbac/preview?source=" + source + "&target=" + target, {
-            signal: c.signal,
-        })
-            .then(setPreview)
-            .catch((e) => {
-                if (!c.signal.aborted) setError(e.message);
-            });
-        return () => c.abort();
-    }, [source, target, revision]);
+    const catalogQuery = usePlatformQuery<Catalog>("/rbac", { revision });
+    const catalog = catalogQuery.data ?? null;
+    const effectiveQuery = usePlatformQuery<Effective>(target ? "/rbac/effective?user=" + target : null, {
+        revision,
+    });
+    const effective = effectiveQuery.data ?? null;
+    // Lo que se edita parte de los accesos vigentes de la persona elegida; cambia al elegir a otra.
+    const draftKey = String(target) + ":" + effectiveQuery.dataUpdatedAt;
+    const [draft, setDraft] = useState<{
+        key: string;
+        profile: string;
+        roles: number[];
+        permissions: number[];
+    } | null>(null);
+    const base = {
+        key: draftKey,
+        profile: effective?.perfilId ? String(effective.perfilId) : "",
+        roles: effective?.rolesAdicionales ?? [],
+        permissions: effective?.permisosAdicionales ?? [],
+    };
+    const current = draft?.key === draftKey ? draft : base;
+    const { profile, roles, permissions } = current;
+    const setProfile = (value: string) => setDraft({ ...current, profile: value });
+    const setRoles = (value: number[]) => setDraft({ ...current, roles: value });
+    const setPermissions = (value: number[]) => setDraft({ ...current, permissions: value });
+    const previewQuery = usePlatformQuery<{ agregar: Named[]; retirar: Named[]; origen: Effective }>(
+        source && target ? "/rbac/preview?source=" + source + "&target=" + target : null,
+        { revision },
+    );
+    const preview = previewQuery.data ?? null;
+    const error =
+        actionError || queryErrorMessage(catalogQuery.error || effectiveQuery.error || previewQuery.error);
     useEffect(() => {
         if (editing !== undefined) dialog.current?.showModal();
     }, [editing]);

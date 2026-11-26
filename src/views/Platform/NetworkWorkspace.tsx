@@ -1,14 +1,15 @@
 "use client";
+import { queryErrorMessage, usePlatformQueries, usePlatformQuery } from "@/platform/query";
 import Link from "next/link";
 import { WorkspaceNavigation, useWorkspaceTab, type WorkspaceTab } from "./WorkspaceNavigation";
 import { InventoryLinkDialog } from "./InventoryLinkDialog";
-import { startTransition, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { Button } from "@/components/client/atoms/Button";
 import { RecordDetail } from "@/features/registros/components/ResourceWorkspace/RecordDetail";
 import { RecordEditor } from "@/features/registros/components/ResourceWorkspace/RecordEditor";
 import { ResourceWorkspace } from "@/features/registros/components/ResourceWorkspace/ResourceWorkspace";
 import { usePlatform } from "@/platform/context";
-import { platformCommand, platformFetch } from "@/platform/client";
+import { platformCommand } from "@/platform/client";
 import type { PlatformRecord } from "@/platform/types";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
 import net from "@/features/infraestructura/components/NetworkPanel/NetworkPanel.module.scss";
@@ -27,47 +28,38 @@ type Graph = {
 };
 export function NetworkWorkspace() {
     const { data } = usePlatform(),
-        [site, setSite] = useState<unknown>(""),
+        [siteChoice, setSite] = useState<unknown>(""),
         [view, setView] = useState("logica"),
-        [graph, setGraph] = useState<Graph | null>(null),
         [selected, setSelected] = useState<PlatformRecord | null>(null),
         [editing, setEditing] = useState<PlatformRecord | null | undefined>(),
         [link, setLink] = useState<Record<string, unknown> | null>(null),
         [positions, setPositions] = useState<Record<string, { x: number; y: number }>>({}),
-        [error, setError] = useState(""),
-        [loading, setLoading] = useState(false),
+        [actionError, setError] = useState(""),
         [busy, setBusy] = useState(false),
         [revision, setRevision] = useState(0),
-        [plan, setPlan] = useState(""),
-        [planOptions, setPlanOptions] = useState<{ id: string; nombre: string; mime: string }[]>([]),
         [planId, setPlanId] = useState("");
     const svg = useRef<SVGSVGElement>(null),
         drag = useRef<{ id: string; dx: number; dy: number } | null>(null),
         [zoom, setZoom] = useState(1);
     const [picker, setPicker] = useState(false);
     // Propuesta: ubicaciones como accesos directos, con su cantidad de dispositivos.
-    const [sites, setSites] = useState<{ id: string; nombre: string; count: number }[]>([]);
-    useEffect(() => {
-        const c = new AbortController();
-        const list = (type: string) =>
-            platformFetch<PageResult<PlatformRecord>>(`/records/${type}?limit=100`, { signal: c.signal })
-                .then((r) => r.items)
-                .catch(() => []);
-        Promise.all([list("instalaciones"), list("dispositivos")]).then(([places, devices]) => {
-            if (c.signal.aborted) return;
-            const rows = places
-                .map((p) => ({
-                    id: p.id,
-                    nombre: p.nombre,
-                    count: devices.filter((d) => d.datos.instalacionId === p.id).length,
-                }))
-                .filter((p) => p.count > 0)
-                .sort((a, b) => b.count - a.count);
-            setSites(rows);
-            if (rows[0]) setSite((current: unknown) => current || rows[0].id);
-        });
-        return () => c.abort();
-    }, [revision]);
+    const siteLists = usePlatformQueries<PageResult<PlatformRecord>>(
+        ["/records/instalaciones?limit=100", "/records/dispositivos?limit=100"],
+        { revision },
+    );
+    const sites = useMemo(() => {
+        const [places, devices] = siteLists.data.map((r) => r?.items ?? []);
+        return places
+            .map((p) => ({
+                id: p.id,
+                nombre: p.nombre,
+                count: devices.filter((d) => d.datos.instalacionId === p.id).length,
+            }))
+            .filter((p) => p.count > 0)
+            .sort((a, b) => b.count - a.count);
+    }, [siteLists.data]);
+    // Sin elección, se abre la ubicación con más dispositivos.
+    const site = siteChoice || sites[0]?.id || "";
     const tabs: WorkspaceTab[] = [];
     if (data?.definitions.dispositivos?.actions.LEER)
         tabs.push({
@@ -96,67 +88,20 @@ export function NetworkWorkspace() {
     // Propuesta: el mapa es la vista principal de la red.
     const orderedTabs = [...tabs.filter((t) => t.id === "mapa"), ...tabs.filter((t) => t.id !== "mapa")];
     const { current, select } = useWorkspaceTab(orderedTabs);
-    useEffect(() => {
-        startTransition(() => {
-            setGraph(null);
-        });
-        startTransition(() => {
-            setSelected(null);
-        });
-        startTransition(() => {
-            setPositions({});
-        });
-        startTransition(() => {
-            setPlanId("");
-        });
-        startTransition(() => {
-            setPlanOptions([]);
-        });
-        if (!site) return;
-        const controller = new AbortController();
-        startTransition(() => {
-            setLoading(true);
-        });
-        startTransition(() => {
-            setError("");
-        });
-        platformFetch<Graph>("/network/" + site, { signal: controller.signal })
-            .then(setGraph)
-            .catch((e) => {
-                if (!controller.signal.aborted) setError(e.message);
-            })
-            .finally(() => {
-                if (!controller.signal.aborted) setLoading(false);
-            });
-        platformFetch<{ id: string; nombre: string; mime: string }[]>(
-            "/records/instalaciones/" + site + "/files",
-            { signal: controller.signal },
-        )
-            .then(setPlanOptions)
-            .catch(() => {});
-        return () => controller.abort();
-    }, [site, revision]);
-    useEffect(() => {
-        startTransition(() => {
-            setPlan("");
-        });
-        if (!planId) return;
-        let url = "";
-        const controller = new AbortController();
-        platformFetch<Blob>("/files/" + planId, { signal: controller.signal })
-            .then((blob) => {
-                if (controller.signal.aborted) return;
-                url = URL.createObjectURL(blob);
-                setPlan(url);
-            })
-            .catch((e) => {
-                if (!controller.signal.aborted) setError(e.message);
-            });
-        return () => {
-            controller.abort();
-            if (url) URL.revokeObjectURL(url);
-        };
-    }, [planId]);
+    // Grafo y planos disponibles de la ubicación elegida.
+    const graphQuery = usePlatformQuery<Graph>(site ? "/network/" + site : null, { revision });
+    const graph = graphQuery.data ?? null;
+    const loading = graphQuery.isFetching;
+    const planOptions =
+        usePlatformQuery<{ id: string; nombre: string; mime: string }[]>(
+            site ? "/records/instalaciones/" + site + "/files" : null,
+            { revision },
+        ).data ?? [];
+    // Plano de la ubicación (archivo adjunto), como imagen local.
+    const planQuery = usePlatformQuery<Blob>(planId ? "/files/" + planId : null, { staleTime: Infinity });
+    const plan = useMemo(() => (planQuery.data ? URL.createObjectURL(planQuery.data) : ""), [planQuery.data]);
+    useEffect(() => () => void (plan && URL.revokeObjectURL(plan)), [plan]);
+    const error = actionError || queryErrorMessage(graphQuery.error || planQuery.error);
     const physical = view === "fisica",
         coords = (row: PlatformRecord) =>
             positions[row.id] || {
@@ -278,6 +223,8 @@ export function NetworkWorkspace() {
                                                 );
                                                 return;
                                             }
+                                            setSelected(null);
+                                            setPlanId("");
                                             setSite(p.id);
                                         }}
                                     >

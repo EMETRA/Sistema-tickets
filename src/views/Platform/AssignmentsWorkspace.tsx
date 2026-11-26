@@ -1,6 +1,8 @@
 "use client";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { platformKey, queryErrorMessage, usePlatformQuery } from "@/platform/query";
 import { statusTone } from "@/helpers/statusTone";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/client/atoms/Button";
 import { PlatformField } from "@/components/client/molecules/PlatformField/PlatformField";
 import { TicketDetail } from "@/features/tickets/components/TicketDetail";
@@ -40,75 +42,49 @@ export function AssignmentsWorkspace() {
             data!.capabilities.assign ? "cola" : data!.capabilities.attend ? "asignados" : "creados",
         ),
         [filter, setFilter] = useState("sin-asignar"),
-        [result, setResult] = useState<PageResult<Ticket>>({
-            items: [],
-            total: 0,
-            offset: 0,
-            limit: 50,
-        }),
         [offset, setOffset] = useState(0),
-        [error, setError] = useState(""),
-        [loading, setLoading] = useState(false),
+        [actionError, setError] = useState(""),
         [revision, setRevision] = useState(0),
         [assigning, setAssigning] = useState<Ticket | null>(null),
         [user, setUser] = useState<unknown>(""),
         [busy, setBusy] = useState(false),
         [detail, setDetail] = useState<Ticket | null>(null),
         [message, setMessage] = useState("");
-    const [counts, setCounts] = useState<{
-        sinAsignar?: number;
-        sinPrimeraAtencion?: number;
-        enTrabajo?: number;
-        resueltos?: number;
-    } | null>(null);
     // Propuesta: los indicadores de la cola funcionan como filtros.
-    useEffect(() => {
-        if (!data!.capabilities.assign) return;
-        const controller = new AbortController();
-        const opts = { signal: controller.signal };
-        // Los contadores de la cola usan la misma fuente que la bandeja, así siempre cuadran.
-        const total = (estado: string) =>
-            platformFetch<PageResult<Ticket>>(`/tickets?scope=cola&estado=${estado}&limit=1`, opts).then(
-                (r) => r.total,
-            );
-        Promise.all([
-            total("sin-asignar"),
-            total("sin-atencion"),
-            platformFetch<{ tickets: { enTrabajo?: number; resueltos?: number } }>(
-                "/metrics?inicio=true",
-                opts,
-            ),
-        ])
-            .then(([sinAsignar, sinPrimeraAtencion, m]) => {
-                if (!controller.signal.aborted)
-                    setCounts({
-                        sinAsignar,
-                        sinPrimeraAtencion,
-                        enTrabajo: m.tickets.enTrabajo,
-                        resueltos: m.tickets.resueltos,
-                    });
-            })
-            .catch(() => undefined);
-        return () => controller.abort();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [revision]);
-    useEffect(() => {
-        const controller = new AbortController();
-        setLoading(true);
-        setError("");
-        platformFetch<PageResult<Ticket>>(
-            "/tickets?scope=" + scope + "&estado=" + (scope === "cola" ? filter : "") + "&offset=" + offset,
-            { signal: controller.signal },
-        )
-            .then(setResult)
-            .catch((e) => {
-                if (!controller.signal.aborted) setError(e.message);
-            })
-            .finally(() => {
-                if (!controller.signal.aborted) setLoading(false);
-            });
-        return () => controller.abort();
-    }, [scope, filter, offset, revision]);
+    // Los contadores de la cola usan la misma fuente que la bandeja, así siempre cuadran.
+    const countsQuery = useQuery({
+        queryKey: [...platformKey("/tickets/cola/contadores"), revision],
+        enabled: !!data!.capabilities.assign,
+        queryFn: async ({ signal }) => {
+            const opts = { signal };
+            const total = (estado: string) =>
+                platformFetch<PageResult<Ticket>>(`/tickets?scope=cola&estado=${estado}&limit=1`, opts).then(
+                    (r) => r.total,
+                );
+            const [sinAsignar, sinPrimeraAtencion, m] = await Promise.all([
+                total("sin-asignar"),
+                total("sin-atencion"),
+                platformFetch<{ tickets: { enTrabajo?: number; resueltos?: number } }>(
+                    "/metrics?inicio=true",
+                    opts,
+                ),
+            ]);
+            return {
+                sinAsignar,
+                sinPrimeraAtencion,
+                enTrabajo: m.tickets.enTrabajo,
+                resueltos: m.tickets.resueltos,
+            };
+        },
+    });
+    const counts = countsQuery.data ?? null;
+    const inbox = usePlatformQuery<PageResult<Ticket>>(
+        "/tickets?scope=" + scope + "&estado=" + (scope === "cola" ? filter : "") + "&offset=" + offset,
+        { placeholderData: keepPreviousData, revision },
+    );
+    const result = inbox.data ?? { items: [], total: 0, offset: 0, limit: 50 };
+    const loading = inbox.isFetching;
+    const error = actionError || queryErrorMessage(inbox.error);
     async function act(row: Ticket, action: string) {
         setBusy(true);
         setError("");

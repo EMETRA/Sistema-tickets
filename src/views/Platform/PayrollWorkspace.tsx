@@ -1,4 +1,6 @@
 "use client";
+import { useQueryClient } from "@tanstack/react-query";
+import { platformKey, queryErrorMessage, usePlatformQuery } from "@/platform/query";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/client/atoms/Button";
 import { usePlatform } from "@/platform/context";
@@ -41,20 +43,19 @@ type Status = {
 export function PayrollWorkspace() {
     const { data } = usePlatform(),
         actions = useModuleActions();
-    const [options, setOptions] = useState<Options | null>(null),
-        [tipo, setTipo] = useState(""),
+    const queryClient = useQueryClient();
+    const [tipo, setTipo] = useState(""),
         [maestro, setMaestro] = useState(""),
         [empleado, setEmpleado] = useState(""),
         [preview, setPreview] = useState<Preview | null>(null),
         [previewPage, setPreviewPage] = useState(0),
-        [jobs, setJobs] = useState<Job[]>([]),
         [job, setJob] = useState(""),
         [status, setStatus] = useState<Status | null>(null),
         [busy, setBusy] = useState(false),
         [sending, setSending] = useState(false),
         [deliveryError, setDeliveryError] = useState(""),
         [deliveryMessage, setDeliveryMessage] = useState(""),
-        [error, setError] = useState(""),
+        [actionError, setError] = useState(""),
         [message, setMessage] = useState(""),
         [pdf, setPdf] = useState(""),
         [reconciliation, setReconciliation] = useState<{
@@ -80,19 +81,10 @@ export function PayrollWorkspace() {
         pdfDialog.current?.showModal();
         return () => URL.revokeObjectURL(pdf);
     }, [pdf]);
-    useEffect(() => {
-        let active = true;
-        platformFetch<Options>("/boletas/options" + (tipo ? "?tipo=" + encodeURIComponent(tipo) : ""))
-            .then((r) => {
-                if (active) setOptions(r);
-            })
-            .catch((e) => {
-                if (active) setError(e.message);
-            });
-        return () => {
-            active = false;
-        };
-    }, [tipo]);
+    const optionsQuery = usePlatformQuery<Options>(
+        "/boletas/options" + (tipo ? "?tipo=" + encodeURIComponent(tipo) : ""),
+    );
+    const options = optionsQuery.data ?? null;
     async function loadStatus(id: string) {
         const request = ++statusRequest.current;
         const result = await platformFetch<Status>("/boletas/jobs/" + id);
@@ -100,12 +92,16 @@ export function PayrollWorkspace() {
             setStatus(result);
         return result;
     }
+    // Envíos recientes de boletas.
+    const jobsQuery = usePlatformQuery<Job[]>("/boletas/jobs");
+    const jobs = jobsQuery.data ?? [];
+    const setJobs = (update: (previous: Job[]) => Job[]) =>
+        queryClient.setQueryData<Job[]>(platformKey("/boletas/jobs"), (previous) => update(previous ?? []));
+    const error = actionError || queryErrorMessage(optionsQuery.error || jobsQuery.error);
     async function refreshJobs() {
-        setJobs(await platformFetch<Job[]>("/boletas/jobs"));
+        const result = await jobsQuery.refetch();
+        if (result.error) throw result.error;
     }
-    useEffect(() => {
-        void refreshJobs().catch((e) => setError(e.message));
-    }, []);
     const params = () =>
         new URLSearchParams({
             tipo,

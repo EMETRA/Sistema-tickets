@@ -1,7 +1,7 @@
 "use client";
 import { statusLabel } from "@/helpers/statusTone";
 import { useEffect, useId, useState } from "react";
-import { platformFetch } from "@/platform/client";
+import { queryErrorMessage, usePlatformQuery } from "@/platform/query";
 import type { Field, PageResult, PlatformRecord } from "@/platform/types";
 import styles from "../../templates/PlatformPage/PlatformPage.module.scss";
 import { PeoplePicker } from "../PeoplePicker";
@@ -21,74 +21,45 @@ export function PlatformField({
     error?: string;
 }) {
     const id = useId(),
-        [query, setQuery] = useState(""),
-        [options, setOptions] = useState<Option[]>([]),
-        [error, setError] = useState("");
-    const selectedReference = field.type === "ref" ? String(value || "") : "";
+        [query, setQuery] = useState("");
     const permissionCode = ["leer", "insertar", "editar", "eliminar"].includes(field.key);
     const access =
         permissionCode ||
         field.key === "perfilId" ||
         (field.type === "list" && ["roles", "permisos"].includes(field.key));
+    // Opciones de referencias, personas y accesos; la búsqueda se aplica 200 ms después de escribir.
+    const [term, setTerm] = useState("");
     useEffect(() => {
-        if (!access && !["ref", "user", "list"].includes(field.type)) return;
-        if (field.type === "list" && !access) return;
-        const controller = new AbortController();
-        const timer = setTimeout(() => {
-            setError("");
-            const path = access
-                ? "/access-options"
-                : field.type === "user" || field.type === "list"
-                  ? (field.lookupPath || "/people") + "?q=" + encodeURIComponent(query)
-                  : "/records/" + field.resource + "?limit=50&q=" + encodeURIComponent(query);
-            platformFetch<
-                | PageResult<PlatformRecord>
-                | Option[]
-                | { profiles: Option[]; roles: Option[]; permissions: Option[] }
-            >(path, { signal: controller.signal })
-                .then((result) => {
-                    if (controller.signal.aborted) return;
-                    if (access) {
-                        const catalog = result as {
-                            profiles: Option[];
-                            roles: Option[];
-                            permissions: Option[];
-                        };
-                        setOptions(
-                            permissionCode
-                                ? catalog.permissions.map((p) => ({
-                                      id: p.nombre,
-                                      nombre: p.nombre,
-                                  }))
-                                : field.key === "perfilId"
-                                  ? catalog.profiles
-                                  : field.key === "roles"
-                                    ? catalog.roles
-                                    : catalog.permissions,
-                        );
-                    } else
-                        setOptions(
-                            Array.isArray(result) ? result : (result as PageResult<PlatformRecord>).items,
-                        );
-                })
-                .catch((e) => {
-                    if (!controller.signal.aborted) setError(e.message);
-                });
-        }, 200);
-        return () => {
-            clearTimeout(timer);
-            controller.abort();
-        };
-    }, [
-        access,
-        permissionCode,
-        field.type,
-        field.resource,
-        field.key,
-        field.lookupPath,
-        query,
-        selectedReference,
-    ]);
+        const timer = setTimeout(() => setTerm(query), 200);
+        return () => clearTimeout(timer);
+    }, [query]);
+    const needsOptions = access || ["ref", "user"].includes(field.type);
+    const optionsPath = !needsOptions
+        ? null
+        : access
+          ? "/access-options"
+          : field.type === "user"
+            ? (field.lookupPath || "/people") + "?q=" + encodeURIComponent(term)
+            : "/records/" + field.resource + "?limit=50&q=" + encodeURIComponent(term);
+    const optionsQuery = usePlatformQuery<
+        PageResult<PlatformRecord> | Option[] | { profiles: Option[]; roles: Option[]; permissions: Option[] }
+    >(optionsPath, { staleTime: 60_000 });
+    const options: Option[] = (() => {
+        const result = optionsQuery.data;
+        if (!result) return [];
+        if (access) {
+            const catalog = result as { profiles: Option[]; roles: Option[]; permissions: Option[] };
+            return permissionCode
+                ? catalog.permissions.map((p) => ({ id: p.nombre, nombre: p.nombre }))
+                : field.key === "perfilId"
+                  ? catalog.profiles
+                  : field.key === "roles"
+                    ? catalog.roles
+                    : catalog.permissions;
+        }
+        return Array.isArray(result) ? result : (result as PageResult<PlatformRecord>).items;
+    })();
+    const error = queryErrorMessage(optionsQuery.error);
     let control: React.ReactNode;
     if (field.type === "boolean")
         control = (

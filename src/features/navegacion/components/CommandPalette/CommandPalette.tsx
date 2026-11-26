@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { Icon } from "@/components/client/atoms/Icon";
 import { WorkspaceIcon } from "@/components/client/atoms/WorkspaceIcon/WorkspaceIcon";
 import { TicketDetail } from "@/features/tickets/components/TicketDetail";
-import { platformFetch } from "@/platform/client";
+import { usePlatformQuery } from "@/platform/query";
 import { readRecents } from "@/platform/recents";
 import { useCommandPalette } from "@/store/useCommandPalette";
 import styles from "./CommandPalette.module.scss";
@@ -63,7 +63,6 @@ export function CommandPalette({ items, ticketScope }: { items: PaletteItem[]; t
     const { open, hide, toggle } = useCommandPalette();
     const [query, setQuery] = useState("");
     const [active, setActive] = useState(0);
-    const [tickets, setTickets] = useState<TicketRow[]>([]);
     const [ticketId, setTicketId] = useState<string | null>(null);
     const dialog = useRef<HTMLDialogElement>(null);
     const input = useRef<HTMLInputElement>(null);
@@ -96,16 +95,11 @@ export function CommandPalette({ items, ticketScope }: { items: PaletteItem[]; t
     }, [open]);
 
     // Tickets propios (o de la bandeja) para encontrarlos por código o asunto.
-    useEffect(() => {
-        if (!open || !ticketScope) return;
-        const controller = new AbortController();
-        platformFetch<{ items: TicketRow[] }>(`/tickets?scope=${ticketScope}&limit=50`, {
-            signal: controller.signal,
-        })
-            .then((r) => !controller.signal.aborted && setTickets(r.items || []))
-            .catch(() => undefined);
-        return () => controller.abort();
-    }, [open, ticketScope]);
+    // Tickets para buscar por código o título (solo mientras el buscador está abierto).
+    const ticketsQuery = usePlatformQuery<{ items: TicketRow[] }>(
+        open && ticketScope ? `/tickets?scope=${ticketScope}&limit=50` : null,
+    );
+    const tickets = useMemo(() => ticketsQuery.data?.items ?? [], [ticketsQuery.data]);
 
     const results = useMemo(() => {
         const terms = normalize(query).split(/\s+/).filter(Boolean);

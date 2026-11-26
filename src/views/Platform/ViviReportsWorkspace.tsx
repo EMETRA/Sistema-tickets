@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useEffectEvent } from "react";
 import { Button } from "@/components/client/atoms/Button";
 import { MetricCard } from "@/components/client/molecules/MetricCard";
 import { platformFetch, PlatformError } from "@/platform/client";
@@ -105,14 +105,16 @@ export function ViviReportsWorkspace() {
             if (!controller.signal.aborted) setBusy(false);
         }
     }
+    // Carga inicial; después los filtros se aplican con «Consultar» (no mientras se escriben).
+    const loadOnMount = useEffectEvent(() => void load("users"));
     useEffect(() => {
-        void load("users");
+        loadOnMount();
+        const list = request,
+            detail = detailRequest;
         return () => {
-            request.current?.abort();
-            detailRequest.current?.abort();
+            list.current?.abort();
+            detail.current?.abort();
         };
-        // Los filtros se aplican con Consultar; no consultar mientras se escriben.
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     function closeDetail() {
         detailRequest.current?.abort();

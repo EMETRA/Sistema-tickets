@@ -1,12 +1,14 @@
 "use client";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { platformKey, usePlatformQueries } from "@/platform/query";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { WorkspaceIcon } from "@/components/client/atoms/WorkspaceIcon/WorkspaceIcon";
 import { TicketDetail } from "@/features/tickets/components/TicketDetail";
 import { usePlatform } from "@/platform/context";
 import { platformFetch } from "@/platform/client";
 import { guatemalaDay } from "@/platform/dates";
-import { readRecents, type RecentModule } from "@/platform/recents";
+import { useRecents } from "@/platform/recents";
 import { ServerFleet } from "@/features/infraestructura/components/ServerFleet";
 import type { PageResult, PlatformRecord } from "@/platform/types";
 import { useAppsCatalogContext } from "@/context/AppsCatalogContext";
@@ -86,12 +88,11 @@ export function LaunchpadHome() {
     const showCreate = useCreateTicketDialog((s) => s.show);
     const createdVersion = useCreateTicketDialog((s) => s.createdVersion);
     const showPalette = useCommandPalette((s) => s.show);
-    const [summary, setSummary] = useState<Summary | null>(null);
-    const [tickets, setTickets] = useState<Ticket[] | null>(null);
-    const [activities, setActivities] = useState<PlatformRecord[] | null>(null);
-    const [recents, setRecents] = useState<RecentModule[]>([]);
-    const [ticketId, setTicketId] = useState<string | null>(null);
+    const recents = useRecents();
+    // «Actualizar» del estado de la plataforma (solo la flota de servidores).
     const [revision, setRevision] = useState(0);
+    const queryClient = useQueryClient();
+    const [ticketId, setTicketId] = useState<string | null>(null);
 
     const actor = data!.actor;
     const staff = actor.admin || actor.mode !== "USUARIO";
@@ -101,50 +102,47 @@ export function LaunchpadHome() {
         !!data!.definitions.servidores && (actor.admin || ["DEVOPS", "DESARROLLADOR"].includes(actor.mode));
     const firstName = actor.nombre.split(" ")[0];
 
-    useEffect(() => {
-        // Recientes: guardados por este navegador al abrir módulos.
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setRecents(readRecents());
-    }, []);
-
-    useEffect(() => {
-        const c = new AbortController();
-        const opts = { signal: c.signal };
-        const ok =
-            <T,>(set: (v: T) => void) =>
-            (v: T) =>
-                !c.signal.aborted && set(v);
-        platformFetch<Summary>("/metrics?inicio=true" + (scope === "creados" ? "&scope=creados" : ""), opts)
-            .then(async (m) => {
-                // La cola se cuenta con la misma fuente que la bandeja (sin ventana de 30 días).
-                if (scope === "cola") {
-                    const total = (estado: string) =>
-                        platformFetch<PageResult<Ticket>>(
-                            `/tickets?scope=cola&estado=${estado}&limit=1`,
-                            opts,
-                        ).then((r) => r.total);
-                    const [sinAsignar, sinPrimeraAtencion] = await Promise.all([
-                        total("sin-asignar"),
-                        total("sin-atencion"),
-                    ]);
-                    m = { ...m, tickets: { ...m.tickets, sinAsignar, sinPrimeraAtencion } };
-                }
-                if (!c.signal.aborted) setSummary(m);
-            })
-            .catch(() => undefined);
-        platformFetch<PageResult<Ticket>>(`/tickets?scope=${scope}&limit=5`, opts)
-            .then(ok((r: PageResult<Ticket>) => setTickets(r.items)))
-            .catch(() => !c.signal.aborted && setTickets([]));
-        const start = new Date(guatemalaDay() + "T00:00:00-06:00");
-        const end = new Date(+start + 7 * 86400000);
-        platformFetch<PageResult<PlatformRecord>>(
-            `/records/actividades?limit=4&desde=${encodeURIComponent(start.toISOString())}&hasta=${encodeURIComponent(end.toISOString())}`,
-            opts,
-        )
-            .then(ok((r: PageResult<PlatformRecord>) => setActivities(r.items)))
-            .catch(() => !c.signal.aborted && setActivities([]));
-        return () => c.abort();
-    }, [scope, revision, createdVersion]);
+    // Indicadores, últimos tickets y agenda de la semana. Crear un ticket los vuelve a consultar.
+    const summaryQuery = useQuery({
+        queryKey: [...platformKey("/metrics?inicio=true"), scope, createdVersion],
+        queryFn: async ({ signal }) => {
+            const opts = { signal };
+            let m = await platformFetch<Summary>(
+                "/metrics?inicio=true" + (scope === "creados" ? "&scope=creados" : ""),
+                opts,
+            );
+            // La cola se cuenta con la misma fuente que la bandeja (sin ventana de 30 días).
+            if (scope === "cola") {
+                const total = (estado: string) =>
+                    platformFetch<PageResult<Ticket>>(
+                        `/tickets?scope=cola&estado=${estado}&limit=1`,
+                        opts,
+                    ).then((r) => r.total);
+                const [sinAsignar, sinPrimeraAtencion] = await Promise.all([
+                    total("sin-asignar"),
+                    total("sin-atencion"),
+                ]);
+                m = { ...m, tickets: { ...m.tickets, sinAsignar, sinPrimeraAtencion } };
+            }
+            return m;
+        },
+    });
+    const summary = summaryQuery.data ?? null;
+    const weekStart = new Date(guatemalaDay() + "T00:00:00-06:00");
+    const weekEnd = new Date(+weekStart + 7 * 86400000);
+    const [ticketsPage, activitiesPage] = usePlatformQueries<PageResult<Ticket> | PageResult<PlatformRecord>>(
+        [
+            `/tickets?scope=${scope}&limit=5`,
+            `/records/actividades?limit=4&desde=${encodeURIComponent(weekStart.toISOString())}&hasta=${encodeURIComponent(weekEnd.toISOString())}`,
+        ],
+        { revision: createdVersion },
+    ).data;
+    const homeLists = {
+        tickets: ticketsPage as PageResult<Ticket> | null,
+        activities: activitiesPage as PageResult<PlatformRecord> | null,
+    };
+    const tickets = homeLists.tickets ? homeLists.tickets.items : summaryQuery.isPending ? null : [];
+    const activities = homeLists.activities ? homeLists.activities.items : summaryQuery.isPending ? null : [];
 
     const apps = catalog ? Object.values(catalog) : [];
     const t = summary?.tickets;
@@ -420,7 +418,7 @@ export function LaunchpadHome() {
                 isOpen={!!ticketId}
                 ticketId={ticketId || ""}
                 onClose={() => setTicketId(null)}
-                onTicketUpdated={() => setRevision((r) => r + 1)}
+                onTicketUpdated={() => void queryClient.invalidateQueries({ queryKey: ["platform"] })}
             />
         </div>
     );

@@ -33,68 +33,40 @@ queryClient.setQueryData(platformKey("/records/" + type + "/" + saved.id), saved
 void queryClient.invalidateQueries({ queryKey: ["platform"] });
 ```
 
-## Cargas imperativas
+## Varias rutas a la vez
 
-Las que acumulan páginas o comparten una solicitud entre lista y detalle (cola PMT, catálogos de CCT)
-siguen con su `load()` y se disparan con `useEffectEvent`, para usar siempre la versión actual sin
-repetir el efecto. Se migran cuando se rediseñe cada flujo, con `useInfiniteQuery`.
+`usePlatformQueries(paths, { revision, enabled })` consulta en paralelo; cada lista falla por separado
+(su dato queda en `null`) y las demás se muestran. Se usa en los resúmenes (Activos, Red, Operaciones),
+el portafolio de Sistemas, la Mesa de servicio y el Inicio.
 
-## Ya migradas
+## Después de guardar
 
-`PeoplePicker` (y `usePeopleNames`), ficha de registros (detalle e historial), directorio de personal,
-perfil e historial de RRHH, arranque de CCT y evidencias de PMT.
+Cualquier `platformCommand` correcto invalida las consultas bajo `["platform"]`: las pantallas visibles
+se actualizan solas. El arranque del espacio (`/bootstrap`) y los avisos de RRHH usan claves de sesión
+(`["sesion", …]`) y no se repiten en cada guardado; se actualizan con `refresh()`.
 
-## Pendientes (cargan con `useEffect` + `platformFetch`)
+Para reflejar el resultado al instante (sin esperar la nueva consulta):
 
-Migrar por área, al tocar cada pantalla:
+```ts
+queryClient.setQueryData(platformKey("/records/" + type + "/" + saved.id), saved);
+```
 
-- `components/client/molecules/PeoplePicker/PeoplePicker.tsx`
-- `components/client/molecules/PlatformField/PlatformField.tsx`
-- `components/client/organisms/FileViewer/FileViewer.tsx`
-- `components/client/organisms/ModuleAccessGate/ModuleAccessGate.tsx`
-- `features/calendario/components/CalendarRail/CalendarRail.tsx`
-- `features/infraestructura/components/AssetsPanel/AssetInventory.tsx`
-- `features/infraestructura/components/AssetsPanel/AssetsOverview.tsx`
-- `features/infraestructura/components/AssetsPanel/MaintenanceBoard.tsx`
-- `features/infraestructura/components/NetworkPanel/NetworkOverview.tsx`
-- `features/infraestructura/components/OperationsSummary/OperationsSummary.tsx`
-- `features/infraestructura/components/RepositoryStatus/RepositoryStatus.tsx`
-- `features/infraestructura/components/ServerFleet/ServerFleet.tsx`
-- `features/infraestructura/components/ServerMonitor/ServerMonitor.tsx`
-- `features/infraestructura/components/SourceCatalog/SourceCatalog.tsx`
-- `features/infraestructura/components/SystemsPanel/SystemDossier.tsx`
-- `features/infraestructura/components/SystemsPanel/systemsData.ts`
-- `features/navegacion/components/CommandPalette/CommandPalette.tsx`
-- `features/personas/components/PeoplePanel/TeamsBoard.tsx`
-- `features/registros/components/RecordSearch/RecordSearch.tsx`
-- `features/registros/components/ResourceWorkspace/InventoryPicker.tsx`
-- `features/registros/components/ResourceWorkspace/RecordDetail.tsx`
-- `features/registros/components/ResourceWorkspace/RecordEditor.tsx`
-- `features/registros/components/ResourceWorkspace/RecordFiles.tsx`
-- `features/registros/components/ResourceWorkspace/ResourceWorkspace.tsx`
-- `features/tickets/components/TicketDetail/TicketClassification.tsx`
-- `platform/context.tsx`
-- `platform/hr-notifications.tsx`
-- `platform/query.tsx`
-- `views/Platform/AccessWorkspace.tsx`
-- `views/Platform/AssignmentsWorkspace.tsx`
-- `views/Platform/AuditWorkspace.tsx`
-- `views/Platform/CalendarWorkspace.tsx`
-- `views/Platform/CctAgentAssignments.tsx`
-- `views/Platform/CctCepoReport.tsx`
-- `views/Platform/CctCepos.tsx`
-- `views/Platform/CctParts.tsx`
-- `views/Platform/CctWorkspace.tsx`
-- `views/Platform/HrCampaignsWorkspace.tsx`
-- `views/Platform/HrProfileWorkspace.tsx`
-- `views/Platform/LaunchpadHome.tsx`
-- `views/Platform/MetricsWorkspace.tsx`
-- `views/Platform/NetworkWorkspace.tsx`
-- `views/Platform/PayrollWorkspace.tsx`
-- `views/Platform/RecordPage.tsx`
-- `views/Platform/SystemsWorkspace.tsx`
-- `views/Platform/TicketTagReport.tsx`
-- `views/Platform/TransitReprintsWorkspace.tsx`
-- `views/Platform/ViviPmtWorkspace.tsx`
-- `views/Platform/ViviReportsWorkspace.tsx`
-- `views/Platform/WorkerNotificationsWorkspace.tsx`
+## Cargas imperativas (a propósito)
+
+Siguen con su función `load()` porque el usuario **aplica** filtros con un botón, la respuesta se valida
+y se conserva el último resultado bueno si la consulta falla, o se acumulan páginas:
+
+- Calendario (páginas de actividades por periodo), cola de PMT, catálogos y asignaciones de CCT.
+- Reporte de etiquetas de tickets, Métricas y Reportes de VIVI.
+- Búsquedas por formulario de CCT (cepos, reportes), Reimpresiones de tránsito y la vista de boletas.
+
+La carga inicial usa `useEffectEvent` (sin `eslint-disable`). Si se rediseña alguno de estos flujos,
+conviene `useQuery` con la selección aplicada en la clave o `useInfiniteQuery` para las páginas.
+
+## Migradas
+
+Toda lectura que dependía de `useEffect` + `platformFetch`: resúmenes, listas y fichas de registros,
+búsqueda, archivos y visor, inventario, monitor y flota de servidores, repositorios, fuentes, sistemas,
+red, accesos, nómina (opciones y envíos), campañas y perfil de RRHH, Mesa de servicio, Inicio,
+avisos del personal, buscador global, control de acceso a formularios, opciones de campos, arranque del
+espacio de trabajo y avisos de RRHH.

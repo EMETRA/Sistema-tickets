@@ -17,7 +17,7 @@ const TYPE: Record<string, [string, string]> = {
     VISITA_TECNICA: ["Visita técnica", "neutral"],
 };
 
-/** Propuesta: mantenimientos como tablero de lo que vence, lo que viene y lo hecho. */
+/** Mantenimientos como tablero de lo que vence, lo que viene y lo hecho. */
 export function MaintenanceBoard({
     onShowTable,
     onChanged,

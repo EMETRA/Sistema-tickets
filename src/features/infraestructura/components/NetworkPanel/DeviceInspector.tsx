@@ -7,7 +7,7 @@ import styles from "./NetworkPanel.module.scss";
 
 type Graph = { dispositivos: PlatformRecord[]; conexiones: PlatformRecord[] };
 
-/** Propuesta: ficha lateral del dispositivo con ocupación, puertos y enlaces legibles. */
+/** Ficha lateral del dispositivo con ocupación, puertos y enlaces legibles. */
 export function DeviceInspector({
     device,
     graph,

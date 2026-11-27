@@ -33,7 +33,7 @@ const DEPLOY_TONE: Record<string, string> = { CORRECTO: "success", FALLIDO: "dan
 const ENV: Record<string, string> = { PRODUCCION: "Producción", QA: "QA", DESARROLLO: "Desarrollo" };
 
 /**
- * Propuesta: columna lateral del calendario con minicalendario, agenda de hoy,
+ * Columna lateral del calendario con minicalendario, agenda de hoy,
  * filtros con conteo y la operación de Informática del periodo.
  */
 export function CalendarRail({

@@ -22,7 +22,7 @@ function isActive(activePath: string, path: string) {
 }
 
 /**
- * Navegación de la propuesta «Panel institucional»: el trabajo personal,
+ * Navegación del «Panel institucional»: el trabajo personal,
  * las aplicaciones institucionales (sistemas migrados) y las herramientas
  * de Informática, cada una en su espacio.
  */

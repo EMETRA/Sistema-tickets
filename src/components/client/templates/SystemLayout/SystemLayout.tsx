@@ -273,7 +273,7 @@ export const SystemLayout = ({ children, className }: { children: React.ReactNod
         return PAGES_CONFIG.home;
     })();
 
-    // Encabezado de espacio de la propuesta (solo pantallas con propósito conocido).
+    // Encabezado de espacio (solo pantallas con propósito conocido).
     const spaceInfo = pathname ? spaceMeta(pathname, staff) : null;
     const spaceTitle =
         pathname === "/espacio/asignacion"

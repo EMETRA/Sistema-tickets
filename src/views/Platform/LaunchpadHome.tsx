@@ -81,7 +81,7 @@ const dayLabel = (iso: string) => {
     }).format(new Date(iso));
 };
 
-/** Inicio de la propuesta «Panel institucional»: un lanzador según el rol. */
+/** Inicio del «Panel institucional»: un lanzador según el rol. */
 export function LaunchpadHome() {
     const { data } = usePlatform();
     const { catalog } = useAppsCatalogContext();

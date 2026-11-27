@@ -154,7 +154,7 @@ export function RecordDetail({
             setBusy(false);
         }
     }
-    // Propuesta: valor legible por tipo de campo; vacío se muestra como «—».
+    // Valor legible por tipo de campo; vacío se muestra como «—».
     const sectionIcon =
         PLATFORM_SECTIONS.find((s) => s.id === def.group)?.iconName || "table-cells-large-solid";
     const teamName =

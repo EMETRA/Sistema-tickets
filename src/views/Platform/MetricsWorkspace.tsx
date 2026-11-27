@@ -46,7 +46,7 @@ export function MetricsWorkspace() {
         [selection, setSelection] = useState<MetricsSelection>({
             from: guatemalaDay(new Date(Date.now() - 30 * 86400000)),
             to: guatemalaDay(),
-            // Propuesta: administración abre con su equipo de Informática, no con «Mis métricas».
+            // Administración abre con su equipo de Informática, no con «Mis métricas».
             team: data?.capabilities.teamMetrics && data.actor.admin ? data.defaultTicketTeamId || "" : "",
         }),
         [metrics, setMetrics] = useState<Metrics | null>(null),

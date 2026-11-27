@@ -60,7 +60,7 @@ async function main(){
   assert.equal(await page.getByRole('button',{name:/Resolver|Registrar recepción|Imponer/}).count(),0);
   await shots('juzgado-consulta');
   await page.goto('http://127.0.0.1:3793/aplicaciones');
-  const acceso=page.getByRole('button',{name:'Ingresar a PMT',exact:true});
+  const acceso=page.locator('section[aria-labelledby="area-pmt"] a[href="/home/pmt/formularios"]');
   await acceso.waitFor();
   await shots('catalogo-aplicaciones');
   await acceso.click();

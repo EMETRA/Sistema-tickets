@@ -62,7 +62,7 @@ async function run() {
   await page.route('**/*',route=>{const url=route.request().url();if(/^https?:/.test(url)&&new URL(url).hostname!=='127.0.0.1'){external.push(url);return route.abort();}return route.continue();});
   const visit=async url=>{await page.goto(instance.base+url);await page.waitForLoadState('networkidle');};
   for(let i=0;i<100;i++){try{if((await fetch(instance.base+'/home')).status<500)break;}catch{}await new Promise(r=>setTimeout(r,100));}
-  await visit('/__laboratorio/entrar?usuario=1');await visit('/mis-tickets/21');
+  await visit('/__laboratorio/entrar?usuario=1');await visit('/mis-tickets/21');await page.getByRole('tab',{name:/^Archivos/}).click();
   const open=async name=>{await page.getByRole('button',{name,exact:true}).click();await page.getByRole('link',{name:'Descargar archivo',exact:true}).waitFor();};
   const close=()=>page.getByRole('button',{name:'Cerrar visor de archivos',exact:true}).click();
   const download=async file=>{const ready=page.waitForEvent('download');await page.getByRole('link',{name:'Descargar archivo',exact:true}).click();const saved=path.join(dir,'descarga-'+file.name);await (await ready).saveAs(saved);assert.deepEqual(await fs.readFile(saved),file.buffer);};

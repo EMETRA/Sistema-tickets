@@ -26,7 +26,7 @@ export function MonitoringWorkspace() {
             </nav>
             {
                 <div hidden={tab !== "salud"} className={styles.page}>
-                    {/* Propuesta: la flota primero; el detalle se abre al elegir un servidor. */}
+                    {/* La flota primero; el detalle se abre al elegir un servidor. */}
                     <ServerFleet
                         selected={server}
                         onSelect={(id) => setServer(id === server ? "" : id)}

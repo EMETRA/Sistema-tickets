@@ -7,7 +7,7 @@ import { areaAccent, areaName } from "@/config/app-areas";
 import { useCreateTicketDialog } from "@/store/useCreateTicketDialog";
 import styles from "./AreaWorkspace.module.scss";
 
-/** Portada de un área institucional (propuesta): secciones como pestañas y módulos como accesos. */
+/** Portada de un área institucional: secciones como pestañas y módulos como accesos. */
 export function AreaWorkspace({ appId, sectionId }: { appId: string; sectionId: string }) {
     const { catalog } = useAppsCatalogContext();
     const showCreate = useCreateTicketDialog((s) => s.show);

@@ -9,7 +9,7 @@ import styles from "./AppsDirectory.module.scss";
 
 const norm = (v: string) => v.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 
-/** Directorio de aplicaciones institucionales (propuesta): todas las áreas, secciones y módulos de un vistazo. */
+/** Directorio de aplicaciones institucionales: todas las áreas, secciones y módulos de un vistazo. */
 export function AppsDirectory({ catalog }: { catalog: AppsCatalog }) {
     const [query, setQuery] = useState("");
     const q = norm(query.trim());

@@ -39,7 +39,7 @@ const subscribeRecent = (notify: () => void) => {
     return () => window.removeEventListener(RECENT_KEY, notify);
 };
 
-/** Propuesta: búsqueda en vivo de registros del panel, agrupada por sección y abierta en su ficha. */
+/** Búsqueda en vivo de registros del panel, agrupada por sección y abierta en su ficha. */
 export function RecordSearch() {
     const [q, setQ] = useState("");
     const [term, setTerm] = useState("");

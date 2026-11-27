@@ -1,4 +1,4 @@
-/** Espacios de la propuesta «Panel institucional» y el propósito de cada pantalla. */
+/** Espacios del «Panel institucional» y el propósito de cada pantalla. */
 export type SpaceMeta = { space: string; description: string; title?: string };
 
 const SECTIONS: Record<string, SpaceMeta> = {

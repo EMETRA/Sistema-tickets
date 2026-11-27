@@ -64,7 +64,7 @@ export function AccessWorkspace() {
 }
 function AccessCatalog({ tab }: { tab: AccessTab }) {
     const [copyOpen, setCopyOpen] = useState(false);
-    // Propuesta: «Copiar accesos» es una tarea ocasional; se abre bajo demanda.
+    // «Copiar accesos» es una tarea ocasional; se abre bajo demanda.
     const wrapCopy = (panel: React.ReactNode) => (
         <PopOver
             isOpen={copyOpen}

@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { Icon } from "../Icon";
 
-/** Iconos de navegación de la propuesta: contorno legible y acento tenue. */
+/** Iconos de navegación: contorno legible y acento tenue. */
 export function WorkspaceIcon({ name, size = 22 }: { name: string; size?: number }) {
     const fill = "var(--workspace-icon-accent, #e7edff)";
     const shapes: Record<string, ReactNode> = {

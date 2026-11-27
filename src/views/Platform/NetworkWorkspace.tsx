@@ -42,7 +42,7 @@ export function NetworkWorkspace() {
         drag = useRef<{ id: string; dx: number; dy: number } | null>(null),
         [zoom, setZoom] = useState(1);
     const [picker, setPicker] = useState(false);
-    // Propuesta: ubicaciones como accesos directos, con su cantidad de dispositivos.
+    // Ubicaciones como accesos directos, con su cantidad de dispositivos.
     const siteLists = usePlatformQueries<PageResult<PlatformRecord>>(
         ["/records/instalaciones?limit=100", "/records/dispositivos?limit=100"],
         { revision },
@@ -85,7 +85,7 @@ export function NetworkWorkspace() {
             description:
                 "Selecciona una ubicación para visualizar sus dispositivos y conexiones. El mapa utiliza los mismos registros de las otras pestañas.",
         });
-    // Propuesta: el mapa es la vista principal de la red.
+    // El mapa es la vista principal de la red.
     const orderedTabs = [...tabs.filter((t) => t.id === "mapa"), ...tabs.filter((t) => t.id !== "mapa")];
     const { current, select } = useWorkspaceTab(orderedTabs);
     // Grafo y planos disponibles de la ubicación elegida.
@@ -108,7 +108,7 @@ export function NetworkWorkspace() {
                 x: Number(row.datos[physical ? "planoX" : "x"] ?? 120),
                 y: Number(row.datos[physical ? "planoY" : "y"] ?? 100),
             };
-    // Propuesta: en la topología, el encuadre se ajusta a los dispositivos.
+    // En la topología, el encuadre se ajusta a los dispositivos.
     const fitBox = (() => {
         // Se calcula con las posiciones guardadas: arrastrar no mueve el encuadre.
         const nodes = (graph?.dispositivos || []).map((r) => ({

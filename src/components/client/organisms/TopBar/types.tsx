@@ -15,7 +15,7 @@ export interface TopBarProps {
     createTicketPath?: string;
     /** Si existe, "Crear ticket" abre la ventana en lugar de navegar. */
     onCreateTicket?: () => void;
-    /** Propuesta: abre el buscador global en lugar del selector de aplicaciones. */
+    /** Abre el buscador global en lugar del selector de aplicaciones. */
     onSearch?: () => void;
     settingsPath?: string;
     notificationsPath?: string;

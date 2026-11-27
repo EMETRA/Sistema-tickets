@@ -164,7 +164,7 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
             )}
         </>
     );
-    // Propuesta: acciones del ticket fijas al pie, con la misma lógica de etiquetas.
+    // Acciones del ticket fijas al pie, con la misma lógica de etiquetas.
     const needsTags = canResolve && (tagCount === null || tagCount === 0 || tagDirty);
     const actions = (canStart || canResolve || canCancel) && (
         <>

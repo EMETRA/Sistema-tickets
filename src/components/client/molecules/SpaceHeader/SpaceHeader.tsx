@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { WorkspaceIcon } from "../../atoms/WorkspaceIcon/WorkspaceIcon";
 import styles from "./SpaceHeader.module.scss";
 
-/** Encabezado de pantalla de la propuesta: espacio, título, propósito y acciones. */
+/** Encabezado de pantalla: espacio, título, propósito y acciones. */
 export function SpaceHeader({
     space,
     title,

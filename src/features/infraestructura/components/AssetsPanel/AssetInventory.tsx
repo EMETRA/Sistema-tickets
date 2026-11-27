@@ -27,7 +27,7 @@ const FILTERS = [
 ] as const;
 
 /**
- * Propuesta: inventario de Activos Fijos con un buscador principal, filtros
+ * Inventario de Activos Fijos con un buscador principal, filtros
  * bajo demanda y el estado de la ficha técnica como etiqueta.
  */
 export function AssetInventory({

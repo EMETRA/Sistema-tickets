@@ -18,7 +18,7 @@ type Counts = {
 };
 
 /**
- * Propuesta: la operación de Informática dentro del mismo periodo de Métricas
+ * La operación de Informática dentro del mismo periodo de Métricas
  * (despliegues, incidentes, mantenimientos y movimientos de activos).
  */
 export function OperationsSummary({ from, to }: { from: string; to: string }) {

@@ -677,7 +677,7 @@
   white-space: nowrap;
 }
 
-// Filtros rápidos por estado (propuesta).
+// Filtros rápidos por estado.
 .stateFilters {
   display: inline-flex;
   flex-wrap: wrap;
@@ -729,7 +729,7 @@
   display: none;
 }
 
-// Propuesta: base visual común para las ventanas que no usan la ficha de registro.
+// Base visual común para las ventanas que no usan la ficha de registro.
 .dialog {
   background: var(--tickets-surface);
   border-radius: 16px;

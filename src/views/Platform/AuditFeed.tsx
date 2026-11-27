@@ -61,7 +61,7 @@ function dayTitle(day: string) {
     return label.charAt(0).toUpperCase() + label.slice(1);
 }
 
-/** Propuesta: la trazabilidad como historial por día; las excepciones resaltan solas. */
+/** La trazabilidad como historial por día; las excepciones resaltan solas. */
 export function AuditFeed({ items }: { items: AuditEntry[] }) {
     const days = items.reduce<Record<string, AuditEntry[]>>((acc, item) => {
         const day = guatemalaDay(new Date(item.fecha));

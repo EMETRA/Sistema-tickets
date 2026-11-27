@@ -18,7 +18,7 @@ const initials = (name: string) =>
         .toUpperCase() || "?";
 const PREVIEW = 12;
 
-/** Propuesta: el personal de RRHH como directorio por unidad, con el estado de su cuenta. */
+/** El personal de RRHH como directorio por unidad, con el estado de su cuenta. */
 export function PeopleDirectoryView({
     people,
     onRefresh,

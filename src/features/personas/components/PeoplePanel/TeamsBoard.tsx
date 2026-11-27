@@ -26,7 +26,7 @@ const initials = (name: string) =>
         .join("")
         .toUpperCase() || "?";
 
-/** Propuesta: los equipos de trabajo como tarjetas con su gente, sus jefaturas y su umbral de atención. */
+/** Los equipos de trabajo como tarjetas con su gente, sus jefaturas y su umbral de atención. */
 export function TeamsBoard({
     revision: outer = 0,
     onShowTable,

@@ -50,7 +50,7 @@ export function AssignmentsWorkspace() {
         [busy, setBusy] = useState(false),
         [detail, setDetail] = useState<Ticket | null>(null),
         [message, setMessage] = useState("");
-    // Propuesta: los indicadores de la cola funcionan como filtros.
+    // Los indicadores de la cola funcionan como filtros.
     // Los contadores de la cola usan la misma fuente que la bandeja, así siempre cuadran.
     const countsQuery = useQuery({
         queryKey: [...platformKey("/tickets/cola/contadores"), revision],

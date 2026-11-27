@@ -23,7 +23,7 @@ const HEALTH: Record<string, string> = { ok: "Operativo", warn: "Revisar", down:
 const shortAgo = (days: number | null) =>
     days === null ? "—" : days === 0 ? "hoy" : days === -1 ? "ayer" : `${-days} d`;
 
-/** Propuesta: los sistemas a cargo como portafolio, con su salud operativa a la vista. */
+/** Los sistemas a cargo como portafolio, con su salud operativa a la vista. */
 export function SystemsPortfolio({ onShowRecords }: { onShowRecords: () => void }) {
     const { data: context } = usePlatform();
     const [revision, setRevision] = useState(0);

@@ -48,7 +48,7 @@ export function ResourceWorkspace({
         [selected, setSelected] = useState<PlatformRecord | null>(null),
         [editing, setEditing] = useState<PlatformRecord | null | undefined>(undefined),
         [message, setMessage] = useState(""),
-        // Propuesta: las solicitudes abren en «Pendientes», la pregunta diaria.
+        // Las solicitudes abren en «Pendientes», la pregunta diaria.
         [estado, setEstado] = useState(type === "solicitudes" ? "PENDIENTE" : "");
     const stateFilters = STATE_FILTERS[type];
     const rawDef = data!.definitions[type],
@@ -60,7 +60,7 @@ export function ResourceWorkspace({
         () => void queryClient.invalidateQueries({ queryKey: ["platform"] }),
         [queryClient],
     );
-    // Propuesta: las listas no traen nombres de personas ni de referencias; se resuelven aquí.
+    // Las listas no traen nombres de personas ni de referencias; se resuelven aquí.
     const refFields =
         copy && def
             ? copy.columns

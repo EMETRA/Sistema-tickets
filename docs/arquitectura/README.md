@@ -39,6 +39,16 @@ Para que Git ignore el commit de formato en `git blame`:
 git config blame.ignoreRevsFile .git-blame-ignore-revs
 ```
 
+## Pruebas de navegador por flujo
+
+`test/integracion/*-browser.cjs` recorren flujos de negocio completos (tickets, RRHH, inventario,
+CCT, Juzgado, Office, permisos…) con Next compilado y un API simulado propio de cada prueba.
+`pnpm build && pnpm test:navegador` las ejecuta en orden (`pnpm test:navegador cct juzgado` filtra).
+Usan el Chromium de Playwright (`pnpm e2e:instalar`); `laboratorio-browser.cjs` necesita
+`pnpm laboratorio` en marcha y las que leen código del API (`catalogo-etiquetas`, `modulos`,
+`metricas-funciones`, `office-preview`, `ticket-admin`, `inventario-boletas`) piden
+`API_TICKETS_DIR` con el API compilado (`pnpm build` en api-tickets).
+
 ## Contrato con api-tickets
 
 `pnpm contrato` compara el panel con el API (por defecto `../../apis/api-tickets`; otra ruta con

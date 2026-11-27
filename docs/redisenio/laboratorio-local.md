@@ -92,4 +92,4 @@ pnpm test:integracion
 
 Las pruebas del adaptador comprueban persistencia, alcance, confirmaciones ligadas al contenido, idempotencia, conflictos de versión, asignación/atención/resolución, puertos, aprobación simulada, documentos y fallos. Para los recorridos completos del navegador se utiliza Next real con datos controlados.
 
-Con el laboratorio iniciado y Chromium de Playwright disponible, `node test/integracion/laboratorio-browser.cjs` recorre creación/asignación/resolución entre perfiles, las 12 secciones, ambas confirmaciones y el alcance del calendario. Agrega ejemplos al archivo ficticio actual; no lo reinicia.
+Con el laboratorio iniciado y Chromium de Playwright disponible, `node test/integracion/laboratorio-browser.cjs` recorre creación, asignación e inicio de atención entre perfiles (y la regla de no resolver sin etiquetas), las 12 secciones, ambas confirmaciones y el alcance del calendario. Agrega ejemplos al archivo ficticio actual; no lo reinicia.

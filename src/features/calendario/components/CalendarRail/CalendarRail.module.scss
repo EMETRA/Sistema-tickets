@@ -36,7 +36,8 @@
     --scope-soft: #f3effa;
   }
   [data-scope="EMPRESA"] {
-    --scope: #64748b;
+    // Texto secundario del tema: ≥ 4.5:1 también sobre el fondo suave del evento.
+    --scope: var(--tickets-text-secondary);
     --scope-soft: #edf1f7;
   }
   [data-scope="PRIVADA"] {

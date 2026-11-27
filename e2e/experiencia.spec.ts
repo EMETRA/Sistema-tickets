@@ -77,12 +77,16 @@ test.describe("Calendario", () => {
         await entrar(page, "Administración ficticia");
         await preferencias(page, {});
         await visitar(page, "/espacio/calendario");
+        // La agenda muestra los 7 días de la semana: la reunión de ejemplo de hoy siempre aparece
+        // (la vista semanal oculta el fin de semana y la prueba dependía del día en que corre).
+        await page.getByRole("button", { name: "Agenda", exact: true }).click();
         await page
-            .getByRole("button", { name: /Seguimiento con Recaudación/ })
+            .getByRole("list", { name: "Agenda de actividades" })
+            .getByRole("button", { name: /Reunión virtual con Financiero/ })
             .first()
             .click();
         const unirse = page.getByRole("link", { name: /Unirse a la reunión/ });
-        await expect(unirse).toHaveAttribute("href", /^https:\/\/meet\.google\.com\//);
+        await expect(unirse).toHaveAttribute("href", /^https:\/\/teams\.microsoft\.com\//);
         await expect(unirse).toHaveAttribute("target", "_blank");
     });
 

@@ -408,7 +408,8 @@ async function createLab(file, options = {}) {
         logs: has(a, "TICKETS_LOGS_LEER"),
         teamMetrics: manager(a),
         // Como platform.service.ts del API: «Personas y accesos» → permisos corporativos si tiene mod06.
-        corporateAccess: moduleAccess(s, a, "mod06").allowed,
+        // Permisos corporativos (mod06) es sensible: solo administración o un permiso explícito.
+        corporateAccess: !!(a.admin || s.moduleAccess?.[a.id]?.mod06?.allowed),
       },
       timezone: "America/Guatemala",
     };

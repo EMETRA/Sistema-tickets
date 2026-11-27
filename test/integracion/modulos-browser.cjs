@@ -56,7 +56,7 @@ async function run() {
   try {
     instance=await start({port:4005,file:path.join(temp,'estado.json'),compiled:true,graphql});
     const { APPS_CATALOG_DUMMY } = require('./load-ts.cjs')(root)('src/api/graphql/home/appsCatalog.dummy.ts');
-    await instance.lab.state.change(s => { s.applicationCatalog = APPS_CATALOG_DUMMY; });
+    await instance.lab.state.change(s => { s.applicationCatalog = APPS_CATALOG_DUMMY; s.moduleAccess = { 7: { mod06: { allowed: true, actions: { LEER: true, INSERTAR: false, EDITAR: false, ELIMINAR: false } } } }; });
     browser=await chromium.launch({executablePath:process.env.QA_CHROMIUM_PATH||undefined,args:['--no-sandbox','--disable-dev-shm-usage']});
     page=await browser.newPage({viewport:{width:1440,height:1100}});page.setDefaultTimeout(25000);
     const errors=[],alerts=[];page.on('pageerror',e=>errors.push(e.message));page.on('dialog',async d=>{alerts.push(d.message());await d.dismiss();});

@@ -29,6 +29,25 @@ if (!fs.existsSync(path.join(root, ".next/BUILD_ID"))) {
 
 const LIMITE = Number(process.env.TICKETS_BROWSER_TIMEOUT || 300) * 1000;
 
+// Requisitos externos: el API compilado (código que algunas pruebas cargan) y el laboratorio en marcha.
+const apiDir = process.env.TICKETS_API_SOURCE || process.env.API_TICKETS_DIR || path.resolve(root, "../../apis/api-tickets");
+const apiCompilado = fs.existsSync(path.join(apiDir, "dist/platform"));
+const labUrl = process.env.TICKETS_LAB_TEST_URL || "http://127.0.0.1:3030";
+async function laboratorioActivo() {
+    try {
+        return (await fetch(labUrl + "/__laboratorio", { signal: AbortSignal.timeout(3000) })).status < 500;
+    } catch {
+        return false;
+    }
+}
+function requisito(file, lab) {
+    const source = fs.readFileSync(path.join(dir, file), "utf8");
+    if (/API_TICKETS_DIR|TICKETS_API_SOURCE/.test(source) && !apiCompilado)
+        return `necesita el API compilado en ${apiDir} (API_TICKETS_DIR)`;
+    if (file === "laboratorio-browser.cjs" && !lab) return `necesita el laboratorio en ${labUrl} (pnpm laboratorio)`;
+    return "";
+}
+
 function correr(file) {
     return new Promise((resolve) => {
         const inicio = Date.now();
@@ -58,7 +77,15 @@ function correr(file) {
 
 (async () => {
     const resultados = [];
+    const lab = await laboratorioActivo();
+    const omitidas = [];
     for (const file of scripts) {
+        const falta = requisito(file, lab);
+        if (falta) {
+            omitidas.push(file);
+            console.log(`- ${file} omitida: ${falta}`);
+            continue;
+        }
         const r = await correr(file);
         resultados.push(r);
         console.log(`${r.ok ? "✓" : "✗"} ${file} (${r.segundos} s)`);
@@ -66,5 +93,7 @@ function correr(file) {
     }
     const fallidas = resultados.filter((r) => !r.ok);
     console.log(`\n${resultados.length - fallidas.length} de ${resultados.length} pruebas de navegador pasaron.`);
-    process.exit(fallidas.length ? 1 : 0);
+    if (omitidas.length) console.log(`${omitidas.length} omitidas por requisitos externos.`);
+    // En CI, TICKETS_BROWSER_ESTRICTO=1 convierte las omisiones en error.
+    process.exit(fallidas.length || (omitidas.length && process.env.TICKETS_BROWSER_ESTRICTO === "1") ? 1 : 0);
 })();

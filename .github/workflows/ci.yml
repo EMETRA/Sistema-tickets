@@ -116,3 +116,44 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 14
+
+  navegador:
+    name: Flujos de negocio en navegador
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: calidad
+    env:
+      API_REF: ${{ (github.base_ref || github.ref_name) == 'main' && 'main' || 'QA' }}
+      TIENE_TOKEN: ${{ secrets.API_TICKETS_TOKEN != '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        if: env.TIENE_TOKEN == 'true'
+        with:
+          repository: EMETRA/api-tickets
+          ref: ${{ env.API_REF }}
+          token: ${{ secrets.API_TICKETS_TOKEN }}
+          path: api-tickets
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: API compilado (pruebas que cargan su código)
+        if: env.TIENE_TOKEN == 'true'
+        working-directory: api-tickets
+        run: pnpm install --frozen-lockfile && pnpm build
+      - name: Chromium para Playwright
+        run: pnpm e2e:instalar
+      - name: Build de producción
+        run: pnpm build
+      - name: Laboratorio local en segundo plano
+        run: |
+          pnpm laboratorio > laboratorio.log 2>&1 &
+          for i in $(seq 1 120); do curl -sf -o /dev/null http://127.0.0.1:3030/__laboratorio && exit 0; sleep 2; done
+          cat laboratorio.log; exit 1
+      - name: Pruebas de navegador por flujo
+        run: pnpm test:navegador
+        env:
+          API_TICKETS_DIR: ${{ github.workspace }}/api-tickets

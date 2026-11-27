@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import type { OrganizationPerson } from "../OrganizationPeople/OrganizationPeople";
+import type { OrganizationPerson } from "./types";
 import common from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
 import tiles from "@/features/infraestructura/components/AssetsPanel/AssetsPanel.module.scss";
 import styles from "./PeoplePanel.module.scss";
@@ -43,7 +43,10 @@ export function PeopleDirectoryView({
         );
         const map = new Map<string, OrganizationPerson[]>();
         for (const p of matches) {
-            const key = p.unidad || "Sin unidad asignada";
+            // Unidad sin nombre en RRHH: se muestra su código para poder corregirla.
+            const key =
+                p.unidad ||
+                (p.unidadCodigo ? `Unidad ${p.unidadCodigo} · Nombre pendiente` : "Sin unidad asignada");
             map.set(key, [...(map.get(key) || []), p]);
         }
         return [...map.entries()]

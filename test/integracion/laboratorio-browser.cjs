@@ -20,7 +20,8 @@ async function run() {
     external = [];
   page.on("pageerror", (e) => errors.push(e.message));
   page.on("response", (r) => {
-    if (r.status() >= 400 && r.url().startsWith(base + "/api/"))
+    // 501 = operación fuera del laboratorio (RRHH, registro de errores): esperado aquí.
+    if (r.status() >= 400 && r.status() !== 501 && r.url().startsWith(base + "/api/"))
       failed.push([r.status(), r.url()]);
   });
   page.on("request", (r) => {
@@ -34,7 +35,8 @@ async function run() {
   const enter = async (name) => {
     await visit("/__laboratorio");
     await page.getByRole("link", { name }).click();
-    await page.getByRole("heading", { name: "Tus solicitudes y aplicaciones" }).waitFor();
+    // Inicio del panel: saludo según la hora («Buenos días, …»).
+    await page.getByRole("heading", { name: /^(Buenos días|Buenas tardes|Buenas noches),/ }).waitFor();
     await page.waitForLoadState("networkidle");
   };
   const confirm = async () => {
@@ -88,7 +90,12 @@ async function run() {
       .click();
     await row.getByRole("button", { name: "Resolver", exact: true }).waitFor();
     await row.getByRole("button", { name: "Resolver", exact: true }).click();
-    await row.getByText("Resuelto", { exact: true }).waitFor();
+    // Regla del API: no se resuelve sin etiquetas (la clasificación se prueba en ticket-etiquetas).
+    await page
+      .getByRole("alert")
+      .filter({ hasText: "Asigna al menos una etiqueta" })
+      .waitFor();
+    await row.getByText("En atención", { exact: true }).waitFor();
     await enter(/Administración ficticia/);
     for (const section of [
       "asignacion",
@@ -112,24 +119,24 @@ async function run() {
         "Desborde: " + section,
       );
     }
-    await visit("/espacio/inventario");
+    await visit("/espacio/inventario?view=ubicaciones");
     await page
-      .getByRole("button", { name: "Registrar instalación", exact: true })
+      .getByRole("button", { name: "Registrar ubicación", exact: true })
       .click();
     const editor = page.getByRole("dialog", {
-      name: "Registrar instalación",
+      name: "Registrar ubicación",
       exact: true,
     });
     await editor
       .getByLabel("Nombre *", { exact: true })
-      .fill("Instalación ficticia " + Date.now());
+      .fill("Ubicación ficticia " + Date.now());
     await editor
       .getByLabel("Dirección *", { exact: true })
-      .fill("Ubicación de prueba");
+      .fill("Dirección de prueba");
     await editor
       .getByLabel("Técnico responsable *", { exact: true })
       .selectOption({ label: "Técnico ficticio" });
-    await editor.getByRole("button", { name: "Guardar", exact: true }).click();
+    await editor.getByRole("button", { name: "Registrar", exact: true }).click();
     await confirm();
     await page
       .getByText("El registro se guardó correctamente.", { exact: true })
@@ -148,10 +155,14 @@ async function run() {
       })
       .waitFor();
     assert.deepEqual(errors, []);
-    assert.deepEqual(failed, []);
+    // Único rechazo esperado: resolver sin etiquetas (409).
+    assert.deepEqual(
+      failed.filter(([status, url]) => !(status === 409 && url.endsWith("/resolve"))),
+      [],
+    );
     assert.deepEqual(external, []);
     console.log(
-      "LABORATORIO_BROWSER_OK: crear/asignar/iniciar/resolver ticket entre perfiles; 12 secciones; crear instalación con ambas confirmaciones; calendario privado; alcance; sin peticiones externas.",
+      "LABORATORIO_BROWSER_OK: crear/asignar/iniciar ticket y regla de etiquetas al resolver entre perfiles; 12 secciones; crear ubicación con ambas confirmaciones; calendario privado; alcance; sin peticiones externas.",
     );
   } finally {
     await browser.close();

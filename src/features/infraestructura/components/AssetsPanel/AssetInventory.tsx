@@ -111,7 +111,12 @@ export function AssetInventory({
                 >
                     Más filtros{active.length ? ` · ${active.length}` : ""}
                 </button>
-                <button type="button" className={styles.ghost} onClick={() => void query.refetch()}>
+                <button
+                    type="button"
+                    className={styles.ghost}
+                    aria-label="Actualizar bienes"
+                    onClick={() => void query.refetch()}
+                >
                     Actualizar
                 </button>
             </div>
@@ -263,6 +268,7 @@ export function AssetInventory({
                                 type="button"
                                 className={styles.ghost}
                                 disabled={busy || !offset}
+                                aria-label="Bienes anteriores"
                                 onClick={() => setOffset((v) => Math.max(0, v - 50))}
                             >
                                 ← Anteriores
@@ -272,6 +278,7 @@ export function AssetInventory({
                                 type="button"
                                 className={styles.ghost}
                                 disabled={busy || !result.hayMas}
+                                aria-label="Bienes siguientes"
                                 onClick={() => setOffset((v) => v + 50)}
                             >
                                 Siguientes →

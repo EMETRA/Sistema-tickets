@@ -274,14 +274,14 @@ export const SystemLayout = ({ children, className }: { children: React.ReactNod
     })();
 
     // Encabezado de espacio de la propuesta (solo pantallas con propósito conocido).
-    const proposalSpace = pathname ? spaceMeta(pathname, staff) : null;
-    const proposalTitle =
+    const spaceInfo = pathname ? spaceMeta(pathname, staff) : null;
+    const spaceTitle =
         pathname === "/espacio/asignacion"
             ? platform.data?.capabilities.assign
                 ? "Mesa de servicio"
                 : "Mis asignados"
-            : proposalSpace?.title || activePage.title;
-    const proposalIcon =
+            : spaceInfo?.title || activePage.title;
+    const spaceIcon =
         [...panelPrimary, ...panelTools].find((l) => l.path === pathname)?.iconName ||
         (pathname === "/aplicaciones" ? "table-cells-large-solid" : activePage.iconName);
 
@@ -359,7 +359,7 @@ export const SystemLayout = ({ children, className }: { children: React.ReactNod
                         unit={user?.departamento || undefined}
                         menuOpen={menuOpen}
                         onMenuClick={() => setMenuOpen((open) => !open)}
-                        title={proposalSpace ? proposalTitle : activePage.title}
+                        title={spaceInfo ? spaceTitle : activePage.title}
                         iconName={activePage.iconName}
                         userName={user?.nombre || "Usuario"}
                         userRole={
@@ -437,12 +437,12 @@ export const SystemLayout = ({ children, className }: { children: React.ReactNod
                             {!appContext &&
                                 pathname !== "/home" &&
                                 !/^\/mis-tickets\/[^/]+$/.test(pathname || "") &&
-                                proposalSpace && (
+                                spaceInfo && (
                                     <SpaceHeader
-                                        space={proposalSpace.space}
-                                        title={proposalTitle}
-                                        description={proposalSpace.description}
-                                        iconName={proposalIcon}
+                                        space={spaceInfo.space}
+                                        title={spaceTitle}
+                                        description={spaceInfo.description}
+                                        iconName={spaceIcon}
                                         actions={
                                             ["/mis-tickets", "/tickets"].includes(pathname || "") &&
                                             canCreateTicket ? (
@@ -454,7 +454,7 @@ export const SystemLayout = ({ children, className }: { children: React.ReactNod
                             {!appContext &&
                                 pathname !== "/home" &&
                                 !/^\/mis-tickets\/[^/]+$/.test(pathname || "") &&
-                                !proposalSpace && (
+                                !spaceInfo && (
                                     <PageHeading
                                         title={activePage.title}
                                         description={

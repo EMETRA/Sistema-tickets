@@ -52,14 +52,14 @@ async function run() {
     await visit('/__laboratorio/entrar?usuario=1');
     await visit('/espacio/organizacion');
     const people=page.getByRole('region',{name:'Personal de RRHH',exact:true});
-    await people.getByRole('button',{name:'Siguiente personal',exact:true}).click();
-    await people.getByRole('cell',{name:'Personal de prueba 27',exact:true}).waitFor();
-    await people.getByRole('button',{name:'Anterior personal',exact:true}).click();
-    await people.getByLabel('Buscar persona, puesto o código',{exact:true}).fill('Jefe');
-    await people.getByRole('cell',{name:'Jefe de prueba',exact:true}).waitFor();
-    await people.getByRole('cell',{name:'Sin cuenta habilitada',exact:true}).waitFor();
-    await people.getByRole('cell',{name:'Unidad 11 · Nombre pendiente',exact:true}).waitFor();
-    await people.getByLabel('Buscar persona, puesto o código',{exact:true}).fill('');
+    // El API entrega todo el personal; la vista agrupa por unidad y muestra 12 por unidad al inicio.
+    await people.getByRole('button',{name:/Ver las \d+ personas restantes/}).first().click();
+    await people.getByText('Personal de prueba 27',{exact:true}).waitFor();
+    await people.getByLabel('Buscar persona',{exact:true}).fill('Jefe');
+    const unidad=people.getByRole('region',{name:'Unidad 11 · Nombre pendiente',exact:true});
+    await unidad.getByText('Jefe de prueba',{exact:true}).waitFor();
+    await unidad.getByText('Sin cuenta',{exact:true}).waitFor();
+    await people.getByLabel('Buscar persona',{exact:true}).fill('');
     await page.screenshot({ path: path.join(out, 'equipos-vista-previa.png'), fullPage: true });
     for (const width of [1024, 390]) {
       await page.setViewportSize({ width, height: 1100 });

@@ -99,7 +99,8 @@ export default function JUZ01() {
                             id="caseNumber"
                             type="text"
                             value={caseNumber}
-                            maxLength={36}
+                            // Margen para espacios al pegar: el esquema los recorta y valida 36 caracteres.
+                            maxLength={44}
                             autoComplete="off"
                             autoCapitalize="characters"
                             spellCheck={false}

@@ -197,7 +197,7 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
         </>
     );
     const content = (
-        <div className={`${styles.ticketDetailContainer} ${styles.proposal}`}>
+        <div className={`${styles.ticketDetailContainer} ${styles.sheet}`}>
             {presentation === "page" && (
                 <nav className={styles.breadcrumb} aria-label="Ruta del ticket">
                     <Link href={returnHref}>Tickets</Link>
@@ -205,68 +205,38 @@ const TicketDetailContent: React.FC<TicketDetailProps> = ({
                     <span>{ticketCode}</span>
                 </nav>
             )}
-            {
-                <header className={styles.sheetHead}>
-                    <span className={styles.sheetIcon} aria-hidden="true">
-                        <WorkspaceIcon name="ticket-solid" size={20} />
-                    </span>
-                    <div className={styles.sheetTitles}>
-                        <div className={styles.sheetKind}>
-                            Ticket
-                            {ticketData?.categoriaNombre ? ` · ${ticketData.categoriaNombre}` : ""}
-                            {ticketData && <TicketStateChip state={state} label={ticketData.estadoNombre} />}
-                        </div>
-                        {presentation === "page" ? (
-                            <h1>{ticketData ? ticketData.titulo : `Ticket #${ticketId}`}</h1>
-                        ) : (
-                            <h2>
-                                {ticketData ? `${ticketCode} · ${ticketData.titulo}` : `Ticket #${ticketId}`}
-                            </h2>
-                        )}
-                        {ticketData && (
-                            <p className={styles.sheetSub}>
-                                Solicitado por {ticketData.creador?.nombre || ticketData.usuarioCreadorNombre}{" "}
-                                · {displayDate(ticketData.fechaCreacion)}
-                            </p>
-                        )}
+            <header className={styles.sheetHead}>
+                <span className={styles.sheetIcon} aria-hidden="true">
+                    <WorkspaceIcon name="ticket-solid" size={20} />
+                </span>
+                <div className={styles.sheetTitles}>
+                    <div className={styles.sheetKind}>
+                        Ticket
+                        {ticketData?.categoriaNombre ? ` · ${ticketData.categoriaNombre}` : ""}
+                        {ticketData && <TicketStateChip state={state} label={ticketData.estadoNombre} />}
                     </div>
-                    <button
-                        type="button"
-                        className={styles.sheetClose}
-                        onClick={onClose}
-                        aria-label={
-                            presentation === "page"
-                                ? "Volver al listado de tickets"
-                                : "Cerrar detalle del ticket"
-                        }
-                    >
-                        ×
-                    </button>
-                </header>
-            }
-            <header className={styles.header} hidden>
-                <div className={styles.headerInfo}>
                     {presentation === "page" ? (
-                        <h1>{ticketData ? `${ticketCode} · ${ticketData.titulo}` : `Ticket #${ticketId}`}</h1>
+                        <h1>{ticketData ? ticketData.titulo : `Ticket #${ticketId}`}</h1>
                     ) : (
                         <h2>{ticketData ? `${ticketCode} · ${ticketData.titulo}` : `Ticket #${ticketId}`}</h2>
                     )}
-                    <p className={styles.muted}>{ticketData?.categoriaNombre || "Detalle de la solicitud"}</p>
+                    {ticketData && (
+                        <p className={styles.sheetSub}>
+                            Solicitado por {ticketData.creador?.nombre || ticketData.usuarioCreadorNombre} ·{" "}
+                            {displayDate(ticketData.fechaCreacion)}
+                        </p>
+                    )}
                 </div>
-                <div className={styles.headerActions}>
-                    {ticketData && <TicketStateChip state={state} label={ticketData.estadoNombre} />}
-                    <Button
-                        variant="outlined"
-                        onClick={onClose}
-                        aria-label={
-                            presentation === "page"
-                                ? "Volver al listado de tickets"
-                                : "Cerrar detalle del ticket"
-                        }
-                    >
-                        {presentation === "page" ? "Volver al listado" : "Cerrar"}
-                    </Button>
-                </div>
+                <button
+                    type="button"
+                    className={styles.sheetClose}
+                    onClick={onClose}
+                    aria-label={
+                        presentation === "page" ? "Volver al listado de tickets" : "Cerrar detalle del ticket"
+                    }
+                >
+                    ×
+                </button>
             </header>
             {viewedFile && (
                 <FileViewer

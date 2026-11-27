@@ -4,7 +4,7 @@ import { Button } from "@/components/client/atoms/Button";
 import { usePlatform } from "@/platform/context";
 import { platformCommand, platformFetch } from "@/platform/client";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
-import { type OrganizationPerson } from "@/features/personas/components/OrganizationPeople/OrganizationPeople";
+import type { OrganizationPerson } from "@/features/personas/components/PeoplePanel/types";
 type Plan = {
     huella: string;
     empresa: number;

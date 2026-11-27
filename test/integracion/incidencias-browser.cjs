@@ -41,7 +41,7 @@ async function run(){
     await visit('/home/rrhh/formularios/mod04');for(const [id,value]of [['company','97'],['paystubType','1'],['payrollManager','2'],['paymentType','%'],['budgetUnit','%']])await page.locator('#'+id).fill(value);
     let downloads=0;page.on('download',()=>downloads++);await page.getByRole('button',{name:'Generar Reporte en Excel',exact:true}).click();await page.getByRole('alert').filter({hasText:'No se encontraron empleados'}).waitFor();assert.equal(downloads,0);assert.equal(await page.locator('#company').inputValue(),'97');assert.equal(deliveries.length,1);
     await page.screenshot({path:path.join(out,'nomina-sin-resultados.png'),fullPage:true});
-    await visit('/__laboratorio/entrar?usuario=5');await visit('/espacio/sistemas');await page.getByRole('button',{name:'Incidentes de aplicaciones',exact:true}).click();await page.getByRole('button',{name:'Error MOD06/empresas',exact:true}).click();
+    await visit('/__laboratorio/entrar?usuario=5');await visit('/espacio/sistemas');await page.getByRole('button',{name:'Registros',exact:true}).click();await page.getByRole('button',{name:'Incidentes de aplicaciones',exact:true}).click();await page.getByRole('button',{name:'Error MOD06/empresas',exact:true}).click();
     await page.getByRole('heading',{name:'Detectada automáticamente',exact:true}).waitFor();await page.getByRole('dialog').getByText(deliveries[0].referencia,{exact:true}).waitFor();
     await page.screenshot({path:path.join(out,'desarrollador-incidencia.png'),fullPage:true});await page.keyboard.press('Escape');
     await page.evaluate(()=>window.dispatchEvent(new ErrorEvent('error',{message:'NO_PERSISTIR_DATOS_DEL_USUARIO'})));

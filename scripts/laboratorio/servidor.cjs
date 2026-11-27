@@ -407,6 +407,8 @@ async function createLab(file, options = {}) {
         audit: has(a, "TICKETS_AUDITORIA_LEER"),
         logs: has(a, "TICKETS_LOGS_LEER"),
         teamMetrics: manager(a),
+        // Como platform.service.ts del API: «Personas y accesos» → permisos corporativos si tiene mod06.
+        corporateAccess: !!(a.admin || s.moduleAccess?.[a.id]?.mod06?.allowed),
       },
       timezone: "America/Guatemala",
     };

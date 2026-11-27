@@ -3,7 +3,7 @@ import { queryErrorMessage, usePlatformQuery } from "@/platform/query";
 import { useState } from "react";
 import { usePlatform } from "@/platform/context";
 import { ResourceWorkspace } from "@/features/registros/components/ResourceWorkspace/ResourceWorkspace";
-import { type OrganizationPerson } from "@/features/personas/components/OrganizationPeople/OrganizationPeople";
+import type { OrganizationPerson } from "@/features/personas/components/PeoplePanel/types";
 import { OrganizationSync } from "./OrganizationSync";
 import { WorkspaceNavigation, useWorkspaceTab, type WorkspaceTab } from "./WorkspaceNavigation";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";

@@ -43,10 +43,12 @@ export function FileViewer({
         };
     }, []);
     const filePath = `/tickets/${encodeURIComponent(ticketId)}/files/${encodeURIComponent(file.id)}`;
-    // Archivo original (el contenido no cambia: se guarda en caché mientras el visor esté abierto).
+    // Archivo original: en caché solo mientras el visor está abierto (gcTime 0); al reabrirlo se
+    // consulta de nuevo, así un acceso retirado se respeta de inmediato.
     const fileQuery = useQuery({
         queryKey: [...platformKey(filePath), "contenido"],
         staleTime: Infinity,
+        gcTime: 0,
         queryFn: async ({ signal }) => {
             const blob = await platformFetch<Blob>(filePath, { signal });
             const mime = blob.type.split(";")[0];
@@ -70,7 +72,7 @@ export function FileViewer({
     // Word y Excel: vista previa convertida en el servidor, después de tener el original.
     const officeQuery = usePlatformQuery<OfficeDocument>(
         officeFile && fileQuery.data ? filePath + "/preview" : null,
-        { staleTime: Infinity },
+        { staleTime: Infinity, gcTime: 0 },
     );
     const office = officeQuery.data ?? null;
     const failure = fileQuery.error;

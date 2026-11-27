@@ -100,7 +100,13 @@ export function HrSubmission({ data }: { data: Pick<HrReview, "campana" | "entre
 }
 function HrUpdateForm({ id, onSent }: { id: string; onSent: () => void }) {
     // Solo lo que la persona cambió; el borrador completo se arma con los datos oficiales (hrDraft).
+    // Las confirmaciones («Correcto» / «Corregir») valen para la versión cargada: si la campaña se
+    // vuelve a consultar, se piden de nuevo (como hacía hrDraft al recargar) y se conservan los valores.
     const [edits, setEdits] = useState<Record<string, HrAnswer>>({}),
+        [confirmations, setConfirmations] = useState<{
+            at: number;
+            values: Record<string, HrAnswer["confirmacion"]>;
+        }>({ at: 0, values: {} }),
         [note, setNote] = useState(""),
         [actionError, setError] = useState(""),
         [message, setMessage] = useState(""),
@@ -109,7 +115,15 @@ function HrUpdateForm({ id, onSent }: { id: string; onSent: () => void }) {
         flight = useRef(false);
     const campaign = usePlatformQuery<HrMine>("/hr/me/campaigns/" + encodeURIComponent(id));
     const data = campaign.data ?? null;
-    const answers = useMemo(() => (data ? hrDraft(data, edits) : {}), [data, edits]);
+    const loadedAt = campaign.dataUpdatedAt;
+    const answers = useMemo(() => {
+        if (!data) return {};
+        const draft = hrDraft(data, edits);
+        if (confirmations.at !== loadedAt) return draft;
+        for (const [code, confirmacion] of Object.entries(confirmations.values))
+            if (draft[code] && confirmacion) draft[code] = { ...draft[code], confirmacion };
+        return draft;
+    }, [data, edits, confirmations, loadedAt]);
     const error = actionError || (campaign.error ? hrError(campaign.error) : "");
     const load = async () => {
         setError("");
@@ -161,9 +175,15 @@ function HrUpdateForm({ id, onSent }: { id: string; onSent: () => void }) {
         editable =
             open && Boolean(data?.perfil.vinculado) && ["PENDIENTE", "DEVUELTA"].includes(data?.estado || "");
     function answer(code: string, value: HrAnswer) {
+        const { confirmacion, ...rest } = value;
+        if (confirmacion)
+            setConfirmations((prior) => ({
+                at: loadedAt,
+                values: { ...(prior.at === loadedAt ? prior.values : {}), [code]: confirmacion },
+            }));
         setEdits((prior) => ({
             ...prior,
-            [code]: { ...answers[code], ...prior[code], ...value },
+            [code]: { ...answers[code], ...prior[code], ...rest },
         }));
     }
     return (

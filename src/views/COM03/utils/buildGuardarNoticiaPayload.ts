@@ -7,10 +7,7 @@ import {
     type SeccionNoticiaCmsInput,
     type VisibilidadNoticiaCms,
 } from "@/api/graphql/COM03";
-import type {
-    NewsFormFile,
-    NewsFormValues,
-} from "@/components/client/organisms/NewsForm";
+import type { NewsFormFile, NewsFormValues } from "@/features/comunicacion/components/NewsForm";
 import { ddMmYyyyToApiDateTime } from "@/helpers/dateInput";
 import { textToHtml } from "@/helpers/textHtml";
 
@@ -28,26 +25,25 @@ export const ESTADO_POR_ACCION: Record<AccionNoticia, EstadoNoticiaCms> = {
  * - video de YouTube agregado en el formulario.
  */
 export interface RecursoPendiente {
-  /** Dónde va: "recurso_principal", "secciones.0" o "galeria.1" */
-  destino: string;
-  tipo: "imagen" | "video";
-  /** Imagen nueva */
-  file?: File;
-  /** Video de YouTube (https://www.youtube.com/watch?v=ID) */
-  url?: string;
+    /** Dónde va: "recurso_principal", "secciones.0" o "galeria.1" */
+    destino: string;
+    tipo: "imagen" | "video";
+    /** Imagen nueva */
+    file?: File;
+    /** Video de YouTube (https://www.youtube.com/watch?v=ID) */
+    url?: string;
 }
 
 export interface GuardarNoticiaPayload {
-  variables: GuardarNoticiaCmsVariables;
-  /**
-   * Recursos que prepareGuardarNoticiaPayload confirma antes de enviar la mutación.
-   */
-  pendientes: RecursoPendiente[];
+    variables: GuardarNoticiaCmsVariables;
+    /**
+     * Recursos que prepareGuardarNoticiaPayload confirma antes de enviar la mutación.
+     */
+    pendientes: RecursoPendiente[];
 }
 
 /** Id numérico de la API. Los ids que no son números (p. ej. locales o del dummy) no se envían. */
-const toApiId = (id: string): number | null =>
-    /^\d+$/.test(id) ? Number(id) : null;
+const toApiId = (id: string): number | null => (/^\d+$/.test(id) ? Number(id) : null);
 
 /**
  * Convierte los valores del formulario en las variables de `guardarNoticiaCms`
@@ -75,13 +71,10 @@ export function buildGuardarNoticiaPayload(
     const pendientes: RecursoPendiente[] = [];
 
     /**
-   * Id del recurso para enviar. undefined = no enviar el campo (pendiente o id no numérico);
-   * null = sin recurso; número = recurso ya guardado.
-   */
-    const toRecursoId = (
-        file: NewsFormFile | null,
-        destino: string,
-    ): number | null | undefined => {
+     * Id del recurso para enviar. undefined = no enviar el campo (pendiente o id no numérico);
+     * null = sin recurso; número = recurso ya guardado.
+     */
+    const toRecursoId = (file: NewsFormFile | null, destino: string): number | null | undefined => {
         if (!file) return null;
         if (file.file) {
             pendientes.push({ destino, tipo: "imagen", file: file.file });
@@ -118,32 +111,24 @@ export function buildGuardarNoticiaPayload(
         ]
             .map(toApiId)
             .filter((id): id is number => id !== null),
-        etiquetasIds: values.etiquetaIds
-            .map(toApiId)
-            .filter((id): id is number => id !== null),
-        secciones: values.secciones.map(
-            (section, index): SeccionNoticiaCmsInput => {
-                const recursoId = toRecursoId(section.imagen, `secciones.${index}`);
-                return {
-                    orden: index + 1,
-                    encabezado: section.encabezado.trim(),
-                    contenidoHtml:
-            section.contenidoHtmlOriginal !== undefined &&
-            section.contenido === section.contenidoOriginal
-                ? section.contenidoHtmlOriginal
-                : textToHtml(section.contenido),
-                    ...(recursoId !== undefined ? { recursoId } : {}),
-                };
-            },
-        ),
+        etiquetasIds: values.etiquetaIds.map(toApiId).filter((id): id is number => id !== null),
+        secciones: values.secciones.map((section, index): SeccionNoticiaCmsInput => {
+            const recursoId = toRecursoId(section.imagen, `secciones.${index}`);
+            return {
+                orden: index + 1,
+                encabezado: section.encabezado.trim(),
+                contenidoHtml:
+                    section.contenidoHtmlOriginal !== undefined &&
+                    section.contenido === section.contenidoOriginal
+                        ? section.contenidoHtmlOriginal
+                        : textToHtml(section.contenido),
+                ...(recursoId !== undefined ? { recursoId } : {}),
+            };
+        }),
     };
 
-    const recursoPrincipalId = toRecursoId(
-        values.archivoPrincipal,
-        "recurso_principal",
-    );
-    if (recursoPrincipalId !== undefined)
-        input.recursoPrincipalId = recursoPrincipalId;
+    const recursoPrincipalId = toRecursoId(values.archivoPrincipal, "recurso_principal");
+    if (recursoPrincipalId !== undefined) input.recursoPrincipalId = recursoPrincipalId;
 
     const id = noticiaId ? toApiId(noticiaId) : null;
     if (id !== null) input.id = id;

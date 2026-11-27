@@ -134,16 +134,15 @@ export async function getStatisticsFilterConfigDummy(): Promise<SecondaryFilterC
             Object.entries(SECONDARY_FILTER_CONFIG.childOptionsByParent).map(([parent, children]) => [
                 parent,
                 children.map((item) => ({ ...item })),
-            ])
+            ]),
         ),
     };
 }
 
 export async function getStatisticsPerformanceDummy(
     parentFilter: string,
-    childFilter: string
+    childFilter: string,
 ): Promise<BarChartDataPoint[]> {
-
     const parentData = SECONDARY_PERFORMANCE_DATA[parentFilter] || {};
     const data = parentData[childFilter] || [];
     return data.map((item) => ({ ...item }));

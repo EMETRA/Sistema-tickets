@@ -13,7 +13,7 @@
  * - fechaInicio <= fechaFin
  *
  * Requiere permisos financieros (Bearer requerido)
- * 
+ *
  * Retorna:
  * - filename: Nombre del archivo Excel generado
  * - mimeType: Tipo MIME (application/vnd.ms-excel)

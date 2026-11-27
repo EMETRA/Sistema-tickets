@@ -10,29 +10,29 @@ import { DonutChartProps } from "./types";
  * Colores predefinidos del sistema de diseño
  */
 const DEFAULT_COLORS = [
-    "#FF9100",  // naranja-1
-    "#00BC70",  // verde-oscuro-1
-    "#FFCE00",  // amarillo-1
-    "#E63946",  // rojo-1
-    "#1700A5",  // azul-1
-    "#97D700",  // verde-claro-1
-    "#54C8E8",  // celeste-1
+    "#FF9100", // naranja-1
+    "#00BC70", // verde-oscuro-1
+    "#FFCE00", // amarillo-1
+    "#E63946", // rojo-1
+    "#1700A5", // azul-1
+    "#97D700", // verde-claro-1
+    "#54C8E8", // celeste-1
 ];
 
 /**
  * Custom tooltip para el DonutChart
  */
 interface CustomTooltipProps {
-  active?: boolean;
-  payload?: unknown[];
-  total: number;
+    active?: boolean;
+    payload?: unknown[];
+    total: number;
 }
 
 const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload, total }) => {
     if (active && payload && payload.length) {
         const data = payload[0] as { name: string; value: number; fill: string };
         const percentage = ((data.value / total) * 100).toFixed(1);
-    
+
         return (
             <div className={styles.Tooltip}>
                 <p className={styles.TooltipLabel}>{data.name}</p>
@@ -51,12 +51,7 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload, total })
  * @param {DonutChartProps} props - Las propiedades del componente DonutChart.
  * @returns {JSX.Element} El componente DonutChart renderizado.
  */
-export const DonutChart: React.FC<DonutChartProps> = ({ 
-    data, 
-    size = 200, 
-    strokeWidth = 20,
-    className 
-}) => {
+export const DonutChart: React.FC<DonutChartProps> = ({ data, size = 200, strokeWidth = 20, className }) => {
     const chartData = useMemo(() => {
         return data.map((item, index) => ({
             name: item.label,

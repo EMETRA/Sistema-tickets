@@ -1,0 +1,74 @@
+@use "../../../../theme/surfaces.scss" as surfaces;
+@use "../../../../theme/colors.scss" as *;
+
+.TicketTable {
+  font-family: var(--font-montserrat), sans-serif;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--tickets-surface);
+  border: 1px solid #7a7a7a40;
+  border-radius: 10px;
+  padding: 24px;
+  width: 100%;
+  gap: 20px;
+}
+
+.title {
+  margin: 0;
+}
+
+.tableContainer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.headerRow {
+  border-bottom: 1px solid var(--tickets-border-strong);
+  padding-bottom: 12px;
+  margin-bottom: 8px;
+}
+
+.rowsContainer {
+  display: flex;
+  flex-direction: column;
+  max-height: 400px;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  // Personalización del scrollbar
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--tickets-background);
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--tickets-neutral-soft);
+    border-radius: 4px;
+
+    &:hover {
+      background: #a0a0a0;
+    }
+  }
+}
+
+.dataRow {
+  border-bottom: 1px solid var(--tickets-border-strong);
+  padding: 12px 0;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.noTicketsText {
+  text-align: center;
+}
+
+.TicketTable {
+  @include surfaces.panel;
+}

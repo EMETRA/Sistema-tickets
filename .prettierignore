@@ -1,0 +1,19 @@
+# Generados y dependencias
+node_modules/
+.next/
+.next-laboratorio/
+.next-oracle/
+.laboratorio/
+storybook-static/
+coverage/
+pnpm-lock.yaml
+*.tsbuildinfo
+next-env.d.ts
+# Fuera del alcance del formato (se mantienen como están)
+public/
+docs/
+test/
+scripts/
+helpers/
+hooks/
+*.md

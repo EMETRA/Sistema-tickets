@@ -14,8 +14,11 @@ import { IconButton } from "../IconButton";
  * @returns {JSX.Element} El componente de entrada renderizado.
  */
 const Input = forwardRef<HTMLInputElement, InputProps>(
-    ({ type = "text", className, state = "default", errorMessage, icon, showIconLeft = false, ...props }, ref) => {
-    // Estado para controlar la visibilidad de la contraseña
+    (
+        { type = "text", className, state = "default", errorMessage, icon, showIconLeft = false, ...props },
+        ref,
+    ) => {
+        // Estado para controlar la visibilidad de la contraseña
         const [showPassword, setShowPassword] = useState(false);
 
         // Referencia interna al input
@@ -25,13 +28,13 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         useImperativeHandle(ref, () => inputRef.current as HTMLInputElement, []);
 
         /**
-     * Alternar la visibilidad de la contraseña
-     */
+         * Alternar la visibilidad de la contraseña
+         */
         const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
         /**
-     * Manejar el clic en el input de tipo file
-     */
+         * Manejar el clic en el input de tipo file
+         */
         const handleFileClick = () => {
             if (inputRef.current) {
                 inputRef.current.click();
@@ -39,10 +42,14 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         };
 
         // Construir las clases CSS dinámicamente usando classnames
-        const inputClasses = classNames(styles.Input, {
-            [styles.InputText]: type === "text" && icon,
-            [styles.InputError]: state === "error",
-        }, className);
+        const inputClasses = classNames(
+            styles.Input,
+            {
+                [styles.InputText]: type === "text" && icon,
+                [styles.InputError]: state === "error",
+            },
+            className,
+        );
 
         const containerClasses = classNames(styles.Container, {
             [styles.ContainerFile]: type === "file",
@@ -103,7 +110,12 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                             disabled={state === "disabled"}
                             {...props}
                         />
-                        <Icon name="file-arrow-up-solid-full" variant="status" size={40} className={styles.Icon} />
+                        <Icon
+                            name="file-arrow-up-solid-full"
+                            variant="status"
+                            size={40}
+                            className={styles.Icon}
+                        />
                         <div className={styles.FileContent}>
                             <p className={styles.FileMainText}>Arrastra tu archivo aquí o</p>
                             <p className={styles.FileLinkText}>da click aquí</p>
@@ -123,9 +135,11 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                 <>
                     <div className={containerClasses}>
                         {showIconLeft && (
-                            <div className={classNames(styles.IconButtonLeft, {
-                                [styles.IconContainerDisabled]: state === "disabled"
-                            })}>
+                            <div
+                                className={classNames(styles.IconButtonLeft, {
+                                    [styles.IconContainerDisabled]: state === "disabled",
+                                })}
+                            >
                                 {icon}
                             </div>
                         )}
@@ -137,9 +151,11 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                             {...props}
                         />
                         {!showIconLeft && (
-                            <div className={classNames(styles.IconButtonRight, {
-                                [styles.IconContainerDisabled]: state === "disabled"
-                            })}>
+                            <div
+                                className={classNames(styles.IconButtonRight, {
+                                    [styles.IconContainerDisabled]: state === "disabled",
+                                })}
+                            >
                                 {icon}
                             </div>
                         )}
@@ -150,7 +166,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                 </>
             );
         }
-    
+
         return (
             <>
                 <input
@@ -165,7 +181,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                 )}
             </>
         );
-    }
+    },
 );
 
 Input.displayName = "Input";

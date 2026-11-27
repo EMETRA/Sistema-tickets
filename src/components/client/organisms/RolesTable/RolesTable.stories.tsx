@@ -4,7 +4,7 @@ import { RolesTable } from "./";
 const meta: Meta<typeof RolesTable> = {
     title: "Organisms/RolesTable",
     component: RolesTable,
-    tags: ["autodocs"]
+    tags: ["autodocs"],
 };
 
 export default meta;
@@ -15,18 +15,18 @@ export const Default: Story = {
         roles: [
             {
                 id: 1,
-                name: 'Administrador del sistema',
-                code: '0001',
-                roleCode: 'GRPADMIN',
-                status: 'Activo'
+                name: "Administrador del sistema",
+                code: "0001",
+                roleCode: "GRPADMIN",
+                status: "Activo",
             },
             {
                 id: 2,
-                name: 'Usuario regular',
-                code: '0002',
-                roleCode: 'GRPREGULAR',
-                status: 'Baja'
-            }
-        ]
-    }
-}
+                name: "Usuario regular",
+                code: "0002",
+                roleCode: "GRPREGULAR",
+                status: "Baja",
+            },
+        ],
+    },
+};

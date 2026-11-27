@@ -1,11 +1,12 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useEffectEvent } from "react";
 import Link from "next/link";
 import { Button } from "@/components/client/atoms/Button";
-import { MetricCard } from "@/components/client/molecules/MetricCard";
+import { PeriodFilter, formatPeriod } from "@/components/client/molecules/PeriodFilter";
+import mx from "./MetricsWorkspace.module.scss";
 import { platformFetch, PlatformError } from "@/platform/client";
 import { guatemalaDay } from "@/platform/dates";
-import { displayDate } from "@/components/client/organisms/ResourceWorkspace/RecordDetail";
+import { displayDate } from "@/helpers/displayDate";
 import {
     ticketReportCsv,
     ticketReportQuery,
@@ -29,16 +30,13 @@ export function TicketTagReport() {
         [reference, setReference] = useState<string>(),
         [groupPage, setGroupPage] = useState(0);
     const request = useRef<AbortController | null>(null);
+    const current = useRef(selection);
     async function load(offset = 0, filters = selection) {
         let path: string;
         try {
             path = ticketReportQuery(filters, offset);
         } catch (failure) {
-            setError(
-                failure instanceof Error
-                    ? failure.message
-                    : "Revisa los filtros.",
-            );
+            setError(failure instanceof Error ? failure.message : "Revisa los filtros.");
             return;
         }
         request.current?.abort();
@@ -49,10 +47,7 @@ export function TicketTagReport() {
         setReference(undefined);
         try {
             const report = await platformFetch<TicketLabelReport>(path, {
-                signal: AbortSignal.any([
-                    controller.signal,
-                    AbortSignal.timeout(45000),
-                ]),
+                signal: AbortSignal.any([controller.signal, AbortSignal.timeout(45000)]),
             });
             if (
                 !report.resumen ||
@@ -70,26 +65,19 @@ export function TicketTagReport() {
             if (offset === 0) setGroupPage(0);
         } catch (failure) {
             if (!controller.signal.aborted) {
-                setError(
-                    failure instanceof Error
-                        ? failure.message
-                        : "No se pudo consultar el reporte.",
-                );
-                setReference(
-                    failure instanceof PlatformError
-                        ? failure.reference
-                        : undefined,
-                );
+                setError(failure instanceof Error ? failure.message : "No se pudo consultar el reporte.");
+                setReference(failure instanceof PlatformError ? failure.reference : undefined);
             }
         } finally {
             if (!controller.signal.aborted) setLoading(false);
         }
     }
+    // Carga inicial con el periodo por defecto; después cada filtro se aplica al cambiar.
+    const loadOnMount = useEffectEvent(() => void load());
     useEffect(() => {
-        void load();
-        return () => request.current?.abort();
-        // Los filtros se aplican al pulsar Consultar, no mientras se editan.
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        loadOnMount();
+        const current = request;
+        return () => current.current?.abort();
     }, []);
     function exportCsv() {
         if (!result || !applied || !result.grupos.length) return;
@@ -104,117 +92,86 @@ export function TicketTagReport() {
         link.click();
         setTimeout(() => URL.revokeObjectURL(url), 10000);
     }
-    const field = (key: keyof TicketReportSelection, value: string) =>
-        setSelection((current) => ({ ...current, [key]: value }));
+    const apply = useCallback((patch: Partial<TicketReportSelection>) => {
+        const next = { ...current.current, ...patch };
+        current.current = next;
+        setSelection(next);
+        void load(0, next);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+    const applyPeriod = useCallback((from: string, to: string) => apply({ from, to }), [apply]);
     return (
         <div className={local.report}>
             <div>
-                <h2>Tickets resueltos por técnico y etiqueta</h2>
+                <h2 className={local.title}>Tickets resueltos por técnico y etiqueta</h2>
                 <p className={styles.muted}>
-                    Cuenta los tickets resueltos por su fecha de cierre, con la
-                    clasificación guardada en ese momento.
+                    Cuenta los tickets resueltos por su fecha de cierre, con la clasificación guardada en ese
+                    momento.
                 </p>
             </div>
-            <form
-                className={styles.toolbar}
-                onSubmit={(event) => {
-                    event.preventDefault();
-                    void load();
-                }}
-            >
-                <div className={styles.actions}>
-                    <label className={styles.field}>
-                        Desde
-                        <input
-                            className={styles.control}
-                            type="date"
-                            required
-                            max={selection.to}
-                            value={selection.from}
-                            onChange={(event) =>
-                                field("from", event.target.value)
-                            }
-                        />
-                    </label>
-                    <label className={styles.field}>
-                        Hasta
-                        <input
-                            className={styles.control}
-                            type="date"
-                            required
-                            min={selection.from}
-                            value={selection.to}
-                            onChange={(event) =>
-                                field("to", event.target.value)
-                            }
-                        />
-                    </label>
-                    <label className={styles.field}>
-                        Técnico
-                        <select
-                            className={styles.control}
-                            aria-label="Técnico"
-                            value={selection.tecnicoId}
-                            onChange={(event) =>
-                                field("tecnicoId", event.target.value)
-                            }
-                        >
-                            <option value="">Todos los técnicos</option>
-                            {selection.tecnicoId &&
-                                !result?.opciones.tecnicos.some(
-                                    (item) =>
-                                        String(item.id) === selection.tecnicoId,
-                                ) && (
-                                    <option value={selection.tecnicoId}>
-                                        Técnico #{selection.tecnicoId}
-                                    </option>
-                                )}
-                            {result?.opciones.tecnicos.map((item) => (
-                                <option key={item.id} value={String(item.id)}>
-                                    {item.nombre}
-                                </option>
-                            ))}
-                        </select>
-                    </label>
-                    <label className={styles.field}>
-                        Etiqueta
-                        <select
-                            className={styles.control}
-                            aria-label="Etiqueta"
-                            value={selection.etiqueta}
-                            onChange={(event) =>
-                                field("etiqueta", event.target.value)
-                            }
-                        >
-                            <option value="">Todas las etiquetas</option>
-                            {result?.opciones.etiquetas.map((item) => (
-                                <option key={item.id} value={item.id}>
-                                    {item.nombre}
-                                </option>
-                            ))}
-                        </select>
-                    </label>
-                </div>
-                <Button type="submit" state={loading ? "loading" : "default"}>
-                    Consultar reporte
+            <div className={mx.filters} role="search" aria-label="Filtros del reporte">
+                <PeriodFilter from={selection.from} to={selection.to} onChange={applyPeriod} />
+                <label className={mx.scope}>
+                    <span>Técnico</span>
+                    <select
+                        aria-label="Técnico"
+                        value={selection.tecnicoId}
+                        onChange={(event) => apply({ tecnicoId: event.target.value })}
+                    >
+                        <option value="">Todos los técnicos</option>
+                        {selection.tecnicoId &&
+                            !result?.opciones.tecnicos.some(
+                                (item) => String(item.id) === selection.tecnicoId,
+                            ) && <option value={selection.tecnicoId}>Técnico #{selection.tecnicoId}</option>}
+                        {result?.opciones.tecnicos.map((item) => (
+                            <option key={item.id} value={String(item.id)}>
+                                {item.nombre}
+                            </option>
+                        ))}
+                    </select>
+                </label>
+                <label className={mx.scope}>
+                    <span>Etiqueta</span>
+                    <select
+                        aria-label="Etiqueta"
+                        value={selection.etiqueta}
+                        onChange={(event) => apply({ etiqueta: event.target.value })}
+                    >
+                        <option value="">Todas las etiquetas</option>
+                        {result?.opciones.etiquetas.map((item) => (
+                            <option key={item.id} value={item.id}>
+                                {item.nombre}
+                            </option>
+                        ))}
+                    </select>
+                </label>
+                <Button
+                    variant="outlined"
+                    className={mx.refresh}
+                    state={loading ? "loading" : "default"}
+                    onClick={() => void load(0, applied || selection)}
+                >
+                    Actualizar
                 </Button>
-            </form>
-            {loading && <p role="status">Consultando tickets resueltos…</p>}
+            </div>
+            {loading && (
+                <p role="status" className={mx.caption}>
+                    Consultando tickets resueltos…
+                </p>
+            )}
             {error && (
                 <div role="alert" className={styles.error}>
                     <p>
                         {error}
-                        {result
-                            ? " Se conservan los resultados de la última consulta."
-                            : ""}
+                        {result ? " Se conservan los resultados de la última consulta." : ""}
                     </p>
                     {reference && <p>Referencia: {reference}</p>}
                 </div>
             )}
             {result && applied && (
                 <>
-                    <p className={styles.muted}>
-                        Resultados del {applied.from} al {applied.to}
+                    <p className={mx.caption} hidden={loading}>
+                        Resultados del {formatPeriod(applied.from, applied.to)}
                         {applied.tecnicoId
                             ? ` · ${result.opciones.tecnicos.find((item) => String(item.id) === applied.tecnicoId)?.nombre || "Técnico seleccionado"}`
                             : " · Todos los técnicos"}
@@ -223,37 +180,34 @@ export function TicketTagReport() {
                             : ""}{" "}
                         · Hora de Guatemala.
                     </p>
-                    <div className={styles.metrics}>
-                        <MetricCard
-                            label="Tickets resueltos únicos"
-                            value={result.resumen.tickets}
-                        />
-                        <MetricCard
-                            label="Técnicos identificados"
-                            value={result.resumen.tecnicos}
-                        />
-                        <MetricCard
-                            label="Sin clasificación histórica"
-                            value={result.resumen.sinClasificacionHistorica}
-                        />
-                    </div>
-                    <section className={styles.card}>
+                    <section className={mx.panel} aria-label="Resumen del reporte">
+                        <dl className={mx.kpis + " " + local.kpis3}>
+                            <div className={mx.kpiMain}>
+                                <dt>Tickets resueltos únicos</dt>
+                                <dd>{result.resumen.tickets}</dd>
+                            </div>
+                            <div>
+                                <dt>Técnicos identificados</dt>
+                                <dd>{result.resumen.tecnicos}</dd>
+                            </div>
+                            <div>
+                                <dt>Sin clasificación histórica</dt>
+                                <dd>{result.resumen.sinClasificacionHistorica}</dd>
+                            </div>
+                        </dl>
+                    </section>
+                    <section className={mx.panel}>
                         <div className={styles.toolbar}>
                             <div>
                                 <h3>Resumen por técnico y etiqueta</h3>
                                 <p className={styles.muted}>
-                                    Un ticket con varias etiquetas cuenta en
-                                    cada una. El total general cuenta tickets
-                                    únicos.
+                                    Un ticket con varias etiquetas cuenta en cada una. El total general cuenta
+                                    tickets únicos.
                                 </p>
                             </div>
                             <Button
                                 variant="outlined"
-                                state={
-                                    loading || !result.grupos.length
-                                        ? "disabled"
-                                        : "default"
-                                }
+                                state={loading || !result.grupos.length ? "disabled" : "default"}
                                 onClick={exportCsv}
                             >
                                 Descargar resumen CSV
@@ -261,39 +215,31 @@ export function TicketTagReport() {
                         </div>
                         {result.resumen.sinClasificacionHistorica > 0 && (
                             <p className={styles.muted}>
-                                Los cierres anteriores sin clasificación
-                                guardada se identifican como «Sin clasificación
-                                histórica».
+                                Los cierres anteriores sin clasificación guardada se identifican como «Sin
+                                clasificación histórica».
                             </p>
                         )}
                         {!result.grupos.length ? (
                             <p className={local.empty}>
-                                No hay tickets resueltos para los filtros
-                                aplicados.
+                                No hay tickets resueltos para los filtros aplicados.
                             </p>
                         ) : (
                             <>
-                                <div className={styles.tableWrap}>
+                                <div className={styles.tableRegion}>
                                     <table className={styles.table}>
                                         <caption className={local.srOnly}>
-                                            Tickets resueltos agrupados por
-                                            técnico y etiqueta
+                                            Tickets resueltos agrupados por técnico y etiqueta
                                         </caption>
                                         <thead>
                                             <tr>
                                                 <th scope="col">Técnico</th>
                                                 <th scope="col">Etiqueta</th>
-                                                <th scope="col">
-                                                    Tickets resueltos
-                                                </th>
+                                                <th scope="col">Tickets resueltos</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {result.grupos
-                                                .slice(
-                                                    groupPage * 50,
-                                                    (groupPage + 1) * 50,
-                                                )
+                                                .slice(groupPage * 50, (groupPage + 1) * 50)
                                                 .map((item, index) => (
                                                     <tr key={index}>
                                                         <td>{item.tecnico}</td>
@@ -305,43 +251,26 @@ export function TicketTagReport() {
                                     </table>
                                 </div>
                                 {result.grupos.length > 50 && (
-                                    <nav
-                                        aria-label="Páginas del resumen"
-                                        className={styles.toolbar}
-                                    >
+                                    <nav aria-label="Páginas del resumen" className={styles.toolbar}>
                                         <span>
-                                            {result.grupos.length} combinaciones
-                                            · Página {groupPage + 1}
+                                            {result.grupos.length} combinaciones · Página {groupPage + 1}
                                         </span>
                                         <div className={styles.actions}>
                                             <Button
                                                 variant="outlined"
-                                                state={
-                                                    groupPage === 0
-                                                        ? "disabled"
-                                                        : "default"
-                                                }
-                                                onClick={() =>
-                                                    setGroupPage(
-                                                        (value) => value - 1,
-                                                    )
-                                                }
+                                                state={groupPage === 0 ? "disabled" : "default"}
+                                                onClick={() => setGroupPage((value) => value - 1)}
                                             >
                                                 Resumen anterior
                                             </Button>
                                             <Button
                                                 variant="outlined"
                                                 state={
-                                                    (groupPage + 1) * 50 >=
-                                                    result.grupos.length
+                                                    (groupPage + 1) * 50 >= result.grupos.length
                                                         ? "disabled"
                                                         : "default"
                                                 }
-                                                onClick={() =>
-                                                    setGroupPage(
-                                                        (value) => value + 1,
-                                                    )
-                                                }
+                                                onClick={() => setGroupPage((value) => value + 1)}
                                             >
                                                 Resumen siguiente
                                             </Button>
@@ -351,22 +280,18 @@ export function TicketTagReport() {
                             </>
                         )}
                     </section>
-                    <section className={styles.card}>
+                    <section className={mx.panel}>
                         <h3>Tickets que forman el reporte</h3>
                         {!result.items.length ? (
-                            <p className={local.empty}>
-                                No hay tickets en esta página.
-                            </p>
+                            <p className={local.empty}>No hay tickets en esta página.</p>
                         ) : (
-                            <div className={styles.tableWrap}>
+                            <div className={styles.tableRegion}>
                                 <table className={styles.table}>
                                     <thead>
                                         <tr>
                                             <th scope="col">Ticket</th>
                                             <th scope="col">Técnico</th>
-                                            <th scope="col">
-                                                Etiquetas al cierre
-                                            </th>
+                                            <th scope="col">Etiquetas al cierre</th>
                                             <th scope="col">Resuelto</th>
                                         </tr>
                                     </thead>
@@ -381,52 +306,31 @@ export function TicketTagReport() {
                                                         title="Abrir ficha en otra pestaña"
                                                     >
                                                         {item.codigo?.trim() &&
-                                                        !/^(null|undefined)$/i.test(
-                                                            item.codigo.trim(),
-                                                        )
+                                                        !/^(null|undefined)$/i.test(item.codigo.trim())
                                                             ? item.codigo
-                                                            : "#" +
-                                                              item.id}{" "}
+                                                            : "#" + item.id}{" "}
                                                         · {item.titulo}
                                                     </Link>
                                                 </td>
                                                 <td>{item.tecnico}</td>
                                                 <td>{item.etiquetas}</td>
-                                                <td>
-                                                    {displayDate(
-                                                        item.resueltoEn,
-                                                    )}
-                                                </td>
+                                                <td>{displayDate(item.resueltoEn)}</td>
                                             </tr>
                                         ))}
                                     </tbody>
                                 </table>
                             </div>
                         )}
-                        <nav
-                            aria-label="Páginas de tickets del reporte"
-                            className={styles.toolbar}
-                        >
+                        <nav aria-label="Páginas de tickets del reporte" className={styles.toolbar}>
                             <p className={styles.muted}>
-                                {result.total} tickets · Hasta {result.limit}{" "}
-                                por página
+                                {result.total} tickets · Hasta {result.limit} por página
                             </p>
                             <div className={styles.actions}>
                                 <Button
                                     variant="outlined"
-                                    state={
-                                        loading || result.offset === 0
-                                            ? "disabled"
-                                            : "default"
-                                    }
+                                    state={loading || result.offset === 0 ? "disabled" : "default"}
                                     onClick={() =>
-                                        void load(
-                                            Math.max(
-                                                0,
-                                                result.offset - result.limit,
-                                            ),
-                                            applied,
-                                        )
+                                        void load(Math.max(0, result.offset - result.limit), applied)
                                     }
                                 >
                                     Tickets anteriores
@@ -434,18 +338,11 @@ export function TicketTagReport() {
                                 <Button
                                     variant="outlined"
                                     state={
-                                        loading ||
-                                        result.offset + result.limit >=
-                                            result.total
+                                        loading || result.offset + result.limit >= result.total
                                             ? "disabled"
                                             : "default"
                                     }
-                                    onClick={() =>
-                                        void load(
-                                            result.offset + result.limit,
-                                            applied,
-                                        )
-                                    }
+                                    onClick={() => void load(result.offset + result.limit, applied)}
                                 >
                                     Tickets siguientes
                                 </Button>

@@ -53,53 +53,57 @@ export interface ErrorTexts {
  */
 export function getErrorTexts(error: NoticiaCmsError | null): ErrorTexts {
     switch (error?.codigo) {
-    // SLUG_IDIOMA_CONFLICT no usa la pantalla de error: se marca en el campo (SLUG_CONFLICT_MESSAGE).
-    case "SLUG_IDIOMA_CONFLICT":
-        return { description: SLUG_CONFLICT_MESSAGE, retryable: false };
-    case "IDEMPOTENCY_CONFLICT":
-        // El siguiente intento ya va con otra clave (NewsFormView): reintentar sí funciona.
-        return {
-            description: "La noticia cambió desde el intento anterior. Tu contenido no se perdió. Inténtalo de nuevo.",
-            retryable: true,
-        };
-    case "NEWS_NOT_FOUND":
-        return {
-            description: "La noticia que intentas editar ya no existe. Pudo haber sido eliminada.",
-            retryable: false,
-        };
+        // SLUG_IDIOMA_CONFLICT no usa la pantalla de error: se marca en el campo (SLUG_CONFLICT_MESSAGE).
+        case "SLUG_IDIOMA_CONFLICT":
+            return { description: SLUG_CONFLICT_MESSAGE, retryable: false };
+        case "IDEMPOTENCY_CONFLICT":
+            // El siguiente intento ya va con otra clave (NewsFormView): reintentar sí funciona.
+            return {
+                description:
+                    "La noticia cambió desde el intento anterior. Tu contenido no se perdió. Inténtalo de nuevo.",
+                retryable: true,
+            };
+        case "NEWS_NOT_FOUND":
+            return {
+                description: "La noticia que intentas editar ya no existe. Pudo haber sido eliminada.",
+                retryable: false,
+            };
     }
 
     switch (error?.statusCode) {
-    case 400:
-        // Los mensajes de validación de backend ya vienen en español (README).
-        return {
-            description: error.mensajes.length > 0
-                ? `No se pudo guardar: ${error.mensajes.join(" ")}`
-                : "Algunos datos no son válidos. Revisa el formulario e inténtalo de nuevo.",
-            retryable: false,
-        };
-    case 401:
-        return {
-            description: "Tu sesión venció o no es válida. Inicia sesión de nuevo para guardar la noticia.",
-            retryable: false,
-        };
-    case 403: {
-        const accion = error.permisoFaltante ? ACCION_POR_PERMISO[error.permisoFaltante] : undefined;
-        return {
-            description: accion
-                ? `No tienes permiso para ${accion}. Pide a un administrador el permiso ${error.permisoFaltante}.`
-                : "No tienes permiso para realizar esta acción. Pide a un administrador el permiso necesario.",
-            retryable: false,
-        };
-    }
-    case 502:
-    case 503:
-        return {
-            description: "El servicio de noticias no está disponible en este momento. Tu contenido no se perdió. Intenta de nuevo en unos minutos.",
-            retryable: true,
-        };
-    default:
-        return { description: ERROR_DESCRIPTION, retryable: true };
+        case 400:
+            // Los mensajes de validación de backend ya vienen en español (README).
+            return {
+                description:
+                    error.mensajes.length > 0
+                        ? `No se pudo guardar: ${error.mensajes.join(" ")}`
+                        : "Algunos datos no son válidos. Revisa el formulario e inténtalo de nuevo.",
+                retryable: false,
+            };
+        case 401:
+            return {
+                description:
+                    "Tu sesión venció o no es válida. Inicia sesión de nuevo para guardar la noticia.",
+                retryable: false,
+            };
+        case 403: {
+            const accion = error.permisoFaltante ? ACCION_POR_PERMISO[error.permisoFaltante] : undefined;
+            return {
+                description: accion
+                    ? `No tienes permiso para ${accion}. Pide a un administrador el permiso ${error.permisoFaltante}.`
+                    : "No tienes permiso para realizar esta acción. Pide a un administrador el permiso necesario.",
+                retryable: false,
+            };
+        }
+        case 502:
+        case 503:
+            return {
+                description:
+                    "El servicio de noticias no está disponible en este momento. Tu contenido no se perdió. Intenta de nuevo en unos minutos.",
+                retryable: true,
+            };
+        default:
+            return { description: ERROR_DESCRIPTION, retryable: true };
     }
 }
 
@@ -110,7 +114,8 @@ export function getErrorTexts(error: NoticiaCmsError | null): ErrorTexts {
  */
 export const PUBLICADA_NO_VISIBLE_SUCCESS: FlowTexts["success"] = {
     title: "Noticia guardada",
-    description: "Quedó como publicada, pero no es visible en el Portal porque es privada. No se envió push a VIVI.",
+    description:
+        "Quedó como publicada, pero no es visible en el Portal porque es privada. No se envió push a VIVI.",
 };
 
 /**
@@ -120,12 +125,15 @@ export const PUBLICADA_NO_VISIBLE_SUCCESS: FlowTexts["success"] = {
  */
 const BORRADOR_DESDE: Partial<Record<EstadoNoticia, { confirm: string; success: string }>> = {
     [EstadoNoticia.PUBLICADA]: {
-        confirm: "Esta noticia está publicada. Al guardarla como borrador dejará de mostrarse en el Portal. La notificación push que ya se envió no se puede deshacer.",
+        confirm:
+            "Esta noticia está publicada. Al guardarla como borrador dejará de mostrarse en el Portal. La notificación push que ya se envió no se puede deshacer.",
         success: "La noticia ya no se muestra en el Portal. Puedes seguir editándola y volver a publicarla.",
     },
     [EstadoNoticia.PROGRAMADA]: {
-        confirm: "Esta noticia está programada. Al guardarla como borrador ya no se publicará en la fecha programada.",
-        success: "Ya no se publicará en la fecha programada. Puedes seguir editándola y volver a programarla.",
+        confirm:
+            "Esta noticia está programada. Al guardarla como borrador ya no se publicará en la fecha programada.",
+        success:
+            "Ya no se publicará en la fecha programada. Puedes seguir editándola y volver a programarla.",
     },
 };
 
@@ -139,61 +147,66 @@ export function getFlowTexts(
     estadoActual: EstadoNoticia | null = null,
 ): FlowTexts {
     switch (accion) {
-    case AccionNoticia.PROGRAMAR: {
-        const fechaIso = ddMmYyyyToIsoDate(fechaPublicacion);
-        const fecha = (fechaIso && formatLongDate(fechaIso)) ?? "la fecha seleccionada";
-        return {
-            confirm: {
-                title: "¿Programar esta noticia?",
-                description: `La noticia se programará para publicarse el ${fecha}. Ese día se hará visible en el Portal y se iniciará el envío del push a VIVI por separado. Puedes editarla o cancelarla antes de esa fecha.`,
-                align: "left",
-            },
-            loading: { title: "Programando tu noticia", description: "Esto tomará unos segundos" },
-            success: {
-                title: "Noticia programada",
-                description: "Puedes verificar su estado en el listado de noticias.",
-            },
-            errorTitle: "No pudimos programar la noticia",
-        };
-    }
-    case AccionNoticia.BORRADOR: {
-        const aviso = estadoActual ? BORRADOR_DESDE[estadoActual] : undefined;
-        return {
-            confirm: {
-                title: "¿Guardar como borrador?",
-                description: aviso?.confirm ?? "No se publicará ni se enviará push a VIVI. Podrás seguir editándolo después.",
-                align: "center",
-            },
-            loading: {
-                title: "Guardando tu borrador...",
-                description: "Estamos guardando los cambios. No cierres esta página.",
-            },
-            success: {
-                title: "Borrador guardado",
-                description: aviso?.success ?? "Puedes seguir editándolo cuando quieras. No se publicó ni se envió push a VIVI.",
-            },
-            errorTitle: "No pudimos guardar tu borrador",
-        };
-    }
-    case AccionNoticia.PUBLICAR:
-    default:
-        return {
-            confirm: {
-                title: "¿Publicar esta noticia?",
-                description: "La noticia se hará visible en el Portal de inmediato. La notificación push a VIVI se procesa por separado y puede tardar unos minutos. Esta acción no se puede deshacer desde aquí.",
-                align: "left",
-            },
-            loading: {
-                title: "Publicando tu noticia",
-                description: "Se enviará el push a VIVI en unos segundos.",
-            },
-            success: {
-                title: "Noticia publicada",
-                description: "Ya está visible en el Portal.",
-                badge: "Notificación pendiente de envío",
-                note: "Puedes consultar si ya se envió desde el listado de noticias.",
-            },
-            errorTitle: "No pudimos publicar la noticia",
-        };
+        case AccionNoticia.PROGRAMAR: {
+            const fechaIso = ddMmYyyyToIsoDate(fechaPublicacion);
+            const fecha = (fechaIso && formatLongDate(fechaIso)) ?? "la fecha seleccionada";
+            return {
+                confirm: {
+                    title: "¿Programar esta noticia?",
+                    description: `La noticia se programará para publicarse el ${fecha}. Ese día se hará visible en el Portal y se iniciará el envío del push a VIVI por separado. Puedes editarla o cancelarla antes de esa fecha.`,
+                    align: "left",
+                },
+                loading: { title: "Programando tu noticia", description: "Esto tomará unos segundos" },
+                success: {
+                    title: "Noticia programada",
+                    description: "Puedes verificar su estado en el listado de noticias.",
+                },
+                errorTitle: "No pudimos programar la noticia",
+            };
+        }
+        case AccionNoticia.BORRADOR: {
+            const aviso = estadoActual ? BORRADOR_DESDE[estadoActual] : undefined;
+            return {
+                confirm: {
+                    title: "¿Guardar como borrador?",
+                    description:
+                        aviso?.confirm ??
+                        "No se publicará ni se enviará push a VIVI. Podrás seguir editándolo después.",
+                    align: "center",
+                },
+                loading: {
+                    title: "Guardando tu borrador...",
+                    description: "Estamos guardando los cambios. No cierres esta página.",
+                },
+                success: {
+                    title: "Borrador guardado",
+                    description:
+                        aviso?.success ??
+                        "Puedes seguir editándolo cuando quieras. No se publicó ni se envió push a VIVI.",
+                },
+                errorTitle: "No pudimos guardar tu borrador",
+            };
+        }
+        case AccionNoticia.PUBLICAR:
+        default:
+            return {
+                confirm: {
+                    title: "¿Publicar esta noticia?",
+                    description:
+                        "La noticia se hará visible en el Portal de inmediato. La notificación push a VIVI se procesa por separado y puede tardar unos minutos. Esta acción no se puede deshacer desde aquí.",
+                    align: "left",
+                },
+                loading: {
+                    title: "Publicando tu noticia",
+                    description: "Se enviará el push a VIVI en unos segundos.",
+                },
+                success: {
+                    title: "Noticia publicada",
+                    description: "Ya está visible en el Portal.",
+                    badge: "Notificación pendiente de envío",
+                    note: "Puedes consultar si ya se envió desde el listado de noticias.",
+                },
+                errorTitle: "No pudimos publicar la noticia",
+            };
     }
 }

@@ -7,22 +7,21 @@ import { Button } from "@/components/client/atoms/Button";
 
 import styles from "./PopUp.module.scss";
 
-export const PopUp = ({
-    isOpen,
-    variant = "default",
-    title,
-    description,
-    actions,
-    onClose,
-}: PopUpProps) => {
+export const PopUp = ({ isOpen, variant = "default", title, description, actions, onClose }: PopUpProps) => {
     return (
         <PopOver isOpen={isOpen} onClose={onClose} position="center">
             <div className={styles.popUpCard}>
                 <div className={styles.header}>
-                    <h2 className={styles.title}>
-                        {title}
-                    </h2>
-                    {variant === 'default' && <IconButton icon="cross-solid" size={24} className={styles.mainIcon} onClick={onClose} borderless />}
+                    <h2 className={styles.title}>{title}</h2>
+                    {variant === "default" && (
+                        <IconButton
+                            icon="cross-solid"
+                            size={24}
+                            className={styles.mainIcon}
+                            onClick={onClose}
+                            borderless
+                        />
+                    )}
                 </div>
 
                 <div className={styles.descriptionWrapper}>
@@ -32,18 +31,22 @@ export const PopUp = ({
                 </div>
 
                 <div className={styles.actionsWrapper}>
-                    {variant === 'success' || variant === 'error' || variant === 'warning' ? (
+                    {variant === "success" || variant === "error" || variant === "warning" ? (
                         <Button
-                            color={variant === 'success' ? 'success' : variant === 'error' ? 'danger' : 'warning'}
+                            color={
+                                variant === "success" ? "success" : variant === "error" ? "danger" : "warning"
+                            }
                             onClick={onClose}
                         >
                             Cerrar
                         </Button>
-                    ) : (actions?.map((action) => (
-                        <Button key={action.text} color={action.color} onClick={action.onClick}>
-                            {action.text}
-                        </Button>
-                    )))}
+                    ) : (
+                        actions?.map((action) => (
+                            <Button key={action.text} color={action.color} onClick={action.onClick}>
+                                {action.text}
+                            </Button>
+                        ))
+                    )}
                 </div>
             </div>
         </PopOver>

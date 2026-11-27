@@ -17,7 +17,7 @@
 }
 
 .name {
-  color: #333333;
+  color: var(--tickets-text);
   font-weight: 600;
   line-height: 1.2;
   white-space: nowrap;
@@ -27,7 +27,7 @@
 }
 
 .role {
-  color: #999999;
+  color: var(--tickets-text-muted);
   font-weight: 400;
   line-height: 1.2;
   margin: 0;
@@ -47,8 +47,8 @@
   list-style: none;
   margin: 0;
   padding: 4px;
-  background: white;
-  border: 1px solid #e0e0e0;
+  background: var(--tickets-surface);
+  border: 1px solid var(--tickets-border);
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   min-width: 140px;
@@ -62,11 +62,11 @@
   p {
     margin: 0;
     font-size: 13px;
-    color: #333;
+    color: var(--tickets-text);
   }
 
   &:hover {
-    background-color: #f5f5f5;
+    background-color: var(--tickets-background);
   }
 }
 
@@ -84,8 +84,8 @@
 }
 .info .role {
   font-size: 10px;
-  color: #536ca1;
-  background: #edf1ff;
+  color: var(--tickets-text-secondary);
+  background: var(--tickets-primary-soft);
   padding: 3px 7px;
   border-radius: 4px;
   margin-top: 4px;
@@ -94,7 +94,16 @@
   border: 0;
   width: 100%;
   text-align: left;
-  background: white;
+  background: var(--tickets-surface);
+}
+@container topbar (max-width: 860px) {
+  .info {
+    display: none;
+  }
+  .userMenu {
+    gap: 5px;
+    padding: 4px;
+  }
 }
 @media (max-width: 1050px) {
   .info {

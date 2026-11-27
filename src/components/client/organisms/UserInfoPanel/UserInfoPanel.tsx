@@ -5,11 +5,7 @@ import styles from "./UserInfoPanel.module.scss";
 import classNames from "classnames";
 import { Title } from "../../atoms/Title";
 
-export const UserInfoPanel = ({
-    locations,
-    vacationDays,
-    className
-}: UserInfoPanelProps) => {
+export const UserInfoPanel = ({ locations, vacationDays, className }: UserInfoPanelProps) => {
     return (
         <div className={classNames(styles.panelCard, className)}>
             {/* Sección: Lugares a cargo */}

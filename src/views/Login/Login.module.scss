@@ -37,8 +37,9 @@
 }
 .errorText {
   color: var(--tickets-danger);
-  background: #fcecee;
+  background: var(--tickets-danger-soft);
   border: 1px solid #f0cdd3;
+  border: 1px solid light-dark(#f0cdd3, #2a3449);
   border-radius: 9px;
   padding: 12px 14px;
   line-height: 1.7;
@@ -56,6 +57,17 @@
   justify-content: center;
 }
 
-.formContainer .activationForm { gap: 18px; }
-.activationActions { display: flex; flex-wrap: wrap; gap: 8px; }
-.activationSuccess { background: #edf8f1; color: #166946; padding: 10px 12px; border-radius: 8px; }
+.formContainer .activationForm {
+  gap: 18px;
+}
+.activationActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.activationSuccess {
+  background: var(--tickets-success-soft);
+  color: var(--tickets-success);
+  padding: 10px 12px;
+  border-radius: 8px;
+}

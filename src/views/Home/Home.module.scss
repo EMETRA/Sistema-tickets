@@ -7,18 +7,19 @@
   flex-wrap: wrap;
   gap: 16px;
   padding: 24px 28px;
-  border: 1px solid #dfe6f2;
+  border: 1px solid var(--tickets-border);
   border-radius: 16px;
-  background: #fff;
-  border-left: 4px solid #4361ee;
+  background: var(--tickets-surface);
+  border-left: 4px solid var(--tickets-primary);
   h1 {
     margin: 6px 0;
-    font-size: clamp(24px, 2.2vw, 32px);
-    color: #243953;
+    font-size: clamp(24px, calc(2.2vw / var(--vp-zoom, 1)), 32px);
+    color: var(--tickets-text);
   }
   p {
     margin: 0;
-    color: #61718a;
+    color: var(--tickets-text-muted);
+    color: var(--tickets-text-secondary);
     font-size: 14px;
     line-height: 1.6;
   }
@@ -27,40 +28,43 @@
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: #596c90;
+  color: var(--tickets-text-secondary);
   font-weight: 700;
 }
 .date {
   padding: 10px 14px;
   border-radius: 10px;
-  background: #f2f5fc;
+  background: var(--tickets-background);
+  background: var(--tickets-surface-subtle);
   font-size: 12px;
-  color: #40597f;
+  color: var(--tickets-text-secondary);
 }
 .state {
   width: 100%;
   min-width: 0;
   box-sizing: border-box;
-  border: 1px solid #dfe6f2;
+  border: 1px solid var(--tickets-border);
   border-radius: 14px;
   padding: 24px;
-  background: #fff;
-  color: #61718a;
+  background: var(--tickets-surface);
+  color: var(--tickets-text-muted);
+  color: var(--tickets-text-secondary);
   p {
     margin: 0 0 12px;
     line-height: 1.6;
   }
   button {
-    border: 1px solid #cdd8ef;
+    border: 1px solid var(--tickets-border-strong);
+    border: 1px solid var(--tickets-border);
     border-radius: 8px;
     padding: 9px 14px;
-    background: #fff;
-    color: #3656af;
+    background: var(--tickets-surface);
+    color: var(--tickets-info);
     cursor: pointer;
     font: inherit;
   }
   button:focus-visible {
-    outline: 3px solid #92a2fa;
+    outline: 3px solid color-mix(in srgb, var(--tickets-primary) 35%, var(--tickets-surface));
     outline-offset: 3px;
   }
 }

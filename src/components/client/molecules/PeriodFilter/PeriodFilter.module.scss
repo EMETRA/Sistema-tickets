@@ -1,0 +1,91 @@
+.period {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  min-width: 0;
+}
+.label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--tickets-text-secondary);
+}
+// Control segmentado: un grupo, una selección visible.
+.segmented {
+  display: inline-flex;
+  flex-wrap: wrap;
+  padding: 3px;
+  gap: 2px;
+  border-radius: 10px;
+  background: var(--tickets-neutral-soft);
+  button {
+    border: 0;
+    background: none;
+    padding: 6px 12px;
+    border-radius: 7px;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--tickets-text-secondary);
+    cursor: pointer;
+    white-space: nowrap;
+    transition:
+      background-color 0.15s ease,
+      color 0.15s ease;
+    &:hover:not(:disabled):not([aria-pressed="true"]) {
+      color: var(--tickets-text);
+      background: color-mix(in srgb, var(--tickets-surface) 85%, transparent);
+    }
+    &[aria-pressed="true"] {
+      background: var(--tickets-surface);
+      color: var(--tickets-text);
+      font-weight: 600;
+      box-shadow: 0 1px 2px #1a2b4a1f;
+    }
+    &:focus-visible {
+      outline: 2px solid var(--tickets-primary);
+      outline-offset: 1px;
+    }
+    &:disabled {
+      cursor: wait;
+    }
+  }
+}
+.range {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--tickets-text-secondary);
+  }
+  input {
+    min-height: 32px;
+    padding: 4px 8px;
+    border: 1px solid var(--tickets-border);
+    border-radius: 8px;
+    background: var(--tickets-surface);
+    color: var(--tickets-text);
+    font: inherit;
+    font-size: 12px;
+    font-weight: 500;
+    &:focus {
+      outline: none;
+      border-color: var(--tickets-primary);
+      box-shadow: var(--tickets-focus);
+    }
+  }
+}
+.dash {
+  color: var(--tickets-text-muted);
+}
+.invalid {
+  flex-basis: 100%;
+  font-size: 12px;
+  color: var(--tickets-danger);
+}

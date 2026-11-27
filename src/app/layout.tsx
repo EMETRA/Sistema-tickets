@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import { THEME_BOOT_SCRIPT } from "@/platform/theme";
+import { ThemeAttributes } from "@/platform/theme-attributes";
 
 // const geistSans = Geist({
 //     variable: "--font-geist-sans",
@@ -33,15 +35,19 @@ export const metadata: Metadata = {
     description: "Portal administrativo para la gestión de tickets del departamento de informática de EMETRA",
 };
 
-
 export default function RootLayout({
     children,
 }: Readonly<{
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en">
+        <html lang="es" suppressHydrationWarning>
+            <head>
+                {/* Aplica el tema guardado antes del primer pintado. */}
+                <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
+            </head>
             <body className={montserrat.variable}>
+                <ThemeAttributes />
                 {children}
             </body>
         </html>

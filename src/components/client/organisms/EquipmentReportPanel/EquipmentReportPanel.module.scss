@@ -1,54 +1,55 @@
 @use "../../../../theme/surfaces.scss" as surfaces;
 .reportCard {
-    background-color: #FFFFFF;
-    border: 1px solid #E0E0E0;
-    border-radius: 16px;
-    display: flex;
-    padding: 32px;
-    gap: 32px;
-    width: 100%;
-    max-width: 1000px;
+  background-color: var(--tickets-surface);
+  border: 1px solid var(--tickets-border);
+  border-radius: 16px;
+  display: flex;
+  padding: 32px;
+  gap: 32px;
+  width: 100%;
+  max-width: 1000px;
 }
 
 .statusSection {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 200px;
 
-    .title {
-        align-self: flex-start;
-        margin-bottom: 24px;
-        font-size: 18px;
-        color: var(--tickets-text);
-    }
+  .title {
+    align-self: flex-start;
+    margin-bottom: 24px;
+    font-size: 18px;
+    color: var(--tickets-text);
+  }
 
-    .ringWrapper {
-        margin-bottom: 16px;
-        :global(.ProgressRing_progressRing__svg) { 
-        stroke: #99cc33; 
-        }
+  .ringWrapper {
+    margin-bottom: 16px;
+    :global(.ProgressRing_progressRing__svg) {
+      stroke: #99cc33;
     }
+  }
 
-    .statusText {
-        color: var(--tickets-text-secondary);
-    }
+  .statusText {
+    color: var(--tickets-text-secondary);
+  }
 }
 
 .divider {
-    width: 1px;
-    background-color: #E0E0E0;
-    align-self: stretch;
+  width: 1px;
+  background-color: var(--tickets-neutral-soft);
+  background-color: var(--tickets-background);
+  align-self: stretch;
 }
 
 .gridSection {
-    flex: 1;
-    display: grid;
-    // Usamos el gap horizontal que discutimos antes
-    grid-template-columns: repeat(2, 1fr);
-    column-gap: 20px;
-    row-gap: 12px;
-    align-content: center;
+  flex: 1;
+  display: grid;
+  // Usamos el gap horizontal que discutimos antes
+  grid-template-columns: repeat(2, 1fr);
+  column-gap: 20px;
+  row-gap: 12px;
+  align-content: center;
 }
 .reportCard {
   @include surfaces.panel;

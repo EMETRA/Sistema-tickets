@@ -13,10 +13,7 @@ const AlertBar = ({ duration, color, className }: AlertBarProps) => {
 
     return (
         <div className={classNames(styles.container, className)} role="progressbar">
-            <div 
-                className={styles.bar} 
-                style={dynamicStyles}
-            />
+            <div className={styles.bar} style={dynamicStyles} />
         </div>
     );
 };

@@ -1,0 +1,64 @@
+# Arquitectura del Panel institucional
+
+| Tema | Guía |
+| --- | --- |
+| Capas: sistema de diseño (Atomic Design) y áreas de negocio | [`src/features/README.md`](../../src/features/README.md) |
+| Colores y medidas desde una sola fuente | `src/theme/tokens.json` → `pnpm tokens` |
+| Lectura del API (TanStack Query) | [consultas.md](consultas.md) |
+| Formularios (react-hook-form + zod) | [formularios.md](formularios.md) |
+| Accesibilidad verificada (Playwright + axe, Storybook) | [accesibilidad.md](accesibilidad.md) |
+
+## Colores
+
+Los estilos usan los tokens del tema (`var(--tickets-text)`, `var(--tickets-border)`, …): así siguen al
+modo oscuro y al alto contraste sin `light-dark()` ni reglas por tema en cada archivo. Para un tono
+intermedio usa `color-mix()` sobre tokens, por ejemplo
+`color-mix(in srgb, var(--tickets-primary) 35%, var(--tickets-surface))`.
+
+Quedan colores heredados (gráficas, transparencias, módulos antiguos). `scripts/tokens/colores-base.json`
+guarda cuántos tiene cada archivo; `pnpm tokens:check` falla si alguno suma más. Al quitar colores,
+`node scripts/tokens/colores.cjs --base` fija la nueva base.
+
+## Comandos de calidad (los mismos que corre CI)
+
+```bash
+pnpm format:check      # Prettier
+pnpm tokens:check      # tokens.css y colors.scss al día; ningún archivo suma colores escritos a mano
+pnpm lint              # ESLint (incluye la frontera sistema de diseño ↔ áreas)
+pnpm typecheck         # TypeScript
+pnpm test:integracion  # pruebas de Node
+pnpm build-storybook   # Storybook compila
+pnpm e2e               # Playwright + axe sobre el laboratorio local
+pnpm build && pnpm test:navegador  # flujos de negocio con API simulado (Playwright)
+```
+
+CI: `.github/workflows/ci.yml` (pull requests y pushes a Dev y main, Node 20 como producción).
+Para que Git ignore el commit de formato en `git blame`:
+
+```bash
+git config blame.ignoreRevsFile .git-blame-ignore-revs
+```
+
+## Pruebas de navegador por flujo
+
+`test/integracion/*-browser.cjs` recorren flujos de negocio completos (tickets, RRHH, inventario,
+CCT, Juzgado, Office, permisos…) con Next compilado y un API simulado propio de cada prueba.
+`pnpm build && pnpm test:navegador` las ejecuta en orden (`pnpm test:navegador cct juzgado` filtra).
+Usan el Chromium de Playwright (`pnpm e2e:instalar`); `laboratorio-browser.cjs` necesita
+`pnpm laboratorio` en marcha y las que leen código del API (`catalogo-etiquetas`, `modulos`,
+`metricas-funciones`, `office-preview`, `ticket-admin`, `inventario-boletas`) piden
+`API_TICKETS_DIR` con el API compilado (`pnpm build` en api-tickets).
+
+## Contrato con api-tickets
+
+`pnpm contrato` compara el panel con el API (por defecto `../../apis/api-tickets`; otra ruta con
+`API_TICKETS_DIR=...`). Usa la rama que corresponde: **QA** para `Dev`, **main** para `main`.
+
+- `scripts/sincronizar-definiciones.cjs <api> [--check]`: definiciones de recursos → fixture del
+  laboratorio y las pruebas (`test/fixtures/platform-definitions.json`).
+- `scripts/contrato-api.cjs <api>`: cada ruta `/platform/...` que llama el panel existe en el API.
+- `scripts/contrato-graphql.cjs <api>`: cada consulta y mutación GraphQL valida contra `src/schema.gql`.
+  Diferencias conocidas del API, con su motivo, en `scripts/contrato-graphql.excepciones.json`.
+
+En CI corre si el repositorio tiene el secreto `API_TICKETS_TOKEN` (lectura de `EMETRA/api-tickets`).
+El laboratorio valida los registros con las mismas reglas que `platform.validation.ts` del API.

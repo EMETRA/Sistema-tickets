@@ -11,24 +11,18 @@ export const EquipmentReportPanel = ({
     percentage,
     statusLabel = "Estado del equipo",
     items,
-    className
+    className,
 }: EquipmentReportPanelProps) => {
     return (
         <div className={classNames(styles.reportCard, className)}>
             {/* Sección Izquierda: Estado Circular */}
             <div className={styles.statusSection}>
-                <Title className={styles.title}>
-                    Reporte Equipo
-                </Title>
-                
+                <Title className={styles.title}>Reporte Equipo</Title>
+
                 <div className={styles.ringWrapper}>
-                    <ProgressRing 
-                        percentage={percentage} 
-                        size={160} 
-                        strokeWidth={12}
-                    />
+                    <ProgressRing percentage={percentage} size={160} strokeWidth={12} />
                 </div>
-                
+
                 <Text variant="body" className={styles.statusText}>
                     {statusLabel}
                 </Text>
@@ -40,10 +34,7 @@ export const EquipmentReportPanel = ({
             {/* Sección Derecha: Grid de Equipos */}
             <div className={styles.gridSection}>
                 {items.map((item, index) => (
-                    <EquipmentItem 
-                        key={index}
-                        {...item}
-                    />
+                    <EquipmentItem key={index} {...item} />
                 ))}
             </div>
         </div>

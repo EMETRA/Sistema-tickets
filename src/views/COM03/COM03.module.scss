@@ -17,14 +17,14 @@
 
 .heading.heading {
   font-size: 1.5rem;
-  color: $negro-2;
+  color: var(--tickets-text);
 }
 .content {
   box-sizing: border-box;
   width: 100%;
   min-width: 0;
   min-height: 100%;
-  padding: clamp(16px, 2.5vw, 32px);
+  padding: clamp(16px, calc(2.5vw / var(--vp-zoom, 1)), 32px);
   gap: 20px;
   background: var(--tickets-background);
   container: news / inline-size;

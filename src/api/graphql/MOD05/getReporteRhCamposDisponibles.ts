@@ -1,6 +1,6 @@
 /**
  * Query GraphQL para obtener catálogo de campos disponibles para reporte RRHH
- * 
+ *
  * Retorna:
  * - codigo
  * - etiqueta

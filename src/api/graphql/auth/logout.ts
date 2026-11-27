@@ -1,6 +1,6 @@
 /**
  * Logout Mutation
- * 
+ *
  */
 
 // export const LOGOUT_MUTATION = `

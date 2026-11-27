@@ -7,22 +7,24 @@ const meta: Meta<typeof NavItem> = {
     // El Decorator envuelve a todas las historias de este archivo
     decorators: [
         (Story) => (
-            <div style={{ 
-                backgroundColor: '#4361EE', 
-                padding: '40px', 
-                display: 'inline-flex', 
-                justifyContent: 'center',
-                alignItems: 'center',
-                minHeight: '200px',
-                minWidth: '200px'
-            }}>
+            <div
+                style={{
+                    backgroundColor: "#4361EE",
+                    padding: "40px",
+                    display: "inline-flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    minHeight: "200px",
+                    minWidth: "200px",
+                }}
+            >
                 <Story />
             </div>
         ),
     ],
     parameters: {
-        backgrounds: { default: 'dark' } 
-    }
+        backgrounds: { default: "dark" },
+    },
 };
 
 export default meta;

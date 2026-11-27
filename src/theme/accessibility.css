@@ -1,0 +1,59 @@
+/* ── Accesibilidad (Ajustes → Accesibilidad) ─────────────────────────────
+   Atributos en <html> puestos por platform/theme.ts antes del primer pintado. */
+
+/* Tamaño del texto. El panel usa medidas en px, así que se escala la
+   interfaz completa (como el zoom del navegador): texto, botones y áreas
+   táctiles crecen juntos y nada se encima.
+   Bajo zoom, vh/vw también se multiplican: los estilos dividen esas unidades
+   entre --vp-zoom. El valor de aquí es el esperado; platform/theme.ts lo mide
+   en el navegador y lo corrige si el motor no escala esas unidades. */
+:root {
+  --vp-zoom: 1;
+}
+:root[data-text-size="large"] {
+  --vp-zoom: 1.125;
+  zoom: 1.125;
+}
+:root[data-text-size="xlarge"] {
+  --vp-zoom: 1.25;
+  zoom: 1.25;
+}
+@media (max-width: 640px) {
+  :root[data-text-size="large"] {
+    --vp-zoom: 1.06;
+    zoom: 1.06;
+  }
+  :root[data-text-size="xlarge"] {
+    --vp-zoom: 1.12;
+    zoom: 1.12;
+  }
+}
+
+/* Alto contraste: los colores están en tokens.css (generado desde tokens.json);
+   aquí solo el foco más grueso y los enlaces subrayados. */
+:root[data-contrast="more"] :focus-visible {
+  outline-width: 3px !important;
+  outline-offset: 2px;
+}
+:root[data-contrast="more"] :is(p, dd, li, td) a[href] {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Reducir animaciones (además de la preferencia del sistema operativo). */
+:root[data-motion="reduce"] *,
+:root[data-motion="reduce"] *::before,
+:root[data-motion="reduce"] *::after {
+  scroll-behavior: auto !important;
+  transition-duration: 0.01ms !important;
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+}
+
+/* Sin transiciones hasta que el panel termina de cargar: evita que el modo
+   oscuro o el tamaño de letra se vean «llegar» desde el tema claro. */
+:root:not([data-ready]) *,
+:root:not([data-ready]) *::before,
+:root:not([data-ready]) *::after {
+  transition: none !important;
+}

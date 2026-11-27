@@ -23,4 +23,4 @@ export const StatusCard: React.FC<StatusCardProps> = ({ label, value, variant, c
     );
 };
 
-export default StatusCard;  
+export default StatusCard;

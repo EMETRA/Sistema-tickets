@@ -16,14 +16,14 @@ interface MarkdownStorage {
     };
 }
 
-export const RichTextField: React.FC<RichTextFieldProps> = ({ 
-    value, 
-    onChange, 
+export const RichTextField: React.FC<RichTextFieldProps> = ({
+    value,
+    onChange,
     className,
     placeholder,
     id,
     label,
-    readOnly = false
+    readOnly = false,
 }) => {
     const editor = useEditor({
         extensions: [
@@ -63,7 +63,7 @@ export const RichTextField: React.FC<RichTextFieldProps> = ({
         if (!editor) return;
         const storage = editor.storage as unknown as MarkdownStorage;
         const markdown = storage.markdown.getMarkdown();
-        
+
         // Solo actualizamos si el cambio viene de afuera y es distinto
         if (value !== markdown) {
             editor.commands.setContent(value);

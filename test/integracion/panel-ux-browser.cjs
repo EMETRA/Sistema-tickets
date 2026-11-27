@@ -3,7 +3,7 @@ const assert=require('node:assert/strict');
 const http=require('node:http');
 const {once}=require('node:events');
 const {spawn}=require('node:child_process');
-const fs=require('node:fs/promises');
+const fs=require('node:fs/promises');const os=require('node:os');
 const path=require('node:path');
 const {chromium}=require('playwright');
 async function run(){
@@ -42,18 +42,20 @@ async function run(){
  try{
   for(let i=0;!output.includes('Ready in')&&i<200;i++){if(next.exitCode!==null)throw new Error(output);await new Promise(r=>setTimeout(r,100));}
   assert.ok(output.includes('Ready in'));
-  browser=await chromium.launch({executablePath:process.env.QA_CHROMIUM_PATH||'/usr/bin/chromium',args:['--no-sandbox','--disable-dev-shm-usage']});
+  browser=await chromium.launch({executablePath:process.env.QA_CHROMIUM_PATH||undefined,args:['--no-sandbox','--disable-dev-shm-usage']});
   const context=await browser.newContext({viewport:{width:1600,height:1050}});page=await context.newPage();page.on('console',msg=>{if(msg.type()==='error')browserErrors.push(msg.text());});page.on('pageerror',err=>browserErrors.push(err.message));
   await page.route('**/*',route=>new URL(route.request().url()).hostname==='127.0.0.1'?route.continue():route.abort());
   await page.goto('http://127.0.0.1:3851/login');
   await context.addCookies([{name:'auth_token',value:'qa-token-controlado',url:'http://127.0.0.1:3851'},{name:'auth_role',value:'USUARIO',url:'http://127.0.0.1:3851'}]);
   await page.evaluate(user=>localStorage.setItem('auth-storage',JSON.stringify({state:{token:'qa-token-controlado',user,userId:user.id_usuario},version:0})),user);
-  const out=process.env.QA_SCREENSHOT_DIR||'/workspace/artifacts/panel-inicio-noticias';await fs.mkdir(out,{recursive:true});
+  const out=process.env.QA_SCREENSHOT_DIR||path.join(os.tmpdir(),'panel-inicio-noticias');await fs.mkdir(out,{recursive:true});
   const fits=async()=>assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'La página no debe desbordar horizontalmente');
   await page.goto('http://127.0.0.1:3851/home');await page.getByText('Actividad de prueba controlada',{exact:true}).waitFor();
   await page.getByRole('heading',{name:'Hola, Usuario'}).waitFor();
   for(const width of [1920,1440,1024,768,390]){await page.setViewportSize({width,height:1050});await fits();}
   await page.setViewportSize({width:1600,height:1050});await page.locator('main').evaluate(el=>{el.scrollTop=0});await page.waitForLoadState('networkidle');await page.screenshot({path:path.join(out,'inicio-escritorio.png')});
+  // Acceso previo al módulo (ModuleAccessGate) autorizado; esta prueba revisa la interfaz de Noticias.
+  await page.route('**/api/platform/module-access/**',route=>route.fulfill({json:{moduloId:decodeURIComponent(route.request().url().split('/').pop()),allowed:true,actions:{LEER:true,INSERTAR:true,EDITAR:true,ELIMINAR:false}}}));
   const newsUrl='http://127.0.0.1:3851/home/comunicacion/contenido/noticias';await page.goto(newsUrl);
   await page.getByRole('button',{name:'Reintentar noticias'}).waitFor();
   assert.equal(await page.getByText('No hay noticias que coincidan con el filtro.',{exact:true}).count(),0);

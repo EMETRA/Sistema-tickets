@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { apiFetch } from "@/api/graphql/client";
-import type { GetTicketTagsResponse, TicketTag } from '@/api/graphql/tickets';
+import type { TicketTag } from '@/api/graphql/tickets';
 
 export function useGetTicketTags(initialTicketId?: string) {
     const [data, setData] = useState<TicketTag[]>([]);

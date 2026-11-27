@@ -2,11 +2,10 @@ import { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { FormField } from "./";
 import { Input } from "../../atoms/Input";
 
-
 const meta = {
     title: "Molecules/FormField",
     component: FormField,
-    tags: ["autodocs"]
+    tags: ["autodocs"],
 } satisfies Meta<typeof FormField>;
 
 export default meta;
@@ -18,8 +17,6 @@ export const Default: Story = {
         label: "Email",
         htmlFor: "email",
         required: true,
-        children: (
-            <Input id="email" placeholder="email@ejemplo.com" />
-        )
-    }
+        children: <Input id="email" placeholder="email@ejemplo.com" />,
+    },
 };

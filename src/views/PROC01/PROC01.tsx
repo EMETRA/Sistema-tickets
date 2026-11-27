@@ -1,27 +1,27 @@
 "use client";
 
-import React, { useState } from 'react';
-import { Title } from '../../components/client/atoms/Title';
-import { FormField } from '../../components/client/molecules/FormField';
-import { Input } from '../../components/client/atoms/Input';
-import { Button } from '../../components/client/atoms/Button';
-import { Card } from '../../components/client/atoms/Card';
-import { Select } from '../../components/client/atoms/Select';
+import React, { useState } from "react";
+import { Title } from "../../components/client/atoms/Title";
+import { FormField } from "../../components/client/molecules/FormField";
+import { Input } from "../../components/client/atoms/Input";
+import { Button } from "../../components/client/atoms/Button";
+import { Card } from "../../components/client/atoms/Card";
+import { Select } from "../../components/client/atoms/Select";
 
-import styles from './PROC01.module.scss';
-import type { ProcessConfig } from './types';
-import { useExecuteLprRemission } from '@/api/hooks';
+import styles from "./PROC01.module.scss";
+import type { ProcessConfig } from "./types";
+import { useExecuteLprRemission } from "@/api/hooks";
 
 const PROCESS_CONFIG: Record<string, ProcessConfig> = {
-    semaforos: { label: 'Semáforos', requiresUser: true, requiresCorrelative: true },
-    kapsch: { label: 'Kapsch', requiresUser: false, requiresCorrelative: false },
-    via: { label: 'Via', requiresUser: true, requiresCorrelative: false },
-    neural: { label: 'Neural', requiresUser: false, requiresCorrelative: false },
-    notificaciones: { label: 'Notificaciones', requiresUser: true, requiresCorrelative: true },
+    semaforos: { label: "Semáforos", requiresUser: true, requiresCorrelative: true },
+    kapsch: { label: "Kapsch", requiresUser: false, requiresCorrelative: false },
+    via: { label: "Via", requiresUser: true, requiresCorrelative: false },
+    neural: { label: "Neural", requiresUser: false, requiresCorrelative: false },
+    notificaciones: { label: "Notificaciones", requiresUser: true, requiresCorrelative: true },
 };
 
 const PROC01: React.FC = () => {
-    const { executeLprRemission, loading, error} = useExecuteLprRemission();
+    const { executeLprRemission, loading, error } = useExecuteLprRemission();
 
     const [processResult, setProcessResult] = useState({
         totalProcesados: "—",
@@ -29,24 +29,27 @@ const PROC01: React.FC = () => {
         totalFallidos: "—",
     });
 
-    const [validation, setValidation] = useState('');
-    const [selectedProcess, setSelectedProcess] = useState<string>('');
-    const [usuario, setUsuario] = useState<string>('');
-    const [correlativo, setCorrelativo] = useState<string>('');
+    const [validation, setValidation] = useState("");
+    const [selectedProcess, setSelectedProcess] = useState<string>("");
+    const [usuario, setUsuario] = useState<string>("");
+    const [correlativo, setCorrelativo] = useState<string>("");
 
     const currentProcess = selectedProcess ? PROCESS_CONFIG[selectedProcess] : null;
 
     const handleExecute = async () => {
         if (loading) return;
-        setValidation('');
-        if (!selectedProcess) { setValidation('Selecciona el proceso que deseas ejecutar.'); return; }
+        setValidation("");
+        if (!selectedProcess) {
+            setValidation("Selecciona el proceso que deseas ejecutar.");
+            return;
+        }
 
         if (currentProcess?.requiresUser && !usuario) {
-            setValidation('Por favor, ingrese el usuario requerido para este proceso.');
+            setValidation("Por favor, ingrese el usuario requerido para este proceso.");
             return;
         }
         if (currentProcess?.requiresCorrelative && !correlativo) {
-            setValidation('Por favor, ingrese el correlativo requerido para este proceso.');
+            setValidation("Por favor, ingrese el correlativo requerido para este proceso.");
             return;
         }
 
@@ -69,18 +72,24 @@ const PROC01: React.FC = () => {
     return (
         <div className={styles.mainContainer}>
             <div className={styles.formContainer}>
-                <Title variant="mid" tag="h3" className={styles.title}>Escoger Proceso</Title>
+                <Title variant="mid" tag="h3" className={styles.title}>
+                    Escoger Proceso
+                </Title>
                 {validation && <p role="alert">{validation}</p>}
-                {error && <p role="alert">No se pudo completar el proceso. Conservamos los parámetros para que reintentes.</p>}
-                
+                {error && (
+                    <p role="alert">
+                        No se pudo completar el proceso. Conservamos los parámetros para que reintentes.
+                    </p>
+                )}
+
                 <FormField label="Proceso" htmlFor="proceso" required>
                     <Select
                         id="proceso"
                         value={selectedProcess}
                         onChange={(e) => {
                             setSelectedProcess(e.target.value);
-                            setUsuario('');
-                            setCorrelativo('');
+                            setUsuario("");
+                            setCorrelativo("");
                         }}
                         options={Object.entries(PROCESS_CONFIG).map(([key, config]) => ({
                             label: config.label,
@@ -146,7 +155,7 @@ const PROC01: React.FC = () => {
                 />
             </div>
         </div>
-    )
-}
+    );
+};
 
 export default PROC01;

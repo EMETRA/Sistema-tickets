@@ -9,13 +9,11 @@ export const MaintenanceRecordPanel = ({
     lastMaintenance,
     nextMaintenance,
     observations,
-    className
+    className,
 }: MaintenanceRecordPanelProps) => {
     return (
         <div className={classNames(styles.card, className)}>
-            <Title className={styles.title}>
-                Registros de Mantenimiento
-            </Title>
+            <Title className={styles.title}>Registros de Mantenimiento</Title>
 
             <div className={styles.records}>
                 <div className={styles.row}>
@@ -23,7 +21,7 @@ export const MaintenanceRecordPanel = ({
                         Ultimo Mantenimiento:
                     </Text>
                     <div className={styles.dateInfo}>
-                        <Icon name="calendar-regular" size={20} color="#A9A9A9" />
+                        <Icon name="calendar-regular" size={20} color="var(--tickets-text-muted)" />
                         <Text variant="muted">{lastMaintenance}</Text>
                     </div>
                 </div>
@@ -32,7 +30,7 @@ export const MaintenanceRecordPanel = ({
                         Proximo Mantenimiento:
                     </Text>
                     <div className={styles.dateInfo}>
-                        <Icon name="calendar-regular" size={20} color="#A9A9A9" />
+                        <Icon name="calendar-regular" size={20} color="var(--tickets-text-muted)" />
                         <Text variant="muted">{nextMaintenance}</Text>
                     </div>
                 </div>

@@ -3,23 +3,30 @@
   font-family: inherit;
   box-sizing: border-box;
   outline: none;
-  background: #ffffff;
-  border: 1px solid var(--tickets-border, #dfe5f2);
+  background: var(--tickets-surface);
+  border: 1px solid var(--tickets-border);
   border-radius: 8px;
-  padding: 12px 13px;
+  min-height: var(--tickets-control-height, 38px);
+  padding: 9px 12px;
   font-weight: 400;
   width: 100%;
   min-width: 0;
-  color: var(--tickets-text, #263b58);
-  font-size: 14px;
-  transition: border-color 0.2s ease;
+  color: var(--tickets-text);
+  font-size: 13px;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
 
   &::placeholder {
-    color: #a9a9a9;
+    color: var(--tickets-text-muted);
+  }
+
+  &:hover:not(:focus):not([disabled]) {
+    border-color: var(--tickets-border-strong);
   }
 
   &:focus {
-    border-color: var(--tickets-primary, #4361ee);
+    border-color: var(--tickets-primary);
     box-shadow: var(--tickets-focus);
     outline: none;
   }
@@ -43,7 +50,7 @@
 
 // Input con error
 .InputError {
-  border-color: #ff4444 !important;
+  border-color: var(--tickets-danger) !important;
 }
 
 // Contenedor base
@@ -81,7 +88,7 @@
   justify-content: center;
   gap: 16px;
   padding: 32px;
-  border: 3px dashed #4361ee;
+  border: 3px dashed var(--tickets-primary);
   border-radius: 14px;
   background: #4361ee0f;
   cursor: pointer;
@@ -89,12 +96,13 @@
   min-height: 200px;
 
   &:hover {
-    background: #f8f9ff;
+    background: var(--tickets-surface-subtle);
+    background: var(--tickets-info-soft);
     border-color: #0e3cc1;
   }
 
   &:focus {
-    outline: 2px solid #4361ee;
+    outline: 2px solid var(--tickets-primary);
     outline-offset: 2px;
   }
 }
@@ -126,14 +134,14 @@
 .FileMainText {
   margin: 0;
   font-size: 16px;
-  color: var(--tickets-text, #263b58);
+  color: var(--tickets-text);
   font-weight: 400;
 }
 
 .FileLinkText {
   margin: 0;
   font-size: 16px;
-  color: #4361ee;
+  color: var(--tickets-primary);
   font-weight: 600;
   text-decoration: underline;
 }
@@ -141,13 +149,13 @@
 .FileSizeText {
   margin: 0;
   font-size: 12px;
-  color: #a9a9a9;
+  color: var(--tickets-text-muted);
   font-weight: 400;
   margin-top: 4px;
 }
 
 .Icon {
-  color: #4361ee;
+  color: var(--tickets-primary);
 }
 
 // IconButton para password
@@ -183,7 +191,7 @@
 // Mensaje de error
 .ErrorMessage {
   display: block;
-  color: #ff4444;
+  color: var(--tickets-danger);
   font-size: 12px;
   margin-top: 4px;
   padding-left: 2px;

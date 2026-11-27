@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useEffectEvent } from "react";
 import { Button } from "@/components/client/atoms/Button";
 import { platformFetch } from "@/platform/client";
 import type { CctPage, CctRow } from "@/platform/cct";
@@ -35,28 +35,25 @@ export function CctAgentAssignments({ agente }: { agente: CctRow }) {
             if (!c.signal.aborted) setBusy(false);
         }
     }
+    // Carga inicial con la versión más reciente de load (sin repetir el efecto).
+    const loadOnChange = useEffectEvent(() => void load());
     useEffect(() => {
-        if (agente.TIPO_AGENTE) void load();
-        return () => request.current?.abort();
+        if (agente.TIPO_AGENTE) loadOnChange();
+        const current = request;
+        return () => current.current?.abort();
     }, [agente.TIPO_AGENTE, agente.CHAPA]);
     return (
         <section aria-label="Asignaciones de remisiones">
             <h3>Asignaciones de remisiones</h3>
             {!agente.TIPO_AGENTE ? (
-                <p>
-                    Falta el tipo del agente en el catálogo para enlazar sus
-                    talonarios con certeza.
-                </p>
+                <p>Falta el tipo del agente en el catálogo para enlazar sus talonarios con certeza.</p>
             ) : (
                 <>
                     {busy && <p role="status">Consultando talonarios…</p>}
                     {error && (
                         <div role="alert" className={styles.error}>
                             {error}
-                            <Button
-                                variant="outlined"
-                                onClick={() => void load(data?.offset || 0)}
-                            >
+                            <Button variant="outlined" onClick={() => void load(data?.offset || 0)}>
                                 Reintentar asignaciones
                             </Button>
                         </div>
@@ -77,11 +74,7 @@ export function CctAgentAssignments({ agente }: { agente: CctRow }) {
                                     "FECHA_FINAL",
                                 ]}
                             />
-                            <CctPager
-                                data={data}
-                                disabled={busy}
-                                onPage={(offset) => void load(offset)}
-                            />
+                            <CctPager data={data} disabled={busy} onPage={(offset) => void load(offset)} />
                         </>
                     )}
                 </>

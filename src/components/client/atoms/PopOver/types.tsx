@@ -1,7 +1,13 @@
-export type PopOverPosition = 
-    | "center" 
-    | "top" | "bottom" | "left" | "right"
-    | "top-left" | "top-right" | "bottom-left" | "bottom-right";
+export type PopOverPosition =
+    | "center"
+    | "top"
+    | "bottom"
+    | "left"
+    | "right"
+    | "top-left"
+    | "top-right"
+    | "bottom-left"
+    | "bottom-right";
 
 export interface PopOverProps {
     /** Estado de visibilidad controlado desde el padre */

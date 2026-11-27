@@ -1,0 +1,49 @@
+.card {
+  padding: 20px 24px;
+  background: var(--tickets-surface);
+  border: 1px solid var(--tickets-border);
+  border-radius: 16px;
+  color: var(--tickets-text);
+  h2 {
+    margin: 0 0 18px;
+    font-size: 16px;
+  }
+}
+.details,
+.compact {
+  margin: 0;
+  display: grid;
+  gap: 14px;
+  font-size: 13px;
+  line-height: 1.5;
+  dt {
+    color: var(--tickets-text-muted);
+    color: var(--tickets-text-secondary);
+    font-size: 12px;
+    margin-bottom: 3px;
+  }
+  dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+  dd span {
+    display: block;
+    font-weight: 600;
+    color: var(--tickets-text);
+  }
+  time {
+    display: block;
+    font-size: 11px;
+    color: var(--tickets-text-muted);
+    color: var(--tickets-text-secondary);
+    margin-top: 2px;
+  }
+}
+.details {
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+}
+.compact {
+  min-width: 180px;
+  max-width: 260px;
+  gap: 10px;
+}

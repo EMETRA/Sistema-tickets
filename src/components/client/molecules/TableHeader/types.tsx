@@ -4,18 +4,18 @@ import type { IconNameInput } from "../../atoms/Icon/types";
  * Props del componente TableHeader
  */
 export interface TableHeaderProps {
-  /**
-   * Nombre del ícono a mostrar
-   */
-  iconName: IconNameInput;
+    /**
+     * Nombre del ícono a mostrar
+     */
+    iconName: IconNameInput;
 
-  /**
-   * Texto del encabezado
-   */
-  label: string;
+    /**
+     * Texto del encabezado
+     */
+    label: string;
 
-  /**
-   * Clase CSS adicional para el contenedor
-   */
-  className?: string;
+    /**
+     * Clase CSS adicional para el contenedor
+     */
+    className?: string;
 }

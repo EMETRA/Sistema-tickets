@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import {usePlatform} from "@/platform/context";
-import {platformSections} from "@/platform/navigation";
-import {useRouter} from "next/navigation";
+import { usePlatform } from "@/platform/context";
+import { platformSections } from "@/platform/navigation";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useMemo } from "react";
 import { FilterUsersBar } from "@/components/client/organisms/FilterUsersBar";
 import style from "./Team.module.scss";
@@ -23,34 +23,35 @@ const LegacyTeam: React.FC = () => {
     const userDepartmentId = useMemo(() => {
         if (!userDepartamento || !departments.length) return undefined;
         const match = departments.find(
-            d => d.nombre_departamento.toLowerCase() === userDepartamento.toLowerCase()
+            (d) => d.nombre_departamento.toLowerCase() === userDepartamento.toLowerCase(),
         );
         return match ? parseInt(match.id_departamento, 10) : undefined;
     }, [userDepartamento, departments]);
 
     const isReady = !loadingDepartments && userDepartmentId !== undefined;
 
-    const { data: teamMembers, loading: isLoading, error: errorMembers } = useGetTeamMembers(
-        { id_departamento: userDepartmentId },
-        isReady
-    );
+    const {
+        data: teamMembers,
+        loading: isLoading,
+        error: errorMembers,
+    } = useGetTeamMembers({ id_departamento: userDepartmentId }, isReady);
 
     if (loadingDepartments || isLoading) {
         return <div className={style.mainContainer}>Cargando usuarios...</div>;
     }
 
-
     const error = errorMembers ? "No fue posible cargar los usuarios" : "";
 
-    const users: UserCardProps[] = teamMembers?.map(member => ({
-        id: member.id_usuario.toString(),
-        name: member.nombre || "Sin nombre",
-        email: "Sin email",
-        role: member.rol || "Sin rol",
-        department: member.departamento || "Sin departamento",
-        assignedCount: member.tickets_asignados,
-        resolvedCount: member.tickets_resueltos,
-    })) || [];
+    const users: UserCardProps[] =
+        teamMembers?.map((member) => ({
+            id: member.id_usuario.toString(),
+            name: member.nombre || "Sin nombre",
+            email: "Sin email",
+            role: member.rol || "Sin rol",
+            department: member.departamento || "Sin departamento",
+            assignedCount: member.tickets_asignados,
+            resolvedCount: member.tickets_resueltos,
+        })) || [];
 
     const filteredUsers = users.filter((user) => {
         const matchesCategory =
@@ -65,19 +66,23 @@ const LegacyTeam: React.FC = () => {
         return matchesCategory && matchesSearch;
     });
 
-
     if (isLoading) {
-        return <div className={style.mainContainer}>Cargando usuarios...</div>
+        return <div className={style.mainContainer}>Cargando usuarios...</div>;
     }
 
     if (error) {
-        return <div className={style.mainContainer}>{error}</div>
+        return <div className={style.mainContainer}>{error}</div>;
     }
 
     return (
         <div className={style.mainContainer}>
             <div className={style.teamContainer}>
-                {!isReady && <p role="status">Tu unidad no está vinculada al catálogo de departamentos. Informática puede revisar el personal y sus bienes en Personal y equipos.</p>}
+                {!isReady && (
+                    <p role="status">
+                        Tu unidad no está vinculada al catálogo de departamentos. Informática puede revisar el
+                        personal y sus bienes en Personal y equipos.
+                    </p>
+                )}
                 <FilterUsersBar
                     variant="categories"
                     searchValue={search}
@@ -93,12 +98,7 @@ const LegacyTeam: React.FC = () => {
                     disabled={isLoading || !!error || users.length === 0}
                 />
                 <div className={style.users}>
-                    <UsersGrid
-                        title=""
-                        iconName=""
-                        users={filteredUsers}
-                        pathActive="equipo"
-                    />
+                    <UsersGrid title="" iconName="" users={filteredUsers} pathActive="equipo" />
                 </div>
                 <div className={style.footer} />
             </div>
@@ -106,10 +106,13 @@ const LegacyTeam: React.FC = () => {
     );
 };
 
-export default function Team(){
-    const {data,loading}=usePlatform(),router=useRouter();
-    const unified=!!data&&platformSections(data).some(s=>s.id==='organizacion');
-    useEffect(()=>{if(unified)router.replace('/espacio/organizacion?view=personas');},[unified,router]);
-    if(loading||unified)return <p role="status">Abriendo personal y equipos…</p>;
-    return <LegacyTeam/>;
+export default function Team() {
+    const { data, loading } = usePlatform(),
+        router = useRouter();
+    const unified = !!data && platformSections(data).some((s) => s.id === "organizacion");
+    useEffect(() => {
+        if (unified) router.replace("/espacio/organizacion?view=personas");
+    }, [unified, router]);
+    if (loading || unified) return <p role="status">Abriendo personal y equipos…</p>;
+    return <LegacyTeam />;
 }

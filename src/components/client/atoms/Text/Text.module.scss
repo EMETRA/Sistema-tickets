@@ -1,17 +1,33 @@
-.body { font-family: var(--font-montserrat), sans-serif; font-size: 1rem; color: var(--tickets-text); }
-.muted { font-family: var(--font-montserrat), sans-serif; color: var(--tickets-text-secondary); }
-.caption { font-family: var(--font-montserrat), sans-serif; font-size: 0.875rem; color: var(--tickets-text-secondary); } // Datos de tablas
-.overline { font-family: var(--font-montserrat), sans-serif; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; } // Sidebar
+.body {
+  font-family: var(--font-montserrat), sans-serif;
+  font-size: 1rem;
+  color: var(--tickets-text);
+}
+.muted {
+  font-family: var(--font-montserrat), sans-serif;
+  color: var(--tickets-text-secondary);
+}
+.caption {
+  font-family: var(--font-montserrat), sans-serif;
+  font-size: 0.875rem;
+  color: var(--tickets-text-secondary);
+} // Datos de tablas
+.overline {
+  font-family: var(--font-montserrat), sans-serif;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+} // Sidebar
 .navLabel {
-    color: #FFFFFF;
-    font-size: 10px;
-    font-weight: 600;
-    text-transform: uppercase; // Para "INICIO" y "CREAR TICKET"
-    text-align: center;
-    opacity: 0.8;
-    transition: opacity 0.2s;
-    margin: 0; // Esto mata el comportamiento de párrafo para que actúe como una etiqueta
-    text-transform: uppercase;
-    font-weight: 600;
-    font-family: var(--font-montserrat), sans-serif;
+  color: var(--tickets-on-primary);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase; // Para "INICIO" y "CREAR TICKET"
+  text-align: center;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+  margin: 0; // Esto mata el comportamiento de párrafo para que actúe como una etiqueta
+  text-transform: uppercase;
+  font-weight: 600;
+  font-family: var(--font-montserrat), sans-serif;
 }

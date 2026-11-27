@@ -4,7 +4,7 @@ import { ModulesTable } from "./";
 const meta: Meta<typeof ModulesTable> = {
     title: "Organisms/ModulesTable",
     component: ModulesTable,
-    tags: ["autodocs"]
+    tags: ["autodocs"],
 };
 
 export default meta;
@@ -15,14 +15,14 @@ export const Default: Story = {
         modules: [
             {
                 id: 1,
-                name: 'Evial',
-                status: 'Activo'
+                name: "Evial",
+                status: "Activo",
             },
             {
                 id: 2,
-                name: 'Tickets',
-                status: 'Baja'
-            }
-        ]
-    }
+                name: "Tickets",
+                status: "Baja",
+            },
+        ],
+    },
 };

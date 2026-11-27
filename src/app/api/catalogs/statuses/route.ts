@@ -1,9 +1,6 @@
-import { NextResponse } from 'next/server';
-import { graphqlRequest } from '@/api/graphql/client';
-import {
-    GET_STATUSES_QUERY,
-    type GetStatusesResponse,
-} from '@/api/graphql/catalogs';
+import { NextResponse } from "next/server";
+import { graphqlRequest } from "@/api/graphql/client";
+import { GET_STATUSES_QUERY, type GetStatusesResponse } from "@/api/graphql/catalogs";
 
 export async function GET() {
     try {
@@ -11,10 +8,7 @@ export async function GET() {
         const typedResult = result as unknown as GetStatusesResponse;
         return NextResponse.json(typedResult.ticketStatuses);
     } catch (error) {
-        console.error('Error fetching statuses:', error);
-        return NextResponse.json(
-            { error: 'Failed to fetch statuses' },
-            { status: 500 }
-        );
+        console.error("Error fetching statuses:", error);
+        return NextResponse.json({ error: "Failed to fetch statuses" }, { status: 500 });
     }
 }

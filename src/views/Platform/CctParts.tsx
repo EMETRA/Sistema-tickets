@@ -1,33 +1,19 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useEffectEvent } from "react";
 import { Button } from "@/components/client/atoms/Button";
 import { platformFetch, PlatformError } from "@/platform/client";
-import {
-    cctLabel,
-    cctQuery,
-    CCT_STATES,
-    type CctPage,
-    type CctRow,
-} from "@/platform/cct";
+import { cctLabel, cctQuery, CCT_STATES, type CctPage, type CctRow } from "@/platform/cct";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
 import local from "./CctWorkspace.module.scss";
 export const cctError = (e: unknown) =>
     (e instanceof Error ? e.message : "No se pudo completar la operación.") +
-    (e instanceof PlatformError && e.reference
-        ? " Referencia: " + e.reference
-        : "");
+    (e instanceof PlatformError && e.reference ? " Referencia: " + e.reference : "");
 function shownValue(key: string, value: string | null, row: CctRow) {
     if (value == null) return "No registrado";
     if (key === "ESTATUS" && row.AVISO) return CCT_STATES[value] || value;
     if (/^\d{4}-\d\d-\d\dT\d\d:\d\d$/.test(value))
         return (
-            value.slice(8, 10) +
-            "/" +
-            value.slice(5, 7) +
-            "/" +
-            value.slice(0, 4) +
-            " · " +
-            value.slice(11)
+            value.slice(8, 10) + "/" + value.slice(5, 7) + "/" + value.slice(0, 4) + " · " + value.slice(11)
         );
     return value;
 }
@@ -97,15 +83,12 @@ export function CctTable({
         "OBSERVACIONES",
     ];
     const keys = items.length
-        ? (
-              columns || preferred.filter((k) => items.some((r) => k in r))
-          ).filter((k) => items.some((r) => k in r))
+        ? (columns || preferred.filter((k) => items.some((r) => k in r))).filter((k) =>
+              items.some((r) => k in r),
+          )
         : [];
     const shown = keys.length ? keys : Object.keys(items[0] || {}).slice(0, 5);
-    if (!items.length)
-        return (
-            <p className={local.empty}>No hay registros para esta consulta.</p>
-        );
+    if (!items.length) return <p className={local.empty}>No hay registros para esta consulta.</p>;
     return (
         <div
             className={styles.tableRegion}
@@ -134,17 +117,12 @@ export function CctTable({
                         <tr key={i}>
                             {shown.map((k) => (
                                 <td key={k} data-label={cctLabel(k)}>
-                                    {row[k] == null
-                                        ? "—"
-                                        : shownValue(k, row[k], row)}
+                                    {row[k] == null ? "—" : shownValue(k, row[k], row)}
                                 </td>
                             ))}
                             {onSelect && (
                                 <td>
-                                    <Button
-                                        variant="outlined"
-                                        onClick={() => onSelect(row)}
-                                    >
+                                    <Button variant="outlined" onClick={() => onSelect(row)}>
                                         Ver detalle
                                     </Button>
                                 </td>
@@ -168,8 +146,7 @@ export function CctPager({
     return (
         <div className={styles.toolbar}>
             <span className={styles.muted}>
-                {data.total} registros · Página{" "}
-                {Math.floor(data.offset / 50) + 1}
+                {data.total} registros · Página {Math.floor(data.offset / 50) + 1}
             </span>
             <div className={local.buttons}>
                 <Button
@@ -249,9 +226,11 @@ export function CctPicker({
             if (!ctl.signal.aborted) setBusy(false);
         }
     }
+    const loadOnChange = useEffectEvent(() => void load());
     useEffect(() => {
-        void load();
-        return () => request.current?.abort();
+        loadOnChange();
+        const current = request;
+        return () => current.current?.abort();
     }, [kind]);
     return (
         <fieldset className={local.picker} disabled={disabled}>
@@ -267,9 +246,7 @@ export function CctPicker({
                 required={!optional}
                 onChange={(e) => onChange(e.target.value)}
             >
-                <option value="">
-                    {optional ? "Todos" : "Selecciona una opción"}
-                </option>
+                <option value="">{optional ? "Todos" : "Selecciona una opción"}</option>
                 {value && !items.some((r) => r.ID === value) && (
                     <option value={value}>Código {value} · valor actual</option>
                 )}

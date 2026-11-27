@@ -1,14 +1,12 @@
-
 /**
  * Propiedades del componente SearchField.
  */
 export interface SearchFieldProps {
-
     /**
      * Valor del input.
      */
     value: string;
-    
+
     /**
      * Texto a mostrar para la búsqueda.
      */

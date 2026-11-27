@@ -1,13 +1,17 @@
 "use client";
-import { useEffect, useState } from "react";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { platformKey, queryErrorMessage, usePlatformQuery } from "@/platform/query";
+import { statusTone } from "@/helpers/statusTone";
+import { useState } from "react";
 import { Button } from "@/components/client/atoms/Button";
 import { PlatformField } from "@/components/client/molecules/PlatformField/PlatformField";
-import { TicketDetail } from "@/components/client/organisms/TicketDetail";
+import { TicketDetail } from "@/features/tickets/components/TicketDetail";
 import { usePlatform } from "@/platform/context";
 import { platformCommand, platformFetch } from "@/platform/client";
 import type { PageResult } from "@/platform/types";
-import { displayDate } from "@/components/client/organisms/ResourceWorkspace/RecordDetail";
+import { displayDate } from "@/helpers/displayDate";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
+import queue from "./QueueSummary.module.scss";
 type Ticket = {
     id: number;
     codigo: string;
@@ -24,53 +28,63 @@ type Ticket = {
     minutosAlerta: number;
     fechaAsignacionConocida: boolean;
 };
+const STATE_LABEL: Record<number, string> = {
+    1: "Sin asignar",
+    2: "Asignado",
+    3: "En atención",
+    4: "Cancelado",
+    5: "Resuelto",
+};
+
 export function AssignmentsWorkspace() {
     const { data } = usePlatform(),
         [scope, setScope] = useState(
-            data!.capabilities.assign
-                ? "cola"
-                : data!.capabilities.attend
-                  ? "asignados"
-                  : "creados",
+            data!.capabilities.assign ? "cola" : data!.capabilities.attend ? "asignados" : "creados",
         ),
         [filter, setFilter] = useState("sin-asignar"),
-        [result, setResult] = useState<PageResult<Ticket>>({
-            items: [],
-            total: 0,
-            offset: 0,
-            limit: 50,
-        }),
         [offset, setOffset] = useState(0),
-        [error, setError] = useState(""),
-        [loading, setLoading] = useState(false),
+        [actionError, setError] = useState(""),
         [revision, setRevision] = useState(0),
         [assigning, setAssigning] = useState<Ticket | null>(null),
         [user, setUser] = useState<unknown>(""),
         [busy, setBusy] = useState(false),
         [detail, setDetail] = useState<Ticket | null>(null),
         [message, setMessage] = useState("");
-    useEffect(() => {
-        const controller = new AbortController();
-        setLoading(true);
-        setError("");
-        platformFetch<PageResult<Ticket>>(
-            "/tickets?scope=" +
-                scope +
-                "&estado=" +
-                (scope === "cola" ? filter : "") +
-                "&offset=" +
-                offset,
-            { signal: controller.signal },
-        )
-            .then(setResult)
-            .catch((e) => {
-                if (!controller.signal.aborted) setError(e.message);
-            })
-            .finally(() => {
-                if (!controller.signal.aborted) setLoading(false);
-            });
-        return () => controller.abort();
-    }, [scope, filter, offset, revision]);
+    // Los indicadores de la cola funcionan como filtros.
+    // Los contadores de la cola usan la misma fuente que la bandeja, así siempre cuadran.
+    const countsQuery = useQuery({
+        queryKey: [...platformKey("/tickets/cola/contadores"), revision],
+        enabled: !!data!.capabilities.assign,
+        queryFn: async ({ signal }) => {
+            const opts = { signal };
+            const total = (estado: string) =>
+                platformFetch<PageResult<Ticket>>(`/tickets?scope=cola&estado=${estado}&limit=1`, opts).then(
+                    (r) => r.total,
+                );
+            const [sinAsignar, sinPrimeraAtencion, m] = await Promise.all([
+                total("sin-asignar"),
+                total("sin-atencion"),
+                platformFetch<{ tickets: { enTrabajo?: number; resueltos?: number } }>(
+                    "/metrics?inicio=true",
+                    opts,
+                ),
+            ]);
+            return {
+                sinAsignar,
+                sinPrimeraAtencion,
+                enTrabajo: m.tickets.enTrabajo,
+                resueltos: m.tickets.resueltos,
+            };
+        },
+    });
+    const counts = countsQuery.data ?? null;
+    const inbox = usePlatformQuery<PageResult<Ticket>>(
+        "/tickets?scope=" + scope + "&estado=" + (scope === "cola" ? filter : "") + "&offset=" + offset,
+        { placeholderData: keepPreviousData, revision },
+    );
+    const result = inbox.data ?? { items: [], total: 0, offset: 0, limit: 50 };
+    const loading = inbox.isFetching;
+    const error = actionError || queryErrorMessage(inbox.error);
     async function act(row: Ticket, action: string) {
         setBusy(true);
         setError("");
@@ -93,11 +107,7 @@ export function AssignmentsWorkspace() {
             setRevision((n) => n + 1);
             setMessage("El cambio del ticket quedó registrado.");
         } catch (e) {
-            setError(
-                e instanceof Error
-                    ? e.message
-                    : "No se pudo aplicar el cambio.",
-            );
+            setError(e instanceof Error ? e.message : "No se pudo aplicar el cambio.");
         } finally {
             setBusy(false);
         }
@@ -105,20 +115,60 @@ export function AssignmentsWorkspace() {
     return (
         <section className={styles.page}>
             <div className={styles.toolbar}>
-                <div>
-                    <h2>Atención de tickets</h2>
-                    <p className={styles.muted}>
-                        Asignaciones, primera atención e historial de
-                        seguimiento.
-                    </p>
-                </div>
-                <Button
-                    variant="outlined"
-                    onClick={() => setRevision((n) => n + 1)}
-                >
+                <p className={styles.muted}>{""}</p>
+                <Button variant="outlined" onClick={() => setRevision((n) => n + 1)}>
                     Actualizar
                 </Button>
             </div>
+            {data!.capabilities.assign && (
+                <div className={queue.strip} role="group" aria-label="Indicadores de la cola">
+                    {[
+                        {
+                            id: "sin-asignar",
+                            label: "Sin asignar",
+                            value: counts?.sinAsignar,
+                            tone: "neutral",
+                            hint: "Esperan responsable",
+                        },
+                        {
+                            id: "sin-atencion",
+                            label: "Sin primera atención",
+                            value: counts?.sinPrimeraAtencion,
+                            tone: (counts?.sinPrimeraAtencion || 0) > 0 ? "danger" : "neutral",
+                            hint: "Superaron el umbral del equipo",
+                        },
+                        {
+                            id: "todos",
+                            label: "Todos los activos",
+                            value: undefined,
+                            tone: "info",
+                            hint: "Toda la bandeja",
+                        },
+                    ].map((tile) => (
+                        <button
+                            key={tile.id}
+                            type="button"
+                            className={queue.tile}
+                            data-tone={tile.tone}
+                            aria-pressed={scope === "cola" && filter === tile.id}
+                            onClick={() => {
+                                setScope("cola");
+                                setFilter(tile.id);
+                                setOffset(0);
+                            }}
+                        >
+                            <span className={queue.label}>{tile.label}</span>
+                            <strong>{tile.value ?? (tile.id === "todos" ? "→" : "—")}</strong>
+                            <small>{tile.hint}</small>
+                        </button>
+                    ))}
+                    <div className={queue.tile} data-tone="success" aria-label="Resueltos en 30 días">
+                        <span className={queue.label}>Resueltos · 30 días</span>
+                        <strong>{counts?.resueltos ?? "—"}</strong>
+                        <small>{counts?.enTrabajo ?? 0} en atención ahora</small>
+                    </div>
+                </div>
+            )}
             <div className={styles.listPanel}>
                 <nav className={styles.tabs} aria-label="Bandejas de tickets">
                     {data!.capabilities.assign && (
@@ -134,9 +184,7 @@ export function AssignmentsWorkspace() {
                     )}
                     {data!.capabilities.attend && (
                         <button
-                            aria-current={
-                                scope === "asignados" ? "page" : undefined
-                            }
+                            aria-current={scope === "asignados" ? "page" : undefined}
                             onClick={() => {
                                 setScope("asignados");
                                 setOffset(0);
@@ -155,24 +203,24 @@ export function AssignmentsWorkspace() {
                         Mis solicitudes
                     </button>
                 </nav>
-                {scope === "cola" && (
-                    <label className={styles.field}>
-                        Mostrar
-                        <select
-                            className={styles.control}
-                            value={filter}
-                            onChange={(e) => {
-                                setFilter(e.target.value);
-                                setOffset(0);
-                            }}
-                        >
-                            <option value="sin-asignar">Sin asignar</option>
-                            <option value="sin-atencion">
-                                Asignados sin primera atención
-                            </option>
-                            <option value="todos">Todos</option>
-                        </select>
-                    </label>
+                {false && (
+                    <div className={styles.toolbar}>
+                        <label className={styles.field}>
+                            Mostrar
+                            <select
+                                className={styles.control}
+                                value={filter}
+                                onChange={(e) => {
+                                    setFilter(e.target.value);
+                                    setOffset(0);
+                                }}
+                            >
+                                <option value="sin-asignar">Sin asignar</option>
+                                <option value="sin-atencion">Asignados sin primera atención</option>
+                                <option value="todos">Todos</option>
+                            </select>
+                        </label>
+                    </div>
                 )}
                 {message && (
                     <p role="status" className={styles.success}>
@@ -185,15 +233,14 @@ export function AssignmentsWorkspace() {
                     </p>
                 )}
                 {assigning && (
-                    <section className={styles.card}>
+                    <section className={styles.card + " " + styles.focusCard}>
                         <h3>Asignar {assigning.codigo}</h3>
-                        <p>{assigning.titulo}</p>
+                        <p className={styles.muted}>{assigning.titulo}</p>
                         <PlatformField
                             field={{
                                 key: "usuarioId",
                                 label: "Responsable",
-                                lookupPath:
-                                    "/tickets/" + assigning.id + "/assignees",
+                                lookupPath: "/tickets/" + assigning.id + "/assignees",
                                 type: "user",
                                 required: true,
                             }}
@@ -211,9 +258,7 @@ export function AssignmentsWorkspace() {
                             </Button>
                             <Button
                                 onClick={() => void act(assigning, "assign")}
-                                state={
-                                    busy ? "loading" : user ? "default" : "disabled"
-                                }
+                                state={busy ? "loading" : user ? "default" : "disabled"}
                             >
                                 Asignar ticket
                             </Button>
@@ -238,42 +283,31 @@ export function AssignmentsWorkspace() {
                             </thead>
                             <tbody>
                                 {result.items.map((row) => (
-                                    <tr key={row.id}>
+                                    <tr key={row.id} className={row.alerta ? styles.rowAlert : undefined}>
                                         <td>
-                                            <button
-                                                className={styles.link}
-                                                onClick={() => setDetail(row)}
-                                            >
-                                                {row.codigo || "#" + row.id} ·{" "}
-                                                {row.titulo}
+                                            <button className={styles.link} onClick={() => setDetail(row)}>
+                                                {row.codigo || "#" + row.id} · {row.titulo}
                                             </button>
-                                            <p className={styles.muted}>
-                                                {(
-                                                    {
-                                                        1: "Sin asignar",
-                                                        2: "Asignado",
-                                                        3: "En atención",
-                                                        4: "Cancelado",
-                                                        5: "Resuelto",
-                                                    } as Record<number, string>
-                                                )[row.estado] ||
-                                                    "Estado registrado"}
-                                            </p>
+                                            <div>
+                                                <span
+                                                    className={styles.chip}
+                                                    data-tone={statusTone(STATE_LABEL[row.estado])}
+                                                >
+                                                    {STATE_LABEL[row.estado] || "Estado registrado"}
+                                                </span>
+                                            </div>
                                         </td>
                                         <td>{row.creador}</td>
                                         <td>{row.asignado || "Sin asignar"}</td>
                                         <td>
                                             {row.alerta ? (
-                                                <span className={styles.error}>
-                                                    Sin primera atención · Umbral{" "}
-                                                    {row.minutosAlerta} min
+                                                <span className={styles.flag}>
+                                                    Sin primera atención · Umbral {row.minutosAlerta} min
                                                 </span>
                                             ) : row.atendidoEn ? (
-                                                "Atendido: " +
-                                                displayDate(row.atendidoEn)
+                                                "Atendido: " + displayDate(row.atendidoEn)
                                             ) : row.asignadoEn ? (
-                                                "Asignado: " +
-                                                displayDate(row.asignadoEn)
+                                                "Asignado: " + displayDate(row.asignadoEn)
                                             ) : row.asignado ? (
                                                 "Asignación histórica sin fecha confirmada"
                                             ) : (
@@ -282,55 +316,35 @@ export function AssignmentsWorkspace() {
                                         </td>
                                         <td>
                                             <div className={styles.actions}>
-                                                {scope === "cola" &&
-                                                    ![4, 5].includes(
-                                                        row.estado,
-                                                    ) && (
-                                                        <button
-                                                            className={styles.link}
-                                                            onClick={() => {
-                                                                setAssigning(row);
-                                                                setUser(
-                                                                    row.asignadoId ||
-                                                                        "",
-                                                                );
-                                                            }}
-                                                        >
-                                                            Asignar
-                                                        </button>
-                                                    )}
-                                                {row.asignadoId ===
-                                                    data!.actor.id &&
-                                                    row.estado === 2 && (
-                                                        <button
-                                                            className={styles.link}
-                                                            disabled={busy}
-                                                            onClick={() =>
-                                                                void act(
-                                                                    row,
-                                                                    "start",
-                                                                )
-                                                            }
-                                                        >
-                                                            Iniciar atención
-                                                        </button>
-                                                    )}
-                                                {row.asignadoId ===
-                                                    data!.actor.id &&
-                                                    row.estado === 3 && (
-                                                        <button
-                                                            className={styles.link}
-                                                            disabled={busy}
-                                                            onClick={() =>
-                                                                void act(
-                                                                    row,
-                                                                    "resolve",
-                                                                )
-                                                            }
-                                                        >
-                                                            Resolver
-                                                        </button>
-                                                    )}
+                                                {scope === "cola" && ![4, 5].includes(row.estado) && (
+                                                    <button
+                                                        className={styles.link}
+                                                        onClick={() => {
+                                                            setAssigning(row);
+                                                            setUser(row.asignadoId || "");
+                                                        }}
+                                                    >
+                                                        Asignar
+                                                    </button>
+                                                )}
+                                                {row.asignadoId === data!.actor.id && row.estado === 2 && (
+                                                    <button
+                                                        className={styles.link}
+                                                        disabled={busy}
+                                                        onClick={() => void act(row, "start")}
+                                                    >
+                                                        Iniciar atención
+                                                    </button>
+                                                )}
+                                                {row.asignadoId === data!.actor.id && row.estado === 3 && (
+                                                    <button
+                                                        className={styles.link}
+                                                        disabled={busy}
+                                                        onClick={() => void act(row, "resolve")}
+                                                    >
+                                                        Resolver
+                                                    </button>
+                                                )}
                                             </div>
                                         </td>
                                     </tr>
@@ -338,9 +352,7 @@ export function AssignmentsWorkspace() {
                             </tbody>
                         </table>
                         {!result.items.length && (
-                            <p className={styles.card}>
-                                No hay tickets en esta bandeja.
-                            </p>
+                            <p className={styles.card}>No hay tickets en esta bandeja.</p>
                         )}
                     </div>
                 )}
@@ -356,9 +368,7 @@ export function AssignmentsWorkspace() {
                         </Button>
                         <Button
                             variant="outlined"
-                            state={
-                                offset + 50 < result.total ? "default" : "disabled"
-                            }
+                            state={offset + 50 < result.total ? "default" : "disabled"}
                             onClick={() => setOffset(offset + 50)}
                         >
                             Siguiente

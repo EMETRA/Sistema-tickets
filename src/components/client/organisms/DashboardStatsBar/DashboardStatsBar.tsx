@@ -14,29 +14,26 @@ import styles from "./DashboardStatsBar.module.scss";
  * @param {DashboardStatsBarProps} props - Las propiedades del componente
  * @returns {JSX.Element} El componente DashboardStatsBar renderizado
  */
-export const DashboardStatsBar: React.FC<DashboardStatsBarProps> = ({
-    stats,
-    className,
-}) => {
+export const DashboardStatsBar: React.FC<DashboardStatsBarProps> = ({ stats, className }) => {
     return (
         <div className={classNames(styles.DashboardStatsBar, className)}>
             {stats.length === 0 ? (
                 <Text variant="caption" className={styles.NoStatsText}>
                     No hay estadísticas disponibles.
                 </Text>
-            ) : (stats.map((stat, index) => (
-                <React.Fragment key={`${stat.type}-${index}`}>
-                    <TicketStat
-                        type={stat.type}
-                        label={stat.label}
-                        value={stat.value}
-                        className={styles.StatItem}
-                    />
-                    {index < stats.length - 1 && (
-                        <Divider orientation="vertical" />
-                    )}
-                </React.Fragment>
-            )))}
+            ) : (
+                stats.map((stat, index) => (
+                    <React.Fragment key={`${stat.type}-${index}`}>
+                        <TicketStat
+                            type={stat.type}
+                            label={stat.label}
+                            value={stat.value}
+                            className={styles.StatItem}
+                        />
+                        {index < stats.length - 1 && <Divider orientation="vertical" />}
+                    </React.Fragment>
+                ))
+            )}
         </div>
     );
 };

@@ -3,9 +3,9 @@ import { SearchField } from "./";
 import { useState } from "react";
 
 const meta = {
-    title: 'Molecules/SearchField',
+    title: "Molecules/SearchField",
     component: SearchField,
-    tags: ['autodocs']
+    tags: ["autodocs"],
 } satisfies Meta<typeof SearchField>;
 
 export default meta;
@@ -16,7 +16,7 @@ export const Default: Story = {
         value: "",
         placeholder: "Buscar...",
         onChange: () => {},
-        onSearch: () => {}
+        onSearch: () => {},
     },
     render: () => {
         const [value, setValue] = useState("");
@@ -29,5 +29,5 @@ export const Default: Story = {
                 placeholder="Buscar..."
             />
         );
-    }
+    },
 };

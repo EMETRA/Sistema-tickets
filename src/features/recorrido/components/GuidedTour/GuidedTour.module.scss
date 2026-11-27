@@ -1,0 +1,136 @@
+.tour {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  overflow: hidden;
+  color: var(--tickets-text);
+  &::backdrop {
+    background: transparent;
+  }
+}
+.shade {
+  position: absolute;
+  inset: 0;
+  &[data-full] {
+    background: rgb(9 14 28 / 58%);
+  }
+}
+.spot {
+  position: absolute;
+  &[hidden] {
+    display: none;
+  }
+  border-radius: 12px;
+  box-shadow:
+    0 0 0 3px var(--tickets-primary),
+    0 0 0 200vmax rgb(9 14 28 / 58%);
+  pointer-events: none;
+  transition:
+    top 0.25s ease,
+    left 0.25s ease,
+    width 0.25s ease,
+    height 0.25s ease;
+}
+.card {
+  position: absolute;
+  width: min(380px, calc(100% - 32px));
+  padding: 20px 20px 16px;
+  border: 1px solid var(--tickets-border);
+  border-radius: 16px;
+  background: var(--tickets-surface);
+  box-shadow: 0 18px 48px rgb(9 14 28 / 35%);
+  transition:
+    top 0.25s ease,
+    left 0.25s ease;
+  h2 {
+    margin: 4px 0 8px;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--tickets-text);
+  }
+}
+.count {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--tickets-primary);
+}
+.body {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--tickets-text-secondary);
+}
+.dots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin: 16px 0 14px;
+  span {
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background: var(--tickets-border-strong);
+    &[data-done] {
+      background: color-mix(in srgb, var(--tickets-primary) 45%, transparent);
+    }
+    &[data-current] {
+      width: 20px;
+      background: var(--tickets-primary-fill);
+    }
+  }
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.spacer {
+  flex: 1;
+}
+.primary,
+.secondary,
+.skip {
+  min-height: 42px;
+  padding: 0 16px;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  &:focus-visible {
+    outline: 2px solid var(--tickets-primary);
+    outline-offset: 2px;
+  }
+}
+.primary {
+  border: 0;
+  background: var(--tickets-primary-fill);
+  color: var(--tickets-on-primary);
+  &:hover {
+    filter: brightness(1.07);
+  }
+}
+.secondary {
+  border: 1px solid var(--tickets-border-strong);
+  background: var(--tickets-surface);
+  color: var(--tickets-text);
+}
+.skip {
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  color: var(--tickets-text-secondary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

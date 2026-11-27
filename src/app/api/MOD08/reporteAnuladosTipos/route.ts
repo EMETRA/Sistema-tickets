@@ -1,12 +1,12 @@
 import { falloModulo } from "@/api/graphql/module-response";
 /**
  * Route Handler: GET /api/MOD08/reporteAnuladosTipos
- * 
+ *
  * Propósito: Obtener catálogo de tipos de reportes de anulados
  * Uso: Poblar select en formulario de reportes anulados
- * 
+ *
  * Parámetros: Ninguno
- * 
+ *
  * Respuesta exitosa (200):
  * {
  *   data: [
@@ -17,10 +17,10 @@ import { falloModulo } from "@/api/graphql/module-response";
  * }
  */
 
-import { NextResponse } from 'next/server';
-import { graphqlRequest } from '@/api/graphql/client';
-import { GET_REPORTE_ANULADOS_TIPOS_QUERY } from '@/api/graphql/MOD08';
-import type { GetReporteAnuladosTiposResponse } from '@/api/graphql/MOD08';
+import { NextResponse } from "next/server";
+import { graphqlRequest } from "@/api/graphql/client";
+import { GET_REPORTE_ANULADOS_TIPOS_QUERY } from "@/api/graphql/MOD08";
+import type { GetReporteAnuladosTiposResponse } from "@/api/graphql/MOD08";
 
 export async function GET() {
     try {
@@ -35,5 +35,7 @@ export async function GET() {
             },
             { status: 200 },
         );
-    } catch (error) { return falloModulo(error, "MOD08/reporteAnuladosTipos"); }
+    } catch (error) {
+        return falloModulo(error, "MOD08/reporteAnuladosTipos");
+    }
 }

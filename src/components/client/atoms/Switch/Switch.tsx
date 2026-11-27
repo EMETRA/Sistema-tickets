@@ -13,7 +13,7 @@ import { SwitchProps } from "./types";
  */
 const Switch = forwardRef<HTMLInputElement, SwitchProps>(
     ({ className, state = "default", errorMessage, label, id, switchSize = "medium", ...props }, ref) => {
-    // Referencia interna al switch
+        // Referencia interna al switch
         const switchRef = useRef<HTMLInputElement>(null);
 
         // Combina la referencia interna con la referencia pasada
@@ -23,10 +23,14 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
         const switchId = id || `switch-${label}`;
 
         // Construir las clases CSS dinámicamente usando classnames
-        const containerClasses = classNames(styles.Container, {
-            [styles.ContainerError]: state === "error",
-            [styles.ContainerDisabled]: state === "disabled",
-        }, className);
+        const containerClasses = classNames(
+            styles.Container,
+            {
+                [styles.ContainerError]: state === "error",
+                [styles.ContainerDisabled]: state === "disabled",
+            },
+            className,
+        );
 
         // Dimensiones predefinidas para cada tamaño
         const sizeConfig = {
@@ -36,7 +40,7 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
         };
 
         const config = sizeConfig[switchSize];
-        const translateX = config.width - config.sliderSize - (config.padding * 2);
+        const translateX = config.width - config.sliderSize - config.padding * 2;
 
         return (
             <div className={styles.Wrapper}>
@@ -49,7 +53,7 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
                         disabled={state === "disabled"}
                         {...props}
                     />
-                    <span 
+                    <span
                         className={styles.StyledSwitch}
                         style={{
                             width: config.width,
@@ -57,15 +61,17 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
                             borderRadius: config.height / 2,
                         }}
                     >
-                        <span 
+                        <span
                             className={styles.Slider}
-                            style={{
-                                width: config.sliderSize,
-                                height: config.sliderSize,
-                                top: config.padding,
-                                left: config.padding,
-                                '--translate-x': `${translateX}px`,
-                            } as React.CSSProperties}
+                            style={
+                                {
+                                    width: config.sliderSize,
+                                    height: config.sliderSize,
+                                    top: config.padding,
+                                    left: config.padding,
+                                    "--translate-x": `${translateX}px`,
+                                } as React.CSSProperties
+                            }
                         ></span>
                     </span>
                     {label && <span className={styles.Label}>{label}</span>}
@@ -75,7 +81,7 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
                 )}
             </div>
         );
-    }
+    },
 );
 
 Switch.displayName = "Switch";

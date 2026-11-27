@@ -5,10 +5,10 @@ import { falloModulo } from "@/api/graphql/module-response";
  * Propósito: Obtener opciones de estatus para el reporte RRHH.
  */
 
-import { NextResponse } from 'next/server';
-import { graphqlRequest } from '@/api/graphql/client';
-import { GET_REPORTE_RH_ESTATUS_OPCIONES_QUERY } from '@/api/graphql/MOD05';
-import type { GetReporteRhEstatusOpcionesResponse } from '@/api/graphql/MOD05';
+import { NextResponse } from "next/server";
+import { graphqlRequest } from "@/api/graphql/client";
+import { GET_REPORTE_RH_ESTATUS_OPCIONES_QUERY } from "@/api/graphql/MOD05";
+import type { GetReporteRhEstatusOpcionesResponse } from "@/api/graphql/MOD05";
 
 export async function GET() {
     try {
@@ -25,5 +25,7 @@ export async function GET() {
             },
             { status: 200 },
         );
-    } catch (error) { return falloModulo(error, "MOD05/reporteRhEstatusOpciones"); }
+    } catch (error) {
+        return falloModulo(error, "MOD05/reporteRhEstatusOpciones");
+    }
 }

@@ -91,16 +91,8 @@ export const Comparison = {
     render: () => (
         <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
             <AssignedChip assigned={false} />
-            <AssignedChip 
-                assigned={true}
-                userName="Miguel Hernández"
-                avatarInitials="M"
-            />
-            <AssignedChip 
-                assigned={true}
-                userName="Ana García"
-                avatarSrc="https://i.pravatar.cc/150?img=5"
-            />
+            <AssignedChip assigned={true} userName="Miguel Hernández" avatarInitials="M" />
+            <AssignedChip assigned={true} userName="Ana García" avatarSrc="https://i.pravatar.cc/150?img=5" />
         </div>
     ),
 };

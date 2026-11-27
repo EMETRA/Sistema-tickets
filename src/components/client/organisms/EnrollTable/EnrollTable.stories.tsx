@@ -4,7 +4,7 @@ import { EnrollTable } from "./";
 const meta: Meta<typeof EnrollTable> = {
     title: "Organisms/EnrollTable",
     component: EnrollTable,
-    tags: ["autodocs"]
+    tags: ["autodocs"],
 };
 
 export default meta;
@@ -15,20 +15,20 @@ export const Default: Story = {
         enroll: [
             {
                 id: 1,
-                name: 'Feyser Cáceres',
-                department: 'Dirección de informática',
-                employeeNumber: '2000145',
-                permission: 'Administrador de tickets',
-                status: 'Solicitado'
+                name: "Feyser Cáceres",
+                department: "Dirección de informática",
+                employeeNumber: "2000145",
+                permission: "Administrador de tickets",
+                status: "Solicitado",
             },
             {
                 id: 2,
-                name: 'Gerbert Martinez',
-                department: 'Dirección de Jurídico',
-                employeeNumber: '2024043',
-                permission: 'Permisos regulares tickets',
-                status: 'Aprobado'
-            }
-        ]
-    }
+                name: "Gerbert Martinez",
+                department: "Dirección de Jurídico",
+                employeeNumber: "2024043",
+                permission: "Permisos regulares tickets",
+                status: "Aprobado",
+            },
+        ],
+    },
 };

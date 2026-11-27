@@ -1,11 +1,6 @@
 "use client";
-import {
-    useCallback,
-    useEffect,
-    useRef,
-    useState,
-    type FormEvent,
-} from "react";
+import { usePlatformQuery } from "@/platform/query";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { PopOver } from "@/components/client/atoms/PopOver";
 import { Button } from "@/components/client/atoms/Button";
 import { usePlatform } from "@/platform/context";
@@ -32,12 +27,10 @@ export function HrCampaignsWorkspace() {
     const { data: platform } = usePlatform(),
         actions = useModuleActions(),
         admin = Boolean(platform?.actor.admin);
-    const [list, setList] = useState<List | null>(null),
-        [options, setOptions] = useState<HrField[]>([]),
-        [page, setPage] = useState(0),
+    const [page, setPage] = useState(0),
         [creating, setCreating] = useState(false),
         [selected, setSelected] = useState(""),
-        [error, setError] = useState(""),
+        [actionError, setError] = useState(""),
         [message, setMessage] = useState(""),
         [busy, setBusy] = useState(false);
     const [name, setName] = useState(""),
@@ -45,96 +38,61 @@ export function HrCampaignsWorkspace() {
         [mode, setMode] = useState("CON_REVISION"),
         [now, setNow] = useState(true),
         [start, setStart] = useState(() => hrLocalInput(new Date())),
-        [end, setEnd] = useState(() =>
-            hrLocalInput(hrDeadline(new Date(), "7")),
-        ),
+        [end, setEnd] = useState(() => hrLocalInput(hrDeadline(new Date(), "7"))),
         [fields, setFields] = useState<Record<string, HrSelection>>({}),
         [filter, setFilter] = useState("");
-    const [report, setReport] = useState<HrReport | null>(null),
-        [reportPage, setReportPage] = useState(0),
+    const [reportPage, setReportPage] = useState(0),
         [state, setState] = useState(""),
         [detail, setDetail] = useState<HrReview | null>(null),
         [decision, setDecision] = useState("APROBAR"),
         [note, setNote] = useState("");
     const mounted = useRef(true),
-        generation = useRef(0),
-        reportGeneration = useRef(0),
         detailGeneration = useRef(0),
         flight = useRef(false);
     useEffect(() => {
         mounted.current = true;
+        // Al desmontar se invalidan las respuestas pendientes de cada consulta.
+        const detailRef = detailGeneration;
         return () => {
             mounted.current = false;
-            generation.current++;
-            reportGeneration.current++;
-            detailGeneration.current++;
+            detailRef.current++;
         };
     }, []);
-    const load = useCallback(async () => {
-        const version = ++generation.current;
-        setError("");
-        try {
-            const [o, l] = await Promise.all([
-                platformFetch<{ campos: HrField[] }>("/hr/options"),
-                platformFetch<List>("/hr/campaigns?offset=" + page),
-            ]);
-            if (version !== generation.current || !mounted.current) return;
-            setOptions(o.campos);
-            setList(l);
-        } catch (e) {
-            if (version === generation.current && mounted.current)
-                setError(hrError(e));
-        }
-    }, [page]);
-    useEffect(() => {
-        void load();
-    }, [load]);
-    const loadReport = useCallback(async () => {
-        if (!selected) {
-            setReport(null);
-            return;
-        }
-        const version = ++reportGeneration.current;
-        setError("");
-        try {
-            const r = await platformFetch<HrReport>(
-                "/hr/campaigns/" +
-                    selected +
-                    "/report?offset=" +
-                    reportPage +
-                    (state ? "&estado=" + encodeURIComponent(state) : ""),
-            );
-            if (version === reportGeneration.current && mounted.current)
-                setReport(r);
-        } catch (e) {
-            if (version === reportGeneration.current && mounted.current)
-                setError(hrError(e));
-        }
-    }, [selected, reportPage, state]);
-    useEffect(() => {
-        detailGeneration.current++;
-        setReport(null);
-        setDetail(null);
-        void loadReport();
-    }, [loadReport]);
+    // Catálogo de campos, campañas (por página) y reporte de la campaña elegida.
+    const optionsQuery = usePlatformQuery<{ campos: HrField[] }>("/hr/options");
+    const listQuery = usePlatformQuery<List>("/hr/campaigns?offset=" + page);
+    const reportQuery = usePlatformQuery<HrReport>(
+        selected
+            ? "/hr/campaigns/" +
+                  selected +
+                  "/report?offset=" +
+                  reportPage +
+                  (state ? "&estado=" + encodeURIComponent(state) : "")
+            : null,
+    );
+    const options = optionsQuery.data?.campos ?? [];
+    const list = listQuery.data ?? null;
+    const report = reportQuery.data ?? null;
+    const loadFailure = optionsQuery.error || listQuery.error || reportQuery.error;
+    const error = actionError || (loadFailure ? hrError(loadFailure) : "");
+    const load = async () => {
+        await Promise.all([optionsQuery.refetch(), listQuery.refetch()]);
+    };
+    const loadReport = async () => {
+        if (selected) await reportQuery.refetch();
+    };
     async function inspect(userId: number) {
         const version = ++detailGeneration.current;
         setDetail(null);
         setError("");
         try {
-            const d = await platformFetch<HrReview>(
-                "/hr/campaigns/" + selected + "/users/" + userId,
-            );
-            if (version !== detailGeneration.current || !mounted.current)
-                return;
+            const d = await platformFetch<HrReview>("/hr/campaigns/" + selected + "/users/" + userId);
+            if (version !== detailGeneration.current || !mounted.current) return;
             setDetail(d);
             setNote("");
-            setDecision(
-                d.estado === "CONTACTO" ? "FINALIZAR_CONTACTO" : "APROBAR",
-            );
+            setDecision(d.estado === "CONTACTO" ? "FINALIZAR_CONTACTO" : "APROBAR");
         } catch (e) {
-            if (version === detailGeneration.current && mounted.current)
-                setError(hrError(e));
+            if (version === detailGeneration.current && mounted.current) setError(hrError(e));
         }
     }
     async function perform(action: () => Promise<void>) {
@@ -156,6 +114,10 @@ export function HrCampaignsWorkspace() {
     async function create(event: FormEvent) {
         event.preventDefault();
         await perform(async () => {
+            // Mismas reglas de periodo que el API: el cierre va después de la apertura y de ahora.
+            const closes = Date.parse(hrLocalIso(end));
+            if (closes <= (now ? Date.now() : Date.parse(hrLocalIso(start))) || closes <= Date.now())
+                throw Error("El cierre debe ser posterior a la apertura y al momento actual.");
             const key = JSON.stringify({
                 name,
                 description,
@@ -216,9 +178,7 @@ export function HrCampaignsWorkspace() {
                 "Cerrar el periodo de actualización de datos",
             );
             if (!mounted.current) return;
-            setMessage(
-                "Campaña cerrada. Los envíos recibidos siguen disponibles para revisión.",
-            );
+            setMessage("Campaña cerrada. Los envíos recibidos siguen disponibles para revisión.");
             window.dispatchEvent(new Event("tickets-hr-updated"));
             await Promise.all([load(), loadReport()]);
         });
@@ -252,8 +212,7 @@ export function HrCampaignsWorkspace() {
                 <div>
                     <h2>Campañas de actualización de datos</h2>
                     <p className={styles.muted}>
-                        Define el periodo y los campos; revisa el avance de
-                        todos los usuarios convocados.
+                        Define el periodo y los campos; revisa el avance de todos los usuarios convocados.
                     </p>
                 </div>
                 <div className={styles.actions}>
@@ -265,10 +224,7 @@ export function HrCampaignsWorkspace() {
                         Actualizar campañas
                     </Button>
                     {actions.INSERTAR && (
-                        <Button
-                            state={busy ? "disabled" : "default"}
-                            onClick={() => setCreating(true)}
-                        >
+                        <Button state={busy ? "disabled" : "default"} onClick={() => setCreating(true)}>
                             Nueva campaña
                         </Button>
                     )}
@@ -278,8 +234,8 @@ export function HrCampaignsWorkspace() {
                 <div role="alert" className={styles.error}>
                     {error}
                     <p>
-                        Conservamos los datos del formulario. Consulta el estado
-                        del registro antes de repetir una operación.
+                        Conservamos los datos del formulario. Consulta el estado del registro antes de repetir
+                        una operación.
                     </p>
                     <Button
                         variant="outlined"
@@ -295,51 +251,54 @@ export function HrCampaignsWorkspace() {
                     {message}
                 </p>
             )}
-            <PopOver isOpen={creating} onClose={() => { if (!busy) setCreating(false); }}
-                ariaLabel="Configurar campaña" className={local.campaignDialog}>
+            <PopOver
+                isOpen={creating}
+                onClose={() => {
+                    if (!busy) setCreating(false);
+                }}
+                ariaLabel="Configurar campaña"
+                className={local.campaignDialog}
+            >
                 <section className={styles.dialogBody}>
                     <div className={styles.toolbar}>
                         <h3>Nueva campaña obligatoria</h3>
-                        <Button variant="outlined" state={busy ? "disabled" : "default"}
-                            onClick={() => setCreating(false)}>Cerrar</Button>
+                        <Button
+                            variant="outlined"
+                            state={busy ? "disabled" : "default"}
+                            onClick={() => setCreating(false)}
+                        >
+                            Cerrar
+                        </Button>
                     </div>
-                    {error && <p role="alert" className={styles.error}>{error}</p>}
+                    {error && (
+                        <p role="alert" className={styles.error}>
+                            {error}
+                        </p>
+                    )}
                     <form onSubmit={create}>
                         <fieldset disabled={busy} className={local.fieldset}>
                             <div className={local.formGrid}>
                                 <div className={styles.field}>
-                                    <label htmlFor="hr-c-name">
-                                        Nombre de campaña *
-                                    </label>
+                                    <label htmlFor="hr-c-name">Nombre de campaña *</label>
                                     <input
                                         id="hr-c-name"
                                         className={styles.control}
                                         required
                                         maxLength={150}
                                         value={name}
-                                        onChange={(e) =>
-                                            setName(e.target.value)
-                                        }
+                                        onChange={(e) => setName(e.target.value)}
                                     />
                                 </div>
                                 <div className={styles.field}>
-                                    <label htmlFor="hr-c-mode">
-                                        Aplicación de los campos editables
-                                    </label>
+                                    <label htmlFor="hr-c-mode">Aplicación de los campos editables</label>
                                     <select
                                         id="hr-c-mode"
                                         className={styles.control}
                                         value={mode}
-                                        onChange={(e) =>
-                                            setMode(e.target.value)
-                                        }
+                                        onChange={(e) => setMode(e.target.value)}
                                     >
-                                        <option value="CON_REVISION">
-                                            RRHH aprueba antes de aplicar
-                                        </option>
-                                        <option value="AL_ENVIAR">
-                                            Aplicar cuando el usuario envíe
-                                        </option>
+                                        <option value="CON_REVISION">RRHH aprueba antes de aplicar</option>
+                                        <option value="AL_ENVIAR">Aplicar cuando el usuario envíe</option>
                                     </select>
                                 </div>
                                 <div className={styles.field}>
@@ -352,9 +311,7 @@ export function HrCampaignsWorkspace() {
                                         required
                                         maxLength={2000}
                                         value={description}
-                                        onChange={(e) =>
-                                            setDescription(e.target.value)
-                                        }
+                                        onChange={(e) => setDescription(e.target.value)}
                                     />
                                 </div>
                                 <div className={styles.field}>
@@ -362,15 +319,11 @@ export function HrCampaignsWorkspace() {
                                         <input
                                             type="checkbox"
                                             checked={now}
-                                            onChange={(e) =>
-                                                setNow(e.target.checked)
-                                            }
+                                            onChange={(e) => setNow(e.target.checked)}
                                         />{" "}
                                         Activar al publicar
                                     </label>
-                                    <label htmlFor="hr-c-start">
-                                        Fecha y hora de apertura
-                                    </label>
+                                    <label htmlFor="hr-c-start">Fecha y hora de apertura</label>
                                     <input
                                         id="hr-c-start"
                                         className={styles.control}
@@ -378,19 +331,14 @@ export function HrCampaignsWorkspace() {
                                         disabled={now}
                                         required={!now}
                                         value={start}
-                                        onChange={(e) =>
-                                            setStart(e.target.value)
-                                        }
+                                        onChange={(e) => setStart(e.target.value)}
                                     />
                                     <span className={styles.muted}>
-                                        Hora de Guatemala. Desmarca para
-                                        programar una apertura futura.
+                                        Hora de Guatemala. Desmarca para programar una apertura futura.
                                     </span>
                                 </div>
                                 <div className={styles.field}>
-                                    <label htmlFor="hr-c-end">
-                                        Fecha y hora de cierre *
-                                    </label>
+                                    <label htmlFor="hr-c-end">Fecha y hora de cierre *</label>
                                     <input
                                         id="hr-c-end"
                                         className={styles.control}
@@ -400,8 +348,7 @@ export function HrCampaignsWorkspace() {
                                         onChange={(e) => setEnd(e.target.value)}
                                     />
                                     <span className={styles.muted}>
-                                        No se aceptan envíos a partir de esta
-                                        fecha y hora.
+                                        No se aceptan envíos a partir de esta fecha y hora.
                                     </span>
                                 </div>
                                 <div className={styles.field}>
@@ -424,11 +371,7 @@ export function HrCampaignsWorkspace() {
                                                                 hrDeadline(
                                                                     now
                                                                         ? new Date()
-                                                                        : new Date(
-                                                                              hrLocalIso(
-                                                                                  start,
-                                                                              ),
-                                                                          ),
+                                                                        : new Date(hrLocalIso(start)),
                                                                     period,
                                                                 ),
                                                             ),
@@ -446,16 +389,12 @@ export function HrCampaignsWorkspace() {
                             </div>
                             <h3>Campos solicitados · {chosen} / 50</h3>
                             <p className={styles.muted}>
-                                Solo los campos seleccionados aparecen en la
-                                campaña. «Solo confirmar» exige confirmar el
-                                dato o solicitar corrección con una observación.
-                                Los datos laborales protegidos solo admiten
-                                confirmación.
+                                Solo los campos seleccionados aparecen en la campaña. «Solo confirmar» exige
+                                confirmar el dato o solicitar corrección con una observación. Los datos
+                                laborales protegidos solo admiten confirmación.
                             </p>
                             <div className={styles.field}>
-                                <label htmlFor="hr-c-filter">
-                                    Buscar campo
-                                </label>
+                                <label htmlFor="hr-c-filter">Buscar campo</label>
                                 <input
                                     id="hr-c-filter"
                                     className={styles.control}
@@ -478,170 +417,84 @@ export function HrCampaignsWorkspace() {
                                             .filter(
                                                 (f) =>
                                                     f.tipo !== "archivo" &&
-                                                    (
-                                                        f.etiqueta +
-                                                        " " +
-                                                        f.codigo
-                                                    )
+                                                    (f.etiqueta + " " + f.codigo)
                                                         .toLowerCase()
-                                                        .includes(
-                                                            filter.toLowerCase(),
-                                                        ),
+                                                        .includes(filter.toLowerCase()),
                                             )
                                             .map((f) => (
                                                 <tr key={f.codigo}>
                                                     <td>
                                                         <input
                                                             type="checkbox"
-                                                            aria-label={
-                                                                "Solicitar " +
-                                                                f.etiqueta
-                                                            }
-                                                            checked={Boolean(
-                                                                fields[
-                                                                    f.codigo
-                                                                ],
-                                                            )}
-                                                            disabled={
-                                                                !fields[
-                                                                    f.codigo
-                                                                ] &&
-                                                                chosen >= 50
-                                                            }
+                                                            aria-label={"Solicitar " + f.etiqueta}
+                                                            checked={Boolean(fields[f.codigo])}
+                                                            disabled={!fields[f.codigo] && chosen >= 50}
                                                             onChange={(e) =>
-                                                                setFields(
-                                                                    (prior) => {
-                                                                        const next =
-                                                                            {
-                                                                                ...prior,
-                                                                            };
-                                                                        if (
-                                                                            e
-                                                                                .target
-                                                                                .checked
-                                                                        )
-                                                                            next[
-                                                                                f.codigo
-                                                                            ] =
-                                                                                {
-                                                                                    codigo: f.codigo,
-                                                                                    modo:
-                                                                                        f.tipo ===
-                                                                                        "coleccion"
-                                                                                            ? "EDITAR"
-                                                                                            : "CONFIRMAR",
-                                                                                    obligatorio: true,
-                                                                                };
-                                                                        else
-                                                                            delete next[
-                                                                                f
-                                                                                    .codigo
-                                                                            ];
-                                                                        return next;
-                                                                    },
-                                                                )
+                                                                setFields((prior) => {
+                                                                    const next = {
+                                                                        ...prior,
+                                                                    };
+                                                                    if (e.target.checked)
+                                                                        next[f.codigo] = {
+                                                                            codigo: f.codigo,
+                                                                            modo:
+                                                                                f.tipo === "coleccion"
+                                                                                    ? "EDITAR"
+                                                                                    : "CONFIRMAR",
+                                                                            obligatorio: true,
+                                                                        };
+                                                                    else delete next[f.codigo];
+                                                                    return next;
+                                                                })
                                                             }
                                                         />
                                                     </td>
                                                     <th scope="row">
                                                         {f.etiqueta}
-                                                        <small
-                                                            className={
-                                                                styles.muted
-                                                            }
-                                                        >
-                                                            {" "}
-                                                            · {f.codigo}
-                                                        </small>
+                                                        <small className={styles.muted}> · {f.codigo}</small>
                                                     </th>
                                                     <td>
                                                         <select
-                                                            className={
-                                                                styles.control
-                                                            }
-                                                            aria-label={
-                                                                "Modo de " +
-                                                                f.etiqueta
-                                                            }
-                                                            disabled={
-                                                                !fields[
-                                                                    f.codigo
-                                                                ]
-                                                            }
-                                                            value={
-                                                                fields[f.codigo]
-                                                                    ?.modo ||
-                                                                "CONFIRMAR"
-                                                            }
+                                                            className={styles.control}
+                                                            aria-label={"Modo de " + f.etiqueta}
+                                                            disabled={!fields[f.codigo]}
+                                                            value={fields[f.codigo]?.modo || "CONFIRMAR"}
                                                             onChange={(e) =>
-                                                                setFields(
-                                                                    (
-                                                                        prior,
-                                                                    ) => ({
-                                                                        ...prior,
-                                                                        [f.codigo]:
-                                                                            {
-                                                                                ...prior[
-                                                                                    f
-                                                                                        .codigo
-                                                                                ],
-                                                                                modo: e
-                                                                                    .target
-                                                                                    .value as HrSelection["modo"],
-                                                                            },
-                                                                    }),
-                                                                )
+                                                                setFields((prior) => ({
+                                                                    ...prior,
+                                                                    [f.codigo]: {
+                                                                        ...prior[f.codigo],
+                                                                        modo: e.target
+                                                                            .value as HrSelection["modo"],
+                                                                    },
+                                                                }))
                                                             }
                                                         >
-                                                            <option value="CONFIRMAR">
-                                                                Solo confirmar
-                                                            </option>
+                                                            <option value="CONFIRMAR">Solo confirmar</option>
                                                             {f.editable && (
                                                                 <option value="EDITAR">
-                                                                    Permitir
-                                                                    edición
+                                                                    Permitir edición
                                                                 </option>
                                                             )}
                                                         </select>
                                                     </td>
                                                     <td>
                                                         <input
-                                                            aria-label={
-                                                                "Requerir " +
-                                                                f.etiqueta
-                                                            }
+                                                            aria-label={"Requerir " + f.etiqueta}
                                                             type="checkbox"
                                                             disabled={
-                                                                !fields[
-                                                                    f.codigo
-                                                                ] ||
-                                                                fields[f.codigo]
-                                                                    ?.modo ===
-                                                                    "CONFIRMAR"
+                                                                !fields[f.codigo] ||
+                                                                fields[f.codigo]?.modo === "CONFIRMAR"
                                                             }
-                                                            checked={Boolean(
-                                                                fields[f.codigo]
-                                                                    ?.obligatorio,
-                                                            )}
+                                                            checked={Boolean(fields[f.codigo]?.obligatorio)}
                                                             onChange={(e) =>
-                                                                setFields(
-                                                                    (
-                                                                        prior,
-                                                                    ) => ({
-                                                                        ...prior,
-                                                                        [f.codigo]:
-                                                                            {
-                                                                                ...prior[
-                                                                                    f
-                                                                                        .codigo
-                                                                                ],
-                                                                                obligatorio:
-                                                                                    e
-                                                                                        .target
-                                                                                        .checked,
-                                                                            },
-                                                                    }),
-                                                                )
+                                                                setFields((prior) => ({
+                                                                    ...prior,
+                                                                    [f.codigo]: {
+                                                                        ...prior[f.codigo],
+                                                                        obligatorio: e.target.checked,
+                                                                    },
+                                                                }))
                                                             }
                                                         />
                                                     </td>
@@ -651,21 +504,11 @@ export function HrCampaignsWorkspace() {
                                 </table>
                             </div>
                             <p className={styles.muted}>
-                                Se convocará a las cuentas habilitadas de la
-                                empresa 97 que existan al publicar. El grupo y
-                                los campos quedarán fijados para conservar el
-                                significado del reporte.
+                                Se convocará a las cuentas habilitadas de la empresa 97 que existan al
+                                publicar. El grupo y los campos quedarán fijados para conservar el significado
+                                del reporte.
                             </p>
-                            <Button
-                                type="submit"
-                                state={
-                                    busy
-                                        ? "loading"
-                                        : !chosen
-                                          ? "disabled"
-                                          : "default"
-                                }
-                            >
+                            <Button type="submit" state={busy ? "loading" : !chosen ? "disabled" : "default"}>
                                 Publicar y notificar campaña
                             </Button>
                         </fieldset>
@@ -675,9 +518,7 @@ export function HrCampaignsWorkspace() {
             <section className={styles.card} aria-label="Campañas publicadas">
                 <h3>Campañas publicadas</h3>
                 {!list && !error && <p role="status">Consultando campañas…</p>}
-                {list && !list.items.length && (
-                    <p>Aún no se han publicado campañas.</p>
-                )}
+                {list && !list.items.length && <p>Aún no se han publicado campañas.</p>}
                 {list?.items.map((c) => (
                     <article className={local.campaign} key={c.id}>
                         <div>
@@ -691,9 +532,7 @@ export function HrCampaignsWorkspace() {
                                 · {hrDate(c.inicio)} — {hrDate(c.fin)}
                             </p>
                             <p>
-                                {c.modo === "AL_ENVIAR"
-                                    ? "Aplicación al enviar"
-                                    : "Con aprobación de RRHH"}
+                                {c.modo === "AL_ENVIAR" ? "Aplicación al enviar" : "Con aprobación de RRHH"}
                             </p>
                         </div>
                         <Button
@@ -733,10 +572,8 @@ export function HrCampaignsWorkspace() {
                         <div>
                             <h3>{report.campana.nombre} · Avance</h3>
                             <p>
-                                {report.resumen.enviadas} de{" "}
-                                {report.resumen.total} usuarios convocados
-                                enviaron su actualización (
-                                {report.resumen.porcentaje}%).
+                                {report.resumen.enviadas} de {report.resumen.total} usuarios convocados
+                                enviaron su actualización ({report.resumen.porcentaje}%).
                             </p>
                         </div>
                         <div className={styles.actions}>
@@ -747,16 +584,15 @@ export function HrCampaignsWorkspace() {
                             >
                                 Actualizar reporte
                             </Button>
-                            {actions.INSERTAR &&
-                                report.campana.ventana !== "CERRADA" && (
-                                    <Button
-                                        variant="outlined"
-                                        state={busy ? "disabled" : "default"}
-                                        onClick={() => void close()}
-                                    >
-                                        Cerrar campaña anticipadamente
-                                    </Button>
-                                )}
+                            {actions.INSERTAR && report.campana.ventana !== "CERRADA" && (
+                                <Button
+                                    variant="outlined"
+                                    state={busy ? "disabled" : "default"}
+                                    onClick={() => void close()}
+                                >
+                                    Cerrar campaña anticipadamente
+                                </Button>
+                            )}
                         </div>
                     </div>
                     <progress
@@ -768,10 +604,7 @@ export function HrCampaignsWorkspace() {
                     <div className={local.stats}>
                         {[
                             ["Pendientes de envío", report.resumen.pendientes],
-                            [
-                                "Aplicadas o confirmadas",
-                                report.resumen.aplicadas,
-                            ],
+                            ["Aplicadas o confirmadas", report.resumen.aplicadas],
                             ["Revisadas por RRHH", report.resumen.revisadas],
                             ["Requieren contacto", report.resumen.contacto],
                         ].map(([label, value]) => (
@@ -782,14 +615,11 @@ export function HrCampaignsWorkspace() {
                         ))}
                     </div>
                     <p className={styles.muted}>
-                        El 100% corresponde al grupo convocado al publicar.
-                        «Enviadas» excluye las devueltas para corrección;
-                        «Aplicadas» y «Revisadas» muestran pasos diferentes.
+                        El 100% corresponde al grupo convocado al publicar. «Enviadas» excluye las devueltas
+                        para corrección; «Aplicadas» y «Revisadas» muestran pasos diferentes.
                     </p>
                     <div className={styles.field}>
-                        <label htmlFor="hr-report-state">
-                            Filtrar usuarios por estado
-                        </label>
+                        <label htmlFor="hr-report-state">Filtrar usuarios por estado</label>
                         <select
                             id="hr-report-state"
                             className={styles.control}
@@ -798,6 +628,7 @@ export function HrCampaignsWorkspace() {
                             onChange={(e) => {
                                 setState(e.target.value);
                                 setReportPage(0);
+                                setDetail(null);
                             }}
                         >
                             <option value="">Todos los estados</option>
@@ -822,26 +653,15 @@ export function HrCampaignsWorkspace() {
                             <tbody>
                                 {report.items.map((r) => (
                                     <tr key={r.usuarioId}>
-                                        <td>
-                                            {r.nombre ||
-                                                "Usuario " + r.usuarioId}
-                                        </td>
-                                        <td>
-                                            {r.empleado ?? "Vínculo pendiente"}
-                                        </td>
+                                        <td>{r.nombre || "Usuario " + r.usuarioId}</td>
+                                        <td>{r.empleado ?? "Vínculo pendiente"}</td>
                                         <td>{HR_STATES[r.estado]}</td>
                                         <td>{hrDate(r.enviadoEn)}</td>
                                         <td>
                                             <Button
                                                 variant="text"
-                                                state={
-                                                    busy
-                                                        ? "disabled"
-                                                        : "default"
-                                                }
-                                                onClick={() =>
-                                                    void inspect(r.usuarioId)
-                                                }
+                                                state={busy ? "disabled" : "default"}
+                                                onClick={() => void inspect(r.usuarioId)}
                                             >
                                                 Ver actualización
                                             </Button>
@@ -850,30 +670,26 @@ export function HrCampaignsWorkspace() {
                                 ))}
                             </tbody>
                         </table>
-                        {!report.items.length && (
-                            <p>No hay usuarios para el filtro aplicado.</p>
-                        )}
+                        {!report.items.length && <p>No hay usuarios para el filtro aplicado.</p>}
                     </div>
                     <div className={styles.actions}>
                         <Button
                             variant="outlined"
-                            state={
-                                busy || reportPage === 0
-                                    ? "disabled"
-                                    : "default"
-                            }
-                            onClick={() =>
-                                setReportPage((v) => Math.max(0, v - 50))
-                            }
+                            state={busy || reportPage === 0 ? "disabled" : "default"}
+                            onClick={() => {
+                                setDetail(null);
+                                setReportPage((v) => Math.max(0, v - 50));
+                            }}
                         >
                             Anterior
                         </Button>
                         <Button
                             variant="outlined"
-                            state={
-                                busy || !report.hayMas ? "disabled" : "default"
-                            }
-                            onClick={() => setReportPage((v) => v + 50)}
+                            state={busy || !report.hayMas ? "disabled" : "default"}
+                            onClick={() => {
+                                setDetail(null);
+                                setReportPage((v) => v + 50);
+                            }}
                         >
                             Siguiente
                         </Button>
@@ -881,10 +697,7 @@ export function HrCampaignsWorkspace() {
                 </section>
             )}
             {detail && (
-                <section
-                    className={styles.card}
-                    aria-label="Revisar actualización"
-                >
+                <section className={styles.card} aria-label="Revisar actualización">
                     <div className={styles.toolbar}>
                         <h3>Actualización de {detail.nombre}</h3>
                         <Button
@@ -896,9 +709,8 @@ export function HrCampaignsWorkspace() {
                         </Button>
                     </div>
                     <p>
-                        Contacto registrado:{" "}
-                        {detail.contacto?.telefono || "Teléfono no disponible"}{" "}
-                        · {detail.contacto?.correo || "Correo no disponible"}
+                        Contacto registrado: {detail.contacto?.telefono || "Teléfono no disponible"} ·{" "}
+                        {detail.contacto?.correo || "Correo no disponible"}
                     </p>
                     <HrSubmission data={detail} />
                     {detail.entrega && detail.entrega.revision > 1 && (
@@ -910,56 +722,37 @@ export function HrCampaignsWorkspace() {
                     )}
                     {detail.entrega &&
                         actions.EDITAR &&
-                        ["ENVIADA", "APLICADA", "CONTACTO"].includes(
-                            detail.estado,
-                        ) && (
+                        ["ENVIADA", "APLICADA", "CONTACTO"].includes(detail.estado) && (
                             <form onSubmit={review}>
-                                <fieldset
-                                    disabled={busy}
-                                    className={local.fieldset}
-                                >
+                                <fieldset disabled={busy} className={local.fieldset}>
                                     <legend>Registrar revisión de RRHH</legend>
                                     <div className={local.formGrid}>
                                         <div className={styles.field}>
-                                            <label htmlFor="hr-decision">
-                                                Decisión
-                                            </label>
+                                            <label htmlFor="hr-decision">Decisión</label>
                                             <select
                                                 id="hr-decision"
                                                 className={styles.control}
                                                 value={decision}
-                                                onChange={(e) =>
-                                                    setDecision(e.target.value)
-                                                }
+                                                onChange={(e) => setDecision(e.target.value)}
                                             >
-                                                {detail.estado ===
-                                                "CONTACTO" ? (
+                                                {detail.estado === "CONTACTO" ? (
                                                     <option value="FINALIZAR_CONTACTO">
-                                                        Finalizar atención de
-                                                        los datos observados
+                                                        Finalizar atención de los datos observados
                                                     </option>
                                                 ) : (
                                                     <>
                                                         <option value="APROBAR">
-                                                            {detail.estado ===
-                                                            "APLICADA"
+                                                            {detail.estado === "APLICADA"
                                                                 ? "Marcar como revisada"
                                                                 : "Aprobar y aplicar campos editables"}
                                                         </option>
                                                         <option value="SOLICITAR_CONTACTO">
-                                                            Solicitar atención
-                                                            de RRHH sin aplicar
-                                                            cambios
+                                                            Solicitar atención de RRHH sin aplicar cambios
                                                         </option>
-                                                        {detail.campana
-                                                            .ventana ===
-                                                            "ABIERTA" &&
-                                                            detail.estado ===
-                                                                "ENVIADA" && (
+                                                        {detail.campana.ventana === "ABIERTA" &&
+                                                            detail.estado === "ENVIADA" && (
                                                                 <option value="DEVOLVER">
-                                                                    Devolver
-                                                                    para
-                                                                    correcciones
+                                                                    Devolver para correcciones
                                                                 </option>
                                                             )}
                                                     </>
@@ -968,8 +761,7 @@ export function HrCampaignsWorkspace() {
                                         </div>
                                         <div className={styles.field}>
                                             <label htmlFor="hr-review-note">
-                                                Observación de RRHH (visible
-                                                para el usuario) *
+                                                Observación de RRHH (visible para el usuario) *
                                             </label>
                                             <textarea
                                                 id="hr-review-note"
@@ -977,25 +769,18 @@ export function HrCampaignsWorkspace() {
                                                 required
                                                 maxLength={2000}
                                                 value={note}
-                                                onChange={(e) =>
-                                                    setNote(e.target.value)
-                                                }
+                                                onChange={(e) => setNote(e.target.value)}
                                             />
                                         </div>
                                     </div>
                                     {detail.estado === "CONTACTO" && (
                                         <p>
-                                            Contacta con el empleado y atiende
-                                            los datos de solo confirmación en el
-                                            sistema oficial de RRHH. Registra
-                                            aquí cómo se resolvió antes de
-                                            finalizar la atención.
+                                            Contacta con el empleado y atiende los datos de solo confirmación
+                                            en el sistema oficial de RRHH. Registra aquí cómo se resolvió
+                                            antes de finalizar la atención.
                                         </p>
                                     )}
-                                    <Button
-                                        type="submit"
-                                        state={busy ? "loading" : "default"}
-                                    >
+                                    <Button type="submit" state={busy ? "loading" : "default"}>
                                         Registrar revisión
                                     </Button>
                                 </fieldset>

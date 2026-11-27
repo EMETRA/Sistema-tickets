@@ -1,9 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import {
-    WORKSPACE_VIEWS,
-    type WorkspaceViewSelection,
-} from "@/platform/presentation";
+import { WORKSPACE_VIEWS, type WorkspaceViewSelection } from "@/platform/presentation";
 import styles from "./WorkspaceViewSwitcher.module.scss";
 
 export function WorkspaceViewSwitcher({
@@ -12,10 +9,10 @@ export function WorkspaceViewSwitcher({
     onClose,
     onApply,
 }: {
-  open: boolean;
-  mode: WorkspaceViewSelection;
-  onClose: () => void;
-  onApply: (mode: WorkspaceViewSelection) => void;
+    open: boolean;
+    mode: WorkspaceViewSelection;
+    onClose: () => void;
+    onApply: (mode: WorkspaceViewSelection) => void;
 }) {
     const dialog = useRef<HTMLDialogElement>(null);
     const [choice, setChoice] = useState(mode);
@@ -44,18 +41,14 @@ export function WorkspaceViewSwitcher({
                     <h2 id="workspace-view-title">Cambiar vista</h2>
                 </header>
                 <p id="workspace-view-description">
-                    Cambia la portada y la navegación para presentaciones y pruebas
-                    visuales. Los datos y permisos siguen siendo los de tu cuenta.
+                    Cambia la portada y la navegación para presentaciones y pruebas visuales. Los datos y
+                    permisos siguen siendo los de tu cuenta.
                 </p>
-                <label htmlFor="workspace-view-choice">
-                    Vista del espacio de trabajo
-                </label>
+                <label htmlFor="workspace-view-choice">Vista del espacio de trabajo</label>
                 <select
                     id="workspace-view-choice"
                     value={choice}
-                    onChange={(event) =>
-                        setChoice(event.target.value as WorkspaceViewSelection)
-                    }
+                    onChange={(event) => setChoice(event.target.value as WorkspaceViewSelection)}
                 >
                     <option value="ACTUAL">Mi vista actual</option>
                     {WORKSPACE_VIEWS.map((view) => (

@@ -1,18 +1,8 @@
 import { randomUUID } from "node:crypto";
-import {
-    mkdir,
-    readFile,
-    readdir,
-    unlink,
-    writeFile,
-    link,
-} from "node:fs/promises";
+import { mkdir, readFile, readdir, unlink, writeFile, link } from "node:fs/promises";
 import { join } from "node:path";
 import { getGraphqlEndpoint } from "@/api/config/env";
-import {
-    diagnosticoErrorGraphql,
-    estadoErrorGraphql,
-} from "@/api/graphql/server-error";
+import { diagnosticoErrorGraphql, estadoErrorGraphql } from "@/api/graphql/server-error";
 type Event = {
     referencia: string;
     origen: "PANEL";
@@ -22,8 +12,7 @@ type Event = {
 };
 let flushing = false;
 let timer: NodeJS.Timeout | undefined;
-const directory = () =>
-    process.env.TICKETS_ERROR_QUEUE_DIR || "/tmp/tickets-panel-incidents";
+const directory = () => process.env.TICKETS_ERROR_QUEUE_DIR || "/tmp/tickets-panel-incidents";
 export function backendReference(error: unknown): string | undefined {
     const root = error as {
         response?: {
@@ -37,23 +26,15 @@ export function backendReference(error: unknown): string | undefined {
     };
     const e = root?.response?.errors?.[0]?.extensions;
     const value = e?.referencia || e?.originalError?.referencia;
-    return typeof value === "string" && /^[a-f0-9-]{36}$/.test(value)
-        ? value
-        : undefined;
+    return typeof value === "string" && /^[a-f0-9-]{36}$/.test(value) ? value : undefined;
 }
-export async function queuePanelIncident(
-    operacion: string,
-    error: unknown,
-    referencia = randomUUID(),
-) {
+export async function queuePanelIncident(operacion: string, error: unknown, referencia = randomUUID()) {
     const existing = backendReference(error);
     if (existing) return existing;
     if ([401, 403].includes(estadoErrorGraphql(error))) return referencia;
     const diagnostic = diagnosticoErrorGraphql(error);
     if (
-        diagnostic.codigosGraphql.some((c) =>
-            ["BAD_USER_INPUT", "BAD_REQUEST"].includes(c),
-        ) &&
+        diagnostic.codigosGraphql.some((c) => ["BAD_USER_INPUT", "BAD_REQUEST"].includes(c)) &&
         !diagnostic.codigosOracle.length
     )
         return referencia;
@@ -70,12 +51,8 @@ export async function queuePanelIncident(
     };
     try {
         await mkdir(directory(), { recursive: true, mode: 0o700 });
-        if ((await readdir(directory())).length >= 10000)
-            throw Error("QUEUE_FULL");
-        const temporary = join(
-            directory(),
-            referencia + "." + randomUUID() + ".tmp",
-        );
+        if ((await readdir(directory())).length >= 10000) throw Error("QUEUE_FULL");
+        const temporary = join(directory(), referencia + "." + randomUUID() + ".tmp");
         try {
             await writeFile(temporary, JSON.stringify(event), {
                 flag: "wx",
@@ -109,9 +86,7 @@ export async function flushPanelIncidents() {
     flushing = true;
     try {
         const url = new URL(getGraphqlEndpoint());
-        url.pathname =
-            url.pathname.replace(/\/graphql\/?$/, "") +
-            "/platform/integrations/panel-errors";
+        url.pathname = url.pathname.replace(/\/graphql\/?$/, "") + "/platform/integrations/panel-errors";
         url.search = "";
         const files = (await readdir(directory()))
             .filter((name) => /^[a-f0-9-]{36}\.json$/.test(name))
@@ -122,8 +97,7 @@ export async function flushPanelIncidents() {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization:
-                        "Bearer " + process.env.TICKETS_PANEL_ERROR_TOKEN,
+                    Authorization: "Bearer " + process.env.TICKETS_PANEL_ERROR_TOKEN,
                 },
                 body: await readFile(join(directory(), name), "utf8"),
                 redirect: "error",

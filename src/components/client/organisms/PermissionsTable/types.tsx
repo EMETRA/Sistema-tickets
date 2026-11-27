@@ -11,15 +11,15 @@ export interface Permissions {
     grabar?: boolean;
     editar?: boolean;
     eliminar?: boolean;
-};
+}
 
 export interface PermissionsTableProps {
     permissions: Permissions[];
     modules: Modules[];
-    onSubmit?: (data: {module: number; name: string; code: string; description: string;}) => void;
+    onSubmit?: (data: { module: number; name: string; code: string; description: string }) => void;
     onEdit?: (data: Permissions) => void;
     onDelete?: (id: number) => void;
     className?: string;
-};
+}
 
 export type PermissionsView = "table" | "create" | "edit";

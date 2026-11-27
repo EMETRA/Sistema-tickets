@@ -1,65 +1,27 @@
 "use client";
-import { startTransition, useEffect, useState } from "react";
-import { Button } from "@/components/client/atoms/Button";
+import { queryErrorMessage, usePlatformQuery } from "@/platform/query";
+import { useState } from "react";
 import { usePlatform } from "@/platform/context";
-import { platformFetch } from "@/platform/client";
-import { ResourceWorkspace } from "@/components/client/organisms/ResourceWorkspace/ResourceWorkspace";
-import {
-    OrganizationPeople,
-    type OrganizationPerson,
-} from "@/components/client/organisms/OrganizationPeople/OrganizationPeople";
+import { ResourceWorkspace } from "@/features/registros/components/ResourceWorkspace/ResourceWorkspace";
+import type { OrganizationPerson } from "@/features/personas/components/PeoplePanel/types";
 import { OrganizationSync } from "./OrganizationSync";
-import {
-    WorkspaceNavigation,
-    useWorkspaceTab,
-    type WorkspaceTab,
-} from "./WorkspaceNavigation";
+import { WorkspaceNavigation, useWorkspaceTab, type WorkspaceTab } from "./WorkspaceNavigation";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
+import { PeopleDirectoryView, TeamsBoard } from "@/features/personas/components/PeoplePanel";
 function PeopleDirectory() {
-    const [people, setPeople] = useState<OrganizationPerson[] | null>(null),
-        [error, setError] = useState(""),
-        [revision, setRevision] = useState(0);
-    useEffect(() => {
-        const controller = new AbortController();
-        startTransition(() => {
-            setPeople(null);
-            setError("");
-        });
-        platformFetch<{ personal: OrganizationPerson[] }>(
-            "/organization/people",
-            { signal: controller.signal },
-        )
-            .then((result) => {
-                if (!controller.signal.aborted) setPeople(result.personal);
-            })
-            .catch((e) => {
-                if (!controller.signal.aborted) setError(e.message);
-            });
-        return () => controller.abort();
-    }, [revision]);
-    return (
-        <section className={styles.listPanel}>
-            <div className={styles.toolbar}>
-                <div>
-                    <h2>Personal de RRHH</h2>
-                </div>
-                <Button
-                    variant="outlined"
-                    onClick={() => setRevision((v) => v + 1)}
-                >
-                    Actualizar personal
-                </Button>
-            </div>
-            {error ? (
-                <p role="alert" className={styles.error}>
-                    {error}
-                </p>
-            ) : people ? (
-                <OrganizationPeople people={people} />
-            ) : (
-                <p role="status">Consultando el personal de RRHH…</p>
-            )}
-        </section>
+    const query = usePlatformQuery<{ personal: OrganizationPerson[] }>("/organization/people");
+    const people = query.data?.personal ?? null;
+    const error = query.error ? queryErrorMessage(query.error) : "";
+    return error ? (
+        <p role="alert" className={styles.error}>
+            {error}
+        </p>
+    ) : people ? (
+        <PeopleDirectoryView people={people} onRefresh={() => void query.refetch()} />
+    ) : (
+        <p role="status" className={styles.muted}>
+            Consultando el personal de RRHH…
+        </p>
     );
 }
 function Responsibilities() {
@@ -98,6 +60,7 @@ function Responsibilities() {
 export function OrganizationWorkspace() {
     const { data } = usePlatform();
     const [revision, setRevision] = useState(0);
+    const [teamsTable, setTeamsTable] = useState(false);
     const tabs: WorkspaceTab[] = [];
     if (data?.actor.admin)
         tabs.push({
@@ -121,18 +84,10 @@ export function OrganizationWorkspace() {
                 "Define qué función cumple cada miembro con cuenta dentro de su equipo. Los permisos del sistema se administran en Personas y accesos.",
         });
     const { current, select } = useWorkspaceTab(tabs);
-    if (!current)
-        return (
-            <p className={styles.card}>No tienes acceso a estos registros.</p>
-        );
+    if (!current) return <p className={styles.card}>No tienes acceso a estos registros.</p>;
     return (
         <section className={`${styles.page} ${styles.workspace}`}>
-            <WorkspaceNavigation
-                tabs={tabs}
-                current={current}
-                onSelect={select}
-                label="Personal y equipos"
-            />
+            <WorkspaceNavigation tabs={tabs} current={current} onSelect={select} label="Personal y equipos" />
             {current.id === "personas" ? (
                 <PeopleDirectory />
             ) : current.id === "responsabilidades" ? (
@@ -142,19 +97,21 @@ export function OrganizationWorkspace() {
                     {data?.actor.admin && (
                         <details className={styles.card}>
                             <summary>Sincronizar equipos desde RRHH</summary>
-                            <OrganizationSync
-                                onApplied={() => setRevision((v) => v + 1)}
-                            />
+                            <OrganizationSync onApplied={() => setRevision((v) => v + 1)} />
                         </details>
                     )}
-                    <ResourceWorkspace
-                        key={revision}
-                        group="organizacion"
-                        types={["equipos"]}
-                        initialType="equipos"
-                        hideTabs
-                        hideDescription
-                    />
+                    {!teamsTable ? (
+                        <TeamsBoard revision={revision} onShowTable={() => setTeamsTable(true)} />
+                    ) : (
+                        <ResourceWorkspace
+                            key={revision}
+                            group="organizacion"
+                            types={["equipos"]}
+                            initialType="equipos"
+                            hideTabs
+                            hideDescription
+                        />
+                    )}
                 </>
             )}
         </section>

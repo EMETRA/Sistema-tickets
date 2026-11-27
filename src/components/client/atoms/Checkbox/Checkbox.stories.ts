@@ -125,7 +125,7 @@ export const Medium: Story = {
     args: {
         label: "Checkbox mediano",
         state: "default",
-        size: 24
+        size: 24,
     },
 };
 

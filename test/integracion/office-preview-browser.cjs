@@ -6,7 +6,7 @@ const path = require('node:path');
 const {chromium} = require('playwright');
 const {start} = require('../../scripts/laboratorio/iniciar.cjs');
 async function run() {
- const api = process.env.TICKETS_API_SOURCE || path.resolve(__dirname,'../../../api-tickets');
+ const api = (process.env.TICKETS_API_SOURCE||process.env.API_TICKETS_DIR||path.resolve(__dirname,'../../../../apis/api-tickets'));
  const {PlatformTicketFiles} = require(path.join(api,'dist/platform/platform.ticket-files.js'));
  const {PlatformOfficePreview} = require(path.join(api,'dist/platform/platform.office-preview.js'));
  const {PlatformTickets} = require(path.join(api,'dist/platform/platform.tickets.js'));
@@ -57,12 +57,12 @@ async function run() {
     else {res.writeHead(200,{'Content-Type':file.mime});res.end(file.buffer);}
    } catch(error){res.writeHead(error.getStatus?.()||503,{'Content-Type':'application/json'});res.end(JSON.stringify({codigo:'PRUEBA',message:error.message,referencia:'11111111-2222-4333-8444-555555555555'}));}
   });
-  browser = await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox','--disable-dev-shm-usage']});
+  browser = await chromium.launch({executablePath:process.env.QA_CHROMIUM_PATH||undefined,args:['--no-sandbox','--disable-dev-shm-usage']});
   page = await browser.newPage({viewport:{width:1440,height:1000}});page.setDefaultTimeout(25000);page.on('pageerror',e=>errors.push(e.message));
   await page.route('**/*',route=>{const url=route.request().url();if(/^https?:/.test(url)&&new URL(url).hostname!=='127.0.0.1'){external.push(url);return route.abort();}return route.continue();});
   const visit=async url=>{await page.goto(instance.base+url);await page.waitForLoadState('networkidle');};
   for(let i=0;i<100;i++){try{if((await fetch(instance.base+'/home')).status<500)break;}catch{}await new Promise(r=>setTimeout(r,100));}
-  await visit('/__laboratorio/entrar?usuario=1');await visit('/mis-tickets/21');
+  await visit('/__laboratorio/entrar?usuario=1');await visit('/mis-tickets/21');await page.getByRole('tab',{name:/^Archivos/}).click();
   const open=async name=>{await page.getByRole('button',{name,exact:true}).click();await page.getByRole('link',{name:'Descargar archivo',exact:true}).waitFor();};
   const close=()=>page.getByRole('button',{name:'Cerrar visor de archivos',exact:true}).click();
   const download=async file=>{const ready=page.waitForEvent('download');await page.getByRole('link',{name:'Descargar archivo',exact:true}).click();const saved=path.join(dir,'descarga-'+file.name);await (await ready).saveAs(saved);assert.deepEqual(await fs.readFile(saved),file.buffer);};

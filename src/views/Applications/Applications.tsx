@@ -5,6 +5,7 @@ import { useAppsCatalogContext } from "@/context/AppsCatalogContext";
 import { resolveIconFile } from "@/components/client/atoms/Icon/types";
 import { getMainApps } from "@/config/apps-catalog";
 import { HomeState } from "../Home/HomeHeading";
+import { AppsDirectory } from "@/components/client/organisms/AreaWorkspace";
 
 export function Applications() {
     const router = useRouter();
@@ -17,6 +18,7 @@ export function Applications() {
                 onRetry={() => void refetch()}
             />
         );
+    if (catalog && Object.keys(catalog).length) return <AppsDirectory catalog={catalog} />;
     return (
         <AppsGrid
             title="Aplicaciones autorizadas"

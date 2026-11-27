@@ -1,65 +1,65 @@
 @use "../../../../theme/surfaces.scss" as surfaces;
 .card {
-    background-color: #FFFFFF;
-    border: 1px solid #E0E0E0;
-    border-radius: 16px;
-    padding: 32px;
-    max-width: 500px;
-    // box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  background-color: var(--tickets-surface);
+  border: 1px solid var(--tickets-border);
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 500px;
+  // box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .title {
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--tickets-text);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--tickets-text);
 }
 
 .records {
-    display: flex;
-    flex-direction: column;
-    margin-top: 20px;
-    margin-bottom: 5%;
+  display: flex;
+  flex-direction: column;
+  margin-top: 20px;
+  margin-bottom: 5%;
 }
 
 .row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    // margin: 0;
-    padding: 0;
-    line-height: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  // margin: 0;
+  padding: 0;
+  line-height: 1;
 }
 
 .label {
-    font-weight: 500;
-    color: var(--tickets-text);
-    // margin: 0;
-    padding: 0;
-    line-height: 2;
+  font-weight: 500;
+  color: var(--tickets-text);
+  // margin: 0;
+  padding: 0;
+  line-height: 2;
 }
 
 .dateInfo {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    min-width: 140px;
-    line-height: 2;
-    // margin-bottom: 7%;
-    // margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 140px;
+  line-height: 2;
+  // margin-bottom: 7%;
+  // margin: 0;
 }
 
 .observationsSection {
-    .obsLabel {
-        font-weight: 600;
-        color: var(--tickets-text);
+  .obsLabel {
+    font-weight: 600;
+    color: var(--tickets-text);
 
-        line-height: 2;
-    }
+    line-height: 2;
+  }
 
-    .obsContent {
-        line-height: 1.5;
-        font-size: 14px;
-    }
+  .obsContent {
+    line-height: 1.5;
+    font-size: 14px;
+  }
 }
 .card {
   @include surfaces.panel;

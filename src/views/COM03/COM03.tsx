@@ -5,7 +5,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useGetPermisosNoticias } from "@/api/hooks";
 import { Text } from "@/components/client/atoms/Text";
 import { Title } from "@/components/client/atoms/Title";
-import { NewsResultCard } from "@/components/client/organisms/NewsResultCard";
+import { NewsResultCard } from "@/features/comunicacion/components/NewsResultCard";
 import NewsListView from "./NewsListView/NewsListView";
 import NewsFormView from "./NewsFormView/NewsFormView";
 import { permisosParaUI } from "./utils/permisos";
@@ -40,7 +40,12 @@ function COM03Content() {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
-    const { data: permisos, loading: loadingPermisos, error: errorPermisos, refetch: refetchPermisos } = useGetPermisosNoticias();
+    const {
+        data: permisos,
+        loading: loadingPermisos,
+        error: errorPermisos,
+        refetch: refetchPermisos,
+    } = useGetPermisosNoticias();
 
     const vista = searchParams.get("vista");
     const id = searchParams.get("id");
@@ -56,24 +61,38 @@ function COM03Content() {
     if (loadingPermisos) {
         return (
             <div className={styles.content}>
-                <Text variant="caption" className={styles.status}>Cargando noticias...</Text>
+                <Text variant="caption" className={styles.status}>
+                    Cargando noticias...
+                </Text>
             </div>
         );
     }
 
-    if (errorPermisos) return <div className={styles.content}><NewsResultCard status="error" title="No se pudieron consultar los permisos" description="Intenta consultar de nuevo para continuar." primaryAction={{ label: 'Reintentar', onClick: () => void refetchPermisos() }} /></div>;
+    if (errorPermisos)
+        return (
+            <div className={styles.content}>
+                <NewsResultCard
+                    status="error"
+                    title="No se pudieron consultar los permisos"
+                    description="Intenta consultar de nuevo para continuar."
+                    primaryAction={{ label: "Reintentar", onClick: () => void refetchPermisos() }}
+                />
+            </div>
+        );
     const { puedeLeer, puedeEditar, puedePublicar } = permisosParaUI(permisos);
 
     const sinPermiso = !puedeLeer
         ? { ...SIN_PERMISO.leer, action: { label: "Ir al inicio", onClick: () => router.push("/home") } }
         : isForm && !puedeEditar
-            ? { ...SIN_PERMISO.editar, action: { label: "Ver listado de noticias", onClick: goToList } }
-            : null;
+          ? { ...SIN_PERMISO.editar, action: { label: "Ver listado de noticias", onClick: goToList } }
+          : null;
 
     if (sinPermiso) {
         return (
             <div className={styles.content}>
-                <Title variant="mid" tag="h1" className={styles.heading}>Comunicación</Title>
+                <Title variant="mid" tag="h1" className={styles.heading}>
+                    Comunicación
+                </Title>
                 <NewsResultCard
                     status="error"
                     title={sinPermiso.title}

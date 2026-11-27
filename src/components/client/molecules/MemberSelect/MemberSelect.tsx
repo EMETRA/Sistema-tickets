@@ -39,7 +39,7 @@ export const MemberSelect: React.FC<MemberSelectProps> = ({
             }
             onOpenChange?.(newValue);
         },
-        [isControlled, onOpenChange]
+        [isControlled, onOpenChange],
     );
 
     // Encontrar el miembro seleccionado
@@ -67,8 +67,8 @@ export const MemberSelect: React.FC<MemberSelectProps> = ({
         setIsOpen(!isOpen);
     };
 
-    const handleSelect = (member: typeof members[0]) => {
-    // Si el miembro clickeado ya está seleccionado, deseleccionar
+    const handleSelect = (member: (typeof members)[0]) => {
+        // Si el miembro clickeado ya está seleccionado, deseleccionar
         if (member.id === selectedId) {
             onSelect?.(undefined);
         } else {

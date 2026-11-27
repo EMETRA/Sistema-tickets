@@ -3,13 +3,7 @@ import { Button } from "@/components/client/atoms/Button";
 import { HR_COLLECTIONS, hrCollection } from "@/platform/hr-extended";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
 import local from "./HrWorkspace.module.scss";
-export function HrCollectionView({
-    code,
-    value,
-}: {
-    code: string;
-    value?: string | null;
-}) {
+export function HrCollectionView({ code, value }: { code: string; value?: string | null }) {
     const config = HR_COLLECTIONS[code];
     if (!config) return <>{value ?? "No registrado"}</>;
     const data = hrCollection(value);
@@ -25,9 +19,7 @@ export function HrCollectionView({
                             .map((c) => (
                                 <div key={c.key}>
                                     <dt>{c.label}</dt>
-                                    <dd>
-                                        {c.options?.[row[c.key]] || row[c.key]}
-                                    </dd>
+                                    <dd>{c.options?.[row[c.key]] || row[c.key]}</dd>
                                 </div>
                             ))}
                     </dl>
@@ -51,20 +43,17 @@ export function HrCollectionEditor({
         data = hrCollection(value) || { declaracion: "", registros: [] };
     if (!config) return null;
     const update = (next: typeof data) => onChange(JSON.stringify(next));
-    const empty = () =>
-        Object.fromEntries(config.columns.map((c) => [c.key, ""]));
+    const empty = () => Object.fromEntries(config.columns.map((c) => [c.key, ""]));
     return (
         <fieldset className={local.collectionEditor} disabled={disabled}>
             <legend>{config.label}</legend>
             {code === "RH_ALERGIAS" && (
                 <p className={styles.muted}>
-                    Indica el medicamento y la reacción que conozcas. Si no
-                    conoces alergias, selecciona esa respuesta.
+                    Indica el medicamento y la reacción que conozcas. Si no conoces alergias, selecciona esa
+                    respuesta.
                 </p>
             )}
-            <label htmlFor={"hr-" + code}>
-                Declaración de {config.label.toLowerCase()} *
-            </label>
+            <label htmlFor={"hr-" + code}>Declaración de {config.label.toLowerCase()} *</label>
             <select
                 id={"hr-" + code}
                 className={styles.control}
@@ -89,8 +78,8 @@ export function HrCollectionEditor({
             {data.declaracion === "REGISTRADO" && (
                 <>
                     <p className={styles.muted}>
-                        Puedes agregar varios registros (máximo 30). Retirar uno
-                        conserva su historial cuando se aplica la actualización.
+                        Puedes agregar varios registros (máximo 30). Retirar uno conserva su historial cuando
+                        se aplica la actualización.
                     </p>
                     {data.registros.map((row, i) => (
                         <section
@@ -106,13 +95,8 @@ export function HrCollectionEditor({
                                     onClick={() =>
                                         update({
                                             ...data,
-                                            declaracion:
-                                                data.registros.length === 1
-                                                    ? ""
-                                                    : data.declaracion,
-                                            registros: data.registros.filter(
-                                                (_, n) => n !== i,
-                                            ),
+                                            declaracion: data.registros.length === 1 ? "" : data.declaracion,
+                                            registros: data.registros.filter((_, n) => n !== i),
                                         })
                                     }
                                 >
@@ -126,33 +110,24 @@ export function HrCollectionEditor({
                                             c.required ||
                                             (c.key === "carrera" &&
                                                 row.nivel &&
-                                                ![
-                                                    "PRIMARIA",
-                                                    "BASICOS",
-                                                ].includes(row.nivel));
+                                                !["PRIMARIA", "BASICOS"].includes(row.nivel));
                                     const props = {
                                         id,
                                         className: styles.control,
                                         value: row[c.key] || "",
                                         required: Boolean(required),
                                         onChange: (
-                                            e: React.ChangeEvent<
-                                                | HTMLInputElement
-                                                | HTMLSelectElement
-                                            >,
+                                            e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
                                         ) =>
                                             update({
                                                 ...data,
-                                                registros: data.registros.map(
-                                                    (r, n) =>
-                                                        n === i
-                                                            ? {
-                                                                  ...r,
-                                                                  [c.key]:
-                                                                      e.target
-                                                                          .value,
-                                                              }
-                                                            : r,
+                                                registros: data.registros.map((r, n) =>
+                                                    n === i
+                                                        ? {
+                                                              ...r,
+                                                              [c.key]: e.target.value,
+                                                          }
+                                                        : r,
                                                 ),
                                             }),
                                     };
@@ -164,16 +139,9 @@ export function HrCollectionEditor({
                                             </label>
                                             {c.options ? (
                                                 <select {...props}>
-                                                    <option value="">
-                                                        Selecciona una opción
-                                                    </option>
-                                                    {Object.entries(
-                                                        c.options,
-                                                    ).map(([value, label]) => (
-                                                        <option
-                                                            key={value}
-                                                            value={value}
-                                                        >
+                                                    <option value="">Selecciona una opción</option>
+                                                    {Object.entries(c.options).map(([value, label]) => (
+                                                        <option key={value} value={value}>
                                                             {label}
                                                         </option>
                                                     ))}
@@ -183,25 +151,14 @@ export function HrCollectionEditor({
                                                     {...props}
                                                     type={c.type || "text"}
                                                     maxLength={c.max}
-                                                    min={
-                                                        c.type === "number"
-                                                            ? 1900
-                                                            : undefined
-                                                    }
+                                                    min={c.type === "number" ? 1900 : undefined}
                                                     max={
                                                         c.type === "number"
                                                             ? new Date().getFullYear()
                                                             : c.type === "date"
-                                                              ? new Date(
-                                                                    Date.now() -
-                                                                        6 *
-                                                                            3600000,
-                                                                )
+                                                              ? new Date(Date.now() - 6 * 3600000)
                                                                     .toISOString()
-                                                                    .slice(
-                                                                        0,
-                                                                        10,
-                                                                    )
+                                                                    .slice(0, 10)
                                                               : undefined
                                                     }
                                                 />
@@ -215,9 +172,7 @@ export function HrCollectionEditor({
                     <Button
                         type="button"
                         variant="outlined"
-                        state={
-                            data.registros.length >= 30 ? "disabled" : "default"
-                        }
+                        state={data.registros.length >= 30 ? "disabled" : "default"}
                         onClick={() =>
                             update({
                                 ...data,

@@ -233,7 +233,8 @@ test("aprobación y alta simulan resultados sin SMTP ni cuentas institucionales"
       data: {
         nombre: "Cuenta ficticia",
         equipoId: lab.state.data.ids.finanzas,
-        visibilidad: "EQUIPO",
+        // Como en el API: las solicitudes siempre son privadas.
+        visibilidad: "PRIVADA",
         estado: "PENDIENTE",
         datos: {
           tipo: "USUARIO_NUEVO",

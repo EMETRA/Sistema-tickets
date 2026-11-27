@@ -16,6 +16,7 @@
 # next.js
 /.next/
 /.next-laboratorio/
+/.next-oracle/
 /.laboratorio/
 /out/
 
@@ -48,3 +49,7 @@ next-env.d.ts
 storybook-static
 
 .tool-versions
+
+# Playwright
+/playwright-report/
+/test-results/

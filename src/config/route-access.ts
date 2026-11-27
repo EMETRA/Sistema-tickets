@@ -8,9 +8,7 @@ import { PAGES_CONFIG, ROLE_LAYOUTS } from "@/config/navigation";
 function getAllowedPathsForRole(role: UserRole): string[] {
     const layout = ROLE_LAYOUTS[role] ?? ROLE_LAYOUTS.USUARIO;
 
-    return layout
-        .map((pageId) => PAGES_CONFIG[pageId]?.path)
-        .filter((path): path is string => Boolean(path));
+    return layout.map((pageId) => PAGES_CONFIG[pageId]?.path).filter((path): path is string => Boolean(path));
 }
 
 /**
@@ -20,7 +18,14 @@ function getAllowedPathsForRole(role: UserRole): string[] {
  */
 export function canAccessPath(role: UserRole | null | undefined, pathname: string): boolean {
     if (!role) return false;
-    if(pathname.startsWith("/espacio/") || pathname === "/ayuda" || pathname === "/mi-perfil" || pathname === "/notificaciones") return true;
+    if (
+        pathname.startsWith("/espacio/") ||
+        pathname === "/ayuda" ||
+        pathname === "/mi-perfil" ||
+        pathname === "/notificaciones" ||
+        pathname === "/ajustes"
+    )
+        return true;
 
     const allowedPaths = getAllowedPathsForRole(role);
 

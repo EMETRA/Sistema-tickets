@@ -1,0 +1,309 @@
+.sidebar {
+  position: relative;
+  isolation: isolate;
+  transform: translateZ(0);
+  width: 248px;
+  height: calc(100dvh / var(--vp-zoom, 1));
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  background: var(--tickets-surface);
+  border-right: 1px solid var(--tickets-border);
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 18px 14px;
+  color: var(--tickets-text);
+  text-decoration: none;
+  strong {
+    display: block;
+    font-size: 17px;
+    letter-spacing: 0.8px;
+    line-height: 1.1;
+  }
+  small {
+    display: block;
+    margin-top: 3px;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.3px;
+    text-transform: uppercase;
+    color: var(--tickets-text-muted);
+  }
+}
+.mark {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--tickets-primary), #2f47c8);
+  color: var(--tickets-on-primary);
+  font-weight: 700;
+  font-size: 16px;
+  box-shadow:
+    inset 0 1px 0 #ffffff33,
+    0 2px 6px #4361ee40;
+}
+.search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 2px 14px 6px;
+  padding: 8px 10px;
+  border: 1px solid var(--tickets-border);
+  border-radius: 9px;
+  background: var(--tickets-surface-subtle);
+  color: var(--tickets-text-muted);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  text-align: left;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+  span {
+    flex: 1;
+  }
+  kbd {
+    padding: 1px 6px;
+    border: 1px solid var(--tickets-border);
+    border-radius: 5px;
+    background: var(--tickets-surface);
+    font: inherit;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--tickets-text-secondary);
+  }
+  &:hover {
+    border-color: var(--tickets-border-strong);
+    background: var(--tickets-surface);
+  }
+  &:focus-visible {
+    outline: 2px solid var(--tickets-primary);
+    outline-offset: 2px;
+  }
+}
+.nav {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 6px 12px 20px;
+  scrollbar-width: thin;
+}
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  & + & {
+    margin-top: 14px;
+  }
+}
+.groupToggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 10px 6px;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--tickets-text-muted);
+  cursor: pointer;
+  border-radius: 6px;
+  &:hover {
+    color: var(--tickets-text-secondary);
+  }
+  &:focus-visible {
+    outline: 2px solid var(--tickets-primary);
+  }
+  &[aria-expanded="false"] .chevron {
+    transform: rotate(-90deg);
+  }
+}
+.chevron {
+  width: 7px;
+  height: 7px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg);
+  margin-top: -3px;
+  transition: transform 0.15s ease;
+}
+.groupBody {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+// Misma pieza que la navegación actual: activo en azul pleno.
+.item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  padding: 8px 10px;
+  border-radius: 9px;
+  color: var(--tickets-text-secondary);
+  text-decoration: none;
+  font-size: 12.5px;
+  font-weight: 600;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+  &:hover {
+    background: var(--tickets-primary-soft);
+    color: var(--tickets-text);
+  }
+  &[aria-current="page"] {
+    background: var(--tickets-primary-fill);
+    color: var(--tickets-on-primary);
+    --workspace-icon-accent: #ffffff26;
+  }
+  &:focus-visible {
+    outline: 2px solid var(--tickets-primary);
+    outline-offset: 1px;
+  }
+}
+.compact {
+  min-height: 34px;
+  padding: 6px 10px;
+  font-weight: 500;
+}
+.icon {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+.label {
+  flex: 1;
+  min-width: 0;
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.badge {
+  min-width: 20px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--tickets-danger);
+  color: var(--tickets-on-primary);
+  font-size: 10px;
+  font-weight: 700;
+  text-align: center;
+}
+.item[aria-current="page"] .badge {
+  background: var(--tickets-surface);
+  color: var(--tickets-primary);
+}
+.app {
+  display: flex;
+  flex-direction: column;
+}
+// Cada área se reconoce por su acento, siempre junto a su nombre.
+.appIcon {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  background: var(--accent);
+  color: var(--tickets-on-primary);
+  --workspace-icon-accent: #ffffff33;
+}
+.inside:not([aria-current="page"]) {
+  color: var(--tickets-text);
+  font-weight: 600;
+}
+.sections {
+  display: flex;
+  flex-direction: column;
+  margin: 2px 0 6px 21px;
+  padding-left: 10px;
+  border-left: 1px solid var(--tickets-border);
+}
+.section {
+  padding: 6px 10px;
+  border-radius: 7px;
+  font-size: 12px;
+  color: var(--tickets-text-secondary);
+  text-decoration: none;
+  &:hover {
+    background: var(--tickets-primary-soft);
+  }
+  &[aria-current="page"] {
+    color: var(--tickets-primary);
+    font-weight: 600;
+    background: var(--tickets-primary-soft);
+  }
+}
+.catalog {
+  color: var(--tickets-text-muted);
+}
+.footer {
+  display: flex;
+  gap: 4px;
+  padding: 10px 12px;
+  border-top: 1px solid var(--tickets-border);
+  a,
+  button {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 38px;
+    padding: 8px;
+    border: 0;
+    border-radius: 8px;
+    background: none;
+    color: var(--tickets-text-secondary);
+    font: inherit;
+    font-size: 12px;
+    text-decoration: none;
+    cursor: pointer;
+    &:hover {
+      background: var(--tickets-primary-soft);
+    }
+  }
+}
+.backdrop {
+  display: none;
+}
+@media (max-width: 1199px) and (min-width: 768px) {
+  .sidebar {
+    width: 220px;
+  }
+}
+@media (max-width: 767px) {
+  .sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    width: 272px;
+    z-index: 1100;
+    transform: translateX(-100%);
+    transition: transform 0.2s;
+  }
+  .sidebar:not(.open) {
+    visibility: hidden;
+  }
+  .open {
+    transform: translateX(0);
+  }
+  .backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    background: #132a4d66;
+    border: 0;
+    z-index: 1099;
+  }
+}

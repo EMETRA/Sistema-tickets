@@ -6,10 +6,17 @@ const meta: Meta<typeof PopOver> = {
     component: PopOver,
     argTypes: {
         position: {
-            control: { type: 'select' },
+            control: { type: "select" },
             options: [
-                "center", "top", "bottom", "left", "right", 
-                "top-left", "top-right", "bottom-left", "bottom-right"
+                "center",
+                "top",
+                "bottom",
+                "left",
+                "right",
+                "top-left",
+                "top-right",
+                "bottom-left",
+                "bottom-right",
             ],
         },
     },
@@ -22,9 +29,9 @@ export const DynamicPosition: StoryObj<typeof PopOver> = {
         isOpen: true,
         position: "center",
         children: (
-            <div style={{ fontFamily: 'Gadugi', padding: '20px' }}>
-                <h3 style={{ marginTop: '15px', marginBottom: '-6px', fontWeight: 700 }}>Asignar Usuario</h3>
-                <p style={{ fontSize: '14px' }}>Contenido flexible dentro del esqueleto.</p>
+            <div style={{ fontFamily: "Gadugi", padding: "20px" }}>
+                <h3 style={{ marginTop: "15px", marginBottom: "-6px", fontWeight: 700 }}>Asignar Usuario</h3>
+                <p style={{ fontSize: "14px" }}>Contenido flexible dentro del esqueleto.</p>
             </div>
         ),
     },

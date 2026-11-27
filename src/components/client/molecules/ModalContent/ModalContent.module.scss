@@ -1,96 +1,97 @@
 .modalCard {
-    max-width: 350px;
-    width: 90vw;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    padding: 20px;
-    // background-color: red;
+  max-width: 350px;
+  width: calc(90vw / var(--vp-zoom, 1));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 20px;
+  // background-color: red;
 }
 
 .iconWrapper {
-    margin-bottom: 0px;
-    
-    .mainIcon {
-        color: #D32F2F;
-    }
+  margin-bottom: 0px;
+
+  .mainIcon {
+    color: var(--tickets-danger);
+  }
 }
 
 .textWrapper {
-    margin-bottom: 32px;
-    // background-color: red;
+  margin-bottom: 32px;
+  // background-color: red;
 
-    .title {
-        margin: 15px;
-        font-size: 20px;
-        font-weight: 600;
-        color: #333333;
-        margin-bottom: 10px;
-    }
+  .title {
+    margin: 15px;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--tickets-text);
+    margin-bottom: 10px;
+  }
 
-    .description {
-        margin: 0;
-        color: #666666;
-        line-height: 1.5;
-        font-size: 15px;
-    }
+  .description {
+    margin: 0;
+    color: var(--tickets-text-muted);
+    color: var(--tickets-text-secondary);
+    line-height: 1.5;
+    font-size: 15px;
+  }
 }
 
 .actions {
-    display: flex;
-    gap: 16px;
-    width: 100%;
-    justify-content: center;
-
+  display: flex;
+  gap: 16px;
+  width: 100%;
+  justify-content: center;
 }
-
 
 // ============================================
 // VARIANTE COMPACT
 // ============================================
 
 .compactCard {
-    width: min(27.5rem, 90vw);
-    display: flex;
-    flex-direction: column;
-    gap: 1.75rem;
-    padding: 1.25rem 1rem 1rem;
-    text-align: center;
+  width: min(27.5rem, calc(90vw / var(--vp-zoom, 1)));
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  padding: 1.25rem 1rem 1rem;
+  text-align: center;
 }
 
 .alignLeft {
-    text-align: left;
+  text-align: left;
 }
 
 .compactText {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .compactTitle.compactTitle {
-    margin: 0;
-    font-size: 1.125rem;
-    font-weight: 700;
-    color: #1a1a1a;
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  color: light-dark(#1a1a1a, #e5eaf5);
 }
 
 .compactDescription.compactDescription {
-    margin: 0;
-    font-size: 0.8125rem;
-    line-height: 1.45;
-    color: #666666;
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--tickets-text-muted);
+  color: var(--tickets-text-secondary);
 }
 
 .compactActions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 0.75rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
 }
 
 // Selector doble para ganar a los estilos base de Button
 .compactButton.compactButton {
-    padding: 0.5rem 1rem;
-    font-size: 0.8125rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.8125rem;
 }

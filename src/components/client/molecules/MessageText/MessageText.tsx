@@ -14,7 +14,7 @@ const MessageText: React.FC<MessageTextProps> = ({
     timestamp,
     avatarProps,
     files,
-    className
+    className,
 }) => {
     const timestampConverter = (timestamp: string) => {
         // Si la fecha es de hoy, colocar "Hoy, HH:mm"; ayera, colocar "Ayer, HH:mm"; si es de hace más de un día, colocar "DD/MM/YYYY, HH:mm"
@@ -29,7 +29,7 @@ const MessageText: React.FC<MessageTextProps> = ({
         } else {
             return `${messageDate.getDate().toString().padStart(2, "0")}/${(messageDate.getMonth() + 1).toString().padStart(2, "0")}/${messageDate.getFullYear()}, ${messageDate.getHours()}:${messageDate.getMinutes().toString().padStart(2, "0")}`;
         }
-    }
+    };
 
     return (
         <div className={classNames(styles.MessageText, className)}>
@@ -39,7 +39,9 @@ const MessageText: React.FC<MessageTextProps> = ({
             <div className={styles.content}>
                 <div className={styles.header}>
                     <Text variant="body">{userName}</Text>
-                    <Text variant="caption" className={styles.Timestamp}>{timestampConverter(timestamp)}</Text>
+                    <Text variant="caption" className={styles.Timestamp}>
+                        {timestampConverter(timestamp)}
+                    </Text>
                 </div>
                 <p className={styles.text}>{text}</p>
                 {files && (

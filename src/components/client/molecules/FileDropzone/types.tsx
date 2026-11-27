@@ -1,4 +1,3 @@
-
 export type FileDropzoneVariant = "default" | "compact";
 
 /**

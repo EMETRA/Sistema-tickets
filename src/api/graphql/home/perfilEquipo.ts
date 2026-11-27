@@ -14,5 +14,5 @@ export const GET_PERFIL_EQUIPO_QUERY = `
 `;
 
 export interface GetPerfilEquipoResponse {
-  perfilequipo: DepartamentoPerfil[];
+    perfilequipo: DepartamentoPerfil[];
 }

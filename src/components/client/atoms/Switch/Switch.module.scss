@@ -20,7 +20,7 @@
 
 .ContainerError {
   .StyledSwitch {
-    border-color: #ff4444;
+    border-color: var(--tickets-danger);
   }
 }
 
@@ -45,7 +45,7 @@
 /* Slider (círculo que se mueve) */
 .Slider {
   position: absolute;
-  background-color: white;
+  background-color: var(--tickets-surface);
   border-radius: 50%;
   transition: transform 0.3s ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
@@ -84,18 +84,18 @@
 /* Label */
 .Label {
   font-size: 14px;
-  color: #262626;
+  color: var(--tickets-text);
   line-height: 1.4;
 }
 
 .ContainerDisabled .Label {
-  color: #a9a9a9;
+  color: var(--tickets-text-muted);
 }
 
 /* Mensaje de error */
 .ErrorMessage {
   font-size: 12px;
-  color: #ff4444;
+  color: var(--tickets-danger);
   margin-left: 62px;
   display: block;
 }

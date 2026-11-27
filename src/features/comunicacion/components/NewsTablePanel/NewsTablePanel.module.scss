@@ -1,0 +1,203 @@
+.NewsTablePanel {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: var(--tickets-surface);
+  border: 1px solid var(--tickets-border);
+  border-radius: 16px;
+  overflow: hidden;
+  font-family: var(--font-montserrat), sans-serif;
+}
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--tickets-border);
+  > * {
+    max-width: 100%;
+  }
+  > :first-child {
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+}
+.search {
+  max-width: 24rem;
+  flex: 1 1 220px;
+}
+.tableScroll {
+  overflow-x: auto;
+  min-width: 0;
+}
+.table {
+  width: 100%;
+  min-width: 920px;
+  border-collapse: collapse;
+  text-align: left;
+  caption {
+    text-align: left;
+    font-size: 12px;
+    color: var(--tickets-text-muted);
+    padding: 12px 20px;
+    background: var(--tickets-surface-subtle);
+    background: var(--tickets-surface);
+  }
+  th {
+    background: var(--tickets-surface-subtle);
+    color: var(--tickets-text-muted);
+    color: var(--tickets-text-secondary);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--tickets-border);
+  }
+  td {
+    padding: 16px 20px;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--tickets-divider);
+    border-bottom: 1px solid var(--tickets-border);
+  }
+  tr:last-child td {
+    border-bottom: 0;
+  }
+  tbody tr:hover {
+    background: var(--tickets-surface-subtle);
+  }
+  td[data-column="titulo"] {
+    min-width: 230px;
+    width: 30%;
+    overflow-wrap: anywhere;
+  }
+  td[data-column="fecha"] {
+    white-space: nowrap;
+  }
+}
+.title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--tickets-text);
+  line-height: 1.6;
+}
+.text {
+  font-size: 13px;
+  color: var(--tickets-text-secondary);
+  line-height: 1.5;
+}
+.muted {
+  font-size: 13px;
+  color: var(--tickets-text-muted);
+}
+.actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 160px;
+}
+.actionButton.actionButton {
+  min-width: 0;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.pill.pill {
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.pill.pill--warning {
+  background: var(--tickets-warning-soft);
+  color: var(--tickets-warning);
+}
+.pill.pill--success {
+  background: var(--tickets-success-soft);
+  color: var(--tickets-success);
+}
+.pill.pill--neutral {
+  background: var(--tickets-surface-disabled);
+  background: var(--tickets-surface-subtle);
+  color: var(--tickets-text-muted);
+  color: var(--tickets-text-secondary);
+}
+.pill.pill--info {
+  background: var(--tickets-info-soft);
+  color: var(--tickets-text-secondary);
+}
+.pill.pill--danger {
+  background: var(--tickets-danger-soft);
+  color: var(--tickets-danger);
+}
+.errorState,
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  padding: 40px 24px;
+  text-align: center;
+  align-items: center;
+  h2 {
+    color: var(--tickets-text);
+    font-size: 18px;
+    margin: 10px 0;
+  }
+  p {
+    margin: 0 auto 18px;
+    max-width: 520px;
+    color: var(--tickets-text-muted);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+}
+.errorState {
+  background: var(--tickets-surface);
+}
+.loadingState {
+  padding: 28px;
+  display: grid;
+  gap: 22px;
+  .skeleton {
+    height: 40px;
+  }
+}
+.skeleton {
+  display: block;
+  height: 14px;
+  border-radius: 6px;
+  background: var(--tickets-neutral-soft);
+  background: var(--tickets-surface-subtle);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+.skeleton--short {
+  width: 80px;
+}
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+.tableScroll:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--tickets-primary) 35%, var(--tickets-surface));
+  outline-offset: -3px;
+}
+@media (max-width: 600px) {
+  .toolbar {
+    padding: 14px;
+    gap: 14px;
+  }
+  .search {
+    flex-basis: 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+}

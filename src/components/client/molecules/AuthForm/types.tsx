@@ -4,7 +4,6 @@ import { ReactNode, SubmitEventHandler } from "react";
  * Propiedades del componente AuthForm.
  */
 export interface AuthFormProps {
-
     /**
      * Titulo de formulario.
      */
@@ -24,5 +23,4 @@ export interface AuthFormProps {
      * Clase CSS adicional.
      */
     className?: string;
-
-};
+}

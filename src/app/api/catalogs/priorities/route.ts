@@ -1,9 +1,6 @@
-import { NextResponse } from 'next/server';
-import { graphqlRequest } from '@/api/graphql/client';
-import {
-    GET_PRIORITIES_QUERY,
-    type GetPrioritiesResponse,
-} from '@/api/graphql/catalogs';
+import { NextResponse } from "next/server";
+import { graphqlRequest } from "@/api/graphql/client";
+import { GET_PRIORITIES_QUERY, type GetPrioritiesResponse } from "@/api/graphql/catalogs";
 
 export async function GET() {
     try {
@@ -11,10 +8,7 @@ export async function GET() {
         const typedResult = result as unknown as GetPrioritiesResponse;
         return NextResponse.json(typedResult.ticketPriorities);
     } catch (error) {
-        console.error('Error fetching priorities:', error);
-        return NextResponse.json(
-            { error: 'Failed to fetch priorities' },
-            { status: 500 }
-        );
+        console.error("Error fetching priorities:", error);
+        return NextResponse.json({ error: "Failed to fetch priorities" }, { status: 500 });
     }
 }

@@ -17,6 +17,8 @@ const meta: Meta<typeof Title> = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const XLarge: Story = { args: { variant: "xlarge", children: "Sistema de tickets EMETRA", tag: "h1" } };
+export const XLarge: Story = {
+    args: { variant: "xlarge", children: "Sistema de tickets EMETRA", tag: "h1" },
+};
 export const Large: Story = { args: { variant: "large", children: "Iniciar Sesión", tag: "h2" } };
 export const Mid: Story = { args: { variant: "mid", children: "Reporte de rendimiento", tag: "h3" } };

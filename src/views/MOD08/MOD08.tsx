@@ -1,44 +1,47 @@
 "use client";
 
-import React, { useState } from 'react';
-import { Title } from '../../components/client/atoms/Title';
-import { FormField } from '../../components/client/molecules/FormField';
+import React, { useState } from "react";
+import { Title } from "../../components/client/atoms/Title";
+import { FormField } from "../../components/client/molecules/FormField";
 import { Input } from "../../components/client/atoms/Input";
-import { Button } from '../../components/client/atoms/Button';
-import { Select } from '../../components/client/atoms/Select';
-import { Text } from '../../components/client/atoms/Text';
+import { Button } from "../../components/client/atoms/Button";
+import { Select } from "../../components/client/atoms/Select";
+import { Text } from "../../components/client/atoms/Text";
 
-import { PopUp } from '@/components/client/molecules/PopUp';
-import { useGetReporteAnuladosExcel } from '@/api/hooks/useGetReporteAnuladosExcel';
+import { PopUp } from "@/components/client/molecules/PopUp";
+import { useGetReporteAnuladosExcel } from "@/api/hooks/useGetReporteAnuladosExcel";
 
-import styles from './MOD08.module.scss';
+import styles from "./MOD08.module.scss";
 
-import type { TipoReporteAnulado } from '@/api/graphql/MOD08';
+import type { TipoReporteAnulado } from "@/api/graphql/MOD08";
 
 const reportTypes = [
-    { label: "Recibos de Pago", value: 'RECIBOS_PAGO' },
-    { label: "Ticket Parqueos", value: 'TICKET_PARQUEOS' },
-    { label: "Paralelo Formas", value: 'PARALELO_FORMAS' },
+    { label: "Recibos de Pago", value: "RECIBOS_PAGO" },
+    { label: "Ticket Parqueos", value: "TICKET_PARQUEOS" },
+    { label: "Paralelo Formas", value: "PARALELO_FORMAS" },
 ];
 
 const MOD08: React.FC = () => {
-    const [startDate, setStartDate] = useState<string>('');
-    const [endDate, setEndDate] = useState<string>('');
-    const [selectedReportType, setSelectedReportType] = useState<TipoReporteAnulado | ''>('');
+    const [startDate, setStartDate] = useState<string>("");
+    const [endDate, setEndDate] = useState<string>("");
+    const [selectedReportType, setSelectedReportType] = useState<TipoReporteAnulado | "">("");
 
-    const [validation, setValidation] = useState('');
+    const [validation, setValidation] = useState("");
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const { exportar, loading, error } = useGetReporteAnuladosExcel();
 
     const handleExecute = async () => {
         if (loading) return;
-        setValidation('');
-        if (startDate === '' || endDate === '' || selectedReportType === '') {
-            setValidation('Por favor, complete todos los campos antes de ejecutar el proceso.');
+        setValidation("");
+        if (startDate === "" || endDate === "" || selectedReportType === "") {
+            setValidation("Por favor, complete todos los campos antes de ejecutar el proceso.");
             return;
         }
 
-        if (startDate > endDate) { setValidation('La fecha de inicio no puede ser posterior a la fecha de fin.'); return; }
+        if (startDate > endDate) {
+            setValidation("La fecha de inicio no puede ser posterior a la fecha de fin.");
+            return;
+        }
         const success = await exportar({
             fechaInicio: startDate,
             fechaFin: endDate,
@@ -53,11 +56,18 @@ const MOD08: React.FC = () => {
     return (
         <div className={styles.mainContainer}>
             <div className={styles.formContainer}>
-                <Title variant="mid" tag="h3" className={styles.title}>Parámetros de exportación</Title>
+                <Title variant="mid" tag="h3" className={styles.title}>
+                    Parámetros de exportación
+                </Title>
                 {validation && <p role="alert">{validation}</p>}
 
                 {/* Fecha de inicio */}
-                <FormField label="Fecha de inicio" htmlFor="startDate" required className={styles.fieldStartDate}>
+                <FormField
+                    label="Fecha de inicio"
+                    htmlFor="startDate"
+                    required
+                    className={styles.fieldStartDate}
+                >
                     <Input
                         id="startDate"
                         type="date"
@@ -82,7 +92,12 @@ const MOD08: React.FC = () => {
                     />
                 </FormField>
 
-                <FormField label="Tipo de Reporte" htmlFor="reportType" required className={styles.fieldReportType}>
+                <FormField
+                    label="Tipo de Reporte"
+                    htmlFor="reportType"
+                    required
+                    className={styles.fieldReportType}
+                >
                     <Select
                         id="reportType"
                         value={selectedReportType}
@@ -99,7 +114,7 @@ const MOD08: React.FC = () => {
                     className={styles.executeButton}
                     state={loading ? "loading" : "default"}
                 >
-                    {loading ? 'Generando...' : 'Generar Reporte en Excel'}
+                    {loading ? "Generando..." : "Generar Reporte en Excel"}
                 </Button>
 
                 {error && (
@@ -120,7 +135,7 @@ const MOD08: React.FC = () => {
                 variant="success"
             />
         </div>
-    )
-}
+    );
+};
 
 export default MOD08;

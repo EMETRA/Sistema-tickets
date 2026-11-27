@@ -12,11 +12,8 @@ type PageProps = {
 export default async function ModuleAppPage({ params }: PageProps) {
     const { appId, sectionId, moduleId } = await params;
     if (moduleId === "mod06") redirect("/espacio/accesos?tab=corporate");
-    if (["mod13", "proc01"].includes(moduleId))
-        redirect("/aplicaciones/en-desuso");
-    const catalog = await requireAppCatalog(
-        `/home/${appId}/${sectionId}/${moduleId}`,
-    );
+    if (["mod13", "proc01"].includes(moduleId)) redirect("/aplicaciones/en-desuso");
+    const catalog = await requireAppCatalog(`/home/${appId}/${sectionId}/${moduleId}`);
 
     const moduleMeta = getModule(appId, sectionId, moduleId, catalog);
     if (!moduleMeta) redirect("/unauthorized");
@@ -25,11 +22,7 @@ export default async function ModuleAppPage({ params }: PageProps) {
     if (!appComponent) return notFound();
 
     return (
-        <ModuleWorkspace
-            moduleId={moduleId}
-            title={moduleMeta.title}
-            showHeading={moduleId !== "noticias"}
-        >
+        <ModuleWorkspace moduleId={moduleId} title={moduleMeta.title} showHeading={moduleId !== "noticias"}>
             {createElement(appComponent)}
         </ModuleWorkspace>
     );

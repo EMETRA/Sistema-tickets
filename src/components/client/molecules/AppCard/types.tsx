@@ -1,13 +1,13 @@
 import { IconName } from "../../atoms/Icon/types";
 
 export interface AppCardProps {
-  icon: IconName;
-  iconLabel: string;
-  iconColor?: string;
-  title: string;
-  description?: string;
-  // bookmarked?: boolean;
-  // onBookmarkClick?: () => void;
-  onButtonClick?: () => void;
-  className?: string;
+    icon: IconName;
+    iconLabel: string;
+    iconColor?: string;
+    title: string;
+    description?: string;
+    // bookmarked?: boolean;
+    // onBookmarkClick?: () => void;
+    onButtonClick?: () => void;
+    className?: string;
 }

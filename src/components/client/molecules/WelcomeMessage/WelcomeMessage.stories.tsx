@@ -11,7 +11,7 @@ const meta: Meta<typeof WelcomeMessage> = {
     argTypes: {
         userName: {
             control: "text",
-        }
+        },
     },
 };
 

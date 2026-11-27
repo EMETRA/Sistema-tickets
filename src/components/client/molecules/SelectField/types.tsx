@@ -4,7 +4,6 @@ import { ReactNode } from "react";
  * Propiedades del componente SelectField.
  */
 export interface SelectFieldProps {
-
     /**
      * Etiqueta del campo.
      */

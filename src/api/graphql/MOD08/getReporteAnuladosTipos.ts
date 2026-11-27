@@ -3,7 +3,7 @@
  *
  * Usado para: Select del formulario de reportes anulados
  * Retorna: Lista de tipos disponibles con sus etiquetas
- * 
+ *
  * Tipos disponibles:
  * - RECIBOS_PAGO: Recibos de pago anulados
  * - TICKET_PARQUEOS: Tickets de parqueo anulados

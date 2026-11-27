@@ -1,51 +1,50 @@
 import { IconNameInput } from "../Icon/types";
 
 export interface IconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  /**
-   * Nombre del icono a mostrar
-   */
-  icon: IconNameInput;
-  
-  /**
-   * Tamaño del icono en píxeles
-   * @default 24
-   */
-  size?: number;
-  
-  /**
-   * Estado deshabilitado del botón
-   * @default false
-   */
-  disabled?: boolean;
-  
-  /**
-   * Estado de carga del botón
-   * Cuando está en true, muestra un spinner y no permite clics
-   * @default false
-   */
-  loading?: boolean;
-  
-  /**
-   * Función a ejecutar al hacer clic
-   */
-  onClick?: () => void;
+    /**
+     * Nombre del icono a mostrar
+     */
+    icon: IconNameInput;
 
-  /**
-   * Sin bordes
-   * @default false
-   */
-  borderless?: boolean;
+    /**
+     * Tamaño del icono en píxeles
+     * @default 24
+     */
+    size?: number;
 
-  /**
-   * Squared para un cuadrado con esquinas redondeadas
-   * @default false
-   */
-  squared_borded?: boolean;
-  
-  
-  /**
-   * Clase CSS adicional
-   */
-  className?: string;
-  iconColor?: string; 
+    /**
+     * Estado deshabilitado del botón
+     * @default false
+     */
+    disabled?: boolean;
+
+    /**
+     * Estado de carga del botón
+     * Cuando está en true, muestra un spinner y no permite clics
+     * @default false
+     */
+    loading?: boolean;
+
+    /**
+     * Función a ejecutar al hacer clic
+     */
+    onClick?: () => void;
+
+    /**
+     * Sin bordes
+     * @default false
+     */
+    borderless?: boolean;
+
+    /**
+     * Squared para un cuadrado con esquinas redondeadas
+     * @default false
+     */
+    squared_borded?: boolean;
+
+    /**
+     * Clase CSS adicional
+     */
+    className?: string;
+    iconColor?: string;
 }

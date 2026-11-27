@@ -10,20 +10,22 @@ const FormField: React.FC<FormFieldProps> = ({
     htmlFor,
     required = false,
     children,
-    className
+    className,
+    error,
 }) => {
     return (
         <div className={classNames(styles.FormField, className)}>
-
             <Label htmlFor={htmlFor}>
                 {label}
                 {required && <span className={styles.required}>*</span>}
             </Label>
 
-            <div className={styles.control}>
-                {children}
-            </div>
-
+            <div className={styles.control}>{children}</div>
+            {error && (
+                <p role="alert" id={htmlFor + "-error"} className={styles.error}>
+                    {error}
+                </p>
+            )}
         </div>
     );
 };

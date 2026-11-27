@@ -1,0 +1,195 @@
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  grid-column: 1 / -1;
+  legend {
+    margin-bottom: 8px;
+    padding: 0;
+    color: var(--tickets-text);
+    font-size: 13px;
+    font-weight: 600;
+  }
+}
+.segmented {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  @media (max-width: 520px) {
+    grid-template-columns: 1fr;
+  }
+  label {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 56px;
+    padding: 8px 12px;
+    border: 1px solid var(--tickets-border);
+    border-radius: 12px;
+    background: var(--tickets-surface);
+    cursor: pointer;
+    &:hover {
+      border-color: var(--tickets-border-strong, var(--tickets-border));
+    }
+    &[data-checked] {
+      border-color: var(--tickets-primary);
+      background: var(--tickets-primary-soft);
+      box-shadow: inset 0 0 0 1px var(--tickets-primary);
+    }
+    &:has(input:focus-visible) {
+      outline: 2px solid var(--tickets-primary);
+      outline-offset: 2px;
+    }
+    input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+    strong {
+      display: block;
+      color: var(--tickets-text);
+      font-size: 14px;
+    }
+    small {
+      display: block;
+      color: var(--tickets-text-muted);
+      font-size: 12px;
+    }
+  }
+}
+.glyph {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: var(--tickets-surface-subtle);
+  color: var(--tickets-primary);
+}
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  label {
+    color: var(--tickets-text);
+    font-size: 13px;
+    font-weight: 600;
+  }
+}
+.input {
+  width: 100%;
+  min-height: var(--tickets-control-height, 40px);
+  padding: 0 12px;
+  border: 1px solid var(--tickets-border-strong, var(--tickets-border));
+  border-radius: 10px;
+  background: var(--tickets-surface);
+  color: var(--tickets-text);
+  font: inherit;
+  font-size: 14px;
+  &:focus-visible {
+    outline: 2px solid var(--tickets-primary);
+    outline-offset: 1px;
+  }
+  &:user-invalid {
+    border-color: var(--tickets-danger);
+  }
+}
+.hint {
+  color: var(--tickets-text-muted);
+  font-size: 12px;
+  &[data-ok] {
+    color: var(--tickets-success);
+  }
+}
+.people {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.meeting {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding: 12px 14px;
+  border: 1px solid var(--tickets-border);
+  border-radius: 14px;
+  background: var(--tickets-primary-soft);
+  &[data-finished] {
+    background: var(--tickets-surface-subtle);
+    .join {
+      background: var(--tickets-surface);
+      color: var(--tickets-primary);
+      box-shadow: inset 0 0 0 1px var(--tickets-border-strong, var(--tickets-border));
+    }
+  }
+  .glyph {
+    background: var(--tickets-surface);
+  }
+}
+.meetingText {
+  flex: 1 1 160px;
+  min-width: 0;
+  strong {
+    display: block;
+    color: var(--tickets-text);
+    font-size: 14px;
+  }
+  small {
+    color: var(--tickets-text-muted);
+    font-size: 12px;
+  }
+}
+.meetingActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.join,
+.ghost {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 16px;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  &:focus-visible {
+    outline: 2px solid var(--tickets-primary);
+    outline-offset: 2px;
+  }
+}
+.join {
+  border: 0;
+  background: var(--tickets-primary-fill);
+  color: var(--tickets-on-primary);
+  &:hover {
+    filter: brightness(1.06);
+  }
+}
+.ghost {
+  border: 1px solid var(--tickets-border-strong, var(--tickets-border));
+  background: var(--tickets-surface);
+  color: var(--tickets-text);
+}
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

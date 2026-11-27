@@ -1,19 +1,12 @@
-
 /**
  * Acciones.
  */
-export type RichTextActions = 
-    | "bold"
-    | "italic"
-    | "underline"
-    | "strike"
-    | "bullet";
+export type RichTextActions = "bold" | "italic" | "underline" | "strike" | "bullet";
 
 /**
  * Propiedades del componente RichTextToolbar.
  */
 export interface RichTextToolbarProps {
-
     /**
      * Función para enviar accion.
      */
@@ -23,5 +16,4 @@ export interface RichTextToolbarProps {
      * Clase CSS adicional.
      */
     className?: string;
-
 }

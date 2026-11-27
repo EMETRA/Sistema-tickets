@@ -10,10 +10,19 @@ export async function GET(_request: NextRequest, context: { params: Promise<{ us
         return NextResponse.json({ error: "El usuario no es válido." }, { status: 400 });
     }
     try {
-        const result = await graphqlRequest<{ usuarioById: UsuarioPerfil | null }>(GET_USER_BY_ID_QUERY, { variables: { idUsuario: userId } });
-        if (!result.usuarioById) return NextResponse.json({ error: "No se encontró el perfil." }, { status: 404 });
-        return NextResponse.json({ usuario: result.usuarioById }, { headers: { "Cache-Control": "no-store" } });
+        const result = await graphqlRequest<{ usuarioById: UsuarioPerfil | null }>(GET_USER_BY_ID_QUERY, {
+            variables: { idUsuario: userId },
+        });
+        if (!result.usuarioById)
+            return NextResponse.json({ error: "No se encontró el perfil." }, { status: 404 });
+        return NextResponse.json(
+            { usuario: result.usuarioById },
+            { headers: { "Cache-Control": "no-store" } },
+        );
     } catch (error) {
-        return NextResponse.json({ error: "No se pudo cargar el perfil." }, { status: ErrorHandler.isAuthError(error) ? 401 : 503 });
+        return NextResponse.json(
+            { error: "No se pudo cargar el perfil." },
+            { status: ErrorHandler.isAuthError(error) ? 401 : 503 },
+        );
     }
 }

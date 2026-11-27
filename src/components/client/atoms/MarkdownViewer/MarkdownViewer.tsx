@@ -41,7 +41,7 @@ export const MarkdownViewer: React.FC<MarkdownViewerProps> = ({ content, classNa
     if (!editor) return null;
 
     return (
-        <div className={classNames(styles.MarkdownViewer, className) } style={{ color: color }}>
+        <div className={classNames(styles.MarkdownViewer, className)} style={{ color: color }}>
             <EditorContent editor={editor} />
         </div>
     );

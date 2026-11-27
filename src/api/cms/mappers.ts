@@ -74,9 +74,7 @@ export function estadoPush(estado?: string): EstadoNotificacion {
     return pushStates[estado || ""] || EstadoNotificacion.NO_DISPONIBLE;
 }
 export function cmsMediaUrl(url: string): string {
-    return url.startsWith("/uploads/noticias/")
-        ? `/api/COM03/media/${url.slice("/uploads/".length)}`
-        : url;
+    return url.startsWith("/uploads/noticias/") ? `/api/COM03/media/${url.slice("/uploads/".length)}` : url;
 }
 export function mapRecurso(dto?: CmsResourceDto | null): RecursoNoticia | null {
     if (!dto) return null;
@@ -114,22 +112,12 @@ export function mapNoticia(dto: CmsNewsDto): NoticiaListItem {
         estadoNotificacion: estadoPush(dto.notificacionPush?.estado),
     };
 }
-export function mapDetalle(
-    dto: CmsNewsDto,
-    categorias: CategoriaNoticia[],
-): NoticiaDetalle {
+export function mapDetalle(dto: CmsNewsDto, categorias: CategoriaNoticia[]): NoticiaDetalle {
     const ids = (dto.categorias || []).map((c) => String(c.id));
-    const root =
-        ids.find(
-            (id) =>
-                categorias.find((c) => c.id === id)?.categoriaPadreId === null,
-        ) || null;
+    const root = ids.find((id) => categorias.find((c) => c.id === id)?.categoriaPadreId === null) || null;
     const child = root
-        ? ids.find(
-              (id) =>
-                  categorias.find((c) => c.id === id)?.categoriaPadreId ===
-                      root && id !== root,
-          ) || null
+        ? ids.find((id) => categorias.find((c) => c.id === id)?.categoriaPadreId === root && id !== root) ||
+          null
         : null;
     return {
         ...mapNoticia(dto),
@@ -139,9 +127,7 @@ export function mapDetalle(
         longitud: dto.longitud ?? null,
         categoriaId: root,
         subcategoriaId: child,
-        categoriaIdsAdicionales: ids.filter(
-            (id) => id !== root && id !== child,
-        ),
+        categoriaIdsAdicionales: ids.filter((id) => id !== root && id !== child),
         etiquetaIds: (dto.etiquetas || []).map((e) => String(e.id)),
         fechaPublicacion: dto.fecha_publicacion ?? null,
         tiempoLectura: dto.tiempo_lectura ?? null,

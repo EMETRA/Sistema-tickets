@@ -1,0 +1,451 @@
+.portfolio {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 10px 14px;
+  flex-wrap: wrap;
+}
+.search {
+  flex: 1;
+  min-width: min(100%, 240px);
+  min-height: 38px;
+  padding: 8px 12px;
+  border: 1px solid var(--tickets-border);
+  border-radius: 9px;
+  background: var(--tickets-surface);
+  font: inherit;
+  font-size: 13px;
+  &:focus {
+    outline: none;
+    border-color: var(--tickets-primary);
+    box-shadow: var(--tickets-focus);
+  }
+}
+.filters {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  button {
+    padding: 6px 12px;
+    border: 1px solid var(--tickets-border);
+    border-radius: 999px;
+    background: var(--tickets-surface);
+    font: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--tickets-text-secondary);
+    cursor: pointer;
+    &[aria-pressed="true"] {
+      border-color: var(--tickets-primary);
+      background: var(--tickets-primary-soft);
+      color: var(--tickets-primary);
+    }
+  }
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr));
+  gap: 14px;
+}
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid var(--tickets-border);
+  border-radius: 14px;
+  background: var(--tickets-surface);
+  box-shadow: var(--tickets-shadow);
+  font: inherit;
+  text-align: left;
+  color: var(--tickets-text);
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+  &[data-alert] {
+    box-shadow:
+      inset 3px 0 0 var(--tickets-danger),
+      var(--tickets-shadow);
+  }
+  &:hover {
+    border-color: color-mix(in srgb, var(--tickets-primary) 35%, var(--tickets-surface));
+    box-shadow: 0 8px 24px #1a2b4a14;
+    transform: translateY(-1px);
+  }
+  &[data-alert]:hover {
+    box-shadow:
+      inset 3px 0 0 var(--tickets-danger),
+      0 8px 24px #1a2b4a14;
+  }
+  &:focus-visible {
+    outline: 2px solid var(--tickets-primary);
+    outline-offset: 2px;
+  }
+}
+.cardHead {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.monogram {
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 11px;
+  background: linear-gradient(135deg, var(--tickets-primary), #2f47c8);
+  color: var(--tickets-on-primary);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+.cardTitle {
+  flex: 1;
+  min-width: 0;
+  strong {
+    display: block;
+    font-size: 15px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  small {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: var(--tickets-text-muted);
+  }
+}
+.health {
+  --health: var(--tickets-success);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--tickets-text-secondary);
+  white-space: nowrap;
+  &::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--health);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--health) 18%, transparent);
+  }
+  &[data-health="warn"] {
+    --health: #d99a1e;
+  }
+  &[data-health="down"] {
+    --health: #9aa6b8;
+  }
+}
+// Último despliegue por entorno: lectura rápida de qué versión corre dónde.
+.envs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.env {
+  --tone: #9aa6b8;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: var(--tickets-surface-subtle);
+  border: 1px solid var(--tickets-divider);
+  box-shadow: inset 0 2px 0 var(--tone);
+  &[data-tone="success"] {
+    --tone: var(--tickets-success);
+  }
+  &[data-tone="danger"] {
+    --tone: var(--tickets-danger);
+  }
+  &[data-tone="warning"] {
+    --tone: var(--tickets-warning);
+  }
+  // Sin monitoreo: borde punteado en lugar de transparencia (el texto sigue legible).
+  &[data-tone="none"] {
+    box-shadow: none;
+    border-style: dashed;
+  }
+  small {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--tickets-text-muted);
+  }
+  code {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--tickets-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  em {
+    font-style: normal;
+    font-size: 11px;
+    color: var(--tickets-text-secondary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  &[data-tone="danger"] em,
+  &[data-tone="warning"] em {
+    color: var(--tone);
+    font-weight: 600;
+  }
+}
+.cardFoot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding-top: 12px;
+  border-top: 1px solid var(--tickets-divider);
+}
+.meta {
+  font-size: 11px;
+  color: var(--tickets-text-muted);
+}
+.empty {
+  padding: 24px 0;
+  font-size: 13px;
+  color: var(--tickets-text-secondary);
+}
+// ── Expediente ────────────────────────────────────────────────
+.dossier {
+  width: min(960px, calc(94vw / var(--vp-zoom, 1)));
+  max-height: calc(90dvh / var(--vp-zoom, 1));
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 16px;
+  &[open] {
+    display: flex;
+  }
+}
+.dossierHead {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--tickets-border);
+  background: linear-gradient(110deg, var(--tickets-surface), var(--tickets-surface-subtle));
+  > div {
+    flex: 1;
+    min-width: 0;
+  }
+  h2 {
+    font-size: 20px;
+    letter-spacing: -0.3px;
+  }
+  .monogram {
+    width: 48px;
+    height: 48px;
+    font-size: 16px;
+  }
+}
+.eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--tickets-primary);
+}
+.lead {
+  margin-top: 2px;
+  font-size: 13px;
+  color: var(--tickets-text-secondary);
+}
+.close {
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--tickets-text-secondary);
+  cursor: pointer;
+  &:hover {
+    background: var(--tickets-neutral-soft);
+  }
+}
+.dossierBody {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 18px 24px;
+  overflow-y: auto;
+}
+.facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+  dt {
+    font-size: 11px;
+    color: var(--tickets-text-muted);
+  }
+  dd {
+    margin: 3px 0 0;
+    font-size: 13px;
+    font-weight: 600;
+  }
+}
+.urls {
+  display: flex;
+  gap: 12px;
+  a {
+    color: var(--tickets-primary);
+    text-decoration: none;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  h3 {
+    font-size: 13px;
+    font-weight: 700;
+    margin: 0;
+  }
+}
+.blockHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  button {
+    font-size: 12px;
+  }
+}
+.columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+.rows,
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 8px;
+    border: 0;
+    border-radius: 9px;
+    background: none;
+    font: inherit;
+    text-align: left;
+    color: var(--tickets-text);
+    cursor: pointer;
+    &:hover {
+      background: var(--tickets-surface-subtle);
+    }
+  }
+  code {
+    flex-shrink: 0;
+    padding: 2px 7px;
+    border-radius: 6px;
+    background: var(--tickets-neutral-soft);
+    font-size: 11px;
+    font-weight: 600;
+  }
+  // Cerrado: texto secundario en lugar de transparencia.
+  li[data-closed] {
+    color: var(--tickets-text-secondary);
+  }
+}
+.timeline li {
+  --tone: #9aa6b8;
+  position: relative;
+  padding-left: 14px;
+  &::before {
+    content: "";
+    position: absolute;
+    left: 3px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--tickets-divider);
+  }
+  &::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 8px;
+    height: 8px;
+    margin-top: -4px;
+    border-radius: 50%;
+    background: var(--tone);
+  }
+  &[data-tone="success"] {
+    --tone: var(--tickets-success);
+  }
+  &[data-tone="danger"] {
+    --tone: var(--tickets-danger);
+  }
+  &[data-tone="warning"] {
+    --tone: var(--tickets-warning);
+  }
+}
+.rowText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 600;
+  small {
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--tickets-text-muted);
+  }
+}
+.none {
+  padding: 8px;
+  font-size: 12px;
+  color: var(--tickets-text-muted);
+}
+.dossierFoot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 12px 24px;
+  border-top: 1px solid var(--tickets-border);
+  background: var(--tickets-surface-subtle);
+}
+@media (max-width: 800px) {
+  .columns,
+  .facts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .envs {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

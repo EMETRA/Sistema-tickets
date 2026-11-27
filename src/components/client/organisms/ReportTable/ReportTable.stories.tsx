@@ -25,8 +25,8 @@ export const Anual: Story = {
             { label: "Agosto", value: 700 },
             { label: "Septiembre", value: 650 },
             { label: "Octubre", value: 600 },
-            { label: "Noviembre",value: 550 },
+            { label: "Noviembre", value: 550 },
             { label: "Diciembre", value: 500 },
-        ]
+        ],
     },
 };

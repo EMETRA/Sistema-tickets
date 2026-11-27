@@ -4,9 +4,9 @@ const path = require('node:path');
 const React = require('react');
 const { renderToStaticMarkup } = require('react-dom/server');
 const root = path.resolve(__dirname, '../..');
-const load = require('./load-ts.cjs')(root, { [path.join(root, 'src/components/client/organisms/NewsActivity/NewsActivity.module.scss')]: {} });
+const load = require('./load-ts.cjs')(root, { [path.join(root, 'src/features/comunicacion/components/NewsActivity/NewsActivity.module.scss')]: {} });
 const { mapNoticia, mapDetalle } = load('src/api/cms/mappers.ts');
-const NewsActivity = load('src/components/client/organisms/NewsActivity/NewsActivity.tsx').default;
+const NewsActivity = load('src/features/comunicacion/components/NewsActivity/NewsActivity.tsx').default;
 const activity = { creadoPor: { id: 1, nombre: 'Persona creadora' }, actualizadoPor: { id: 2, nombre: 'Persona editora' }, creadoEn: '2026-11-01T12:00:00.000Z', actualizadoEn: '2026-11-11T15:00:00.000Z' };
 const dto = { id: 21, titulo: 'Noticia', estado: 'borrador', idioma: 'es-GT', visibilidad: 'publica', slug: 'noticia', autor: { id: 9, nombre: 'Firma editorial' }, actividadEditorial: activity };
 

@@ -1,0 +1,313 @@
+// Barra de filtros: una sola fila sobre todo lo que filtra.
+.filters {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+  padding: 10px 12px 10px 16px;
+  background: var(--tickets-surface);
+  border: 1px solid var(--tickets-border);
+  border-radius: var(--tickets-radius);
+  box-shadow: var(--tickets-shadow);
+}
+.scope {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--tickets-text-secondary);
+  select {
+    min-height: 32px;
+    max-width: 260px;
+    padding: 4px 30px 4px 10px;
+    border: 1px solid var(--tickets-border);
+    border-radius: 8px;
+    background: var(--tickets-surface);
+    color: var(--tickets-text);
+    font: inherit;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    &:focus {
+      outline: none;
+      border-color: var(--tickets-primary);
+      box-shadow: var(--tickets-focus);
+    }
+  }
+}
+.refresh {
+  margin-left: auto;
+  min-height: 32px !important;
+  padding: 4px 12px !important;
+  font-size: 12px !important;
+}
+.caption {
+  margin-top: -6px;
+  min-height: 18px;
+  font-size: 12px;
+  color: var(--tickets-text-secondary);
+}
+.results {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+  transition: opacity 0.15s ease;
+  // Al recargar se conserva el marco anterior, atenuado.
+  &[aria-busy="true"] {
+    opacity: 0.55;
+  }
+}
+.panel {
+  min-width: 0;
+  padding: 18px 20px 20px;
+  background: var(--tickets-surface);
+  border: 1px solid var(--tickets-border);
+  border-radius: var(--tickets-radius);
+  box-shadow: var(--tickets-shadow);
+}
+.wide {
+  grid-column: 1 / -1;
+  padding-bottom: 0;
+  overflow: hidden;
+}
+.panelHeader {
+  margin-bottom: 16px;
+  h3 {
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.4;
+    margin: 0;
+  }
+  p {
+    margin-top: 2px;
+    font-size: 12px;
+    color: var(--tickets-text-secondary);
+  }
+}
+.panelHeaderRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 12px;
+}
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 0;
+  > div {
+    min-width: 0;
+    padding: 2px 16px;
+    border-left: 1px solid var(--tickets-divider);
+    &:first-child {
+      padding-left: 0;
+      border-left: 0;
+    }
+  }
+  dt {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--tickets-text-secondary);
+    white-space: nowrap;
+  }
+  dd {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    margin: 4px 0 0;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.4px;
+    color: var(--tickets-text);
+    small {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0;
+      color: var(--tickets-text-muted);
+    }
+  }
+}
+.kpiMain dd {
+  font-size: 30px;
+}
+// Colores de estado coherentes con los chips del panel.
+.results {
+  [data-part="resueltos"] {
+    --part: #177849;
+  }
+  [data-part="atencion"] {
+    --part: var(--paleta-azul-5);
+  }
+  [data-part="asignados"] {
+    --part: #d99a1e;
+  }
+  [data-part="otros"] {
+    --part: #9aa6b8;
+  }
+}
+.swatch {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  flex-shrink: 0;
+  background: var(--part);
+}
+.distribution {
+  margin-top: 20px;
+}
+// Barra segmentada fina: un todo dividido en partes, 2px de separación.
+.bar {
+  display: flex;
+  gap: 2px;
+  height: 8px;
+  span {
+    min-width: 4px;
+    background: var(--part);
+    &:first-child {
+      border-radius: 4px 0 0 4px;
+    }
+    &:last-child {
+      border-radius: 0 4px 4px 0;
+    }
+    &:only-child {
+      border-radius: 4px;
+    }
+  }
+}
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin-top: 10px;
+  padding: 0;
+  list-style: none;
+  li {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--tickets-text-secondary);
+  }
+  strong {
+    color: var(--tickets-text);
+    font-weight: 600;
+  }
+}
+// Ranking de operaciones: barras horizontales de una sola serie.
+.ranking {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  li {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(60px, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+  }
+  strong {
+    min-width: 28px;
+    text-align: right;
+    font-size: 14px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+}
+.rankingText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  span {
+    font-size: 13px;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  small {
+    font-size: 11px;
+    color: var(--tickets-text-muted);
+  }
+}
+.rankingTrack {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--tickets-primary-soft);
+  span {
+    display: block;
+    height: 100%;
+    min-width: 4px;
+    border-radius: 4px;
+    background: var(--tickets-primary-fill);
+  }
+}
+.empty {
+  padding: 18px 0 6px;
+  font-size: 13px;
+  color: var(--tickets-text-secondary);
+}
+.flush {
+  margin: 0 -20px;
+  max-width: none !important;
+  border: 0;
+  border-top: 1px solid var(--tickets-divider);
+  border-radius: 0;
+  th:first-child,
+  td:first-child {
+    padding-left: 20px;
+  }
+  th:last-child,
+  td:last-child {
+    padding-right: 20px;
+  }
+}
+.num {
+  text-align: right !important;
+}
+.nowrap {
+  white-space: nowrap;
+}
+.emptyCell {
+  padding: 28px 16px !important;
+  text-align: center;
+  color: var(--tickets-text-secondary);
+}
+.pager {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin: 0 -20px;
+  padding: 10px 20px;
+  border-top: 1px solid var(--tickets-divider);
+  font-size: 12px;
+  color: var(--tickets-text-secondary);
+  > div {
+    display: flex;
+    gap: 8px;
+  }
+}
+@media (max-width: 1100px) {
+  .results {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 700px) {
+  .kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    row-gap: 14px;
+    > div:nth-child(3) {
+      padding-left: 0;
+      border-left: 0;
+    }
+  }
+  .refresh {
+    margin-left: 0;
+  }
+}

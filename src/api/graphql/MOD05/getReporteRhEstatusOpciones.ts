@@ -1,6 +1,6 @@
 /**
  * Query GraphQL para obtener opciones de status para reporte RRHH
- * 
+ *
  * Retorna:
  * - codigo
  * - etiqueta

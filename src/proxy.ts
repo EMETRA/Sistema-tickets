@@ -1,26 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import {
-    protectedRoutes,
-    publicRoutes,
-    nologRoutes,
-    sessionOnlyRoutes,
-} from "@/config/protected-routes";
+import { protectedRoutes, publicRoutes, nologRoutes, sessionOnlyRoutes } from "@/config/protected-routes";
 import { getSessionFromRequest } from "@/auth/session";
 import { canAccessPath } from "@/config/route-access";
 import { legacyApplicationDestination } from "@/config/apps-catalog";
 
 function isInternalPath(pathname: string) {
-    return (
-        pathname.startsWith("/_next") ||
-        pathname.startsWith("/api") ||
-        pathname === "/favicon.ico"
-    );
+    return pathname.startsWith("/_next") || pathname.startsWith("/api") || pathname === "/favicon.ico";
 }
 
 function matchRoute(pathname: string, routes: string[]) {
-    return routes.some(
-        (route) => pathname === route || pathname.startsWith(`${route}/`),
-    );
+    return routes.some((route) => pathname === route || pathname.startsWith(`${route}/`));
 }
 
 export function proxy(request: NextRequest) {
@@ -34,8 +23,7 @@ export function proxy(request: NextRequest) {
     const isPublicRoute = matchRoute(pathname, publicRoutes);
     const isNologRoute = matchRoute(pathname, nologRoutes);
     const isSessionOnlyRoute = matchRoute(pathname, sessionOnlyRoutes);
-    const isDeclaredRoute =
-        isProtectedRoute || isPublicRoute || isNologRoute || isSessionOnlyRoute;
+    const isDeclaredRoute = isProtectedRoute || isPublicRoute || isNologRoute || isSessionOnlyRoute;
 
     // Rutas no declaradas: dejar que Next.js renderice app/not-found.tsx
     if (!isDeclaredRoute) {
@@ -51,8 +39,7 @@ export function proxy(request: NextRequest) {
     const destination = legacyApplicationDestination(pathname);
     if (session && destination) {
         const target = new URL(destination, request.url);
-        if (destination.startsWith("/home/juzgado/"))
-            target.search = request.nextUrl.search;
+        if (destination.startsWith("/home/juzgado/")) target.search = request.nextUrl.search;
         return NextResponse.redirect(target);
     }
 

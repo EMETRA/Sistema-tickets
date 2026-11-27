@@ -26,6 +26,13 @@ export function useGetNoticias(filters?: NoticiasFilterInput) {
             setError(err instanceof Error ? err : new Error(String(err))); setData([]); setTotal(0);
         } finally { if (current === seq.current) setLoading(false); }
     }, [estado, busqueda, page, limit]);
-    useEffect(() => { void fetchData(); return () => { seq.current++; }; }, [fetchData]);
+    useEffect(() => {
+        void fetchData();
+        // Invalida la respuesta en curso al cambiar los filtros o desmontar.
+        const sequence = seq;
+        return () => {
+            sequence.current++;
+        };
+    }, [fetchData]);
     return { data, total, loading, error, refetch: fetchData };
 }

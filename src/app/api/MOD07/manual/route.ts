@@ -13,22 +13,22 @@ import { falloModulo } from "@/api/graphql/module-response";
  * }
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { graphqlRequest } from '@/api/graphql/client';
-import { GET_MANUAL_QUERY } from '@/api/graphql/MOD07';
-import type { GetManualResponse } from '@/api/graphql/MOD07';
+import { NextRequest, NextResponse } from "next/server";
+import { graphqlRequest } from "@/api/graphql/client";
+import { GET_MANUAL_QUERY } from "@/api/graphql/MOD07";
+import type { GetManualResponse } from "@/api/graphql/MOD07";
 
 export async function GET(request: NextRequest) {
     try {
         const searchParams = request.nextUrl.searchParams;
-        const idParam = searchParams.get('id');
+        const idParam = searchParams.get("id");
         const timestamp = new Date().toISOString();
 
         if (!idParam) {
             return NextResponse.json(
                 {
-                    error: 'Parámetro requerido ausente',
-                    message: 'id es requerido',
+                    error: "Parámetro requerido ausente",
+                    message: "id es requerido",
                     timestamp,
                 },
                 { status: 400 },
@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
         if (Number.isNaN(id) || !Number.isInteger(id) || id <= 0) {
             return NextResponse.json(
                 {
-                    error: 'ID inválido',
+                    error: "ID inválido",
                     message: `id debe ser un entero positivo (recibido: ${idParam})`,
                     timestamp,
                 },
@@ -48,14 +48,11 @@ export async function GET(request: NextRequest) {
             );
         }
 
-        const response = await graphqlRequest<GetManualResponse>(
-            GET_MANUAL_QUERY,
-            {
-                variables: {
-                    manualId: id,
-                },
+        const response = await graphqlRequest<GetManualResponse>(GET_MANUAL_QUERY, {
+            variables: {
+                manualId: id,
             },
-        );
+        });
 
         return NextResponse.json(
             {
@@ -63,5 +60,7 @@ export async function GET(request: NextRequest) {
             },
             { status: 200 },
         );
-    } catch (error) { return falloModulo(error, "MOD07/manual"); }
+    } catch (error) {
+        return falloModulo(error, "MOD07/manual");
+    }
 }

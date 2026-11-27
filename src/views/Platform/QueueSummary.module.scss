@@ -1,0 +1,82 @@
+// Indicadores de la Mesa de servicio: cada uno filtra la bandeja.
+.strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+.tile {
+  --tone: var(--tickets-text-muted);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 14px 16px;
+  border: 1px solid var(--tickets-border);
+  border-radius: 14px;
+  background: var(--tickets-surface);
+  box-shadow: var(--tickets-shadow);
+  color: var(--tickets-text);
+  font: inherit;
+  text-align: left;
+  &[data-tone="danger"] {
+    --tone: var(--tickets-danger);
+    strong {
+      color: var(--tickets-danger);
+    }
+  }
+  &[data-tone="info"] {
+    --tone: var(--tickets-primary);
+  }
+  &[data-tone="success"] {
+    --tone: var(--tickets-success);
+  }
+  strong {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.4px;
+    line-height: 1.2;
+  }
+  small {
+    font-size: 11px;
+    color: var(--tickets-text-muted);
+  }
+}
+button.tile {
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+  &:hover {
+    border-color: color-mix(in srgb, var(--tickets-primary) 35%, var(--tickets-surface));
+  }
+  &[aria-pressed="true"] {
+    border-color: var(--tone);
+    box-shadow:
+      0 0 0 3px color-mix(in srgb, var(--tone) 16%, transparent),
+      var(--tickets-shadow);
+  }
+  &:focus-visible {
+    outline: 2px solid var(--tickets-primary);
+    outline-offset: 2px;
+  }
+}
+.label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--tickets-text-secondary);
+  &::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--tone);
+  }
+}
+@media (max-width: 900px) {
+  .strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

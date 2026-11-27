@@ -1,10 +1,16 @@
 .PermissionsForm {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 
 .form {
-    display: grid;
-    gap: 16px;
+  display: grid;
+  gap: 16px;
+}
+
+.error {
+  margin: -8px 0 12px;
+  font-size: 13px;
+  color: var(--tickets-danger);
 }

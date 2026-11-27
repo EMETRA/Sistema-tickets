@@ -39,7 +39,9 @@ const YouTubeLinkField: React.FC<YouTubeLinkFieldProps> = ({
 
     return (
         <div className={classNames(styles.YouTubeLinkField, className)}>
-            <label htmlFor={id} className={styles.label}>{label}</label>
+            <label htmlFor={id} className={styles.label}>
+                {label}
+            </label>
             <div className={styles.row}>
                 <div className={styles.input}>
                     <Input

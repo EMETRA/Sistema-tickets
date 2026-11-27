@@ -10,24 +10,18 @@ import { useRouter } from "next/navigation";
 export function PermissionsBridge() {
     const { disabled, loading } = usePlatform();
     const router = useRouter();
-    useEffect(() => { if (!loading && !disabled) router.replace("/espacio/accesos?tab=corporate"); }, [loading, disabled, router]);
+    useEffect(() => {
+        if (!loading && !disabled) router.replace("/espacio/accesos?tab=corporate");
+    }, [loading, disabled, router]);
     return disabled ? <MOD06 /> : <p role="status">Abriendo Personas y accesos…</p>;
 }
 export function ProjectsBridge() {
     const { disabled } = usePlatform();
-    return disabled ? (
-        <DashboardProjects />
-    ) : (
-        <PlatformRoute section="metricas" />
-    );
+    return disabled ? <DashboardProjects /> : <PlatformRoute section="metricas" />;
 }
 export function CollaboratorsBridge() {
     const { disabled } = usePlatform();
-    return disabled ? (
-        <DashboardCollaborators />
-    ) : (
-        <PlatformRoute section="metricas" />
-    );
+    return disabled ? <DashboardCollaborators /> : <PlatformRoute section="metricas" />;
 }
 export function SearchBridge() {
     const { disabled } = usePlatform();

@@ -31,9 +31,6 @@ export { useGetLastTicket } from './useGetLastTicket';
 export { useGetLastMovements } from './useGetLastMovements';
 
 // Configuration hooks
-export { useGetPendingRequests } from './useGetPendingRequests';
-export { useAproveRequest } from './useAproveRequest';
-export { useRequestPermission } from './useRequestPermission';
 export { useGetModules } from './useGetModules';
 export { useGetPermissions } from './useGetPermissions';
 export { useGetEnrolls } from './useGetEnrolls';
@@ -61,10 +58,6 @@ export { useGetManual } from './useGetManual';
 
 // RBAC hooks
 export { useGetRoles } from './useGetRoles';
-export { useCreateRol } from './useCreateRol';
-export { useUpdateRol } from './useUpdateRol';
-export { useAssignPermission } from './useAssignPermission';
-export { useCreateModule } from './useCreateModule';
 
 // Tickets hooks - Details, Comments, History, Attachments, Tags, Messages
 export { useGetTicketById } from './useGetTicketById';

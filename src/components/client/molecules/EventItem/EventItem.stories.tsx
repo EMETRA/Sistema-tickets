@@ -192,11 +192,7 @@ export const EventList = {
                 label={{ ticketId: 124, newState: "Resuelto" }}
                 date={new Date("2023-11-02")}
             />
-            <EventItem
-                type="event"
-                eventName="Nombre evento"
-                date={new Date("2023-11-18")}
-            />
+            <EventItem type="event" eventName="Nombre evento" date={new Date("2023-11-18")} />
         </div>
     ),
 };

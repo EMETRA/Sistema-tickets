@@ -38,11 +38,7 @@ export function AccessChoices({
                 {visible.map((option) => (
                     <label
                         key={option.id}
-                        className={
-                            value.includes(option.id)
-                                ? styles.selected
-                                : undefined
-                        }
+                        className={value.includes(option.id) ? styles.selected : undefined}
                     >
                         <input
                             type="checkbox"
@@ -58,19 +54,14 @@ export function AccessChoices({
                         />
                         <span>
                             <strong>{option.nombre}</strong>
-                            {option.descripcion && (
-                                <small>{option.descripcion}</small>
-                            )}
+                            {option.descripcion && <small>{option.descripcion}</small>}
                         </span>
                     </label>
                 ))}
-                {!visible.length && (
-                    <p>No hay opciones que coincidan con la búsqueda.</p>
-                )}
+                {!visible.length && <p>No hay opciones que coincidan con la búsqueda.</p>}
             </div>
             <small id={countId}>
-                {value.length} seleccionadas · {options.length} disponibles ·{" "}
-                {visible.length} mostradas
+                {value.length} seleccionadas · {options.length} disponibles · {visible.length} mostradas
             </small>
         </fieldset>
     );

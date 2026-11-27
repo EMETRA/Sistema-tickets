@@ -1,0 +1,114 @@
+.picker {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 3px 4px 3px 4px;
+  border: 1px solid var(--tickets-border);
+  border-radius: 999px;
+  background: var(--tickets-surface-subtle);
+  color: var(--tickets-text);
+  font-size: 13px;
+  font-weight: 500;
+  button {
+    display: inline-grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--tickets-text-muted);
+    font-size: 17px;
+    line-height: 1;
+    cursor: pointer;
+    &:hover,
+    &:focus-visible {
+      background: var(--tickets-danger-soft);
+      color: var(--tickets-danger);
+    }
+  }
+  &:not(:has(button)) {
+    padding-right: 12px;
+  }
+}
+.avatar {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--tickets-primary-soft);
+  color: var(--tickets-primary);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.combo {
+  position: relative;
+}
+.input {
+  width: 100%;
+  min-height: var(--tickets-control-height, 40px);
+  padding: 0 12px;
+  border: 1px solid var(--tickets-border-strong, var(--tickets-border));
+  border-radius: 10px;
+  background: var(--tickets-surface);
+  color: var(--tickets-text);
+  font: inherit;
+  font-size: 14px;
+  &:focus-visible {
+    outline: 2px solid var(--tickets-primary);
+    outline-offset: 1px;
+  }
+}
+.options {
+  margin-top: 4px !important;
+  max-height: 220px;
+  margin: 0;
+  padding: 4px;
+  overflow-y: auto;
+  list-style: none;
+  border: 1px solid var(--tickets-border);
+  border-radius: 12px;
+  background: var(--tickets-surface);
+  box-shadow: var(--tickets-shadow-raised, 0 12px 32px rgba(15, 23, 42, 0.16));
+  li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 40px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    color: var(--tickets-text);
+    font-size: 14px;
+    cursor: pointer;
+    &[data-active] {
+      background: var(--tickets-primary-soft);
+    }
+  }
+  .none {
+    color: var(--tickets-text-muted);
+    cursor: default;
+    font-size: 13px;
+  }
+}
+.hint {
+  color: var(--tickets-text-muted);
+  font-size: 12px;
+}

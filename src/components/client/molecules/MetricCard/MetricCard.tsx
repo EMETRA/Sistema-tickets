@@ -4,9 +4,9 @@ export function MetricCard({
     value,
     caption,
 }: {
-  label: string;
-  value: number | string | undefined;
-  caption?: string;
+    label: string;
+    value: number | string | undefined;
+    caption?: string;
 }) {
     return (
         <article className={styles.card}>

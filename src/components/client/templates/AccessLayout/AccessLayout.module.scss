@@ -1,14 +1,14 @@
 .layout {
-  min-height: 100dvh;
+  min-height: calc(100dvh / var(--vp-zoom, 1));
   display: grid;
   grid-template-columns: 1fr 1fr;
-  background: #f8faff;
+  background: var(--tickets-surface-subtle);
   color: var(--tickets-text);
   border-top: 5px solid var(--tickets-primary);
 }
 .introduction {
-  padding: clamp(32px, 5vw, 80px);
-  background: #edf1ff;
+  padding: clamp(32px, calc(5vw / var(--vp-zoom, 1)), 80px);
+  background: var(--tickets-primary-soft);
   display: flex;
   flex-direction: column;
   gap: 70px;
@@ -17,7 +17,7 @@
   display: flex;
   flex-direction: column;
   gap: 7px;
-  color: #243b70;
+  color: var(--tickets-text);
   strong {
     font-size: 23px;
     letter-spacing: 1px;
@@ -32,13 +32,13 @@
   max-width: 620px;
   margin: auto 0;
   h1 {
-    font-size: clamp(28px, 3.2vw, 43px);
+    font-size: clamp(28px, calc(3.2vw / var(--vp-zoom, 1)), 43px);
     line-height: 1.25;
     margin: 20px 0 24px;
     letter-spacing: -0.8px;
   }
   p {
-    color: #617a9f;
+    color: var(--tickets-text-muted);
     line-height: 1.9;
     font-size: 14px;
     max-width: 520px;
@@ -49,7 +49,7 @@
     flex-wrap: wrap;
     gap: 22px;
     margin-top: 36px;
-    color: #536ca1;
+    color: var(--tickets-text-secondary);
     font-size: 12px;
   }
   li {
@@ -66,14 +66,14 @@
   letter-spacing: 1.4px;
 }
 .footer {
-  color: #718198;
+  color: var(--tickets-text-muted);
   font-size: 11px;
   line-height: 1.7;
 }
 .formRegion {
   display: grid;
   align-items: center;
-  padding: clamp(28px, 5vw, 80px);
+  padding: clamp(28px, calc(5vw / var(--vp-zoom, 1)), 80px);
 }
 .formContent {
   width: 100%;

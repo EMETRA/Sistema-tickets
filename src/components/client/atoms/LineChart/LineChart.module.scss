@@ -31,6 +31,6 @@
 .EmptyState {
   padding: 32px;
   text-align: center;
-  color: $gris-1;
+  color: var(--tickets-text-muted);
   font-size: 14px;
 }

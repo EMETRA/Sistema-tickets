@@ -49,15 +49,42 @@ export const SizeComparison: Story = {
     render: () => (
         <div style={{ display: "flex", flexDirection: "column", gap: "24px", alignItems: "center" }}>
             <div>
-                <p style={{ fontSize: "12px", fontFamily: "Arial, sans-serif", color: "gray", marginBottom: "8px" }}>Large (Default)</p>
+                <p
+                    style={{
+                        fontSize: "12px",
+                        fontFamily: "Arial, sans-serif",
+                        color: "gray",
+                        marginBottom: "8px",
+                    }}
+                >
+                    Large (Default)
+                </p>
                 <Logo name="EmetraMain" width={250} />
             </div>
             <div>
-                <p style={{ fontSize: "12px", fontFamily: "Arial, sans-serif", color: "gray", marginBottom: "8px" }}>Medium</p>
+                <p
+                    style={{
+                        fontSize: "12px",
+                        fontFamily: "Arial, sans-serif",
+                        color: "gray",
+                        marginBottom: "8px",
+                    }}
+                >
+                    Medium
+                </p>
                 <Logo name="EmetraMain" width={150} />
             </div>
             <div>
-                <p style={{ fontSize: "12px", fontFamily: "Arial, sans-serif", color: "gray", marginBottom: "8px" }}>Small</p>
+                <p
+                    style={{
+                        fontSize: "12px",
+                        fontFamily: "Arial, sans-serif",
+                        color: "gray",
+                        marginBottom: "8px",
+                    }}
+                >
+                    Small
+                </p>
                 <Logo name="EmetraMain" width={80} />
             </div>
         </div>

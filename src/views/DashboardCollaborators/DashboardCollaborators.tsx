@@ -12,22 +12,22 @@ import type { TableCellConfig } from "@/components/client/molecules/TableRow/typ
 import styles from "./DashboardCollaborators.module.scss";
 
 interface CollaboratorRow {
-  colaborador: string;
-  reportes: number;
-  proyectos: number;
-  avancePlan: string;
-  avanceReal: string;
-  desvAvance: string;
-  cumplTareas: string;
-  cumplFechas: string;
-  desvHoras: string;
-  productividad: number;
-  bloqueos: number;
-  ultimoReporte: string;
+    colaborador: string;
+    reportes: number;
+    proyectos: number;
+    avancePlan: string;
+    avanceReal: string;
+    desvAvance: string;
+    cumplTareas: string;
+    cumplFechas: string;
+    desvHoras: string;
+    productividad: number;
+    bloqueos: number;
+    ultimoReporte: string;
 }
 
 const GRID =
-  "minmax(0,1.2fr) minmax(0,0.6fr) minmax(0,0.7fr) minmax(0,0.9fr) minmax(0,0.9fr) minmax(0,0.9fr) minmax(0,0.9fr) minmax(0,0.9fr) minmax(0,0.9fr) minmax(0,0.8fr) minmax(0,0.6fr) minmax(0,0.9fr)";
+    "minmax(0,1.2fr) minmax(0,0.6fr) minmax(0,0.7fr) minmax(0,0.9fr) minmax(0,0.9fr) minmax(0,0.9fr) minmax(0,0.9fr) minmax(0,0.9fr) minmax(0,0.9fr) minmax(0,0.8fr) minmax(0,0.6fr) minmax(0,0.9fr)";
 
 const DUMMY_DATA: CollaboratorRow[] = [
     {
@@ -212,7 +212,7 @@ const DashboardCollaborators: React.FC = () => {
 
     const handleConsultar = () => {
         console.log({ desde, hasta });
-    // TODO: refetch query with date range
+        // TODO: refetch query with date range
     };
 
     return (
@@ -223,21 +223,11 @@ const DashboardCollaborators: React.FC = () => {
             <div className={styles.filterBar}>
                 <div className={styles.filterField}>
                     <Text className={styles.filterLabel}>Desde:</Text>
-                    <Input
-                        id="desde"
-                        type="date"
-                        value={desde}
-                        onChange={(e) => setDesde(e.target.value)}
-                    />
+                    <Input id="desde" type="date" value={desde} onChange={(e) => setDesde(e.target.value)} />
                 </div>
                 <div className={styles.filterField}>
                     <Text className={styles.filterLabel}>Hasta:</Text>
-                    <Input
-                        id="hasta"
-                        type="date"
-                        value={hasta}
-                        onChange={(e) => setHasta(e.target.value)}
-                    />
+                    <Input id="hasta" type="date" value={hasta} onChange={(e) => setHasta(e.target.value)} />
                 </div>
                 <Button variant="contained" color="default" onClick={handleConsultar}>
                     Consultar
@@ -251,37 +241,19 @@ const DashboardCollaborators: React.FC = () => {
                     value={stats.colaboradoresConReportes}
                     variant="blue"
                 />
-                <StatusCard
-                    label="Total reportes"
-                    value={stats.totalReportes}
-                    variant="green"
-                />
-                <StatusCard
-                    label="Bloqueos acumulados"
-                    value={stats.bloqueosAcumulados}
-                    variant="yellow"
-                />
+                <StatusCard label="Total reportes" value={stats.totalReportes} variant="green" />
+                <StatusCard label="Bloqueos acumulados" value={stats.bloqueosAcumulados} variant="yellow" />
             </div>
 
             {/* Avance real chart */}
             <div className={styles.chartContainer}>
-                <Text className={styles.chartTitle}>
-                    Avance real promedio por colaborador
-                </Text>
-                <BarChart
-                    data={avanceData}
-                    colorScheme="single"
-                    height={400}
-                    width="100%"
-                    showFullGrid
-                />
+                <Text className={styles.chartTitle}>Avance real promedio por colaborador</Text>
+                <BarChart data={avanceData} colorScheme="single" height={400} width="100%" showFullGrid />
             </div>
 
             {/* Productividad chart */}
             <div className={styles.chartContainer}>
-                <Text className={styles.chartTitle}>
-                    Productividad promedio por colaborador
-                </Text>
+                <Text className={styles.chartTitle}>Productividad promedio por colaborador</Text>
                 <BarChart
                     data={productividadData}
                     colorScheme="single"
@@ -301,27 +273,27 @@ const DashboardCollaborators: React.FC = () => {
                         gridTemplate={GRID}
                         scale={0.8}
                         cells={
-              [
-                  { content: <Text variant="muted">{row.colaborador}</Text> },
-                  { content: <Text variant="muted">{row.reportes}</Text> },
-                  { content: <Text variant="muted">{row.proyectos}</Text> },
-                  { content: <Text variant="muted">{row.avancePlan}</Text> },
-                  { content: <Text variant="muted">{row.avanceReal}</Text> },
-                  { content: <Text variant="muted">{row.desvAvance}</Text> },
-                  { content: <Text variant="muted">{row.cumplTareas}</Text> },
-                  { content: <Text variant="muted">{row.cumplFechas}</Text> },
-                  { content: <Text variant="muted">{row.desvHoras}</Text> },
-                  { content: <Text variant="muted">{row.productividad}</Text> },
-                  { content: <Text variant="muted">{row.bloqueos}</Text> },
-                  { content: <Text variant="muted">{row.ultimoReporte}</Text> },
-              ] as TableCellConfig[]
+                            [
+                                { content: <Text variant="muted">{row.colaborador}</Text> },
+                                { content: <Text variant="muted">{row.reportes}</Text> },
+                                { content: <Text variant="muted">{row.proyectos}</Text> },
+                                { content: <Text variant="muted">{row.avancePlan}</Text> },
+                                { content: <Text variant="muted">{row.avanceReal}</Text> },
+                                { content: <Text variant="muted">{row.desvAvance}</Text> },
+                                { content: <Text variant="muted">{row.cumplTareas}</Text> },
+                                { content: <Text variant="muted">{row.cumplFechas}</Text> },
+                                { content: <Text variant="muted">{row.desvHoras}</Text> },
+                                { content: <Text variant="muted">{row.productividad}</Text> },
+                                { content: <Text variant="muted">{row.bloqueos}</Text> },
+                                { content: <Text variant="muted">{row.ultimoReporte}</Text> },
+                            ] as TableCellConfig[]
                         }
                     />
                 ))}
                 <div className={styles.tableFooter}>
                     <Text variant="muted" className={styles.tableFooterText}>
-                        El dashboard incluye a todos los colaboradores. Los que no tienen
-                        reportes en el rango aparecen con valores en cero.
+                        El dashboard incluye a todos los colaboradores. Los que no tienen reportes en el rango
+                        aparecen con valores en cero.
                     </Text>
                 </div>
             </div>

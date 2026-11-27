@@ -1,1 +1,36 @@
-.File { display: inline-flex; align-items: center; gap: 9px; padding: 9px 12px; border: 1px solid transparent; border-radius: 8px; background: var(--tickets-surface-subtle); cursor: pointer; font: inherit; color: var(--tickets-text); text-align: left; min-width: 0; max-width: 100%; height: fit-content; > span, > p { overflow-wrap: anywhere; font-size: 12px; min-width: 0; } svg { flex-shrink: 0; } &.outlined { background: #fff; border-color: var(--tickets-border); } &:hover { background: var(--tickets-primary-soft); } &:focus-visible { outline: 2px solid var(--tickets-primary); outline-offset: 2px; } }
+.File {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 12px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: var(--tickets-surface-subtle);
+  cursor: pointer;
+  font: inherit;
+  color: var(--tickets-text);
+  text-align: left;
+  min-width: 0;
+  max-width: 100%;
+  height: fit-content;
+  > span,
+  > p {
+    overflow-wrap: anywhere;
+    font-size: 12px;
+    min-width: 0;
+  }
+  svg {
+    flex-shrink: 0;
+  }
+  &.outlined {
+    background: var(--tickets-surface);
+    border-color: var(--tickets-border);
+  }
+  &:hover {
+    background: var(--tickets-primary-soft);
+  }
+  &:focus-visible {
+    outline: 2px solid var(--tickets-primary);
+    outline-offset: 2px;
+  }
+}

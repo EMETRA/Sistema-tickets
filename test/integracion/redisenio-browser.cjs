@@ -1,7 +1,7 @@
 // Recorridos reales de Next con límites HTTP sustituidos. Sin Oracle ni envíos reales.
 const assert=require('node:assert/strict');
 const http=require('node:http');
-const fs=require('node:fs/promises');
+const fs=require('node:fs/promises');const os=require('node:os');
 const path=require('node:path');
 const {once}=require('node:events');
 const {spawn,execFileSync}=require('node:child_process');
@@ -53,12 +53,14 @@ async function run(){
  });backend.listen(3862,'127.0.0.1');await once(backend,'listening');
  const next=spawn(process.execPath,['node_modules/next/dist/bin/next','start','-p','3861','-H','127.0.0.1'],{cwd:root,env:{...process.env,GRAPHQL_ENDPOINT:'http://127.0.0.1:3862/graphql',API_PORTAL_URL:'http://127.0.0.1:3862',AUTH_RECOVERY_BASE_URL:'http://127.0.0.1:3862/auth/',NEXT_TELEMETRY_DISABLED:'1'},stdio:['ignore','pipe','pipe']});
  let output='';next.stdout.on('data',b=>output+=b);next.stderr.on('data',b=>output+=b);let browser,context,page;const errors=[];const visited=[];
- const out=process.env.QA_SCREENSHOT_DIR||'/workspace/artifacts/tickets-redisenio';await fs.mkdir(out,{recursive:true});
+ const out=process.env.QA_SCREENSHOT_DIR||path.join(os.tmpdir(),'tickets-redisenio');await fs.mkdir(out,{recursive:true});
  try{
   for(let i=0;i<200&&!output.includes('Ready in');i++){if(next.exitCode!==null)throw Error(output);await new Promise(r=>setTimeout(r,100));}assert.ok(output.includes('Ready in'));
-  browser=await chromium.launch({executablePath:process.env.QA_CHROMIUM_PATH||'/usr/bin/chromium',args:['--no-sandbox','--disable-dev-shm-usage']});
+  browser=await chromium.launch({executablePath:process.env.QA_CHROMIUM_PATH||undefined,args:['--no-sandbox','--disable-dev-shm-usage']});
   context=await browser.newContext({viewport:{width:1600,height:1000}});page=await context.newPage();page.on('pageerror',error=>errors.push(error.message));
   await page.route('**/*',route=>new URL(route.request().url()).hostname==='127.0.0.1'?route.continue():route.abort());
+  // Acceso previo a módulos (ModuleAccessGate) autorizado: esta prueba recorre las vistas.
+  await page.route('**/api/platform/module-access/**',route=>route.fulfill({json:{moduloId:decodeURIComponent(route.request().url().split('/').pop()),allowed:true,actions:{LEER:true,INSERTAR:true,EDITAR:true,ELIMINAR:false}}}));
   const fits=async()=>assert.ok(await page.evaluate(()=>{const m=document.querySelector('main');return document.documentElement.scrollWidth<=innerWidth&&(!m||m.scrollWidth<=m.clientWidth+1);}),'Desborde horizontal en '+page.url());
   await page.goto(base+'/login');await page.getByLabel('Usuario',{exact:false}).fill('qa@example.invalid');await page.locator('#clave').fill('ClaveSoloQA1!');
   loginFails=true;await page.getByRole('button',{name:'Iniciar Sesión',exact:true}).click();await page.getByText('Email o contraseña incorrectos',{exact:true}).waitFor();
@@ -66,9 +68,9 @@ async function run(){
   await page.screenshot({path:path.join(out,'login-error.png')});
   loginFails=false;await page.locator('#clave').fill('ClaveSoloQA1!');await page.getByRole('button',{name:'Iniciar Sesión',exact:true}).click();await page.waitForURL('**/home');await page.getByText('Acción controlada de pruebas',{exact:true}).waitFor();
   await page.waitForLoadState('networkidle');await page.mouse.move(0,0);await page.screenshot({path:path.join(out,'inicio-usuario.png')});
-  await page.getByLabel('Buscar una aplicación').fill('comunicación');const app=page.getByRole('link',{name:/Aplicaciones de Comunicación/});await app.waitFor();await app.click();await page.waitForURL('**/home/comunicacion/contenido');
-  assert.equal(await page.getByRole('navigation',{name:'Menú principal'}).getByRole('link',{name:'Mis tickets',exact:true}).count(),1);
-  await page.getByRole('navigation',{name:'Menú principal'}).getByRole('link',{name:'Mis tickets',exact:true}).click();await page.waitForURL('**/mis-tickets');await page.getByText(ticket.titulo,{exact:true}).waitFor();
+  await page.getByRole('button',{name:/Buscar aplicaciones, módulos, tickets/}).click();await page.getByLabel('Buscar aplicaciones, módulos, tickets o secciones').fill('comunicación');const app=page.getByRole('option',{name:/Comunicación/}).first();await app.waitFor();await app.click();await page.waitForURL('**/home/comunicacion/**');
+  assert.equal(await page.getByRole('navigation',{name:'Menú principal'}).getByRole('link',{name:'Mis solicitudes',exact:true}).count(),1);
+  await page.getByRole('navigation',{name:'Menú principal'}).getByRole('link',{name:'Mis solicitudes',exact:true}).click();await page.waitForURL('**/mis-tickets');await page.getByText(ticket.titulo,{exact:true}).waitFor();
   assert.ok(calls.some(c=>c.query.includes('query Tickets')&&c.variables?.filters?.usuarioCreadorId===12));
   const session=async(nextRole)=>{role=nextRole;await context.addCookies([{name:'auth_token',value:'qa-token-controlado',url:base},{name:'auth_role',value:role,url:base}]);await page.evaluate(user=>localStorage.setItem('auth-storage',JSON.stringify({state:{token:'qa-token-controlado',user,userId:user.id_usuario},version:0})),user());};
   for(const current of ['TECNICO','DESARROLLADOR','ADMINISTRADOR']){await session(current);await page.goto(base+'/home');await page.getByRole('heading',{name:'Hola, Usuario'}).waitFor();await page.waitForLoadState('networkidle');await fits();if(current==='TECNICO'){
@@ -89,14 +91,14 @@ async function run(){
   assert.ok(calls.some(c=>c.query.includes('mutation UpdateTicket')&&c.variables.input.estadoId===4));assert.equal(calls.filter(c=>c.query.includes('mutation DeleteTicket')).length,0);
   await page.goto(base+'/config');await page.getByText('Vista de demostración de accesos.',{exact:false}).waitFor();await page.locator('fieldset[disabled]').waitFor();assert.equal(await page.locator('fieldset[disabled]').count(),1);await page.getByText('Roles del sistema',{exact:true}).click();assert.equal(await page.locator('fieldset[disabled]').count(),1);
   await session('TECNICO');await page.goto(base+'/tickets-creation');await page.locator('#subject').fill('Técnico no se autoasigna');await page.locator('#department').selectOption('1');await page.locator('[contenteditable=true]').fill('Descripción controlada');await page.getByRole('button',{name:'Crear ticket',exact:true}).click();await page.getByText('Ticket QA-031 creado correctamente.',{exact:true}).waitFor();const tech=calls.filter(c=>c.query.includes('mutation CreateTicket')).at(-1);assert.equal(tech.variables.input.usuarioAsignadoId,undefined);assert.equal(tech.variables.input.estadoId,1);
-  for(const route of ['/usuarios','/equipo','/equipo/12','/aplicaciones','/statistics']){await session('ADMINISTRADOR');await page.goto(base+route);await page.waitForLoadState('networkidle');await fits();if(route==='/equipo/12'){await page.getByRole('heading',{name:'Información del colaborador'}).waitFor();assert.equal(await page.getByRole('article').filter({hasText:'Tickets creados'}).locator('strong').innerText(),'1');}await page.screenshot({path:path.join(out,route.replaceAll('/','-').slice(1)+'.png')});}
+  for(const route of ['/usuarios','/equipo','/equipo/13','/aplicaciones','/statistics']){await session('ADMINISTRADOR');await page.goto(base+route);await page.waitForLoadState('networkidle');await fits();if(route==='/equipo/13'){await page.getByRole('heading',{name:'Información del colaborador'}).waitFor();assert.equal(await page.getByRole('article').filter({hasText:'Tickets creados'}).locator('strong').innerText(),'1');}await page.screenshot({path:path.join(out,route.replaceAll('/','-').slice(1)+'.png')});}
   await session('USUARIO');for(const route of coverage.moduleRoutes){await page.goto(base+route.path);await page.locator('main').waitFor();await page.waitForLoadState('networkidle');assert.ok(!page.url().includes('/unauthorized'),route.path);await fits();visited.push(route.path);if(['mod01','mod04','noticias','juz01'].includes(route.module))await page.screenshot({path:path.join(out,route.module+'-escritorio.png')});}
   await page.goto(base+'/home/informatica/manuales/mod07');await page.getByRole('button',{name:'Manual QA controlado'}).click();assert.ok((await page.getByTitle('Manual QA controlado',{exact:true}).boundingBox()).height>=400);
   const layoutFailures=[];
-  for(const width of [1024,768]){await page.setViewportSize({width,height:1000});for(const route of coverage.moduleRoutes){await page.goto(base+route.path);await page.waitForLoadState('networkidle');try{await fits();}catch(error){layoutFailures.push({width,path:route.path});await page.screenshot({path:path.join(out,'desborde-'+width+'-'+route.module+'.png')});}}await page.screenshot({path:path.join(out,'modulos-'+width+'.png')});}
+  for(const width of [1024,768]){await page.setViewportSize({width,height:1000});for(const route of coverage.moduleRoutes){await page.goto(base+route.path);await page.waitForLoadState('networkidle');try{await fits();}catch (_error){layoutFailures.push({width,path:route.path});await page.screenshot({path:path.join(out,'desborde-'+width+'-'+route.module+'.png')});}}await page.screenshot({path:path.join(out,'modulos-'+width+'.png')});}
   assert.deepEqual(layoutFailures,[],'Módulos con desborde: '+JSON.stringify(layoutFailures));
   for(const width of [1920,1440,1180,1024,768,390]){await page.setViewportSize({width,height:1000});await page.goto(base+'/home');await page.getByText('Acción controlada de pruebas',{exact:true}).waitFor();await fits();await page.mouse.move(0,0);await page.screenshot({path:path.join(out,'inicio-'+width+'.png')});}
-  await page.getByRole('button',{name:'Abrir menú',exact:true}).click();await page.getByRole('navigation',{name:'Menú principal'}).getByRole('link',{name:'Mis tickets',exact:true}).waitFor();await page.keyboard.press('Escape');assert.equal(await page.getByRole('button',{name:'Abrir menú',exact:true}).getAttribute('aria-expanded'),'false');
+  await page.getByRole('button',{name:'Abrir menú',exact:true}).click();await page.getByRole('navigation',{name:'Menú principal'}).getByRole('link',{name:'Mis solicitudes',exact:true}).waitFor();await page.keyboard.press('Escape');assert.equal(await page.getByRole('button',{name:'Abrir menú',exact:true}).getAttribute('aria-expanded'),'false');
   await page.goto(base+'/config');await page.waitForURL('**/unauthorized');
   await context.clearCookies();await page.evaluate(()=>localStorage.clear());await page.goto(base+'/forgot-password');await page.locator('#recovery-email').fill('qa@example.invalid');await page.getByRole('button',{name:'Solicitar recuperación'}).click();await page.locator('#recovery-code').waitFor();await page.locator('#recovery-code').fill('123456');await page.locator('#recovery-password').fill('Recuperar123!');await page.locator('#recovery-repeat').fill('Recuperar123!');await page.getByRole('button',{name:'Actualizar contraseña'}).click();await page.getByRole('heading',{name:'Acceso recuperado'}).waitFor();
   assert.ok(!errors.length,JSON.stringify(errors));

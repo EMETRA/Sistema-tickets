@@ -2,68 +2,32 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { TicketCreationPanel } from "@/components/client/organisms/TicketCreationPanel";
-import { useCreateTicket } from "@/api/hooks/useCreateTicket";
-import { TicketFormData } from "@/components/client/organisms/TicketCreationPanel/types";
+import { TicketCreationPanel } from "@/features/tickets/components/TicketCreationPanel";
+import { TicketFormData } from "@/features/tickets/components/TicketCreationPanel/types";
 import styles from "./TicketsCreation.module.scss";
 import { ErrorHandler } from "@/api/graphql/errors";
-import { useAuthStore } from "@/store/useAuthStore";
+import { useCreateTicketDialog } from "@/store/useCreateTicketDialog";
+import { TICKET_DEPARTMENTS, useSubmitTicket } from "./useSubmitTicket";
 
+/** Página directa (enlaces compartidos); el flujo habitual abre la ventana. */
 export default function CreateTicketPage() {
     const router = useRouter();
-    const { createTicket, loading, error, uploadProgress } = useCreateTicket();
+    const { submit, loading, error, uploadProgress } = useSubmitTicket();
+    const notifyCreated = useCreateTicketDialog((s) => s.notifyCreated);
     const [formKey, setFormKey] = useState(0);
     const [success, setSuccess] = useState("");
 
-    const userId = useAuthStore((state) => state.getUserId());
-    const role = useAuthStore((state) => state.getRole());
-
-    const departments = [
-        { label: "Técnico", value: "1" },
-        { label: "Desarrollador", value: "2" },
-    ];
-
     const handleTicketSubmit = async (data: TicketFormData) => {
         setSuccess("");
-        if (!Number.isSafeInteger(Number(userId)) || Number(userId) <= 0) return;
         try {
-            const files = data.files.map((f) => f.file);
-
-            const usuarioAsignadoId =
-        role === "ADMINISTRADOR"
-            ? userId
-                ? parseInt(userId, 10)
-                : undefined
-            : undefined;
-
-            const result = await createTicket(
-                {
-                    titulo: data.subject,
-                    descripcion: data.description,
-                    categoriaId:
-            typeof data.departmentId === "string"
-                ? parseInt(data.departmentId, 10)
-                : data.departmentId,
-                    prioridadId: 2,
-                    estadoId: usuarioAsignadoId ? 2 : 1,
-                    usuarioCreadorId: Number(userId),
-                    usuarioAsignadoId: usuarioAsignadoId ? usuarioAsignadoId : undefined,
-                    tiempoEstimado: 60,
-                },
-                files,
-            );
-
-            setSuccess(
-                `Ticket ${result.ticket.codigo || result.ticket.id} creado correctamente.`,
-            );
+            const ticket = await submit(data);
+            if (!ticket) return;
+            setSuccess(`Ticket ${ticket.codigo || ticket.id} creado correctamente.`);
             setFormKey((prev) => prev + 1);
+            notifyCreated();
         } catch (err) {
             console.error("Error al crear el ticket:", err);
         }
-    };
-
-    const handleCancel = () => {
-        router.push("/mis-tickets");
     };
 
     return (
@@ -77,9 +41,9 @@ export default function CreateTicketPage() {
 
             <TicketCreationPanel
                 key={formKey}
-                departments={departments}
+                departments={TICKET_DEPARTMENTS}
                 onSubmit={handleTicketSubmit}
-                onCancel={handleCancel}
+                onCancel={() => router.push("/mis-tickets")}
                 loading={loading}
                 uploadProgress={uploadProgress}
                 className={styles.formWrapper}

@@ -1,25 +1,25 @@
 .StatusChip {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 4px 10px;
-    border-radius: 4px;
-    font-size: 12px;
-    font-weight: 500;
-    letter-spacing: 0.5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
 }
 
 .verde {
-    background: #2d6a2d;
-    color: #fff;
+  background: #2d6a2d;
+  color: var(--tickets-on-primary);
 }
 
 .amarillo {
-    background: #c9922a;
-    color: #fff;
+  background: #c9922a;
+  color: var(--tickets-on-primary);
 }
 
 .rojo {
-    background: #b53a3a;
-    color: #fff;
+  background: #b53a3a;
+  color: var(--tickets-on-primary);
 }

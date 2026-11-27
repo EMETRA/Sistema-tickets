@@ -2,8 +2,8 @@ import { IconName } from "../../atoms/Icon/types";
 
 export interface TableCellConfig {
     content?: React.ReactNode;
-    icon?: IconName; 
-    label?: string;  
+    icon?: IconName;
+    label?: string;
     align?: "left" | "center" | "right";
 }
 
@@ -16,7 +16,7 @@ export interface TableRowProps {
     selectable?: boolean;
     isSelected?: boolean;
     onSelect?: (checked: boolean) => void;
-    variant?: "default" | "permission"; 
+    variant?: "default" | "permission";
     id?: string | number;
     rowContentClassName?: string;
 }

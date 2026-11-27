@@ -19,24 +19,21 @@ import {
  */
 export async function GET(_request: NextRequest) {
     try {
-        const result = await graphqlRequest<Record<string, unknown>>(
-            GET_TECHNICIAN_LAST_TICKETS_QUERY
-        );
+        const result = await graphqlRequest<Record<string, unknown>>(GET_TECHNICIAN_LAST_TICKETS_QUERY);
 
         const typedResult = result as unknown as GetTechnicianLastTicketsResponse;
 
         return NextResponse.json(typedResult);
     } catch (error) {
         const message = error instanceof Error ? error.message : "Error desconocido";
-        const statusCode =
-            error instanceof Error && error.message.includes("401") ? 401 : 500;
+        const statusCode = error instanceof Error && error.message.includes("401") ? 401 : 500;
 
         return NextResponse.json(
             {
                 error: message,
                 timestamp: new Date().toISOString(),
             },
-            { status: statusCode }
+            { status: statusCode },
         );
     }
 }

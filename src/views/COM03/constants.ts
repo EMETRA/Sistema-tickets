@@ -1,6 +1,6 @@
 import { VisibilidadNoticia } from "@/api/graphql/COM03";
 import type { SelectOption } from "@/components/client/atoms/Select/types";
-import type { NewsFormAccept } from "@/components/client/organisms/NewsForm";
+import type { NewsFormAccept } from "@/features/comunicacion/components/NewsForm";
 
 /**
  * Visibilidad según TB_NOTICIA.VISIBILIDAD.
@@ -14,9 +14,7 @@ export const VISIBILIDAD_OPTIONS: SelectOption[] = [
  * TODO [COM03-BACKEND]: el modelo solo indica el valor por defecto (es-GT).
  * Confirmar si hay otros idiomas o si el campo es fijo.
  */
-export const IDIOMA_OPTIONS: SelectOption[] = [
-    { value: "es-GT", label: "Español" },
-];
+export const IDIOMA_OPTIONS: SelectOption[] = [{ value: "es-GT", label: "Español" }];
 
 /** Opción vacía de Subcategoría (la categoría no tiene hijas o no se elige ninguna) */
 export const SIN_SUBCATEGORIA_OPTION: SelectOption = { value: "", label: "— Sin subcategoría —" };

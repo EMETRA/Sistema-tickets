@@ -26,5 +26,5 @@ export const GET_MY_STATS_QUERY = `
 `;
 
 export interface GetMyStatsResponse {
-  myStats: MyStats;
+    myStats: MyStats;
 }

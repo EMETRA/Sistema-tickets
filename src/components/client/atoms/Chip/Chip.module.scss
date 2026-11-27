@@ -10,12 +10,12 @@
   white-space: nowrap;
   gap: 8px;
   background-color: var(--chip-color, #0318ff);
-  color: #ffffff;
+  color: var(--tickets-on-primary);
 }
 
 .outlined {
   background-color: transparent;
-  color: var(--chip-color, #666);
+  color: var(--chip-color, var(--tickets-text-muted));
   padding: 5px 11px;
   border: 1px solid var(--chip-color, #666);
 }

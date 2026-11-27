@@ -1,17 +1,12 @@
-
 /**
  * Estados.
  */
-export type FileItemStatus = 
-    | "ready"
-    | "uploading"
-    | "done";
+export type FileItemStatus = "ready" | "uploading" | "done";
 
 /**
  * Propiedades del componente FileItem.
  */
 export interface FileItemProps {
-
     /**
      * Nombre del archivo.
      */
@@ -48,5 +43,4 @@ export interface FileItemProps {
      * Clase CSS adicional.
      */
     className?: string;
-
 }

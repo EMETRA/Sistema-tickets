@@ -1,35 +1,35 @@
 .container {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .svg {
-    transform: rotate(-90deg); // Para que el progreso empiece desde arriba
+  transform: rotate(-90deg); // Para que el progreso empiece desde arriba
 }
 
 .backgroundRing {
-    stroke: #e0e0e0;
+  stroke: #e0e0e0;
 }
 
 .progressRing {
-    stroke: #AACC00; 
-    transition: stroke-dashoffset 0.5s ease-in-out;
+  stroke: #aacc00;
+  transition: stroke-dashoffset 0.5s ease-in-out;
 }
 
 .content {
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
 .percentageText {
-    font-family: var(--font-montserrat), sans-serif;
-    font-size: 2rem;
-    font-weight: 500;
-    color: #262626;
+  font-family: var(--font-montserrat), sans-serif;
+  font-size: 2rem;
+  font-weight: 500;
+  color: var(--tickets-text);
 }

@@ -14,7 +14,7 @@ import { Icon } from "../Icon";
  */
 const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
     ({ className, state = "default", errorMessage, label, id, size = 16, ...props }, ref) => {
-    // Referencia interna al checkbox
+        // Referencia interna al checkbox
         const checkboxRef = useRef<HTMLInputElement>(null);
 
         // Combina la referencia interna con la referencia pasada
@@ -24,10 +24,14 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
         const checkboxId = id || `checkbox-${label}`;
 
         // Construir las clases CSS dinámicamente usando classnames
-        const containerClasses = classNames(styles.Container, {
-            [styles.ContainerError]: state === "error",
-            [styles.ContainerDisabled]: state === "disabled",
-        }, className);
+        const containerClasses = classNames(
+            styles.Container,
+            {
+                [styles.ContainerError]: state === "error",
+                [styles.ContainerDisabled]: state === "disabled",
+            },
+            className,
+        );
 
         return (
             <div className={styles.Wrapper}>
@@ -40,7 +44,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
                         disabled={state === "disabled"}
                         {...props}
                     />
-                    <div 
+                    <div
                         className={styles.CheckboxButton}
                         style={{
                             width: size,
@@ -49,11 +53,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
                             minHeight: size,
                         }}
                     >
-                        <Icon
-                            name="check-solid"
-                            size={size * 0.7}
-                            className={styles.CheckIcon}
-                        />
+                        <Icon name="check-solid" size={size * 0.7} className={styles.CheckIcon} />
                     </div>
                     {label && <span className={styles.Label}>{label}</span>}
                 </label>
@@ -62,7 +62,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
                 )}
             </div>
         );
-    }
+    },
 );
 
 Checkbox.displayName = "Checkbox";

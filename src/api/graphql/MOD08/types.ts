@@ -9,24 +9,24 @@
  * - PARALELO_FORMAS: Paralelo de formas anuladas
  */
 export enum TipoReporteAnulado {
-  RECIBOS_PAGO = 'RECIBOS_PAGO',
-  TICKET_PARQUEOS = 'TICKET_PARQUEOS',
-  PARALELO_FORMAS = 'PARALELO_FORMAS',
+    RECIBOS_PAGO = "RECIBOS_PAGO",
+    TICKET_PARQUEOS = "TICKET_PARQUEOS",
+    PARALELO_FORMAS = "PARALELO_FORMAS",
 }
 
 /**
  * Información de un tipo de reporte
  */
 export interface ReporteAnuladoTipoInfo {
-  codigo: TipoReporteAnulado;
-  etiqueta: string;
+    codigo: TipoReporteAnulado;
+    etiqueta: string;
 }
 
 /**
  * Respuesta para obtener tipos de reportes
  */
 export interface GetReporteAnuladosTiposResponse {
-  reporteAnuladosTipos: ReporteAnuladoTipoInfo[];
+    reporteAnuladosTipos: ReporteAnuladoTipoInfo[];
 }
 
 /**
@@ -37,24 +37,24 @@ export interface GetReporteAnuladosTiposResponse {
  * - fechaInicio <= fechaFin
  */
 export interface ReporteAnuladosInput {
-  fechaInicio: string;
-  fechaFin: string;
-  tipoReporte: TipoReporteAnulado;
+    fechaInicio: string;
+    fechaFin: string;
+    tipoReporte: TipoReporteAnulado;
 }
 
 /**
  * Par clave-valor de un campo en una fila del reporte
  */
 export interface ReporteAnuladoCampo {
-  nombre: string;
-  valor: string | null;
+    nombre: string;
+    valor: string | null;
 }
 
 /**
  * Fila del reporte (columnas dinámicas)
  */
 export interface ReporteAnuladoFila {
-  campos: ReporteAnuladoCampo[];
+    campos: ReporteAnuladoCampo[];
 }
 
 /**
@@ -62,19 +62,19 @@ export interface ReporteAnuladoFila {
  * Estructura dinámica con columnas variables según el tipo de reporte
  */
 export interface ReporteAnuladosResultado {
-  tipoReporte: TipoReporteAnulado;
-  fechaInicio: string;
-  fechaFin: string;
-  columnas: string[];
-  total: number;
-  filas: ReporteAnuladoFila[];
+    tipoReporte: TipoReporteAnulado;
+    fechaInicio: string;
+    fechaFin: string;
+    columnas: string[];
+    total: number;
+    filas: ReporteAnuladoFila[];
 }
 
 /**
  * Respuesta para obtener resultados del reporte
  */
 export interface GetReporteAnuladosResultadosResponse {
-  reporteAnuladosResultados: ReporteAnuladosResultado;
+    reporteAnuladosResultados: ReporteAnuladosResultado;
 }
 
 /**
@@ -82,16 +82,16 @@ export interface GetReporteAnuladosResultadosResponse {
  * Incluye información de bitácora si está configurada
  */
 export interface ReporteAnuladosExcelExport {
-  filename: string;
-  mimeType: string;
-  contentBase64: string;
-  totalFilas: number;
-  bitacoraId?: number | null;
+    filename: string;
+    mimeType: string;
+    contentBase64: string;
+    totalFilas: number;
+    bitacoraId?: number | null;
 }
 
 /**
  * Respuesta para exportar a Excel
  */
 export interface GetReporteAnuladosExcelResponse {
-  reporteAnuladosExportExcel: ReporteAnuladosExcelExport;
+    reporteAnuladosExportExcel: ReporteAnuladosExcelExport;
 }

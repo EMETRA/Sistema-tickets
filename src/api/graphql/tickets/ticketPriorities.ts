@@ -19,4 +19,4 @@ export const GET_TICKET_PRIORITIES_QUERY = `
   }
 `;
 
-export type { GetTicketPrioritiesResponse } from './types';
+export type { GetTicketPrioritiesResponse } from "./types";

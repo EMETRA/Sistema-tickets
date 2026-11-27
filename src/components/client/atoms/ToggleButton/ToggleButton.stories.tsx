@@ -154,7 +154,7 @@ export const Interactive = {
                     />
                     <p>Valor seleccionado: {value}</p>
                 </div>
-        
+
                 <div>
                     <h3>Variante Secondary</h3>
                     <ToggleButton

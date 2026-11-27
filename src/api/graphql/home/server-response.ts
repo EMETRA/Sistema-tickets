@@ -1,23 +1,34 @@
-import { randomUUID } from 'node:crypto';
-import { NextResponse } from 'next/server';
-import { diagnosticoErrorGraphql, estadoErrorGraphql } from '@/api/graphql/server-error';
-import { queuePanelIncident } from '@/observability/server-incidents';
+import { randomUUID } from "node:crypto";
+import { NextResponse } from "next/server";
+import { diagnosticoErrorGraphql, estadoErrorGraphql } from "@/api/graphql/server-error";
+import { queuePanelIncident } from "@/observability/server-incidents";
 
-export const headersInicio = { 'Cache-Control': 'private, no-store' };
+export const headersInicio = { "Cache-Control": "private, no-store" };
 
-export async function falloInicio(error: unknown, operacion: 'myActivity' | 'myStats') {
-    const referencia = await queuePanelIncident('Inicio.'+operacion,error,randomUUID());
+export async function falloInicio(error: unknown, operacion: "myActivity" | "myStats") {
+    const referencia = await queuePanelIncident("Inicio." + operacion, error, randomUUID());
     const status = estadoErrorGraphql(error);
     console.error({
-        evento: 'PANEL_INICIO_FALLIDO', operacion, referencia, status,
+        evento: "PANEL_INICIO_FALLIDO",
+        operacion,
+        referencia,
+        status,
         ...diagnosticoErrorGraphql(error),
     });
-    const detalle = operacion === 'myActivity' ? 'la actividad reciente' : 'el reporte de tickets';
-    const errorPublico = status === 401 ? 'Tu sesión expiró. Inicia sesión nuevamente.'
-        : status === 403 ? `No tienes permiso para consultar ${detalle}.`
-            : `No se pudo consultar ${detalle}. Intenta nuevamente.`;
-    return NextResponse.json({
-        codigo: 'PANEL_INICIO_FALLIDO', referencia, error: errorPublico,
-        timestamp: new Date().toISOString(),
-    }, { status, headers: headersInicio });
+    const detalle = operacion === "myActivity" ? "la actividad reciente" : "el reporte de tickets";
+    const errorPublico =
+        status === 401
+            ? "Tu sesión expiró. Inicia sesión nuevamente."
+            : status === 403
+              ? `No tienes permiso para consultar ${detalle}.`
+              : `No se pudo consultar ${detalle}. Intenta nuevamente.`;
+    return NextResponse.json(
+        {
+            codigo: "PANEL_INICIO_FALLIDO",
+            referencia,
+            error: errorPublico,
+            timestamp: new Date().toISOString(),
+        },
+        { status, headers: headersInicio },
+    );
 }

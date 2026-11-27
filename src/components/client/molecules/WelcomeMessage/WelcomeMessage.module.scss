@@ -14,9 +14,10 @@
 }
 
 .name {
-  color: #AACC00;
+  color: #aacc00;
+  color: light-dark(#aacc00, #deee8b);
   margin-left: 10px;
-  font-size: 1.5rem; 
+  font-size: 1.5rem;
 }
 
 .description {
@@ -28,7 +29,8 @@
 .caption {
   margin-top: 8px;
   margin-bottom: 8px;
-  color: #666666;
+  color: var(--tickets-text-muted);
+  color: var(--tickets-text-secondary);
   text-align: center;
   justify-content: center;
   align-self: center;

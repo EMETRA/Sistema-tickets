@@ -14,14 +14,8 @@ type Story = StoryObj<typeof meta>;
 export const Interactive: Story = {
     render: () => {
         const [isEnabled, setIsEnabled] = useState(false);
-        return (
-            <PermissionToggle 
-                label="Grabar"
-                checked={isEnabled}
-                onChange={setIsEnabled}
-            />
-        );
-    }
+        return <PermissionToggle label="Grabar" checked={isEnabled} onChange={setIsEnabled} />;
+    },
 };
 
 /**
@@ -29,10 +23,10 @@ export const Interactive: Story = {
  */
 export const PermissionGrid: Story = {
     render: () => (
-        <div style={{ display: 'flex', gap: '24px', padding: '20px', backgroundColor: '#FFF' }}>
+        <div style={{ display: "flex", gap: "24px", padding: "20px", backgroundColor: "#FFF" }}>
             <PermissionToggle label="Grabar" checked={true} />
             <PermissionToggle label="Editar" checked={false} />
             <PermissionToggle label="Eliminar" checked={false} />
         </div>
-    )
+    ),
 };

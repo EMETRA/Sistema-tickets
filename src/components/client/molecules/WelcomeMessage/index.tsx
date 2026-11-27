@@ -1,2 +1,2 @@
-export { WelcomeMessage } from './WelcomeMessage';
-export type { WelcomeMessageProps } from './types';
+export { WelcomeMessage } from "./WelcomeMessage";
+export type { WelcomeMessageProps } from "./types";

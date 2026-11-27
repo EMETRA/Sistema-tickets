@@ -13,9 +13,7 @@ const DAY = 86400000;
 const localMidnight = (day: string) => Date.parse(day + "T00:00:00-06:00");
 
 export function shiftCalendarDay(day: string, amount: number): string {
-    return new Date(Date.parse(day + "T12:00:00Z") + amount * DAY)
-        .toISOString()
-        .slice(0, 10);
+    return new Date(Date.parse(day + "T12:00:00Z") + amount * DAY).toISOString().slice(0, 10);
 }
 export function startOfCalendarWeek(day: string): string {
     const weekday = new Date(day + "T12:00:00Z").getUTCDay();
@@ -23,18 +21,13 @@ export function startOfCalendarWeek(day: string): string {
 }
 export function weekDays(day: string): string[] {
     const start = startOfCalendarWeek(day);
-    return Array.from({ length: 7 }, (_, index) =>
-        shiftCalendarDay(start, index),
-    );
+    return Array.from({ length: 7 }, (_, index) => shiftCalendarDay(start, index));
 }
 export function calendarPeriod(day: string, view: CalendarView) {
-    const first =
-        view === "month" ? day.slice(0, 7) + "-01" : startOfCalendarWeek(day);
+    const first = view === "month" ? day.slice(0, 7) + "-01" : startOfCalendarWeek(day);
     const until =
         view === "month"
-            ? new Date(
-                  Date.UTC(Number(day.slice(0, 4)), Number(day.slice(5, 7)), 1),
-              )
+            ? new Date(Date.UTC(Number(day.slice(0, 4)), Number(day.slice(5, 7)), 1))
                   .toISOString()
                   .slice(0, 10)
             : shiftCalendarDay(first, 7);
@@ -45,51 +38,27 @@ export function calendarPeriod(day: string, view: CalendarView) {
         to: new Date(localMidnight(until)).toISOString(),
     };
 }
-export function moveCalendar(
-    day: string,
-    view: CalendarView,
-    amount: number,
-): string {
+export function moveCalendar(day: string, view: CalendarView, amount: number): string {
     if (view !== "month") return shiftCalendarDay(day, amount * 7);
     // Navegar meses no salta otro mes cuando el ancla era un día 29, 30 o 31.
-    return new Date(
-        Date.UTC(
-            Number(day.slice(0, 4)),
-            Number(day.slice(5, 7)) - 1 + amount,
-            1,
-        ),
-    )
+    return new Date(Date.UTC(Number(day.slice(0, 4)), Number(day.slice(5, 7)) - 1 + amount, 1))
         .toISOString()
         .slice(0, 10);
 }
 export function monthCells(day: string): (string | null)[] {
     const first = day.slice(0, 7) + "-01";
     const weekday = (new Date(first + "T12:00:00Z").getUTCDay() + 6) % 7;
-    const count = new Date(
-        Date.UTC(Number(day.slice(0, 4)), Number(day.slice(5, 7)), 0),
-    ).getUTCDate();
-    return Array.from(
-        { length: Math.ceil((weekday + count) / 7) * 7 },
-        (_, i) =>
-            i < weekday || i >= weekday + count
-                ? null
-                : shiftCalendarDay(first, i - weekday),
+    const count = new Date(Date.UTC(Number(day.slice(0, 4)), Number(day.slice(5, 7)), 0)).getUTCDate();
+    return Array.from({ length: Math.ceil((weekday + count) / 7) * 7 }, (_, i) =>
+        i < weekday || i >= weekday + count ? null : shiftCalendarDay(first, i - weekday),
     );
 }
 export function validActivity(record: PlatformRecord): boolean {
     const start = Date.parse(String(record.datos.inicio));
     const end = Date.parse(String(record.datos.fin));
-    return (
-        Number.isFinite(start) &&
-        Number.isFinite(end) &&
-        end > start &&
-        record.estado !== "CANCELADO"
-    );
+    return Number.isFinite(start) && Number.isFinite(end) && end > start && record.estado !== "CANCELADO";
 }
-export function activitiesForDay(
-    records: PlatformRecord[],
-    day: string,
-): ActivitySegment[] {
+export function activitiesForDay(records: PlatformRecord[], day: string): ActivitySegment[] {
     const from = localMidnight(day),
         to = from + DAY;
     return records
@@ -103,18 +72,11 @@ export function activitiesForDay(
                     record,
                     start: (Math.max(start, from) - from) / 60000,
                     end: (Math.min(end, to) - from) / 60000,
-                    multipleDays:
-                        guatemalaDay(new Date(start)) !==
-                        guatemalaDay(new Date(end - 1)),
+                    multipleDays: guatemalaDay(new Date(start)) !== guatemalaDay(new Date(end - 1)),
                 },
             ];
         })
-        .sort(
-            (a, b) =>
-                a.start - b.start ||
-                b.end - a.end ||
-                a.record.id.localeCompare(b.record.id),
-        );
+        .sort((a, b) => a.start - b.start || b.end - a.end || a.record.id.localeCompare(b.record.id));
 }
 /** Reparte actividades solapadas sin ocultar ninguna detrás de otra. */
 export function placeActivities(segments: ActivitySegment[]): PlacedActivity[] {
@@ -123,16 +85,12 @@ export function placeActivities(segments: ActivitySegment[]): PlacedActivity[] {
         laneEnds: number[] = [],
         until = -1;
     const finish = () => {
-        result.push(
-            ...group.map((item) => ({ ...item, lanes: laneEnds.length })),
-        );
+        result.push(...group.map((item) => ({ ...item, lanes: laneEnds.length })));
         group = [];
         laneEnds = [];
         until = -1;
     };
-    for (const item of [...segments].sort(
-        (a, b) => a.start - b.start || b.end - a.end,
-    )) {
+    for (const item of [...segments].sort((a, b) => a.start - b.start || b.end - a.end)) {
         if (item.start >= until) finish();
         let lane = laneEnds.findIndex((end) => end <= item.start);
         if (lane === -1) lane = laneEnds.length;
@@ -152,9 +110,7 @@ export function activityHours(segments: ActivitySegment[]) {
         last: Math.max(17, ...timed.map((item) => Math.ceil(item.end / 60))),
     };
 }
-export function activityScope(
-    record: PlatformRecord,
-): "EMPRESA" | "PRIVADA" | "EQUIPO" {
+export function activityScope(record: PlatformRecord): "EMPRESA" | "PRIVADA" | "EQUIPO" {
     return record.visibilidad === "EMPRESA"
         ? "EMPRESA"
         : record.visibilidad === "PRIVADA"

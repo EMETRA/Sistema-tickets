@@ -21,23 +21,27 @@ export const GET_USER_QUERY = `
   }
 `;
 
+/**
+ * Perfil de otra persona. El API expone `user(id)` (no `usuarioById`); los alias conservan la
+ * forma `UsuarioPerfil` que usan las pantallas.
+ */
 export const GET_USER_BY_ID_QUERY = `
   query UsuarioById($idUsuario: Int!) {
-    usuarioById(id_usuario: $idUsuario) {
+    usuarioById: user(id: $idUsuario) {
       avatar
       departamento
       email
-      id_usuario
-      nombre
+      id_usuario: id
+      nombre: name
       rol
     }
   }
 `;
 
 export interface GetUserResponse {
-  usuario: UsuarioPerfil;
+    usuario: UsuarioPerfil;
 }
 
 export interface GetUserByIdResponse {
-  usuario: UsuarioPerfil;
+    usuario: UsuarioPerfil;
 }

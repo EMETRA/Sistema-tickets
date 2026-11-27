@@ -4,7 +4,7 @@ import { PermissionsForm } from "./";
 const meta: Meta<typeof PermissionsForm> = {
     title: "Organisms/PermissionsForm",
     component: PermissionsForm,
-    tags: ["autodocs"]
+    tags: ["autodocs"],
 };
 
 export default meta;

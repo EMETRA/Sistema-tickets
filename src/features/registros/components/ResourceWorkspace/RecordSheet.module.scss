@@ -1,0 +1,245 @@
+// Ficha y formulario de registro («Panel institucional»).
+.sheet {
+  width: min(780px, calc(94vw / var(--vp-zoom, 1))) !important;
+  max-height: calc(90dvh / var(--vp-zoom, 1));
+  padding: 0;
+  overflow: hidden;
+  border-radius: 16px !important;
+  background: var(--tickets-surface) !important;
+  box-shadow: 0 24px 70px #132a4d40 !important;
+  &[open] {
+    display: flex;
+    flex-direction: column;
+  }
+  // El cuerpo hace scroll; cabecera y pie quedan fijos.
+  > form,
+  > .body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+  }
+}
+.head {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 18px 22px 14px;
+  border-bottom: 1px solid var(--tickets-border);
+  background: linear-gradient(110deg, var(--tickets-surface), var(--tickets-surface-subtle));
+}
+.icon {
+  display: inline-grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  background: var(--tickets-primary-soft);
+  color: var(--tickets-primary);
+  --workspace-icon-accent: #ffffffb3;
+}
+.titles {
+  flex: 1;
+  min-width: 0;
+  h2 {
+    margin: 2px 0 0;
+    font-size: 19px;
+    line-height: 1.3;
+    letter-spacing: -0.3px;
+    overflow-wrap: anywhere;
+  }
+}
+.kind {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--tickets-primary);
+}
+.sub {
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--tickets-text-secondary);
+}
+.close {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border: 0;
+  border-radius: 9px;
+  background: none;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--tickets-text-secondary);
+  cursor: pointer;
+  &:hover:not(:disabled) {
+    background: var(--tickets-neutral-soft);
+    color: var(--tickets-text);
+  }
+  &:focus-visible {
+    outline: 2px solid var(--tickets-primary);
+  }
+}
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px 22px 22px;
+}
+// Datos de la ficha: etiqueta pequeña, valor legible; texto largo a todo el ancho.
+.facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 24px;
+  margin: 0;
+  > div {
+    min-width: 0;
+  }
+  dt {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--tickets-text-muted);
+  }
+  dd {
+    margin: 4px 0 0;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--tickets-text);
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+    a {
+      color: var(--tickets-primary);
+      text-decoration: none;
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}
+.wide {
+  grid-column: 1 / -1;
+  dd {
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: var(--tickets-surface-subtle);
+    font-size: 13px;
+  }
+}
+.empty {
+  color: var(--tickets-text-muted) !important;
+}
+.callout {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--tickets-primary) 35%, var(--tickets-surface));
+  background: var(--tickets-primary-soft);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--tickets-text);
+  &[data-tone="warning"] {
+    border-color: #f0d9a8;
+    border-color: light-dark(#f0d9a8, #2a3449);
+    background: var(--tickets-warning-soft);
+    color: var(--tickets-warning);
+  }
+}
+.foot {
+  display: flex;
+  align-items: center;
+  gap: 10px 14px;
+  flex-wrap: wrap;
+  padding: 12px 22px;
+  border-top: 1px solid var(--tickets-border);
+  background: var(--tickets-surface-subtle);
+  p {
+    flex: 1;
+    min-width: 200px;
+    font-size: 11px;
+    line-height: 1.5;
+    color: var(--tickets-text-muted);
+  }
+}
+.footActions {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+.danger {
+  padding: 6px 4px;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--tickets-danger);
+  cursor: pointer;
+  &:hover:not(:disabled) {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  &:disabled {
+    opacity: 0.5;
+  }
+}
+// Formulario: dos columnas; texto largo y listas ocupan todo el ancho.
+.form {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.formBody {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 18px;
+  padding: 18px 22px 22px;
+  > :has(textarea),
+  > :has(select[multiple]),
+  > .full {
+    grid-column: 1 / -1;
+  }
+  textarea {
+    min-height: 96px;
+    resize: vertical;
+  }
+}
+// Historial en la ficha.
+.sheet ul[class] li {
+  border-left-color: var(--tickets-border-strong);
+}
+@media (max-width: 640px) {
+  .facts,
+  .formBody {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .head,
+  .body,
+  .foot {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
+
+// En el formulario el pie queda visible mientras se desplaza el contenido.
+.form .foot {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+}
+.body > section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+// Foco al abrir la ventana: visible pero discreto.
+.close:focus-visible {
+  outline: none;
+  background: var(--tickets-neutral-soft);
+  box-shadow: 0 0 0 2px #4361ee59;
+}

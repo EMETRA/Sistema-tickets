@@ -3,7 +3,6 @@ import React from "react";
 import Link from "next/link";
 import { TopBarProps } from "./types";
 import { UserMenu } from "../../molecules/UserMenu";
-import { ApplicationSwitcher } from "../../molecules/ApplicationSwitcher/ApplicationSwitcher";
 import { Icon } from "../../atoms/Icon";
 import { WorkspaceIcon } from "../../atoms/WorkspaceIcon/WorkspaceIcon";
 import { IconButton } from "../../atoms/IconButton";
@@ -20,8 +19,9 @@ export const TopBar = ({
     onNotificationsClick,
     onProfileClick,
     className,
-    applications = [],
     createTicketPath,
+    onCreateTicket,
+    onSearch,
     settingsPath,
     notificationsPath,
     onMenuClick,
@@ -41,7 +41,7 @@ export const TopBar = ({
                     aria-controls="system-navigation"
                     onClick={onMenuClick}
                 >
-                    <Icon name="bars-solid" size={22} color="#263b58" />
+                    <Icon name="bars-solid" size={22} color="currentColor" />
                 </button>
             )}
             <div className={styles.heading}>
@@ -50,20 +50,35 @@ export const TopBar = ({
             </div>
         </div>
         <div className={styles.globalActions}>
-            <ApplicationSwitcher applications={applications} />
+            <button type="button" className={styles.paletteTrigger} onClick={onSearch} data-tour="buscar">
+                <Icon name="magnifying-glass-solid" size={14} color="currentColor" />
+                <span>Buscar aplicaciones, módulos, tickets…</span>
+                <kbd>⌘K</kbd>
+            </button>
             {createTicketPath && (
-                <Link href={createTicketPath} className={styles.createTicket}>
-                    <Icon name="plus-solid" size={15} color="#fff" />
+                <Link
+                    href={createTicketPath}
+                    className={styles.createTicket}
+                    data-tour="crear-ticket"
+                    onClick={(event) => {
+                        if (!onCreateTicket || event.metaKey || event.ctrlKey || event.shiftKey) return;
+                        event.preventDefault();
+                        onCreateTicket();
+                    }}
+                >
+                    <Icon name="plus-solid" size={15} color="var(--tickets-on-primary)" />
                     <span>Crear ticket</span>
                 </Link>
             )}
             {settingsPath ? (
                 <Link
                     href={settingsPath}
-                    aria-label="Configuración"
+                    aria-label="Ajustes"
+                    title="Ajustes"
                     className={styles.settings}
+                    data-tour="ajustes"
                 >
-                    <Icon name="gear-solid" size={19} color="#61728b" />
+                    <Icon name="gear-solid" size={19} color="var(--tickets-text-secondary)" />
                 </Link>
             ) : (
                 onSettingsClick && (
@@ -75,7 +90,20 @@ export const TopBar = ({
                     />
                 )
             )}
-            {notificationsPath && <Link href={notificationsPath} className={styles.notification} aria-label="Notificaciones" title="Actualizaciones de RRHH y seguimiento de tickets"><span style={{position:"relative",display:"inline-flex"}}><WorkspaceIcon name="bell-regular" size={21}/><HrNotificationBadge/></span></Link>}
+            {notificationsPath && (
+                <Link
+                    href={notificationsPath}
+                    className={styles.notification}
+                    data-tour="notificaciones"
+                    aria-label="Notificaciones"
+                    title="Actualizaciones de RRHH y seguimiento de tickets"
+                >
+                    <span style={{ position: "relative", display: "inline-flex" }}>
+                        <WorkspaceIcon name="bell-regular" size={21} />
+                        <HrNotificationBadge />
+                    </span>
+                </Link>
+            )}
             {!notificationsPath && onNotificationsClick && (
                 <IconButton
                     icon="bell-regular"
@@ -91,6 +119,7 @@ export const TopBar = ({
                 status={userStatus}
                 onMenuClick={onProfileClick}
                 profilePath={profilePath}
+                settingsPath={settingsPath}
                 onChangeView={onChangeView}
             />
         </div>

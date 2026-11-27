@@ -1,0 +1,149 @@
+.fleet {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  font-size: 12px;
+  color: var(--tickets-text-secondary);
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    &::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--health);
+    }
+  }
+}
+.fleet {
+  [data-health="ok"] {
+    --health: var(--tickets-success);
+  }
+  [data-health="warn"] {
+    --health: #d99a1e;
+  }
+  [data-health="down"] {
+    --health: #9aa6b8;
+  }
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+  gap: 14px;
+}
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid var(--tickets-border);
+  border-radius: 14px;
+  background: var(--tickets-surface);
+  box-shadow: var(--tickets-shadow);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+  &:hover {
+    border-color: color-mix(in srgb, var(--tickets-primary) 35%, var(--tickets-surface));
+    box-shadow: 0 8px 24px #1a2b4a14;
+  }
+  &:focus-visible {
+    outline: 2px solid var(--tickets-primary);
+    outline-offset: 2px;
+  }
+}
+.selected {
+  border-color: var(--tickets-primary);
+  box-shadow:
+    0 0 0 3px #4361ee22,
+    var(--tickets-shadow);
+}
+.head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  strong {
+    flex: 1;
+    min-width: 0;
+    font-size: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  small {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--health);
+  }
+}
+.card[data-health="down"] .head small {
+  color: var(--tickets-text-muted);
+}
+.dot {
+  width: 9px;
+  height: 9px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--health);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--health) 20%, transparent);
+}
+.meter {
+  display: grid;
+  grid-template-columns: 62px minmax(0, 1fr) 38px;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--tickets-text-secondary);
+}
+// Medidor: el relleno lleva la severidad; la pista es un paso más claro del mismo tono.
+.track {
+  --level: var(--tickets-primary);
+  height: 6px;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--level) 14%, var(--tickets-surface));
+  overflow: hidden;
+  &[data-level="mid"] {
+    --level: #d99a1e;
+  }
+  &[data-level="high"] {
+    --level: var(--tickets-danger);
+  }
+  span {
+    display: block;
+    height: 100%;
+    border-radius: 3px;
+    background: var(--level);
+  }
+}
+.pct {
+  text-align: right;
+  font-weight: 600;
+  color: var(--tickets-text);
+  font-variant-numeric: tabular-nums;
+}
+.noData {
+  font-size: 12px;
+  color: var(--tickets-text-muted);
+}
+.foot {
+  padding-top: 8px;
+  border-top: 1px solid var(--tickets-divider);
+  font-size: 11px;
+  color: var(--tickets-text-muted);
+}
+.muted {
+  font-size: 13px;
+  color: var(--tickets-text-secondary);
+}

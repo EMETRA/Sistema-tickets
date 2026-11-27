@@ -6,7 +6,7 @@ const meta: Meta<typeof ProgressRing> = {
     component: ProgressRing,
     tags: ["autodocs"],
     argTypes: {
-        percentage: { control: { type: 'range', min: 0, max: 100, step: 1 } },
+        percentage: { control: { type: "range", min: 0, max: 100, step: 1 } },
     },
 };
 

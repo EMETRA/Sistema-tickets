@@ -4,7 +4,7 @@ import { Button } from "@/components/client/atoms/Button";
 import { usePlatform } from "@/platform/context";
 import { platformCommand, platformFetch } from "@/platform/client";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
-import { type OrganizationPerson } from "@/components/client/organisms/OrganizationPeople/OrganizationPeople";
+import type { OrganizationPerson } from "@/features/personas/components/PeoplePanel/types";
 type Plan = {
     huella: string;
     empresa: number;
@@ -41,9 +41,7 @@ export function OrganizationSync({ onApplied }: { onApplied: () => void }) {
         try {
             setPlan(await platformFetch<Plan>("/organization/preview"));
         } catch (e) {
-            setError(
-                e instanceof Error ? e.message : "No se pudo consultar RRHH.",
-            );
+            setError(e instanceof Error ? e.message : "No se pudo consultar RRHH.");
         } finally {
             setBusy(false);
         }
@@ -60,18 +58,12 @@ export function OrganizationSync({ onApplied }: { onApplied: () => void }) {
                 true,
                 "Generar equipos y actualizar membresías desde RRHH",
             );
-            setMessage(
-                `${result.aplicados} cambios aplicados. La trazabilidad se conserva en el historial.`,
-            );
+            setMessage(`${result.aplicados} cambios aplicados. La trazabilidad se conserva en el historial.`);
             setPlan(null);
             await refresh();
             onApplied();
         } catch (e) {
-            setError(
-                e instanceof Error
-                    ? e.message
-                    : "No se pudo generar los equipos.",
-            );
+            setError(e instanceof Error ? e.message : "No se pudo generar los equipos.");
         } finally {
             setBusy(false);
         }
@@ -79,18 +71,14 @@ export function OrganizationSync({ onApplied }: { onApplied: () => void }) {
     return (
         <section className={styles.page}>
             {data?.actor.admin && (
-                <section
-                    className={styles.card}
-                    aria-label="Generación de equipos desde RRHH"
-                >
+                <section className={styles.card} aria-label="Generación de equipos desde RRHH">
                     <div className={styles.toolbar}>
                         <div>
                             <h2>Sincronizar equipos con RRHH</h2>
                             <p className={styles.muted}>
-                                Una unidad institucional forma un equipo; los
-                                empleados activos aparecen en la vista previa.
-                                Para incorporarse como miembros con acceso
-                                necesitan una cuenta habilitada.
+                                Una unidad institucional forma un equipo; los empleados activos aparecen en la
+                                vista previa. Para incorporarse como miembros con acceso necesitan una cuenta
+                                habilitada.
                             </p>
                         </div>
                         <Button
@@ -102,10 +90,8 @@ export function OrganizationSync({ onApplied }: { onApplied: () => void }) {
                         </Button>
                     </div>
                     <p className={styles.muted}>
-                        Los puestos se muestran para revisar responsabilidades.
-                        Los miembros nuevos ingresan como MIEMBRO; las jefaturas
-                        y funciones especiales se revisan en la ficha del
-                        miembro.
+                        Los puestos se muestran para revisar responsabilidades. Los miembros nuevos ingresan
+                        como MIEMBRO; las jefaturas y funciones especiales se revisan en la ficha del miembro.
                     </p>
                     {error && (
                         <p role="alert" className={styles.error}>
@@ -116,33 +102,28 @@ export function OrganizationSync({ onApplied }: { onApplied: () => void }) {
                     {plan && (
                         <div className={styles.page}>
                             <p>
-                                Unidades con nombre: {plan.unidades.length} ·
-                                Cambios: {plan.cambios.length} · Empleados sin
-                                cuenta habilitada: {plan.sinUsuario}. Las
-                                unidades identificadas se incluyen; podrán
-                                incorporarse como miembros cuando tengan cuenta
+                                Unidades con nombre: {plan.unidades.length} · Cambios: {plan.cambios.length} ·
+                                Empleados sin cuenta habilitada: {plan.sinUsuario}. Las unidades identificadas
+                                se incluyen; podrán incorporarse como miembros cuando tengan cuenta
                                 habilitada.
                             </p>
                             <p className={styles.muted}>
-                                La vista previa incluye altas, actualizaciones y
-                                bajas de membresías gestionadas desde RRHH.
-                                Conserva las membresías manuales y los equipos
-                                con historial.
+                                La vista previa incluye altas, actualizaciones y bajas de membresías
+                                gestionadas desde RRHH. Conserva las membresías manuales y los equipos con
+                                historial.
                             </p>
                             {!!plan.sinUnidad && (
                                 <p role="status" className={styles.card}>
-                                    Unidad pendiente para {plan.sinUnidad}{" "}
-                                    empleados. Se conservan sus asignaciones
-                                    anteriores; revisa los datos de RRHH antes
-                                    de incorporarlos a un equipo.
+                                    Unidad pendiente para {plan.sinUnidad} empleados. Se conservan sus
+                                    asignaciones anteriores; revisa los datos de RRHH antes de incorporarlos a
+                                    un equipo.
                                 </p>
                             )}
                             {plan.cuentaActualVinculada === false && (
                                 <p role="status" className={styles.card}>
-                                    Tu cuenta no está vinculada a un empleado
-                                    activo en esta lectura de RRHH. Para
-                                    incluirte como miembro, revisa el código de
-                                    empleado asociado a tu cuenta.
+                                    Tu cuenta no está vinculada a un empleado activo en esta lectura de RRHH.
+                                    Para incluirte como miembro, revisa el código de empleado asociado a tu
+                                    cuenta.
                                 </p>
                             )}
 
@@ -166,10 +147,7 @@ export function OrganizationSync({ onApplied }: { onApplied: () => void }) {
                                     </tbody>
                                 </table>
                             </div>
-                            <div
-                                className={styles.tableRegion}
-                                style={{ maxHeight: 420, overflow: "auto" }}
-                            >
+                            <div className={styles.tableRegion} style={{ maxHeight: 420, overflow: "auto" }}>
                                 <table className={styles.table}>
                                     <thead>
                                         <tr>
@@ -187,9 +165,7 @@ export function OrganizationSync({ onApplied }: { onApplied: () => void }) {
                                                 <td>{change.nombre}</td>
                                                 <td>{change.unidad}</td>
                                                 <td>{change.puesto || "—"}</td>
-                                                <td>
-                                                    {change.funcion || "Equipo"}
-                                                </td>
+                                                <td>{change.funcion || "Equipo"}</td>
                                             </tr>
                                         ))}
                                     </tbody>
@@ -197,13 +173,7 @@ export function OrganizationSync({ onApplied }: { onApplied: () => void }) {
                             </div>
                             <Button
                                 onClick={() => void apply()}
-                                state={
-                                    busy
-                                        ? "loading"
-                                        : !plan.cambios.length
-                                          ? "disabled"
-                                          : "default"
-                                }
+                                state={busy ? "loading" : !plan.cambios.length ? "disabled" : "default"}
                             >
                                 Confirmar sincronización de equipos
                             </Button>

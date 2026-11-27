@@ -13,6 +13,6 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
     args: {
         userName: "Gildder",
-        imageSrc: "/images/image.png"
+        imageSrc: "/images/image.png",
     },
 };

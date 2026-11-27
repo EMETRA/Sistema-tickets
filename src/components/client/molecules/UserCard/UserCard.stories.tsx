@@ -75,7 +75,6 @@ export const WithAvatar: Story = {
         status: "online",
         assignedCount: 25,
         resolvedCount: 18,
-        
     },
 };
 
@@ -158,12 +157,14 @@ export const NewUser: Story = {
  */
 export const MultipleCards = {
     render: () => (
-        <div style={{ 
-            display: "grid", 
-            gridTemplateColumns: "repeat(auto-fill, minmax(350px, 1fr))", 
-            gap: "24px",
-            padding: "24px"
-        }}>
+        <div
+            style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(350px, 1fr))",
+                gap: "24px",
+                padding: "24px",
+            }}
+        >
             <UserCard
                 name="Gildder Alberto Caceres Urizar"
                 email="albertourizar964@gmail.com"

@@ -2,9 +2,9 @@ import { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { ModulesForm } from "./";
 
 const meta: Meta<typeof ModulesForm> = {
-    title: 'Organisms/ModulesForm',
+    title: "Organisms/ModulesForm",
     component: ModulesForm,
-    tags: ["autodocs"]
+    tags: ["autodocs"],
 };
 
 export default meta;

@@ -4,6 +4,7 @@ const { randomUUID, createHash } = require("node:crypto");
 const { parse, getOperationAST, valueFromASTUntyped } = require("graphql");
 const { State, definitions, clone, now } = require("./estado.cjs");
 const ticketLabels = require('./ticket-labels.cjs');
+const assets = require('./activos-ejemplo.cjs');
 const fail = (status, message) => {
   throw Object.assign(new Error(message), { status });
 };
@@ -161,45 +162,89 @@ function verifyVersion(row, body) {
   if (Number(body.version) !== row.version)
     fail(409, "El registro cambió. Actualiza antes de guardar.");
 }
-function validate(type, data) {
+// Mismas reglas que el API (api-tickets: platform.validation.ts validData y records.save),
+// para que lo que pasa en el laboratorio también pase en QA. Normaliza data en el lugar.
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+function validate(type, data, { request = false } = {}) {
   const d = definitions[type];
   if (!d) fail(404, "Recurso no encontrado.");
+  if (!data || typeof data !== "object" || Array.isArray(data)) fail(400, "Datos inválidos");
+  const allowed = ["nombre", "equipoId", "visibilidad", "estado", "datos"];
+  if (request && Object.keys(data).some((k) => !allowed.includes(k)))
+    fail(400, "La solicitud contiene campos no permitidos");
+  const nombre = String(data.nombre || "").trim();
+  // Como el API: NOMBRE es VARCHAR2(200 BYTE), se mide en bytes UTF-8.
+  if (!nombre || Buffer.byteLength(nombre, "utf8") > 200)
+    fail(400, "Ingresa un nombre de hasta 200 caracteres (las letras con tilde o ñ cuentan como dos)");
+  data.nombre = nombre;
+  if (!data.equipoId && !["equipos", "modulos"].includes(type))
+    fail(400, "Selecciona el equipo de trabajo");
+  const visibilidad = String(data.visibilidad || "EQUIPO");
   if (
-    !data ||
-    typeof data !== "object" ||
-    typeof data.nombre !== "string" ||
-    !data.nombre.trim()
+    !["PRIVADA", "EQUIPO", "EMPRESA"].includes(visibilidad) ||
+    (visibilidad === "EMPRESA" && type !== "actividades") ||
+    (type === "solicitudes" && visibilidad !== "PRIVADA")
   )
-    fail(400, "Nombre requerido.");
-  if (
-    data.nombre.length > 200 ||
-    !data.datos ||
-    typeof data.datos !== "object" ||
-    Array.isArray(data.datos)
-  )
-    fail(400, "Registro inválido.");
+    fail(400, "Visibilidad no permitida para este módulo");
+  const raw = data.datos && typeof data.datos === "object" && !Array.isArray(data.datos) ? { ...data.datos } : fail(400, "Datos inválidos");
+  delete raw._rrhh;
+  delete raw._automatico;
+  delete raw._inventario;
+  const keys = d.fields.map((f) => f.key);
+  if (Object.keys(raw).some((k) => !keys.includes(k)))
+    fail(400, "La solicitud contiene campos no permitidos");
+  const out = {};
   for (const f of d.fields) {
-    const v = data.datos[f.key];
-    if (f.required && (v === undefined || v === null || v === ""))
-      fail(400, "Completa " + f.label + ".");
-    if (v === undefined || v === null || v === "") continue;
-    if (f.options && !f.options.includes(v))
-      fail(400, "Opción inválida: " + f.label);
-    if (
-      f.type === "number" &&
-      (!Number.isFinite(Number(v)) ||
-        (f.min !== undefined && Number(v) < f.min) ||
-        (f.max !== undefined && Number(v) > f.max))
-    )
-      fail(400, "Valor inválido: " + f.label);
-    if (["date", "datetime"].includes(f.type) && !Number.isFinite(+new Date(v)))
-      fail(400, "Fecha inválida: " + f.label);
+    let v = raw[f.key];
+    if (v === "" || v === null || v === undefined) {
+      if (f.required) fail(400, "Completa " + f.label);
+      continue;
+    }
+    if (f.type === "boolean") {
+      if (typeof v !== "boolean") fail(400, "Revisa " + f.label);
+    } else if (f.type === "number" || f.type === "user") {
+      const n = Number(v);
+      if (!Number.isSafeInteger(n) || n < (f.min ?? 1) || n > (f.max ?? Number.MAX_SAFE_INTEGER))
+        fail(400, "Valor numérico inválido");
+      v = n;
+    } else if (f.type === "list") {
+      if (!Array.isArray(v) || v.length > 100 || v.some((x) => !Number.isSafeInteger(x) || x <= 0))
+        fail(400, "Revisa " + f.label);
+      v = [...new Set(v)];
+    } else {
+      if (typeof v !== "string" || v.length > (f.type === "textarea" ? 8000 : 500))
+        fail(400, "Revisa " + f.label);
+      v = v.trim();
+      if (f.required && !v) fail(400, "Completa " + f.label);
+      if (f.type === "select" && !f.options?.includes(v)) fail(400, "Opción no permitida: " + f.label);
+      if (f.type === "ref" && !UUID.test(v)) fail(400, "Identificador inválido");
+      if (f.type === "datetime") {
+        if (!/^\d{4}-\d\d-\d\dT/.test(v) || !Number.isFinite(Date.parse(v))) fail(400, "Fecha inválida");
+        v = new Date(v).toISOString();
+      }
+      if (
+        f.type === "date" &&
+        (!/^\d{4}-\d\d-\d\d$/.test(v) || !Number.isFinite(Date.parse(v)) || new Date(v).toISOString().slice(0, 10) !== v)
+      )
+        fail(400, "Fecha inválida");
+      if (f.type === "url" && v) {
+        let url;
+        try {
+          url = new URL(v);
+        } catch {
+          fail(400, "URL inválida");
+        }
+        if (!["https:", "http:"].includes(url.protocol) || url.username || url.password) fail(400, "URL inválida");
+      }
+    }
+    out[f.key] = v;
   }
-  if (
-    type === "actividades" &&
-    new Date(data.datos.fin) <= new Date(data.datos.inicio)
-  )
-    fail(400, "El final debe ser posterior al inicio.");
+  if (JSON.stringify(out).length > 24000) fail(400, "El registro supera el tamaño permitido");
+  if (type === "actividades" && Date.parse(out.fin) <= Date.parse(out.inicio))
+    fail(400, "La finalización debe ser posterior al inicio");
+  // Se conservan las claves internas que el servidor mantiene (RRHH, inventario, detección automática).
+  for (const k of ["_rrhh", "_automatico", "_inventario"]) if (data.datos[k] !== undefined) out[k] = data.datos[k];
+  data.datos = out;
 }
 function catalog(s) {
   return {
@@ -323,7 +368,7 @@ async function createLab(file, options = {}) {
   function bootstrap(s, a) {
     return {
       enabled: true,
-      inventoryConnected: false,
+      inventoryConnected: !!s.assetExample,
       defaultTicketTeamId: s.ids.it,
       actor: { id: a.id, nombre: a.nombre, admin: a.admin, mode: a.mode },
       definitions: Object.fromEntries(
@@ -364,9 +409,20 @@ async function createLab(file, options = {}) {
         audit: has(a, "TICKETS_AUDITORIA_LEER"),
         logs: has(a, "TICKETS_LOGS_LEER"),
         teamMetrics: manager(a),
+        // Como platform.service.ts del API: «Personas y accesos» → permisos corporativos si tiene mod06.
+        // Permisos corporativos (mod06) es sensible: solo administración o un permiso explícito.
+        corporateAccess: !!(a.admin || s.moduleAccess?.[a.id]?.mod06?.allowed),
       },
       timezone: "America/Guatemala",
     };
+  }
+  // Acceso a un módulo del catálogo (como platform.service.ts moduleAccess del API).
+  function moduleAccess(s, a, id) {
+    const custom = s.moduleAccess?.[a.id]?.[id];
+    if (custom) return { moduloId:id, ...custom };
+    const visible = Object.values(s.applicationCatalog || {}).some(app => Object.values(app.sections || {}).some(section => (section.modules || []).some(module => module.id===id)));
+    const actions = { LEER:!!(a.admin || visible), INSERTAR:!!a.admin, EDITAR:!!a.admin, ELIMINAR:!!a.admin };
+    return { moduloId:id, allowed:actions.LEER && (!['proc01','mod01','mod10'].includes(id) || actions.INSERTAR), actions };
   }
   function dispatch(s, a, req, url, body, upload) {
     const p = url.pathname.replace(/^\/platform/, ""),
@@ -375,16 +431,10 @@ async function createLab(file, options = {}) {
     if (p === "/bootstrap") return bootstrap(s, a);
     if (p === "/organization/people") {
       if (!a.admin) fail(403, "Solo Informática consulta el directorio institucional.");
-      return {empresa:97,personal:s.users.map(u=>({empresa:97,empleado:9000000+u.id,nombre:u.nombre,puesto:u.rol,unidadCodigo:u.equipoId===s.ids.it?1:2,unidad:u.equipoId===s.ids.it?'Informática ficticia':'Contabilidad ficticia',sinUnidad:false,cuentasHabilitadas:1,usuariosIds:[u.id]}))};
+      return {empresa:97,personal:s.users.map(u=>({empresa:97,empleado:9000000+u.id,nombre:u.nombre,puesto:u.rol,unidadCodigo:u.equipoId===s.ids.it?1:2,unidad:u.equipoId===s.ids.it?'Informática ficticia':'Contabilidad ficticia',sinUnidad:false,cuentasHabilitadas:1,usuariosIds:[u.id]})).concat(s.assetExample?assets.people():[])};
     }
     if (p === "/catalog") return s.applicationCatalog || {}; // Catálogo ficticio explícito de los recorridos; sin trámites externos.
-    if (parts[0] === 'module-access') {
-      const id = parts[1], custom = s.moduleAccess?.[a.id]?.[id];
-      if (custom) return { moduloId:id, ...custom };
-      const visible = Object.values(s.applicationCatalog || {}).some(app => Object.values(app.sections || {}).some(section => (section.modules || []).some(module => module.id===id)));
-      const actions = { LEER:!!(a.admin || visible), INSERTAR:!!a.admin, EDITAR:!!a.admin, ELIMINAR:!!a.admin };
-      return { moduloId:id, allowed:actions.LEER && (!['proc01','mod01','mod10'].includes(id) || actions.INSERTAR), actions };
-    }
+    if (parts[0] === 'module-access') return moduleAccess(s, a, parts[1]);
     if (p === "/people")
       return s.users
         .filter(
@@ -921,7 +971,7 @@ async function createLab(file, options = {}) {
         if (req.method === "GET")
           return s.files
             .filter((f) => f.tipo === type && f.registroId === id)
-            .map(({ base64, ...f }) => f);
+            .map(({ base64: _base64, ...f }) => f);
         return command(s, a, req, p, body, (proof) => {
           if (!allowed(a, type, "EDITAR") && !allowed(a, type, "INSERTAR"))
             fail(403, "Sin permiso para adjuntar.");
@@ -981,6 +1031,9 @@ async function createLab(file, options = {}) {
           items = items.filter((r) => r.nombre.toLowerCase().includes(term));
         if (q.get("equipoId"))
           items = items.filter((r) => r.equipoId === q.get("equipoId"));
+        // Igual que el API real: filtro opcional por estado del registro.
+        if (q.get("estado"))
+          items = items.filter((r) => r.estado === q.get("estado"));
         if (type === "actividades")
           items = items.filter(
             (r) =>
@@ -1004,7 +1057,7 @@ async function createLab(file, options = {}) {
           return { id, retirado: true };
         }
         const data = clone(body.data);
-        validate(type, data);
+        validate(type, data, { request: true });
         if (
           !a.admin &&
           (data.equipoId !== a.equipoId ||
@@ -1092,6 +1145,8 @@ async function createLab(file, options = {}) {
         return r;
       });
     }
+    // Activos Fijos simulado solo cuando se cargaron los activos de ejemplo.
+    if (parts[0] === "inventory" && s.assetExample) return assets.inventory(s, q);
     fail(
       501,
       "Esta operación está fuera del laboratorio. No se consultó un servicio externo.",

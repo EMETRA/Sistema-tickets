@@ -15,13 +15,10 @@ import {
 import { CctPager, CctTable, CctPicker, cctError } from "./CctParts";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
 import local from "./CctWorkspace.module.scss";
-const day = (s: string) =>
-    s.slice(8, 10) + "/" + s.slice(5, 7) + "/" + s.slice(0, 4);
+const day = (s: string) => s.slice(8, 10) + "/" + s.slice(5, 7) + "/" + s.slice(0, 4);
 function defaults(): CctCepoReportFilters {
     const hasta = cctCivilNow().slice(0, 10),
-        desde = new Date(Date.parse(hasta + "T00:00:00Z") - 29 * 86400000)
-            .toISOString()
-            .slice(0, 10);
+        desde = new Date(Date.parse(hasta + "T00:00:00Z") - 29 * 86400000).toISOString().slice(0, 10);
     return {
         desde,
         hasta,
@@ -65,8 +62,7 @@ export function CctCepoReport() {
         setError("");
         try {
             const data = await platformFetch<Report>(
-                "/cct/reportes/cepos?" +
-                    cctQuery({ ...q, offset: String(offset) }),
+                "/cct/reportes/cepos?" + cctQuery({ ...q, offset: String(offset) }),
                 { signal: ctl.signal },
             );
             if (ctl.signal.aborted) return;
@@ -88,10 +84,9 @@ export function CctCepoReport() {
         try {
             if (kind === "pdf") {
                 const blob = await cctPdfBlob(
-                    await platformFetch<Blob>(
-                        "/cct/reportes/cepos/pdf?" + cctQuery(applied),
-                        { signal: ctl.signal },
-                    ),
+                    await platformFetch<Blob>("/cct/reportes/cepos/pdf?" + cctQuery(applied), {
+                        signal: ctl.signal,
+                    }),
                 );
                 if (ctl.signal.aborted) return;
                 if (pdfUrl.current) URL.revokeObjectURL(pdfUrl.current);
@@ -112,8 +107,7 @@ export function CctCepoReport() {
                     ),
                     a = document.createElement("a");
                 a.href = url;
-                a.download =
-                    "CCT-cepos-" + applied.desde + "-" + applied.hasta + ".csv";
+                a.download = "CCT-cepos-" + applied.desde + "-" + applied.hasta + ".csv";
                 a.click();
                 setTimeout(() => URL.revokeObjectURL(url), 10000);
             }
@@ -130,14 +124,11 @@ export function CctCepoReport() {
     }
     return (
         <>
-            <section
-                className={styles.card}
-                aria-label="Filtros del reporte de cepos"
-            >
+            <section className={styles.card} aria-label="Filtros del reporte de cepos">
                 <h2>Reporte operativo de cepos</h2>
                 <p className={local.hint}>
-                    Revisa avisos registrados por período, estado y agente, con
-                    sus comprobantes de pago y fechas de liberación.
+                    Revisa avisos registrados por período, estado y agente, con sus comprobantes de pago y
+                    fechas de liberación.
                 </p>
                 <form
                     onSubmit={(e) => {
@@ -147,24 +138,18 @@ export function CctCepoReport() {
                 >
                     <div className={local.form}>
                         <div>
-                            <label htmlFor="cct-report-fechaBase">
-                                Fecha a considerar
-                            </label>
+                            <label htmlFor="cct-report-fechaBase">Fecha a considerar</label>
                             <select
                                 id="cct-report-fechaBase"
                                 className={styles.control}
                                 value={form.fechaBase}
-                                onChange={(e) =>
-                                    set("fechaBase", e.target.value)
-                                }
+                                onChange={(e) => set("fechaBase", e.target.value)}
                             >
-                                {Object.entries(CCT_REPORT_DATE_LABELS).map(
-                                    ([value, label]) => (
-                                        <option key={value} value={value}>
-                                            {label}
-                                        </option>
-                                    ),
-                                )}
+                                {Object.entries(CCT_REPORT_DATE_LABELS).map(([value, label]) => (
+                                    <option key={value} value={value}>
+                                        {label}
+                                    </option>
+                                ))}
                             </select>
                         </div>
                         <div>
@@ -191,9 +176,7 @@ export function CctCepoReport() {
                             />
                         </div>
                         <div>
-                            <label htmlFor="cct-report-estado">
-                                Estado actual
-                            </label>
+                            <label htmlFor="cct-report-estado">Estado actual</label>
                             <select
                                 id="cct-report-estado"
                                 className={styles.control}
@@ -201,13 +184,11 @@ export function CctCepoReport() {
                                 onChange={(e) => set("estado", e.target.value)}
                             >
                                 <option value="">Todos los estados</option>
-                                {Object.entries(CCT_STATES).map(
-                                    ([value, label]) => (
-                                        <option key={value} value={value}>
-                                            {label}
-                                        </option>
-                                    ),
-                                )}
+                                {Object.entries(CCT_STATES).map(([value, label]) => (
+                                    <option key={value} value={value}>
+                                        {label}
+                                    </option>
+                                ))}
                             </select>
                         </div>
                         <CctPicker
@@ -220,9 +201,7 @@ export function CctCepoReport() {
                             onChange={(v) => set("tipoAgente", v)}
                         />
                         <div>
-                            <label htmlFor="cct-report-agente">
-                                Chapa del agente colocador (opcional)
-                            </label>
+                            <label htmlFor="cct-report-agente">Chapa del agente colocador (opcional)</label>
                             <input
                                 id="cct-report-agente"
                                 className={styles.control}
@@ -256,9 +235,8 @@ export function CctCepoReport() {
                         {busy ? "Preparando…" : "Generar reporte de cepos"}
                     </Button>
                     <p className={local.hint}>
-                        El período usa la fecha elegida y la hora de Guatemala.
-                        El estado corresponde al registro actual del aviso. Sin
-                        un tipo de agente, la chapa incluye todos los tipos.
+                        El período usa la fecha elegida y la hora de Guatemala. El estado corresponde al
+                        registro actual del aviso. Sin un tipo de agente, la chapa incluye todos los tipos.
                     </p>
                 </form>
             </section>
@@ -268,27 +246,20 @@ export function CctCepoReport() {
                 </p>
             )}
             {result && applied && (
-                <section
-                    className={styles.card}
-                    aria-label="Resultados del reporte de cepos"
-                >
+                <section className={styles.card} aria-label="Resultados del reporte de cepos">
                     <div className={styles.toolbar}>
                         <h2>Avisos del período</h2>
                         <div className={local.buttons}>
                             <Button
                                 variant="outlined"
-                                state={
-                                    busy || exporting ? "disabled" : "default"
-                                }
+                                state={busy || exporting ? "disabled" : "default"}
                                 onClick={() => void exportReport("pdf")}
                             >
                                 Ver PDF de cepos
                             </Button>
                             <Button
                                 variant="outlined"
-                                state={
-                                    busy || exporting ? "disabled" : "default"
-                                }
+                                state={busy || exporting ? "disabled" : "default"}
                                 onClick={() => void exportReport("csv")}
                             >
                                 Exportar reporte CSV
@@ -296,18 +267,12 @@ export function CctCepoReport() {
                         </div>
                     </div>
                     <p className={local.hint}>
-                        {CCT_REPORT_DATE_LABELS[applied.fechaBase]} ·{" "}
-                        {day(applied.desde)} al {day(applied.hasta)} ·{" "}
-                        {CCT_STATES[applied.estado] || "Todos los estados"} ·
-                        Tipo de agente: {applied.tipoAgente || "Todos"} · Chapa:{" "}
-                        {applied.agente || "Todas"} · Tipo vehículo:{" "}
-                        {applied.tipoVehiculo || "Todos"} · Motivo:{" "}
-                        {applied.motivo || "Todos"}
+                        {CCT_REPORT_DATE_LABELS[applied.fechaBase]} · {day(applied.desde)} al{" "}
+                        {day(applied.hasta)} · {CCT_STATES[applied.estado] || "Todos los estados"} · Tipo de
+                        agente: {applied.tipoAgente || "Todos"} · Chapa: {applied.agente || "Todas"} · Tipo
+                        vehículo: {applied.tipoVehiculo || "Todos"} · Motivo: {applied.motivo || "Todos"}
                     </p>
-                    <div
-                        className={local.summary}
-                        aria-label="Resumen del período"
-                    >
+                    <div className={local.summary} aria-label="Resumen del período">
                         <div>
                             Avisos<strong>{result.resumen.total}</strong>
                         </div>
@@ -320,24 +285,18 @@ export function CctCepoReport() {
                         ].map(([code, label]) => (
                             <div key={code}>
                                 {label}
-                                <strong>
-                                    {result.resumen.estados[code] || 0}
-                                </strong>
+                                <strong>{result.resumen.estados[code] || 0}</strong>
                             </div>
                         ))}
                     </div>
                     <p className={local.hint}>
-                        Resumen de todos los resultados filtrados. Las
-                        exportaciones incluyen el reporte completo hasta 2000
-                        avisos; si se supera ese límite, se solicitará
-                        delimitarlo. Desplaza la tabla horizontalmente para
-                        consultar todas las columnas.
+                        Resumen de todos los resultados filtrados. Las exportaciones incluyen el reporte
+                        completo hasta 2000 avisos; si se supera ese límite, se solicitará delimitarlo.
+                        Desplaza la tabla horizontalmente para consultar todas las columnas.
                     </p>
                     {Boolean(result.resumen.distribucion?.length) && (
                         <details className={local.distribution}>
-                            <summary>
-                                Distribución por tipo de vehículo y motivo
-                            </summary>
+                            <summary>Distribución por tipo de vehículo y motivo</summary>
                             <CctTable
                                 items={result.resumen.distribucion!}
                                 columns={[
@@ -358,12 +317,8 @@ export function CctCepoReport() {
                             ...row,
                             TIPO_VEHICULO_NOMBRE:
                                 row.TIPO_VEHICULO_NOMBRE ||
-                                (row.TIPO_VEHICULO
-                                    ? "Tipo " + row.TIPO_VEHICULO
-                                    : null),
-                            MOTIVO_NOMBRE:
-                                row.MOTIVO_NOMBRE ||
-                                (row.MOTIVO ? "Motivo " + row.MOTIVO : null),
+                                (row.TIPO_VEHICULO ? "Tipo " + row.TIPO_VEHICULO : null),
+                            MOTIVO_NOMBRE: row.MOTIVO_NOMBRE || (row.MOTIVO ? "Motivo " + row.MOTIVO : null),
                         }))}
                         columns={[
                             "AVISO",
@@ -404,20 +359,12 @@ export function CctCepoReport() {
                                 Descargar PDF
                             </a>
                         )}
-                        <Button
-                            variant="outlined"
-                            onClick={() => dialog.current?.close()}
-                        >
+                        <Button variant="outlined" onClick={() => dialog.current?.close()}>
                             Cerrar
                         </Button>
                     </div>
                 </header>
-                {pdf && (
-                    <iframe
-                        src={pdf}
-                        title="Reporte operativo de cepos en PDF"
-                    />
-                )}
+                {pdf && <iframe src={pdf} title="Reporte operativo de cepos en PDF" />}
             </dialog>
         </>
     );

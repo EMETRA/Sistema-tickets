@@ -10,27 +10,20 @@ import { TicketStateChip } from "../../atoms/TicketStateChip";
 import { IconButton } from "../../atoms/IconButton";
 import { Button } from "../../atoms/Button";
 
-const GRID = "minmax(0, 1.8fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 0.8fr) minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr)";
+const GRID =
+    "minmax(0, 1.8fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 0.8fr) minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr)";
 
-const RequestTable: React.FC<RequestTableProps> = ({
-    requests,
-    onApproveAll,
-    onApprove,
-    className
-}) => {
-
+const RequestTable: React.FC<RequestTableProps> = ({ requests, onApproveAll, onApprove, className }) => {
     const [selected, setSelected] = useState<number[]>([]);
 
     const isAllSelected = selected.length === requests.length;
 
     const handleSelectAll = (checked: boolean) => {
-        setSelected(checked ? requests.map(r => r.id) : [])
+        setSelected(checked ? requests.map((r) => r.id) : []);
     };
 
     const handleSelectRow = (id: number, checked: boolean) => {
-        setSelected(prev => 
-            checked ? [...prev, id] : prev.filter(r => r !== id)
-        );
+        setSelected((prev) => (checked ? [...prev, id] : prev.filter((r) => r !== id)));
     };
 
     const handleApproveAll = () => {
@@ -39,46 +32,39 @@ const RequestTable: React.FC<RequestTableProps> = ({
     };
 
     const handleApprove = (id: number) => {
-        onApprove?.(id)
+        onApprove?.(id);
     };
 
     return (
         <div className={classNames(styles.RequestTable, className)}>
-
             <div className={styles.header}>
-
-                <TableHeader 
-                    iconName="user-clock-solid"
-                    label="Solicitudes pendientes"
-                />
+                <TableHeader iconName="user-clock-solid" label="Solicitudes pendientes" />
 
                 <Button onClick={handleApproveAll} state={selected.length === 0 ? "disabled" : "default"}>
                     Aprobar y notificar
                 </Button>
-
             </div>
 
             <div className={styles.table}>
-
-                <TableRow 
+                <TableRow
                     isHeader
                     selectable
                     isSelected={isAllSelected}
                     onSelect={handleSelectAll}
                     gridTemplate={GRID}
                     cells={[
-                        { icon: "user-regular", label: "Nombre y apellido"},
-                        { icon: "envelope-regular", label: "Correo"},
-                        { icon: "file-lines-regular", label: "No. Empleado"},
-                        { icon: "pen-to-square-regular", label: "Renglón"},
-                        { icon: "adress-book-regular", label: "Puesto solicitado"},
-                        { icon: "spinner-solid", label: "Estado"},
-                        { icon: "gears-solid", label: "", align: "center" }
+                        { icon: "user-regular", label: "Nombre y apellido" },
+                        { icon: "envelope-regular", label: "Correo" },
+                        { icon: "file-lines-regular", label: "No. Empleado" },
+                        { icon: "pen-to-square-regular", label: "Renglón" },
+                        { icon: "adress-book-regular", label: "Puesto solicitado" },
+                        { icon: "spinner-solid", label: "Estado" },
+                        { icon: "gears-solid", label: "", align: "center" },
                     ]}
                 />
 
                 {requests.map((req) => (
-                    <TableRow 
+                    <TableRow
                         key={req.id}
                         id={req.id}
                         selectable
@@ -95,34 +81,30 @@ const RequestTable: React.FC<RequestTableProps> = ({
                                             <Text variant="body">{req.name}</Text>
                                         </div>
                                     </div>
-                                )
+                                ),
                             },
-                            { content: <Text variant="muted">{req.email}</Text>},
-                            { content: <Text>{req.employeeNumber}</Text>},
-                            { content: <Text>{req.budget}</Text>},
-                            { content: <Text>{req.position}</Text>},
+                            { content: <Text variant="muted">{req.email}</Text> },
+                            { content: <Text>{req.employeeNumber}</Text> },
+                            { content: <Text>{req.budget}</Text> },
+                            { content: <Text>{req.position}</Text> },
+                            {
+                                content: <TicketStateChip label={req.status} state="asignado" />,
+                                align: "center",
+                            },
                             {
                                 content: (
-                                    <TicketStateChip label={req.status} state="asignado" />
-                                ),
-                                align: "center"
-                            },
-                            { 
-                                content: (
-                                    <IconButton 
+                                    <IconButton
                                         icon="paper-plane-solid"
                                         iconColor="#8A8A8A"
-                                        onClick={() => handleApprove(req.id)}  
+                                        onClick={() => handleApprove(req.id)}
                                     />
                                 ),
-                                align: "center"
-                            }
+                                align: "center",
+                            },
                         ]}
                     />
                 ))}
-
             </div>
-
         </div>
     );
 };

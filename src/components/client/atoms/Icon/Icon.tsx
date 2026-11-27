@@ -15,7 +15,6 @@ export const Icon = ({
     backgroundColor,
     raw = false,
 }: IconProps) => {
-
     const src = getIconSrc(name);
     const isCustom = !!(color || backgroundColor);
 
@@ -26,7 +25,7 @@ export const Icon = ({
                 { [styles.hasBg]: backgroundColor },
                 !isCustom && styles[variant],
                 !isCustom && { [styles.active]: active },
-                className
+                className,
             )}
             style={
                 {

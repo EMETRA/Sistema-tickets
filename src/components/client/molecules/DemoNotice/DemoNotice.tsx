@@ -1,9 +1,5 @@
 import styles from "./DemoNotice.module.scss";
-export function DemoNotice({
-    configuration = false,
-}: {
-  configuration?: boolean;
-}) {
+export function DemoNotice({ configuration = false }: { configuration?: boolean }) {
     return (
         <p role="status" className={styles.notice}>
             {configuration

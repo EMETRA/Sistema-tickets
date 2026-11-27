@@ -1,0 +1,249 @@
+.directory,
+.teams {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 10px 14px;
+  flex-wrap: wrap;
+}
+.search {
+  flex: 1;
+  min-width: min(100%, 260px);
+  min-height: 38px;
+  padding: 8px 12px;
+  border: 1px solid var(--tickets-border);
+  border-radius: 9px;
+  background: var(--tickets-surface);
+  font: inherit;
+  font-size: 13px;
+  &:focus {
+    outline: none;
+    border-color: var(--tickets-primary);
+    box-shadow: var(--tickets-focus);
+  }
+}
+.count {
+  font-size: 12px;
+  color: var(--tickets-text-secondary);
+}
+.ghost,
+.more {
+  min-height: 36px;
+  padding: 6px 12px;
+  border: 1px solid var(--tickets-border-strong);
+  border-radius: 9px;
+  background: var(--tickets-surface);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--tickets-text);
+  cursor: pointer;
+  &:hover {
+    background: var(--tickets-surface-subtle);
+  }
+}
+.more {
+  align-self: flex-start;
+  margin: 4px 16px 14px;
+}
+// ── Directorio por unidad ─────────────────────────────────────
+.unit {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--tickets-border);
+  border-radius: 14px;
+  background: var(--tickets-surface);
+  box-shadow: var(--tickets-shadow);
+  overflow: hidden;
+  &[data-missing] {
+    border-color: var(--tickets-border);
+    border-color: color-mix(in srgb, var(--tickets-danger) 25%, var(--tickets-surface));
+    header {
+      background: color-mix(in srgb, var(--tickets-danger) 7%, var(--tickets-surface));
+      h3 {
+        color: var(--tickets-danger);
+      }
+    }
+  }
+  header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px 16px;
+    background: var(--tickets-surface-subtle);
+    border-bottom: 1px solid var(--tickets-divider);
+    h3 {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    span {
+      font-size: 12px;
+      color: var(--tickets-text-secondary);
+    }
+  }
+}
+.people {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  gap: 0;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+}
+.person {
+  display: flex;
+  gap: 12px;
+  padding: 10px;
+  border-radius: 10px;
+  &:hover {
+    background: var(--tickets-surface-subtle);
+  }
+}
+.avatar {
+  display: inline-grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--tickets-neutral-soft);
+  color: var(--tickets-text-secondary);
+  font-size: 12px;
+  font-weight: 700;
+  &[data-account] {
+    background: var(--tickets-primary-soft);
+    color: var(--tickets-primary);
+  }
+}
+.personText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  font-size: 12px;
+  small {
+    font-size: 11px;
+    color: var(--tickets-text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+.name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--tickets-text);
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+a.name:hover {
+  color: var(--tickets-primary);
+  text-decoration: underline;
+}
+.personActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+  font-size: 12px;
+}
+.empty {
+  padding: 24px 0;
+  font-size: 13px;
+  color: var(--tickets-text-secondary);
+}
+// ── Equipos ───────────────────────────────────────────────────
+.teamGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+  gap: 14px;
+}
+.team {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid var(--tickets-border);
+  border-radius: 14px;
+  background: var(--tickets-surface);
+  box-shadow: var(--tickets-shadow);
+  font: inherit;
+  text-align: left;
+  color: var(--tickets-text);
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+  &:hover {
+    border-color: color-mix(in srgb, var(--tickets-primary) 35%, var(--tickets-surface));
+    box-shadow: 0 8px 24px #1a2b4a14;
+  }
+  &:focus-visible {
+    outline: 2px solid var(--tickets-primary);
+    outline-offset: 2px;
+  }
+}
+.teamHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  strong {
+    font-size: 15px;
+  }
+}
+.teamMeta,
+.heads {
+  font-size: 12px;
+  color: var(--tickets-text-secondary);
+}
+.heads {
+  padding-top: 10px;
+  border-top: 1px solid var(--tickets-divider);
+}
+.stack {
+  display: flex;
+  align-items: center;
+  .avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 11px;
+    border: 2px solid var(--tickets-surface);
+    & + .avatar {
+      margin-left: -8px;
+    }
+  }
+  em {
+    margin-left: 10px;
+    font-style: normal;
+    font-size: 12px;
+    color: var(--tickets-text-secondary);
+  }
+}
+.roles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  span {
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: var(--tickets-neutral-soft);
+    font-size: 11px;
+    color: var(--tickets-text-secondary);
+  }
+  b {
+    color: var(--tickets-text);
+  }
+}
+.teams .bar > :last-child {
+  margin-left: auto;
+}

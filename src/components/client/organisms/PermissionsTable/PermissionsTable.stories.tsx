@@ -4,7 +4,7 @@ import { PermissionsTable } from "./";
 const meta: Meta<typeof PermissionsTable> = {
     title: "Organisms/PermissionsTable",
     component: PermissionsTable,
-    tags: ["autodocs"]
+    tags: ["autodocs"],
 };
 
 export default meta;
@@ -15,14 +15,14 @@ export const Default: Story = {
         permissions: [
             {
                 id: 1,
-                name: 'Permiso 1',
-                status: 'Activo'
+                name: "Permiso 1",
+                status: "Activo",
             },
             {
                 id: 2,
-                name: 'Permiso 2',
-                status: 'Baja'
-            }
-        ]
-    }
+                name: "Permiso 2",
+                status: "Baja",
+            },
+        ],
+    },
 };

@@ -1,8 +1,4 @@
-import {
-    graphqlProof,
-    legacyProof,
-    completeLegacy,
-} from "@/platform/legacy-proof";
+import { graphqlProof, legacyProof, completeLegacy } from "@/platform/legacy-proof";
 import { getPlatformRuntime } from "@/platform/runtime";
 import { GraphQLClient } from "graphql-request";
 import { ErrorHandler } from "./errors";
@@ -75,9 +71,7 @@ export type GraphQLClientError = Error & {
     graphQLErrors: GraphQLResponseError[];
 };
 
-function toGraphQLClientError(
-    errors: GraphQLResponseError[],
-): GraphQLClientError {
+function toGraphQLClientError(errors: GraphQLResponseError[]): GraphQLClientError {
     return Object.assign(new Error(errors[0]?.message), {
         graphQLErrors: errors,
     });
@@ -143,10 +137,7 @@ export async function graphqlRequest<TData = Record<string, unknown>>(
 
         // Realizar request con timeout
         const controller = new AbortController();
-        const timeoutId = setTimeout(
-            () => controller.abort(),
-            config.graphqlTimeoutMs,
-        );
+        const timeoutId = setTimeout(() => controller.abort(), config.graphqlTimeoutMs);
 
         try {
             const data = await client.request<TData>({
@@ -183,9 +174,10 @@ export async function graphqlRequest<TData = Record<string, unknown>>(
  * ```
  */
 
-export async function graphqlRequestClient<
-    TData extends Record<string, unknown> = Record<string, unknown>,
->(query: string, options?: GraphQLRequestOptions): Promise<TData> {
+export async function graphqlRequestClient<TData extends Record<string, unknown> = Record<string, unknown>>(
+    query: string,
+    options?: GraphQLRequestOptions,
+): Promise<TData> {
     try {
         const graphqlEndpoint = "/api/graphql";
 
@@ -197,11 +189,7 @@ export async function graphqlRequestClient<
         const variables = options?.variables ?? {};
 
         const change = describeGraphqlChange(query, variables);
-        const proofHeaders = await graphqlProof(
-            query,
-            variables,
-            change?.label || "Aplicar cambios",
-        );
+        const proofHeaders = await graphqlProof(query, variables, change?.label || "Aplicar cambios");
         if (!getPlatformRuntime()) await confirmAdministrativeChange(change);
 
         if (files.length > 0) {
@@ -232,17 +220,13 @@ export async function graphqlRequestClient<
                 const xhr = new XMLHttpRequest();
                 xhr.open("POST", graphqlEndpoint);
 
-                if (token)
-                    xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+                if (token) xhr.setRequestHeader("Authorization", `Bearer ${token}`);
                 xhr.setRequestHeader("apollo-require-preflight", "true");
-                for (const [name, value] of Object.entries(proofHeaders))
-                    xhr.setRequestHeader(name, value);
+                for (const [name, value] of Object.entries(proofHeaders)) xhr.setRequestHeader(name, value);
 
                 xhr.upload.onprogress = (event) => {
                     if (event.lengthComputable) {
-                        const percent = Math.round(
-                            (event.loaded / event.total) * 100,
-                        );
+                        const percent = Math.round((event.loaded / event.total) * 100);
                         options?.onProgress?.(percent);
                     }
                 };
@@ -280,10 +264,7 @@ export async function graphqlRequestClient<
 
         // Regular fetch for non-file requests
         const controller = new AbortController();
-        const timeoutId = setTimeout(
-            () => controller.abort(),
-            config.graphqlTimeoutMs,
-        );
+        const timeoutId = setTimeout(() => controller.abort(), config.graphqlTimeoutMs);
 
         let response: Response;
         try {
@@ -373,27 +354,18 @@ export async function apiFetch<TData = Record<string, unknown>>(
             typeof options?.body === "string"
         ) {
             const request = JSON.parse(options.body);
-            proofHeaders = await graphqlProof(
-                request.query,
-                request.variables || {},
-                restChange.label,
-            );
+            proofHeaders = await graphqlProof(request.query, request.variables || {}, restChange.label);
         } else await confirmAdministrativeChange(restChange);
 
         // Preparar headers con token si está disponible
         const headers = new Headers(options?.headers || {});
-        for (const [name, value] of Object.entries(proofHeaders))
-            headers.set(name, value);
+        for (const [name, value] of Object.entries(proofHeaders)) headers.set(name, value);
 
         if (token) {
             headers.set("Authorization", `Bearer ${token}`);
         }
 
-        if (
-            !headers.has("Content-Type") &&
-            options?.body &&
-            !(options.body instanceof FormData)
-        ) {
+        if (!headers.has("Content-Type") && options?.body && !(options.body instanceof FormData)) {
             headers.set("Content-Type", "application/json");
         }
 
@@ -439,8 +411,7 @@ export async function apiFetch<TData = Record<string, unknown>>(
         }
     } catch (error: unknown) {
         // Loguear error
-        if (!(error instanceof AdministrativeChangeCancelled))
-            ErrorHandler.log(error, "apiFetch");
+        if (!(error instanceof AdministrativeChangeCancelled)) ErrorHandler.log(error, "apiFetch");
         throw error;
     }
 }

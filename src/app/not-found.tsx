@@ -14,14 +14,10 @@ export default function NotFound() {
             <div className={styles.content}>
                 <Title variant="large">Página no encontrada</Title>
                 <Text variant="caption">
-                    La página que buscas no existe o la dirección es incorrecta.
-                    Verifica la URL e intenta nuevamente.
+                    La página que buscas no existe o la dirección es incorrecta. Verifica la URL e intenta
+                    nuevamente.
                 </Text>
-                <Button
-                    type="button"
-                    color="cancel"
-                    onClick={() => router.push("/home")}
-                >
+                <Button type="button" color="cancel" onClick={() => router.push("/home")}>
                     Volver al inicio
                 </Button>
             </div>

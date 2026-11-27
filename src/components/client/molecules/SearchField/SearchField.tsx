@@ -11,7 +11,7 @@ const SearchField: React.FC<SearchFieldProps> = ({
     disabled = false,
     onChange,
     onSearch,
-    className
+    className,
 }) => {
     return (
         <form
@@ -22,15 +22,22 @@ const SearchField: React.FC<SearchFieldProps> = ({
             }}
         >
             <div className={styles.inputWrapper}>
-                <Input 
+                <Input
                     value={value}
                     placeholder={placeholder}
-                    onChange={e => onChange(e.target.value)}
+                    onChange={(e) => onChange(e.target.value)}
                     className={styles.input}
                     disabled={disabled}
                 />
 
-                <IconButton icon="magnifying-glass-solid" iconColor="#000000" borderless type="submit" disabled={disabled} className={styles.searchButton}/>
+                <IconButton
+                    icon="magnifying-glass-solid"
+                    iconColor="#000000"
+                    borderless
+                    type="submit"
+                    disabled={disabled}
+                    className={styles.searchButton}
+                />
             </div>
         </form>
     );

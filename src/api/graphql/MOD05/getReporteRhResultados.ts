@@ -1,9 +1,9 @@
 /**
  * Query GraphQL para obtener resultados del reporte RRHH
- * 
+ *
  * Parámetros:
  * - input: ReporteRhInput
- * 
+ *
  * Retorna:
  * - camposSeleccionados
  * - estatus

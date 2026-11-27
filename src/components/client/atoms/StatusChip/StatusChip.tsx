@@ -19,9 +19,7 @@ const LABELS: Record<StatusChipVariant, string> = {
 
 export const StatusChip: React.FC<StatusChipProps> = ({ variant, className }) => {
     return (
-        <span className={classNames(styles.StatusChip, styles[variant], className)}>
-            {LABELS[variant]}
-        </span>
+        <span className={classNames(styles.StatusChip, styles[variant], className)}>{LABELS[variant]}</span>
     );
 };
 

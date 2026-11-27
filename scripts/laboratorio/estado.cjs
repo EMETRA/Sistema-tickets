@@ -200,7 +200,6 @@ function seed() {
     y: 160,
     planoX: 180,
     planoY: 160,
-    responsableId: 4,
     ultimaRevision: new Date().toISOString().slice(0, 10),
   });
   rec("dispositivos", ids.router, "Router de prueba", {
@@ -212,7 +211,6 @@ function seed() {
     y: 220,
     planoX: 500,
     planoY: 220,
-    responsableId: 4,
   });
   rec("conexiones", ids.enlace, "Enlace ficticio", {
     origenId: ids.switch,

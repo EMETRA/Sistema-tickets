@@ -16,7 +16,7 @@
   gap: 20px;
   padding: 20px 40px;
   border-radius: 8px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--tickets-border);
 }
 
 .title {
@@ -64,6 +64,16 @@
   box-shadow: var(--tickets-shadow);
 }
 
-.completedTasksFilters { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)); gap: 20px; min-width: 0; > * { min-width: 0; } }
+.completedTasksFilters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
+  gap: 20px;
+  min-width: 0;
+  > * {
+    min-width: 0;
+  }
+}
 
-.errorText { overflow-wrap: anywhere; }
+.errorText {
+  overflow-wrap: anywhere;
+}

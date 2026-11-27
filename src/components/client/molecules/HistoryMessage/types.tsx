@@ -1,12 +1,5 @@
-
 export type HistoryAction =
-    | "CREACION"
-    | "ASIGNACION"
-    | "TAGGED"
-    | "EN_TRABAJO"
-    | "CAMBIO_ESTADO"
-    | "COMPLETADO";
-
+    "CREACION" | "ASIGNACION" | "TAGGED" | "EN_TRABAJO" | "CAMBIO_ESTADO" | "COMPLETADO";
 
 export interface HistoryItem {
     user: string;

@@ -32,7 +32,7 @@ async function run() {
       s.messages = [{ticketId:1, usuario:7, nombre_usuario:s.users[6].nombre, fechaEnvio:new Date().toISOString(), textoMensaje:'Adjunto la captura de la pantalla.', archivos:[]}, {ticketId:1, usuario:4, nombre_usuario:s.users[3].nombre, fechaEnvio:new Date().toISOString(), textoMensaje:'Estamos revisando la solicitud.', archivos:[]}];
       s.ticketHistory = [{id:'h1',ticketId:1,usuarioId:7,accion:'CREACION',valorAnterior:null,valorNuevo:'Creado',fecha:new Date().toISOString()},{id:'h2',ticketId:1,usuarioId:4,accion:'EN_TRABAJO',valorAnterior:'Asignado',valorNuevo:'En trabajo',fecha:new Date().toISOString()}];
     });
-    browser = await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox','--disable-dev-shm-usage']});
+    browser = await chromium.launch({executablePath:process.env.QA_CHROMIUM_PATH||undefined,args:['--no-sandbox','--disable-dev-shm-usage']});
     const page = await browser.newPage({viewport:{width:1440,height:1100}});
     page.setDefaultTimeout(25000);
     const errors=[];page.on('pageerror', e=>errors.push(e.message));
@@ -43,7 +43,7 @@ async function run() {
       if(failComment && /sendTicketMessage/i.test(raw)) return route.fulfill({status:503,json:{errors:[{message:'Prueba de envío fallido'}]}});
       return route.continue();
     });
-    await page.route('**/api/ticket/1/attachments', route=>route.fulfill(failFiles?{status:503,json:{error:'Prueba de archivos no disponibles'}}:{json:{ticketAttachments:['captura-ejemplo.png','documento.pdf','nota.txt','planilla.xlsx'].map((name,i)=>({id:String(i+1),ticketId:1,usuarioId:7,nombreArchivo:name,keyStorage:null,url_descarga:null,fecha:new Date().toISOString()}))}}));
+    await page.route('**/api/ticket/1/attachments', route=>route.fulfill(failFiles?{status:500,json:{error:'Prueba de archivos no disponibles'}}:{json:{ticketAttachments:['captura-ejemplo.png','documento.pdf','nota.txt','planilla.xlsx'].map((name,i)=>({id:String(i+1),ticketId:1,usuarioId:7,nombreArchivo:name,keyStorage:null,url_descarga:null,fecha:new Date().toISOString()}))}}));
     await page.route('**/api/platform/tickets/1/files/*', route=>{
       const id=new URL(route.request().url()).pathname.split('/').pop();
       assert.match(route.request().headers().authorization,/^Bearer laboratorio-/); previewCalls.push(id);
@@ -54,12 +54,12 @@ async function run() {
     for(let i=0;i<100;i++){try{if((await fetch(instance.base+'/home')).status<500)break;}catch{}await new Promise(r=>setTimeout(r,100));}
     const visit=async url=>{await page.goto(instance.base+url);await page.waitForLoadState('networkidle');};
     await visit('/__laboratorio/entrar?usuario=7');
-    await page.getByRole('heading',{name:'Tus solicitudes y aplicaciones',exact:true}).waitFor();
-    await page.getByRole('button',{name:'Registraste el ticket QA-001',exact:true}).click();
+    await page.getByRole('heading',{name:'Tus solicitudes',exact:true}).waitFor();
+    await page.getByRole('region',{name:'Tus solicitudes'}).getByRole('button',{name:/^QA-001/}).click();
     await page.getByRole('dialog').getByRole('heading',{name:'QA-001 · No carga un adjunto',exact:true}).waitFor();
     await page.getByRole('dialog').getByText('Estamos revisando la solicitud.',{exact:true}).waitFor();
     await page.screenshot({path:path.join(out,'ticket-vista-rapida.png'),fullPage:true});
-    await page.getByRole('dialog').getByRole('tab',{name:'Archivos',exact:true}).click();
+    await page.getByRole('dialog').getByRole('tab',{name:/^Archivos/}).click();
     await page.getByRole('dialog').getByRole('tabpanel').getByRole('button',{name:'captura-ejemplo.png',exact:true}).click();
     await page.getByRole('dialog',{name:'captura-ejemplo.png',exact:true}).getByRole('img').waitFor();
     await page.keyboard.press('Escape');
@@ -83,10 +83,11 @@ async function run() {
     assert.equal(await page.getByRole('button',{name:'Abrir ticket QA-001',exact:true}).count(),0);
     await page.getByRole('button',{name:'Limpiar filtros',exact:true}).click();
     await page.getByRole('button',{name:'Ver detalle de No carga un adjunto',exact:true}).click();
-    await page.waitForURL('**/mis-tickets/1');
+    // Mis tickets abre el detalle en ventana (como Asignación) sin salir de la lista.
+    await page.getByRole('dialog').getByRole('heading',{name:'QA-001 · No carga un adjunto',exact:true}).waitFor();assert.ok(page.url().endsWith('/mis-tickets'));
     await page.getByRole('heading',{name:'QA-001 · No carga un adjunto',exact:true}).waitFor();
     await page.getByText('Estamos revisando la solicitud.',{exact:true}).waitFor();
-    assert.equal(await page.getByRole('heading',{name:'Gestión del ticket',exact:true}).count(),0);
+    assert.equal(await page.getByRole('combobox',{name:'Etiqueta'}).count(),0);
     const comment=page.getByLabel('Comentario',{exact:true});
     await comment.fill('Borrador que se conserva');
     await page.getByRole('tab',{name:'Conversación',exact:true}).focus();
@@ -113,12 +114,12 @@ async function run() {
     await page.getByRole('button',{name:'Enviar comentario',exact:true}).waitFor();
     assert.equal(await comment.inputValue(),'');
     assert.equal(instance.lab.state.data.messages.filter(m=>m.textoMensaje==='Borrador que se conserva').length,1);
-    await page.getByRole('tab',{name:'Archivos',exact:true}).click();
+    await page.getByRole('tab',{name:/^Archivos/}).click();
     await page.getByRole('tabpanel').getByRole('button',{name:'captura-ejemplo.png',exact:true}).focus();
     await page.keyboard.press('Enter');
     await page.getByRole('dialog',{name:'captura-ejemplo.png',exact:true}).getByRole('img',{name:'captura-ejemplo.png',exact:true}).waitFor();
     await page.getByRole('button',{name:'Cerrar visor de archivos',exact:true}).click();
-    for(const [name,selector]of [['documento.pdf','iframe'],['nota.txt','pre'],['planilla.xlsx','h3']]){
+    for(const [name,selector]of [['documento.pdf','iframe'],['nota.txt','pre'],['planilla.xlsx','text=El original está disponible']]){
       await page.getByRole('tabpanel').getByRole('button',{name,exact:true}).click();
       const viewer=page.getByRole('dialog',{name,exact:true});
       await viewer.locator(selector).waitFor();
@@ -136,8 +137,8 @@ async function run() {
     await page.keyboard.press('Escape');
     assert.ok(previewCalls.length>=7);
     await page.setViewportSize({width:1440,height:1100});
-    await page.reload();
-    await page.getByRole('heading',{name:'QA-001 · No carga un adjunto',exact:true}).waitFor();
+    await visit('/mis-tickets/1'); // detalle como página
+    await page.getByRole('heading',{name:'No carga un adjunto',exact:true}).waitFor();
     await page.getByRole('button',{name:'Volver al listado de tickets',exact:true}).click();
     await page.waitForURL('**/mis-tickets');
     await page.getByRole('button',{name:'Abrir ticket QA-001',exact:true}).waitFor();
@@ -148,26 +149,29 @@ async function run() {
     }
     await page.setViewportSize({width:1440,height:1100});
     await visit('/aplicaciones');
-    await page.getByRole('heading',{name:'Aplicaciones y secciones',exact:true}).waitFor();
-    assert.equal(await page.getByRole('article').count(),3);
+    // Directorio de aplicaciones: una sección por área autorizada.
+    const areas=page.locator('section[aria-labelledby^="area-"]');
+    await areas.first().waitFor();
+    assert.equal(await areas.count(),2); // Informática solo tenía mod01, retirado del catálogo público.
     await page.screenshot({path:path.join(out,'aplicaciones.png'),fullPage:true});
     for(const width of [1024,390]){
       await page.setViewportSize({width,height:1100});
       assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'aplicaciones sin desbordamiento '+width);
       await page.screenshot({path:path.join(out,'aplicaciones-'+width+'.png'),fullPage:true});
     }
-    await page.getByRole('button',{name:'Ingresar a Comunicación',exact:true}).click();
+    await page.locator('section[aria-labelledby="area-comunicacion"] a[href="/home/comunicacion"]').click();
     await page.waitForURL('**/home/comunicacion/contenido');
-    await page.getByRole('heading',{name:'Módulos de Comunicación',exact:true}).waitFor();
-    await page.getByRole('button',{name:'Ingresar a Noticias',exact:true}).waitFor();
+    await page.getByRole('heading',{name:'Comunicación',exact:true,level:1}).waitFor();
+    await page.getByRole('link',{name:/^Noticias/}).waitFor();
     await page.screenshot({path:path.join(out,'aplicaciones-modulos.png'),fullPage:true});
     await visit('/mis-tickets/999');
     await page.getByRole('alert').filter({hasText:'No fue posible consultar este ticket'}).waitFor();
     assert.equal(await page.getByText('Ticket privado de otra persona',{exact:true}).count(),0);
     failFiles=true;await visit('/mis-tickets/1');
+    await page.getByRole('tab',{name:/^Archivos/}).click();
     await page.getByRole('button',{name:'Reintentar archivos',exact:true}).waitFor();
     failFiles=false;await page.getByRole('button',{name:'Reintentar archivos',exact:true}).click();
-    await page.getByRole('region',{name:'Adjuntos del ticket',exact:true}).getByRole('button',{name:'captura-ejemplo.png',exact:true}).waitFor();
+    await page.getByRole('tabpanel').getByRole('button',{name:'captura-ejemplo.png',exact:true}).waitFor();
     assert.deepEqual(errors,[]);
     console.log('TICKETS_APLICACIONES_BROWSER_OK; búsqueda, filtros, páginas, detalle enlazable, pestañas por teclado, historial, archivos, error/reintento de comentario, aislamiento y navegación; capturas='+out);
   } finally {await browser?.close();await instance?.close();}

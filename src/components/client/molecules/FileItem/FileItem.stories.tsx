@@ -4,7 +4,7 @@ import { FileItem } from "./";
 const meta = {
     title: "Molecules/FileItem",
     component: FileItem,
-    tags: ["autodocs"]
+    tags: ["autodocs"],
 } satisfies Meta<typeof FileItem>;
 
 export default meta;
@@ -14,8 +14,8 @@ export const Uploaded: Story = {
     args: {
         name: "image.png",
         status: "done",
-        onRemove: () => alert("remove")
-    }
+        onRemove: () => alert("remove"),
+    },
 };
 
 export const Uploading: Story = {
@@ -23,6 +23,6 @@ export const Uploading: Story = {
         name: "image.png",
         status: "uploading",
         progress: 50,
-        onRemove: () => alert("remove")
-    }
+        onRemove: () => alert("remove"),
+    },
 };

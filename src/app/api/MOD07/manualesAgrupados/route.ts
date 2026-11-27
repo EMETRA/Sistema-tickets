@@ -14,10 +14,10 @@ import { falloModulo } from "@/api/graphql/module-response";
  * }
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { graphqlRequest } from '@/api/graphql/client';
-import { GET_MANUALES_AGRUPADOS_QUERY, CategoriaManual, CategoriaManualENUM } from '@/api/graphql/MOD07';
-import type { GetManualesAgrupadosResponse, ManualesFilterInput } from '@/api/graphql/MOD07';
+import { NextRequest, NextResponse } from "next/server";
+import { graphqlRequest } from "@/api/graphql/client";
+import { GET_MANUALES_AGRUPADOS_QUERY, CategoriaManual, CategoriaManualENUM } from "@/api/graphql/MOD07";
+import type { GetManualesAgrupadosResponse, ManualesFilterInput } from "@/api/graphql/MOD07";
 
 function isValidCategoria(categoria: string): categoria is CategoriaManual {
     return Object.values(CategoriaManualENUM).includes(categoria as CategoriaManual);
@@ -26,15 +26,15 @@ function isValidCategoria(categoria: string): categoria is CategoriaManual {
 export async function GET(request: NextRequest) {
     try {
         const searchParams = request.nextUrl.searchParams;
-        const busqueda = searchParams.get('busqueda') || null;
-        const categoria = searchParams.get('categoria') || null;
+        const busqueda = searchParams.get("busqueda") || null;
+        const categoria = searchParams.get("categoria") || null;
         const timestamp = new Date().toISOString();
 
         if (categoria && !isValidCategoria(categoria)) {
             return NextResponse.json(
                 {
-                    error: 'Categoría inválida',
-                    message: `categoria debe ser uno de: ${Object.values(CategoriaManualENUM).join(', ')} (recibido: ${categoria})`,
+                    error: "Categoría inválida",
+                    message: `categoria debe ser uno de: ${Object.values(CategoriaManualENUM).join(", ")} (recibido: ${categoria})`,
                     timestamp,
                 },
                 { status: 400 },
@@ -46,14 +46,11 @@ export async function GET(request: NextRequest) {
             categoria: categoria ? (categoria as CategoriaManual) : null,
         };
 
-        const response = await graphqlRequest<Record<string, unknown>>(
-            GET_MANUALES_AGRUPADOS_QUERY,
-            {
-                variables: {
-                    filters,
-                },
+        const response = await graphqlRequest<Record<string, unknown>>(GET_MANUALES_AGRUPADOS_QUERY, {
+            variables: {
+                filters,
             },
-        );
+        });
 
         const typedResponse = response as unknown as GetManualesAgrupadosResponse;
 
@@ -63,5 +60,7 @@ export async function GET(request: NextRequest) {
             },
             { status: 200 },
         );
-    } catch (error) { return falloModulo(error, "MOD07/manualesAgrupados"); }
+    } catch (error) {
+        return falloModulo(error, "MOD07/manualesAgrupados");
+    }
 }

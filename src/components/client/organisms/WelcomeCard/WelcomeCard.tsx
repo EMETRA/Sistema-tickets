@@ -12,9 +12,9 @@ export const WelcomeCard = ({ userName, imageSrc, className }: WelcomeCardProps)
             </div>
             <div className={styles.illustrationWrapper}>
                 <Image
-                    src={imageSrc} 
-                    alt="Ilustración de bienvenida" 
-                    width={220} 
+                    src={imageSrc}
+                    alt="Ilustración de bienvenida"
+                    width={220}
                     height={100}
                     className={styles.illustration}
                 />

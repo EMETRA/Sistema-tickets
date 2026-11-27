@@ -2,36 +2,36 @@
   --row-scale: 1;
   display: grid;
   align-items: stretch;
-  background-color: #FFFFFF;
+  background-color: var(--tickets-surface);
   width: 100%;
 
-  border-bottom: 1px solid #E0E0E0;
+  border-bottom: 1px solid var(--tickets-border);
 
   &.header {
-    background-color: #F9F9F9;
-    border: 2px solid #BDBDBD;
+    background-color: var(--tickets-surface-subtle);
+    border: 2px solid var(--tickets-border);
     border-radius: 8px 8px 0 0;
-    
+
     .cell {
-      border-right: 1px solid #D0D7DE;
-      padding: calc(8px * var(--row-scale)) calc(12px * var(--row-scale)); 
-      min-height: calc(25px * var(--row-scale)); 
+      border-right: 1px solid var(--tickets-border);
+      padding: calc(8px * var(--row-scale)) calc(12px * var(--row-scale));
+      min-height: calc(25px * var(--row-scale));
     }
   }
 
   transition: background-color 0.2s ease;
 
   &.selected {
-    background-color: #F0F4FF; 
+    background-color: var(--tickets-surface-disabled);
+    background-color: var(--tickets-info-soft);
   }
 }
-
 
 .checkboxCell {
   padding: 0 !important;
   display: flex;
   justify-content: center;
-  align-items: center; 
+  align-items: center;
 }
 
 // Nueva regla específica para el Header
@@ -43,29 +43,33 @@
 
 // Opcional: si quieres que el checkbox del header tenga el mismo estilo gris
 .header .checkboxCell {
-  background-color: #F9F9F9;
+  background-color: var(--tickets-surface-subtle);
 }
 
 .cell {
   padding: calc(6px * var(--row-scale)) calc(10px * var(--row-scale));
   display: flex;
-  align-items: center; 
+  align-items: center;
   min-height: calc(48px * var(--row-scale));
-  overflow: hidden; 
+  overflow: hidden;
 
-  &.left { 
-    justify-content: flex-start; 
-    text-align: left; 
+  &.left {
+    justify-content: flex-start;
+    text-align: left;
   }
-  &.center { 
-    justify-content: center; 
+  &.center {
+    justify-content: center;
     text-align: center;
-    .headerContent { justify-content: center; }
+    .headerContent {
+      justify-content: center;
+    }
   }
-  &.right { 
-    justify-content: flex-end; 
-    text-align: right; 
-    .headerContent { justify-content: flex-end; }
+  &.right {
+    justify-content: flex-end;
+    text-align: right;
+    .headerContent {
+      justify-content: flex-end;
+    }
   }
 }
 
@@ -79,7 +83,7 @@
   width: 100%;
   font-size: calc(13px * var(--row-scale));
   background-color: "red";
-  :global(.text) { 
+  :global(.text) {
     font-size: calc(13px * var(--row-scale)) !important;
   }
 }
@@ -88,27 +92,27 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: calc(8px * var(--row-scale)); 
+  gap: calc(8px * var(--row-scale));
   white-space: nowrap;
   width: 100%;
 }
 
 .userMenu {
-    display: flex;
-    align-items: center;
-    gap: calc(12px * var(--row-scale));
+  display: flex;
+  align-items: center;
+  gap: calc(12px * var(--row-scale));
 }
 
 .name {
-    font-size: calc(14px * var(--row-scale));
-    line-height: 1.2;
-    margin: 0;
+  font-size: calc(14px * var(--row-scale));
+  line-height: 1.2;
+  margin: 0;
 }
 
 .role {
-    font-size: calc(11px * var(--row-scale)); 
-    line-height: 1.2;
-    margin: 0;
+  font-size: calc(11px * var(--row-scale));
+  line-height: 1.2;
+  margin: 0;
 }
 
 .checkbox {
@@ -123,11 +127,11 @@
   }
 
   &.header {
-    background-color: #FFFFFF; // Fondo blanco para headers de módulo
-    border: 1px solid #E0E0E0;
-    
+    background-color: var(--tickets-surface); // Fondo blanco para headers de módulo
+    border: 1px solid var(--tickets-border);
+
     .checkboxCell {
-        background-color: transparent;
+      background-color: transparent;
     }
   }
 }
@@ -158,19 +162,19 @@
 }
 
 .storieP {
-    font-size: 13px;
-    margin: 0;
+  font-size: 13px;
+  margin: 0;
 }
 
 .tablePermissionInfo {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 4px;
-    height: 100%;
-    background-color: "red";
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  height: 100%;
+  background-color: "red";
 }
 
 .rowContentExample {
-    height: 100%;
+  height: 100%;
 }

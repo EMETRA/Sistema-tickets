@@ -1,7 +1,6 @@
-
 export interface WelcomeMessageProps {
-  /**
-   * Nombre del usuario
-   */
-  userName: string;
+    /**
+     * Nombre del usuario
+     */
+    userName: string;
 }

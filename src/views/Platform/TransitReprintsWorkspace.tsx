@@ -18,12 +18,8 @@ const money = (value: number | null) =>
               currency: "GTQ",
           }).format(value);
 const failureText = (error: unknown) =>
-    (error instanceof Error
-        ? error.message
-        : "No fue posible consultar la boleta.") +
-    (error instanceof PlatformError && error.reference
-        ? " Referencia: " + error.reference
-        : "");
+    (error instanceof Error ? error.message : "No fue posible consultar la boleta.") +
+    (error instanceof PlatformError && error.reference ? " Referencia: " + error.reference : "");
 export function TransitReprintsWorkspace() {
     const [numero, setNumero] = useState(""),
         [slip, setSlip] = useState<TransitSlip | null>(null);
@@ -69,19 +65,11 @@ export function TransitReprintsWorkspace() {
         clearPdf();
         try {
             const data = await platformFetch<TransitSlip>(path, {
-                signal: AbortSignal.any([
-                    controller.signal,
-                    AbortSignal.timeout(40000),
-                ]),
+                signal: AbortSignal.any([controller.signal, AbortSignal.timeout(40000)]),
             });
             if (controller.signal.aborted) return;
-            if (
-                !validTransitSlip(data) ||
-                data.numero !== transitSlipNumber(numero)
-            )
-                throw Error(
-                    "El servicio devolvió una boleta diferente o incompleta.",
-                );
+            if (!validTransitSlip(data) || data.numero !== transitSlipNumber(numero))
+                throw Error("El servicio devolvió una boleta diferente o incompleta.");
             setSlip(data);
         } catch (error) {
             if (!controller.signal.aborted) setError(failureText(error));
@@ -97,15 +85,9 @@ export function TransitReprintsWorkspace() {
         setPdfBusy(true);
         setPdfError("");
         try {
-            const blob = await platformFetch<Blob>(
-                transitSlipPath(slip.numero, true),
-                {
-                    signal: AbortSignal.any([
-                        controller.signal,
-                        AbortSignal.timeout(40000),
-                    ]),
-                },
-            );
+            const blob = await platformFetch<Blob>(transitSlipPath(slip.numero, true), {
+                signal: AbortSignal.any([controller.signal, AbortSignal.timeout(40000)]),
+            });
             if (controller.signal.aborted) return;
             if (
                 !(blob instanceof Blob) ||
@@ -125,20 +107,15 @@ export function TransitReprintsWorkspace() {
     }
     return (
         <div className={styles.page}>
-            <section
-                className={styles.card}
-                aria-labelledby="reimpresion-buscar"
-            >
+            <section className={styles.card} aria-labelledby="reimpresion-buscar">
                 <h2 id="reimpresion-buscar">Buscar boleta de tránsito</h2>
                 <p className={styles.muted}>
-                    Consulta una boleta existente de la serie N para revisar sus
-                    datos y obtener su reimpresión.
+                    Consulta una boleta existente de la serie N para revisar sus datos y obtener su
+                    reimpresión.
                 </p>
                 <form className={local.search} onSubmit={consult}>
                     <div className={styles.field}>
-                        <label htmlFor="reimpresion-numero">
-                            Número de boleta
-                        </label>
+                        <label htmlFor="reimpresion-numero">Número de boleta</label>
                         <input
                             id="reimpresion-numero"
                             className={styles.control}
@@ -157,16 +134,10 @@ export function TransitReprintsWorkspace() {
                             required
                         />
                         <span id="reimpresion-ayuda" className={styles.muted}>
-                            Puedes escribir el número o pegar el código completo
-                            N-1234567.
+                            Puedes escribir el número o pegar el código completo N-1234567.
                         </span>
                     </div>
-                    <Button
-                        type="submit"
-                        state={
-                            busy ? "loading" : pdfBusy ? "disabled" : "default"
-                        }
-                    >
+                    <Button type="submit" state={busy ? "loading" : pdfBusy ? "disabled" : "default"}>
                         Consultar boleta
                     </Button>
                 </form>
@@ -186,36 +157,20 @@ export function TransitReprintsWorkspace() {
                 )}
             </section>
             {slip && (
-                <section
-                    className={styles.card}
-                    aria-labelledby="reimpresion-datos"
-                >
+                <section className={styles.card} aria-labelledby="reimpresion-datos">
                     <div className={styles.toolbar}>
                         <div>
-                            <p className={styles.muted}>
-                                SERIE N · CIUDAD DE GUATEMALA
-                            </p>
-                            <h2 id="reimpresion-datos">
-                                Boleta N-{slip.numero}
-                            </h2>
+                            <p className={styles.muted}>SERIE N · CIUDAD DE GUATEMALA</p>
+                            <h2 id="reimpresion-datos">Boleta N-{slip.numero}</h2>
                             <p className={local.plate}>
-                                {slip.tipoPlaca} -{" "}
-                                {slip.placa || "Placa no registrada"}
+                                {slip.tipoPlaca} - {slip.placa || "Placa no registrada"}
                             </p>
                         </div>
                         <Button
                             onClick={() => void preview()}
-                            state={
-                                pdfBusy
-                                    ? "loading"
-                                    : busy
-                                      ? "disabled"
-                                      : "default"
-                            }
+                            state={pdfBusy ? "loading" : busy ? "disabled" : "default"}
                         >
-                            {pdf
-                                ? "Actualizar PDF"
-                                : "Ver PDF para reimpresión"}
+                            {pdf ? "Actualizar PDF" : "Ver PDF para reimpresión"}
                         </Button>
                     </div>
                     <div className={local.details}>
@@ -224,9 +179,8 @@ export function TransitReprintsWorkspace() {
                             <dd>{slip.fecha}</dd>
                             <dt>Vehículo</dt>
                             <dd>
-                                {[slip.marca, slip.color, slip.modelo]
-                                    .filter(Boolean)
-                                    .join(" · ") || "No registrado"}
+                                {[slip.marca, slip.color, slip.modelo].filter(Boolean).join(" · ") ||
+                                    "No registrado"}
                             </dd>
                             <dt>Lugar</dt>
                             <dd>{slip.lugar || "No registrado"}</dd>
@@ -234,15 +188,12 @@ export function TransitReprintsWorkspace() {
                         <dl>
                             <dt>Conductor / infractor</dt>
                             <dd>
-                                {[slip.nombres, slip.apellidos]
-                                    .filter(Boolean)
-                                    .join(" ") || "No registrado"}
+                                {[slip.nombres, slip.apellidos].filter(Boolean).join(" ") || "No registrado"}
                             </dd>
                             <dt>Licencia</dt>
                             <dd>
-                                {[slip.tipoLicencia, slip.licencia]
-                                    .filter(Boolean)
-                                    .join("-") || "No registrada"}
+                                {[slip.tipoLicencia, slip.licencia].filter(Boolean).join("-") ||
+                                    "No registrada"}
                             </dd>
                             <dt>Agente</dt>
                             <dd>
@@ -265,9 +216,7 @@ export function TransitReprintsWorkspace() {
                     )}
                     <div className={styles.tableRegion}>
                         <table className={styles.table}>
-                            <caption className={local.caption}>
-                                Artículos registrados en la boleta
-                            </caption>
+                            <caption className={local.caption}>Artículos registrados en la boleta</caption>
                             <thead>
                                 <tr>
                                     <th scope="col">Artículo</th>
@@ -280,14 +229,9 @@ export function TransitReprintsWorkspace() {
                                     <tr key={rule.regla + "-" + index}>
                                         <td>
                                             {rule.articulo || rule.regla}
-                                            {rule.numeral
-                                                ? " - " + rule.numeral
-                                                : ""}
+                                            {rule.numeral ? " - " + rule.numeral : ""}
                                         </td>
-                                        <td>
-                                            {rule.descripcion ||
-                                                "Sin descripción registrada"}
-                                        </td>
+                                        <td>{rule.descripcion || "Sin descripción registrada"}</td>
                                         <td>{money(rule.monto)}</td>
                                     </tr>
                                 ))}
@@ -311,21 +255,11 @@ export function TransitReprintsWorkspace() {
                 </section>
             )}
             {pdf && slip && (
-                <section
-                    className={styles.card}
-                    aria-labelledby="reimpresion-preview"
-                >
+                <section className={styles.card} aria-labelledby="reimpresion-preview">
                     <div className={styles.toolbar}>
-                        <h2 id="reimpresion-preview">
-                            Vista previa de la reimpresión
-                        </h2>
+                        <h2 id="reimpresion-preview">Vista previa de la reimpresión</h2>
                         <div className={styles.actions}>
-                            <a
-                                href={pdf}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className={local.link}
-                            >
+                            <a href={pdf} target="_blank" rel="noopener noreferrer" className={local.link}>
                                 Abrir PDF para imprimir
                             </a>
                             <a

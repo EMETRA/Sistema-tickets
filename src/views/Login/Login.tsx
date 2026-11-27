@@ -1,6 +1,10 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { mensajes, texto } from "@/platform/forms";
 import { Title } from "@/components/client/atoms/Title";
 import { Text } from "@/components/client/atoms/Text";
 import { FormField } from "@/components/client/molecules/FormField";
@@ -20,12 +24,24 @@ import { useRouter } from "next/dist/client/components/navigation";
 import { ActivarCuenta } from "./ActivarCuenta";
 import type { UsuarioPerfil } from "@/api/graphql/home/types";
 
+const loginSchema = z.object({
+    email: texto("Usuario", { requerido: true, max: 254 }),
+    clave: z.string().min(1, mensajes.requerido("Contraseña")),
+});
+type LoginValues = z.infer<typeof loginSchema>;
+
 const Login: React.FC = () => {
     const router = useRouter();
     const { loading, error: loginError, login } = useLogin();
     const setAuth = useAuthStore((state) => state.setAuth);
-    const [email, setEmail] = useState("");
-    const [clave, setClave] = useState("");
+    const {
+        register,
+        handleSubmit: validate,
+        setValue,
+        getValues,
+        formState: { errors },
+    } = useForm<LoginValues>({ resolver: zodResolver(loginSchema), defaultValues: { email: "", clave: "" } });
+    const setClave = (value: string) => setValue("clave", value);
     const [error, setError] = useState<string | null>(null);
     const [activando, setActivando] = useState(false);
     const [activada, setActivada] = useState(false);
@@ -35,41 +51,33 @@ const Login: React.FC = () => {
     // const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
     /**
-   * Obtener información del usuario desde el backend
-   * El token se envía automáticamente via apiFetch
-   */
-    const fetchUserInfo = async (
-        token: string,
-    ): Promise<UsuarioPerfil | null> => {
+     * Obtener información del usuario desde el backend
+     * El token se envía automáticamente via apiFetch
+     */
+    const fetchUserInfo = async (token: string): Promise<UsuarioPerfil | null> => {
         try {
-            const response = await apiFetch<{ usuario: UsuarioPerfil }>(
-                "/api/usuario",
-                token,
-            );
+            const response = await apiFetch<{ usuario: UsuarioPerfil }>("/api/usuario", token);
             return response.usuario || null;
         } catch (error) {
             const e = error as {
-        statusCode?: number;
-        body?: { referencia?: string };
-      };
+                statusCode?: number;
+                body?: { referencia?: string };
+            };
             const message =
-        e.statusCode === 401
-            ? "La sesión no fue validada. Vuelve a iniciar sesión."
-            : e.statusCode === 403
-                ? "Tu cuenta no tiene permiso para consultar el perfil."
-                : "Se obtuvo la respuesta de acceso, pero no se pudo cargar tu perfil. Intenta nuevamente.";
+                e.statusCode === 401
+                    ? "La sesión no fue validada. Vuelve a iniciar sesión."
+                    : e.statusCode === 403
+                      ? "Tu cuenta no tiene permiso para consultar el perfil."
+                      : "Se obtuvo la respuesta de acceso, pero no se pudo cargar tu perfil. Intenta nuevamente.";
             const referencia = e.body?.referencia;
             throw new Error(
                 message +
-          (referencia && /^[a-f0-9-]{36}$/.test(referencia)
-              ? ` Referencia: ${referencia}`
-              : ""),
+                    (referencia && /^[a-f0-9-]{36}$/.test(referencia) ? ` Referencia: ${referencia}` : ""),
             );
         }
     };
 
-    const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
-        e.preventDefault();
+    const handleSubmit = validate(async ({ email, clave }) => {
         if (submittingRef.current) return;
         submittingRef.current = true;
         setSubmitting(true);
@@ -112,65 +120,64 @@ const Login: React.FC = () => {
 
             router.push("/home");
         } catch (err) {
-            setError(
-                err instanceof Error
-                    ? err.message
-                    : "No se pudo completar el inicio de sesión.",
-            );
+            setError(err instanceof Error ? err.message : "No se pudo completar el inicio de sesión.");
             setClave("");
             // setCaptchaToken(null);
         } finally {
             submittingRef.current = false;
             setSubmitting(false);
         }
-    };
+    });
 
-    if (activando) return (
-        <ActivarCuenta correo={email} claveTemporal={clave} salir={(completado) => {
-            setClave("");
-            setActivando(false);
-            setActivada(completado);
-        }} />
-    );
+    if (activando)
+        return (
+            <ActivarCuenta
+                correo={getValues("email")}
+                claveTemporal={getValues("clave")}
+                salir={(completado) => {
+                    setClave("");
+                    setActivando(false);
+                    setActivada(completado);
+                }}
+            />
+        );
 
     return (
         <AccessLayout>
             <div className={styles.formContainer}>
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit} noValidate>
                     <div className={styles.headerContainer}>
                         <Title variant="large">Iniciar Sesión</Title>
                         <Text variant="caption" className={styles.headerText}>
                             Tu perfil y tus permisos se cargan después de validar tu cuenta.
                         </Text>
                     </div>
-                    {activada && <p role="status" className={styles.activationSuccess}>
-                        Tu cuenta está activa. Inicia sesión con la nueva contraseña.
-                    </p>}
+                    {activada && (
+                        <p role="status" className={styles.activationSuccess}>
+                            Tu cuenta está activa. Inicia sesión con la nueva contraseña.
+                        </p>
+                    )}
                     <div className={styles.formFieldsContainer}>
-                        <FormField htmlFor="email" label="Usuario" required>
+                        <FormField htmlFor="email" label="Usuario" required error={errors.email?.message}>
                             <Input
                                 id="email"
                                 autoComplete="username"
-                                name="username"
                                 placeholder="email@ejemplo.com"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                disabled={busy}
-                                required
+                                {...register("email")}
+                                readOnly={busy}
+                                aria-invalid={!!errors.email}
                             />
                         </FormField>
-                        <FormField htmlFor="clave" label="Contraseña" required>
+                        <FormField htmlFor="clave" label="Contraseña" required error={errors.clave?.message}>
                             <Input
                                 id="clave"
                                 autoComplete="current-password"
-                                name="password"
                                 type="password"
                                 placeholder="Contraseña"
-                                value={clave}
-                                onChange={(e) => setClave(e.target.value)}
-                                disabled={busy}
-                                required
-                                iconcolor="#000000"
+                                {...register("clave")}
+                                readOnly={busy}
+                                aria-invalid={!!errors.clave}
+                                iconcolor="currentColor"
                             />
                         </FormField>
                         <Link href="/forgot-password" className={styles.forgotPasswordLink}>
@@ -188,26 +195,20 @@ const Login: React.FC = () => {
                                 />
                             </div> */}
                         {(loginError || error) && (
-                            <Text variant="caption" className={styles.errorText}>
+                            <p className={styles.errorText} role="alert">
                                 {error || loginError}
-                            </Text>
+                            </p>
                         )}
                     </div>
                     <FormActions className={styles.loginButton}>
-                        <Button
-                            color="default"
-                            fullWidth
-                            type="submit"
-                            state={busy ? "loading" : "default"}
-                        >
+                        <Button color="default" fullWidth type="submit" state={busy ? "loading" : "default"}>
                             {busy ? "Iniciando..." : "Iniciar Sesión"}
                         </Button>
                     </FormActions>
                 </form>
             </div>
             <p className={styles.accessNote}>
-                El acceso a cada aplicación depende de los permisos otorgados por
-                Informática.
+                El acceso a cada aplicación depende de los permisos otorgados por Informática.
             </p>
         </AccessLayout>
     );

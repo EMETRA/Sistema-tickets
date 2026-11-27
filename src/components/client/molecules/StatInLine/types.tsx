@@ -27,72 +27,72 @@ export const STAT_INLINE_CONFIG: Record<StatInLineType, { color: string }> = {
  * Props cuando se usa un tipo predefinido
  */
 interface StatInLinePropsWithType {
-  /**
-   * Tipo predefinido de estadística
-   */
-  type: StatInLineType;
+    /**
+     * Tipo predefinido de estadística
+     */
+    type: StatInLineType;
 
-  /**
-   * Texto del label (ej: "Asignados", "Resueltos")
-   */
-  label: string;
+    /**
+     * Texto del label (ej: "Asignados", "Resueltos")
+     */
+    label: string;
 
-  /**
-   * Valor numérico a mostrar
-   */
-  value: number;
+    /**
+     * Valor numérico a mostrar
+     */
+    value: number;
 
-  /**
-   * Tamaño del componente
-   * @default "small"
-   */
-  size?: StatInLineSize;
+    /**
+     * Tamaño del componente
+     * @default "small"
+     */
+    size?: StatInLineSize;
 
-  /**
-   * Clase CSS adicional para el contenedor
-   */
-  className?: string;
+    /**
+     * Clase CSS adicional para el contenedor
+     */
+    className?: string;
 
-  /**
-   * No se permite color cuando se usa type
-   */
-  color?: never;
+    /**
+     * No se permite color cuando se usa type
+     */
+    color?: never;
 }
 
 /**
  * Props cuando se usa color personalizado
  */
 interface StatInLinePropsCustom {
-  /**
-   * Texto del label (ej: "Asignados", "Resueltos")
-   */
-  label: string;
+    /**
+     * Texto del label (ej: "Asignados", "Resueltos")
+     */
+    label: string;
 
-  /**
-   * Valor numérico a mostrar
-   */
-  value: number;
+    /**
+     * Valor numérico a mostrar
+     */
+    value: number;
 
-  /**
-   * Color personalizado del valor (ej: "#AACC00")
-   */
-  color: string;
+    /**
+     * Color personalizado del valor (ej: "#AACC00")
+     */
+    color: string;
 
-  /**
-   * Tamaño del componente
-   * @default "small"
-   */
-  size?: StatInLineSize;
+    /**
+     * Tamaño del componente
+     * @default "small"
+     */
+    size?: StatInLineSize;
 
-  /**
-   * Clase CSS adicional para el contenedor
-   */
-  className?: string;
+    /**
+     * Clase CSS adicional para el contenedor
+     */
+    className?: string;
 
-  /**
-   * No se permite type cuando se usa color personalizado
-   */
-  type?: never;
+    /**
+     * No se permite type cuando se usa color personalizado
+     */
+    type?: never;
 }
 
 /**

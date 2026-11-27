@@ -1,7 +1,48 @@
-.MessageText { display: flex; gap: 12px; padding: 18px 0; min-width: 0; }
-.avatarContainer { display: flex; align-items: flex-start; flex-shrink: 0; padding-top: 2px; }
-.content { display: flex; flex-direction: column; gap: 9px; min-width: 0; flex: 1; }
-.header { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; > :first-child { color: var(--tickets-text); font-weight: 600; font-size: 12px; } }
-.Timestamp { color: var(--tickets-text-secondary); font-size: 10px; }
-.text { margin: 0; font-size: 12px; line-height: 1.9; color: var(--tickets-text-secondary); white-space: pre-wrap; overflow-wrap: anywhere; }
-.filesContainer { display: flex; flex-wrap: wrap; gap: 8px; min-width: 0; }
+.MessageText {
+  display: flex;
+  gap: 12px;
+  padding: 18px 0;
+  min-width: 0;
+}
+.avatarContainer {
+  display: flex;
+  align-items: flex-start;
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  min-width: 0;
+  flex: 1;
+}
+.header {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  > :first-child {
+    color: var(--tickets-text);
+    font-weight: 600;
+    font-size: 12px;
+  }
+}
+.Timestamp {
+  color: var(--tickets-text-secondary);
+  font-size: 10px;
+}
+.text {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.9;
+  color: var(--tickets-text-secondary);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.filesContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+}

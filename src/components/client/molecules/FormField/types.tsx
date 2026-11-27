@@ -4,7 +4,6 @@ import { ReactNode } from "react";
  * Propiedades del componente FormField.
  */
 export interface FormFieldProps {
-
     /**
      * Etiqueta del campo.
      */
@@ -31,4 +30,8 @@ export interface FormFieldProps {
      */
     className?: string;
 
-};
+    /**
+     * Mensaje de validación (se muestra debajo del campo y se anuncia a lectores de pantalla).
+     */
+    error?: string;
+}

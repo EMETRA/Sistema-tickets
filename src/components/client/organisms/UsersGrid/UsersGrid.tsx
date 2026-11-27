@@ -2,13 +2,9 @@ import React from "react";
 import classNames from "classnames";
 import { UserCard } from "../../molecules/UserCard";
 import { UsersGridProps } from "./types";
-import styles from "./UsersGrid.module.scss"
+import styles from "./UsersGrid.module.scss";
 
-export const UsersGrid: React.FC<UsersGridProps> = ({
-    users,
-    className,
-    pathActive = "profile",
-}) => {
+export const UsersGrid: React.FC<UsersGridProps> = ({ users, className, pathActive = "profile" }) => {
     return (
         <section className={classNames(styles.UsersGrid, className)}>
             <div className={styles.grid}>

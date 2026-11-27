@@ -5,10 +5,10 @@ import { falloModulo } from "@/api/graphql/module-response";
  * Propósito: Obtener el catálogo de campos disponibles para el reporte RRHH.
  */
 
-import { NextResponse } from 'next/server';
-import { graphqlRequest } from '@/api/graphql/client';
-import { GET_REPORTE_RH_CAMPOS_DISPONIBLES_QUERY } from '@/api/graphql/MOD05';
-import type { GetReporteRhCamposDisponiblesResponse } from '@/api/graphql/MOD05';
+import { NextResponse } from "next/server";
+import { graphqlRequest } from "@/api/graphql/client";
+import { GET_REPORTE_RH_CAMPOS_DISPONIBLES_QUERY } from "@/api/graphql/MOD05";
+import type { GetReporteRhCamposDisponiblesResponse } from "@/api/graphql/MOD05";
 
 export async function GET() {
     try {
@@ -25,5 +25,7 @@ export async function GET() {
             },
             { status: 200 },
         );
-    } catch (error) { return falloModulo(error, "MOD05/reporteRhCamposDisponibles"); }
+    } catch (error) {
+        return falloModulo(error, "MOD05/reporteRhCamposDisponibles");
+    }
 }

@@ -10,15 +10,11 @@ export class PlatformError extends Error {
         super(message);
     }
 }
-export async function platformFetch<T>(
-    path: string,
-    init: RequestInit = {},
-): Promise<T> {
+export async function platformFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
     const token = useAuthStore.getState().token;
     const headers = new Headers(init.headers);
     if (token) headers.set("Authorization", "Bearer " + token);
-    if (init.body && !(init.body instanceof FormData))
-        headers.set("Content-Type", "application/json");
+    if (init.body && !(init.body instanceof FormData)) headers.set("Content-Type", "application/json");
     const response = await fetch("/api/platform" + path, {
         ...init,
         headers,
@@ -36,12 +32,9 @@ export async function platformFetch<T>(
             body.codigo,
         );
     }
-    if (response.headers.get("content-type")?.includes("application/json"))
-        return response.json();
+    if (response.headers.get("content-type")?.includes("application/json")) return response.json();
     if (
-        !/^\/vivi-pmt\/casos\/[1-9]\d{0,18}\/evidencias\/[1-9]\d{0,18}$/.test(
-            path,
-        ) &&
+        !/^\/vivi-pmt\/casos\/[1-9]\d{0,18}\/evidencias\/[1-9]\d{0,18}$/.test(path) &&
         !/^\/boletas\/pdf\?/.test(path) &&
         !/^\/cct\/reportes\/pdf\?/.test(path) &&
         !/^\/cct\/reportes\/cepos\/pdf\?/.test(path) &&
@@ -63,12 +56,7 @@ function stable(value: unknown): string {
             "{" +
             Object.keys(value)
                 .sort()
-                .map(
-                    (k) =>
-                        JSON.stringify(k) +
-                        ":" +
-                        stable((value as Record<string, unknown>)[k]),
-                )
+                .map((k) => JSON.stringify(k) + ":" + stable((value as Record<string, unknown>)[k]))
                 .join(",") +
             "}"
         );
@@ -76,16 +64,18 @@ function stable(value: unknown): string {
 }
 async function digest(value: unknown) {
     return Array.from(
-        new Uint8Array(
-            await crypto.subtle.digest(
-                "SHA-256",
-                new TextEncoder().encode(stable(value)),
-            ),
-        ),
+        new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(stable(value)))),
     )
         .map((x) => x.toString(16).padStart(2, "0"))
         .join("");
 }
+/** Avisos de cambios guardados: la caché de consultas (platform/query) se actualiza al recibirlos. */
+const mutationListeners = new Set<(path: string) => void>();
+export function onPlatformMutation(listener: (path: string) => void) {
+    mutationListeners.add(listener);
+    return () => void mutationListeners.delete(listener);
+}
+
 export async function platformCommand<T>(
     path: string,
     method: string,
@@ -114,22 +104,16 @@ export async function platformCommand<T>(
             {
                 label,
                 onReview: async () => {
-                    const response = await platformFetch<{ id: string }>(
-                        "/confirmations/review",
-                        {
-                            method: "POST",
-                            body: JSON.stringify({ path, method, body }),
-                        },
-                    );
+                    const response = await platformFetch<{ id: string }>("/confirmations/review", {
+                        method: "POST",
+                        body: JSON.stringify({ path, method, body }),
+                    });
                     confirmationId = response.id;
                 },
                 onConfirm: async () => {
-                    await platformFetch(
-                        "/confirmations/" + confirmationId + "/confirm",
-                        {
-                            method: "POST",
-                        },
-                    );
+                    await platformFetch("/confirmations/" + confirmationId + "/confirm", {
+                        method: "POST",
+                    });
                 },
             },
             true,
@@ -139,12 +123,11 @@ export async function platformCommand<T>(
     const result = await platformFetch<T>(path, {
         method,
         body: form || JSON.stringify(body),
-        headers: confirmationId
-            ? { "X-Ticket-Confirmation": confirmationId }
-            : {},
+        headers: confirmationId ? { "X-Ticket-Confirmation": confirmationId } : {},
     });
     keys.delete(key);
     sessionStorage.removeItem("tk-command-" + key);
+    mutationListeners.forEach((listener) => listener(path));
     return result;
 }
 export async function downloadPlatform(path: string, name: string) {

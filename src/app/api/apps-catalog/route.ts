@@ -1,22 +1,17 @@
 import { NextResponse } from "next/server";
 import { randomUUID } from "node:crypto";
-import { queuePanelIncident } from '@/observability/server-incidents';
-import {
-    AppsCatalogError,
-    getAppsCatalog,
-} from "@/api/graphql/home/getAppsCatalog";
+import { queuePanelIncident } from "@/observability/server-incidents";
+import { AppsCatalogError, getAppsCatalog } from "@/api/graphql/home/getAppsCatalog";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
     const headers = { "Cache-Control": "private, no-store" };
     try {
-        return NextResponse.json(
-            { appsCatalog: await getAppsCatalog() },
-            { headers },
-        );
+        return NextResponse.json({ appsCatalog: await getAppsCatalog() }, { headers });
     } catch (error) {
         const status = error instanceof AppsCatalogError ? error.status : 503;
-        const referencia = status >= 500 ? await queuePanelIncident('AppsCatalog',error,randomUUID()) : randomUUID();
+        const referencia =
+            status >= 500 ? await queuePanelIncident("AppsCatalog", error, randomUUID()) : randomUUID();
         console.warn(
             JSON.stringify({
                 codigo: "CATALOGO_APLICACIONES_FALLIDO",

@@ -5,6 +5,12 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@hookform/resolvers':
+    specifier: ^5
+    version: 5.9.2(react-hook-form@7.92.0)(zod@4.6.5)
+  '@tanstack/react-query':
+    specifier: ^5.108.4
+    version: 5.108.4(@types/react@19.2.14)(react@19.2.3)
   '@tiptap/extension-strike':
     specifier: ^3.20.4
     version: 3.20.4(@tiptap/core@3.20.4)
@@ -37,13 +43,16 @@ dependencies:
     version: 3.0.5
   next:
     specifier: 16.1.6
-    version: 16.1.6(@babel/core@7.29.0)(react-dom@19.2.3)(react@19.2.3)(sass@1.98.0)
+    version: 16.1.6(@babel/core@7.29.0)(@playwright/test@1.64.0)(react-dom@19.2.3)(react@19.2.3)(sass@1.98.0)
   react:
     specifier: 19.2.3
     version: 19.2.3
   react-dom:
     specifier: 19.2.3
     version: 19.2.3(react@19.2.3)
+  react-hook-form:
+    specifier: ^7
+    version: 7.92.0(@types/react@19.2.14)(react@19.2.3)
   react-turnstile:
     specifier: ^1.1.5
     version: 1.1.5(react-dom@19.2.3)(react@19.2.3)
@@ -64,6 +73,15 @@ dependencies:
     version: 5.0.12(@types/react@19.2.14)(react@19.2.3)
 
 devDependencies:
+  '@axe-core/playwright':
+    specifier: ^4.14.1
+    version: 4.14.1(playwright-core@1.64.0)
+  '@playwright/test':
+    specifier: ^1.64.0
+    version: 1.64.0
+  '@storybook/addon-a11y':
+    specifier: ^10.2.8
+    version: 10.2.8(storybook@10.2.8)
   '@storybook/nextjs-vite':
     specifier: ^10.2.8
     version: 10.2.8(@babel/core@7.29.0)(next@16.1.6)(react-dom@19.2.3)(react@19.2.3)(storybook@10.2.8)(typescript@5.9.3)(vite@7.3.1)
@@ -85,18 +103,24 @@ devDependencies:
   eslint-config-next:
     specifier: 16.1.6
     version: 16.1.6(@typescript-eslint/parser@8.56.0)(eslint@9.39.2)(typescript@5.9.3)
+  eslint-config-prettier:
+    specifier: ^10.1.8
+    version: 10.1.8(eslint@9.39.2)
   eslint-plugin-storybook:
     specifier: ^10.2.8
     version: 10.2.8(eslint@9.39.2)(storybook@10.2.8)(typescript@5.9.3)
   playwright:
-    specifier: ^1.53.2
+    specifier: ^1.64.0
     version: 1.64.0
+  prettier:
+    specifier: ^3.10.1
+    version: 3.10.1
   sass-embedded:
     specifier: ^1.97.3
     version: 1.97.3
   storybook:
     specifier: ^10.2.8
-    version: 10.2.8(@testing-library/dom@10.4.1)(react-dom@19.2.3)(react@19.2.3)
+    version: 10.2.8(@testing-library/dom@10.4.1)(prettier@3.10.1)(react-dom@19.2.3)(react@19.2.3)
   typescript:
     specifier: ^5
     version: 5.9.3
@@ -108,6 +132,16 @@ packages:
 
   /@adobe/css-tools@4.4.4:
     resolution: {integrity: sha512-Elp+iwUx5rN5+Y8xLt5/GRoG20WGoDCQ/1Fb+1LiGtvwbDavuSk0jhD/eZdckHAuzcDzccnkv+rEjyWfRx18gg==}
+    dev: true
+
+  /@axe-core/playwright@4.14.1(playwright-core@1.64.0):
+    resolution: {integrity: sha512-cSN1ijrWLnlOof22sPN4RtWGSoPpt7GzOVyOKomyhnPsy1fPNoRdBiJAUziuCRs8KoK50kKufiMUFt7itAuwOg==}
+    engines: {node: '>=22.12.0'}
+    peerDependencies:
+      playwright-core: '>= 1.0.0'
+    dependencies:
+      axe-core: 4.14.1
+      playwright-core: 1.64.0
     dev: true
 
   /@babel/code-frame@7.29.0:
@@ -615,6 +649,89 @@ packages:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
     dependencies:
       graphql: 16.13.1
+    dev: false
+
+  /@hookform/resolvers@5.9.2(react-hook-form@7.92.0)(zod@4.6.5):
+    resolution: {integrity: sha512-RtjTnZqsC38s4NKp2XO3fD8IA5uyN4tB7McQ5C6uiMPcV+WWO8F+wVa3e+BXUpH2ScgxghAlwFRMVqjT9WChAQ==}
+    peerDependencies:
+      '@sinclair/typebox': '>=0.25.24'
+      '@standard-schema/spec': ^1.0.0
+      '@typeschema/main': '>=0.13.7'
+      '@vinejs/vine': ^2.0.0 || ^3.0.0 || ^4.0.0
+      ajv: ^8.12.0
+      ajv-errors: ^3.0.0
+      ajv-formats: ^2.1.1
+      arktype: ^2.0.0
+      ata-validator: ^1.23.0
+      class-transformer: '>=0.4.0'
+      class-validator: '>=0.12.0'
+      computed-types: ^1.0.0
+      effect: ^3.10.3
+      fluentvalidation-ts: ^3.0.0
+      fp-ts: ^2.7.0
+      io-ts: ^2.0.0
+      joi: ^17.0.0 || ^18.0.0
+      nope-validator: '>=0.12.0'
+      react-hook-form: ^7.55.0
+      superstruct: '>=0.12.0'
+      typanion: ^3.3.2
+      valibot: '>=0.31.0 || ^1.0.0-beta.4 || ^1.0.0-rc'
+      vest: '>=6.0.0'
+      yup: ^1.0.0
+      zod: ^3.25.0 || ^4.0.0
+    peerDependenciesMeta:
+      '@sinclair/typebox':
+        optional: true
+      '@standard-schema/spec':
+        optional: true
+      '@typeschema/main':
+        optional: true
+      '@vinejs/vine':
+        optional: true
+      ajv:
+        optional: true
+      ajv-errors:
+        optional: true
+      ajv-formats:
+        optional: true
+      arktype:
+        optional: true
+      ata-validator:
+        optional: true
+      class-transformer:
+        optional: true
+      class-validator:
+        optional: true
+      computed-types:
+        optional: true
+      effect:
+        optional: true
+      fluentvalidation-ts:
+        optional: true
+      fp-ts:
+        optional: true
+      io-ts:
+        optional: true
+      joi:
+        optional: true
+      nope-validator:
+        optional: true
+      superstruct:
+        optional: true
+      typanion:
+        optional: true
+      valibot:
+        optional: true
+      vest:
+        optional: true
+      yup:
+        optional: true
+      zod:
+        optional: true
+    dependencies:
+      '@standard-schema/utils': 0.3.0
+      react-hook-form: 7.92.0(@types/react@19.2.14)(react@19.2.3)
+      zod: 4.6.5
     dev: false
 
   /@humanfs/core@0.19.1:
@@ -1136,6 +1253,13 @@ packages:
       '@parcel/watcher-win32-x64': 2.5.6
     optional: true
 
+  /@playwright/test@1.64.0:
+    resolution: {integrity: sha512-oTN9FNYuN6bqQMwiho6jJKLCG2/QOYCixGXuCjRmzOq23eODeukuY2XiAVoVpAECbuezMt1MHQjAiQxK8F+Y+g==}
+    engines: {node: '>=20'}
+    hasBin: true
+    dependencies:
+      playwright: 1.64.0
+
   /@reduxjs/toolkit@2.11.2(react-redux@9.2.0)(react@19.2.3):
     resolution: {integrity: sha512-Kd6kAHTA6/nUpp8mySPqj3en3dm0tdMIgbttnQ1xFMVpufoj+ADi8pXLBsd4xzTRHQa7t/Jv8W5UnCuW4kuWMQ==}
     peerDependencies:
@@ -1387,6 +1511,16 @@ packages:
     resolution: {integrity: sha512-e7Mew686owMaPJVNNLs55PUvgz371nKgwsc4vxE49zsODpJEnxgxRo2y/OKrqueavXgZNMDVj3DdHFlaSAeU8g==}
     dev: false
 
+  /@storybook/addon-a11y@10.2.8(storybook@10.2.8):
+    resolution: {integrity: sha512-EW5MzPKNzyPorvodd416U2Np+zEdMPe+BSyomjm0oCXoC/6rDurf05H1pa99rZsrTDRrpog+HCz8iVa4XSwN5Q==}
+    peerDependencies:
+      storybook: ^10.2.8
+    dependencies:
+      '@storybook/global': 5.0.0
+      axe-core: 4.14.1
+      storybook: 10.2.8(@testing-library/dom@10.4.1)(prettier@3.10.1)(react-dom@19.2.3)(react@19.2.3)
+    dev: true
+
   /@storybook/builder-vite@10.2.8(storybook@10.2.8)(vite@7.3.1):
     resolution: {integrity: sha512-+6/Lwi7W0YIbzHDh798GPp0IHUYDwp0yv0Y1eVNK/StZD0tnv4/1C28NKyP+O7JOsFsuWI1qHiDhw8kNURugZw==}
     peerDependencies:
@@ -1394,7 +1528,7 @@ packages:
       vite: ^5.0.0 || ^6.0.0 || ^7.0.0
     dependencies:
       '@storybook/csf-plugin': 10.2.8(storybook@10.2.8)(vite@7.3.1)
-      storybook: 10.2.8(@testing-library/dom@10.4.1)(react-dom@19.2.3)(react@19.2.3)
+      storybook: 10.2.8(@testing-library/dom@10.4.1)(prettier@3.10.1)(react-dom@19.2.3)(react@19.2.3)
       ts-dedent: 2.2.0
       vite: 7.3.1(@types/node@20.19.33)(sass-embedded@1.97.3)(sass@1.98.0)
     transitivePeerDependencies:
@@ -1421,7 +1555,7 @@ packages:
       webpack:
         optional: true
     dependencies:
-      storybook: 10.2.8(@testing-library/dom@10.4.1)(react-dom@19.2.3)(react@19.2.3)
+      storybook: 10.2.8(@testing-library/dom@10.4.1)(prettier@3.10.1)(react-dom@19.2.3)(react@19.2.3)
       unplugin: 2.3.11
       vite: 7.3.1(@types/node@20.19.33)(sass-embedded@1.97.3)(sass@1.98.0)
     dev: true
@@ -1456,10 +1590,10 @@ packages:
       '@storybook/builder-vite': 10.2.8(storybook@10.2.8)(vite@7.3.1)
       '@storybook/react': 10.2.8(react-dom@19.2.3)(react@19.2.3)(storybook@10.2.8)(typescript@5.9.3)
       '@storybook/react-vite': 10.2.8(react-dom@19.2.3)(react@19.2.3)(storybook@10.2.8)(typescript@5.9.3)(vite@7.3.1)
-      next: 16.1.6(@babel/core@7.29.0)(react-dom@19.2.3)(react@19.2.3)(sass@1.98.0)
+      next: 16.1.6(@babel/core@7.29.0)(@playwright/test@1.64.0)(react-dom@19.2.3)(react@19.2.3)(sass@1.98.0)
       react: 19.2.3
       react-dom: 19.2.3(react@19.2.3)
-      storybook: 10.2.8(@testing-library/dom@10.4.1)(react-dom@19.2.3)(react@19.2.3)
+      storybook: 10.2.8(@testing-library/dom@10.4.1)(prettier@3.10.1)(react-dom@19.2.3)(react@19.2.3)
       styled-jsx: 5.1.6(@babel/core@7.29.0)(react@19.2.3)
       typescript: 5.9.3
       vite: 7.3.1(@types/node@20.19.33)(sass-embedded@1.97.3)(sass@1.98.0)
@@ -1482,7 +1616,7 @@ packages:
     dependencies:
       react: 19.2.3
       react-dom: 19.2.3(react@19.2.3)
-      storybook: 10.2.8(@testing-library/dom@10.4.1)(react-dom@19.2.3)(react@19.2.3)
+      storybook: 10.2.8(@testing-library/dom@10.4.1)(prettier@3.10.1)(react-dom@19.2.3)(react@19.2.3)
     dev: true
 
   /@storybook/react-vite@10.2.8(react-dom@19.2.3)(react@19.2.3)(storybook@10.2.8)(typescript@5.9.3)(vite@7.3.1):
@@ -1503,7 +1637,7 @@ packages:
       react-docgen: 8.0.2
       react-dom: 19.2.3(react@19.2.3)
       resolve: 1.22.11
-      storybook: 10.2.8(@testing-library/dom@10.4.1)(react-dom@19.2.3)(react@19.2.3)
+      storybook: 10.2.8(@testing-library/dom@10.4.1)(prettier@3.10.1)(react-dom@19.2.3)(react@19.2.3)
       tsconfig-paths: 4.2.0
       vite: 7.3.1(@types/node@20.19.33)(sass-embedded@1.97.3)(sass@1.98.0)
     transitivePeerDependencies:
@@ -1530,7 +1664,7 @@ packages:
       react: 19.2.3
       react-docgen: 8.0.2
       react-dom: 19.2.3(react@19.2.3)
-      storybook: 10.2.8(@testing-library/dom@10.4.1)(react-dom@19.2.3)(react@19.2.3)
+      storybook: 10.2.8(@testing-library/dom@10.4.1)(prettier@3.10.1)(react-dom@19.2.3)(react@19.2.3)
       typescript: 5.9.3
     transitivePeerDependencies:
       - supports-color
@@ -1540,6 +1674,24 @@ packages:
     resolution: {integrity: sha512-JQ5TuMi45Owi4/BIMAJBoSQoOJu12oOk/gADqlcUL9JEdHB8vyjUSsxqeNXnmXHjYKMi2WcYtezGEEhqUI/E2g==}
     dependencies:
       tslib: 2.8.1
+
+  /@tanstack/query-core@5.108.4:
+    resolution: {integrity: sha512-2Ks5dlLWz4eXJrthOyG0qW3SLt3xx0RrQmAmN0rnmogiaaOYuWiAe6HAm9KE2b2v8nig+vraNz8fsfZ6fF6zFg==}
+    dev: false
+
+  /@tanstack/react-query@5.108.4(@types/react@19.2.14)(react@19.2.3):
+    resolution: {integrity: sha512-GlTa94kfEKTVsbzXe58rFA3GZ0ZE7N1aFtbZAfOS3XxMv8YNn4C+8rsz40LorHLazdm5PsqCroWaYAR+ZkMXMQ==}
+    peerDependencies:
+      '@types/react': ^18 || ^19
+      react: ^18 || ^19
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+    dependencies:
+      '@tanstack/query-core': 5.108.4
+      '@types/react': 19.2.14
+      react: 19.2.3
+    dev: false
 
   /@testing-library/dom@10.4.1:
     resolution: {integrity: sha512-o4PXJQidqJl82ckFaXUeoAW+XysPLauYI43Abki5hABd853iMhitooc6znOnczgbTYmEP6U6/y1ZyKAIsvMKGg==}
@@ -2552,6 +2704,11 @@ packages:
     engines: {node: '>=4'}
     dev: true
 
+  /axe-core@4.14.1:
+    resolution: {integrity: sha512-FHfa+lmNjQZfJz1q8wKqIDwC6DExcHt/pkjNQb09a3NPjCKg2rhu5qb2S4r76ASyFNNtuFooJpZe37OgudVGtQ==}
+    engines: {node: '>=4'}
+    dev: true
+
   /axios@1.13.5:
     resolution: {integrity: sha512-cz4ur7Vb0xS4/KUN0tPWe44eqxrIu31me+fbang3ijiNscE129POzipJJA6zniq2C/Z6sJCjMimjS8Lc/GAs8Q==}
     dependencies:
@@ -3182,6 +3339,15 @@ packages:
       - supports-color
     dev: true
 
+  /eslint-config-prettier@10.1.8(eslint@9.39.2):
+    resolution: {integrity: sha512-82GZUjRS0p/jganf6q1rEO25VSoHH0hKPCTrgillPjdI/3bgBhAE1QzHrHTizjpRvy6pGAvKjDJtk2pF9NDq8w==}
+    hasBin: true
+    peerDependencies:
+      eslint: '>=7.0.0'
+    dependencies:
+      eslint: 9.39.2
+    dev: true
+
   /eslint-import-resolver-node@0.3.9:
     resolution: {integrity: sha512-WFj2isz22JahUv+B788TlO3N6zL3nNJGU8CcZbPZvVEkBPaJdCV4vy5wyghty5ROFbCRnm132v8BScu5/1BQ8g==}
     dependencies:
@@ -3360,7 +3526,7 @@ packages:
     dependencies:
       '@typescript-eslint/utils': 8.56.0(eslint@9.39.2)(typescript@5.9.3)
       eslint: 9.39.2
-      storybook: 10.2.8(@testing-library/dom@10.4.1)(react-dom@19.2.3)(react@19.2.3)
+      storybook: 10.2.8(@testing-library/dom@10.4.1)(prettier@3.10.1)(react-dom@19.2.3)(react@19.2.3)
     transitivePeerDependencies:
       - supports-color
       - typescript
@@ -4312,7 +4478,7 @@ packages:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
     dev: true
 
-  /next@16.1.6(@babel/core@7.29.0)(react-dom@19.2.3)(react@19.2.3)(sass@1.98.0):
+  /next@16.1.6(@babel/core@7.29.0)(@playwright/test@1.64.0)(react-dom@19.2.3)(react@19.2.3)(sass@1.98.0):
     resolution: {integrity: sha512-hkyRkcu5x/41KoqnROkfTm2pZVbKxvbZRuNvKXLRXxs3VfyO0WhY50TQS40EuKO9SW3rBj/sF3WbVwDACeMZyw==}
     engines: {node: '>=20.9.0'}
     hasBin: true
@@ -4334,6 +4500,7 @@ packages:
         optional: true
     dependencies:
       '@next/env': 16.1.6
+      '@playwright/test': 1.64.0
       '@swc/helpers': 0.5.15
       baseline-browser-mapping: 2.9.19
       caniuse-lite: 1.0.30001770
@@ -4529,7 +4696,6 @@ packages:
     resolution: {integrity: sha512-T9r+MZkTECl2+oUcZ26YgZzTrYidTsIhYYkJix+6iDOymOb1FB2RLLSOxRGnZGv5DStt+aduIVbt+E8WygXYpg==}
     engines: {node: '>=20'}
     hasBin: true
-    dev: true
 
   /playwright@1.64.0:
     resolution: {integrity: sha512-kVzTnYFYEyQ9RGzBjNCd2+yEqWmVbxl3AHPynv3qQ6JTjv4a+kwRcnqQwIpuP3NnrnIrE/Q6wWAIAvMfIE2/Yg==}
@@ -4537,7 +4703,6 @@ packages:
     hasBin: true
     dependencies:
       playwright-core: 1.64.0
-    dev: true
 
   /possible-typed-array-names@1.1.0:
     resolution: {integrity: sha512-/+5VFTchJDoVj3bhoqi6UeymcD00DAwb1nJwamzPvHEszJ4FpF6SNNbUbOS8yI56qHzdV8eK0qEfOSiodkTdxg==}
@@ -4564,6 +4729,12 @@ packages:
   /prelude-ls@1.2.1:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
     engines: {node: '>= 0.8.0'}
+    dev: true
+
+  /prettier@3.10.1:
+    resolution: {integrity: sha512-70vp3ZUYoPlFbF9uiTdXHUUCGEIp7d4+6p+8DYbkm2jP7x/3i/paXVF6dopSI3zd/CEitrZN1rc4i85xWmmXlg==}
+    engines: {node: '>=14'}
+    hasBin: true
     dev: true
 
   /pretty-format@27.5.1:
@@ -4777,6 +4948,20 @@ packages:
     dependencies:
       react: 19.2.3
       scheduler: 0.27.0
+
+  /react-hook-form@7.92.0(@types/react@19.2.14)(react@19.2.3):
+    resolution: {integrity: sha512-O5ILyY5fYHN7N13Pfxpe55KboyNFsJdM03BHpshQkClJd8raugiAUGY7VjifITrfhVxyx81ko25azXCoayhf1w==}
+    engines: {node: '>=18.0.0'}
+    peerDependencies:
+      '@types/react': '*'
+      react: ^16.8.0 || ^17 || ^18 || ^19
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+    dependencies:
+      '@types/react': 19.2.14
+      react: 19.2.3
+    dev: false
 
   /react-is@16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
@@ -5399,7 +5584,7 @@ packages:
       internal-slot: 1.1.0
     dev: true
 
-  /storybook@10.2.8(@testing-library/dom@10.4.1)(react-dom@19.2.3)(react@19.2.3):
+  /storybook@10.2.8(@testing-library/dom@10.4.1)(prettier@3.10.1)(react-dom@19.2.3)(react@19.2.3):
     resolution: {integrity: sha512-885uSIn8NQw2ZG7vy84K45lHCOSyz1DVsDV8pHiHQj3J0riCuWLNeO50lK9z98zE8kjhgTtxAAkMTy5nkmNRKQ==}
     hasBin: true
     peerDependencies:
@@ -5416,6 +5601,7 @@ packages:
       '@vitest/spy': 3.2.4
       esbuild: 0.27.3
       open: 10.2.0
+      prettier: 3.10.1
       recast: 0.23.11
       semver: 7.7.4
       use-sync-external-store: 1.6.0(react@19.2.3)
@@ -5840,8 +6026,8 @@ packages:
       image-size: 2.0.2
       magic-string: 0.30.21
       module-alias: 2.3.4
-      next: 16.1.6(@babel/core@7.29.0)(react-dom@19.2.3)(react@19.2.3)(sass@1.98.0)
-      storybook: 10.2.8(@testing-library/dom@10.4.1)(react-dom@19.2.3)(react@19.2.3)
+      next: 16.1.6(@babel/core@7.29.0)(@playwright/test@1.64.0)(react-dom@19.2.3)(react@19.2.3)(sass@1.98.0)
+      storybook: 10.2.8(@testing-library/dom@10.4.1)(prettier@3.10.1)(react-dom@19.2.3)(react@19.2.3)
       ts-dedent: 2.2.0
       vite: 7.3.1(@types/node@20.19.33)(sass-embedded@1.97.3)(sass@1.98.0)
       vite-tsconfig-paths: 5.1.4(typescript@5.9.3)(vite@7.3.1)

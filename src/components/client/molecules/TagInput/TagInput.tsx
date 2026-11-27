@@ -31,27 +31,20 @@ export function TagInput({
         [open, setOpen] = useState(false),
         [active, setActive] = useState(0);
     const matching = options.filter(
-        (tag) =>
-            !value.includes(tag.id) && fold(tag.nombre).includes(fold(query)),
+        (tag) => !value.includes(tag.id) && fold(tag.nombre).includes(fold(query)),
     );
     const exact = options.find((tag) => fold(tag.nombre) === fold(query));
-    const canCreate =
-        !!onCreate && !!query.trim() && !exact && value.length < max;
-    const count =
-        value.length < max ? matching.length + (canCreate ? 1 : 0) : 0;
+    const canCreate = !!onCreate && !!query.trim() && !exact && value.length < max;
+    const count = value.length < max ? matching.length + (canCreate ? 1 : 0) : 0;
     const activeIndex = count ? Math.min(active, count - 1) : -1;
     useEffect(() => {
         if (open && !disabled && activeIndex >= 0)
-            document
-                .getElementById(id + "-option-" + activeIndex)
-                ?.scrollIntoView({ block: "nearest" });
+            document.getElementById(id + "-option-" + activeIndex)?.scrollIntoView({ block: "nearest" });
     }, [id, open, disabled, activeIndex, query]);
     let emptyMessage = "El catálogo todavía no tiene etiquetas.";
     if (options.length) emptyMessage = "No hay otras etiquetas con ese nombre.";
-    if (exact && value.includes(exact.id))
-        emptyMessage = "Esta etiqueta ya está seleccionada.";
-    if (value.length >= max)
-        emptyMessage = `Puedes escoger hasta ${max} etiquetas.`;
+    if (exact && value.includes(exact.id)) emptyMessage = "Esta etiqueta ya está seleccionada.";
+    if (value.length >= max) emptyMessage = `Puedes escoger hasta ${max} etiquetas.`;
     function remove(tagId: string) {
         onChange(value.filter((v) => v !== tagId));
         input.current?.focus();
@@ -80,28 +73,21 @@ export function TagInput({
                     onClick={() => input.current?.focus()}
                 >
                     {value.map((tagId) => {
-                        const tag = options.find(
-                            (option) => option.id === tagId,
-                        );
+                        const tag = options.find((option) => option.id === tagId);
                         return (
                             <span
                                 key={tagId}
                                 className={styles.chip}
                                 style={{
-                                    borderInlineStartColor:
-                                        /^#[0-9A-F]{6}$/i.test(tag?.color || "")
-                                            ? tag!.color!
-                                            : undefined,
+                                    borderInlineStartColor: /^#[0-9A-F]{6}$/i.test(tag?.color || "")
+                                        ? tag!.color!
+                                        : undefined,
                                 }}
                             >
-                                <span>
-                                    {tag?.nombre || "Etiqueta " + tagId}
-                                </span>
+                                <span>{tag?.nombre || "Etiqueta " + tagId}</span>
                                 <button
                                     type="button"
-                                    aria-label={
-                                        "Quitar " + (tag?.nombre || tagId)
-                                    }
+                                    aria-label={"Quitar " + (tag?.nombre || tagId)}
                                     disabled={disabled}
                                     onClick={(e) => {
                                         e.stopPropagation();
@@ -121,20 +107,14 @@ export function TagInput({
                         aria-expanded={open && !disabled}
                         aria-controls={id + "-options"}
                         aria-activedescendant={
-                            open && !disabled && activeIndex >= 0
-                                ? id + "-option-" + activeIndex
-                                : undefined
+                            open && !disabled && activeIndex >= 0 ? id + "-option-" + activeIndex : undefined
                         }
                         aria-describedby={id + "-hint"}
                         autoComplete="off"
                         value={query}
                         maxLength={50}
                         disabled={disabled}
-                        placeholder={
-                            value.length
-                                ? "Agregar etiqueta…"
-                                : "Buscar o agregar etiquetas…"
-                        }
+                        placeholder={value.length ? "Agregar etiqueta…" : "Buscar o agregar etiquetas…"}
                         onFocus={() => setOpen(true)}
                         onClick={() => setOpen(true)}
                         onChange={(e) => {
@@ -153,23 +133,15 @@ export function TagInput({
                                 setOpen(true);
                                 if (count)
                                     setActive(
-                                        (activeIndex +
-                                            (e.key === "ArrowDown" ? 1 : -1) +
-                                            count) %
-                                            count,
+                                        (activeIndex + (e.key === "ArrowDown" ? 1 : -1) + count) % count,
                                     );
                             }
                             if (e.key === "Enter") {
                                 e.preventDefault();
-                                if (open && activeIndex >= 0)
-                                    void choose(activeIndex);
+                                if (open && activeIndex >= 0) void choose(activeIndex);
                                 else setOpen(true);
                             }
-                            if (
-                                e.key === "Backspace" &&
-                                !query &&
-                                value.length
-                            ) {
+                            if (e.key === "Backspace" && !query && value.length) {
                                 e.preventDefault();
                                 remove(value[value.length - 1]);
                             }
@@ -191,9 +163,7 @@ export function TagInput({
                                     key={tag.id}
                                     role="option"
                                     aria-selected="false"
-                                    data-active={
-                                        activeIndex === index || undefined
-                                    }
+                                    data-active={activeIndex === index || undefined}
                                     onMouseDown={(e) => e.preventDefault()}
                                     onMouseEnter={() => setActive(index)}
                                     onClick={() => void choose(index)}
@@ -206,9 +176,7 @@ export function TagInput({
                                 id={id + "-option-" + matching.length}
                                 role="option"
                                 aria-selected="false"
-                                data-active={
-                                    activeIndex === matching.length || undefined
-                                }
+                                data-active={activeIndex === matching.length || undefined}
                                 onMouseDown={(e) => e.preventDefault()}
                                 onMouseEnter={() => setActive(matching.length)}
                                 onClick={() => void choose(matching.length)}
@@ -225,8 +193,8 @@ export function TagInput({
                 )}
             </div>
             <small id={id + "-hint"}>
-                Escribe para buscar, pulsa Enter para agregar y × para quitar.
-                Guarda los cambios para aplicarlos al ticket.
+                Escribe para buscar, pulsa Enter para agregar y × para quitar. Guarda los cambios para
+                aplicarlos al ticket.
             </small>
         </div>
     );

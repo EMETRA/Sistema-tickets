@@ -14,17 +14,17 @@ export const ProfileHeader = ({
     role,
     switchOptions,
     switchValue,
-    onSwitchChange
+    onSwitchChange,
 }: ProfileHeaderProps) => {
     return (
         <header className={styles.headerContainer}>
             {/* Imagen de Portada (Banner) */}
             <div className={styles.bannerWrapper}>
-                <Image 
-                    src={bannerSrc} 
-                    alt="Profile Banner" 
-                    width={1200} 
-                    height={300} 
+                <Image
+                    src={bannerSrc}
+                    alt="Profile Banner"
+                    width={1200}
+                    height={300}
                     className={styles.bannerImage}
                 />
             </div>
@@ -32,14 +32,14 @@ export const ProfileHeader = ({
             <div className={styles.contentWrapper}>
                 <div className={styles.profileInfo}>
                     {/* El Avatar usa 'lg' y 'ringed' para resaltar */}
-                    <Avatar 
-                        src={avatarSrc} 
-                        initials={initials} 
-                        size="lg" 
-                        ringed 
-                        className={styles.avatarOverlap} 
+                    <Avatar
+                        src={avatarSrc}
+                        initials={initials}
+                        size="lg"
+                        ringed
+                        className={styles.avatarOverlap}
                     />
-                    
+
                     <div className={styles.textGroup}>
                         <Text variant="body" className={styles.userName}>
                             {name}
@@ -52,11 +52,7 @@ export const ProfileHeader = ({
 
                 {/* Switch de navegación entre vistas */}
                 <nav aria-label="Perfil del colaborador" className={styles.actions}>
-                    <CardSwitch 
-                        options={switchOptions} 
-                        value={switchValue} 
-                        onChange={onSwitchChange} 
-                    />
+                    <CardSwitch options={switchOptions} value={switchValue} onChange={onSwitchChange} />
                 </nav>
             </div>
         </header>

@@ -7,7 +7,7 @@ const {parse,getOperationAST}=require('graphql');
 const {chromium}=require('playwright');
 const {start}=require('../../scripts/laboratorio/iniciar.cjs');
 async function run(){
- const root=path.resolve(__dirname,'../..'), api=process.env.TICKETS_API_SOURCE||path.resolve(root,'../api-tickets');
+ const root=path.resolve(__dirname,'../..'), api=(process.env.TICKETS_API_SOURCE||process.env.API_TICKETS_DIR||path.resolve(__dirname,'../../../../apis/api-tickets'));
  const {PlatformActivity}=require(path.join(api,'dist/platform/platform.activity.js'));
  const {PlatformTelemetry}=require(path.join(api,'dist/platform/platform.telemetry.js'));
  const temp=await fs.mkdtemp(path.join(os.tmpdir(),'tickets-metricas-funciones-'));
@@ -43,7 +43,7 @@ async function run(){
  try{
   instance=await start({port:4055,file:path.join(temp,'estado.json'),compiled:true,graphql});
   const {APPS_CATALOG_DUMMY}=require('./load-ts.cjs')(root)('src/api/graphql/home/appsCatalog.dummy.ts');await instance.lab.state.change(s=>{s.applicationCatalog=APPS_CATALOG_DUMMY;});
-  browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox','--disable-dev-shm-usage']});page=await browser.newPage({viewport:{width:1440,height:1100}});page.setDefaultTimeout(25000);page.on('pageerror',e=>errors.push(e.message));
+  browser=await chromium.launch({executablePath:process.env.QA_CHROMIUM_PATH||undefined,args:['--no-sandbox','--disable-dev-shm-usage']});page=await browser.newPage({viewport:{width:1440,height:1100}});page.setDefaultTimeout(25000);page.on('pageerror',e=>errors.push(e.message));
   await page.route('**/*',route=>/^https?:/.test(route.request().url())&&new URL(route.request().url()).hostname!=='127.0.0.1'?route.abort():route.continue());
   await page.route('**/api/platform/metrics?*',async route=>{const params=Object.fromEntries(new URL(route.request().url()).searchParams);queries.push(params);if(failMetrics)return route.fulfill({status:503,json:{message:'No se pudo actualizar el reporte de métricas.'}});return route.fulfill({json:await telemetry.metrics({id:1,admin:true,memberships:[],permisos:new Set()},params)});});
   for(let i=0;i<100;i++){try{if((await fetch(instance.base+'/home')).status<500)break;}catch{}await new Promise(r=>setTimeout(r,100));}
@@ -63,11 +63,14 @@ async function run(){
   for(const width of [1024,390]){await page.setViewportSize({width,height:1100});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'sin desbordamiento '+width);assert.ok((await choices.boundingBox()).height<500);await page.screenshot({path:path.join(out,'funciones-'+width+'.png'),fullPage:true});}
   await page.setViewportSize({width:1440,height:1100});await page.getByRole('button',{name:'Guardar permisos',exact:true}).click();
   await page.getByRole('dialog',{name:'Revisa el cambio',exact:true}).waitFor();assert.equal(calls.filter(c=>c.name==='guardarFuncionesPorUsuario').length,0);await page.getByRole('button',{name:'Confirmar revisión · 1 de 2',exact:true}).click();await page.getByLabel('He revisado la acción y quiero aplicarla.').check();await page.getByRole('button',{name:'Confirmar y aplicar · 2 de 2',exact:true}).click();await page.getByText('Permisos guardados correctamente',{exact:true}).waitFor();await drain(2);
-  await visit('/espacio/metricas');await page.getByRole('cell',{name:'Funciones corporativas guardadas',exact:true}).waitFor();await page.getByRole('cell',{name:'Consulta de funciones corporativas',exact:true}).waitFor();await page.screenshot({path:path.join(out,'metricas-operaciones-confirmadas.png'),fullPage:true});
+  await visit('/espacio/metricas');await page.getByRole('search',{name:'Filtros de métricas'}).getByRole('combobox').last().selectOption({label:'Mis métricas'});await page.getByRole('cell',{name:'Funciones corporativas guardadas',exact:true}).waitFor();await page.getByRole('cell',{name:'Consulta de funciones corporativas',exact:true}).waitFor();await page.screenshot({path:path.join(out,'metricas-operaciones-confirmadas.png'),fullPage:true});
   await Promise.all(Array.from({length:101},()=>activity.capture('ReporteRhResolver.reporteRhExportExcel',1,{contentBase64:'DATOS_FICTICIOS',totalFilas:3})));await drain(103);
-  await page.getByRole('button',{name:'Consultar',exact:true}).click();await page.getByText(/103 registros/).waitFor();
-  const original=queries.at(-1).desde;await page.getByLabel('Desde',{exact:true}).fill('2026-11-01');const next=page.waitForResponse(r=>r.url().includes('/api/platform/metrics?')&&new URL(r.url()).searchParams.get('offset')==='100');await page.getByRole('button',{name:'Siguiente',exact:true}).click();await next;assert.equal(queries.at(-1).desde,original,'paginar usa los filtros aplicados');
-  failMetrics=true;await page.getByRole('button',{name:'Consultar',exact:true}).click();await page.getByRole('alert').filter({hasText:'Se conservan los resultados'}).waitFor();assert.equal(await page.getByRole('row').count(),4);
+  await page.getByRole('button',{name:'Actualizar',exact:true}).click();await page.getByText(/103 registros/).waitFor();
+  // Los atajos de periodo se aplican al instante; el rango personalizado, al completar ambas fechas.
+  await page.getByRole('button',{name:'7 días',exact:true}).click();await page.waitForResponse(r=>r.url().includes('/api/platform/metrics?'));await page.getByRole('button',{name:'30 días',exact:true}).click();await page.getByText(/103 registros/).waitFor();
+  await page.getByRole('button',{name:'Personalizado',exact:true}).click();const custom=page.waitForResponse(r=>r.url().includes('/api/platform/metrics?'));await page.getByLabel('Desde',{exact:true}).fill('2026-11-01');await custom;
+  const applied=queries.at(-1).desde;await page.getByText(/103 registros/).waitFor();const next=page.waitForResponse(r=>r.url().includes('/api/platform/metrics?')&&new URL(r.url()).searchParams.get('offset')==='100');await page.getByRole('button',{name:'Siguiente',exact:true}).click();await next;assert.equal(queries.at(-1).desde,applied,'paginar usa los filtros aplicados');
+  failMetrics=true;await page.getByRole('button',{name:'Actualizar',exact:true}).click();await page.getByRole('alert').filter({hasText:'Se conservan los resultados'}).waitFor();assert.equal(await page.getByRole('row').count(),4);
   assert.deepEqual(errors,[]);console.log('METRICAS_FUNCIONES_BROWSER_OK; operaciones reales del colector compilado, catálogos excluidos, lista de 180 funciones acotada, búsqueda sin perder selección, dos confirmaciones, fechas, paginación y error conservado; capturas='+out);
  }catch(e){if(page){await page.screenshot({path:path.join(out,'fallo.png'),fullPage:true}).catch(()=>{});await fs.writeFile(path.join(out,'fallo.txt'),await page.locator('body').innerText()).catch(()=>{});}throw e;}
  finally{activity.onModuleDestroy();await browser?.close();await instance?.close();}

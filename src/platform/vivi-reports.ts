@@ -116,8 +116,7 @@ export function viviReportQuery(
     filters: ViviUsersFilters | ViviActivityFilters,
     offset = 0,
 ) {
-    if (!Number.isInteger(offset) || offset < 0 || offset > 1000000)
-        throw Error("Página inválida.");
+    if (!Number.isInteger(offset) || offset < 0 || offset > 1000000) throw Error("Página inválida.");
     const params = new URLSearchParams();
     for (const [key, value] of Object.entries(filters)) {
         const text = value.trim();
@@ -134,31 +133,18 @@ export function viviReportQuery(
         )
             throw Error("Revisa las fechas del reporte.");
     }
-    if (
-        params.has("desde") &&
-        params.has("hasta") &&
-        params.get("desde")! > params.get("hasta")!
-    )
+    if (params.has("desde") && params.has("hasta") && params.get("desde")! > params.get("hasta")!)
         throw Error("Desde debe ser anterior o igual a Hasta.");
-    if ((params.get("q") || "").length > 100)
-        throw Error("La búsqueda admite hasta 100 caracteres.");
-    if (
-        params.has("usuarioId") &&
-        !/^[1-9][0-9]{0,18}$/.test(params.get("usuarioId")!)
-    )
+    if ((params.get("q") || "").length > 100) throw Error("La búsqueda admite hasta 100 caracteres.");
+    if (params.has("usuarioId") && !/^[1-9][0-9]{0,18}$/.test(params.get("usuarioId")!))
         throw Error("El ID de usuario VIVI debe ser un número positivo.");
     params.set("offset", String(offset));
     return "/vivi-reports/" + kind + "?" + params;
 }
-export function viviReportCsv(
-    report: ViviUsersReport | ViviActivityReport,
-    kind: "users" | "activity",
-) {
+export function viviReportCsv(report: ViviUsersReport | ViviActivityReport, kind: "users" | "activity") {
     const cell = (value: unknown) => {
         const text = String(value ?? "");
-        const safe = /^[\s\u0000-\u001f\u200b-\u200f]*[=+@-]/.test(text)
-            ? "'" + text
-            : text;
+        const safe = /^[\s\u0000-\u001f\u200b-\u200f]*[=+@-]/.test(text) ? "'" + text : text;
         return '"' + safe.replaceAll('"', '""') + '"';
     };
     const rows: unknown[][] =
@@ -213,9 +199,5 @@ export function viviReportCsv(
                       e.registradoEn,
                   ]),
               ];
-    return (
-        "\ufeff" +
-        rows.map((row) => row.map(cell).join(";")).join("\r\n") +
-        "\r\n"
-    );
+    return "\ufeff" + rows.map((row) => row.map(cell).join(";")).join("\r\n") + "\r\n";
 }

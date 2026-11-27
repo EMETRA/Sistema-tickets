@@ -1,13 +1,7 @@
 "use client";
 import Link from "next/link";
-import {
-    createContext,
-    useCallback,
-    useContext,
-    useEffect,
-    useRef,
-    useState,
-} from "react";
+import { createContext, useCallback, useContext, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useAuthStore } from "@/store/useAuthStore";
 import { platformFetch, PlatformError } from "./client";
 import { hrDate, HR_STATES, type HrNotice } from "./hr";
@@ -20,119 +14,72 @@ const Context = createContext({
     error: "",
     refresh: async () => {},
 });
-export function HrNotificationsProvider({
-    children,
-}: {
-    children: React.ReactNode;
-}) {
+export function HrNotificationsProvider({ children }: { children: React.ReactNode }) {
     const token = useAuthStore((s) => s.token),
         hydrated = useAuthStore((s) => s.isHydrated);
-    const [data, setData] = useState<Inbox | null>(null),
-        [error, setError] = useState("");
-    const [blocked, setBlocked] = useState(false),
-        [failures, setFailures] = useState(0);
-    const generation = useRef(0);
-    const refresh = useCallback(async () => {
-        const version = ++generation.current;
-        if (!token || !hydrated) {
-            setData(null);
-            return;
-        }
-        try {
-            const r = await platformFetch<Inbox>("/hr/inbox");
-            if (version !== generation.current) return;
-            if (!Array.isArray(r.items) || typeof r.pendientes !== "number")
-                throw Error("No se pudieron leer las notificaciones de RRHH.");
-            setData(r);
-            setError("");
-            setBlocked(false);
-            setFailures(0);
-        } catch (e) {
-            if (version !== generation.current) return;
-            const denied =
-                e instanceof PlatformError &&
-                ([401, 403].includes(e.status) ||
-                    e.code === "FEATURE_DISABLED");
-            if (denied)
-                setData(
-                    e instanceof PlatformError && e.code === "FEATURE_DISABLED"
-                        ? { habilitado: false, items: [], pendientes: 0 }
-                        : null,
-                );
-            setBlocked(denied);
-            setFailures((v) => v + 1);
-            setError(
-                e instanceof PlatformError && e.code === "FEATURE_DISABLED"
-                    ? ""
-                    : (e instanceof Error
-                          ? e.message
-                          : "No se pudieron leer las notificaciones.") +
-                          (e instanceof PlatformError && e.reference
-                              ? " Referencia: " + e.reference
-                              : ""),
-            );
-        }
-    }, [token, hydrated]);
-    useEffect(() => {
-        setData(null);
-        setBlocked(false);
-        setFailures(0);
-        setError("");
-        void refresh();
-        return () => {
-            generation.current++;
-        };
-    }, [refresh]);
-    useEffect(() => {
-        if (!token || !hydrated || blocked) return;
-        const update = () => {
-            if (document.visibilityState === "visible") void refresh();
-        };
-        const timer = error
-            ? setTimeout(
-                  update,
-                  Math.min(
-                      300000,
-                      30000 * 2 ** Math.min(4, Math.max(0, failures - 1)),
-                  ),
-              )
-            : data?.habilitado
-              ? setInterval(update, 60000)
-              : null;
-        window.addEventListener("focus", update);
-        window.addEventListener("tickets-hr-updated", update);
-        return () => {
-            if (timer !== null) {
-                clearInterval(timer);
-                clearTimeout(timer);
+    const enabled = !!token && hydrated;
+    const query = useQuery({
+        queryKey: ["sesion", "hr-inbox", token],
+        enabled,
+        retry: false,
+        refetchOnWindowFocus: true,
+        queryFn: async ({ signal }): Promise<Inbox> => {
+            try {
+                const r = await platformFetch<Inbox>("/hr/inbox", { signal });
+                if (!Array.isArray(r.items) || typeof r.pendientes !== "number")
+                    throw Error("No se pudieron leer las notificaciones de RRHH.");
+                return r;
+            } catch (e) {
+                // Módulo apagado: sin avisos y sin reintentos.
+                if (e instanceof PlatformError && e.code === "FEATURE_DISABLED")
+                    return { habilitado: false, items: [], pendientes: 0 };
+                throw e;
             }
-            window.removeEventListener("focus", update);
-            window.removeEventListener("tickets-hr-updated", update);
-        };
-    }, [token, hydrated, data?.habilitado, error, failures, blocked, refresh]);
-    return (
-        <Context.Provider value={{ data, error, refresh }}>
-            {children}
-        </Context.Provider>
-    );
+        },
+        // Cada minuto si hay avisos activos; tras un error, espera creciente (30 s → 5 min);
+        // sin acceso (401/403) deja de consultar.
+        refetchInterval: (q) => {
+            const failure = q.state.error;
+            if (failure instanceof PlatformError && [401, 403].includes(failure.status)) return false;
+            if (failure)
+                return Math.min(300000, 30000 * 2 ** Math.min(4, Math.max(0, q.state.errorUpdateCount - 1)));
+            return q.state.data?.habilitado ? 60000 : false;
+        },
+    });
+    const failure = query.error;
+    const data = enabled
+        ? failure instanceof PlatformError && [401, 403].includes(failure.status)
+            ? null
+            : (query.data ?? null)
+        : null;
+    const error = failure
+        ? (failure instanceof Error ? failure.message : "No se pudieron leer las notificaciones.") +
+          (failure instanceof PlatformError && failure.reference ? " Referencia: " + failure.reference : "")
+        : "";
+    const { refetch } = query;
+    const refresh = useCallback(async () => {
+        await refetch();
+    }, [refetch]);
+    // Otras pantallas avisan que cambió algo de RRHH (p. ej. al enviar una actualización).
+    useEffect(() => {
+        const update = () => void refetch();
+        window.addEventListener("tickets-hr-updated", update);
+        return () => window.removeEventListener("tickets-hr-updated", update);
+    }, [refetch]);
+    return <Context.Provider value={{ data, error, refresh }}>{children}</Context.Provider>;
 }
 export const useHrNotifications = () => useContext(Context);
 export function HrMandatoryNotice() {
     const { data } = useHrNotifications();
     if (!data?.pendientes) return null;
     return (
-        <aside
-            className={local.notice}
-            aria-label="Actualización obligatoria de RRHH"
-        >
+        <aside className={local.notice} aria-label="Actualización obligatoria de RRHH">
             <div>
                 <strong>Actualización de datos obligatoria</strong>
                 <span>
                     {data.pendientes === 1
                         ? "Tienes una campaña pendiente."
-                        : "Tienes " +
-                          data.pendientes +
-                          " campañas pendientes."}{" "}
+                        : "Tienes " + data.pendientes + " campañas pendientes."}{" "}
                     Revisa sus campos y fecha de cierre.
                 </span>
             </div>
@@ -157,12 +104,8 @@ export function HrNotificationsPage() {
                         {error}
                     </p>
                 )}
-                {!data && !error && (
-                    <p role="status">Consultando notificaciones…</p>
-                )}
-                {data && !data.items.length && (
-                    <p>No hay campañas de actualización para tu cuenta.</p>
-                )}
+                {!data && !error && <p role="status">Consultando notificaciones…</p>}
+                {data && !data.items.length && <p>No hay campañas de actualización para tu cuenta.</p>}
                 {data?.items.map((c) => (
                     <article key={c.id} className={local.campaign}>
                         <div>
@@ -171,8 +114,7 @@ export function HrNotificationsPage() {
                             <p>
                                 <strong>
                                     {c.ventana === "CERRADA"
-                                        ? "Campaña cerrada · " +
-                                          HR_STATES[c.estado]
+                                        ? "Campaña cerrada · " + HR_STATES[c.estado]
                                         : c.ventana === "PROGRAMADA"
                                           ? "Programada"
                                           : c.pendiente
@@ -185,21 +127,13 @@ export function HrNotificationsPage() {
                                     : "Cierre: " + hrDate(c.fin)}
                             </p>
                         </div>
-                        <Link
-                            href={
-                                "/mi-perfil?campana=" + encodeURIComponent(c.id)
-                            }
-                        >
-                            Ver actualización
-                        </Link>
+                        <Link href={"/mi-perfil?campana=" + encodeURIComponent(c.id)}>Ver actualización</Link>
                     </article>
                 ))}
             </section>
             <section className={styles.card}>
                 <h2>Seguimiento de tickets</h2>
-                <Link href="/mis-tickets">
-                    Ver respuestas y actualizaciones de mis tickets
-                </Link>
+                <Link href="/mis-tickets">Ver respuestas y actualizaciones de mis tickets</Link>
             </section>
         </div>
     );
@@ -210,9 +144,7 @@ export function HrNotificationBadge() {
     return data?.pendientes ? (
         <span
             className={local.badge}
-            aria-label={
-                data.pendientes + " actualizaciones obligatorias pendientes"
-            }
+            aria-label={data.pendientes + " actualizaciones obligatorias pendientes"}
         >
             {data.pendientes > 99 ? "99+" : data.pendientes}
         </span>

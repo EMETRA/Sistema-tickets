@@ -1,4 +1,4 @@
-import type { PermisoNoticia } from './types';
+import type { PermisoNoticia } from "./types";
 
 /**
  * TODO [COM03-BACKEND]: simulación de permisos para probar las pantallas sin backend.

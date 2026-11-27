@@ -3,53 +3,53 @@
  */
 
 export interface FuncionesPorUsuarioAplicacion {
-  aplicacion: string;
-  nombre: string;
+    aplicacion: string;
+    nombre: string;
 }
 
 export interface FuncionesPorUsuarioEmpresa {
-  empresa: string;
-  nombre: string;
+    empresa: string;
+    nombre: string;
 }
 
 export interface FuncionesPorUsuarioUsuario {
-  asignaUsuario: string;
-  usuario: string;
+    asignaUsuario: string;
+    usuario: string;
 }
 
 export interface FuncionPermisoItem {
-  funcion: number;
-  nombre: string;
-  permitido: boolean;
-  uso?: string | null;
+    funcion: number;
+    nombre: string;
+    permitido: boolean;
+    uso?: string | null;
 }
 
 export interface FuncionesPorUsuarioConsultaInput {
-  empresa: string;
-  asignaUsuario: string;
-  aplicacion: string;
+    empresa: string;
+    asignaUsuario: string;
+    aplicacion: string;
 }
 
 export interface FuncionesPorUsuarioConsulta {
-  aplicacion: string;
-  asignaUsuario: string;
-  empresa: string;
-  funciones: FuncionPermisoItem[];
-  totalPermitidas: number;
+    aplicacion: string;
+    asignaUsuario: string;
+    empresa: string;
+    funciones: FuncionPermisoItem[];
+    totalPermitidas: number;
 }
 
 export interface GetFuncionesPorUsuarioAplicacionesResponse {
-  funcionesPorUsuarioAplicaciones: FuncionesPorUsuarioAplicacion[];
+    funcionesPorUsuarioAplicaciones: FuncionesPorUsuarioAplicacion[];
 }
 
 export interface GetFuncionesPorUsuarioEmpresasResponse {
-  funcionesPorUsuarioEmpresas: FuncionesPorUsuarioEmpresa[];
+    funcionesPorUsuarioEmpresas: FuncionesPorUsuarioEmpresa[];
 }
 
 export interface GetFuncionesPorUsuarioUsuariosResponse {
-  funcionesPorUsuarioUsuarios: FuncionesPorUsuarioUsuario[];
+    funcionesPorUsuarioUsuarios: FuncionesPorUsuarioUsuario[];
 }
 
 export interface GetFuncionesPorUsuarioPermisosResponse {
-  funcionesPorUsuarioPermisos: FuncionesPorUsuarioConsulta;
+    funcionesPorUsuarioPermisos: FuncionesPorUsuarioConsulta;
 }

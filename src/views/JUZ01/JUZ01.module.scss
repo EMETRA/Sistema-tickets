@@ -15,7 +15,7 @@
   min-width: 0;
 }
 .searchPanel {
-  padding: clamp(20px, 2.5vw, 28px);
+  padding: clamp(20px, calc(2.5vw / var(--vp-zoom, 1)), 28px);
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -41,7 +41,7 @@
   border-radius: 12px;
   display: grid;
   place-items: center;
-  background: var(--tickets-primary-soft, #edf1ff);
+  background: var(--tickets-primary-soft);
   color: var(--tickets-primary);
   svg {
     width: 23px;
@@ -70,7 +70,7 @@
 }
 .fieldError {
   margin: 0;
-  color: #ac2945;
+  color: var(--tickets-danger);
   font-size: 13px;
   line-height: 1.6;
 }
@@ -84,8 +84,8 @@
   margin: 0;
   padding: 14px;
   border-radius: 8px;
-  background: #fff2f4;
-  color: #ac2945;
+  background: var(--tickets-danger-soft);
+  color: var(--tickets-danger);
   font-size: 13px;
   p {
     margin: 5px 0 0;
@@ -121,7 +121,9 @@
     margin: 0;
   }
   // El título recibe foco de lectura; no es un control interactivo.
-  h2:focus { outline: none; }
+  h2:focus {
+    outline: none;
+  }
 }
 .count {
   padding: 4px 8px;
@@ -129,7 +131,7 @@
   box-sizing: border-box;
   border-radius: 7px;
   color: var(--tickets-primary);
-  background: var(--tickets-primary-soft, #edf1ff);
+  background: var(--tickets-primary-soft);
   font-size: 12px;
   font-weight: 600;
   text-align: center;
@@ -140,7 +142,7 @@
   font-size: 12px;
   th {
     text-align: left;
-    background: var(--tickets-surface-subtle, #f7f9ff);
+    background: var(--tickets-surface-subtle);
     color: var(--tickets-text-secondary);
     font-weight: 600;
   }
@@ -157,15 +159,16 @@
     overflow-wrap: anywhere;
     line-height: 1.7;
     mark {
-      background: #e7ecff;
+      background: var(--tickets-info-soft);
       color: #273f91;
+      color: light-dark(#273f91, #97a8e3);
       font-weight: 700;
       border-radius: 3px;
       padding: 2px 0;
     }
   }
   tbody tr:hover {
-    background: #fafbff;
+    background: var(--tickets-surface-subtle);
   }
 }
 .date {
@@ -185,7 +188,7 @@
   padding: 5px 9px;
   border-radius: 6px;
   color: var(--tickets-primary);
-  background: var(--tickets-primary-soft, #edf1ff);
+  background: var(--tickets-primary-soft);
   font-size: 11px;
 }
 .open {

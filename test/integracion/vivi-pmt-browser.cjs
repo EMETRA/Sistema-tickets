@@ -1,8 +1,9 @@
 // Browser and local service doubles only. No institutional network, Oracle, SAT or SMTP.
+const os=require('node:os');
 const assert=require('node:assert/strict'),http=require('node:http'),fs=require('node:fs/promises'),path=require('node:path');
 const {once}=require('node:events'),{spawn}=require('node:child_process'),{chromium}=require('playwright');
 async function main(){
- const dir=process.env.QA_SCREENSHOT_DIR || '/tmp/vivi-pmt-browser';await fs.mkdir(dir,{recursive:true});const errors=[],calls=[];
+ const dir=process.env.QA_SCREENSHOT_DIR || path.join(os.tmpdir(),'vivi-pmt-browser');await fs.mkdir(dir,{recursive:true});const errors=[],calls=[];
  let allowed=false,state='PENDIENTE',version=1,mia=false,fines=0,admin=false,loseResponse=true,publication='PENDIENTE',storageReady=false;
  const codigo='b0ff431a-6233-4ecf-a460-894ce777eeee';
  const account={id_usuario:'1',nombre:'Revisor Ficticio',email:'persona@example.invalid',rol:'ADMINISTRADOR',permisos:['VIVI_PMT_CONSULTAR','VIVI_PMT_REVISAR','VIVI_PMT_IMPONER','VIVI_JUZGADO_CONSULTAR'],departamento:'Unidad ficticia'};
@@ -40,7 +41,7 @@ async function main(){
  async function shots(name){for(const width of[1440,1024,390]){await page.setViewportSize({width,height:1050});const dialog=page.locator('dialog[open]');if(await dialog.count()){const box=await dialog.boundingBox();assert.ok(box.x>=-1&&box.x+box.width<=width+1,'dialog overflow at '+width);}await page.screenshot({path:path.join(dir,`${name}-${width}.png`),fullPage:true});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'page overflow at '+width);}await page.setViewportSize({width:1440,height:1050});}
  try{
   for(let i=0;!output.includes('Ready in')&&i<200;i++){if(next.exitCode!==null)throw Error(output);await new Promise(r=>setTimeout(r,100));}assert.ok(output.includes('Ready in'));
-  browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox'],headless:true});const context=await browser.newContext({viewport:{width:1440,height:1050}});
+  browser=await chromium.launch({executablePath:process.env.QA_CHROMIUM_PATH||undefined,args:['--no-sandbox'],headless:true});const context=await browser.newContext({viewport:{width:1440,height:1050}});
   await context.addCookies([{name:'auth_token',value:'token-ficticio',url:'http://127.0.0.1:3793'},{name:'auth_role',value:account.rol,url:'http://127.0.0.1:3793'}]);await context.addInitScript(user=>localStorage.setItem('auth-storage',JSON.stringify({state:{token:'token-ficticio',user,userId:'1'},version:0})),account);
   page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));page.on('dialog',dialog=>dialog.accept());await page.route('**/*',r=>new URL(r.request().url()).hostname==='127.0.0.1'||r.request().url().startsWith('blob:')?r.continue():r.abort());
   const url='http://127.0.0.1:3793/home/pmt/formularios/pmt-avisame';await page.goto(url);await page.getByText('Sin acceso a este formulario',{exact:true}).waitFor();assert.equal(calls.filter(c=>c.p.startsWith('/platform/vivi-pmt')).length,0);
@@ -59,7 +60,7 @@ async function main(){
   assert.equal(await page.getByRole('button',{name:/Resolver|Registrar recepción|Imponer/}).count(),0);
   await shots('juzgado-consulta');
   await page.goto('http://127.0.0.1:3793/aplicaciones');
-  const acceso=page.getByRole('button',{name:'Ingresar a Aplicaciones PMT',exact:true});
+  const acceso=page.locator('section[aria-labelledby="area-pmt"] a[href="/home/pmt/formularios"]');
   await acceso.waitFor();
   await shots('catalogo-aplicaciones');
   await acceso.click();

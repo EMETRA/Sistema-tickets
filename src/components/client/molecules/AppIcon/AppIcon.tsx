@@ -12,9 +12,7 @@ export const AppIcon = ({ icon, label, size = 24, color, className }: AppIconPro
             <div className={styles.iconWrapper}>
                 <Icon name={icon} variant="status" size={size} color={color} />
             </div>
-            <p className={styles.label}>
-                {label}
-            </p>
+            <p className={styles.label}>{label}</p>
         </div>
     );
 };

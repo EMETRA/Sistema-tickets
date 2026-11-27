@@ -1,14 +1,29 @@
 const assert = require('node:assert/strict');
 const http = require('node:http');
 const fs = require('node:fs/promises');
+const os = require('node:os');
 const path = require('node:path');
 const { once } = require('node:events');
 const { spawn } = require('node:child_process');
 const { chromium } = require('playwright');
 const slip = require('../fixtures/transit-slip.json');
+function pdfMinimo(texto) {
+  const objetos = ['<< /Type /Catalog /Pages 2 0 R >>', '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
+    '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>',
+    null, '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>'];
+  const flujo = `BT /F1 18 Tf 72 720 Td (${texto}) Tj ET`;
+  objetos[3] = `<< /Length ${flujo.length} >>\nstream\n${flujo}\nendstream`;
+  let pdf = '%PDF-1.4\n'; const pos = [];
+  objetos.forEach((o, i) => { pos.push(pdf.length); pdf += `${i + 1} 0 obj\n${o}\nendobj\n`; });
+  const xref = pdf.length;
+  pdf += `xref\n0 ${objetos.length + 1}\n0000000000 65535 f \n` + pos.map((p) => String(p).padStart(10, '0') + ' 00000 n \n').join('');
+  pdf += `trailer\n<< /Size ${objetos.length + 1} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF\n`;
+  return Buffer.from(pdf, 'latin1');
+}
 async function main() {
-  const directory = '/tmp/reimpresion-n-browser'; await fs.mkdir(directory, {recursive:true});
-  const bytes = await fs.readFile(process.env.REIMPRESION_N_PDF || '/tmp/reimpresion-n-ejemplo.pdf');
+  const directory = path.join(os.tmpdir(),'reimpresion-n-browser'); await fs.mkdir(directory, {recursive:true});
+  // PDF de ejemplo: el indicado en REIMPRESION_N_PDF o uno mínimo generado aquí (datos ficticios).
+  const bytes = process.env.REIMPRESION_N_PDF ? await fs.readFile(process.env.REIMPRESION_N_PDF) : pdfMinimo('Boleta N de prueba');
   assert.equal(bytes.subarray(0,5).toString(), '%PDF-');
   const calls=[], errors=[], reference='b06f32ff-c167-4575-ad76-d5b5400ae908';
   let allowed=false, pdfFail=true;
@@ -38,7 +53,7 @@ async function main() {
   let browser,page;
   try{
     for(let i=0;!output.includes('Ready in')&&i<200;i++){if(next.exitCode!==null)throw Error(output);await new Promise(r=>setTimeout(r,100));}assert.ok(output.includes('Ready in'));
-    browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox'],headless:true});
+    browser=await chromium.launch({executablePath:process.env.QA_CHROMIUM_PATH||undefined,args:['--no-sandbox'],headless:true});
     const context=await browser.newContext({viewport:{width:1440,height:1050}});
     await context.addCookies([{name:'auth_token',value:'token-ficticio',url:'http://127.0.0.1:3781'},{name:'auth_role',value:'ADMINISTRADOR',url:'http://127.0.0.1:3781'}]);
     await context.addInitScript(user=>localStorage.setItem('auth-storage',JSON.stringify({state:{token:'token-ficticio',user,userId:user.id_usuario},version:0})),account);
@@ -63,7 +78,7 @@ async function main() {
     await page.screenshot({path:path.join(directory,'reimpresion-n-pdf.png'),fullPage:false});
     const downloadEvent=page.waitForEvent('download');await page.getByRole('link',{name:'Descargar PDF',exact:true}).click();const download=await downloadEvent;
     assert.equal(download.suggestedFilename(),'boleta-N-1234567.pdf');assert.deepEqual(await fs.readFile(await download.path()),bytes);
-    const popupEvent=page.waitForEvent('popup');await page.getByRole('link',{name:'Abrir PDF para imprimir'}).click();const popup=await popupEvent;assert.ok(popup.url().startsWith('blob:'));await popup.close();
+    const abrir=page.getByRole('link',{name:'Abrir PDF para imprimir'});assert.ok((await abrir.getAttribute('href')).startsWith('blob:'));const popupEvent=page.waitForEvent('popup');await abrir.click();const popup=await popupEvent;await popup.close();
     await page.getByRole('button',{name:'Cerrar vista previa'}).click();await page.getByTitle('Vista previa boleta N-1234567').waitFor({state:'detached'});
     for(const width of [1440,1024,390]){await page.setViewportSize({width,height:1050});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await page.screenshot({path:path.join(directory,'reimpresion-n-'+width+'.png'),fullPage:false});}
     assert.deepEqual(errors,[]);assert.ok(calls.filter(c=>c.path.startsWith('/platform/transit-reprints')).every(c=>c.authorization==='Bearer token-ficticio'&&c.method==='GET'));

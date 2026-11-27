@@ -4,6 +4,19 @@
   gap: 16px;
   min-width: 0;
   color: var(--tickets-text);
+  // Jerarquía: el h1 vive en la cabecera de la vista; aquí solo secciones.
+  h2 {
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.4;
+    letter-spacing: -0.15px;
+  }
+  h3 {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.45;
+    margin-bottom: 10px;
+  }
 }
 .homePage {
   padding: var(--tickets-page-padding);
@@ -33,6 +46,13 @@
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 14px;
+  // Con filtros rotulados, los botones se alinean con la base de los campos.
+  &:has(.field) {
+    align-items: flex-end;
+  }
+  .field .control {
+    min-width: 160px;
+  }
 }
 .actions {
   display: flex;
@@ -43,24 +63,65 @@
 .tabs {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 4px 22px;
   border-bottom: 1px solid var(--tickets-border);
-  padding-bottom: 12px;
   button,
   a {
-    border: 1px solid var(--tickets-border);
-    background: #fff;
+    position: relative;
+    border: 0;
+    background: none;
     color: var(--tickets-text-secondary);
-    padding: 10px 14px;
-    border-radius: 8px;
+    padding: 10px 1px 12px;
+    margin-bottom: -1px;
+    border-bottom: 2px solid transparent;
     font: inherit;
+    font-size: 13px;
+    font-weight: 500;
     cursor: pointer;
-    font-size: 12px;
+    white-space: nowrap;
+    transition:
+      color 0.15s ease,
+      border-color 0.15s ease;
+    &:hover {
+      color: var(--tickets-text);
+      border-bottom-color: var(--tickets-border-strong);
+    }
     &[aria-selected="true"],
-    &[aria-current="page"] {
-      background: var(--tickets-primary-soft, #edf1ff);
+    &[aria-current="page"],
+    &[aria-pressed="true"] {
       color: var(--tickets-primary);
-      border-color: #abbaff;
+      font-weight: 600;
+      border-bottom-color: var(--tickets-primary);
+    }
+    &:focus-visible {
+      outline: 2px solid var(--tickets-primary);
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
+  }
+}
+// Segundo nivel de pestañas (una vista con pestañas dentro de otra):
+// píldoras discretas para que no compitan con el primer nivel.
+.page .page > .tabs,
+.subtabs {
+  gap: 6px;
+  border-bottom: 0;
+  button,
+  a {
+    padding: 6px 12px;
+    margin: 0;
+    border: 0;
+    border-radius: 999px;
+    font-size: 12px;
+    &:hover {
+      background: var(--tickets-neutral-soft);
+      border: 0;
+    }
+    &[aria-selected="true"],
+    &[aria-current="page"],
+    &[aria-pressed="true"] {
+      background: var(--tickets-primary-soft);
+      border: 0;
     }
   }
 }
@@ -72,23 +133,23 @@
   min-width: 0;
   box-shadow: var(--tickets-shadow);
   h2 {
-    font-size: 17px;
+    font-size: 16px;
     line-height: 1.42;
     margin-bottom: 10px;
   }
   h3 {
-    font-size: 15px;
+    font-size: 14px;
     margin-bottom: 12px;
   }
 }
 .muted {
   color: var(--tickets-text-secondary);
   font-size: 12px;
-  line-height: 1.8;
+  line-height: 1.6;
 }
 .error {
-  color: #a3313c;
-  background: #fff1f3;
+  color: var(--tickets-danger);
+  background: var(--tickets-danger-soft);
   border-radius: 8px;
   padding: 12px;
   font-size: 12px;
@@ -96,9 +157,10 @@
   overflow-wrap: anywhere;
 }
 .success {
-  color: #166946;
-  background: #edf9f0;
+  color: var(--tickets-success);
+  background: var(--tickets-success-soft);
   border: 1px solid #c2e4cf;
+  border: 1px solid light-dark(#c2e4cf, #2a3449);
   padding: 12px 16px;
   border-radius: 10px;
   font-size: 13px;
@@ -106,19 +168,32 @@
 .control {
   min-width: 0;
   width: 100%;
+  min-height: var(--tickets-control-height, 38px);
   border: 1px solid var(--tickets-border);
   border-radius: 8px;
-  padding: 11px 13px;
-  background: #fff;
+  padding: 8px 12px;
+  background: var(--tickets-surface);
   color: var(--tickets-text);
   font: inherit;
   font-size: 13px;
+  font-weight: 400;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+  &::placeholder {
+    color: var(--tickets-text-muted);
+  }
+  &:hover:not(:focus):not(:disabled) {
+    border-color: var(--tickets-border-strong);
+  }
   &:focus {
-    outline: 2px solid #4361ee44;
-    outline-offset: 1px;
+    outline: none;
+    border-color: var(--tickets-primary);
+    box-shadow: var(--tickets-focus);
   }
   &:disabled {
     opacity: 0.65;
+    background: var(--tickets-surface-disabled);
   }
 }
 .search {
@@ -127,11 +202,20 @@
 .field {
   display: flex;
   flex-direction: column;
-  gap: 9px;
+  gap: 6px;
   min-width: 0;
+  // Muchos campos usan <label class="field">Texto<input/></label>:
+  // el rótulo es el propio contenedor, así que se estiliza aquí.
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--tickets-text);
   label {
     font-size: 12px;
     font-weight: 600;
+  }
+  > p,
+  > small {
+    font-weight: 400;
   }
   input[type="checkbox"] {
     width: 20px;
@@ -142,7 +226,7 @@
 .formGrid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 20px;
+  gap: 16px 20px;
 }
 .grid {
   display: grid;
@@ -152,69 +236,126 @@
 .metrics {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
-  gap: 16px;
+  gap: 12px;
 }
 .tableRegion {
   overflow: auto;
   max-width: 100%;
   border: 1px solid var(--tickets-border);
   border-radius: 12px;
-  background: #fff;
+  background: var(--tickets-surface);
 }
 .table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 12px;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
   th {
     text-align: left;
+    font-size: 11px;
     font-weight: 600;
-    color: #60728f;
-    background: #f8faff;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--tickets-text-muted);
+    background: var(--tickets-surface-subtle);
+    white-space: nowrap;
   }
   td,
   th {
-    padding: 10px 12px;
+    padding: 11px 14px;
     border-bottom: 1px solid var(--tickets-divider);
     vertical-align: middle;
     line-height: 1.5;
   }
+  th {
+    padding-top: 9px;
+    padding-bottom: 9px;
+  }
   td {
     overflow-wrap: anywhere;
   }
+  tbody tr:last-child td {
+    border-bottom: 0;
+  }
+  tbody tr {
+    transition: background-color 0.12s ease;
+  }
   tbody tr:hover {
-    background: #fafbff;
+    background: var(--tickets-surface-subtle);
   }
 }
+// Enlaces dentro de tablas y textos: sin subrayado permanente.
 .link {
   color: var(--tickets-primary);
   background: none;
   border: 0;
+  padding: 0;
   cursor: pointer;
   text-align: left;
   font: inherit;
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  font-weight: 600;
+  text-decoration: none;
+  &:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
 }
+// Estado: punto + texto. data-tone se calcula con helpers/statusTone.
 .chip {
-  display: inline-block;
-  padding: 5px 9px;
-  background: #edf1ff;
-  color: #34559f;
-  border-radius: 7px;
-  font-size: 11px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 9px;
+  background: var(--tickets-neutral-soft);
+  color: var(--tickets-text-secondary);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
   line-height: 1.5;
+  white-space: nowrap;
+  &[data-tone]::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+  }
+  &[data-tone="success"] {
+    background: var(--tickets-success-soft);
+    color: var(--tickets-success);
+  }
+  &[data-tone="danger"] {
+    background: var(--tickets-danger-soft);
+    color: var(--tickets-danger);
+  }
+  &[data-tone="warning"] {
+    background: var(--tickets-warning-soft);
+    color: var(--tickets-warning);
+  }
+  &[data-tone="info"] {
+    background: var(--tickets-info-soft);
+    color: var(--tickets-info);
+  }
+}
+// Fila que merece atención (p. ej. un movimiento denegado).
+.rowAlert {
+  background: color-mix(in srgb, var(--tickets-danger) 7%, var(--tickets-surface));
+  > td:first-child {
+    box-shadow: inset 3px 0 0 var(--tickets-danger);
+  }
 }
 .danger {
-  color: #a3313c;
-  background: #fff1f3;
+  color: var(--tickets-danger);
+  background: var(--tickets-danger-soft);
 }
 .dialog {
   margin: auto;
   border: 1px solid var(--tickets-border);
   border-radius: 16px;
   padding: 0;
-  width: min(1100px, 94vw);
-  max-height: 92dvh;
+  width: min(1100px, calc(94vw / var(--vp-zoom, 1)));
+  max-height: calc(92dvh / var(--vp-zoom, 1));
   background: var(--tickets-background);
   color: var(--tickets-text);
   box-shadow: 0 20px 70px #243b7044;
@@ -227,14 +368,14 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  background: #fff;
+  background: var(--tickets-surface);
   position: sticky;
   top: 0;
   z-index: 1;
   padding: 14px 20px;
   border-bottom: 1px solid var(--tickets-border);
   h2 {
-    font-size: 20px;
+    font-size: 18px;
   }
 }
 .dialogBody {
@@ -278,6 +419,7 @@
   padding: 0;
   li {
     border-left: 3px solid #c2cdf9;
+    border-left: 3px solid light-dark(#c2cdf9, #2a3449);
     padding: 0 0 14px 16px;
   }
 }
@@ -286,7 +428,7 @@
   grid-template-columns: repeat(7, minmax(0, 1fr));
   border-top: 1px solid var(--tickets-border);
   border-left: 1px solid var(--tickets-border);
-  background: #fff;
+  background: var(--tickets-surface);
 }
 .day {
   padding: 10px;
@@ -305,8 +447,8 @@
     text-align: left;
     border: 0;
     border-radius: 6px;
-    background: #edf1ff;
-    color: #36559c;
+    background: var(--tickets-primary-soft);
+    color: var(--tickets-info);
     font: inherit;
     font-size: 10px;
     line-height: 1.5;
@@ -319,7 +461,7 @@
   overflow: auto;
   border: 1px solid var(--tickets-border);
   border-radius: 12px;
-  background: radial-gradient(#d9e2f7 1px, transparent 1px) 0 0/20px 20px #fff;
+  background: radial-gradient(#d9e2f7 1px, transparent 1px) 0 0/20px 20px var(--tickets-surface);
   svg {
     display: block;
     min-width: 650px;
@@ -335,14 +477,15 @@
   button {
     min-height: 40px;
     border: 1px solid #b8c8eb;
+    border: 1px solid light-dark(#b8c8eb, #2a3449);
     border-radius: 6px;
-    background: #eef7ff;
+    background: var(--tickets-primary-soft);
     font: inherit;
     font-size: 11px;
     cursor: pointer;
   }
   button[data-busy="true"] {
-    background: #e3f3e7;
+    background: var(--tickets-success-soft);
     border-color: #a6cfb2;
   }
 }
@@ -379,7 +522,7 @@
     font-size: 10px;
   }
   .dialog {
-    width: 98vw;
+    width: calc(98vw / var(--vp-zoom, 1));
   }
   .dialogHeader {
     padding: 16px;
@@ -390,9 +533,19 @@
 }
 
 .workspace {
-  .search, .field { font-size: 12px; }
-  .toolbar h2 { font-size: 20px; line-height: 1.4; }
-  summary { font-size: 14px; font-weight: 600; cursor: pointer; }
+  .search,
+  .field {
+    font-size: 12px;
+  }
+  .toolbar h2 {
+    font-size: 17px;
+    line-height: 1.4;
+  }
+  summary {
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
 }
 .shortcut {
   display: inline-flex;
@@ -404,5 +557,192 @@
   color: var(--tickets-primary);
   font-size: 12px;
   text-decoration: none;
-  &:focus-visible { outline: 2px solid var(--tickets-primary); outline-offset: 2px; }
+  &:focus-visible {
+    outline: 2px solid var(--tickets-primary);
+    outline-offset: 2px;
+  }
+}
+
+.inlineDetails {
+  margin-top: 4px;
+  summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--tickets-primary);
+    cursor: pointer;
+    list-style: none;
+    &::-webkit-details-marker {
+      display: none;
+    }
+    &::before {
+      content: "›";
+      display: inline-block;
+      transition: transform 0.15s ease;
+    }
+  }
+  &[open] summary::before {
+    transform: rotate(90deg);
+  }
+}
+
+// Indicadores dentro de un panel: sin tarjeta dentro de tarjeta.
+.card > .grid > article,
+.card > .metrics > article {
+  background: var(--tickets-surface-subtle);
+  border-color: transparent;
+  box-shadow: none;
+}
+
+// Búsqueda + lista desplegable del mismo campo: se leen como un solo control.
+.field > input.control:has(+ select.control) {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  background: var(--tickets-surface-subtle);
+}
+.field > input.control + select.control {
+  margin-top: -7px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+.field > .control:focus {
+  position: relative;
+  z-index: 1;
+}
+// Separación entre bloques sueltos dentro de un panel.
+.card > * + .field,
+.card > .field + * {
+  margin-top: 14px;
+}
+
+// Formulario abierto sobre una lista: se distingue sin competir con la tabla.
+.focusCard {
+  border-color: color-mix(in srgb, var(--tickets-primary) 35%, var(--tickets-surface));
+  box-shadow: 0 0 0 3px #4361ee12;
+  h3 {
+    margin-bottom: 2px;
+  }
+}
+
+.flag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--tickets-danger);
+  &::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+  }
+}
+
+// Estado vacío dentro de una tabla: mensaje centrado, sin otra tarjeta.
+.tableRegion > .card {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 32px 16px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--tickets-text-secondary);
+  .muted {
+    margin-top: 4px;
+  }
+}
+
+// Ritmo vertical dentro de paneles que no son flex.
+.card > :where(.toolbar, .tableRegion, form, .error, .success) + *,
+.card > * + :where(.toolbar, .tableRegion, form) {
+  margin-top: 14px;
+}
+// Fila de filtros: los campos y su botón quedan juntos.
+.toolbar:has(> .field) {
+  justify-content: flex-start;
+  gap: 12px;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+// Filtros rápidos por estado.
+.stateFilters {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-right: auto;
+  button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 11px;
+    border: 1px solid var(--tickets-border);
+    border-radius: 999px;
+    background: var(--tickets-surface);
+    font: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--tickets-text-secondary);
+    cursor: pointer;
+    &[data-tone]::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--tickets-text-muted);
+    }
+    &[data-tone="warning"]::before {
+      background: #d99a1e;
+    }
+    &[data-tone="success"]::before {
+      background: var(--tickets-success);
+    }
+    &[data-tone="danger"]::before {
+      background: var(--tickets-danger);
+    }
+    &:hover {
+      border-color: var(--tickets-border-strong);
+      color: var(--tickets-text);
+    }
+    &[aria-pressed="true"] {
+      border-color: var(--tickets-primary);
+      background: var(--tickets-primary-soft);
+      color: var(--tickets-primary);
+    }
+  }
+}
+
+.toolbar[hidden],
+.actions[hidden] {
+  display: none;
+}
+
+// Base visual común para las ventanas que no usan la ficha de registro.
+.dialog {
+  background: var(--tickets-surface);
+  border-radius: 16px;
+  box-shadow: 0 24px 70px #132a4d40;
+}
+.dialogHeader {
+  padding: 18px 22px 14px;
+  background: linear-gradient(110deg, var(--tickets-surface), var(--tickets-surface-subtle));
+  h2 {
+    font-size: 19px;
+    letter-spacing: -0.3px;
+  }
+}
+.dialogBody {
+  padding: 16px 22px 22px;
 }

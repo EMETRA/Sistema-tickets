@@ -4,7 +4,7 @@ import { ConfigurationManagement } from "./";
 const meta: Meta<typeof ConfigurationManagement> = {
     title: "Organisms/ConfigurationManagement",
     component: ConfigurationManagement,
-    tags: ["autodocs"]
+    tags: ["autodocs"],
 };
 
 export default meta;

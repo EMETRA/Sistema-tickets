@@ -8,7 +8,7 @@ const { buildSchema, parse, validate, getOperationAST, getVariableValues } = req
 const { chromium } = require('playwright');
 const { start } = require('../../scripts/laboratorio/iniciar.cjs');
 async function run() {
-  const root = path.resolve(__dirname, '../..'), api = process.env.TICKETS_API_SOURCE || path.resolve(root, '../api-tickets');
+  const root = path.resolve(__dirname, '../..'), api = (process.env.TICKETS_API_SOURCE||process.env.API_TICKETS_DIR||path.resolve(__dirname,'../../../../apis/api-tickets'));
   const temp = await fs.mkdtemp(path.join(os.tmpdir(), 'tickets-modulos-'));
   const out = process.env.QA_SCREENSHOT_DIR || path.join(temp, 'capturas'); await fs.mkdir(out, {recursive:true});
   const schemaFile = path.join(temp, 'schema.gql');
@@ -56,8 +56,8 @@ async function run() {
   try {
     instance=await start({port:4005,file:path.join(temp,'estado.json'),compiled:true,graphql});
     const { APPS_CATALOG_DUMMY } = require('./load-ts.cjs')(root)('src/api/graphql/home/appsCatalog.dummy.ts');
-    await instance.lab.state.change(s => { s.applicationCatalog = APPS_CATALOG_DUMMY; });
-    browser=await chromium.launch({executablePath:process.env.QA_CHROMIUM_PATH||'/usr/bin/chromium',args:['--no-sandbox','--disable-dev-shm-usage']});
+    await instance.lab.state.change(s => { s.applicationCatalog = APPS_CATALOG_DUMMY; s.moduleAccess = { 7: { mod06: { allowed: true, actions: { LEER: true, INSERTAR: false, EDITAR: false, ELIMINAR: false } } } }; });
+    browser=await chromium.launch({executablePath:process.env.QA_CHROMIUM_PATH||undefined,args:['--no-sandbox','--disable-dev-shm-usage']});
     page=await browser.newPage({viewport:{width:1440,height:1100}});page.setDefaultTimeout(25000);
     const errors=[],alerts=[];page.on('pageerror',e=>errors.push(e.message));page.on('dialog',async d=>{alerts.push(d.message());await d.dismiss();});
     await page.route('**/*',r=>/^https?:/.test(r.request().url())&&new URL(r.request().url()).hostname!=='127.0.0.1'?r.abort():r.continue());
@@ -86,10 +86,9 @@ async function run() {
     await page.getByRole('button',{name:'Guardar permisos',exact:true}).click();await page.getByRole('dialog',{name:'Revisa el cambio'}).waitFor();assert.equal(calls.filter(c=>c.name==='guardarFuncionesPorUsuario').length,0);await confirmations();await page.getByText('Permisos guardados correctamente',{exact:true}).waitFor();assert.deepEqual(calls.find(c=>c.name==='guardarFuncionesPorUsuario').variables.input.funciones,[1,2]);
     await page.locator('#userOrigin').selectOption('7');await page.locator('#userDestiny').selectOption('8');await page.getByLabel('Confirmo copiar los permisos',{exact:false}).check();await page.getByRole('button',{name:'Copiar permisos',exact:true}).click();assert.equal(calls.filter(c=>c.name==='copiarFuncionesPorUsuario').length,0);await confirmations();await page.getByText('Permisos copiados correctamente',{exact:true}).waitFor();assert.equal(calls.filter(c=>c.name==='copiarFuncionesPorUsuario').length,1);
     await visit('/home/financiero/formularios/mod08');await page.locator('#startDate').fill('2026-11-01');await page.locator('#endDate').fill('2026-11-09');await page.locator('#reportType').selectOption('RECIBOS_PAGO');assert.equal(await download(page.getByRole('button',{name:'Generar Reporte en Excel',exact:true})),'anulados-ejemplo.xls');
-    await visit('/home/informatica/reportes/exportmod01');await page.getByText('Proyecto de prueba',{exact:true}).waitFor();assert.equal(await download(page.getByRole('button',{name:'Descargar Excel del reporte 1',exact:true})),'semanal-ejemplo.xls');
+    // Módulos retirados del catálogo: muestran la página de desuso, sin formularios.
+    for(const retirado of ['/home/informatica/reportes/exportmod01','/home/informatica/reportes/save-mod01','/home/recaudacion/proyectos/mod13']){await visit(retirado);await page.getByRole('heading',{name:'Aplicación en desuso'}).waitFor();assert.equal(await page.locator('#main-content form').count(),0);}
     for(const [route,field]of [['/api/MOD07/manual?id=1','id'],['/api/MOD07/manualesDisponibles','length'],['/api/MOD08/reporteAnuladosTipos','length']]){const data=await page.evaluate(async url=>{const r=await fetch(url,{headers:{Authorization:'Bearer '+JSON.parse(localStorage.getItem('auth-storage')).state.token}});return r.json();},route);assert.equal(data.data[field],1);}
-    await visit('/home/informatica/reportes/save-mod01');await page.getByText('No hay un reporte guardado en esta sesión',{exact:true}).waitFor();assert.equal(await page.getByText('Reporte guardado correctamente',{exact:true}).count(),0);
-    await visit('/home/recaudacion/proyectos/mod13');await page.getByText(/Esta consulta todavía no está disponible/).waitFor();assert.equal(await page.getByText('Conexión Oracle OK',{exact:true}).count(),0);
     await visit('/__laboratorio/entrar?usuario=7');
     await visit('/home/informatica/permisos/mod06');await page.waitForURL('**/espacio/accesos?tab=corporate');await page.locator('#company').waitFor();
     assert.equal(await page.getByRole('navigation',{name:'Personas y accesos',exact:true}).getByRole('link',{name:'Roles',exact:true}).count(),0);

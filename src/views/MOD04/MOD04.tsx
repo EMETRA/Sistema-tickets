@@ -1,39 +1,44 @@
 "use client";
 
-import React, { useState } from 'react';
-import { Title } from '../../components/client/atoms/Title';
-import { FormField } from '../../components/client/molecules/FormField';
+import React, { useState } from "react";
+import { Title } from "../../components/client/atoms/Title";
+import { FormField } from "../../components/client/molecules/FormField";
 import { Input } from "../../components/client/atoms/Input";
-import { Button } from '../../components/client/atoms/Button';
-import { Text } from '../../components/client/atoms/Text';
+import { Button } from "../../components/client/atoms/Button";
+import { Text } from "../../components/client/atoms/Text";
 
-import { PopUp } from '@/components/client/molecules/PopUp';
+import { PopUp } from "@/components/client/molecules/PopUp";
 
-import { useGetVisaNominaExportExcel } from '@/api/hooks';
+import { useGetVisaNominaExportExcel } from "@/api/hooks";
 
-import styles from './MOD04.module.scss';
+import styles from "./MOD04.module.scss";
 
 const MOD04: React.FC = () => {
     const { exportar, loading: exportLoading, error: exportError } = useGetVisaNominaExportExcel();
 
-    const [company, setCompany] = useState<string>('97');
-    const [paystubType, setPaystubType] = useState<string>('');
-    const [playrollManager, setPlayrollManager] = useState<string>('');
-    const [paymentType, setPaymentType] = useState<string>('');
-    const [budgetUnit, setBudgetUnit] = useState<string>('');
+    const [company, setCompany] = useState<string>("97");
+    const [paystubType, setPaystubType] = useState<string>("");
+    const [playrollManager, setPlayrollManager] = useState<string>("");
+    const [paymentType, setPaymentType] = useState<string>("");
+    const [budgetUnit, setBudgetUnit] = useState<string>("");
 
-    const [validation, setValidation] = useState('');
+    const [validation, setValidation] = useState("");
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
     const handleExecute = async () => {
         if (exportLoading) return;
-        setValidation('');
-        if (company.trim() === '' || paystubType === '' || playrollManager === '' || paymentType === '' || budgetUnit === '') {
-            setValidation('Completa todos los parámetros de la consulta.');
+        setValidation("");
+        if (
+            company.trim() === "" ||
+            paystubType === "" ||
+            playrollManager === "" ||
+            paymentType === "" ||
+            budgetUnit === ""
+        ) {
+            setValidation("Completa todos los parámetros de la consulta.");
             return;
         }
 
-        
         const result = await exportar({
             empresa: company,
             tipoNomina: paystubType,
@@ -42,7 +47,10 @@ const MOD04: React.FC = () => {
             unidadPresupuestaria: budgetUnit,
         });
 
-        if (result?.totalEmpleados === 0) setValidation('No se encontraron empleados con estos filtros. Revisa los códigos de empresa, nómina, maestro y unidad presupuestaria.');
+        if (result?.totalEmpleados === 0)
+            setValidation(
+                "No se encontraron empleados con estos filtros. Revisa los códigos de empresa, nómina, maestro y unidad presupuestaria.",
+            );
         else if (result) {
             setIsModalOpen(true);
         }
@@ -51,7 +59,9 @@ const MOD04: React.FC = () => {
     return (
         <div className={styles.mainContainer}>
             <div className={styles.formContainer}>
-                <Title variant="mid" tag="h3" className={styles.title}>Parámetros de consulta</Title>
+                <Title variant="mid" tag="h3" className={styles.title}>
+                    Parámetros de consulta
+                </Title>
                 {validation && <p role="alert">{validation}</p>}
 
                 {/* Empresa */}
@@ -68,7 +78,12 @@ const MOD04: React.FC = () => {
                 </FormField>
 
                 {/* Tipo de nómina */}
-                <FormField label="Tipo de nómina" htmlFor="paystubType" required className={styles.fieldPaystubType}>
+                <FormField
+                    label="Tipo de nómina"
+                    htmlFor="paystubType"
+                    required
+                    className={styles.fieldPaystubType}
+                >
                     <Input
                         id="paystubType"
                         type="text"
@@ -81,7 +96,12 @@ const MOD04: React.FC = () => {
                 </FormField>
 
                 {/* Maestro de Nómina */}
-                <FormField label="Maestro de Nómina" htmlFor="payrollManager" required className={styles.fieldPayrollManager}>
+                <FormField
+                    label="Maestro de Nómina"
+                    htmlFor="payrollManager"
+                    required
+                    className={styles.fieldPayrollManager}
+                >
                     <Input
                         id="payrollManager"
                         type="text"
@@ -94,7 +114,12 @@ const MOD04: React.FC = () => {
                 </FormField>
 
                 {/* Tipo de pago (Ej. % o 01%) */}
-                <FormField label="Tipo de Pago (Ej. % o 01%)" htmlFor="paymentType" required className={styles.fieldPaymentType}>
+                <FormField
+                    label="Tipo de Pago (Ej. % o 01%)"
+                    htmlFor="paymentType"
+                    required
+                    className={styles.fieldPaymentType}
+                >
                     <Input
                         id="paymentType"
                         type="text"
@@ -107,7 +132,12 @@ const MOD04: React.FC = () => {
                 </FormField>
 
                 {/* Unidad presupuestaria */}
-                <FormField label="Unidad Presupuestaria (Ej. 12% o %)" htmlFor="budgetUnit" required className={styles.fieldBudgetUnit}>
+                <FormField
+                    label="Unidad Presupuestaria (Ej. 12% o %)"
+                    htmlFor="budgetUnit"
+                    required
+                    className={styles.fieldBudgetUnit}
+                >
                     <Input
                         id="budgetUnit"
                         type="text"
@@ -126,11 +156,13 @@ const MOD04: React.FC = () => {
                     className={styles.executeButton}
                     state={exportLoading ? "loading" : "default"}
                 >
-                    {exportLoading ? 'Generando Excel...' : 'Generar Reporte en Excel'}
+                    {exportLoading ? "Generando Excel..." : "Generar Reporte en Excel"}
                 </Button>
 
                 {exportError && (
-                    <p role="alert" className={styles.errorText}>{exportError.message}</p>
+                    <p role="alert" className={styles.errorText}>
+                        {exportError.message}
+                    </p>
                 )}
 
                 <Text variant="caption" className={styles.footerText}>
@@ -145,7 +177,7 @@ const MOD04: React.FC = () => {
                 variant="success"
             />
         </div>
-    )
-}
+    );
+};
 
 export default MOD04;

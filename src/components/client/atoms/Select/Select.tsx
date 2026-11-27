@@ -12,28 +12,22 @@ import { SelectProps, SelectOption, SelectOptionGroup } from "./types";
  * @returns {JSX.Element} El componente de select renderizado.
  */
 const Select = forwardRef<HTMLSelectElement, SelectProps>(
-    (
-        {
-            className,
-            state = "default",
-            errorMessage,
-            placeholder,
-            options,
-            ...props
-        },
-        ref
-    ) => {
-    // Referencia interna al select
+    ({ className, state = "default", errorMessage, placeholder, options, ...props }, ref) => {
+        // Referencia interna al select
         const selectRef = useRef<HTMLSelectElement>(null);
 
         // Combina la referencia interna con la referencia pasada
         useImperativeHandle(ref, () => selectRef.current as HTMLSelectElement, []);
 
         // Construir las clases CSS dinámicamente usando classnames
-        const selectClasses = classNames(styles.Select, {
-            [styles.SelectError]: state === "error",
-            [styles.SelectDisabled]: state === "disabled",
-        }, className);
+        const selectClasses = classNames(
+            styles.Select,
+            {
+                [styles.SelectError]: state === "error",
+                [styles.SelectDisabled]: state === "disabled",
+            },
+            className,
+        );
 
         // Verificar si options tiene grupos
         const isGrouped = options.length > 0 && "options" in options[0];
@@ -93,7 +87,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
                 )}
             </div>
         );
-    }
+    },
 );
 
 Select.displayName = "Select";

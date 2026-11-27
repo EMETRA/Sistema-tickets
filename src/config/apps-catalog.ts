@@ -31,10 +31,7 @@ export function getMainApps(catalog: AppsCatalog): AppMeta[] {
     return Object.values(catalog).map((app) => app.meta);
 }
 
-export function getMainApp(
-    appId: string,
-    catalog: AppsCatalog,
-): MainApp | null {
+export function getMainApp(appId: string, catalog: AppsCatalog): MainApp | null {
     return catalog[appId] ?? null;
 }
 
@@ -44,19 +41,11 @@ export function getSections(appId: string, catalog: AppsCatalog): AppMeta[] {
     return Object.values(app.sections).map((section) => section.meta);
 }
 
-export function getSection(
-    appId: string,
-    sectionId: string,
-    catalog: AppsCatalog,
-): AppSection | null {
+export function getSection(appId: string, sectionId: string, catalog: AppsCatalog): AppSection | null {
     return catalog[appId]?.sections[sectionId] ?? null;
 }
 
-export function getModules(
-    appId: string,
-    sectionId: string,
-    catalog: AppsCatalog,
-): AppMeta[] {
+export function getModules(appId: string, sectionId: string, catalog: AppsCatalog): AppMeta[] {
     return getSection(appId, sectionId, catalog)?.modules ?? [];
 }
 
@@ -70,10 +59,7 @@ export function getModule(
     return modules.find((m) => m.id === moduleId) ?? null;
 }
 
-export function getFirstSectionId(
-    appId: string,
-    catalog: AppsCatalog,
-): string | null {
+export function getFirstSectionId(appId: string, catalog: AppsCatalog): string | null {
     const sections = Object.keys(catalog[appId]?.sections ?? {});
     return sections[0] ?? null;
 }
@@ -97,10 +83,7 @@ export function resolveAppPath(pathname: string): ResolvedAppPath | null {
 }
 
 /** True si el path completo existe en el catálogo (app / sección / módulo). */
-export function isKnownAppPath(
-    pathname: string,
-    catalog: AppsCatalog,
-): boolean {
+export function isKnownAppPath(pathname: string, catalog: AppsCatalog): boolean {
     const resolved = resolveAppPath(pathname);
     if (!resolved) return false;
 
@@ -118,10 +101,7 @@ export function isKnownAppPath(
 }
 
 /** Metadata para TopBar según la profundidad del path. */
-export function getAppPathMeta(
-    pathname: string,
-    catalog: AppsCatalog,
-): AppMeta | null {
+export function getAppPathMeta(pathname: string, catalog: AppsCatalog): AppMeta | null {
     const resolved = resolveAppPath(pathname);
     if (!resolved) return null;
 
@@ -129,12 +109,7 @@ export function getAppPathMeta(
     if (!app) return null;
 
     if (resolved.moduleId && resolved.sectionId) {
-        return getModule(
-            resolved.appId,
-            resolved.sectionId,
-            resolved.moduleId,
-            catalog,
-        );
+        return getModule(resolved.appId, resolved.sectionId, resolved.moduleId, catalog);
     }
 
     if (resolved.sectionId) {
@@ -148,11 +123,7 @@ export function buildSectionPath(appId: string, sectionId: string): string {
     return `/home/${appId}/${sectionId}`;
 }
 
-export function buildModulePath(
-    appId: string,
-    sectionId: string,
-    moduleId: string,
-): string {
+export function buildModulePath(appId: string, sectionId: string, moduleId: string): string {
     return `/home/${appId}/${sectionId}/${moduleId}`;
 }
 
@@ -181,13 +152,9 @@ export function publicAppsCatalog(catalog: AppsCatalog): AppsCatalog {
                 }
                 return true;
             });
-            if (modules.length || section.modules.length === 0)
-                sections[sectionId] = { ...section, modules };
+            if (modules.length || section.modules.length === 0) sections[sectionId] = { ...section, modules };
         }
-        if (
-            Object.keys(sections).length ||
-            Object.keys(app.sections).length === 0
-        )
+        if (Object.keys(sections).length || Object.keys(app.sections).length === 0)
             result[appId] = { ...app, sections };
     }
     // Solo se traslada un módulo ya autorizado; nunca se crea un acceso nuevo.
@@ -217,23 +184,16 @@ export function publicAppsCatalog(catalog: AppsCatalog): AppsCatalog {
 
 /** Destinos de marcadores antiguos; el destino conserva sus controles de acceso. */
 export function legacyApplicationDestination(pathname: string): string | null {
-    const match = pathname.match(
-        /^\/home\/[^/]+\/[^/]+\/([^/]+)(\/detail)?\/?$/,
-    );
+    const match = pathname.match(/^\/home\/[^/]+\/[^/]+\/([^/]+)(\/detail)?\/?$/);
     if (!match) return null;
     const [, moduleId, detail = ""] = match;
     if (moduleId === "juz01") {
         const target = `/home/juzgado/consultas/juz01${detail}`;
         return pathname.replace(/\/$/, "") === target ? null : target;
     }
-    if (["dashboard-proyectos", "dashboard-colaboradores"].includes(moduleId))
-        return "/espacio/metricas";
+    if (["dashboard-proyectos", "dashboard-colaboradores"].includes(moduleId)) return "/espacio/metricas";
     if (moduleId === "mod06") return "/espacio/accesos?tab=corporate";
-    if (
-        ["proc01", "mod13", "mod01", "exportmod01", "save-mod01"].includes(
-            moduleId,
-        )
-    )
+    if (["proc01", "mod13", "mod01", "exportmod01", "save-mod01"].includes(moduleId))
         return "/aplicaciones/en-desuso";
     return null;
 }

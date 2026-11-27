@@ -1,12 +1,12 @@
 .title {
   font-family: var(--font-montserrat), sans-serif;
   font-weight: 700;
-  color: var(--tickets-text, #263b58);
+  color: var(--tickets-text);
   margin: 0;
 }
 .xlarge {
   font-family: var(--font-montserrat), sans-serif;
-  font-size: clamp(28px, 3vw, 40px);
+  font-size: clamp(28px, calc(3vw / var(--vp-zoom, 1)), 40px);
 }
 .large {
   font-family: var(--font-montserrat), sans-serif;

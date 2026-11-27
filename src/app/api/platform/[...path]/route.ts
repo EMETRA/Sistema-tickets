@@ -3,16 +3,12 @@ import { NextRequest } from "next/server";
 import { getGraphqlEndpoint } from "@/api/config/env";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-async function proxy(
-    request: NextRequest,
-    context: { params: Promise<{ path: string[] }> },
-) {
+async function proxy(request: NextRequest, context: { params: Promise<{ path: string[] }> }) {
     if (process.env.TICKETS_PLATFORM_ENABLED !== "true")
         return Response.json(
             {
                 codigo: "FEATURE_DISABLED",
-                message:
-                    "Los módulos nuevos de Tickets todavía no están habilitados.",
+                message: "Los módulos nuevos de Tickets todavía no están habilitados.",
             },
             { status: 503, headers: { "Cache-Control": "private, no-store" } },
         );
@@ -50,27 +46,21 @@ async function proxy(
             "hr",
         ].includes(path[0])
     )
-        return Response.json(
-            { message: "Ruta no disponible" },
-            { status: 404 },
-        );
+        return Response.json({ message: "Ruta no disponible" }, { status: 404 });
     if (path.length > 6 || path.some((x) => !/^[-a-zA-Z0-9]+$/.test(x)))
         return Response.json({ message: "Ruta inválida" }, { status: 400 });
-    if (path[0] === "worker-notifications" &&
-        (request.method !== "GET" || path.length !== 2 ||
-            !["summary", "results", "pending", "fine"].includes(path[1])))
+    if (
+        path[0] === "worker-notifications" &&
+        (request.method !== "GET" ||
+            path.length !== 2 ||
+            !["summary", "results", "pending", "fine"].includes(path[1]))
+    )
         return Response.json({ message: "Ruta no disponible" }, { status: 404 });
     const authorization = request.headers.get("authorization");
     if (!authorization || !/^Bearer \S+$/.test(authorization))
-        return Response.json(
-            { message: "Inicia sesión para continuar." },
-            { status: 401 },
-        );
+        return Response.json({ message: "Inicia sesión para continuar." }, { status: 401 });
     const endpoint = new URL(getGraphqlEndpoint());
-    endpoint.pathname =
-        endpoint.pathname.replace(/\/graphql\/?$/, "") +
-        "/platform/" +
-        path.join("/");
+    endpoint.pathname = endpoint.pathname.replace(/\/graphql\/?$/, "") + "/platform/" + path.join("/");
     endpoint.search = request.nextUrl.search;
     const headers = new Headers({ Authorization: authorization });
     const confirmation = request.headers.get("x-ticket-confirmation");
@@ -80,23 +70,10 @@ async function proxy(
     try {
         if (!["GET", "HEAD"].includes(request.method)) {
             if (mime.includes("multipart/form-data")) {
-                if (
-                    !/^records\/[-a-z]+\/[-a-f0-9]{36}\/files$/.test(
-                        path.join("/"),
-                    )
-                )
-                    return Response.json(
-                        { message: "Subida no permitida" },
-                        { status: 400 },
-                    );
-                if (
-                    Number(request.headers.get("content-length") || 0) >
-                    21 * 1024 * 1024
-                )
-                    return Response.json(
-                        { message: "El archivo es demasiado grande." },
-                        { status: 413 },
-                    );
+                if (!/^records\/[-a-z]+\/[-a-f0-9]{36}\/files$/.test(path.join("/")))
+                    return Response.json({ message: "Subida no permitida" }, { status: 400 });
+                if (Number(request.headers.get("content-length") || 0) > 21 * 1024 * 1024)
+                    return Response.json({ message: "El archivo es demasiado grande." }, { status: 413 });
                 const form = await request.formData(),
                     file = form.get("file"),
                     command = form.get("command");
@@ -106,10 +83,7 @@ async function proxy(
                     typeof command !== "string" ||
                     command.length > 5000
                 )
-                    return Response.json(
-                        { message: "Archivo inválido." },
-                        { status: 400 },
-                    );
+                    return Response.json({ message: "Archivo inválido." }, { status: 400 });
                 body = form;
             } else {
                 const reader = request.body?.getReader();
@@ -124,8 +98,7 @@ async function proxy(
                             await reader.cancel();
                             return Response.json(
                                 {
-                                    message:
-                                        "La solicitud es demasiado grande.",
+                                    message: "La solicitud es demasiado grande.",
                                 },
                                 { status: 413 },
                             );
@@ -158,23 +131,14 @@ async function proxy(
         });
     } catch (error) {
         const referencia =
-            path[0] === "client-errors"
-                ? undefined
-                : await queuePanelIncident("Platform." + path[0], error);
+            path[0] === "client-errors" ? undefined : await queuePanelIncident("Platform." + path[0], error);
         return Response.json(
             {
-                message:
-                    "No se pudo comunicar con Tickets. Conserva los datos y reintenta.",
+                message: "No se pudo comunicar con Tickets. Conserva los datos y reintenta.",
                 referencia,
             },
             { status: 503, headers: { "Cache-Control": "no-store" } },
         );
     }
 }
-export {
-    proxy as GET,
-    proxy as POST,
-    proxy as PATCH,
-    proxy as PUT,
-    proxy as DELETE,
-};
+export { proxy as GET, proxy as POST, proxy as PATCH, proxy as PUT, proxy as DELETE };

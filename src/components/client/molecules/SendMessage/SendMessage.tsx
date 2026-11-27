@@ -1,16 +1,10 @@
 "use client";
-import {
-    useId,
-    useRef,
-    useState,
-    type ChangeEvent,
-    type KeyboardEvent,
-} from "react";
+import { useId, useRef, useState, type ChangeEvent, type KeyboardEvent } from "react";
 import classNames from "classnames";
 import { Icon } from "../../atoms/Icon";
 import { SendMessageProps } from "./types";
 import styles from "./SendMessage.module.scss";
-import { AdministrativeChangeCancelled } from '@/api/administrative-confirmation';
+import { AdministrativeChangeCancelled } from "@/api/administrative-confirmation";
 
 export const SendMessage = ({
     onSend,
@@ -34,9 +28,10 @@ export const SendMessage = ({
             setMessage("");
             setFiles([]);
         } catch (error) {
-            if (!(error instanceof AdministrativeChangeCancelled)) setError(
-                "No se pudo enviar el comentario. Conservamos el texto y los archivos para que reintentes.",
-            );
+            if (!(error instanceof AdministrativeChangeCancelled))
+                setError(
+                    "No se pudo enviar el comentario. Conservamos el texto y los archivos para que reintentes.",
+                );
         } finally {
             setIsSending(false);
         }
@@ -49,11 +44,7 @@ export const SendMessage = ({
     };
     const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
         const selected = Array.from(event.currentTarget.files || []);
-        if (selected.length)
-            setFiles((current) => [
-                ...current,
-                ...selected,
-            ]);
+        if (selected.length) setFiles((current) => [...current, ...selected]);
         event.currentTarget.value = "";
     };
     return (
@@ -80,11 +71,7 @@ export const SendMessage = ({
                                 type="button"
                                 disabled={isDisabled}
                                 aria-label={"Eliminar archivo " + file.name}
-                                onClick={() =>
-                                    setFiles((current) =>
-                                        current.filter((_, i) => i !== index),
-                                    )
-                                }
+                                onClick={() => setFiles((current) => current.filter((_, i) => i !== index))}
                             >
                                 ×
                             </button>

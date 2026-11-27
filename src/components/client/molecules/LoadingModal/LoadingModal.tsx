@@ -15,9 +15,13 @@ const LoadingModal: React.FC<LoadingModalProps> = ({ isOpen, title, description,
     <PopOver isOpen={isOpen} onClose={noop} position="center">
         <div className={classNames(styles.LoadingModal, className)} role="status" aria-live="polite">
             <span className={styles.spinner} aria-hidden="true" />
-            <Text variant="body" className={styles.title}>{title}</Text>
+            <Text variant="body" className={styles.title}>
+                {title}
+            </Text>
             {description && (
-                <Text variant="muted" className={styles.description}>{description}</Text>
+                <Text variant="muted" className={styles.description}>
+                    {description}
+                </Text>
             )}
         </div>
     </PopOver>

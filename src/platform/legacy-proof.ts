@@ -11,12 +11,7 @@ function canonical(value: unknown): string {
             "{" +
             Object.keys(value)
                 .sort()
-                .map(
-                    (k) =>
-                        JSON.stringify(k) +
-                        ":" +
-                        canonical((value as Record<string, unknown>)[k]),
-                )
+                .map((k) => JSON.stringify(k) + ":" + canonical((value as Record<string, unknown>)[k]))
                 .join(",") +
             "}"
         );
@@ -51,9 +46,7 @@ export async function legacyProof(
             }),
         ),
     );
-    const key = Array.from(new Uint8Array(bytes), (b) =>
-        b.toString(16).padStart(2, "0"),
-    ).join("");
+    const key = Array.from(new Uint8Array(bytes), (b) => b.toString(16).padStart(2, "0")).join("");
     let remembered: string | null = null;
     try {
         remembered = sessionStorage.getItem("tk-legacy-" + key);
@@ -61,8 +54,11 @@ export async function legacyProof(
     // El PDF se reconstruye por ID de resolución y el servicio reutiliza su fila.
     // Cada clic debe poder obtener una revisión nueva, aunque el intento anterior
     // quedara INCIERTO en la auditoría. Las demás mutaciones conservan su identidad.
-    const documentRetry = /^\/legacy\/vivi\/juzgado\/resoluciones\/[1-9]\d{0,18}\/documento\/generar$/.test(path);
-    const requestId = documentRetry ? crypto.randomUUID()
+    const documentRetry = /^\/legacy\/vivi\/juzgado\/resoluciones\/[1-9]\d{0,18}\/documento\/generar$/.test(
+        path,
+    );
+    const requestId = documentRetry
+        ? crypto.randomUUID()
         : pending.get(key) || remembered || crypto.randomUUID();
     pending.set(key, requestId);
     try {
@@ -76,26 +72,20 @@ export async function legacyProof(
                 label,
                 onReview: async () => {
                     proof = (
-                        await platformFetch<{ id: string }>(
-                            "/confirmations/review",
-                            {
+                        await platformFetch<{ id: string }>("/confirmations/review", {
+                            method: "POST",
+                            body: JSON.stringify({
                                 method: "POST",
-                                body: JSON.stringify({
-                                    method: "POST",
-                                    path,
-                                    body,
-                                }),
-                            },
-                        )
+                                path,
+                                body,
+                            }),
+                        })
                     ).id;
                 },
                 onConfirm: async () => {
-                    await platformFetch(
-                        "/confirmations/" + proof + "/confirm",
-                        {
-                            method: "POST",
-                        },
-                    );
+                    await platformFetch("/confirmations/" + proof + "/confirm", {
+                        method: "POST",
+                    });
                 },
             },
             true,
@@ -106,23 +96,14 @@ export async function legacyProof(
         ...(proof ? { "X-Ticket-Confirmation": proof } : {}),
     };
 }
-export async function graphqlProof(
-    query: string,
-    variables: Record<string, unknown>,
-    label: string,
-) {
+export async function graphqlProof(query: string, variables: Record<string, unknown>, label: string) {
     const operation = getOperationAST(parse(query));
     if (operation?.operation !== "mutation") return {};
     const fields = operation.selectionSet.selections;
     if (fields.length !== 1 || fields[0].kind !== Kind.FIELD)
         throw new Error("Envía una acción por solicitud.");
     const field = fields[0];
-    if (
-        ["login", "logout", "refresh", "refreshToken"].includes(
-            field.name.value,
-        )
-    )
-        return {};
+    if (["login", "logout", "refresh", "refreshToken"].includes(field.name.value)) return {};
     const uploads = new Set(
         (operation.variableDefinitions || [])
             .filter((def) => {
@@ -137,10 +118,7 @@ export async function graphqlProof(
             .filter(
                 (a) =>
                     a.name.value !== "files" &&
-                    !(
-                        a.value.kind === Kind.VARIABLE &&
-                        uploads.has(a.value.name.value)
-                    ),
+                    !(a.value.kind === Kind.VARIABLE && uploads.has(a.value.name.value)),
             )
             .map((a) => [a.name.value, valueFromASTUntyped(a.value, variables)])
             .filter(([, v]) => v !== undefined),

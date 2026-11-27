@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
 import MOD10Modal from "./MOD10Modal";
 import { Button } from "../../atoms/Button";
-import type { UploadedFile } from "../TicketCreationPanel/types";
+import type { UploadedFile } from "@/features/tickets/components/TicketCreationPanel/types";
 import type { casesNotificationFormData } from "../../../../views/MOD10/types";
 import type { MOD10ModalProps } from "./types";
 
@@ -68,7 +68,8 @@ const baseData = {
     caseNumber: "EXP-2026-00145",
     pageNumbers: 3,
     name: "Notificación de Infracción de Tránsito",
-    reference: "Exceso de velocidad en zona de 40 km/h en 9na avenida zona 12. Lo que constituye una infracción al artículo 130 del Reglamento de Tránsito.",
+    reference:
+        "Exceso de velocidad en zona de 40 km/h en 9na avenida zona 12. Lo que constituye una infracción al artículo 130 del Reglamento de Tránsito.",
     file: mockUploadedFile,
 };
 
@@ -79,14 +80,14 @@ const ModalWithButton: React.FC<Omit<MOD10ModalProps, "isOpen" | "onClose" | "on
     const handleSubmit = (data: casesNotificationFormData) => {
         alert(
             `✅ Formulario enviado exitosamente\n\n` +
-            `Área destino: ${data.destinyArea}\n` +
-            `Fecha: ${data.documentDate}\n` +
-            `Emitido por: ${data.issuedBy}\n` +
-            `Expediente: ${data.caseNumber}\n` +
-            `Folios: ${data.pageNumbers}\n` +
-            `Nombre: ${data.name}\n` +
-            `Referencia: ${data.reference}\n` +
-            `Archivo: ${data.file.name}`
+                `Área destino: ${data.destinyArea}\n` +
+                `Fecha: ${data.documentDate}\n` +
+                `Emitido por: ${data.issuedBy}\n` +
+                `Expediente: ${data.caseNumber}\n` +
+                `Folios: ${data.pageNumbers}\n` +
+                `Nombre: ${data.name}\n` +
+                `Referencia: ${data.reference}\n` +
+                `Archivo: ${data.file.name}`,
         );
         setIsOpen(false);
     };
@@ -113,14 +114,14 @@ const ModalAutoOpen: React.FC<Omit<MOD10ModalProps, "isOpen" | "onClose" | "onSu
     const handleSubmit = (data: casesNotificationFormData) => {
         alert(
             `✅ Formulario enviado exitosamente\n\n` +
-            `Área destino: ${data.destinyArea}\n` +
-            `Fecha: ${data.documentDate}\n` +
-            `Emitido por: ${data.issuedBy}\n` +
-            `Expediente: ${data.caseNumber}\n` +
-            `Folios: ${data.pageNumbers}\n` +
-            `Nombre: ${data.name}\n` +
-            `Referencia: ${data.reference}\n` +
-            `Archivo: ${data.file.name}`
+                `Área destino: ${data.destinyArea}\n` +
+                `Fecha: ${data.documentDate}\n` +
+                `Emitido por: ${data.issuedBy}\n` +
+                `Expediente: ${data.caseNumber}\n` +
+                `Folios: ${data.pageNumbers}\n` +
+                `Nombre: ${data.name}\n` +
+                `Referencia: ${data.reference}\n` +
+                `Archivo: ${data.file.name}`,
         );
         setIsOpen(false);
     };

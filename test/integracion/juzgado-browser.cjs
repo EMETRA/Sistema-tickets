@@ -64,7 +64,7 @@ async function run() {
   try {
     for (let i = 0; !salida.includes('Ready in') && i < 200; i++) { if (next.exitCode !== null) throw new Error(salida); await new Promise(r => setTimeout(r, 100)); }
     assert.ok(salida.includes('Ready in'));
-    browser = await chromium.launch({ executablePath: process.env.QA_CHROMIUM_PATH || '/usr/bin/chromium', args: ['--no-sandbox', '--disable-dev-shm-usage'] });
+    browser = await chromium.launch({ executablePath:process.env.QA_CHROMIUM_PATH||undefined, args: ['--no-sandbox', '--disable-dev-shm-usage'] });
     const context = await browser.newContext({ viewport: { width: 1440, height: 1100 }, acceptDownloads: true });
     page = await context.newPage();
     await page.route('**/*', route => new URL(route.request().url()).hostname === '127.0.0.1' ? route.continue() : route.abort());
@@ -89,14 +89,15 @@ async function run() {
     await page.evaluate(({ user }) => localStorage.setItem('auth-storage', JSON.stringify({ state: { token: 'qa-token-controlado', user, userId: user.id_usuario }, version: 0 })), { user });
     const url = `http://127.0.0.1:3741/home/juzgado/consultas/juz01/detail?caseNumber=${codigo}`;
     await page.goto('http://127.0.0.1:3741/aplicaciones');
-    await page.getByRole('button', { name: 'Ingresar a Aplicaciones Juzgado', exact: true }).click();
+    // Directorio de aplicaciones: área → sección → módulo.
+    await page.locator('a[href="/home/juzgado/consultas"]').first().click();
     await page.waitForURL('**/home/juzgado/consultas');
-    await page.getByRole('button', { name: 'Ingresar a Consultar caso', exact: true }).click();
+    await page.locator('a[href="/home/juzgado/consultas/juz01"]').first().click();
     await page.waitForURL('**/home/juzgado/consultas/juz01');
     await page.goto('http://127.0.0.1:3741/home/juridico/juz01/juz01');
     await page.waitForURL('**/home/juzgado/consultas/juz01');
     await page.locator('#caseNumber').fill('ab');await page.getByRole('button',{name:'Consultar caso',exact:true}).click();
-    await page.getByRole('alert').filter({hasText:'primeros 3 caracteres'}).waitFor();
+    await page.getByRole('alert').filter({hasText:'al menos 3 caracteres'}).waitFor();
     assert.equal(llamadas.filter(l=>l.query.includes('viviJuzgadoBuscar')).length,0);
     assert.equal(await page.locator('#caseNumber').evaluate(el=>el===document.activeElement),true);
     const buscar=async valor=>{

@@ -18,8 +18,15 @@
   font: inherit;
   text-align: left;
   cursor: pointer;
-  &:hover { border-color: #bac7ee; background: var(--tickets-surface-subtle); }
-  &:focus-visible { outline: 2px solid var(--tickets-primary); outline-offset: 2px; }
+  &:hover {
+    border-color: #bac7ee;
+    border-color: light-dark(#bac7ee, #2a3449);
+    background: var(--tickets-surface-subtle);
+  }
+  &:focus-visible {
+    outline: 2px solid var(--tickets-primary);
+    outline-offset: 2px;
+  }
 }
 .icon {
   display: grid;
@@ -30,7 +37,22 @@
   background: var(--tickets-primary-soft);
   color: var(--tickets-primary);
 }
-.content { display: grid; gap: 3px; min-width: 0; overflow-wrap: anywhere; }
-.title { font-size: 14px; font-weight: 650; line-height: 1.42; }
-.description { color: var(--tickets-text-secondary); font-size: 12px; line-height: 1.45; }
-.arrow { color: var(--tickets-primary); }
+.content {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.title {
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.42;
+}
+.description {
+  color: var(--tickets-text-secondary);
+  font-size: 12px;
+  line-height: 1.45;
+}
+.arrow {
+  color: var(--tickets-primary);
+}

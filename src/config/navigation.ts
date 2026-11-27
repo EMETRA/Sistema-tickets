@@ -3,17 +3,23 @@ import { UserRole } from "../types/roles";
 export type { UserRole };
 
 export interface PageMetadata {
-  label: string;
-  title: string;
-  iconName: string;
-  path: string;
+    label: string;
+    title: string;
+    iconName: string;
+    path: string;
 }
 
 // Metadata única de cada página del menú de sistema
 export const PAGES_CONFIG: Record<string, PageMetadata> = {
-    mi_perfil: {path:"/mi-perfil",label:"Mi perfil",title:"Mi perfil",iconName:"user-solid"},
-    notificaciones: {path:"/notificaciones",label:"Notificaciones",title:"Notificaciones",iconName:"bell-regular"},
-    ayuda: {path:"/ayuda",label:"Ayuda",title:"Ayuda",iconName:"circle-exclamation-solid"},
+    mi_perfil: { path: "/mi-perfil", label: "Mi perfil", title: "Mi perfil", iconName: "user-solid" },
+    notificaciones: {
+        path: "/notificaciones",
+        label: "Notificaciones",
+        title: "Notificaciones",
+        iconName: "bell-regular",
+    },
+    ajustes: { path: "/ajustes", label: "Ajustes", title: "Ajustes", iconName: "gear-solid" },
+    ayuda: { path: "/ayuda", label: "Ayuda", title: "Ayuda", iconName: "circle-exclamation-solid" },
     aplicaciones: {
         path: "/aplicaciones",
         label: "Aplicaciones",
@@ -83,7 +89,7 @@ export const PAGES_CONFIG: Record<string, PageMetadata> = {
     crear_ticket: {
         path: "/tickets-creation",
         label: "CREAR TICKET",
-        title: "Nuevo Ticket",
+        title: "Nuevo ticket",
         iconName: "file-circle-plus-solid",
     },
 };
@@ -98,10 +104,10 @@ export const ROLE_LAYOUTS: Record<UserRole, string[]> = {
         "tickets",
         "config",
         "crear_ticket",
-    // "historial",
-    // "planifica",
-    // "reportes",
-    // "estadistica"
+        // "historial",
+        // "planifica",
+        // "reportes",
+        // "estadistica"
     ],
     TECNICO: [
         "home",
@@ -112,7 +118,7 @@ export const ROLE_LAYOUTS: Record<UserRole, string[]> = {
         // "planifica",
         "usuarios",
         "equipo",
-    // "historial"
+        // "historial"
     ],
     USUARIO: [
         "home",
@@ -122,7 +128,7 @@ export const ROLE_LAYOUTS: Record<UserRole, string[]> = {
         "tickets",
         // "historial",
         "equipo",
-    // "reportes"
+        // "reportes"
     ],
     DESARROLLADOR: [
         "home",
@@ -133,7 +139,7 @@ export const ROLE_LAYOUTS: Record<UserRole, string[]> = {
         // "planifica",
         "usuarios",
         "equipo",
-    // "historial"
+        // "historial"
     ],
 };
 

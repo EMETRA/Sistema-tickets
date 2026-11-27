@@ -3,7 +3,13 @@ import { ModalUserSelect } from "./ModalUserSelect";
 import { Button } from "../../atoms/Button";
 import { Text } from "../../atoms/Text";
 import { useEffect, useState } from "react";
-import { AssignableUser, getAssignableUsersDummy } from "@/api/graphql/queries/getAssignableUsers";
+
+// El módulo de datos ficticios original ya no existe; la historia usa los suyos.
+type AssignableUser = { id: string; workstation: string; userInfo: { userName: string } };
+const getAssignableUsersDummy = async (): Promise<AssignableUser[]> => [
+    { id: "1", workstation: "Soporte técnico", userInfo: { userName: "Técnico ficticio" } },
+    { id: "2", workstation: "Desarrollo", userInfo: { userName: "Desarrolladora ficticia" } },
+];
 
 const meta: Meta<typeof ModalUserSelect> = {
     title: "Molecules/ModalUserSelect",
@@ -33,23 +39,29 @@ export const InteractiveExample = () => {
     };
 
     return (
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: "20px", padding: "20px" }}>
+        <div
+            style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-start",
+                gap: "20px",
+                padding: "20px",
+            }}
+        >
             <Button onClick={() => setOpen(true)}>Asignar usuario</Button>
 
             {assignedUser ? (
                 <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
                     <Text variant="caption">Usuario asignado:</Text>
-                    <Text variant="body"><strong>{assignedUser.userInfo.userName}</strong> — {assignedUser.workstation}</Text>
+                    <Text variant="body">
+                        <strong>{assignedUser.userInfo.userName}</strong> — {assignedUser.workstation}
+                    </Text>
                 </div>
             ) : (
                 <Text variant="caption">Sin usuario asignado</Text>
             )}
 
-            <ModalUserSelect
-                isOpen={open}
-                onClose={() => setOpen(false)}
-                onConfirm={handleConfirm}
-            />
+            <ModalUserSelect isOpen={open} onClose={() => setOpen(false)} onConfirm={handleConfirm} />
         </div>
     );
 };

@@ -18,7 +18,8 @@ const meta: Meta<typeof TableRow> = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const COMMON_GRID = "minmax(0, 1.8fr) minmax(0, 1fr) minmax(0, 1.4fr) minmax(0, 0.6fr) minmax(0, 0.9fr) minmax(0, 1.2fr) minmax(0, 1fr)";
+const COMMON_GRID =
+    "minmax(0, 1.8fr) minmax(0, 1fr) minmax(0, 1.4fr) minmax(0, 0.6fr) minmax(0, 0.9fr) minmax(0, 1.2fr) minmax(0, 1fr)";
 
 export const Header: Story = {
     args: {
@@ -32,63 +33,71 @@ export const Header: Story = {
             { icon: "magnifying-glass-solid", label: "Status Actual" },
             { icon: "circle-user-regular", label: "Asignación" },
             { icon: "hand-regular", label: "Acciones" },
-        ]
-    }
+        ],
+    },
 };
 
 export const DataRow: Story = {
     args: {
         gridTemplate: COMMON_GRID,
         cells: [
-            { 
-                content:
-    <div className={classNames(styles.userMenu)}>
-        <Avatar 
-            initials={"G"}
-            ringed={false}
-            size="md"
-        />
-                
-        <div className={styles.info}>
-            <Text variant="body" className={styles.name}>
-                Gildder Caceres
-            </Text>
-            <Text variant="caption" className={styles.role}>
-                Recursos Humanos  
-            </Text>
-        </div>
-    </div> 
+            {
+                content: (
+                    <div className={classNames(styles.userMenu)}>
+                        <Avatar initials={"G"} ringed={false} size="md" />
+
+                        <div className={styles.info}>
+                            <Text variant="body" className={styles.name}>
+                                Gildder Caceres
+                            </Text>
+                            <Text variant="caption" className={styles.role}>
+                                Recursos Humanos
+                            </Text>
+                        </div>
+                    </div>
+                ),
             },
-            { content: <Text variant="body" className="{
+            {
+                content: (
+                    <Text
+                        variant="body"
+                        className="{
                 
-                }">Cancelación Remisión</Text> },
+                }"
+                    >
+                        Cancelación Remisión
+                    </Text>
+                ),
+            },
             { content: <Text variant="muted">Remisión errónea a vehículo</Text> },
             { content: <Text variant="muted">Hoy, 17:24</Text> },
             { content: <TicketStateChip label="Ingresado" state="asignado" /> },
             { content: <AssignedChip assigned={false} /> },
             { content: <IconButton icon="user-lock-solid" size={24} /> },
-        ]
-    }
+        ],
+    },
 };
 
 /**
  * Ejemplo de Tabla Completa:
- * Esta historia compone el Header y múltiples DataRows para 
+ * Esta historia compone el Header y múltiples DataRows para
  * visualizar el diseño final de la tabla de tickets.
  */
 export const TableExample: Story = {
     render: () => (
-        <div style={{ 
-            display: 'flex', 
-            flexDirection: 'column', 
-            width: '100%',
-            // overflowX: 'auto' // Por si la pantalla es pequeña
-        }}>
+        <div
+            style={{
+                display: "flex",
+                flexDirection: "column",
+                width: "100%",
+                // overflowX: 'auto' // Por si la pantalla es pequeña
+            }}
+        >
             {/* Renderizamos el Header usando los mismos args definidos arriba */}
-            <TableRow 
+            <TableRow
                 isHeader
                 gridTemplate={COMMON_GRID}
-                cells={ [
+                cells={[
                     { icon: "user-regular", label: "Usuario" },
                     { icon: "clipboard-regular", label: "Titulo" },
                     { icon: "file-lines-regular", label: "Descripción" },
@@ -96,38 +105,41 @@ export const TableExample: Story = {
                     { icon: "magnifying-glass-solid", label: "Status Actual" },
                     { icon: "circle-user-regular", label: "Asignación" },
                     { icon: "hand-regular", label: "Acciones" },
-                ]}     
+                ]}
             />
-            
-            
-            <TableRow 
+
+            <TableRow
                 gridTemplate={COMMON_GRID}
                 scale={1}
                 cells={[
-                    { 
-                        content:
-    <div className={classNames(styles.userMenu)}>
-        <Avatar initials="F" size="sm"   />
-        <div className={styles.info}>
-            <Text variant="body" className={styles.name}>
-                Feyser Emilio Caceres
-            </Text>
-            <Text variant="caption" className={styles.role}>
-                Informática
-            </Text>
-        </div>
-    </div> 
+                    {
+                        content: (
+                            <div className={classNames(styles.userMenu)}>
+                                <Avatar initials="F" size="sm" />
+                                <div className={styles.info}>
+                                    <Text variant="body" className={styles.name}>
+                                        Feyser Emilio Caceres
+                                    </Text>
+                                    <Text variant="caption" className={styles.role}>
+                                        Informática
+                                    </Text>
+                                </div>
+                            </div>
+                        ),
                     },
                     { content: <Text variant="muted">Solicitud de Mantenimiento</Text> },
                     { content: <Text variant="muted">Mantenimiento a computadora</Text> },
                     { content: <Text variant="muted">Ayer, 14:32</Text> },
-                    { content: <TicketStateChip label="Asignado" state="asignado" />, align:"center" },
-                    { content: <AssignedChip assigned={false} />, align:"center" },
-                    { content: <IconButton icon="trash-solid" size={24} iconColor="#BDBDBD" />, align:"center" },
+                    { content: <TicketStateChip label="Asignado" state="asignado" />, align: "center" },
+                    { content: <AssignedChip assigned={false} />, align: "center" },
+                    {
+                        content: <IconButton icon="trash-solid" size={24} iconColor="#BDBDBD" />,
+                        align: "center",
+                    },
                 ]}
             />
         </div>
-    )
+    ),
 };
 
 /**
@@ -150,34 +162,40 @@ export const SelectableTableExample: Story = {
 
         // Función para seleccionar una fila individual
         const handleSelectRow = (id: number, checked: boolean) => {
-            setSelectedRows(prev => 
-                checked ? [...prev, id] : prev.filter(rowId => rowId !== id)
-            );
+            setSelectedRows((prev) => (checked ? [...prev, id] : prev.filter((rowId) => rowId !== id)));
         };
 
         const exampleCells = [
-            { 
-                content:
-    <div className={classNames(styles.userMenu)}>
-        <Avatar initials="G" size="sm" />
-        <div className={styles.info}>
-            <Text variant="body" className={styles.name}>Gildder Caceres</Text>
-            <Text variant="caption" className={styles.role}>Recursos Humanos</Text>
-        </div>
-    </div> 
+            {
+                content: (
+                    <div className={classNames(styles.userMenu)}>
+                        <Avatar initials="G" size="sm" />
+                        <div className={styles.info}>
+                            <Text variant="body" className={styles.name}>
+                                Gildder Caceres
+                            </Text>
+                            <Text variant="caption" className={styles.role}>
+                                Recursos Humanos
+                            </Text>
+                        </div>
+                    </div>
+                ),
             },
             { content: <Text variant="muted">Cancelación Remisión</Text> },
             { content: <Text variant="muted">Remisión errónea a vehículo</Text> },
             { content: <Text variant="muted">Hoy, 17:24</Text> },
             { content: <TicketStateChip label="Ingresado" state="asignado" />, align: "center" as const },
             { content: <AssignedChip assigned={false} />, align: "center" as const },
-            { content: <IconButton icon="trash-solid" size={24} iconColor="#BDBDBD" />, align: "center" as const },
+            {
+                content: <IconButton icon="trash-solid" size={24} iconColor="#BDBDBD" />,
+                align: "center" as const,
+            },
         ];
 
         return (
-            <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+            <div style={{ display: "flex", flexDirection: "column", width: "100%" }}>
                 {/* Header con lógica de Seleccionar Todo */}
-                <TableRow 
+                <TableRow
                     isHeader
                     selectable
                     isSelected={isAllSelected}
@@ -193,10 +211,10 @@ export const SelectableTableExample: Story = {
                         { icon: "hand-regular", label: "Acciones" },
                     ]}
                 />
-                
+
                 {/* Renderizado de las 3 filas con estado independiente */}
                 {rowIds.map((id) => (
-                    <TableRow 
+                    <TableRow
                         key={id}
                         id={id} // 👈 Pasamos el ID único de la fila
                         selectable
@@ -209,15 +227,17 @@ export const SelectableTableExample: Story = {
                 ))}
             </div>
         );
-    }
+    },
 };
 
 export const PermissionsTableExample: Story = {
     render: () => {
         const permissionIds = [1, 2];
-        
+
         // 1. Estado para los switches de permisos
-        const [permissions, setPermissions] = React.useState<Record<string, { grabar: boolean; editar: boolean; eliminar: boolean; ver: boolean }>>({
+        const [permissions, setPermissions] = React.useState<
+            Record<string, { grabar: boolean; editar: boolean; eliminar: boolean; ver: boolean }>
+        >({
             "1": { grabar: true, editar: false, eliminar: true, ver: true },
             "2": { grabar: false, editar: true, eliminar: false, ver: true },
         });
@@ -227,9 +247,9 @@ export const PermissionsTableExample: Story = {
         const isModuleSelected = selectedRows.length === permissionIds.length;
 
         const handleTogglePermission = (rowId: number, field: string, value: boolean) => {
-            setPermissions(prev => ({
+            setPermissions((prev) => ({
                 ...prev,
-                [rowId.toString()]: { ...prev[rowId.toString()], [field]: value }
+                [rowId.toString()]: { ...prev[rowId.toString()], [field]: value },
             }));
         };
 
@@ -238,14 +258,21 @@ export const PermissionsTableExample: Story = {
         };
 
         const handleSelectRow = (id: number, checked: boolean) => {
-            setSelectedRows(prev => 
-                checked ? [...prev, id] : prev.filter(pId => pId !== id)
-            );
+            setSelectedRows((prev) => (checked ? [...prev, id] : prev.filter((pId) => pId !== id)));
         };
 
         return (
-            <div style={{ display: 'flex', flexDirection: 'column', width: '100%', border: '1px solid #E0E0E0', borderRadius: '8px', overflow: 'hidden' }}>
-                <TableRow 
+            <div
+                style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    width: "100%",
+                    border: "1px solid #E0E0E0",
+                    borderRadius: "8px",
+                    overflow: "hidden",
+                }}
+            >
+                <TableRow
                     variant="permission"
                     isHeader
                     selectable
@@ -254,9 +281,9 @@ export const PermissionsTableExample: Story = {
                     gridTemplate=""
                     cells={[{ label: "Nombre del modulo (Modulo Usuarios)" }]}
                 />
-                
+
                 {permissionIds.map((id) => (
-                    <TableRow 
+                    <TableRow
                         key={id}
                         id={id}
                         variant="permission"
@@ -267,50 +294,69 @@ export const PermissionsTableExample: Story = {
                         gridTemplate=""
                         rowContentClassName={styles.rowContentExample}
                         cells={[
-                            { 
+                            {
                                 content: (
-                                    <div style={{ display: 'flex', flexDirection: 'column', height: "100%", justifyContent: 'center' }}>
-                                        <Text variant="body" className={styles.storieP}>Nombre del permiso</Text>
-                                        <Text variant="muted" className={styles.storieP}>Descripcion del permiso si es demasiado largo debera ser cortada</Text>
+                                    <div
+                                        style={{
+                                            display: "flex",
+                                            flexDirection: "column",
+                                            height: "100%",
+                                            justifyContent: "center",
+                                        }}
+                                    >
+                                        <Text variant="body" className={styles.storieP}>
+                                            Nombre del permiso
+                                        </Text>
+                                        <Text variant="muted" className={styles.storieP}>
+                                            Descripcion del permiso si es demasiado largo debera ser cortada
+                                        </Text>
                                     </div>
-                                ) 
+                                ),
                             },
-                            { 
-                                content: <PermissionToggle 
-                                    id={`row-${id}-grabar`} 
-                                    label="Grabar" 
-                                    checked={permissions[id].grabar} 
-                                    onChange={(val) => handleTogglePermission(id, 'grabar', val)} 
-                                /> 
+                            {
+                                content: (
+                                    <PermissionToggle
+                                        id={`row-${id}-grabar`}
+                                        label="Grabar"
+                                        checked={permissions[id].grabar}
+                                        onChange={(val) => handleTogglePermission(id, "grabar", val)}
+                                    />
+                                ),
                             },
-                            { 
-                                content: <PermissionToggle 
-                                    id={`row-${id}-editar`} 
-                                    label="Editar" 
-                                    checked={permissions[id].editar} 
-                                    onChange={(val) => handleTogglePermission(id, 'editar', val)} 
-                                /> 
+                            {
+                                content: (
+                                    <PermissionToggle
+                                        id={`row-${id}-editar`}
+                                        label="Editar"
+                                        checked={permissions[id].editar}
+                                        onChange={(val) => handleTogglePermission(id, "editar", val)}
+                                    />
+                                ),
                             },
-                            { 
-                                content: <PermissionToggle 
-                                    id={`row-${id}-eliminar`} 
-                                    label="Eliminar" 
-                                    checked={permissions[id].eliminar} 
-                                    onChange={(val) => handleTogglePermission(id, 'eliminar', val)} 
-                                /> 
+                            {
+                                content: (
+                                    <PermissionToggle
+                                        id={`row-${id}-eliminar`}
+                                        label="Eliminar"
+                                        checked={permissions[id].eliminar}
+                                        onChange={(val) => handleTogglePermission(id, "eliminar", val)}
+                                    />
+                                ),
                             },
-                            { 
-                                content: <PermissionToggle 
-                                    id={`row-${id}-ver`} 
-                                    label="Visualizacion" 
-                                    checked={permissions[id].ver} 
-                                    onChange={(val) => handleTogglePermission(id, 'ver', val)} 
-                                /> 
+                            {
+                                content: (
+                                    <PermissionToggle
+                                        id={`row-${id}-ver`}
+                                        label="Visualizacion"
+                                        checked={permissions[id].ver}
+                                        onChange={(val) => handleTogglePermission(id, "ver", val)}
+                                    />
+                                ),
                             },
                         ]}
                     />
                 ))}
             </div>
         );
-    }
+    },
 };

@@ -17,15 +17,12 @@ import {
 import styles from "./Statistics.module.scss";
 
 export const Statistics = () => {
-    const [systems, setSystems] = useState<
-    Array<{ label: string; value: string }>
-  >([]);
+    const [systems, setSystems] = useState<Array<{ label: string; value: string }>>([]);
     const [selectedSystem, setSelectedSystem] = useState({
         label: "",
         value: "",
     });
-    const [filterConfig, setFilterConfig] =
-    useState<SecondaryFilterConfig | null>(null);
+    const [filterConfig, setFilterConfig] = useState<SecondaryFilterConfig | null>(null);
     const [selectedParentFilter, setSelectedParentFilter] = useState("");
     const [selectedChildFilter, setSelectedChildFilter] = useState("");
     const [data, setData] = useState<BarChartDataPoint[]>([]);
@@ -41,8 +38,7 @@ export const Statistics = () => {
                 const systemsData = await getSystemsDummy();
                 const config = await getStatisticsFilterConfigDummy();
                 const defaultParent = config.parentOptions[0]?.value || "";
-                const defaultChild =
-          config.childOptionsByParent[defaultParent]?.[0]?.value || "";
+                const defaultChild = config.childOptionsByParent[defaultParent]?.[0]?.value || "";
 
                 setSystems(systemsData);
                 setSelectedSystem(systemsData[0] || { label: "", value: "" });
@@ -86,8 +82,7 @@ export const Statistics = () => {
 
     const handleParentFilterChange = (value: string) => {
         setSelectedParentFilter(value);
-        const nextChild =
-      filterConfig?.childOptionsByParent[value]?.[0]?.value || "";
+        const nextChild = filterConfig?.childOptionsByParent[value]?.[0]?.value || "";
         setSelectedChildFilter(nextChild);
     };
 
@@ -102,9 +97,7 @@ export const Statistics = () => {
                         className={styles.systemDropdown}
                     />
                     <Text variant="caption">Reporte del:</Text>
-                    <Text variant="body">
-                        {selectedSystem.label || "Seleccione un sistema"}
-                    </Text>
+                    <Text variant="body">{selectedSystem.label || "Seleccione un sistema"}</Text>
                 </div>
                 <Button variant="contained" icon="print-solid" left>
                     Imprimir
@@ -119,9 +112,7 @@ export const Statistics = () => {
                     <PerformanceChartPanel
                         variant="secondary"
                         data={data}
-                        filterConfig={
-                            filterConfig || { parentOptions: [], childOptionsByParent: {} }
-                        }
+                        filterConfig={filterConfig || { parentOptions: [], childOptionsByParent: {} }}
                         selectedParentFilter={selectedParentFilter}
                         selectedChildFilter={selectedChildFilter}
                         onParentFilterChange={handleParentFilterChange}

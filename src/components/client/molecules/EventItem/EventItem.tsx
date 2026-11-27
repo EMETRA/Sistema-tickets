@@ -13,23 +13,23 @@ import styles from "./EventItem.module.scss";
  */
 const formatDate = (date: Date): string => {
     const today = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Guatemala" }));
-    const isToday = 
-    date.getDate() === today.getDate() &&
-    date.getMonth() === today.getMonth() &&
-    date.getFullYear() === today.getFullYear();
+    const isToday =
+        date.getDate() === today.getDate() &&
+        date.getMonth() === today.getMonth() &&
+        date.getFullYear() === today.getFullYear();
 
     if (isToday) {
-    // Mostrar solo hora (formato 24h)
-        return date.toLocaleTimeString("es-ES", { 
-            hour: "2-digit", 
-            minute: "2-digit" 
+        // Mostrar solo hora (formato 24h)
+        return date.toLocaleTimeString("es-ES", {
+            hour: "2-digit",
+            minute: "2-digit",
         });
     } else {
-    // Mostrar solo fecha
+        // Mostrar solo fecha
         return date.toLocaleDateString("es-ES", {
             day: "2-digit",
             month: "2-digit",
-            year: "numeric"
+            year: "numeric",
         });
     }
 };
@@ -40,13 +40,13 @@ const formatDate = (date: Date): string => {
 const calculateDaysRemaining = (targetDate: Date): number => {
     const today = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Guatemala" }));
     today.setHours(0, 0, 0, 0);
-  
+
     const target = new Date(targetDate);
     target.setHours(0, 0, 0, 0);
-  
+
     const diffTime = target.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  
+
     return diffDays;
 };
 
@@ -60,29 +60,18 @@ export const EventItem: React.FC<EventItemProps> = (props) => {
     const { type, date, className } = props;
 
     if (type === "movement") {
-        const { 
-            userName, 
-            avatarSrc, 
-            avatarInitials, 
-            label 
-        } = props;
+        const { userName, avatarSrc, avatarInitials, label } = props;
 
-        const userNameDisplay = userName.split(' ').length > 2 ? userName.split(' ')[0] + ' ' + userName.split(' ')[1] : userName;
+        const userNameDisplay =
+            userName.split(" ").length > 2 ? userName.split(" ")[0] + " " + userName.split(" ")[1] : userName;
 
         // Determinar el texto del label
-        const labelText = typeof label === "string" 
-            ? label 
-            : `Ticket #${label.ticketId} a ${label.newState}`;
+        const labelText = typeof label === "string" ? label : `Ticket #${label.ticketId} a ${label.newState}`;
 
         return (
             <div className={classNames(styles.EventItem, styles.movement, className)}>
-                <Avatar 
-                    src={avatarSrc} 
-                    initials={avatarInitials} 
-                    size="md" 
-                    className={styles.avatar}
-                />
-        
+                <Avatar src={avatarSrc} initials={avatarInitials} size="md" className={styles.avatar} />
+
                 <div className={styles.content}>
                     <Text variant="body" className={styles.userName}>
                         {userNameDisplay}
@@ -91,7 +80,7 @@ export const EventItem: React.FC<EventItemProps> = (props) => {
                         {labelText}
                     </Text>
                 </div>
-        
+
                 <Text variant="caption" className={styles.date}>
                     {formatDate(date)}
                 </Text>
@@ -100,26 +89,22 @@ export const EventItem: React.FC<EventItemProps> = (props) => {
     }
 
     // type === "event"
-    const { 
-        eventName, 
-        iconColor, 
-        iconBackgroundColor 
-    } = props;
+    const { eventName, iconColor, iconBackgroundColor } = props;
 
     const daysRemaining = calculateDaysRemaining(date);
     const daysText = `${daysRemaining} ${daysRemaining === 1 ? "día" : "días"}`;
 
     return (
         <div className={classNames(styles.EventItem, styles.event, className)}>
-            <Icon 
-                name="calendar-day-solid" 
+            <Icon
+                name="calendar-day-solid"
                 variant="status"
                 size={24}
                 color={iconColor}
                 backgroundColor={iconBackgroundColor}
                 className={styles.icon}
             />
-      
+
             <div className={styles.content}>
                 <Text variant="body" className={styles.eventName}>
                     {eventName}
@@ -128,11 +113,11 @@ export const EventItem: React.FC<EventItemProps> = (props) => {
                     {date.toLocaleDateString("es-ES", {
                         day: "numeric",
                         month: "long",
-                        year: "numeric"
+                        year: "numeric",
                     })}
                 </Text>
             </div>
-      
+
             <Text variant="caption" className={styles.daysRemaining}>
                 {daysText}
             </Text>

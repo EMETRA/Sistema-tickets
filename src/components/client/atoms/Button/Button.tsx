@@ -27,9 +27,9 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             left = false,
             ...props
         },
-        ref
+        ref,
     ) => {
-    // Determinar si el botón está deshabilitado
+        // Determinar si el botón está deshabilitado
         const isDisabled = state === "disabled" || state === "loading";
 
         // Construir las clases CSS dinámicamente usando classnames
@@ -43,16 +43,11 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
                 [styles["Button--disabled"]]: state === "disabled",
                 [styles["Button--loading"]]: state === "loading",
             },
-            className
+            className,
         );
 
         return (
-            <button
-                ref={ref}
-                className={buttonClasses}
-                disabled={isDisabled}
-                {...props}
-            >
+            <button ref={ref} className={buttonClasses} disabled={isDisabled} {...props}>
                 {state === "loading" ? (
                     loadingText
                 ) : (
@@ -64,7 +59,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
                 )}
             </button>
         );
-    }
+    },
 );
 
 Button.displayName = "Button";

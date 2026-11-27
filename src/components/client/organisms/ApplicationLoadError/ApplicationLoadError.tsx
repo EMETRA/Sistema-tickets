@@ -4,11 +4,8 @@ import Link from "next/link";
 import { Button } from "@/components/client/atoms/Button";
 import { useAuthStore } from "@/store/useAuthStore";
 import styles from "@/components/client/templates/PlatformPage/PlatformPage.module.scss";
-export function ApplicationLoadError({
-    onRetry,
-}: {
-    onRetry: () => void | Promise<void>;
-}) {
+import { StateNotice } from "@/components/client/molecules/StateNotice";
+export function ApplicationLoadError({ onRetry }: { onRetry: () => void | Promise<void> }) {
     const [busy, setBusy] = useState(false);
     async function retry() {
         setBusy(true);
@@ -21,29 +18,24 @@ export function ApplicationLoadError({
         }
     }
     return (
-        <section className={styles.card} role="alert">
-            <h2>No se pudo abrir la aplicación</h2>
-            <p>
-                Intenta nuevamente. Si tu sesión venció, vuelve a iniciar
-                sesión.
-            </p>
-            <div className={styles.actions}>
-                <Button
-                    state={busy ? "loading" : "default"}
-                    onClick={() => void retry()}
-                >
-                    Reintentar aplicación
-                </Button>
-                <Link className={styles.link} href="/aplicaciones">
-                    Volver a aplicaciones
-                </Link>
-                <Button
-                    variant="outlined"
-                    onClick={() => useAuthStore.getState().logout()}
-                >
-                    Volver a iniciar sesión
-                </Button>
-            </div>
-        </section>
+        <StateNotice
+            tone="error"
+            title="No se pudo abrir la aplicación"
+            description="Intenta nuevamente. Si tu sesión venció, vuelve a iniciar sesión."
+            helpTopic="aplicaciones"
+            actions={
+                <>
+                    <Button state={busy ? "loading" : "default"} onClick={() => void retry()}>
+                        Reintentar aplicación
+                    </Button>
+                    <Button variant="outlined" onClick={() => useAuthStore.getState().logout()}>
+                        Volver a iniciar sesión
+                    </Button>
+                    <Link className={styles.link} href="/aplicaciones">
+                        Volver a aplicaciones
+                    </Link>
+                </>
+            }
+        />
     );
 }

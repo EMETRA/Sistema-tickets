@@ -18,7 +18,7 @@
   gap: 20px;
   padding: 20px 40px;
   border-radius: 8px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--tickets-border);
 }
 
 .title {
@@ -54,7 +54,7 @@
   max-width: 100%;
   align-self: flex-start;
   align-items: stretch;
-  padding: clamp(18px, 2.3vw, 30px);
+  padding: clamp(18px, calc(2.3vw / var(--vp-zoom, 1)), 30px);
   border: 1px solid var(--tickets-border);
   border-radius: var(--tickets-radius);
   background: var(--tickets-surface);
@@ -62,10 +62,52 @@
 }
 
 .generalInfomationContainer,
-.userPermissionsContainer { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)); gap: 20px; min-width: 0; > * { min-width: 0; } }
+.userPermissionsContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
+  gap: 20px;
+  min-width: 0;
+  > * {
+    min-width: 0;
+  }
+}
 
-.errorText { overflow-wrap: anywhere; }
-.generalInfomationContainer, .userPermissionsContainer { padding: 0; border: 0; }
-.formContainer { font-size: 12px; line-height: 1.8; p { color: var(--tickets-text-secondary); } [role="alert"] { color: var(--tickets-danger); } [role="status"] { color: var(--tickets-success); } h2 { font-size: 18px; } }
-.permissionList { border: 1px solid var(--tickets-border); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; min-width: 0; background: var(--tickets-surface); }
-.consent { display: flex; align-items: flex-start; gap: 10px; }
+.errorText {
+  overflow-wrap: anywhere;
+}
+.generalInfomationContainer,
+.userPermissionsContainer {
+  padding: 0;
+  border: 0;
+}
+.formContainer {
+  font-size: 12px;
+  line-height: 1.8;
+  p {
+    color: var(--tickets-text-secondary);
+  }
+  [role="alert"] {
+    color: var(--tickets-danger);
+  }
+  [role="status"] {
+    color: var(--tickets-success);
+  }
+  h2 {
+    font-size: 18px;
+  }
+}
+.permissionList {
+  border: 1px solid var(--tickets-border);
+  border-radius: 10px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  background: var(--tickets-surface);
+}
+.consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}

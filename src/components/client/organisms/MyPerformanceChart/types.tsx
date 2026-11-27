@@ -1,23 +1,23 @@
 import { LineChartDataPoint } from "../../atoms/LineChart";
 
 export interface MyPerformanceChartProps {
-  /**
-   * Array de puntos de datos para la gráfica de rendimiento
-   */
-  data: LineChartDataPoint[];
+    /**
+     * Array de puntos de datos para la gráfica de rendimiento
+     */
+    data: LineChartDataPoint[];
 
-  /**
-   * Classname
-   */
-  className?: string;
+    /**
+     * Classname
+     */
+    className?: string;
 
-  /**
-   * Width
-   */
-  width?: number;
+    /**
+     * Width
+     */
+    width?: number;
 
-  /**
-   * Height
-   */
-  height?: number;
+    /**
+     * Height
+     */
+    height?: number;
 }

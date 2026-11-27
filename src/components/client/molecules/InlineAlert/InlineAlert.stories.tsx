@@ -14,10 +14,10 @@ export const RevertAlert = () => {
     const [open, setOpen] = useState(false);
 
     return (
-        <div style={{ height: '300px', padding: '20px' }}>
+        <div style={{ height: "300px", padding: "20px" }}>
             <Button onClick={() => setOpen(true)}>Simular cancelación de ticket</Button>
-            
-            <InlineAlert 
+
+            <InlineAlert
                 isOpen={open}
                 onClose={() => setOpen(false)}
                 onAction={() => {

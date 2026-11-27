@@ -43,7 +43,7 @@
   "src/components/client/organisms/WorkspaceViewSwitcher/WorkspaceViewSwitcher.module.scss": 2,
   "src/components/client/templates/PlatformPage/PlatformPage.module.scss": 18,
   "src/components/client/templates/SystemLayout/SystemLayout.module.scss": 1,
-  "src/features/calendario/components/CalendarRail/CalendarRail.module.scss": 15,
+  "src/features/calendario/components/CalendarRail/CalendarRail.module.scss": 14,
   "src/features/calendario/components/WeeklyCalendar/WeeklyCalendar.module.scss": 6,
   "src/features/comunicacion/components/NewsResultCard/NewsResultCard.module.scss": 5,
   "src/features/infraestructura/components/AssetsPanel/AssetsPanel.module.scss": 7,

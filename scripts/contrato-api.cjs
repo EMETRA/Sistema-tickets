@@ -28,16 +28,32 @@ for (const file of walk(path.join(api, "src"), (p) => /controller\.ts$/.test(p) 
 const toRegex = (p) => new RegExp("^" + p.replace(/:[^/]+/g, "[^/]+").replace(/\*/g, ".*") + "/?$");
 const apiPlatform = routes.filter((r) => r.path.startsWith("/platform"));
 
-// 2. Llamadas del front: primer argumento literal de platformFetch/platformCommand.
+// 2. Llamadas del front: primer argumento de platformFetch / platformCommand / usePlatformQuery, y cada
+// elemento del arreglo de usePlatformQueries. Una ruta condicional (`cond ? "/ruta" : null`) se lee
+// desde su primer literal.
 const calls = new Map();
+const add = (p0, file) => {
+    if (!p0 || !p0.startsWith("/")) return;
+    const key = "/platform" + p0;
+    if (!calls.has(key)) calls.set(key, new Set());
+    calls.get(key).add(path.relative(root, file));
+};
 for (const file of walk(path.join(root, "src"), (p) => /\.(ts|tsx)$/.test(p))) {
     const text = fs.readFileSync(file, "utf8");
-    for (const m of text.matchAll(/platform(?:Fetch|Command)\s*(?:<[^>]*>)?\(/g)) {
-        const p0 = argumentPath(text, m.index + m[0].length);
-        if (!p0 || !p0.startsWith("/")) continue;
-        const key = "/platform" + p0;
-        if (!calls.has(key)) calls.set(key, new Set());
-        calls.get(key).add(path.relative(root, file));
+    for (const m of text.matchAll(/(?:platform(?:Fetch|Command)|usePlatformQuery)\s*(?:<[^>]*>)?\(/g)) {
+        let start = m.index + m[0].length;
+        const ternary = /^\s*[^"'`(),]*\?\s*(?=["'`])/.exec(text.slice(start, start + 200));
+        if (ternary) start += ternary[0].length;
+        add(argumentPath(text, start)[0], file);
+    }
+    for (const m of text.matchAll(/usePlatformQueries\s*(?:<[^>]*>)?\(\s*\[/g)) {
+        let i = m.index + m[0].length;
+        for (let n = 0; n < 50; n++) {
+            const [p0, next] = argumentPath(text, i);
+            add(p0, file);
+            if (text[next] !== ",") break;
+            i = next + 1;
+        }
     }
 }
 /**
@@ -45,6 +61,7 @@ for (const file of walk(path.join(root, "src"), (p) => /\.(ts|tsx)$/.test(p))) {
  * concatenada (`"/records/" + type + "/" + id`) se vuelve un segmento comodín. Se descarta la query.
  */
 function argumentPath(text, i) {
+    // Devuelve [ruta, índice donde terminó el argumento].
     let out = "", depth = 0;
     const skip = () => { while (/\s/.test(text[i])) i++; };
     for (;;) {
@@ -81,7 +98,7 @@ function argumentPath(text, i) {
         break;
     }
     out = out.split("?")[0].replace(/(:x)+/g, ":x");
-    return out.endsWith("/") ? out + ":x" : out;
+    return [out.endsWith("/") ? out + ":x" : out, i];
 }
 const missing = [];
 for (const [call, files] of calls) {

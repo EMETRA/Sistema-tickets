@@ -24,7 +24,7 @@ export function AccessLayout({ children }: { children: React.ReactNode }) {
                             ["calendar-regular", "Actividades"],
                         ].map(([icon, label]) => (
                             <li key={label}>
-                                <Icon name={icon} color="#536ca1" size={20} />
+                                <Icon name={icon} color="var(--tickets-primary)" size={20} />
                                 <span>{label}</span>
                             </li>
                         ))}

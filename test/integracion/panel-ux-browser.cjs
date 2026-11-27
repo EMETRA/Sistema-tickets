@@ -54,6 +54,8 @@ async function run(){
   await page.getByRole('heading',{name:'Hola, Usuario'}).waitFor();
   for(const width of [1920,1440,1024,768,390]){await page.setViewportSize({width,height:1050});await fits();}
   await page.setViewportSize({width:1600,height:1050});await page.locator('main').evaluate(el=>{el.scrollTop=0});await page.waitForLoadState('networkidle');await page.screenshot({path:path.join(out,'inicio-escritorio.png')});
+  // Acceso previo al módulo (ModuleAccessGate) autorizado; esta prueba revisa la interfaz de Noticias.
+  await page.route('**/api/platform/module-access/**',route=>route.fulfill({json:{moduloId:decodeURIComponent(route.request().url().split('/').pop()),allowed:true,actions:{LEER:true,INSERTAR:true,EDITAR:true,ELIMINAR:false}}}));
   const newsUrl='http://127.0.0.1:3851/home/comunicacion/contenido/noticias';await page.goto(newsUrl);
   await page.getByRole('button',{name:'Reintentar noticias'}).waitFor();
   assert.equal(await page.getByText('No hay noticias que coincidan con el filtro.',{exact:true}).count(),0);

@@ -51,7 +51,7 @@ const File: React.FC<FileProps> = ({
         >
             <Icon name={icon} color={color} raw />
             <Text variant="body">{name}</Text>
-            {download && <Icon name="download-solid" color="#000000" size={24} raw />}
+            {download && <Icon name="download-solid" color="currentColor" size={24} raw />}
         </button>
     );
 };

@@ -85,7 +85,7 @@ const MOD07: React.FC = () => {
                                 <Icon
                                     name={CATEGORIES_ICONS[cat.codigo] || "folder-solid"}
                                     size={18}
-                                    color="#000000"
+                                    color="currentColor"
                                 />
                                 <Text className={styles.categoryLabel}>{cat.etiqueta}</Text>
                             </button>
@@ -113,7 +113,7 @@ const MOD07: React.FC = () => {
                                 className={`${styles.manualItem} ${selectedManual?.id === manual.id ? styles.manualActive : ""}`}
                                 onClick={() => setSelectedManual(manual)}
                             >
-                                <Icon name="file" size={14} color="#000000" />
+                                <Icon name="file" size={14} color="currentColor" />
                                 <Text className={styles.manualName}>
                                     {manual.titulo || manual.nombreArchivo}
                                 </Text>

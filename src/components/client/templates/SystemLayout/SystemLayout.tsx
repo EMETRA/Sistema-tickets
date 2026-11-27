@@ -112,13 +112,6 @@ export const SystemLayout = ({ children, className }: { children: React.ReactNod
     const workspaceNavigation = platform.data
         ? workspaceViewNavigation(platform.data, workspaceView.mode)
         : null;
-    const applicationLinks = catalog
-        ? Object.values(catalog).map((app) => ({
-              id: app.meta.id,
-              title: app.meta.title,
-              href: `/home/${app.meta.id}`,
-          }))
-        : [];
 
     // ── Navegación del Panel institucional ──
     const showPalette = useCommandPalette((s) => s.show);
@@ -348,7 +341,6 @@ export const SystemLayout = ({ children, className }: { children: React.ReactNod
                 <div className={styles.container}>
                     <TopBar
                         onChangeView={workspaceView.canChangeView ? () => setViewDialogOpen(true) : undefined}
-                        applications={applicationLinks}
                         profilePath="/mi-perfil"
                         createTicketPath={canCreateTicket ? "/tickets-creation" : undefined}
                         onSearch={showPalette}

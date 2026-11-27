@@ -3,7 +3,6 @@ import React from "react";
 import Link from "next/link";
 import { TopBarProps } from "./types";
 import { UserMenu } from "../../molecules/UserMenu";
-import { ApplicationSwitcher } from "../../molecules/ApplicationSwitcher/ApplicationSwitcher";
 import { Icon } from "../../atoms/Icon";
 import { WorkspaceIcon } from "../../atoms/WorkspaceIcon/WorkspaceIcon";
 import { IconButton } from "../../atoms/IconButton";
@@ -20,7 +19,6 @@ export const TopBar = ({
     onNotificationsClick,
     onProfileClick,
     className,
-    applications = [],
     createTicketPath,
     onCreateTicket,
     onSearch,
@@ -43,7 +41,7 @@ export const TopBar = ({
                     aria-controls="system-navigation"
                     onClick={onMenuClick}
                 >
-                    <Icon name="bars-solid" size={22} color="#263b58" />
+                    <Icon name="bars-solid" size={22} color="currentColor" />
                 </button>
             )}
             <div className={styles.heading}>
@@ -52,15 +50,11 @@ export const TopBar = ({
             </div>
         </div>
         <div className={styles.globalActions}>
-            {onSearch ? (
-                <button type="button" className={styles.paletteTrigger} onClick={onSearch} data-tour="buscar">
-                    <Icon name="magnifying-glass-solid" size={14} color="#7b8ba2" />
-                    <span>Buscar aplicaciones, módulos, tickets…</span>
-                    <kbd>⌘K</kbd>
-                </button>
-            ) : (
-                <ApplicationSwitcher applications={applications} />
-            )}
+            <button type="button" className={styles.paletteTrigger} onClick={onSearch} data-tour="buscar">
+                <Icon name="magnifying-glass-solid" size={14} color="currentColor" />
+                <span>Buscar aplicaciones, módulos, tickets…</span>
+                <kbd>⌘K</kbd>
+            </button>
             {createTicketPath && (
                 <Link
                     href={createTicketPath}
@@ -72,7 +66,7 @@ export const TopBar = ({
                         onCreateTicket();
                     }}
                 >
-                    <Icon name="plus-solid" size={15} color="#fff" />
+                    <Icon name="plus-solid" size={15} color="var(--tickets-on-primary)" />
                     <span>Crear ticket</span>
                 </Link>
             )}

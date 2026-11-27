@@ -11,12 +11,11 @@ export interface TopBarProps {
     onNotificationsClick?: () => void;
     onProfileClick?: () => void;
     className?: string;
-    applications?: import("../../molecules/ApplicationSwitcher/ApplicationSwitcher").ApplicationLink[];
     createTicketPath?: string;
     /** Si existe, "Crear ticket" abre la ventana en lugar de navegar. */
     onCreateTicket?: () => void;
-    /** Abre el buscador global en lugar del selector de aplicaciones. */
-    onSearch?: () => void;
+    /** Abre el buscador global (aplicaciones, módulos, tickets y secciones). */
+    onSearch: () => void;
     settingsPath?: string;
     notificationsPath?: string;
     onMenuClick?: () => void;

@@ -65,7 +65,7 @@ export const InlineAlert = ({
                     </Button>
                 </div>
 
-                <AlertBar duration={duration} color="#D32F2F" className={styles.progressBar} />
+                <AlertBar duration={duration} color="var(--tickets-danger)" className={styles.progressBar} />
             </div>
         </PopOver>
     );

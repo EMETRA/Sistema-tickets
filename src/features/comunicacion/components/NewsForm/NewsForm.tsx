@@ -525,7 +525,7 @@ const NewsForm: React.FC<NewsFormProps> = ({
                     <Icon
                         name="circle-exclamation-solid"
                         size={18}
-                        color="#8A6100"
+                        color="var(--tickets-warning)"
                         className={styles.noticeIcon}
                     />
                     <Text variant="caption" className={styles.noticeText}>

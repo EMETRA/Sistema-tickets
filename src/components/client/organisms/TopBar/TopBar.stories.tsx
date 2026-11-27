@@ -15,6 +15,7 @@ export const PaginaPrincipal: StoryObj<typeof TopBar> = {
         userName: "Gildder Caceres",
         userRole: "Administrador",
         userStatus: "online",
+        onSearch: () => {},
     },
 };
 
@@ -25,5 +26,6 @@ export const VistaEquipo: StoryObj<typeof TopBar> = {
         userName: "Gildder Caceres",
         userRole: "Administrador",
         userStatus: "online",
+        onSearch: () => {},
     },
 };

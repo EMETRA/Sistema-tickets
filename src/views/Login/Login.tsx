@@ -177,7 +177,7 @@ const Login: React.FC = () => {
                                 {...register("clave")}
                                 readOnly={busy}
                                 aria-invalid={!!errors.clave}
-                                iconcolor="#000000"
+                                iconcolor="currentColor"
                             />
                         </FormField>
                         <Link href="/forgot-password" className={styles.forgotPasswordLink}>

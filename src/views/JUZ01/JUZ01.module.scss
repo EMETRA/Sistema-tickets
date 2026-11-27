@@ -71,7 +71,6 @@
 .fieldError {
   margin: 0;
   color: var(--tickets-danger);
-  color: var(--tickets-danger);
   font-size: 13px;
   line-height: 1.6;
 }
@@ -86,8 +85,6 @@
   padding: 14px;
   border-radius: 8px;
   background: var(--tickets-danger-soft);
-  background: var(--tickets-danger-soft);
-  color: var(--tickets-danger);
   color: var(--tickets-danger);
   font-size: 13px;
   p {
@@ -162,7 +159,6 @@
     overflow-wrap: anywhere;
     line-height: 1.7;
     mark {
-      background: var(--tickets-info-soft);
       background: var(--tickets-info-soft);
       color: #273f91;
       color: light-dark(#273f91, #97a8e3);

@@ -95,12 +95,9 @@
 .success {
   padding: 14px 18px;
   background: var(--tickets-success-soft);
-  background: var(--tickets-success-soft);
-  border: 1px solid var(--tickets-border);
   border: 1px solid var(--tickets-border);
   border-radius: 8px;
   color: var(--tickets-success);
-  color: light-dark(#236c43, #9bdfb9);
 }
 .inline {
   display: flex;
@@ -212,7 +209,6 @@
     box-shadow: -4px 0 7px #203e7008;
   }
   th:last-child {
-    background: var(--tickets-surface-subtle);
     background: var(--tickets-surface-subtle);
   }
 }

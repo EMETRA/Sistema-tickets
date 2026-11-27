@@ -149,7 +149,6 @@
 }
 .error {
   color: var(--tickets-danger);
-  color: var(--tickets-danger);
   background: var(--tickets-danger-soft);
   border-radius: 8px;
   padding: 12px;
@@ -159,8 +158,6 @@
 }
 .success {
   color: var(--tickets-success);
-  color: light-dark(#166946, #91e8c3);
-  background: var(--tickets-success-soft);
   background: var(--tickets-success-soft);
   border: 1px solid #c2e4cf;
   border: 1px solid light-dark(#c2e4cf, #2a3449);
@@ -350,7 +347,6 @@
 }
 .danger {
   color: var(--tickets-danger);
-  color: var(--tickets-danger);
   background: var(--tickets-danger-soft);
 }
 .dialog {
@@ -453,7 +449,6 @@
     border-radius: 6px;
     background: var(--tickets-primary-soft);
     color: var(--tickets-info);
-    color: var(--tickets-info);
     font: inherit;
     font-size: 10px;
     line-height: 1.5;
@@ -490,7 +485,6 @@
     cursor: pointer;
   }
   button[data-busy="true"] {
-    background: var(--tickets-success-soft);
     background: var(--tickets-success-soft);
     border-color: #a6cfb2;
   }
@@ -625,7 +619,6 @@
 
 // Formulario abierto sobre una lista: se distingue sin competir con la tabla.
 .focusCard {
-  border-color: color-mix(in srgb, var(--tickets-primary) 35%, var(--tickets-surface));
   border-color: color-mix(in srgb, var(--tickets-primary) 35%, var(--tickets-surface));
   box-shadow: 0 0 0 3px #4361ee12;
   h3 {

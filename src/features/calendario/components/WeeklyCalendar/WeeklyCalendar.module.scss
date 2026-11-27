@@ -54,7 +54,6 @@
   div {
     position: relative;
     border-bottom: 1px solid var(--tickets-divider);
-    border-bottom: 1px solid var(--tickets-divider);
   }
   span {
     position: absolute;
@@ -76,8 +75,6 @@
   border-left: 3px solid #8d6cc8;
   border-radius: 5px;
   background: var(--tickets-info-soft);
-  background: var(--tickets-info-soft);
-  color: var(--tickets-text-secondary);
   color: var(--tickets-text-secondary);
   padding: 6px 8px;
   display: flex;
@@ -116,9 +113,7 @@
   }
   &[data-scope="PRIVADA"] {
     background: var(--tickets-success-soft);
-    background: var(--tickets-success-soft);
     border-left-color: var(--tickets-success);
-    color: var(--tickets-success);
     color: var(--tickets-success);
   }
   &:hover {

@@ -19,9 +19,30 @@ test.describe("Lectura y accesibilidad", () => {
 
     test("el modo oscuro se aplica antes del primer pintado (sin destello)", async ({ page }) => {
         await preferencias(page, { tema: "dark" });
+        // Antes de cualquier script de la página: anota el tema del primer cuadro y cada transición de color.
+        await page.addInitScript(() => {
+            const w = window as unknown as { __primerTema?: string | null; __transiciones: string[] };
+            w.__transiciones = [];
+            requestAnimationFrame(
+                () => (w.__primerTema = document.documentElement.getAttribute("data-theme")),
+            );
+            document.addEventListener(
+                "transitionstart",
+                (e) => {
+                    if (/color|background/.test(e.propertyName))
+                        w.__transiciones.push(
+                            `${e.propertyName} · ${String((e.target as Element).className)}`,
+                        );
+                },
+                true,
+            );
+        });
         await visitar(page, "/home");
-        expect(await page.evaluate(() => document.getAnimations().length)).toBe(0);
-        await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+        const carga = await page.evaluate(() => {
+            const w = window as unknown as { __primerTema?: string | null; __transiciones: string[] };
+            return { tema: w.__primerTema, transiciones: w.__transiciones };
+        });
+        expect(carga).toEqual({ tema: "dark", transiciones: [] });
     });
 
     test("Ajustes cambia el tamaño del texto al momento", async ({ page }) => {

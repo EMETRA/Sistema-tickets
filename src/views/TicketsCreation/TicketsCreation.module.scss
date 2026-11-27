@@ -14,16 +14,13 @@
   padding: 15px 18px;
   border-radius: 10px;
   color: var(--tickets-success);
-  color: light-dark(#177849, #90eabe);
   border: 1px solid #b8dfca;
-  background: var(--tickets-success-soft);
   background: var(--tickets-success-soft);
   font-size: 13px;
 }
 .errorMessage {
   padding: 15px 18px;
   border-radius: 10px;
-  color: var(--tickets-danger);
   color: var(--tickets-danger);
   border: 1px solid #e7b5bc;
   border: 1px solid light-dark(#e7b5bc, #2a3449);

@@ -9,7 +9,6 @@
   padding: clamp(16px, calc(3vw / var(--vp-zoom, 1)), 36px);
   background: var(--tickets-background);
   color: var(--tickets-text);
-  color: light-dark(#24344c, #a5b8d4);
   box-sizing: border-box;
   container: caso / inline-size;
   margin: 0 auto;
@@ -109,9 +108,7 @@
 .juzgadoInfo {
   padding: 1rem;
   border: 1px solid var(--tickets-border);
-  border: 1px solid var(--tickets-border);
   border-radius: 12px;
-  background: var(--tickets-surface-subtle);
   background: var(--tickets-surface-subtle);
   display: flex;
   flex-direction: column;
@@ -120,7 +117,6 @@
 }
 .ayuda {
   color: var(--tickets-text-muted);
-  color: light-dark(#62748b, #e5eaf5);
   font-size: 0.875rem;
   line-height: 1.5;
   margin: 0;
@@ -179,7 +175,6 @@
 }
 .statusPill {
   border: 1px solid var(--tickets-border);
-  border: 1px solid var(--tickets-border);
   border-radius: 8px;
   padding: 8px 12px;
   color: var(--tickets-primary);
@@ -213,7 +208,6 @@
     text-decoration: none;
     padding: 10px 16px;
     border: 1px solid var(--tickets-border);
-    border: 1px solid var(--tickets-border);
     background: var(--tickets-surface);
     border-radius: 10px;
     color: #34517b;
@@ -222,7 +216,6 @@
     font-weight: 600;
     &:hover {
       border-color: var(--tickets-primary);
-      color: var(--tickets-info);
       color: var(--tickets-info);
     }
   }
@@ -233,7 +226,6 @@
   box-sizing: border-box;
   background: var(--tickets-surface);
   border: 1px solid var(--tickets-border);
-  border: 1px solid var(--tickets-border);
   border-radius: 16px;
   padding: clamp(18px, calc(2.5vw / var(--vp-zoom, 1)), 28px);
   box-shadow: 0 3px 12px #203d6905;
@@ -242,13 +234,11 @@
     margin: 6px 0 0;
     font-size: 20px;
     color: var(--tickets-text);
-    color: light-dark(#253953, #a3b9d6);
     line-height: 1.35;
   }
   h3 {
     margin: 0;
     color: var(--tickets-text);
-    color: light-dark(#24344c, #a5b8d4);
     font-size: 15px;
   }
 }
@@ -265,7 +255,6 @@
   background: var(--tickets-surface-disabled);
   background: var(--tickets-surface-subtle);
   color: var(--tickets-text-secondary);
-  color: var(--tickets-text-secondary);
   font-size: 12px;
   white-space: nowrap;
 }
@@ -275,17 +264,13 @@
   line-height: 1.7;
   margin: 0 0 22px;
   color: var(--tickets-text-secondary);
-  color: var(--tickets-text-secondary);
 }
 .emptyState {
   background: var(--tickets-surface-subtle);
-  background: var(--tickets-surface-subtle);
-  border: 1px dashed var(--tickets-border);
   border: 1px dashed var(--tickets-border);
   padding: 18px;
   border-radius: 10px;
   color: var(--tickets-text-muted);
-  color: light-dark(#65758d, #e5eaf5);
   font-size: 14px;
   line-height: 1.6;
 }
@@ -332,9 +317,7 @@
   border-radius: 10px;
   border: 1px solid #e9d8ab;
   background: var(--tickets-warning-soft);
-  background: var(--tickets-warning-soft);
   color: var(--tickets-warning);
-  color: light-dark(#765818, #e9cd91);
   font-size: 13px;
   line-height: 1.7;
   overflow-wrap: anywhere;
@@ -348,7 +331,6 @@
   padding: 22px;
   p {
     margin: 8px 0;
-    color: var(--tickets-text-secondary);
     color: var(--tickets-text-secondary);
     font-size: 13px;
     line-height: 1.7;
@@ -364,15 +346,12 @@
     border-color: light-dark(#f0e2bf, #2a3449);
     h3 {
       color: var(--tickets-warning);
-      color: light-dark(#72591e, #e3cc96);
     }
   }
   &[data-state="error"] {
     background: var(--tickets-danger-soft);
     border-color: var(--tickets-border);
-    border-color: var(--tickets-border);
     h3 {
-      color: var(--tickets-danger);
       color: var(--tickets-danger);
     }
   }
@@ -434,7 +413,6 @@
   display: grid;
   place-items: center;
   background: var(--tickets-info-soft);
-  background: var(--tickets-info-soft);
   color: #5269bc;
   font-size: 22px;
   svg {
@@ -482,19 +460,13 @@
   border-radius: 8px;
   font-size: 12px;
   background: var(--tickets-warning-soft);
-  background: var(--tickets-warning-soft);
-  color: var(--tickets-warning);
   color: var(--tickets-warning);
   &[data-state="ACEPTADA"] {
     color: var(--tickets-success);
-    color: var(--tickets-success);
-    background: var(--tickets-success-soft);
     background: var(--tickets-success-soft);
   }
   &[data-state="RECHAZADA"] {
     color: var(--tickets-danger);
-    color: var(--tickets-danger);
-    background: var(--tickets-danger-soft);
     background: var(--tickets-danger-soft);
   }
 }
@@ -502,7 +474,6 @@
   padding: 14px 16px;
   margin: 0 0 20px;
   border-radius: 10px;
-  background: var(--tickets-info-soft);
   background: var(--tickets-info-soft);
   color: #3d5085;
   color: light-dark(#3d5085, #a4b1d5);
@@ -513,9 +484,7 @@
   padding: 12px 16px;
   margin: 12px 0;
   background: var(--tickets-warning-soft);
-  background: var(--tickets-warning-soft);
   border-left: 3px solid #d4a642;
-  color: var(--tickets-warning);
   color: var(--tickets-warning);
   font-size: 13px;
   line-height: 1.6;
@@ -537,9 +506,7 @@
     font-size: 14px;
     overflow-wrap: anywhere;
     color: var(--tickets-text);
-    color: light-dark(#30445f, #a7b9d2);
     &[data-warning="true"] {
-      color: var(--tickets-danger);
       color: var(--tickets-danger);
       font-weight: 600;
     }
@@ -555,7 +522,6 @@
   background: var(--tickets-surface);
   padding: 20px;
   border: 1px solid var(--tickets-border);
-  border: 1px solid var(--tickets-border);
   border-radius: 12px;
 }
 .fileHeading {
@@ -566,7 +532,6 @@
   span {
     font-size: 11px;
     color: var(--tickets-text-muted);
-    color: light-dark(#6e7d90, #e5eaf5);
   }
 }
 .fileHint {
@@ -587,7 +552,6 @@
     cursor: pointer;
     font-weight: 600;
     color: var(--tickets-text-secondary);
-    color: var(--tickets-text-secondary);
   }
 }
 .evidenceGrid {
@@ -596,7 +560,6 @@
   gap: 14px;
 }
 .evidenceCard {
-  border: 1px solid var(--tickets-border);
   border: 1px solid var(--tickets-border);
   border-radius: 12px;
   padding: 18px;
@@ -620,7 +583,6 @@
   border-radius: 8px;
   color: #5269bc;
   background: var(--tickets-info-soft);
-  background: var(--tickets-info-soft);
   font-size: 32px;
 }
 .fileActions {
@@ -629,7 +591,6 @@
   gap: 10px;
   button {
     cursor: pointer;
-    color: var(--tickets-info);
     color: var(--tickets-info);
     border: 1px solid var(--tickets-border-strong);
     border: 1px solid var(--tickets-border);
@@ -667,7 +628,6 @@
   margin: 20px 0 0;
   padding-top: 18px;
   border-top: 1px solid var(--tickets-border);
-  border-top: 1px solid var(--tickets-border);
   img,
   video {
     display: block;
@@ -689,13 +649,11 @@
   }
   button {
     border: 1px solid var(--tickets-border);
-    border: 1px solid var(--tickets-border);
     border-radius: 8px;
     padding: 8px 14px;
     cursor: pointer;
     background: var(--tickets-surface);
     color: var(--tickets-text);
-    color: light-dark(#30445f, #a7b9d2);
   }
 }
 .tableContainer {

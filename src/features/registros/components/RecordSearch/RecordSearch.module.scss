@@ -80,7 +80,6 @@
     cursor: pointer;
     &:hover {
       border-color: color-mix(in srgb, var(--tickets-primary) 35%, var(--tickets-surface));
-      border-color: color-mix(in srgb, var(--tickets-primary) 35%, var(--tickets-surface));
     }
   }
 }

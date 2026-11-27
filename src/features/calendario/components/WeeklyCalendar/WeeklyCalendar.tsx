@@ -86,6 +86,7 @@ export function WeeklyCalendar({
                         key={date}
                         className={styles.day}
                         style={{ height }}
+                        role="group"
                         aria-label={calendarDate(date, {
                             weekday: "long",
                             day: "numeric",

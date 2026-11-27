@@ -18,7 +18,6 @@
 
 .name {
   color: var(--tickets-text);
-  color: var(--tickets-text);
   font-weight: 600;
   line-height: 1.2;
   white-space: nowrap;
@@ -64,11 +63,9 @@
     margin: 0;
     font-size: 13px;
     color: var(--tickets-text);
-    color: var(--tickets-text);
   }
 
   &:hover {
-    background-color: var(--tickets-background);
     background-color: var(--tickets-background);
   }
 }

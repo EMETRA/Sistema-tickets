@@ -14,7 +14,6 @@
   padding: 10px 5px;
   background-color: var(--tickets-surface);
   border: 1px solid var(--tickets-border-strong);
-  border: 1px solid var(--tickets-border-strong);
   border-radius: 4px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   z-index: 1000;
@@ -28,7 +27,6 @@
   cursor: pointer;
 
   &:hover {
-    background-color: var(--tickets-background);
     background-color: var(--tickets-background);
   }
 }

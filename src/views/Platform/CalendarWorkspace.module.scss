@@ -60,13 +60,10 @@
     &[data-scope="EMPRESA"] {
       background: var(--tickets-neutral-soft);
       color: var(--tickets-text-muted);
-      color: light-dark(#64748b, #e5eaf5);
     }
     &[data-scope="PRIVADA"] {
       background: var(--tickets-success-soft);
-      background: var(--tickets-success-soft);
       color: var(--tickets-success);
-      color: light-dark(#2d785f, #9fdbc7);
     }
     &[aria-pressed="false"] {
       background: var(--tickets-surface);
@@ -227,13 +224,10 @@
     &:nth-child(2) {
       background: var(--tickets-neutral-soft);
       color: var(--tickets-text-muted);
-      color: light-dark(#64748b, #e5eaf5);
     }
     &:nth-child(3) {
       background: var(--tickets-success-soft);
-      background: var(--tickets-success-soft);
       color: var(--tickets-success);
-      color: light-dark(#2d785f, #9fdbc7);
     }
   }
 }
@@ -295,8 +289,6 @@
   border-radius: 5px;
   padding: 8px;
   background: var(--tickets-info-soft);
-  background: var(--tickets-info-soft);
-  color: var(--tickets-text-secondary);
   color: var(--tickets-text-secondary);
   display: flex;
   flex-direction: column;
@@ -321,9 +313,7 @@
   }
   &[data-scope="PRIVADA"] {
     background: var(--tickets-success-soft);
-    background: var(--tickets-success-soft);
     border-left-color: var(--tickets-success);
-    color: var(--tickets-success);
     color: var(--tickets-success);
   }
   &:focus-visible {

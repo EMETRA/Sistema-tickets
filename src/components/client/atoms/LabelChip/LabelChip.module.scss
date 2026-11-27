@@ -19,32 +19,24 @@
     background-color: var(--tickets-neutral-soft);
     background-color: var(--tickets-background);
     color: var(--tickets-text);
-    color: var(--tickets-text);
   }
 
   &.bug {
     background-color: var(--tickets-danger-soft);
-    background-color: var(--tickets-danger-soft);
-    color: var(--tickets-danger);
     color: var(--tickets-danger);
   }
 
   &.maintenance {
     background-color: var(--tickets-info-soft);
-    background-color: var(--tickets-info-soft);
-    color: var(--tickets-info);
     color: var(--tickets-info);
   }
 
   &.feature {
     background-color: var(--tickets-success-soft);
-    background-color: var(--tickets-success-soft);
     color: var(--tickets-success);
-    color: light-dark(#166534, #92e7b2);
   }
 
   &.urgent {
-    background-color: var(--tickets-warning-soft);
     background-color: var(--tickets-warning-soft);
     color: #b95c1c;
     color: light-dark(#b95c1c, #eeb48c);

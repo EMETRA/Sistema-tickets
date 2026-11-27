@@ -83,7 +83,6 @@
   font-weight: 600;
   background-color: $amarillo-10;
   color: var(--tickets-warning);
-  color: var(--tickets-warning);
 }
 
 // ============================================
@@ -155,7 +154,6 @@
   font-size: 0.8125rem;
   line-height: 1.4;
   color: var(--tickets-warning);
-  color: var(--tickets-warning);
 }
 
 // ============================================
@@ -219,14 +217,12 @@
 .card {
   min-width: 0;
   border: 1px solid var(--tickets-border);
-  border: 1px solid var(--tickets-border);
   border-radius: 16px;
   padding: 24px;
   gap: 8px;
 }
 .cardTitle {
   color: var(--tickets-text);
-  color: light-dark(#2e435f, #a6b9d4);
 }
 .row {
   min-width: 0;
@@ -240,7 +236,6 @@
   z-index: 2;
   background: var(--tickets-surface);
   padding: 16px 20px;
-  border: 1px solid var(--tickets-border);
   border: 1px solid var(--tickets-border);
   border-radius: 12px;
   gap: 12px;

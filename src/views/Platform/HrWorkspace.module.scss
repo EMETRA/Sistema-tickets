@@ -5,7 +5,6 @@
   gap: 16px;
   padding: 14px 32px;
   background: var(--tickets-warning-soft);
-  background: var(--tickets-warning-soft);
   border-bottom: 1px solid #eddca7;
   color: #4c431f;
   color: light-dark(#4c431f, #d9cda1);
@@ -99,7 +98,6 @@
   background: var(--tickets-background);
   background: var(--tickets-success-soft);
   color: var(--tickets-success);
-  color: light-dark(#1e6140, #9ae0bd);
 }
 .formGrid {
   display: grid;

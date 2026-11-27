@@ -4,7 +4,6 @@
   min-width: 0;
   background: var(--tickets-surface);
   border: 1px solid var(--tickets-border);
-  border: 1px solid var(--tickets-border);
   border-radius: 16px;
   overflow: hidden;
   font-family: var(--font-montserrat), sans-serif;
@@ -16,7 +15,6 @@
   flex-wrap: wrap;
   gap: 16px;
   padding: 18px 20px;
-  border-bottom: 1px solid var(--tickets-border);
   border-bottom: 1px solid var(--tickets-border);
   > * {
     max-width: 100%;
@@ -55,7 +53,6 @@
     font-weight: 600;
     padding: 14px 20px;
     border-bottom: 1px solid var(--tickets-border);
-    border-bottom: 1px solid var(--tickets-border);
   }
   td {
     padding: 16px 20px;
@@ -82,12 +79,10 @@
   font-size: 13px;
   font-weight: 700;
   color: var(--tickets-text);
-  color: var(--tickets-text);
   line-height: 1.6;
 }
 .text {
   font-size: 13px;
-  color: var(--tickets-text-secondary);
   color: var(--tickets-text-secondary);
   line-height: 1.5;
 }
@@ -117,14 +112,10 @@
 }
 .pill.pill--warning {
   background: var(--tickets-warning-soft);
-  background: var(--tickets-warning-soft);
-  color: var(--tickets-warning);
   color: var(--tickets-warning);
 }
 .pill.pill--success {
   background: var(--tickets-success-soft);
-  background: var(--tickets-success-soft);
-  color: var(--tickets-success);
   color: var(--tickets-success);
 }
 .pill.pill--neutral {
@@ -135,14 +126,10 @@
 }
 .pill.pill--info {
   background: var(--tickets-info-soft);
-  background: var(--tickets-info-soft);
-  color: var(--tickets-text-secondary);
   color: var(--tickets-text-secondary);
 }
 .pill.pill--danger {
   background: var(--tickets-danger-soft);
-  background: var(--tickets-danger-soft);
-  color: var(--tickets-danger);
   color: var(--tickets-danger);
 }
 .errorState,
@@ -154,7 +141,6 @@
   align-items: center;
   h2 {
     color: var(--tickets-text);
-    color: light-dark(#304561, #a6b9d3);
     font-size: 18px;
     margin: 10px 0;
   }
@@ -162,13 +148,11 @@
     margin: 0 auto 18px;
     max-width: 520px;
     color: var(--tickets-text-muted);
-    color: light-dark(#667992, #e5eaf5);
     font-size: 14px;
     line-height: 1.6;
   }
 }
 .errorState {
-  background: var(--tickets-surface);
   background: var(--tickets-surface);
 }
 .loadingState {

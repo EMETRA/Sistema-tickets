@@ -22,13 +22,11 @@
 .divider {
   border: none;
   border-top: 1.5px solid var(--tickets-border);
-  border-top: 1.5px solid var(--tickets-border);
   margin: 0 0 1.5rem;
 }
 
 .card {
   background: var(--tickets-surface);
-  border: 2px solid var(--tickets-border);
   border: 2px solid var(--tickets-border);
   border-radius: 12px;
   padding: 2rem;
@@ -79,7 +77,6 @@
 .dividerS {
   border: none;
   border-top: 1.5px solid var(--tickets-border);
-  border-top: 1.5px solid var(--tickets-border);
   margin-top: 1.5rem;
   margin-bottom: 1.5rem;
 }
@@ -97,6 +94,5 @@
 
 .errorItem {
   font-size: 13px;
-  color: var(--tickets-danger);
   color: var(--tickets-danger);
 }

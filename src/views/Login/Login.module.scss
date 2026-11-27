@@ -38,7 +38,6 @@
 .errorText {
   color: var(--tickets-danger);
   background: var(--tickets-danger-soft);
-  background: var(--tickets-danger-soft);
   border: 1px solid #f0cdd3;
   border: 1px solid light-dark(#f0cdd3, #2a3449);
   border-radius: 9px;
@@ -68,9 +67,7 @@
 }
 .activationSuccess {
   background: var(--tickets-success-soft);
-  background: var(--tickets-success-soft);
   color: var(--tickets-success);
-  color: light-dark(#166946, #91e8c3);
   padding: 10px 12px;
   border-radius: 8px;
 }

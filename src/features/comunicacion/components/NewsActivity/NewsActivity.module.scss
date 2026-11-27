@@ -2,9 +2,7 @@
   padding: 20px 24px;
   background: var(--tickets-surface);
   border: 1px solid var(--tickets-border);
-  border: 1px solid var(--tickets-border);
   border-radius: 16px;
-  color: var(--tickets-text);
   color: var(--tickets-text);
   h2 {
     margin: 0 0 18px;
@@ -31,7 +29,6 @@
   dd span {
     display: block;
     font-weight: 600;
-    color: var(--tickets-text);
     color: var(--tickets-text);
   }
   time {

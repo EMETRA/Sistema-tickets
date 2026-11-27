@@ -55,7 +55,9 @@ export function useThemePreference(): ThemePreference {
 export function useThemeSync() {
     const preference = useThemePreference();
     useEffect(() => {
-        applyTheme(preference);
+        // Lee lo guardado, no el valor del render: al hidratar, el hook aún entrega el valor del
+        // servidor («light») y aplicarlo hacía parpadear el modo oscuro.
+        applyTheme(readTheme());
         if (preference !== "system") return;
         const query = media();
         const update = () => applyTheme("system");
@@ -179,7 +181,8 @@ export function applyStoredPreferences() {
 export function useAccessibilitySync() {
     const prefs = useAccessibility();
     useEffect(() => {
-        applyAccessibility(prefs);
+        applyAccessibility(readAccessibility()); // lo guardado, no el valor por defecto de la hidratación
+
         const onStorage = (e: StorageEvent) => {
             if (e.key && [THEME_KEY, ...Object.values(A11Y_KEYS).map((k) => k.key)].includes(e.key)) {
                 applyTheme(readTheme());

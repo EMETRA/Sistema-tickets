@@ -25,27 +25,20 @@
 }
 .asignado {
   background: var(--tickets-warning-soft);
-  background: light-dark(#fff1d1, #5c4a1f);
-  color: var(--tickets-warning);
   color: var(--tickets-warning);
 }
 .en_trabajo,
 .en_atencion {
   background: var(--tickets-primary-soft);
   color: var(--tickets-info);
-  color: var(--tickets-info);
 }
 .completado,
 .resuelto {
   background: var(--tickets-success-soft);
-  background: var(--tickets-success-soft);
   color: var(--tickets-success);
-  color: light-dark(#176b43, #92e8bf);
 }
 .cancelado {
   background: var(--tickets-danger-soft);
-  background: var(--tickets-danger-soft);
-  color: var(--tickets-danger);
   color: var(--tickets-danger);
 }
 .outlined {

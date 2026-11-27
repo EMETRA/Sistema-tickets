@@ -253,17 +253,12 @@
   white-space: nowrap;
   background: var(--tickets-neutral-soft);
   color: var(--tickets-text-muted);
-  color: light-dark(#62728b, #e5eaf5);
   &[data-tone="success"] {
     background: var(--tickets-success-soft);
-    background: var(--tickets-success-soft);
-    color: var(--tickets-success);
     color: var(--tickets-success);
   }
   &[data-tone="danger"] {
     background: var(--tickets-danger-soft);
-    background: var(--tickets-danger-soft);
-    color: var(--tickets-danger);
     color: var(--tickets-danger);
   }
 }
@@ -276,10 +271,8 @@
   white-space: nowrap;
   &[data-tone="success"] {
     color: var(--tickets-success);
-    color: var(--tickets-success);
   }
   &[data-tone="danger"] {
-    color: var(--tickets-danger);
     color: var(--tickets-danger);
   }
 }
@@ -384,9 +377,7 @@
 .notice {
   border: 1px solid #ead7ac;
   background: var(--tickets-warning-soft);
-  background: var(--tickets-warning-soft);
   color: var(--tickets-warning);
-  color: light-dark(#785c25, #e0c89a);
   padding: 14px 18px;
   border-radius: 10px;
   font-size: 12px;

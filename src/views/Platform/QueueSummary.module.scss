@@ -48,7 +48,6 @@ button.tile {
     box-shadow 0.15s ease;
   &:hover {
     border-color: color-mix(in srgb, var(--tickets-primary) 35%, var(--tickets-surface));
-    border-color: color-mix(in srgb, var(--tickets-primary) 35%, var(--tickets-surface));
   }
   &[aria-pressed="true"] {
     border-color: var(--tone);

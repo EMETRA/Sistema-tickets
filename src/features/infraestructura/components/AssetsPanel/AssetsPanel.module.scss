@@ -46,7 +46,6 @@
   }
   &:hover {
     border-color: color-mix(in srgb, var(--tickets-primary) 35%, var(--tickets-surface));
-    border-color: color-mix(in srgb, var(--tickets-primary) 35%, var(--tickets-surface));
     box-shadow: 0 8px 22px #1a2b4a12;
   }
   &:focus-visible {
@@ -196,7 +195,6 @@
   gap: 6px;
   button {
     padding: 4px 10px;
-    border: 1px solid color-mix(in srgb, var(--tickets-primary) 35%, var(--tickets-surface));
     border: 1px solid color-mix(in srgb, var(--tickets-primary) 35%, var(--tickets-surface));
     border-radius: 999px;
     background: var(--tickets-primary-soft);
@@ -399,7 +397,6 @@
     box-shadow: inset 3px 0 0 var(--tickets-danger);
   }
   &:hover {
-    border-color: color-mix(in srgb, var(--tickets-primary) 35%, var(--tickets-surface));
     border-color: color-mix(in srgb, var(--tickets-primary) 35%, var(--tickets-surface));
     box-shadow: 0 6px 16px #1a2b4a12;
   }

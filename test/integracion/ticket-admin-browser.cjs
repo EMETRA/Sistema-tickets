@@ -13,7 +13,7 @@ function pdf(){
  const xref=Buffer.byteLength(output);output+=`xref\n0 6\n0000000000 65535 f \n${offsets.slice(1).map(n=>String(n).padStart(10,'0')+' 00000 n \n').join('')}trailer\n<</Size 6/Root 1 0 R>>\nstartxref\n${xref}\n%%EOF\n`;return Buffer.from(output);
 }
 async function run(){
- const root=path.resolve(__dirname,'../..'), api=(process.env.TICKETS_API_SOURCE||process.env.API_TICKETS_DIR||path.resolve(__dirname,'../../../../apis/api-tickets'));
+ const api=(process.env.TICKETS_API_SOURCE||process.env.API_TICKETS_DIR||path.resolve(__dirname,'../../../../apis/api-tickets'));
  const {PlatformTicketFiles}=require(path.join(api,'dist/platform/platform.ticket-files.js'));
  const {PlatformTickets}=require(path.join(api,'dist/platform/platform.tickets.js'));
  const {PlatformAccess}=require(path.join(api,'dist/platform/platform.access.js'));

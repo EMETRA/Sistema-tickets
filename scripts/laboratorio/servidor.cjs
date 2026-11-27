@@ -408,10 +408,18 @@ async function createLab(file, options = {}) {
         logs: has(a, "TICKETS_LOGS_LEER"),
         teamMetrics: manager(a),
         // Como platform.service.ts del API: «Personas y accesos» → permisos corporativos si tiene mod06.
-        corporateAccess: !!(a.admin || s.moduleAccess?.[a.id]?.mod06?.allowed),
+        corporateAccess: moduleAccess(s, a, "mod06").allowed,
       },
       timezone: "America/Guatemala",
     };
+  }
+  // Acceso a un módulo del catálogo (como platform.service.ts moduleAccess del API).
+  function moduleAccess(s, a, id) {
+    const custom = s.moduleAccess?.[a.id]?.[id];
+    if (custom) return { moduloId:id, ...custom };
+    const visible = Object.values(s.applicationCatalog || {}).some(app => Object.values(app.sections || {}).some(section => (section.modules || []).some(module => module.id===id)));
+    const actions = { LEER:!!(a.admin || visible), INSERTAR:!!a.admin, EDITAR:!!a.admin, ELIMINAR:!!a.admin };
+    return { moduloId:id, allowed:actions.LEER && (!['proc01','mod01','mod10'].includes(id) || actions.INSERTAR), actions };
   }
   function dispatch(s, a, req, url, body, upload) {
     const p = url.pathname.replace(/^\/platform/, ""),
@@ -423,13 +431,7 @@ async function createLab(file, options = {}) {
       return {empresa:97,personal:s.users.map(u=>({empresa:97,empleado:9000000+u.id,nombre:u.nombre,puesto:u.rol,unidadCodigo:u.equipoId===s.ids.it?1:2,unidad:u.equipoId===s.ids.it?'Informática ficticia':'Contabilidad ficticia',sinUnidad:false,cuentasHabilitadas:1,usuariosIds:[u.id]})).concat(s.assetExample?assets.people():[])};
     }
     if (p === "/catalog") return s.applicationCatalog || {}; // Catálogo ficticio explícito de los recorridos; sin trámites externos.
-    if (parts[0] === 'module-access') {
-      const id = parts[1], custom = s.moduleAccess?.[a.id]?.[id];
-      if (custom) return { moduloId:id, ...custom };
-      const visible = Object.values(s.applicationCatalog || {}).some(app => Object.values(app.sections || {}).some(section => (section.modules || []).some(module => module.id===id)));
-      const actions = { LEER:!!(a.admin || visible), INSERTAR:!!a.admin, EDITAR:!!a.admin, ELIMINAR:!!a.admin };
-      return { moduloId:id, allowed:actions.LEER && (!['proc01','mod01','mod10'].includes(id) || actions.INSERTAR), actions };
-    }
+    if (parts[0] === 'module-access') return moduleAccess(s, a, parts[1]);
     if (p === "/people")
       return s.users
         .filter(

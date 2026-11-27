@@ -28,7 +28,7 @@ async function run(){
     instance=await start({port:4025,file:path.join(dir,'estado.json'),compiled:true,graphql,incident,incidentToken:'clave-ficticia-del-emisor-panel-para-pruebas'});
     const {APPS_CATALOG_DUMMY}=require('./load-ts.cjs')(root)('src/api/graphql/home/appsCatalog.dummy.ts');
     await instance.lab.state.change(s=>{s.applicationCatalog=APPS_CATALOG_DUMMY;s.resources.incidencias=[];const app=s.resources.aplicaciones.find(a=>a.id===s.ids.app);app.nombre='Sistema Tickets · prueba';app.equipoId=s.ids.it;app.visibilidad='EQUIPO';app.datos.codigo='SISTEMA_TICKETS';});
-    browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox','--disable-dev-shm-usage']});page=await browser.newPage({viewport:{width:1440,height:1100}});page.setDefaultTimeout(20000);page.on('pageerror',e=>errors.push(e.message));
+    browser=await chromium.launch({executablePath:process.env.QA_CHROMIUM_PATH||undefined,args:['--no-sandbox','--disable-dev-shm-usage']});page=await browser.newPage({viewport:{width:1440,height:1100}});page.setDefaultTimeout(20000);page.on('pageerror',e=>errors.push(e.message));
     await page.route('**/*',route=>/^https?:/.test(route.request().url())&&new URL(route.request().url()).hostname!=='127.0.0.1'?route.abort():route.continue());
     for(let i=0;i<100;i++){try{if((await fetch(instance.base+'/home')).status<500)break;}catch{}await new Promise(r=>setTimeout(r,100));}
     const visit=async url=>{await page.goto(instance.base+url);await page.waitForLoadState('networkidle');};

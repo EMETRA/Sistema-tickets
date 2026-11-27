@@ -64,7 +64,7 @@ async function run() {
   try {
     for (let i = 0; !salida.includes('Ready in') && i < 200; i++) { if (next.exitCode !== null) throw new Error(salida); await new Promise(r => setTimeout(r, 100)); }
     assert.ok(salida.includes('Ready in'));
-    browser = await chromium.launch({ executablePath: process.env.QA_CHROMIUM_PATH || '/usr/bin/chromium', args: ['--no-sandbox', '--disable-dev-shm-usage'] });
+    browser = await chromium.launch({ executablePath:process.env.QA_CHROMIUM_PATH||undefined, args: ['--no-sandbox', '--disable-dev-shm-usage'] });
     const context = await browser.newContext({ viewport: { width: 1440, height: 1100 }, acceptDownloads: true });
     page = await context.newPage();
     await page.route('**/*', route => new URL(route.request().url()).hostname === '127.0.0.1' ? route.continue() : route.abort());

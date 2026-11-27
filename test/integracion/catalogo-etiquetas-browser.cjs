@@ -3,7 +3,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs/promises'),os=req
 const {chromium}=require('playwright'),{start}=require('../../scripts/laboratorio/iniciar.cjs');
 async function main(){
  const dir=await fs.mkdtemp(path.join(os.tmpdir(),'tickets-catalogo-'));
- const {PlatformTagCatalog}=require(path.resolve(__dirname,'../../../api-tickets/dist/platform/platform.tag-catalog'));
+ const {PlatformTagCatalog}=require(path.join((process.env.TICKETS_API_SOURCE||process.env.API_TICKETS_DIR||path.resolve(__dirname,'../../../../apis/api-tickets')),'dist/platform/platform.tag-catalog'));
  const labels=require('../../scripts/laboratorio/ticket-labels.cjs');labels.catalog.splice(0);
  let instance,browser,page;const errors=[],audits=[];
  try{
@@ -19,7 +19,7 @@ async function main(){
    const json=(r,status=201)=>{res.writeHead(status,{'Content-Type':'application/json'});res.end(JSON.stringify(r));};
    try{const chunks=[];for await(const c of req)chunks.push(c);const body=JSON.parse(Buffer.concat(chunks)||'{}');const result=await service.save(actor,body,req.url.endsWith('/initialize'),req.headers['x-ticket-confirmation']);json(result);}catch(e){json({message:e.message},e.getStatus?.()||500);}
   });
-  browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox','--disable-dev-shm-usage']});page=await browser.newPage({viewport:{width:1440,height:1100}});page.setDefaultTimeout(20000);page.on('pageerror',e=>errors.push(e.message));await page.route('**/*',r=>/^https?:/.test(r.request().url())&&new URL(r.request().url()).hostname!=='127.0.0.1'?r.abort():r.continue());
+  browser=await chromium.launch({executablePath:process.env.QA_CHROMIUM_PATH||undefined,args:['--no-sandbox','--disable-dev-shm-usage']});page=await browser.newPage({viewport:{width:1440,height:1100}});page.setDefaultTimeout(20000);page.on('pageerror',e=>errors.push(e.message));await page.route('**/*',r=>/^https?:/.test(r.request().url())&&new URL(r.request().url()).hostname!=='127.0.0.1'?r.abort():r.continue());
   const visit=async url=>{await page.goto(instance.base+url);await page.waitForLoadState('networkidle');};
   const confirm=async()=>{await page.getByRole('button',{name:'Confirmar revisión · 1 de 2',exact:true}).click();await page.getByLabel('He revisado la acción y quiero aplicarla.').check();await page.getByRole('button',{name:'Confirmar y aplicar · 2 de 2',exact:true}).click();};
   for(let i=0;i<100;i++){try{if((await fetch(instance.base+'/home')).status<500)break;}catch{}await new Promise(r=>setTimeout(r,100));}

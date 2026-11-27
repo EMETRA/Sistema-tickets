@@ -29,6 +29,7 @@ pnpm typecheck         # TypeScript
 pnpm test:integracion  # pruebas de Node
 pnpm build-storybook   # Storybook compila
 pnpm e2e               # Playwright + axe sobre el laboratorio local
+pnpm build && pnpm test:navegador  # flujos de negocio con API simulado (Playwright)
 ```
 
 CI: `.github/workflows/ci.yml` (pull requests y pushes a Dev y main, Node 20 como producción).

@@ -1,8 +1,9 @@
 // Panel/BFF de producción, con fuentes y sesión ficticias. No abre conexiones institucionales.
+const os=require('node:os');
 const assert = require('node:assert/strict'), http = require('node:http'), fs = require('node:fs/promises'), path = require('node:path');
 const { spawn } = require('node:child_process'), { once } = require('node:events'), { chromium } = require('playwright');
 async function main() {
-    const directory = process.env.QA_SCREENSHOT_DIR || '/tmp/vivi-reportes-browser';
+    const directory = process.env.QA_SCREENSHOT_DIR || path.join(os.tmpdir(),'vivi-reportes-browser');
     await fs.mkdir(directory, { recursive: true });
     const id = '9007199254740993', calls = [], errors = [];
     let allowed = false, failUsers = false, failDetail = false;
@@ -49,7 +50,7 @@ async function main() {
     try {
         for (let i = 0; !output.includes('Ready in') && i < 200; i++) { if (next.exitCode !== null) throw Error(output); await new Promise(r => setTimeout(r, 100)); }
         assert.ok(output.includes('Ready in'));
-        browser = await chromium.launch({ executablePath: '/usr/bin/chromium', args: ['--no-sandbox'], headless: true });
+        browser = await chromium.launch({ executablePath:process.env.QA_CHROMIUM_PATH||undefined, args: ['--no-sandbox'], headless: true });
         const context = await browser.newContext({ viewport: { width: 1440, height: 1050 } });
         await context.addCookies([{ name: 'auth_token', value: 'token-ficticio', url: 'http://127.0.0.1:3781' }, { name: 'auth_role', value: 'ADMINISTRADOR', url: 'http://127.0.0.1:3781' }]);
         await context.addInitScript(user => localStorage.setItem('auth-storage', JSON.stringify({ state: { token: 'token-ficticio', user, userId: user.id_usuario }, version: 0 })), account);

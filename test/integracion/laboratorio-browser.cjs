@@ -7,7 +7,7 @@ async function run() {
   assert.match(base, /^http:\/\/127\.0\.0\.1:\d+$/);
   const browser = await chromium.launch({
     ...(fs.existsSync("/usr/bin/chromium")
-      ? { executablePath: "/usr/bin/chromium" }
+      ? { executablePath:process.env.QA_CHROMIUM_PATH||undefined }
       : {}),
     args: ["--no-sandbox", "--disable-dev-shm-usage"],
   });

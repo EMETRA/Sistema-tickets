@@ -8,7 +8,7 @@ const { buildSchema, parse, validate, getOperationAST, getVariableValues } = req
 const { chromium } = require('playwright');
 const { start } = require('../../scripts/laboratorio/iniciar.cjs');
 async function run() {
-  const root = path.resolve(__dirname, '../..'), api = process.env.TICKETS_API_SOURCE || path.resolve(root, '../api-tickets');
+  const root = path.resolve(__dirname, '../..'), api = (process.env.TICKETS_API_SOURCE||process.env.API_TICKETS_DIR||path.resolve(__dirname,'../../../../apis/api-tickets'));
   const temp = await fs.mkdtemp(path.join(os.tmpdir(), 'tickets-modulos-'));
   const out = process.env.QA_SCREENSHOT_DIR || path.join(temp, 'capturas'); await fs.mkdir(out, {recursive:true});
   const schemaFile = path.join(temp, 'schema.gql');
@@ -57,7 +57,7 @@ async function run() {
     instance=await start({port:4005,file:path.join(temp,'estado.json'),compiled:true,graphql});
     const { APPS_CATALOG_DUMMY } = require('./load-ts.cjs')(root)('src/api/graphql/home/appsCatalog.dummy.ts');
     await instance.lab.state.change(s => { s.applicationCatalog = APPS_CATALOG_DUMMY; });
-    browser=await chromium.launch({executablePath:process.env.QA_CHROMIUM_PATH||'/usr/bin/chromium',args:['--no-sandbox','--disable-dev-shm-usage']});
+    browser=await chromium.launch({executablePath:process.env.QA_CHROMIUM_PATH||undefined,args:['--no-sandbox','--disable-dev-shm-usage']});
     page=await browser.newPage({viewport:{width:1440,height:1100}});page.setDefaultTimeout(25000);
     const errors=[],alerts=[];page.on('pageerror',e=>errors.push(e.message));page.on('dialog',async d=>{alerts.push(d.message());await d.dismiss();});
     await page.route('**/*',r=>/^https?:/.test(r.request().url())&&new URL(r.request().url()).hostname!=='127.0.0.1'?r.abort():r.continue());

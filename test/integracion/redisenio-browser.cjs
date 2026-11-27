@@ -1,7 +1,7 @@
 // Recorridos reales de Next con límites HTTP sustituidos. Sin Oracle ni envíos reales.
 const assert=require('node:assert/strict');
 const http=require('node:http');
-const fs=require('node:fs/promises');
+const fs=require('node:fs/promises');const os=require('node:os');
 const path=require('node:path');
 const {once}=require('node:events');
 const {spawn,execFileSync}=require('node:child_process');
@@ -53,10 +53,10 @@ async function run(){
  });backend.listen(3862,'127.0.0.1');await once(backend,'listening');
  const next=spawn(process.execPath,['node_modules/next/dist/bin/next','start','-p','3861','-H','127.0.0.1'],{cwd:root,env:{...process.env,GRAPHQL_ENDPOINT:'http://127.0.0.1:3862/graphql',API_PORTAL_URL:'http://127.0.0.1:3862',AUTH_RECOVERY_BASE_URL:'http://127.0.0.1:3862/auth/',NEXT_TELEMETRY_DISABLED:'1'},stdio:['ignore','pipe','pipe']});
  let output='';next.stdout.on('data',b=>output+=b);next.stderr.on('data',b=>output+=b);let browser,context,page;const errors=[];const visited=[];
- const out=process.env.QA_SCREENSHOT_DIR||'/workspace/artifacts/tickets-redisenio';await fs.mkdir(out,{recursive:true});
+ const out=process.env.QA_SCREENSHOT_DIR||path.join(os.tmpdir(),'tickets-redisenio');await fs.mkdir(out,{recursive:true});
  try{
   for(let i=0;i<200&&!output.includes('Ready in');i++){if(next.exitCode!==null)throw Error(output);await new Promise(r=>setTimeout(r,100));}assert.ok(output.includes('Ready in'));
-  browser=await chromium.launch({executablePath:process.env.QA_CHROMIUM_PATH||'/usr/bin/chromium',args:['--no-sandbox','--disable-dev-shm-usage']});
+  browser=await chromium.launch({executablePath:process.env.QA_CHROMIUM_PATH||undefined,args:['--no-sandbox','--disable-dev-shm-usage']});
   context=await browser.newContext({viewport:{width:1600,height:1000}});page=await context.newPage();page.on('pageerror',error=>errors.push(error.message));
   await page.route('**/*',route=>new URL(route.request().url()).hostname==='127.0.0.1'?route.continue():route.abort());
   const fits=async()=>assert.ok(await page.evaluate(()=>{const m=document.querySelector('main');return document.documentElement.scrollWidth<=innerWidth&&(!m||m.scrollWidth<=m.clientWidth+1);}),'Desborde horizontal en '+page.url());

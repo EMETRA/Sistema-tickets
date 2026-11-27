@@ -14,7 +14,7 @@ async function run(){
    s.tickets=[{id:21,codigo:null,titulo:'Clasificación de prueba',descripcion:'Datos ficticios',usuarioCreadorId:7,usuarioAsignadoId:4,estadoId:2,categoriaId:1,prioridadId:2,version:1,fechaCreacion:new Date().toISOString(),fechaActualizacion:new Date().toISOString()},
    {id:22,codigo:null,titulo:'Cierre anterior de prueba',descripcion:'Datos ficticios',usuarioCreadorId:7,usuarioAsignadoId:5,estadoId:5,categoriaId:1,prioridadId:2,version:1,fechaCreacion:new Date().toISOString(),fechaActualizacion:new Date().toISOString(),fechaCierre:new Date().toISOString()}];s.ticketHistory=[];s.messages=[];
   });
-  browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox','--disable-dev-shm-usage']});
+  browser=await chromium.launch({executablePath:process.env.QA_CHROMIUM_PATH||undefined,args:['--no-sandbox','--disable-dev-shm-usage']});
   page=await browser.newPage({viewport:{width:1440,height:1100}});page.setDefaultTimeout(25000);page.on('pageerror',error=>errors.push(error.message));
   await page.route('**/*',route=>/^https?:/.test(route.request().url())&&new URL(route.request().url()).hostname!=='127.0.0.1'?route.abort():route.continue());
   const visit=async url=>{await page.goto(instance.base+url);await page.waitForLoadState('networkidle');};

@@ -31,7 +31,7 @@ async function run() {
     instance = await start({ port: 4035, file: path.join(dir, 'estado.json'), compiled: true, graphql });
     const { APPS_CATALOG_DUMMY } = require('./load-ts.cjs')(root)('src/api/graphql/home/appsCatalog.dummy.ts');
     await instance.lab.state.change(s => { s.applicationCatalog = APPS_CATALOG_DUMMY; s.moduleAccess = { 7: { mod04: access('mod04', false), mod05: access('mod05', true), mod06: access('mod06', true) } }; });
-    browser = await chromium.launch({ executablePath: '/usr/bin/chromium', args: ['--no-sandbox', '--disable-dev-shm-usage'] });
+    browser = await chromium.launch({ executablePath:process.env.QA_CHROMIUM_PATH||undefined, args: ['--no-sandbox', '--disable-dev-shm-usage'] });
     page = await browser.newPage({ viewport: { width: 1440, height: 1100 } }); page.setDefaultTimeout(20000);
     page.on('pageerror', e => errors.push(e.message));
     await page.route('**/*', route => /^https?:/.test(route.request().url()) && new URL(route.request().url()).hostname !== '127.0.0.1' ? route.abort() : route.continue());

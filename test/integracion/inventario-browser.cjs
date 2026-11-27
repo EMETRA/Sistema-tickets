@@ -7,7 +7,7 @@ async function run(){
  const errors=[],inventory=[],writes=[];let previews=0,fail=false;
  try{
   instance=await start({port:4025,file:path.join(dir,'estado.json'),compiled:true});
-  browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox','--disable-dev-shm-usage']});
+  browser=await chromium.launch({executablePath:process.env.QA_CHROMIUM_PATH||undefined,args:['--no-sandbox','--disable-dev-shm-usage']});
   page=await browser.newPage({viewport:{width:1440,height:1100}});page.setDefaultTimeout(20000);page.on('pageerror',e=>errors.push(e.message));
   page.on('request',r=>{if(r.method()==='POST'&&new URL(r.url()).pathname==='/api/platform/records/dispositivos')writes.push(r.postDataJSON());});
   await page.route('**/*',r=>/^https?:/.test(r.request().url())&&new URL(r.request().url()).hostname!=='127.0.0.1'?r.abort():r.continue());

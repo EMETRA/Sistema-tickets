@@ -14,7 +14,7 @@ async function run() {
   const errors = [];
   try {
     instance = await start({ port: 4015, file: path.join(dir, 'estado.json'), compiled: true });
-    browser = await chromium.launch({ executablePath: '/usr/bin/chromium', args: ['--no-sandbox', '--disable-dev-shm-usage'] });
+    browser = await chromium.launch({ executablePath:process.env.QA_CHROMIUM_PATH||undefined, args: ['--no-sandbox', '--disable-dev-shm-usage'] });
     page = await browser.newPage({ viewport: { width: 1440, height: 1100 } });
     page.setDefaultTimeout(20000);
     page.on('pageerror', e => errors.push(e.message));

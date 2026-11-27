@@ -32,7 +32,7 @@ async function run() {
       s.messages = [{ticketId:1, usuario:7, nombre_usuario:s.users[6].nombre, fechaEnvio:new Date().toISOString(), textoMensaje:'Adjunto la captura de la pantalla.', archivos:[]}, {ticketId:1, usuario:4, nombre_usuario:s.users[3].nombre, fechaEnvio:new Date().toISOString(), textoMensaje:'Estamos revisando la solicitud.', archivos:[]}];
       s.ticketHistory = [{id:'h1',ticketId:1,usuarioId:7,accion:'CREACION',valorAnterior:null,valorNuevo:'Creado',fecha:new Date().toISOString()},{id:'h2',ticketId:1,usuarioId:4,accion:'EN_TRABAJO',valorAnterior:'Asignado',valorNuevo:'En trabajo',fecha:new Date().toISOString()}];
     });
-    browser = await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox','--disable-dev-shm-usage']});
+    browser = await chromium.launch({executablePath:process.env.QA_CHROMIUM_PATH||undefined,args:['--no-sandbox','--disable-dev-shm-usage']});
     const page = await browser.newPage({viewport:{width:1440,height:1100}});
     page.setDefaultTimeout(25000);
     const errors=[];page.on('pageerror', e=>errors.push(e.message));

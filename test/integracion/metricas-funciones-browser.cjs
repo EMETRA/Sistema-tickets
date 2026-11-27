@@ -7,7 +7,7 @@ const {parse,getOperationAST}=require('graphql');
 const {chromium}=require('playwright');
 const {start}=require('../../scripts/laboratorio/iniciar.cjs');
 async function run(){
- const root=path.resolve(__dirname,'../..'), api=process.env.TICKETS_API_SOURCE||path.resolve(root,'../api-tickets');
+ const root=path.resolve(__dirname,'../..'), api=(process.env.TICKETS_API_SOURCE||process.env.API_TICKETS_DIR||path.resolve(__dirname,'../../../../apis/api-tickets'));
  const {PlatformActivity}=require(path.join(api,'dist/platform/platform.activity.js'));
  const {PlatformTelemetry}=require(path.join(api,'dist/platform/platform.telemetry.js'));
  const temp=await fs.mkdtemp(path.join(os.tmpdir(),'tickets-metricas-funciones-'));
@@ -43,7 +43,7 @@ async function run(){
  try{
   instance=await start({port:4055,file:path.join(temp,'estado.json'),compiled:true,graphql});
   const {APPS_CATALOG_DUMMY}=require('./load-ts.cjs')(root)('src/api/graphql/home/appsCatalog.dummy.ts');await instance.lab.state.change(s=>{s.applicationCatalog=APPS_CATALOG_DUMMY;});
-  browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox','--disable-dev-shm-usage']});page=await browser.newPage({viewport:{width:1440,height:1100}});page.setDefaultTimeout(25000);page.on('pageerror',e=>errors.push(e.message));
+  browser=await chromium.launch({executablePath:process.env.QA_CHROMIUM_PATH||undefined,args:['--no-sandbox','--disable-dev-shm-usage']});page=await browser.newPage({viewport:{width:1440,height:1100}});page.setDefaultTimeout(25000);page.on('pageerror',e=>errors.push(e.message));
   await page.route('**/*',route=>/^https?:/.test(route.request().url())&&new URL(route.request().url()).hostname!=='127.0.0.1'?route.abort():route.continue());
   await page.route('**/api/platform/metrics?*',async route=>{const params=Object.fromEntries(new URL(route.request().url()).searchParams);queries.push(params);if(failMetrics)return route.fulfill({status:503,json:{message:'No se pudo actualizar el reporte de métricas.'}});return route.fulfill({json:await telemetry.metrics({id:1,admin:true,memberships:[],permisos:new Set()},params)});});
   for(let i=0;i<100;i++){try{if((await fetch(instance.base+'/home')).status<500)break;}catch{}await new Promise(r=>setTimeout(r,100));}

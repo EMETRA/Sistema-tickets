@@ -13,7 +13,7 @@ function pdf(){
  const xref=Buffer.byteLength(output);output+=`xref\n0 6\n0000000000 65535 f \n${offsets.slice(1).map(n=>String(n).padStart(10,'0')+' 00000 n \n').join('')}trailer\n<</Size 6/Root 1 0 R>>\nstartxref\n${xref}\n%%EOF\n`;return Buffer.from(output);
 }
 async function run(){
- const root=path.resolve(__dirname,'../..'), api=process.env.TICKETS_API_SOURCE||path.resolve(root,'../api-tickets');
+ const root=path.resolve(__dirname,'../..'), api=(process.env.TICKETS_API_SOURCE||process.env.API_TICKETS_DIR||path.resolve(__dirname,'../../../../apis/api-tickets'));
  const {PlatformTicketFiles}=require(path.join(api,'dist/platform/platform.ticket-files.js'));
  const {PlatformTickets}=require(path.join(api,'dist/platform/platform.tickets.js'));
  const {PlatformAccess}=require(path.join(api,'dist/platform/platform.access.js'));
@@ -35,7 +35,7 @@ async function run(){
    s.tickets=[{id:21,codigo:null,titulo:'Primer ticket de prueba',descripcion:'Descripción **ficticia**.',usuarioCreadorId:1,usuarioAsignadoId:1,estadoId:3,categoriaId:1,prioridadId:2,tiempoEstimado:10,version:1,fechaCreacion:new Date().toISOString(),fechaActualizacion:new Date().toISOString()}];
    s.messages=[{ticketId:21,usuario:1,nombre_usuario:null,fechaEnvio:new Date().toISOString(),textoMensaje:'Comentario anterior de prueba',archivos:[]}];s.ticketHistory=[];
   });
-  browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox','--disable-dev-shm-usage']});page=await browser.newPage({viewport:{width:1440,height:1100}});page.setDefaultTimeout(25000);page.on('pageerror',e=>errors.push(e.message));
+  browser=await chromium.launch({executablePath:process.env.QA_CHROMIUM_PATH||undefined,args:['--no-sandbox','--disable-dev-shm-usage']});page=await browser.newPage({viewport:{width:1440,height:1100}});page.setDefaultTimeout(25000);page.on('pageerror',e=>errors.push(e.message));
   await page.route('**/*',route=>/^https?:/.test(route.request().url())&&new URL(route.request().url()).hostname!=='127.0.0.1'?route.abort():route.continue());
   await page.route('**/api/ticket/21/attachments',route=>route.fulfill({json:{ticketAttachments:[{id:'2',ticketId:21,usuarioId:1,nombreArchivo:'ejemplo.pdf',keyStorage:'tickets/ejemplo.pdf',fecha:new Date().toISOString()}]}}));
   await page.route('**/api/platform/tickets/*/files/*',async route=>{

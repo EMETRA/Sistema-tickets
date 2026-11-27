@@ -37,7 +37,7 @@ async function run() {
       await new Promise(resolve => setTimeout(resolve, 100));
     }
     assert(output.includes('Ready in'));
-    browser = await chromium.launch({executablePath: process.env.QA_CHROMIUM_PATH || '/usr/bin/chromium', args: ['--no-sandbox', '--disable-dev-shm-usage']});
+    browser = await chromium.launch({executablePath:process.env.QA_CHROMIUM_PATH||undefined, args: ['--no-sandbox', '--disable-dev-shm-usage']});
     const context = await browser.newContext({viewport: {width: 1440, height: 1100}});
     const page = await context.newPage();
     await page.route('**/*', route => new URL(route.request().url()).hostname === '127.0.0.1' ? route.continue() : route.abort());

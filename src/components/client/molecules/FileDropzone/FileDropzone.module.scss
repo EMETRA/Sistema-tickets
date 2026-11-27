@@ -95,7 +95,7 @@
 
 .rejected {
   grid-column: 1 / -1;
-  color: #e63946;
+  color: var(--paleta-rojo-1);
   font-size: 0.8rem;
   margin-top: 0.5rem;
 }

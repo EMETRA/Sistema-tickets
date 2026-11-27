@@ -12,8 +12,8 @@
   gap: 1rem;
   background: var(--tickets-surface);
   border-radius: 1rem;
-  border: 1.4px solid #d0d0d0;
-  border: 1.4px solid light-dark(#d0d0d0, #2a3449);
+  border: 1.4px solid var(--tickets-border-strong);
+  border: 1.4px solid var(--tickets-border-strong);
   padding: 1.75rem;
 }
 
@@ -21,8 +21,8 @@
 .searchLabel {
   font-size: 0.95rem;
   font-weight: 700;
-  color: #1b1b1b;
-  color: light-dark(#1b1b1b, #e5eaf5);
+  color: var(--tickets-text);
+  color: var(--tickets-text);
   margin: 0;
 }
 
@@ -44,8 +44,8 @@
   outline: none;
   padding: 0.6rem 0.85rem;
   font-size: 0.9rem;
-  color: #1b1b1b;
-  color: light-dark(#1b1b1b, #e5eaf5);
+  color: var(--tickets-text);
+  color: var(--tickets-text);
   background: transparent;
 }
 
@@ -56,13 +56,13 @@
   padding: 0.6rem 0.85rem;
   background: transparent;
   border: none;
-  color: #6b6b6b;
+  color: var(--tickets-text-muted);
   color: light-dark(#6b6b6b, #e5eaf5);
   cursor: pointer;
   flex-shrink: 0;
 
   &:hover:not(:disabled) {
-    color: #1b2a6b;
+    color: var(--tickets-text);
     color: light-dark(#1b2a6b, #95a4e4);
   }
 
@@ -76,8 +76,8 @@
   display: inline-block;
   width: 14px;
   height: 14px;
-  border: 2px solid #d0d0d0;
-  border: 2px solid light-dark(#d0d0d0, #2a3449);
+  border: 2px solid var(--tickets-border-strong);
+  border: 2px solid var(--tickets-border-strong);
   border-top-color: #1b2a6b;
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
@@ -99,8 +99,8 @@
 .sectionTitle {
   font-size: 0.95rem;
   font-weight: 700;
-  color: #1b1b1b;
-  color: light-dark(#1b1b1b, #e5eaf5);
+  color: var(--tickets-text);
+  color: var(--tickets-text);
   margin: 0;
 }
 
@@ -120,8 +120,8 @@
 
 // Debug box
 .debugBox {
-  border: 1px solid #d0d0d0;
-  border: 1px solid light-dark(#d0d0d0, #2a3449);
+  border: 1px solid var(--tickets-border-strong);
+  border: 1px solid var(--tickets-border-strong);
   border-radius: 0.25rem;
   padding: 1rem 1.25rem;
   background: var(--tickets-surface);
@@ -132,7 +132,7 @@
 
 .debugLine {
   font-size: 0.85rem;
-  color: #8a8a8a;
+  color: var(--tickets-text-muted);
   margin: 0;
   line-height: 1.7;
 }

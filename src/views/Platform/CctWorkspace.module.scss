@@ -16,8 +16,8 @@
     cursor: pointer;
   }
   button[aria-selected="true"] {
-    background: var(--tickets-primary-soft, #eef1ff);
-    color: var(--tickets-primary, #445af5);
+    background: var(--tickets-primary-soft);
+    color: var(--tickets-primary);
     font-weight: 600;
   }
 }
@@ -60,7 +60,7 @@
 }
 .empty {
   padding: 28px 16px;
-  background: var(--tickets-surface-subtle, #f7f9fd);
+  background: var(--tickets-surface-subtle);
   border: 1px dashed var(--tickets-border);
   border-radius: 8px;
   color: var(--tickets-text-secondary);
@@ -77,7 +77,7 @@
   flex-wrap: wrap;
   margin: 20px 0;
   padding: 18px;
-  background: var(--tickets-surface-subtle, #f7f9fd);
+  background: var(--tickets-surface-subtle);
   border-radius: 8px;
   strong {
     display: block;
@@ -94,12 +94,12 @@
 }
 .success {
   padding: 14px 18px;
-  background: #eaf8ef;
-  background: light-dark(#eaf8ef, #13322e);
-  border: 1px solid #cbe5d3;
-  border: 1px solid light-dark(#cbe5d3, #2a3449);
+  background: var(--tickets-success-soft);
+  background: var(--tickets-success-soft);
+  border: 1px solid var(--tickets-border);
+  border: 1px solid var(--tickets-border);
   border-radius: 8px;
-  color: #236c43;
+  color: var(--tickets-success);
   color: light-dark(#236c43, #9bdfb9);
 }
 .inline {
@@ -212,8 +212,8 @@
     box-shadow: -4px 0 7px #203e7008;
   }
   th:last-child {
-    background: #f7f9fd;
-    background: light-dark(#f7f9fd, #132241);
+    background: var(--tickets-surface-subtle);
+    background: var(--tickets-surface-subtle);
   }
 }
 
@@ -248,7 +248,7 @@
       font-size: 13px;
     }
     &[aria-pressed="true"] {
-      border-color: var(--tickets-primary, #445af5);
+      border-color: var(--tickets-primary);
       background: var(--tickets-surface-subtle);
     }
   }
@@ -350,7 +350,7 @@ table.wideTable {
     color: var(--tickets-text-secondary);
     font-size: 13px;
     &[aria-current="page"] {
-      background: var(--tickets-primary-soft, #eef1ff);
+      background: var(--tickets-primary-soft);
       color: var(--tickets-primary);
       border-color: var(--tickets-border);
       font-weight: 600;
@@ -370,7 +370,7 @@ table.wideTable {
   margin: 10px 0;
 }
 .availability {
-  background: var(--tickets-surface-subtle, #f7f9fd);
+  background: var(--tickets-surface-subtle);
   padding: 10px 14px;
   border-radius: 8px;
   summary {

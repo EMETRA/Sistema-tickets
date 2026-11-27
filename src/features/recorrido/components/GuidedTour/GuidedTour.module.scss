@@ -116,7 +116,7 @@
 .primary {
   border: 0;
   background: var(--tickets-primary-fill);
-  color: #fff;
+  color: var(--tickets-on-primary);
   &:hover {
     filter: brightness(1.07);
   }

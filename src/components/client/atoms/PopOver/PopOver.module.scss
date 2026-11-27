@@ -80,9 +80,9 @@
 }
 .popoverContent {
   margin: 0;
-  border: 1px solid var(--tickets-border, #dfe5f2);
+  border: 1px solid var(--tickets-border);
   padding: 0;
-  color: var(--tickets-text, #263b58);
+  color: var(--tickets-text);
   max-width: calc(calc(100vw / var(--vp-zoom, 1)) - 24px);
   max-height: calc(calc(100dvh / var(--vp-zoom, 1)) - 24px);
 }

@@ -40,7 +40,7 @@
   padding: 8px 12px;
   font-size: 13px;
   &::placeholder {
-    color: #98a5b8;
+    color: var(--tickets-text-muted);
   }
   &:focus-visible {
     outline: none;

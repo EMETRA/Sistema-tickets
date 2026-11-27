@@ -45,7 +45,7 @@
 
     .date {
       flex-shrink: 0;
-      color: #a3a3a3;
+      color: var(--tickets-text-muted);
       margin: 0;
       margin-left: auto;
       white-space: nowrap;
@@ -71,7 +71,7 @@
 
     .daysRemaining {
       flex-shrink: 0;
-      color: #a3a3a3;
+      color: var(--tickets-text-muted);
       margin: 0;
       margin-left: auto;
       white-space: nowrap;

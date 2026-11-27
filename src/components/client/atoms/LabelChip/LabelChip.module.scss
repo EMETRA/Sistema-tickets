@@ -16,36 +16,36 @@
 
   // Default variant (neutral gray)
   &.default {
-    background-color: #e9eaec;
-    background-color: light-dark(#e9eaec, #131a2b);
-    color: #3a3d42;
-    color: light-dark(#3a3d42, #e5eaf5);
+    background-color: var(--tickets-neutral-soft);
+    background-color: var(--tickets-background);
+    color: var(--tickets-text);
+    color: var(--tickets-text);
   }
 
   &.bug {
-    background-color: #fde8e8;
-    background-color: light-dark(#fde8e8, #381825);
-    color: #b91c1c;
-    color: light-dark(#b91c1c, #ee8c8c);
+    background-color: var(--tickets-danger-soft);
+    background-color: var(--tickets-danger-soft);
+    color: var(--tickets-danger);
+    color: var(--tickets-danger);
   }
 
   &.maintenance {
-    background-color: #e8f0fd;
-    background-color: light-dark(#e8f0fd, #12274b);
-    color: #1c4db9;
-    color: light-dark(#1c4db9, #8caaee);
+    background-color: var(--tickets-info-soft);
+    background-color: var(--tickets-info-soft);
+    color: var(--tickets-info);
+    color: var(--tickets-info);
   }
 
   &.feature {
-    background-color: #e8fdf0;
-    background-color: light-dark(#e8fdf0, #123e33);
-    color: #166534;
+    background-color: var(--tickets-success-soft);
+    background-color: var(--tickets-success-soft);
+    color: var(--tickets-success);
     color: light-dark(#166534, #92e7b2);
   }
 
   &.urgent {
-    background-color: #fff3e8;
-    background-color: light-dark(#fff3e8, #3c2c25);
+    background-color: var(--tickets-warning-soft);
+    background-color: var(--tickets-warning-soft);
     color: #b95c1c;
     color: light-dark(#b95c1c, #eeb48c);
   }

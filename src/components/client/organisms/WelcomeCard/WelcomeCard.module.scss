@@ -1,8 +1,8 @@
 @use "../../../../theme/surfaces.scss" as surfaces;
 .welcomeCard {
   background-color: var(--tickets-surface);
-  border: 1px solid #f0f0f0;
-  border: 1px solid light-dark(#f0f0f0, #2a3449);
+  border: 1px solid var(--tickets-divider);
+  border: 1px solid var(--tickets-divider);
   border-radius: 16px;
   width: 500px;
   max-width: 100%;

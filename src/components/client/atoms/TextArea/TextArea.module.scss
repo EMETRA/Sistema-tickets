@@ -16,7 +16,7 @@
   min-height: 100px;
 
   &::placeholder {
-    color: #a9a9a9;
+    color: var(--tickets-text-muted);
   }
 
   &:focus {
@@ -35,13 +35,13 @@
 
 // TextArea con error
 .TextAreaError {
-  border-color: #ff4444 !important;
+  border-color: var(--tickets-danger) !important;
 }
 
 // Mensaje de error
 .ErrorMessage {
   display: block;
-  color: #ff4444;
+  color: var(--tickets-danger);
   font-size: 12px;
   margin-top: 4px;
   padding-left: 2px;

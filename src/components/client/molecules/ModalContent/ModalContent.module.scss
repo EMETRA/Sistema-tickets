@@ -13,7 +13,7 @@
   margin-bottom: 0px;
 
   .mainIcon {
-    color: #d32f2f;
+    color: var(--tickets-danger);
   }
 }
 
@@ -25,15 +25,15 @@
     margin: 15px;
     font-size: 20px;
     font-weight: 600;
-    color: #333333;
-    color: light-dark(#333333, #e5eaf5);
+    color: var(--tickets-text);
+    color: var(--tickets-text);
     margin-bottom: 10px;
   }
 
   .description {
     margin: 0;
-    color: #666666;
-    color: light-dark(#666666, #e5eaf5);
+    color: var(--tickets-text-muted);
+    color: var(--tickets-text-secondary);
     line-height: 1.5;
     font-size: 15px;
   }
@@ -81,8 +81,8 @@
   margin: 0;
   font-size: 0.8125rem;
   line-height: 1.45;
-  color: #666666;
-  color: light-dark(#666666, #e5eaf5);
+  color: var(--tickets-text-muted);
+  color: var(--tickets-text-secondary);
 }
 
 .compactActions {

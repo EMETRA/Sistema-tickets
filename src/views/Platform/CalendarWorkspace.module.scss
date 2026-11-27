@@ -42,8 +42,8 @@
     align-items: center;
     gap: 6px;
     padding: 7px 9px;
-    background: #f3effa;
-    background: light-dark(#f3effa, #1c193e);
+    background: var(--tickets-info-soft);
+    background: var(--tickets-surface-subtle);
     color: #71569a;
     color: light-dark(#71569a, #b9aacf);
     border: 1px solid transparent;
@@ -59,18 +59,18 @@
     }
     &[data-scope="EMPRESA"] {
       background: var(--tickets-neutral-soft);
-      color: #64748b;
+      color: var(--tickets-text-muted);
       color: light-dark(#64748b, #e5eaf5);
     }
     &[data-scope="PRIVADA"] {
-      background: #e8f5f0;
-      background: light-dark(#e8f5f0, #123033);
-      color: #2d785f;
+      background: var(--tickets-success-soft);
+      background: var(--tickets-success-soft);
+      color: var(--tickets-success);
       color: light-dark(#2d785f, #9fdbc7);
     }
     &[aria-pressed="false"] {
       background: var(--tickets-surface);
-      color: #71809b;
+      color: var(--tickets-text-muted);
       border-color: var(--tickets-border);
       span {
         background: transparent;
@@ -100,7 +100,7 @@
     font-size: 11px;
     cursor: pointer;
     &[aria-pressed="true"] {
-      background: var(--tickets-primary-soft, #edf1ff);
+      background: var(--tickets-primary-soft);
       color: var(--tickets-primary);
       font-weight: 600;
     }
@@ -220,19 +220,19 @@
   span {
     border-radius: 4px;
     padding: 5px 7px;
-    background: #f3effa;
-    background: light-dark(#f3effa, #1c193e);
+    background: var(--tickets-info-soft);
+    background: var(--tickets-surface-subtle);
     color: #71569a;
     color: light-dark(#71569a, #b9aacf);
     &:nth-child(2) {
       background: var(--tickets-neutral-soft);
-      color: #64748b;
+      color: var(--tickets-text-muted);
       color: light-dark(#64748b, #e5eaf5);
     }
     &:nth-child(3) {
-      background: #e8f5f0;
-      background: light-dark(#e8f5f0, #123033);
-      color: #2d785f;
+      background: var(--tickets-success-soft);
+      background: var(--tickets-success-soft);
+      color: var(--tickets-success);
       color: light-dark(#2d785f, #9fdbc7);
     }
   }
@@ -265,7 +265,7 @@
   gap: 5px;
   &[aria-current="date"] .dayNumber strong {
     background: var(--tickets-primary-fill);
-    color: #fff;
+    color: var(--tickets-on-primary);
     border-radius: 50%;
   }
 }
@@ -294,10 +294,10 @@
   border-left: 3px solid #8d6cc8;
   border-radius: 5px;
   padding: 8px;
-  background: #f0eafa;
-  background: light-dark(#f0eafa, #1e1942);
-  color: #655185;
-  color: light-dark(#655185, #b9adcd);
+  background: var(--tickets-info-soft);
+  background: var(--tickets-info-soft);
+  color: var(--tickets-text-secondary);
+  color: var(--tickets-text-secondary);
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -315,16 +315,16 @@
   }
   &[data-scope="EMPRESA"] {
     background: var(--tickets-neutral-soft);
-    border-left-color: #94a4be;
-    color: #5b6e89;
-    color: light-dark(#5b6e89, #afbaca);
+    border-left-color: var(--tickets-border-strong);
+    color: var(--tickets-text-muted);
+    color: var(--tickets-text-secondary);
   }
   &[data-scope="PRIVADA"] {
-    background: #e8f5f0;
-    background: light-dark(#e8f5f0, #123033);
-    border-left-color: #48a183;
-    color: #276c57;
-    color: light-dark(#276c57, #9edcc9);
+    background: var(--tickets-success-soft);
+    background: var(--tickets-success-soft);
+    border-left-color: var(--tickets-success);
+    color: var(--tickets-success);
+    color: var(--tickets-success);
   }
   &:focus-visible {
     outline: 2px solid var(--tickets-primary);

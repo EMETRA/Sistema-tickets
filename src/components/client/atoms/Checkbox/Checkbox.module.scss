@@ -14,7 +14,7 @@
   user-select: none;
 
   &:hover .CheckboxButton {
-    border-color: #a9a9a9;
+    border-color: var(--tickets-border-strong);
   }
 }
 
@@ -31,7 +31,7 @@
 // Contenedor con error
 .ContainerError {
   .CheckboxButton {
-    border-color: #ff4444;
+    border-color: var(--tickets-danger);
   }
 }
 
@@ -65,8 +65,8 @@
 // Cuando el checkbox está marcado
 .HiddenCheckbox:checked ~ .CheckboxButton {
   background-color: var(--tickets-primary-fill);
-  border-color: #cecece;
-  border-color: light-dark(#cecece, #2a3449);
+  border-color: var(--tickets-border-strong);
+  border-color: var(--tickets-border-strong);
 
   .CheckIcon {
     opacity: 1;
@@ -77,7 +77,7 @@
 
 // Focus del checkbox
 .HiddenCheckbox:focus ~ .CheckboxButton {
-  outline: 2px solid #a9a9a9;
+  outline: 2px solid var(--tickets-border-strong);
   outline-offset: 2px;
 }
 
@@ -98,13 +98,13 @@
 
 // Label disabled
 .ContainerDisabled .Label {
-  color: #a9a9a9;
+  color: var(--tickets-text-muted);
 }
 
 // Mensaje de error
 .ErrorMessage {
   display: block;
-  color: #ff4444;
+  color: var(--tickets-danger);
   font-size: 12px;
   margin-left: 28px;
   padding-left: 2px;

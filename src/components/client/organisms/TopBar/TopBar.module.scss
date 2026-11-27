@@ -7,7 +7,7 @@
   min-height: 76px;
   padding: 12px var(--tickets-page-padding, 28px);
   background: var(--tickets-surface);
-  border-bottom: 1px solid var(--tickets-border, #dfe5f2);
+  border-bottom: 1px solid var(--tickets-border);
   flex-shrink: 0;
   /* Con «Tamaño del texto» grande la interfaz se escala y las media queries
      no se enteran: las reglas @container usan el ancho real de la barra. */
@@ -33,13 +33,13 @@
   gap: 5px;
   min-width: 0;
   strong {
-    color: var(--tickets-text, #263b58);
+    color: var(--tickets-text);
     font-size: 15px;
     line-height: 1.35;
   }
   span {
     font-size: 10px;
-    color: var(--tickets-text-muted, #7b8ba2);
+    color: var(--tickets-text-muted);
   }
 }
 .globalActions {
@@ -57,12 +57,12 @@
   white-space: nowrap;
   padding: 10px 14px;
   border-radius: 9px;
-  color: #fff;
+  color: var(--tickets-on-primary);
   font-size: 11px;
   font-weight: 600;
   background: var(--tickets-primary-fill);
   &:hover {
-    background: var(--tickets-primary-hover, #3654db);
+    background: var(--tickets-primary-hover);
   }
 }
 .settings {

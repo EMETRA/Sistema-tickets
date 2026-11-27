@@ -4,29 +4,29 @@
   box-sizing: border-box;
   outline: none;
   background: var(--tickets-surface);
-  border: 1px solid var(--tickets-border, #dfe5f2);
+  border: 1px solid var(--tickets-border);
   border-radius: 8px;
   min-height: var(--tickets-control-height, 38px);
   padding: 9px 12px;
   font-weight: 400;
   width: 100%;
   min-width: 0;
-  color: var(--tickets-text, #263b58);
+  color: var(--tickets-text);
   font-size: 13px;
   transition:
     border-color 0.15s ease,
     box-shadow 0.15s ease;
 
   &::placeholder {
-    color: #98a5b8;
+    color: var(--tickets-text-muted);
   }
 
   &:hover:not(:focus):not([disabled]) {
-    border-color: var(--tickets-border-strong, #cdd6e6);
+    border-color: var(--tickets-border-strong);
   }
 
   &:focus {
-    border-color: var(--tickets-primary, #4361ee);
+    border-color: var(--tickets-primary);
     box-shadow: var(--tickets-focus);
     outline: none;
   }
@@ -50,7 +50,7 @@
 
 // Input con error
 .InputError {
-  border-color: #ff4444 !important;
+  border-color: var(--tickets-danger) !important;
 }
 
 // Contenedor base
@@ -96,8 +96,8 @@
   min-height: 200px;
 
   &:hover {
-    background: #f8f9ff;
-    background: light-dark(#f8f9ff, #131e4a);
+    background: var(--tickets-surface-subtle);
+    background: var(--tickets-info-soft);
     border-color: #0e3cc1;
   }
 
@@ -134,7 +134,7 @@
 .FileMainText {
   margin: 0;
   font-size: 16px;
-  color: var(--tickets-text, #263b58);
+  color: var(--tickets-text);
   font-weight: 400;
 }
 
@@ -149,7 +149,7 @@
 .FileSizeText {
   margin: 0;
   font-size: 12px;
-  color: #a9a9a9;
+  color: var(--tickets-text-muted);
   font-weight: 400;
   margin-top: 4px;
 }
@@ -191,7 +191,7 @@
 // Mensaje de error
 .ErrorMessage {
   display: block;
-  color: #ff4444;
+  color: var(--tickets-danger);
   font-size: 12px;
   margin-top: 4px;
   padding-left: 2px;

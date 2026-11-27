@@ -40,7 +40,7 @@
   flex-shrink: 0;
   border-radius: 15px;
   background: var(--accent);
-  color: #fff;
+  color: var(--tickets-on-primary);
   --workspace-icon-accent: #ffffff33;
   box-shadow: 0 8px 20px color-mix(in srgb, var(--accent) 35%, transparent);
 }

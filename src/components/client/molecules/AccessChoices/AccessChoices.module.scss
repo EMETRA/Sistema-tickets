@@ -40,8 +40,8 @@
     align-items: flex-start;
     gap: 10px;
     padding: 11px 12px;
-    border-bottom: 1px solid #edf0f7;
-    border-bottom: 1px solid light-dark(#edf0f7, #2a3449);
+    border-bottom: 1px solid var(--tickets-divider);
+    border-bottom: 1px solid var(--tickets-border);
     cursor: pointer;
     &:last-child {
       border-bottom: 0;
@@ -75,8 +75,8 @@
     }
   }
   .selected {
-    background: #f2f5ff;
-    background: light-dark(#f2f5ff, #13214a);
+    background: var(--tickets-background);
+    background: var(--tickets-info-soft);
   }
   p {
     font-size: 12px;

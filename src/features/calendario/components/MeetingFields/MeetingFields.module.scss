@@ -104,7 +104,7 @@
   color: var(--tickets-text-muted);
   font-size: 12px;
   &[data-ok] {
-    color: var(--tickets-success, #1f7a4d);
+    color: var(--tickets-success);
   }
 }
 .people {
@@ -175,7 +175,7 @@
 .join {
   border: 0;
   background: var(--tickets-primary-fill);
-  color: #fff;
+  color: var(--tickets-on-primary);
   &:hover {
     filter: brightness(1.06);
   }

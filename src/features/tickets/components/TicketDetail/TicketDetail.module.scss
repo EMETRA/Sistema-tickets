@@ -173,8 +173,8 @@
 }
 .error {
   padding: 14px 18px;
-  border: 1px solid #f0cbd2;
-  border: 1px solid light-dark(#f0cbd2, #2a3449);
+  border: 1px solid color-mix(in srgb, var(--tickets-danger) 25%, var(--tickets-surface));
+  border: 1px solid color-mix(in srgb, var(--tickets-danger) 25%, var(--tickets-surface));
   border-radius: 10px;
   background: var(--tickets-danger-soft);
   color: var(--tickets-danger);

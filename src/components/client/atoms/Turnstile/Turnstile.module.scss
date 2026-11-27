@@ -26,8 +26,8 @@
 .loadError {
   margin: 0 0 0.5rem;
   font-size: 0.75rem;
-  color: #b42318;
-  color: light-dark(#b42318, #ee928b);
+  color: var(--tickets-danger);
+  color: var(--tickets-danger);
   text-align: center;
 }
 

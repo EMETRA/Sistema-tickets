@@ -29,8 +29,8 @@
 }
 
 .contentContainer {
-  border: 1px solid #edf0f2;
-  border: 1px solid light-dark(#edf0f2, #2a3449);
+  border: 1px solid var(--tickets-divider);
+  border: 1px solid var(--tickets-border);
   border-radius: 16px;
   padding: 24px;
 }
@@ -46,7 +46,7 @@
   text-align: center;
   padding: 5px 26px;
   margin-bottom: 16px;
-  border-bottom: 2px solid #a9a9a9;
+  border-bottom: 2px solid var(--tickets-border-strong);
   gap: 16px;
 }
 
@@ -66,8 +66,8 @@
   flex-direction: row;
   align-items: center;
   gap: 4px;
-  border-top: 2px solid #a9a9a9;
-  border-bottom: 2px solid #a9a9a9;
+  border-top: 2px solid var(--tickets-border-strong);
+  border-bottom: 2px solid var(--tickets-border-strong);
 }
 
 .fieldLabel {
@@ -88,7 +88,7 @@
   gap: 16px;
   text-align: center;
   padding: 36px 26px;
-  background-color: #d9d9d9;
+  background-color: var(--tickets-neutral-soft);
 }
 
 .signature {

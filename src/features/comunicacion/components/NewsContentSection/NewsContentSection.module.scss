@@ -7,8 +7,8 @@
   padding: 1rem;
   border: 1px solid var(--tickets-border);
   border-radius: 0.5rem;
-  background-color: #f9fafc;
-  background-color: light-dark(#f9fafc, #131f38);
+  background-color: var(--tickets-surface-subtle);
+  background-color: var(--tickets-surface-subtle);
   font-family: var(--font-montserrat), sans-serif;
 }
 

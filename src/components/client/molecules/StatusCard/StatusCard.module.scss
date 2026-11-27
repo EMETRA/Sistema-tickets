@@ -1,7 +1,7 @@
 .StatusCard {
   background: var(--tickets-surface);
-  border: 2px solid #e5e5e5;
-  border: 2px solid light-dark(#e5e5e5, #2a3449);
+  border: 2px solid var(--tickets-border);
+  border: 2px solid var(--tickets-border);
   border-radius: 10px;
   border-top-width: 4px;
   padding: 2rem 1.5rem;
@@ -12,7 +12,7 @@
 }
 
 .green {
-  border-top-color: #4a7c3f;
+  border-top-color: var(--tickets-success);
 }
 
 .yellow {
@@ -20,11 +20,11 @@
 }
 
 .red {
-  border-top-color: #b53a3a;
+  border-top-color: var(--tickets-danger);
 }
 
 .blue {
-  border-top-color: #1700a5;
+  border-top-color: var(--paleta-azul-1);
 }
 
 .label {

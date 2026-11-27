@@ -103,7 +103,7 @@
     }
     &[data-selected] {
       background: var(--tickets-primary-fill);
-      color: #fff;
+      color: var(--tickets-on-primary);
       font-weight: 700;
       &::after {
         background: var(--tickets-surface);
@@ -142,7 +142,7 @@
   gap: 6px;
   border-radius: 8px;
   background: var(--tickets-primary-fill);
-  color: #fff;
+  color: var(--tickets-on-primary);
   font-weight: 600;
   text-decoration: none;
   &:hover {

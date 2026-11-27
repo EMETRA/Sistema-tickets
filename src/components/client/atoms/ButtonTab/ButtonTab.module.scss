@@ -23,19 +23,19 @@
 
   &.selected {
     background-color: var(--tickets-surface) !important;
-    color: #000000 !important;
+    color: var(--tickets-text) !important;
 
     svg {
-      color: #000000 !important;
+      color: var(--tickets-text) !important;
     }
   }
 
   &.unselected {
     background-color: transparent !important;
-    color: #a9a9a9 !important;
+    color: var(--tickets-text-muted) !important;
 
     svg {
-      color: #a9a9a9 !important;
+      color: var(--tickets-text-muted) !important;
     }
 
     &:hover:not(:disabled) {

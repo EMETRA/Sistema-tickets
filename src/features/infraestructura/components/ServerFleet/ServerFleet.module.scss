@@ -56,8 +56,8 @@
     border-color 0.15s ease,
     box-shadow 0.15s ease;
   &:hover {
-    border-color: #b8c5f5;
-    border-color: light-dark(#b8c5f5, #2a3449);
+    border-color: color-mix(in srgb, var(--tickets-primary) 35%, var(--tickets-surface));
+    border-color: color-mix(in srgb, var(--tickets-primary) 35%, var(--tickets-surface));
     box-shadow: 0 8px 24px #1a2b4a14;
   }
   &:focus-visible {

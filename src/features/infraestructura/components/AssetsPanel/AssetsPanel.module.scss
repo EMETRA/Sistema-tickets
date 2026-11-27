@@ -45,8 +45,8 @@
     color: var(--tickets-text-muted);
   }
   &:hover {
-    border-color: #b8c5f5;
-    border-color: light-dark(#b8c5f5, #2a3449);
+    border-color: color-mix(in srgb, var(--tickets-primary) 35%, var(--tickets-surface));
+    border-color: color-mix(in srgb, var(--tickets-primary) 35%, var(--tickets-surface));
     box-shadow: 0 8px 22px #1a2b4a12;
   }
   &:focus-visible {
@@ -104,7 +104,7 @@
 .apply {
   border-color: var(--tickets-primary);
   background: var(--tickets-primary-fill);
-  color: #fff;
+  color: var(--tickets-on-primary);
   &:hover:not(:disabled) {
     background: var(--tickets-primary-hover);
   }
@@ -196,8 +196,8 @@
   gap: 6px;
   button {
     padding: 4px 10px;
-    border: 1px solid #c7d2fb;
-    border: 1px solid light-dark(#c7d2fb, #2a3449);
+    border: 1px solid color-mix(in srgb, var(--tickets-primary) 35%, var(--tickets-surface));
+    border: 1px solid color-mix(in srgb, var(--tickets-primary) 35%, var(--tickets-surface));
     border-radius: 999px;
     background: var(--tickets-primary-soft);
     font: inherit;
@@ -336,8 +336,8 @@
   &[data-tone="danger"] {
     --tone: var(--tickets-danger);
     background: color-mix(in srgb, var(--tickets-danger) 7%, var(--tickets-surface));
-    border-color: #f6d9de;
-    border-color: light-dark(#f6d9de, #2a3449);
+    border-color: var(--tickets-border);
+    border-color: color-mix(in srgb, var(--tickets-danger) 25%, var(--tickets-surface));
   }
   &[data-tone="warning"] {
     --tone: #d99a1e;
@@ -399,8 +399,8 @@
     box-shadow: inset 3px 0 0 var(--tickets-danger);
   }
   &:hover {
-    border-color: #b8c5f5;
-    border-color: light-dark(#b8c5f5, #2a3449);
+    border-color: color-mix(in srgb, var(--tickets-primary) 35%, var(--tickets-surface));
+    border-color: color-mix(in srgb, var(--tickets-primary) 35%, var(--tickets-surface));
     box-shadow: 0 6px 16px #1a2b4a12;
   }
   &:focus-visible {

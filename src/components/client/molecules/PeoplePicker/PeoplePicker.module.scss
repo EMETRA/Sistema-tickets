@@ -38,8 +38,8 @@
     cursor: pointer;
     &:hover,
     &:focus-visible {
-      background: var(--tickets-danger-soft, #fdecec);
-      color: var(--tickets-danger, #b42318);
+      background: var(--tickets-danger-soft);
+      color: var(--tickets-danger);
     }
   }
   &:not(:has(button)) {

@@ -13,8 +13,8 @@
   gap: 6px;
   padding: 6px 10px;
   min-height: 38px;
-  border: 2px solid #edf0f2;
-  border: 2px solid light-dark(#edf0f2, #2a3449);
+  border: 2px solid var(--tickets-divider);
+  border: 2px solid var(--tickets-border);
   border-radius: 8px;
   background-color: var(--tickets-surface);
   cursor: pointer;
@@ -29,12 +29,12 @@
     }
 
     &:focus-visible {
-      border-color: #6366f1;
+      border-color: var(--tickets-primary);
       box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
     }
 
     &.inputBoxOpen {
-      border-color: #6366f1;
+      border-color: var(--tickets-primary);
       box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
     }
   }
@@ -47,7 +47,7 @@
 .placeholder {
   font-size: 13px;
   font-family: var(--font-montserrat), sans-serif;
-  color: #9ca3af;
+  color: var(--tickets-text-muted);
   pointer-events: none;
   user-select: none;
 }
@@ -63,8 +63,8 @@
   padding: 4px;
   list-style: none;
   background-color: var(--tickets-surface);
-  border: 2px solid #edf0f2;
-  border: 2px solid light-dark(#edf0f2, #2a3449);
+  border: 2px solid var(--tickets-divider);
+  border: 2px solid var(--tickets-border);
   border-radius: 8px;
   box-shadow:
     0 4px 6px -1px rgba(0, 0, 0, 0.07),
@@ -86,14 +86,14 @@
   }
 
   &:focus-visible {
-    background-color: #eff6ff;
-    background-color: light-dark(#eff6ff, #13294a);
+    background-color: var(--tickets-background);
+    background-color: var(--tickets-info-soft);
   }
 }
 
 // --- Empty state ---
 .empty {
   font-size: 15px;
-  color: #9ca3af;
+  color: var(--tickets-text-muted);
   font-family: var(--font-montserrat), sans-serif;
 }

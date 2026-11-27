@@ -44,13 +44,13 @@
   }
 
   &.selected {
-    background-color: #e0e0e0;
-    background-color: light-dark(#e0e0e0, #111722);
+    background-color: var(--tickets-neutral-soft);
+    background-color: var(--tickets-background);
   }
 
   &:hover {
-    background-color: #f0f0f0;
-    background-color: light-dark(#f0f0f0, #131926);
+    background-color: var(--tickets-neutral-soft);
+    background-color: var(--tickets-background);
   }
 }
 

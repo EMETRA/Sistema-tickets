@@ -64,7 +64,7 @@
   border: 1px solid var(--tickets-primary);
   border-radius: 9px;
   background: var(--tickets-primary-fill);
-  color: #fff;
+  color: var(--tickets-on-primary);
   cursor: pointer;
   &:hover {
     background: var(--tickets-primary-hover);

@@ -24,29 +24,29 @@
   color: var(--tickets-text-secondary);
 }
 .asignado {
-  background: #fff1d1;
+  background: var(--tickets-warning-soft);
   background: light-dark(#fff1d1, #5c4a1f);
   color: var(--tickets-warning);
-  color: light-dark(#80540d, #eec88b);
+  color: var(--tickets-warning);
 }
 .en_trabajo,
 .en_atencion {
   background: var(--tickets-primary-soft);
-  color: #3453b7;
-  color: light-dark(#3453b7, #98a9e2);
+  color: var(--tickets-info);
+  color: var(--tickets-info);
 }
 .completado,
 .resuelto {
-  background: #e5f5eb;
-  background: light-dark(#e5f5eb, #12342f);
-  color: #176b43;
+  background: var(--tickets-success-soft);
+  background: var(--tickets-success-soft);
+  color: var(--tickets-success);
   color: light-dark(#176b43, #92e8bf);
 }
 .cancelado {
-  background: #fff0f2;
-  background: light-dark(#fff0f2, #37192b);
-  color: #a33146;
-  color: light-dark(#a33146, #e099a6);
+  background: var(--tickets-danger-soft);
+  background: var(--tickets-danger-soft);
+  color: var(--tickets-danger);
+  color: var(--tickets-danger);
 }
 .outlined {
   background: transparent;
@@ -54,7 +54,7 @@
   border: 1px solid var(--tickets-border);
   &.active {
     background: var(--tickets-primary-fill);
-    color: #fff;
+    color: var(--tickets-on-primary);
     border-color: var(--tickets-primary);
   }
 }

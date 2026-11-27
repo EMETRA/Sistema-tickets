@@ -80,7 +80,7 @@
     color: var(--accent);
     // En oscuro, el color del área se aclara para leerse sobre el fondo (≥ 4.5:1).
     :global([data-theme="dark"]) & {
-      color: color-mix(in srgb, var(--accent), #fff 45%);
+      color: color-mix(in srgb, var(--accent), var(--tickets-on-primary) 45%);
     }
   }
 }
@@ -91,7 +91,7 @@
   height: 38px;
   border-radius: 10px;
   background: var(--accent);
-  color: #fff;
+  color: var(--tickets-on-primary);
   --workspace-icon-accent: #ffffff33;
 }
 .arrow {
@@ -132,7 +132,7 @@
       color: var(--accent);
       // En oscuro, el color del área se aclara para leerse sobre el fondo (≥ 4.5:1).
       :global([data-theme="dark"]) & {
-        color: color-mix(in srgb, var(--accent), #fff 45%);
+        color: color-mix(in srgb, var(--accent), var(--tickets-on-primary) 45%);
       }
     }
   }
@@ -147,7 +147,7 @@
   color: var(--accent);
   // En oscuro, el color del área se aclara para leerse sobre el fondo (≥ 4.5:1).
   :global([data-theme="dark"]) & {
-    color: color-mix(in srgb, var(--accent), #fff 45%);
+    color: color-mix(in srgb, var(--accent), var(--tickets-on-primary) 45%);
   }
   text-decoration: none;
   &:hover {

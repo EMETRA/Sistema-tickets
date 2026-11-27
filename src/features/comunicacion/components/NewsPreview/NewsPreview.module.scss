@@ -39,8 +39,8 @@
   font-size: 0.6875rem;
   font-weight: 600;
   background-color: $amarillo-10;
-  color: #8a6100;
-  color: light-dark(#8a6100, #eed18b);
+  color: var(--tickets-warning);
+  color: var(--tickets-warning);
 }
 
 // ============================================

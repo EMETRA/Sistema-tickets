@@ -19,7 +19,7 @@
   letter-spacing: 1px;
 } // Sidebar
 .navLabel {
-  color: #ffffff;
+  color: var(--tickets-on-primary);
   font-size: 10px;
   font-weight: 600;
   text-transform: uppercase; // Para "INICIO" y "CREAR TICKET"

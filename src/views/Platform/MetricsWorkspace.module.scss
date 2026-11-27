@@ -140,7 +140,7 @@
     --part: #177849;
   }
   [data-part="atencion"] {
-    --part: #4361ee;
+    --part: var(--paleta-azul-5);
   }
   [data-part="asignados"] {
     --part: #d99a1e;

@@ -1,6 +1,6 @@
 .divider {
-  background-color: #e5e7eb;
-  background-color: light-dark(#e5e7eb, #121b2f); // Un gris claro estándar de UI
+  background-color: var(--tickets-neutral-soft);
+  background-color: var(--tickets-background); // Un gris claro estándar de UI
   border: none;
 }
 

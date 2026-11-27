@@ -22,8 +22,8 @@
   transition: background-color 0.2s ease;
 
   &.selected {
-    background-color: #f0f4ff;
-    background-color: light-dark(#f0f4ff, #13224a);
+    background-color: var(--tickets-surface-disabled);
+    background-color: var(--tickets-info-soft);
   }
 }
 

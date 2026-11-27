@@ -4,8 +4,8 @@
   align-items: center;
   gap: 16px;
   padding: 14px 32px;
-  background: #fff8e8;
-  background: light-dark(#fff8e8, #3c3525);
+  background: var(--tickets-warning-soft);
+  background: var(--tickets-warning-soft);
   border-bottom: 1px solid #eddca7;
   color: #4c431f;
   color: light-dark(#4c431f, #d9cda1);
@@ -87,7 +87,7 @@
 .reviewNote {
   margin-top: 16px;
   padding: 16px;
-  background: var(--tickets-surface-subtle, #f7f9fd);
+  background: var(--tickets-surface-subtle);
   border-radius: 8px;
   font-size: 13px;
   overflow-wrap: anywhere;
@@ -96,9 +96,9 @@
   padding: 14px;
   border: 1px solid #badac8;
   border-radius: 8px;
-  background: #f0faf4;
-  background: light-dark(#f0faf4, #13312f);
-  color: #1e6140;
+  background: var(--tickets-background);
+  background: var(--tickets-success-soft);
+  color: var(--tickets-success);
   color: light-dark(#1e6140, #9ae0bd);
 }
 .formGrid {
@@ -162,7 +162,7 @@
   height: 17px;
   border-radius: 12px;
   background: #d44242;
-  color: #fff;
+  color: var(--tickets-on-primary);
   font-size: 10px;
   display: grid;
   place-items: center;

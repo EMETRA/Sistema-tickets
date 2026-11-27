@@ -37,7 +37,7 @@
 .avatarOverlap {
   margin-top: -60px;
   border-width: 2px !important;
-  border-color: #ffffff !important;
+  border-color: var(--tickets-divider) !important;
   background-color: var(--tickets-surface);
 }
 
@@ -50,13 +50,13 @@
   .userName {
     font-size: 24px;
     font-weight: 700;
-    color: #333333;
-    color: light-dark(#333333, #e5eaf5);
+    color: var(--tickets-text);
+    color: var(--tickets-text);
     margin: 0;
   }
 
   .userRole {
-    color: #999999;
+    color: var(--tickets-text-muted);
     font-size: 14px;
     margin: 0;
   }

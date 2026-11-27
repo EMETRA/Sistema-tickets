@@ -15,14 +15,14 @@
   }
 
   &.active {
-    background-color: #f0f2f5;
-    background-color: light-dark(#f0f2f5, #131e32);
+    background-color: var(--tickets-neutral-soft);
+    background-color: var(--tickets-surface-subtle);
   }
 }
 
 .name {
-  color: #333333;
-  color: light-dark(#333333, #e5eaf5);
+  color: var(--tickets-text);
+  color: var(--tickets-text);
   font-weight: 500;
   margin: 0;
   white-space: nowrap;

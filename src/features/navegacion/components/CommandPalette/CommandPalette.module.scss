@@ -34,7 +34,7 @@
     font-size: 15px;
     color: var(--tickets-text);
     &::placeholder {
-      color: #98a5b8;
+      color: var(--tickets-text-muted);
     }
   }
 }

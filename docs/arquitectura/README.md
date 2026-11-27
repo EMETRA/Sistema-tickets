@@ -8,11 +8,22 @@
 | Formularios (react-hook-form + zod) | [formularios.md](formularios.md) |
 | Accesibilidad verificada (Playwright + axe, Storybook) | [accesibilidad.md](accesibilidad.md) |
 
+## Colores
+
+Los estilos usan los tokens del tema (`var(--tickets-text)`, `var(--tickets-border)`, …): así siguen al
+modo oscuro y al alto contraste sin `light-dark()` ni reglas por tema en cada archivo. Para un tono
+intermedio usa `color-mix()` sobre tokens, por ejemplo
+`color-mix(in srgb, var(--tickets-primary) 35%, var(--tickets-surface))`.
+
+Quedan colores heredados (gráficas, transparencias, módulos antiguos). `scripts/tokens/colores-base.json`
+guarda cuántos tiene cada archivo; `pnpm tokens:check` falla si alguno suma más. Al quitar colores,
+`node scripts/tokens/colores.cjs --base` fija la nueva base.
+
 ## Comandos de calidad (los mismos que corre CI)
 
 ```bash
 pnpm format:check      # Prettier
-pnpm tokens:check      # tokens.css y colors.scss generados al día
+pnpm tokens:check      # tokens.css y colors.scss al día; ningún archivo suma colores escritos a mano
 pnpm lint              # ESLint (incluye la frontera sistema de diseño ↔ áreas)
 pnpm typecheck         # TypeScript
 pnpm test:integracion  # pruebas de Node

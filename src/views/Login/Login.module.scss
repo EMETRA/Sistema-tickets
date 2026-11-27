@@ -37,8 +37,8 @@
 }
 .errorText {
   color: var(--tickets-danger);
-  background: #fcecee;
-  background: light-dark(#fcecee, #31192a);
+  background: var(--tickets-danger-soft);
+  background: var(--tickets-danger-soft);
   border: 1px solid #f0cdd3;
   border: 1px solid light-dark(#f0cdd3, #2a3449);
   border-radius: 9px;
@@ -67,9 +67,9 @@
   gap: 8px;
 }
 .activationSuccess {
-  background: #edf8f1;
-  background: light-dark(#edf8f1, #132f2e);
-  color: #166946;
+  background: var(--tickets-success-soft);
+  background: var(--tickets-success-soft);
+  color: var(--tickets-success);
   color: light-dark(#166946, #91e8c3);
   padding: 10px 12px;
   border-radius: 8px;

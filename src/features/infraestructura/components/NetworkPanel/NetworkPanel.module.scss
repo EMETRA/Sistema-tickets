@@ -164,7 +164,7 @@
 // Tinte por clase, compartido por el mapa y el inspector.
 .node,
 .glyph {
-  --tint: #4361ee;
+  --tint: var(--paleta-azul-5);
   &[data-class="ROUTER"] {
     --tint: #7048c8;
   }
@@ -318,7 +318,7 @@
     &[data-state="used"] {
       border-color: transparent;
       background: var(--medium);
-      color: #fff;
+      color: var(--tickets-on-primary);
     }
     &[data-state="inactive"] {
       border-style: dashed;

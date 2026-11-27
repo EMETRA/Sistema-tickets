@@ -92,7 +92,7 @@
 
     &:hover:not(:disabled) {
       background-color: color-mix(in srgb, #{$gris-1} 30%, transparent);
-      color: color-mix(in srgb, #{$gris-1}, #000 50%);
+      color: color-mix(in srgb, #{$gris-1}, var(--tickets-text) 50%);
     }
 
     &:active:not(:disabled) {

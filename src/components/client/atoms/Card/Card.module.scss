@@ -3,10 +3,10 @@
   flex-direction: column;
   padding: 22px;
   min-width: 0;
-  background: var(--tickets-surface, #fff);
+  background: var(--tickets-surface);
   box-shadow: var(--tickets-shadow);
   border-radius: var(--tickets-radius, 14px);
-  border: 1px solid var(--tickets-border, #dfe5f2);
+  border: 1px solid var(--tickets-border);
 }
 
 .defaultCard {

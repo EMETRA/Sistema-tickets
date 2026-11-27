@@ -6,8 +6,8 @@
 
 .card {
   background: var(--tickets-surface);
-  border: 2px solid #e5e5e5;
-  border: 2px solid light-dark(#e5e5e5, #2a3449);
+  border: 2px solid var(--tickets-border);
+  border: 2px solid var(--tickets-border);
   border-radius: 12px;
   padding: 2rem;
   display: flex;
@@ -20,8 +20,8 @@
 }
 
 .tableContainer {
-  border: 2px solid #e5e5e5;
-  border: 2px solid light-dark(#e5e5e5, #2a3449);
+  border: 2px solid var(--tickets-border);
+  border: 2px solid var(--tickets-border);
   border-radius: 8px;
   overflow: hidden;
 }

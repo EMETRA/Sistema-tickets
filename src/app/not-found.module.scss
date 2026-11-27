@@ -4,7 +4,7 @@
   align-items: center;
   justify-content: center;
   padding: 2rem;
-  background: var(--color-background, #f5f6f8);
+  background: var(--color-background, var(--tickets-background));
 }
 
 .content {

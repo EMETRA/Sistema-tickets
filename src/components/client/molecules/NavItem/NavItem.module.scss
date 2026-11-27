@@ -8,18 +8,18 @@
   border: 0;
   border-radius: var(--tickets-control-radius, 9px);
   background: transparent;
-  color: var(--tickets-text-secondary, #61728b);
+  color: var(--tickets-text-secondary);
   text-align: left;
   cursor: pointer;
   text-decoration: none;
   font: inherit;
   transition: background 0.15s;
   &:hover {
-    background: var(--tickets-primary-soft, #edf1ff);
+    background: var(--tickets-primary-soft);
   }
   &.active {
     background: var(--tickets-primary-fill);
-    color: #fff;
+    color: var(--tickets-on-primary);
   }
 }
 .label {

@@ -6,8 +6,8 @@
   gap: 18px;
 }
 .error {
-  border: 1px solid #f0cbd2;
-  border: 1px solid light-dark(#f0cbd2, #2a3449);
+  border: 1px solid color-mix(in srgb, var(--tickets-danger) 25%, var(--tickets-surface));
+  border: 1px solid color-mix(in srgb, var(--tickets-danger) 25%, var(--tickets-surface));
   border-radius: 10px;
   background: var(--tickets-danger-soft);
   color: var(--tickets-danger);
@@ -28,8 +28,8 @@
   border: 1px solid #c8e8d5;
   border: 1px solid light-dark(#c8e8d5, #2a3449);
   border-radius: 10px;
-  background: #eff9f3;
-  background: light-dark(#eff9f3, #132f2f);
+  background: var(--tickets-success-soft);
+  background: var(--tickets-success-soft);
   color: var(--tickets-success);
   padding: 14px 18px;
   font-size: 12px;

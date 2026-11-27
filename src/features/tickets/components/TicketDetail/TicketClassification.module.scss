@@ -9,10 +9,10 @@
     margin-top: 12px;
   }
   [role="alert"] {
-    background: #fff4f6;
-    background: light-dark(#fff4f6, #37192c);
-    color: #ac274b;
-    color: light-dark(#ac274b, #e693aa);
+    background: var(--tickets-background);
+    background: var(--tickets-danger-soft);
+    color: var(--tickets-danger);
+    color: var(--tickets-danger);
     padding: 12px;
     border-radius: 8px;
     overflow-wrap: anywhere;

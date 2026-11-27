@@ -37,8 +37,8 @@
 
 .divider {
   width: 1px;
-  background-color: #e0e0e0;
-  background-color: light-dark(#e0e0e0, #111722);
+  background-color: var(--tickets-neutral-soft);
+  background-color: var(--tickets-background);
   align-self: stretch;
 }
 

@@ -16,7 +16,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "tokens": "node scripts/tokens/generar.cjs",
-    "tokens:check": "node scripts/tokens/generar.cjs --check",
+    "tokens:check": "node scripts/tokens/generar.cjs --check && node scripts/tokens/colores.cjs --check",
     "e2e": "playwright test",
     "e2e:instalar": "playwright install --with-deps chromium",
     "contrato": "node scripts/sincronizar-definiciones.cjs ${API_TICKETS_DIR:-../../apis/api-tickets} --check && node scripts/contrato-api.cjs ${API_TICKETS_DIR:-../../apis/api-tickets} && node scripts/contrato-graphql.cjs ${API_TICKETS_DIR:-../../apis/api-tickets}"

@@ -74,8 +74,8 @@
       var(--tickets-shadow);
   }
   &:hover {
-    border-color: #b8c5f5;
-    border-color: light-dark(#b8c5f5, #2a3449);
+    border-color: color-mix(in srgb, var(--tickets-primary) 35%, var(--tickets-surface));
+    border-color: color-mix(in srgb, var(--tickets-primary) 35%, var(--tickets-surface));
     box-shadow: 0 8px 24px #1a2b4a14;
     transform: translateY(-1px);
   }
@@ -102,7 +102,7 @@
   flex-shrink: 0;
   border-radius: 11px;
   background: linear-gradient(135deg, var(--tickets-primary), #2f47c8);
-  color: #fff;
+  color: var(--tickets-on-primary);
   font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.5px;

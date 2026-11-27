@@ -41,7 +41,7 @@
   flex-shrink: 0;
   border-radius: 10px;
   background: linear-gradient(135deg, var(--tickets-primary), #2f47c8);
-  color: #fff;
+  color: var(--tickets-on-primary);
   font-weight: 700;
   font-size: 16px;
   box-shadow:
@@ -163,7 +163,7 @@
   }
   &[aria-current="page"] {
     background: var(--tickets-primary-fill);
-    color: #fff;
+    color: var(--tickets-on-primary);
     --workspace-icon-accent: #ffffff26;
   }
   &:focus-visible {
@@ -193,7 +193,7 @@
   padding: 1px 6px;
   border-radius: 999px;
   background: var(--tickets-danger);
-  color: #fff;
+  color: var(--tickets-on-primary);
   font-size: 10px;
   font-weight: 700;
   text-align: center;
@@ -215,7 +215,7 @@
   flex-shrink: 0;
   border-radius: 6px;
   background: var(--accent);
-  color: #fff;
+  color: var(--tickets-on-primary);
   --workspace-icon-accent: #ffffff33;
 }
 .inside:not([aria-current="page"]) {

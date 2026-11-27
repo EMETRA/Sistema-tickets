@@ -17,7 +17,7 @@
   padding: 3px;
   gap: 2px;
   border-radius: 10px;
-  background: var(--tickets-neutral-soft, #eef1f6);
+  background: var(--tickets-neutral-soft);
   button {
     border: 0;
     background: none;
@@ -37,7 +37,7 @@
       background: color-mix(in srgb, var(--tickets-surface) 85%, transparent);
     }
     &[aria-pressed="true"] {
-      background: var(--tickets-surface, #fff);
+      background: var(--tickets-surface);
       color: var(--tickets-text);
       font-weight: 600;
       box-shadow: 0 1px 2px #1a2b4a1f;

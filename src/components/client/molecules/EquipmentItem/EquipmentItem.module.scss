@@ -30,16 +30,16 @@
 
 .title {
   font-weight: 400;
-  color: #333333;
-  color: light-dark(#333333, #e5eaf5);
+  color: var(--tickets-text);
+  color: var(--tickets-text);
   margin-top: 1px;
   font-size: 15px;
 }
 
 .description {
   font-weight: 550;
-  color: #333333;
-  color: light-dark(#333333, #e5eaf5);
+  color: var(--tickets-text);
+  color: var(--tickets-text);
   font-size: 15px;
   margin: 0;
   white-space: nowrap;

@@ -86,3 +86,14 @@ test("recuperación y colocación CCT aplican las reglas del API", () => {
     assert.match(errores({ fecha: "2999-01-01T00:00" }).fecha, /posterior a la hora actual/);
     assert.match(errores({ observaciones: "x".repeat(301) }).observaciones, /hasta 300/);
 });
+
+test("el nombre de un registro se mide en bytes como VARCHAR2(200 BYTE)", () => {
+    const { texto, utf8Bytes } = load("src/platform/forms.ts");
+    const nombre = texto("Nombre", { requerido: true, max: 200, bytes: 200 });
+    assert.equal(utf8Bytes("Peñón"), 7);
+    assert.equal(nombre.safeParse("a".repeat(200)).success, true);
+    const r = nombre.safeParse("á".repeat(150));
+    assert.equal(r.success, false);
+    assert.match(r.error.issues[0].message, /tilde o ñ cuentan como dos/);
+    assert.equal(nombre.safeParse("   ").success, false);
+});

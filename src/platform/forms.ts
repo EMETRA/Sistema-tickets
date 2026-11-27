@@ -23,10 +23,22 @@ export const mensajes = {
     enlace: (label: string) => `Pega el enlace completo en «${label}» (empieza con https://).`,
 };
 
-/** Texto obligatorio u opcional, sin espacios sobrantes. */
-export function texto(label: string, { requerido = false, max = 200 } = {}) {
+/** Bytes UTF-8 de un texto (las columnas VARCHAR2(n BYTE) cuentan una tilde o ñ como dos). */
+export const utf8Bytes = (value: string) => new TextEncoder().encode(value).length;
+
+/**
+ * Texto obligatorio u opcional, sin espacios sobrantes. Con `bytes`, también se mide en bytes UTF-8,
+ * como el API para columnas VARCHAR2(n BYTE).
+ */
+export function texto(label: string, { requerido = false, max = 200, bytes = 0 } = {}) {
     const base = z.string().trim().max(max, mensajes.maximo(label, max));
-    return requerido ? base.min(1, mensajes.requerido(label)) : base;
+    const medido = bytes
+        ? base.refine(
+              (v) => utf8Bytes(v) <= bytes,
+              `«${label}» admite hasta ${bytes} caracteres (las letras con tilde o ñ cuentan como dos).`,
+          )
+        : base;
+    return requerido ? medido.refine((v) => v.length > 0, mensajes.requerido(label)) : medido;
 }
 
 /** Valor vacío ("", solo espacios o null) → undefined, para tratarlo como «sin dato» (como el API). */

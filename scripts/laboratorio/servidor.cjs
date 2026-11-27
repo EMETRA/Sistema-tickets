@@ -173,7 +173,9 @@ function validate(type, data, { request = false } = {}) {
   if (request && Object.keys(data).some((k) => !allowed.includes(k)))
     fail(400, "La solicitud contiene campos no permitidos");
   const nombre = String(data.nombre || "").trim();
-  if (!nombre || nombre.length > 200) fail(400, "Ingresa un nombre de hasta 200 caracteres");
+  // Como el API: NOMBRE es VARCHAR2(200 BYTE), se mide en bytes UTF-8.
+  if (!nombre || Buffer.byteLength(nombre, "utf8") > 200)
+    fail(400, "Ingresa un nombre de hasta 200 caracteres (las letras con tilde o ñ cuentan como dos)");
   data.nombre = nombre;
   if (!data.equipoId && !["equipos", "modulos"].includes(type))
     fail(400, "Selecciona el equipo de trabajo");

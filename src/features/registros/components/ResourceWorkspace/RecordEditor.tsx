@@ -21,7 +21,7 @@ import { PLATFORM_SECTIONS } from "@/platform/navigation";
 /** Valida nombre y datos con zod; devuelve { campo: mensaje } (vacío si todo está bien). */
 function validateRecord(values: { nombre: string; datos: Record<string, unknown> }, fields: Field[]) {
     const result = z
-        .object({ nombre: texto("Nombre", { requerido: true, max: 200 }), datos: esquemaDatos(fields) })
+        .object({ nombre: texto("Nombre", { requerido: true, max: 200, bytes: 200 }), datos: esquemaDatos(fields) })
         .safeParse(values);
     if (result.success) return {};
     const problems: Record<string, string> = {};
